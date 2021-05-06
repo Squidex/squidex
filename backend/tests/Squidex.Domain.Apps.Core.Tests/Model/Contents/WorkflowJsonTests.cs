@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             var serialized = workflow.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(workflow);
+            Assert.Equal(workflow, serialized);
         }
 
         [Fact]
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             var serialized = workflow.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(workflow);
+            Assert.Equal(workflow, serialized);
         }
 
         [Fact]
@@ -58,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             var serialized = jsonStep.SerializeAndDeserialize<WorkflowStep>();
 
-            serialized.Should().BeEquivalentTo(new WorkflowStep(null, null, NoUpdate.Always));
+            Assert.Equal(new WorkflowStep(null, null, NoUpdate.Always), serialized);
         }
 
         [Fact]
@@ -68,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             var serialized = step.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(step);
+            Assert.Equal(step, serialized);
         }
 
         [Fact]

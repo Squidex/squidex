@@ -202,33 +202,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void OrderedHashCode_should_return_same_hash_codes_for_list_with_same_order()
-        {
-            var collection1 = new[] { 3, 5, 6 };
-            var collection2 = new[] { 3, 5, 6 };
-
-            Assert.Equal(collection2.OrderedHashCode(), collection1.OrderedHashCode());
-        }
-
-        [Fact]
-        public void OrderedHashCode_should_return_different_hash_codes_for_list_with_different_items()
-        {
-            var collection1 = new[] { 3, 5, 6 };
-            var collection2 = new[] { 3, 4, 1 };
-
-            Assert.NotEqual(collection2.OrderedHashCode(), collection1.OrderedHashCode());
-        }
-
-        [Fact]
-        public void OrderedHashCode_should_return_same_hash_codes_for_list_with_different_order()
-        {
-            var collection1 = new[] { 3, 5, 6 };
-            var collection2 = new[] { 6, 5, 3 };
-
-            Assert.Equal(collection2.OrderedHashCode(), collection1.OrderedHashCode());
-        }
-
-        [Fact]
         public void EqualsDictionary_should_return_true_for_equal_dictionaries()
         {
             var lhs = new Dictionary<int, int>

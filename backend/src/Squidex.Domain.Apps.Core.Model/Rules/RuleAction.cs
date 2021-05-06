@@ -41,10 +41,5 @@ namespace Squidex.Domain.Apps.Core.Rules
         {
             yield break;
         }
-
-        public bool DeepEquals(RuleAction action)
-        {
-            return SimpleEquals.IsEquals(this, action);
-        }
     }
 }

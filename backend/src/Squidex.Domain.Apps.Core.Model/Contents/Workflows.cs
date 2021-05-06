@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public Workflows(Dictionary<DomainId, Workflow> inner)
+        public Workflows(IDictionary<DomainId, Workflow> inner)
             : base(inner)
         {
         }

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class Workflow
+    public sealed record Workflow
     {
         private const string DefaultName = "Unnamed";
 

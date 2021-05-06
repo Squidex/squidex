@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             var serialized = plan.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(plan);
+            Assert.Equal(plan, serialized);
         }
     }
 }

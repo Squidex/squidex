@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
         }
 
-        public AppClients(Dictionary<string, AppClient> inner)
+        public AppClients(IDictionary<string, AppClient> inner)
             : base(inner)
         {
         }

@@ -7,7 +7,6 @@
 
 using System;
 using System.Linq;
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             var serialized = fieldData.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(fieldData);
+            Assert.Equal(fieldData, serialized);
         }
 
         [Fact]

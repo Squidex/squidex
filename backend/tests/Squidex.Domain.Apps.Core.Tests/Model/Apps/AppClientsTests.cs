@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
 
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", "my-secret");
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret"));
+            Assert.Equal(new AppClient("2", "my-secret"), clients_1["2"]);
         }
 
         [Fact]
@@ -30,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", "my-secret", Role.Reader);
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret") with { Role = Role.Reader });
+            Assert.Equal(new AppClient("2", "my-secret") with { Role = Role.Reader }, clients_1["2"]);
         }
 
         [Fact]
@@ -46,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", role: Role.Reader);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { Role = Role.Reader });
+            Assert.Equal(new AppClient("1", "my-secret") with { Role = Role.Reader }, client_1["1"]);
         }
 
         [Fact]
@@ -54,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", name: "New-Name");
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("New-Name", "my-secret"));
+            Assert.Equal(new AppClient("New-Name", "my-secret"), client_1["1"]);
         }
 
         [Fact]
@@ -62,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", allowAnonymous: true);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { AllowAnonymous = true });
+            Assert.Equal(new AppClient("1", "my-secret") with { AllowAnonymous = true }, client_1["1"]);
         }
 
         [Fact]
@@ -70,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", apiCallsLimit: 1000);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { ApiCallsLimit = 1000 });
+            Assert.Equal(new AppClient("1", "my-secret") with { ApiCallsLimit = 1000 }, client_1["1"]);
         }
 
         [Fact]
@@ -78,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", apiTrafficLimit: 1000);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret") with { ApiTrafficLimit = 1000 });
+            Assert.Equal(new AppClient("1", "my-secret") with { ApiTrafficLimit = 1000 }, client_1["1"]);
         }
 
         [Fact]

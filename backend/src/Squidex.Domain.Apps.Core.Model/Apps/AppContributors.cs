@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
         }
 
-        public AppContributors(Dictionary<string, string> inner)
+        public AppContributors(IDictionary<string, string> inner)
             : base(inner)
         {
         }

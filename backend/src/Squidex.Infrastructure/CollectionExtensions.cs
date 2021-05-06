@@ -152,27 +152,6 @@ namespace Squidex.Infrastructure
             return hashCode;
         }
 
-        public static int OrderedHashCode<T>(this IEnumerable<T> collection) where T : notnull
-        {
-            return collection.OrderedHashCode(EqualityComparer<T>.Default);
-        }
-
-        public static int OrderedHashCode<T>(this IEnumerable<T> collection, IEqualityComparer<T> comparer) where T : notnull
-        {
-            Guard.NotNull(comparer, nameof(comparer));
-
-            var hashCodes = collection.Where(x => !Equals(x, null)).Select(x => x.GetHashCode()).OrderBy(x => x).ToArray();
-
-            var hashCode = 17;
-
-            foreach (var code in hashCodes)
-            {
-                hashCode = (hashCode * 23) + code;
-            }
-
-            return hashCode;
-        }
-
         public static int DictionaryHashCode<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary) where TKey : notnull
         {
             return DictionaryHashCode(dictionary, EqualityComparer<TKey>.Default, EqualityComparer<TValue>.Default);

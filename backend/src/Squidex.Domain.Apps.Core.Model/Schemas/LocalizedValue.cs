@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
         }
 
-        public LocalizedValue(Dictionary<string, T> inner)
+        public LocalizedValue(IDictionary<string, T> inner)
             : base(inner)
         {
         }

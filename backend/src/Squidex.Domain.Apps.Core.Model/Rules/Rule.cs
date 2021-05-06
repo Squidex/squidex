@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Rules
                 throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
             }
 
-            if (Trigger.DeepEquals(newTrigger))
+            if (Trigger.Equals(newTrigger))
             {
                 return this;
             }
