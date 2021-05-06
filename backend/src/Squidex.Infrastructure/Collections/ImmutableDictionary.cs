@@ -27,17 +27,36 @@ namespace Squidex.Infrastructure.Collections
 
         public static ImmutableDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(this Dictionary<TKey, TValue> source) where TKey : notnull
         {
+            if (source.Count == 0)
+            {
+                return Empty<TKey, TValue>();
+            }
+
             return new ImmutableDictionary<TKey, TValue>(source);
         }
 
         public static ImmutableDictionary<TKey, TValue> ToImmutableDictionary<TKey, TValue>(this IEnumerable<TValue> source, Func<TValue, TKey> keySelector) where TKey : notnull
         {
-            return new ImmutableDictionary<TKey, TValue>(source.ToDictionary(keySelector));
+            var inner = source.ToDictionary(keySelector);
+
+            if (inner.Count == 0)
+            {
+                return Empty<TKey, TValue>();
+            }
+
+            return new ImmutableDictionary<TKey, TValue>(inner);
         }
 
         public static ImmutableDictionary<TKey, TValue> ToImmutableDictionary<TSource, TKey, TValue>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TValue> elementSelector) where TKey : notnull
         {
-            return new ImmutableDictionary<TKey, TValue>(source.ToDictionary(keySelector, elementSelector));
+            var inner = source.ToDictionary(keySelector, elementSelector);
+
+            if (inner.Count == 0)
+            {
+                return Empty<TKey, TValue>();
+            }
+
+            return new ImmutableDictionary<TKey, TValue>(inner);
         }
     }
 }

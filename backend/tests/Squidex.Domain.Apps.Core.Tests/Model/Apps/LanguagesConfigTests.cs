@@ -128,6 +128,14 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
+        public void Should_return_same_language_if_already_added()
+        {
+            var config_1 = config_0.Set(Language.EN);
+
+            Assert.Same(config_1, config_0);
+        }
+
+        [Fact]
         public void Should_make_master_language()
         {
             var config =

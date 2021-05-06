@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class LanguageConfig
+    public sealed record LanguageConfig
     {
         public static readonly LanguageConfig Default = new LanguageConfig();
 

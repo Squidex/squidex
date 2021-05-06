@@ -138,21 +138,21 @@ namespace Squidex.Infrastructure
             var domainId_1_a = DomainId.Create("1");
             var domainId_1_b = DomainId.Create("1");
 
-            var domainId2_a = DomainId.Create("2");
+            var domainId_2_a = DomainId.Create("2");
 
             Assert.Equal(domainId_1_a, domainId_1_b);
             Assert.Equal(domainId_1_a.GetHashCode(), domainId_1_b.GetHashCode());
             Assert.True(domainId_1_a.Equals((object)domainId_1_b));
 
-            Assert.NotEqual(domainId_1_a, domainId2_a);
-            Assert.NotEqual(domainId_1_a.GetHashCode(), domainId2_a.GetHashCode());
-            Assert.False(domainId_1_a.Equals((object)domainId2_a));
+            Assert.NotEqual(domainId_1_a, domainId_2_a);
+            Assert.NotEqual(domainId_1_a.GetHashCode(), domainId_2_a.GetHashCode());
+            Assert.False(domainId_1_a.Equals((object)domainId_2_a));
 
             Assert.True(domainId_1_a == domainId_1_b);
-            Assert.True(domainId_1_a != domainId2_a);
+            Assert.True(domainId_1_a != domainId_2_a);
 
             Assert.False(domainId_1_a != domainId_1_b);
-            Assert.False(domainId_1_a == domainId2_a);
+            Assert.False(domainId_1_a == domainId_2_a);
         }
 
         [Fact]

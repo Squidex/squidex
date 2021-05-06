@@ -286,6 +286,73 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
+        public void EqualsList_should_return_true_for_equal_lists()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                1,
+                2
+            };
+
+            Assert.True(lhs.EqualsList(rhs));
+        }
+
+        [Fact]
+        public void EqualsList_should_return_false_for_different_sizes()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                1
+            };
+
+            Assert.False(lhs.EqualsList(rhs));
+        }
+
+        [Fact]
+        public void EqualsList_should_return_false_for_different_values()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                1,
+                3
+            };
+
+            Assert.False(lhs.EqualsList(rhs));
+        }
+
+        [Fact]
+        public void EqualsList_should_return_false_for_different_order()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                2,
+                1
+            };
+
+            Assert.False(lhs.EqualsList(rhs));
+        }
+
+        [Fact]
         public void Foreach_should_call_action_foreach_item_with_index()
         {
             var source = new List<int> { 3, 5, 1 };
