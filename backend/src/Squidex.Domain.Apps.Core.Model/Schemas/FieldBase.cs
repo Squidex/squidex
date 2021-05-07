@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class FieldBase<T> : Cloneable<T> where T : Cloneable
+    public abstract class FieldBase
     {
         public long Id { get; }
 

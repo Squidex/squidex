@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class RootField : FieldBase<RootField>, IRootField
+    public abstract class RootField : FieldBase, IRootField
     {
         public Partitioning Partitioning { get; }
 
@@ -110,5 +111,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public abstract T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
 
         public abstract RootField Update(FieldProperties newProperties);
+
+        protected RootField Clone(Action<RootField> updater)
+        {
+            var clone = (RootField)MemberwiseClone();
+
+            updater(clone);
+
+            return clone;
+        }
     }
 }

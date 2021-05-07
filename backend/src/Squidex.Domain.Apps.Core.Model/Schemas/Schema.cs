@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class Schema : Cloneable<Schema>
+    public sealed class Schema
     {
         private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
         private readonly string name;
@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             rules ??= FieldRules.Empty;
 
-            if (fieldRules.SetEquals(rules))
+            if (fieldRules.Equals(rules))
             {
                 return this;
             }
@@ -322,6 +322,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 clone.fields = newFields;
             });
+        }
+
+        private Schema Clone(Action<Schema> updater)
+        {
+            var clone = (Schema)MemberwiseClone();
+
+            updater(clone);
+
+            return clone;
         }
     }
 }

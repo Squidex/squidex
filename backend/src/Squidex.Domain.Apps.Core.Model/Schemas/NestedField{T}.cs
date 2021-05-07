@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            return Clone<NestedField<T>>(clone =>
+            return Clone(clone =>
             {
-                clone.Properties = typedProperties;
+                ((NestedField<T>)clone).Properties = typedProperties;
             });
         }
 

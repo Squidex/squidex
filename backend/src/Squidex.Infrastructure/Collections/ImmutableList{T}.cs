@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Squidex.Infrastructure.Collections
 {
@@ -22,7 +21,7 @@ namespace Squidex.Infrastructure.Collections
         }
 
         public ImmutableList(IList<T> list)
-            : base(list as IList<T> ?? list.ToList())
+            : base(list)
         {
         }
 
@@ -31,7 +30,7 @@ namespace Squidex.Infrastructure.Collections
             return Equals(obj as ImmutableList<T>);
         }
 
-        public bool Equals(ImmutableList<T>? other)
+        public virtual bool Equals(ImmutableList<T>? other)
         {
             return this.EqualsList(other);
         }

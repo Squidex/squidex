@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Collections
     public class ImmutableDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ImmutableDictionary<TKey, TValue>> where TKey : notnull
     {
         private static readonly Dictionary<TKey, TValue> EmptyInner = new Dictionary<TKey, TValue>();
-        private IDictionary<TKey, TValue> inner;
+        private readonly IDictionary<TKey, TValue> inner;
 
         public TValue this[TKey key]
         {
@@ -55,71 +55,6 @@ namespace Squidex.Infrastructure.Collections
             Guard.NotNull(inner, nameof(inner));
 
             this.inner = inner;
-        }
-
-        public ImmutableDictionary<TKey, TValue> Set(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null)
-        {
-            return Set<ImmutableDictionary<TKey, TValue>>(key, value, valueComparer);
-        }
-
-        public TArray Set<TArray>(TKey key, TValue value, IEqualityComparer<TValue>? valueComparer = null) where TArray : ImmutableDictionary<TKey, TValue>
-        {
-            if (!TryGetValue(key, out var found) || !IsEqual(value, found, valueComparer))
-            {
-                var clone = new Dictionary<TKey, TValue>(inner)
-                {
-                    [key] = value
-                };
-
-                return Create<TArray>(clone);
-            }
-
-            return Self<TArray>();
-        }
-
-        private static bool IsEqual(TValue lhs, TValue rhs, IEqualityComparer<TValue>? comparer = null)
-        {
-            comparer ??= EqualityComparer<TValue>.Default;
-
-            return comparer.Equals(lhs, rhs);
-        }
-
-        public ImmutableDictionary<TKey, TValue> RemoveKey(TKey key)
-        {
-            return RemoveKey<ImmutableDictionary<TKey, TValue>>(key);
-        }
-
-        public TArray RemoveKey<TArray>(TKey key) where TArray : ImmutableDictionary<TKey, TValue>
-        {
-            if (!inner.ContainsKey(key))
-            {
-                return Self<TArray>();
-            }
-
-            if (Count == 1)
-            {
-                return Create<TArray>(EmptyInner);
-            }
-
-            var clone = new Dictionary<TKey, TValue>(inner);
-
-            clone.Remove(key);
-
-            return Create<TArray>(clone);
-        }
-
-        private TArray Self<TArray>() where TArray : ImmutableDictionary<TKey, TValue>
-        {
-            return (this as TArray)!;
-        }
-
-        private TArray Create<TArray>(Dictionary<TKey, TValue> clone) where TArray : ImmutableDictionary<TKey, TValue>
-        {
-            var newClone = (TArray)MemberwiseClone();
-
-            newClone.inner = clone;
-
-            return newClone;
         }
 
         public bool ContainsKey(TKey key)

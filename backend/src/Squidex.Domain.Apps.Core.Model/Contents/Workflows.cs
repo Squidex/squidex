@@ -29,7 +29,12 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Remove(DomainId id)
         {
-            return RemoveKey<Workflows>(id);
+            if (!this.TryRemove(id, out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
@@ -37,7 +42,12 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
-            return Set<Workflows>(workflowId, Workflow.CreateDefault(name));
+            if (!this.TryAdd(workflowId, Workflow.CreateDefault(name), out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
@@ -45,7 +55,12 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow, nameof(workflow));
 
-            return Set<Workflows>(default, workflow);
+            if (!this.TrySet(default, workflow, out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
@@ -53,7 +68,12 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             Guard.NotNull(workflow, nameof(workflow));
 
-            return Set<Workflows>(id, workflow);
+            if (!this.TrySet(id, workflow, out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
@@ -66,12 +86,12 @@ namespace Squidex.Domain.Apps.Core.Contents
                 return Set(workflow);
             }
 
-            if (!ContainsKey(id))
+            if (!this.TryUpdate(id, workflow, out var updated))
             {
                 return this;
             }
 
-            return Set<Workflows>(id, workflow);
+            return new Workflows(updated);
         }
 
         public Workflow GetFirst()

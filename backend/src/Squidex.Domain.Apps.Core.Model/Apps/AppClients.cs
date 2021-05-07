@@ -30,7 +30,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            return RemoveKey<AppClients>(id);
+            if (!this.TryRemove(id, out var updated))
+            {
+                return this;
+            }
+
+            return new AppClients(updated);
         }
 
         [Pure]
@@ -39,17 +44,17 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNullOrEmpty(secret, nameof(secret));
 
-            if (ContainsKey(id))
-            {
-                return this;
-            }
-
             var newClient = new AppClient(id, secret)
             {
                 Role = role.Or(Role.Editor)
             };
 
-            return Set<AppClients>(id, newClient);
+            if (!this.TryAdd(id, newClient, out var updated))
+            {
+                return this;
+            }
+
+            return new AppClients(updated);
         }
 
         [Pure]
@@ -90,7 +95,12 @@ namespace Squidex.Domain.Apps.Core.Apps
                 newClient = newClient with { ApiTrafficLimit = apiTrafficLimit.Value };
             }
 
-            return Set<AppClients>(id, newClient);
+            if (!this.TrySet(id, newClient, out var updated))
+            {
+                return this;
+            }
+
+            return new AppClients(updated);
         }
     }
 }

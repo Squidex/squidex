@@ -5,11 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Diagnostics.Contracts;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class NestedField : FieldBase<NestedField>, INestedField
+    public abstract class NestedField : FieldBase, INestedField
     {
         public bool IsLocked { get; private set; }
 
@@ -103,5 +104,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public abstract T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
 
         public abstract NestedField Update(FieldProperties newProperties);
+
+        protected NestedField Clone(Action<NestedField> updater)
+        {
+            var clone = (NestedField)MemberwiseClone();
+
+            updater(clone);
+
+            return clone;
+        }
     }
 }

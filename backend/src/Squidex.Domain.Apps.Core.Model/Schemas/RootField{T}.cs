@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            return Clone<RootField<T>>(clone =>
+            return Clone(clone =>
             {
-                clone.Properties = typedProperties;
+                ((RootField<T>)clone).Properties = typedProperties;
             });
         }
 

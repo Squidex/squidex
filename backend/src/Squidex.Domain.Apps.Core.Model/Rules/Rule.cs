@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public sealed class Rule : Cloneable<Rule>
+    public sealed class Rule
     {
         public string? Name { get; private set; }
 
@@ -113,6 +113,15 @@ namespace Squidex.Domain.Apps.Core.Rules
             {
                 clone.Action = newAction;
             });
+        }
+
+        private Rule Clone(Action<Rule> updater)
+        {
+            var clone = (Rule)MemberwiseClone();
+
+            updater(clone);
+
+            return clone;
         }
     }
 }

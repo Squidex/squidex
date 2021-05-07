@@ -7,12 +7,87 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static bool TryAdd<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, TValue value, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (!source.ContainsKey(key))
+            {
+                var clone = new Dictionary<TKey, TValue>(source)
+                {
+                    [key] = value
+                };
+
+                result = clone;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TrySet<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, TValue value, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (!source.TryGetValue(key, out var found) || !Equals(found, value))
+            {
+                var clone = new Dictionary<TKey, TValue>(source)
+                {
+                    [key] = value
+                };
+
+                result = clone;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryUpdate<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, TValue value, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (source.TryGetValue(key, out var found) && !Equals(found, value))
+            {
+                var clone = new Dictionary<TKey, TValue>(source)
+                {
+                    [key] = value
+                };
+
+                result = clone;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryRemove<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (source.ContainsKey(key))
+            {
+                var clone = new Dictionary<TKey, TValue>(source);
+
+                result = clone;
+                result.Remove(key);
+
+                return true;
+            }
+
+            return false;
+        }
+
         public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other)
         {
             return source.Count == other.Count && source.Intersect(other).Count() == other.Count;

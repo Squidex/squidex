@@ -31,7 +31,12 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
             Guard.NotNullOrEmpty(role, nameof(role));
 
-            return Set<AppContributors>(contributorId, role, EqualityComparer<string>.Default);
+            if (!this.TrySet(contributorId, role, out var updated))
+            {
+                return this;
+            }
+
+            return new AppContributors(updated);
         }
 
         [Pure]
@@ -39,7 +44,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
 
-            return RemoveKey<AppContributors>(contributorId);
+            if (!this.TryRemove(contributorId, out var updated))
+            {
+                return this;
+            }
+
+            return new AppContributors(updated);
         }
     }
 }
