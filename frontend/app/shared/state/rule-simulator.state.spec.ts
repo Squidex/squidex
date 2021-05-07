@@ -64,6 +64,8 @@ describe('RuleSimulatorState', () => {
     it('should not load simulated rule events if no rule selected', () => {
         ruleSimulatorState.load().subscribe();
 
+        expect().nothing();
+
         rulesService.verify(x => x.getSimulatedEvents(app, It.isAnyString()), Times.never());
     });
 });

@@ -1,5 +1,35 @@
 # Changelog
 
+## 5.7.0 - 2012-05-07
+
+### Features
+ 
+* **Assets**: Delete assets permanently.
+* **GraphQL**: Updrade to GraphQL.NET 4 for better performance.
+* **GraphQL**: Provide detailed user information for contents and assets.
+* **Infrastructure**: New option to disable the request log.
+* **Infrastructure**: Update of NSWAG to reduce memory footprint.
+* **Performance**: Performance optimization for batch operations.
+* **Performance**: Performance improvements for restore operations, recovery and repair.
+* **Rules**: New rule simulator to test how a rule would have behaved for the latest 100 events within the last 7 days.
+* **Rules**: Better rule editor for scripts and templates including intellisense code formatting.
+* **Rules**: Http DELETE for webhooks.
+* **Scripting**: More variables for scripts.
+* **Scripting**: New functions to hash strings with SHA256 and MD5.
+* **UI**: Easy cloning of references.
+* **UI**: New fullscreen view for rules.
+* **UI**: Show confirm and alert dialogs in UI plugins.
+* **UI**: Show asset selector in UI plugins.
+* **UI**: Show saved queries i nsearch dialog.
+
+### Bugfixes
+
+* **OpenAPI**: Fix several endpoint descriptions.
+* **Contents**: Correct validation for PUT requests.
+* **GraphQL**: Fix GraphQL for empty nested fields.
+* **UI**: Url decode role names in API endpoint.
+* **UI**: Fix several error handling bugs, especially around content updates.
+
 ## 5.6.0 - 2021-02-27
 
 ### Features
