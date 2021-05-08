@@ -20,13 +20,13 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public ImmutableList<Language> Fallbacks { get; } = ImmutableList.Empty<Language>();
 
-        public LanguageConfig(bool isOptional = false, ImmutableList<Language>? fallback = null)
+        public LanguageConfig(bool isOptional = false, ImmutableList<Language>? fallbacks = null)
         {
             IsOptional = isOptional;
 
-            if (fallback != null)
+            if (fallbacks != null)
             {
-                Fallbacks = fallback;
+                Fallbacks = fallbacks;
             }
         }
 
