@@ -47,11 +47,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
         }
 
-        public sealed class InvalidAction : RuleAction
+        public sealed record InvalidAction : RuleAction
         {
         }
 
-        public sealed class ValidAction : RuleAction
+        public sealed record ValidAction : RuleAction
         {
         }
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             public int Value { get; set; }
         }
 
-        public sealed class InvalidTrigger : RuleTrigger
+        public sealed record InvalidTrigger : RuleTrigger
         {
             public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
             {

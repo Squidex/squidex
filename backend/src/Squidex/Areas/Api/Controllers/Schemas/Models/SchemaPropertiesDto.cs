@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -47,6 +47,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Tags for automation processes.
         /// </summary>
-        public ReadOnlyCollection<string>? Tags { get; set; }
+        public ImmutableList<string>? Tags { get; set; }
     }
 }

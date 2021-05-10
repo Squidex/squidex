@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public ReadOnlyCollection<string>? AllowedValues { get; set; }
+        public ImmutableList<string>? AllowedValues { get; set; }
 
         /// <summary>
         /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.

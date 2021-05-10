@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core
 {
-    public abstract class Named
+    public abstract record Named
     {
         public string Name { get; }
 

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
@@ -43,6 +44,20 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 var implementationType = typeof(List<>).MakeGenericType(objectType.GetGenericArguments());
 
                 return base.CreateArrayContract(implementationType);
+            }
+
+            if (objectType.BaseType?.IsGenericType == true && objectType.BaseType.GetGenericTypeDefinition() == typeof(ImmutableList<>))
+            {
+                var contract = base.CreateArrayContract(objectType);
+
+                return contract;
+            }
+
+            if (objectType.IsGenericType == true && objectType.GetGenericTypeDefinition() == typeof(ImmutableList<>))
+            {
+                var contract = base.CreateArrayContract(objectType);
+
+                return contract;
             }
 
             return base.CreateArrayContract(objectType);

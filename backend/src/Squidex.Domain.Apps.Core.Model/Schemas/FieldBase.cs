@@ -5,13 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Reflection.Equality
+using Squidex.Infrastructure;
+
+namespace Squidex.Domain.Apps.Core.Schemas
 {
-    internal sealed class NoopComparer : IDeepComparer
+    public abstract class FieldBase
     {
-        public bool IsEquals(object? x, object? y)
+        public long Id { get; }
+
+        public string Name { get; }
+
+        protected FieldBase(long id, string name)
         {
-            return false;
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.GreaterThan(id, 0, nameof(id));
+
+            Id = id;
+
+            Name = name;
         }
     }
 }

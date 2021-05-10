@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_contains_an_not_allowed_values()
         {
-            var sut = Field(new TagsFieldProperties { AllowedValues = ReadOnlyCollection.Create("tag-2", "tag-3") });
+            var sut = Field(new TagsFieldProperties { AllowedValues = ImmutableList.Create("tag-2", "tag-3") });
 
             await sut.ValidateAsync(CreateValue("tag-1", "tag-2", null), errors);
 

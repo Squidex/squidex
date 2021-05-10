@@ -9,12 +9,11 @@ using System;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class ArrayFieldProperties : FieldProperties
+    public sealed record ArrayFieldProperties : FieldProperties
     {
-        public int? MinItems { get; set; }
+        public int? MinItems { get; init; }
 
-        public int? MaxItems { get; set; }
+        public int? MaxItems { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

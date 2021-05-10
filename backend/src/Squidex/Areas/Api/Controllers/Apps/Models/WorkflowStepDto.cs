@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using NoUpdateType = Squidex.Domain.Apps.Core.Contents.NoUpdate;
@@ -64,7 +65,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public WorkflowStep ToStep()
         {
             return new WorkflowStep(
-                Transitions?.ToDictionary(
+                Transitions?.ToImmutableDictionary(
                     y => y.Key,
                     y => y.Value?.ToTransition()!),
                 Color,

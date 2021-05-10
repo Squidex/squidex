@@ -19,14 +19,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public AssetFieldBuilder MustBeImage()
         {
-            Properties<AssetsFieldProperties>().MustBeImage = true;
+            Properties<AssetsFieldProperties>(p => p with
+            {
+                MustBeImage = true
+            });
 
             return this;
         }
 
         public AssetFieldBuilder RequireSingle()
         {
-            Properties<AssetsFieldProperties>().MaxItems = 2;
+            Properties<AssetsFieldProperties>(p => p with
+            {
+                MaxItems = 1
+            });
 
             return this;
         }

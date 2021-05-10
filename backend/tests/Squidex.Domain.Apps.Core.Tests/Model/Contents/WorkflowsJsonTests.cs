@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             var serialized = workflows.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(workflows);
+            Assert.Equal(workflows, serialized);
         }
     }
 }

@@ -38,8 +38,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         Partitioning = "language"
                     }
                 },
-                FieldsInLists = new FieldNames("meta.id", "myString"),
-                FieldsInReferences = new FieldNames("myString"),
+                FieldsInLists = FieldNames.Create("meta.id", "myString"),
+                FieldsInReferences = FieldNames.Create("myString"),
                 Scripts = new SchemaScripts
                 {
                     Change = "change-script"
@@ -60,8 +60,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     })
                     .HideField(1).DisableField(1).LockField(1)
                     .ChangeCategory("myCategory")
-                    .SetFieldsInLists(new FieldNames("meta.id", "myString"))
-                    .SetFieldsInReferences(new FieldNames("myString"))
+                    .SetFieldsInLists(FieldNames.Create("meta.id", "myString"))
+                    .SetFieldsInReferences(FieldNames.Create("myString"))
                     .SetScripts(new SchemaScripts
                     {
                         Change = "change-script"

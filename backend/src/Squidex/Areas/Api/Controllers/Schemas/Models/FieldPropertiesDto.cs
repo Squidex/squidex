@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web.Json;
 
@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Tags for automation processes.
         /// </summary>
-        public ReadOnlyCollection<string>? Tags { get; set; }
+        public ImmutableList<string>? Tags { get; set; }
 
         public abstract FieldProperties ToProperties();
 

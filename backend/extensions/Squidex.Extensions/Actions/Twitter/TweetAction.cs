@@ -19,7 +19,7 @@ namespace Squidex.Extensions.Actions.Twitter
         Display = "Tweet",
         Description = "Tweet an update with your twitter account.",
         ReadMore = "https://twitter.com")]
-    public sealed class TweetAction : RuleAction
+    public sealed record TweetAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Access Token", Description = " The generated access token.")]

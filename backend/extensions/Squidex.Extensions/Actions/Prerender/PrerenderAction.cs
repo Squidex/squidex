@@ -19,7 +19,7 @@ namespace Squidex.Extensions.Actions.Prerender
         Display = "Recache URL",
         Description = "Prerender a javascript website for bots.",
         ReadMore = "https://prerender.io")]
-    public sealed class PrerenderAction : RuleAction
+    public sealed record PrerenderAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Token", Description = "The prerender token from your account.")]

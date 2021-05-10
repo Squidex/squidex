@@ -19,7 +19,7 @@ namespace Squidex.Extensions.Actions.Kafka
         Display = "Push to kafka",
         Description = "Connect to Kafka stream and push data to that stream.",
         ReadMore = "https://kafka.apache.org/quickstart")]
-    public sealed class KafkaAction : RuleAction
+    public sealed record KafkaAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Topic Name", Description = "The name of the topic.")]

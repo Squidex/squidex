@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
         }
 
-        public AppContributors(Dictionary<string, string> inner)
+        public AppContributors(IDictionary<string, string> inner)
             : base(inner)
         {
         }
@@ -31,7 +31,12 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
             Guard.NotNullOrEmpty(role, nameof(role));
 
-            return With<AppContributors>(contributorId, role, EqualityComparer<string>.Default);
+            if (!this.TrySet(contributorId, role, out var updated))
+            {
+                return this;
+            }
+
+            return new AppContributors(updated);
         }
 
         [Pure]
@@ -39,7 +44,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
 
-            return Without<AppContributors>(contributorId);
+            if (!this.TryRemove(contributorId, out var updated))
+            {
+                return this;
+            }
+
+            return new AppContributors(updated);
         }
     }
 }

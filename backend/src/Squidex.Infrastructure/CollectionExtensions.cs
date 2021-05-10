@@ -7,12 +7,87 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static bool TryAdd<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, TValue value, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (!source.ContainsKey(key))
+            {
+                var clone = new Dictionary<TKey, TValue>(source)
+                {
+                    [key] = value
+                };
+
+                result = clone;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TrySet<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, TValue value, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (!source.TryGetValue(key, out var found) || !Equals(found, value))
+            {
+                var clone = new Dictionary<TKey, TValue>(source)
+                {
+                    [key] = value
+                };
+
+                result = clone;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryUpdate<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, TValue value, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (source.TryGetValue(key, out var found) && !Equals(found, value))
+            {
+                var clone = new Dictionary<TKey, TValue>(source)
+                {
+                    [key] = value
+                };
+
+                result = clone;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool TryRemove<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> result) where TKey : notnull
+        {
+            result = null;
+
+            if (source.ContainsKey(key))
+            {
+                var clone = new Dictionary<TKey, TValue>(source);
+
+                result = clone;
+                result.Remove(key);
+
+                return true;
+            }
+
+            return false;
+        }
+
         public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other)
         {
             return source.Count == other.Count && source.Intersect(other).Count() == other.Count;
@@ -152,27 +227,6 @@ namespace Squidex.Infrastructure
             return hashCode;
         }
 
-        public static int OrderedHashCode<T>(this IEnumerable<T> collection) where T : notnull
-        {
-            return collection.OrderedHashCode(EqualityComparer<T>.Default);
-        }
-
-        public static int OrderedHashCode<T>(this IEnumerable<T> collection, IEqualityComparer<T> comparer) where T : notnull
-        {
-            Guard.NotNull(comparer, nameof(comparer));
-
-            var hashCodes = collection.Where(x => !Equals(x, null)).Select(x => x.GetHashCode()).OrderBy(x => x).ToArray();
-
-            var hashCode = 17;
-
-            foreach (var code in hashCodes)
-            {
-                hashCode = (hashCode * 23) + code;
-            }
-
-            return hashCode;
-        }
-
         public static int DictionaryHashCode<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary) where TKey : notnull
         {
             return DictionaryHashCode(dictionary, EqualityComparer<TKey>.Default, EqualityComparer<TValue>.Default);
@@ -220,6 +274,39 @@ namespace Squidex.Infrastructure
             var comparer = new KeyValuePairComparer<TKey, TValue>(keyComparer, valueComparer);
 
             return !dictionary.Except(other, comparer).Any();
+        }
+
+        public static bool EqualsList<T>(this IReadOnlyList<T> list, IReadOnlyList<T>? other)
+        {
+            return EqualsList(list, other, EqualityComparer<T>.Default);
+        }
+
+        public static bool EqualsList<T>(this IReadOnlyList<T> list, IReadOnlyList<T>? other, IEqualityComparer<T> comparer)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(list, other))
+            {
+                return true;
+            }
+
+            if (list.Count != other.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (!comparer.Equals(list[i], other[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary) where TKey : notnull

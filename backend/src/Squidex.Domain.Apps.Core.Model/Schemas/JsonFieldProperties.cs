@@ -7,8 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class JsonFieldProperties : FieldProperties
+    public sealed record JsonFieldProperties : FieldProperties
     {
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

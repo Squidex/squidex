@@ -7,24 +7,18 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators =true)]
-    public sealed class SchemaScripts : Freezable
+    public sealed record SchemaScripts
     {
         public static readonly SchemaScripts Empty = new SchemaScripts();
 
-        static SchemaScripts()
-        {
-            Empty.Freeze();
-        }
+        public string Change { get; init; }
 
-        public string Change { get; set; }
+        public string Create { get; init; }
 
-        public string Create { get; set; }
+        public string Update { get; init; }
 
-        public string Update { get; set; }
+        public string Delete { get; init; }
 
-        public string Delete { get; set; }
-
-        public string Query { get; set; }
+        public string Query { get; init; }
     }
 }

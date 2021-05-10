@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
             }
 
             var transitions =
-                Transitions?.ToDictionary(
+                Transitions?.ToImmutableDictionary(
                     x => x.Key,
                     x => x.Value.ToSource());
 

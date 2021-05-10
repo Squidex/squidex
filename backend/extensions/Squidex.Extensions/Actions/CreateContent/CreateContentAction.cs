@@ -18,7 +18,7 @@ namespace Squidex.Extensions.Actions.CreateContent
         IconColor = "#3389ff",
         Display = "Create content",
         Description = "Create a a new content item for any schema.")]
-    public sealed class CreateContentAction : RuleAction
+    public sealed record CreateContentAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Data", Description = "The content data.")]

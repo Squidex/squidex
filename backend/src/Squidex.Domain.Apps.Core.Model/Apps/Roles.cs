@@ -92,17 +92,17 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public Roles Remove(string name)
         {
-            return Create(inner.Without(name));
+            if (!inner.TryRemove(name, out var updated))
+            {
+                return this;
+            }
+
+            return Create(new ImmutableDictionary<string, Role>(updated));
         }
 
         [Pure]
         public Roles Add(string name)
         {
-            if (inner.ContainsKey(name))
-            {
-                return this;
-            }
-
             if (IsDefault(name))
             {
                 return this;
@@ -110,7 +110,12 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newRole = Role.Create(name);
 
-            return Create(inner.With(name, newRole));
+            if (!inner.TryAdd(name, newRole, out var updated))
+            {
+                return this;
+            }
+
+            return Create(new ImmutableDictionary<string, Role>(updated));
         }
 
         [Pure]
@@ -125,7 +130,12 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newRole = role.Update(permissions, properties);
 
-            return Create(inner.With(name, newRole));
+            if (!inner.TrySet(name, newRole, out var updated))
+            {
+                return this;
+            }
+
+            return Create(new ImmutableDictionary<string, Role>(updated));
         }
 
         public static bool IsDefault(string role)

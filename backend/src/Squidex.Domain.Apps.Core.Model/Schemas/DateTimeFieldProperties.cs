@@ -9,20 +9,19 @@ using NodaTime;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class DateTimeFieldProperties : FieldProperties
+    public sealed record DateTimeFieldProperties : FieldProperties
     {
-        public LocalizedValue<Instant?> DefaultValues { get; set; }
+        public LocalizedValue<Instant?> DefaultValues { get; init; }
 
-        public Instant? DefaultValue { get; set; }
+        public Instant? DefaultValue { get; init; }
 
-        public Instant? MaxValue { get; set; }
+        public Instant? MaxValue { get; init; }
 
-        public Instant? MinValue { get; set; }
+        public Instant? MinValue { get; init; }
 
-        public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; set; }
+        public DateTimeCalculatedDefaultValue? CalculatedDefaultValue { get; init; }
 
-        public DateTimeFieldEditor Editor { get; set; }
+        public DateTimeFieldEditor Editor { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

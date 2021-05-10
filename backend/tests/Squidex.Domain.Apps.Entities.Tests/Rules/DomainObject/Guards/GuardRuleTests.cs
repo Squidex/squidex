@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
-        public sealed class TestAction : RuleAction
+        public sealed record TestAction : RuleAction
         {
             public Uri Url { get; set; }
         }
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = null!,
             });
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {

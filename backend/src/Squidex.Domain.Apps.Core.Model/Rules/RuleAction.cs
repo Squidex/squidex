@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public abstract class RuleAction : Freezable
+    public abstract record RuleAction
     {
         public IEnumerable<ValidationError> Validate()
         {
@@ -40,11 +40,6 @@ namespace Squidex.Domain.Apps.Core.Rules
         protected virtual IEnumerable<ValidationError> CustomValidate()
         {
             yield break;
-        }
-
-        public bool DeepEquals(RuleAction action)
-        {
-            return SimpleEquals.IsEquals(this, action);
         }
     }
 }

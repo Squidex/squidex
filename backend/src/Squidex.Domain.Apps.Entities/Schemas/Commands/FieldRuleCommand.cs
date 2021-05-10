@@ -19,7 +19,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public FieldRule ToFieldRule()
         {
-            return new FieldRule(Action, Field, Condition);
+            return new FieldRule(Action, Field)
+            {
+                Condition = Condition
+            };
         }
     }
 }

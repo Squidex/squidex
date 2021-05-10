@@ -44,9 +44,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                         Patterns?.Select(x => new Pattern(x.Name, x.Regex)
                         {
                             Message = x.Message
-                        }).ToReadOnlyCollection()!,
+                        }).ToImmutableList()!,
                     Editors =
-                        Editors?.Select(x => new Editor(x.Name, x.Url)).ToReadOnlyCollection()!
+                        Editors?.Select(x => new Editor(x.Name, x.Url)).ToImmutableList()!
                 }
             };
         }

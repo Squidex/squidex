@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class Schema : Cloneable<Schema>
+    public sealed class Schema
     {
         private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
         private readonly string name;
@@ -105,7 +105,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             this.name = name;
 
             this.properties = properties ?? new SchemaProperties();
-            this.properties.Freeze();
 
             this.isSingleton = isSingleton;
         }
@@ -133,7 +132,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone(clone =>
             {
                 clone.properties = newProperties;
-                clone.Properties.Freeze();
             });
         }
 
@@ -150,7 +148,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone(clone =>
             {
                 clone.scripts = newScripts;
-                clone.scripts.Freeze();
             });
         }
 
@@ -203,7 +200,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             rules ??= FieldRules.Empty;
 
-            if (fieldRules.SetEquals(rules))
+            if (fieldRules.Equals(rules))
             {
                 return this;
             }
@@ -325,6 +322,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 clone.fields = newFields;
             });
+        }
+
+        private Schema Clone(Action<Schema> updater)
+        {
+            var clone = (Schema)MemberwiseClone();
+
+            updater(clone);
+
+            return clone;
         }
     }
 }
