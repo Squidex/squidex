@@ -68,7 +68,7 @@ describe('EventConsumersState', () => {
 
         it('should show notification on load error if silent is false', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
-                .returns(() => throwError({})).verifiable();
+                .returns(() => throwError('Service Error')).verifiable();
 
             eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
 

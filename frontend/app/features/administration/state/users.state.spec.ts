@@ -136,11 +136,11 @@ describe('UsersState', () => {
 
         it('should return null on select if user is not found', () => {
             usersService.setup(x => x.getUser('unknown'))
-                .returns(() => throwError({})).verifiable();
+                .returns(() => throwError('Service Error')).verifiable();
 
             let userSelected: UserDto;
 
-            usersState.select('unknown').subscribe(x => {
+            usersState.select('unknown').pipe(onErrorResumeNext()).subscribe(x => {
                 userSelected = x!;
             }).unsubscribe();
 

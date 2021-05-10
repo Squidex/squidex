@@ -230,11 +230,11 @@ describe('SchemasState', () => {
 
         it('should not try to load if not found', () => {
             schemasService.setup(x => x.getSchema(app, 'failed'))
-                .returns(() => throwError({})).verifiable(Times.never());
+                .returns(() => throwError('Service Error')).verifiable(Times.never());
 
             let schemaSelected: SchemaDto;
 
-            schemasState.select('failed').subscribe(x => {
+            schemasState.select('failed').pipe(onErrorResumeNext()).subscribe(x => {
                 schemaSelected = x!;
             });
 
