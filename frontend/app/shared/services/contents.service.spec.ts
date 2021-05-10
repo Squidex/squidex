@@ -438,17 +438,17 @@ export function createContent(id: number, suffix = '') {
 
     return new ContentDto(links,
         `id${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
+        new Version(key),
         `Status${key}`,
         'black',
         `NewStatus${key}`,
         'black',
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
         new ScheduleDto('Draft', `Scheduler${id}`, 'red', DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`)),
         {},
         'my-schema',
         'MySchema',
         {},
-        [],
-        new Version(key));
+        []);
 }

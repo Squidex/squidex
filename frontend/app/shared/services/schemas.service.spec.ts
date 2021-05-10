@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, createProperties, DateTime, FieldRule, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, createProperties, DateTime, FieldRule, NestedFieldDto, Resource, ResourceLinks, RootFieldDto, SchemaDto, SchemaPropertiesDto, SchemasDto, SchemasService, Version } from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const version = new Version('1');
@@ -74,7 +74,7 @@ describe('SchemasService', () => {
     it('should make get request to get schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.getSchema('my-app', 'my-schema').subscribe(result => {
             schema = result;
@@ -85,9 +85,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make post request to create schema',
@@ -95,7 +95,7 @@ describe('SchemasService', () => {
 
         const dto = { name: 'name' };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.postSchema('my-app', dto).subscribe(result => {
             schema = result;
@@ -106,9 +106,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update schema',
@@ -122,7 +122,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putSchema('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -133,9 +133,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update schema scripts',
@@ -149,7 +149,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putScripts('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -160,9 +160,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update field rules',
@@ -176,7 +176,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putFieldRules('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -187,9 +187,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to synchronize schema',
@@ -203,7 +203,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putSchemaSync('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -214,9 +214,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update category',
@@ -230,7 +230,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putCategory('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -241,9 +241,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update preview urls',
@@ -257,7 +257,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putPreviewUrls('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -268,9 +268,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make post request to add field',
@@ -284,7 +284,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.postField('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -295,9 +295,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to publish schema',
@@ -309,7 +309,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.publishSchema('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -320,9 +320,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to unpublish schema',
@@ -334,7 +334,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.unpublishSchema('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -345,9 +345,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update field',
@@ -361,7 +361,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putField('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -372,9 +372,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update ui fields',
@@ -388,7 +388,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putUIFields('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -399,9 +399,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to update field ordering',
@@ -415,7 +415,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.putFieldOrdering('my-app', resource, dto, version).subscribe(result => {
             schema = result;
@@ -426,9 +426,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to lock field',
@@ -440,7 +440,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.lockField('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -451,9 +451,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to enable field',
@@ -465,7 +465,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.enableField('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -476,9 +476,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to disable field',
@@ -490,7 +490,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.disableField('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -501,9 +501,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to show field',
@@ -515,7 +515,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.showField('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -526,9 +526,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make put request to hide field',
@@ -540,7 +540,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.hideField('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -551,9 +551,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make delete request to delete field',
@@ -565,7 +565,7 @@ describe('SchemasService', () => {
             }
         };
 
-        let schema: SchemaDetailsDto;
+        let schema: SchemaDto;
 
         schemasService.deleteField('my-app', resource, version).subscribe(result => {
             schema = result;
@@ -576,9 +576,9 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(schemaDetailsResponse(12));
+        req.flush(schemaResponse(12));
 
-        expect(schema!).toEqual(createSchemaDetails(12));
+        expect(schema!).toEqual(createSchema(12));
     }));
 
     it('should make delete request to delete schema',
@@ -621,36 +621,15 @@ describe('SchemasService', () => {
 
         return {
             id: `id${id}`,
-            name: `schema-name${key}`,
-            category: `schema-category${key}`,
-            isSingleton: id % 2 === 0,
-            isPublished: id % 3 === 0,
-            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
-            createdBy: `creator${id}`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
-            lastModifiedBy: `modifier${id}`,
-            properties: schemaPropertiesResponse(id, suffix),
-            version: key,
-            _links: {
-                update: { method: 'PUT', href: `/schemas/${id}` }
-            }
-        };
-    }
-
-    function schemaDetailsResponse(id: number, suffix = '') {
-        const key = `${id}${suffix}`;
-
-        return {
-            id: `id${id}`,
-            name: `schema-name${key}`,
-            category: `schema-category${key}`,
-            isSingleton: id % 2 === 0,
-            isPublished: id % 3 === 0,
             created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
             createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             lastModifiedBy: `modifier${id}`,
             version: key,
+            name: `schema-name${key}`,
+            category: `schema-category${key}`,
+            type: id % 2 === 0 ? 'Default' : 'Singleton',
+            isPublished: id % 3 === 0,
             properties: schemaPropertiesResponse(id, suffix),
             previewUrls: {
                 Default: 'url'
@@ -846,33 +825,14 @@ export function createSchema(id: number, suffix = '') {
 
     return new SchemaDto(links,
         `id${id}`,
-        `schema-name${key}`,
-        `schema-category${key}`,
-        createSchemaProperties(id, suffix),
-        id % 2 === 0,
-        id % 3 === 0,
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
-        new Version(key));
-}
-
-export function createSchemaDetails(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/schemas/${id}` }
-    };
-
-    const key = `${id}${suffix}`;
-
-    return new SchemaDetailsDto(links,
-        `id${id}`,
-        `schema-name${key}`,
-        `schema-category${key}`,
-        createSchemaProperties(id, suffix),
-        id % 2 === 0,
-        id % 3 === 0,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
         new Version(key),
+        `schema-name${key}`,
+        `schema-category${key}`,
+        id % 2 === 0 ? 'Default' : 'Singleton',
+        id % 3 === 0,
+        createSchemaProperties(id, suffix),
         [
             new RootFieldDto({}, 11, 'field11', createProperties('Array'), 'language', true, true, true, [
                 new NestedFieldDto({}, 101, 'field101', createProperties('String'), 11, true, true, true),
@@ -894,13 +854,13 @@ export function createSchemaDetails(id: number, suffix = '') {
             field: 'field1', action: 'Hide', condition: 'a === 2'
         }],
         {
+            Default: 'url'
+        },
+        {
             query: '<script-query>',
             create: '<script-create>',
             change: '<script-change>',
             delete: '<script-delete>',
             update: '<script-update>'
-        },
-        {
-            Default: 'url'
         });
 }

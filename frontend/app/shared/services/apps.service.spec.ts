@@ -283,18 +283,20 @@ describe('AppsService', () => {
 
         return {
             id: `id${id}`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            createdBy: `creator${id}`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
+            lastModifiedBy: `modifier${id}`,
+            version: key,
             name: `app-name${key}`,
             label: `app-label${key}`,
             description: `app-description${key}`,
             permissions: ['Owner'],
-            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             canAccessApi: id % 2 === 0,
             canAccessContent: id % 2 === 0,
             planName: 'Free',
             planUpgrade: 'Basic',
             roleProperties: createProperties(id),
-            version: key,
             _links: {
                 update: { method: 'PUT', href: `apps/${id}` }
             }
@@ -333,17 +335,17 @@ export function createApp(id: number, suffix = '') {
 
     return new AppDto(links,
         `id${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
+        new Version(key),
         `app-name${key}`,
         `app-label${key}`,
         `app-description${key}`,
         ['Owner'],
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
         id % 2 === 0,
         id % 2 === 0,
         'Free', 'Basic',
-        createProperties(id),
-        new Version(key));
+        createProperties(id));
 }
 
 export function createAppSettings(id: number, suffix = '') {

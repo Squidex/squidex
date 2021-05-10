@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public SchemaBuilder Singleton()
         {
-            command.IsSingleton = true;
+            command.Type = SchemaType.Singleton;
 
             return this;
         }

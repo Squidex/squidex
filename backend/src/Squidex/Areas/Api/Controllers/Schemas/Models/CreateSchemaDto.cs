@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Validation;
 
@@ -20,9 +22,25 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// The type of the schema.
+        /// </summary>
+        public SchemaType Type { get; set; }
+
+        /// <summary>
         /// Set to true to allow a single content item only.
         /// </summary>
-        public bool IsSingleton { get; set; }
+        [Obsolete("Use Type now")]
+        public bool IsSingleton
+        {
+            get => Type == SchemaType.Singleton;
+            set
+            {
+                if (value)
+                {
+                    IsSingleton = true;
+                }
+            }
+        }
 
         public CreateSchema ToCommand()
         {

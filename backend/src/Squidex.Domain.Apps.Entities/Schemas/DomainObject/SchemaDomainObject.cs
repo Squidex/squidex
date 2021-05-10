@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             };
 
             var schemaSource = Snapshot.SchemaDef;
-            var schemaTarget = command.BuildSchema(schemaSource.Name, schemaSource.IsSingleton);
+            var schemaTarget = command.BuildSchema(schemaSource.Name, schemaSource.Type);
 
             var events = schemaSource.Synchronize(schemaTarget, () => Snapshot.SchemaFieldsTotal + 1, options);
 

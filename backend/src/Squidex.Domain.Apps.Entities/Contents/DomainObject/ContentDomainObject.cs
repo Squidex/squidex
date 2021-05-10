@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -95,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         await CreateCore(c, operation);
 
-                        if (operation.Schema.SchemaDef.IsSingleton)
+                        if (operation.Schema.SchemaDef.IsSingleton())
                         {
                             ChangeStatus(c.AsChange(Status.Published));
                         }

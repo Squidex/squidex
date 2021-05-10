@@ -52,7 +52,7 @@ describe('BackupsState', () => {
 
         it('should reset loading state if loading failed', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             backupsState.load().pipe(onErrorResumeNext()).subscribe();
 

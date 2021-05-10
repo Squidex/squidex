@@ -279,7 +279,7 @@ describe('AssetsState', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, asset1, It.isValue(request), asset1.version))
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             assetsState.moveAsset(asset1, request.parentId).pipe(onErrorResumeNext()).subscribe();
 
@@ -318,7 +318,7 @@ describe('AssetsState', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNext()).subscribe();
 

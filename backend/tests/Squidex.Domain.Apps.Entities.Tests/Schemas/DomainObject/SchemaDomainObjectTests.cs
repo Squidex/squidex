@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
 using Squidex.Log;
 using Xunit;
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var properties = new SchemaProperties();
 
-            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, IsSingleton = true };
+            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Type = SchemaType.Singleton };
 
             var result = await PublishAsync(command);
 
@@ -64,12 +65,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
             Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-            Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-            Assert.True(sut.Snapshot.SchemaDef.IsSingleton);
+            Assert.Equal(SchemaType.Singleton, sut.Snapshot.SchemaDef.Type);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, command.IsSingleton) })
+                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, SchemaType.Singleton) })
                 );
         }
 
@@ -291,7 +291,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["Web"] = "web-url"
-                }
+                }.ToImmutableDictionary()
             };
 
             await ExecuteCreateAsync();

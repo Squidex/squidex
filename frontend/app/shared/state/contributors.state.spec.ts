@@ -63,7 +63,7 @@ describe('ContributorsState', () => {
 
         it('should reset loading state if loading failed', () => {
             contributorsService.setup(x => x.getContributors(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             contributorsState.load().pipe(onErrorResumeNext()).subscribe();
 

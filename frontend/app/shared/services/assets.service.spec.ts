@@ -528,6 +528,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         `id${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
+        new Version(key),
         `My Name${key}.png`,
         `My Hash${key}`,
         'png',
@@ -546,8 +547,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         tags || [
             'tag1',
             'tag2'
-        ],
-        new Version(key));
+        ]);
 }
 
 export function createAssetFolder(id: number, suffix = '', parentId?: string) {

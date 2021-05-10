@@ -37,7 +37,7 @@ export class SchemaFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.createForm.load({ ...this.import, name: '' });
+        this.createForm.load({ type: 'Default', ...this.import, name: '' });
 
         this.showImport = !!this.import;
     }

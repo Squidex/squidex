@@ -9,7 +9,7 @@
 
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { MetaFields, SchemaDetailsDto, TableField } from './../services/schemas.service';
+import { MetaFields, SchemaDto, TableField } from './../services/schemas.service';
 import { UIState } from './ui.state';
 
 const META_FIELD_NAMES = Object.values(MetaFields);
@@ -31,7 +31,7 @@ export class TableFields {
 
     constructor(
         private readonly uiState: UIState,
-        private readonly schema: SchemaDetailsDto
+        private readonly schema: SchemaDto
     ) {
         this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
 

@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static async Task CheckTransitionAsync(this OperationContext context, Status status)
         {
-            if (!context.SchemaDef.IsSingleton)
+            if (!context.SchemaDef.IsSingleton())
             {
                 var workflow = GetWorkflow(context);
 
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static async Task CheckStatusAsync(this OperationContext context, Status status)
         {
-            if (!context.SchemaDef.IsSingleton)
+            if (!context.SchemaDef.IsSingleton())
             {
                 var workflow = GetWorkflow(context);
 

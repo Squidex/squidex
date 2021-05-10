@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { defined, fadeAnimation, MessageBus, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { defined, fadeAnimation, MessageBus, ModalModel, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 import { map } from 'rxjs/operators';
 import { SchemaCloning } from './../messages';
 
@@ -22,7 +22,7 @@ import { SchemaCloning } from './../messages';
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public readonly exact = { exact: true };
 
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
     public schemaTab = this.route.queryParams.pipe(map(x => x['tab'] || 'fields'));
 
     public editOptionsDropdown = new ModalModel();

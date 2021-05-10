@@ -48,7 +48,7 @@ describe('EventConsumersState', () => {
 
         it('should reset loading state if loading failed', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
 

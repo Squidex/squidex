@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using SchemaField = Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
@@ -31,11 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         FieldRuleCommand[]? FieldRules { get; set; }
 
-        Dictionary<string, string>? PreviewUrls { get; set; }
+        ImmutableDictionary<string, string>? PreviewUrls { get; set; }
 
-        Schema ToSchema(string name, bool isSingleton)
+        Schema ToSchema(string name, SchemaType type)
         {
-            var schema = new Schema(name, Properties, isSingleton);
+            var schema = new Schema(name, Properties, type);
 
             if (IsPublished)
             {

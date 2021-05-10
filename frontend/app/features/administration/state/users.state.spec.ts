@@ -53,7 +53,7 @@ describe('UsersState', () => {
 
         it('should reset loading state if loading failed', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             usersState.load().pipe(onErrorResumeNext()).subscribe();
 

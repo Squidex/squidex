@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
@@ -88,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var previewUrls = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            };
+            }.ToImmutableDictionary();
 
             var sourceSchema =
                 new Schema("source");

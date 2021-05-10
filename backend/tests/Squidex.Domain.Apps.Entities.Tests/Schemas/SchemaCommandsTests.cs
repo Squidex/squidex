@@ -10,6 +10,7 @@ using FluentAssertions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
@@ -47,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["mobile"] = "http://mobile"
-                },
+                }.ToImmutableDictionary(),
                 Category = "myCategory"
             };
 
@@ -69,10 +70,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     .SetPreviewUrls(new Dictionary<string, string>
                     {
                         ["mobile"] = "http://mobile"
-                    })
+                    }.ToImmutableDictionary())
                     .Publish();
 
-            var actual = command.BuildSchema("my-schema", false);
+            var actual = command.BuildSchema("my-schema", SchemaType.Default);
 
             actual.Should().BeEquivalentTo(expected);
         }
