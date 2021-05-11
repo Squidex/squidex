@@ -31,9 +31,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public JsonSchema DataSchema { get; init; }
 
-        public string FormatText(string text)
+        public string? FormatText(string text)
         {
-            return text?.Replace("schema ", $"'{SchemaDisplayName}' ", StringComparison.OrdinalIgnoreCase)!;
+            return text?.Replace("[schema]", $"'{SchemaDisplayName}'", StringComparison.Ordinal);
         }
 
         public OperationBuilder AddOperation(string method, string path)
