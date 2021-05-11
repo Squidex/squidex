@@ -46,20 +46,6 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 return base.CreateArrayContract(implementationType);
             }
 
-            if (objectType.BaseType?.IsGenericType == true && objectType.BaseType.GetGenericTypeDefinition() == typeof(ImmutableList<>))
-            {
-                var contract = base.CreateArrayContract(objectType);
-
-                return contract;
-            }
-
-            if (objectType.IsGenericType == true && objectType.GetGenericTypeDefinition() == typeof(ImmutableList<>))
-            {
-                var contract = base.CreateArrayContract(objectType);
-
-                return contract;
-            }
-
             return base.CreateArrayContract(objectType);
         }
 

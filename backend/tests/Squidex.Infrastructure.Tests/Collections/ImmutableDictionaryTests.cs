@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Collections
@@ -40,13 +41,31 @@ namespace Squidex.Infrastructure.Collections
         [Fact]
         public void Should_make_correct_object_equal_comparisons()
         {
-            var obj1a = new Dictionary<int, int> { [1] = 1 }.ToImmutableDictionary();
-            var obj1b = new Dictionary<int, int> { [1] = 1 }.ToImmutableDictionary();
+            var obj1a = new Dictionary<int, int>
+            {
+                [1] = 1
+            }.ToImmutableDictionary();
 
-            var dictionaryOtherValue = new Dictionary<int, int> { [1] = 2 }.ToImmutableDictionary();
-            var dictionaryOtherKey = new Dictionary<int, int> { [2] = 1 }.ToImmutableDictionary();
+            var obj1b = new Dictionary<int, int>
+            {
+                [1] = 1
+            }.ToImmutableDictionary();
 
-            var dictionaryOtherCount = new Dictionary<int, int> { [1] = 1, [2] = 2 }.ToImmutableDictionary();
+            var dictionaryOtherValue = new Dictionary<int, int>
+            {
+                [1] = 2
+            }.ToImmutableDictionary();
+
+            var dictionaryOtherKey = new Dictionary<int, int>
+            {
+                [2] = 1
+            }.ToImmutableDictionary();
+
+            var dictionaryOtherCount = new Dictionary<int, int>
+            {
+                [1] = 1,
+                [2] = 2
+            }.ToImmutableDictionary();
 
             Assert.Equal(obj1a, obj1b);
             Assert.Equal(obj1a.GetHashCode(), obj1b.GetHashCode());
@@ -63,6 +82,21 @@ namespace Squidex.Infrastructure.Collections
             Assert.NotEqual(obj1a, dictionaryOtherCount);
             Assert.NotEqual(obj1a.GetHashCode(), dictionaryOtherCount.GetHashCode());
             Assert.False(obj1a.Equals((object)dictionaryOtherCount));
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize()
+        {
+            var sut = new Dictionary<int, int>
+            {
+                [11] = 1,
+                [12] = 2,
+                [13] = 3
+            }.ToImmutableDictionary();
+
+            var serialized = sut.SerializeAndDeserialize();
+
+            Assert.Equal(sut, serialized);
         }
     }
 }

@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FluentAssertions;
+using Squidex.Infrastructure.TestHelpers;
 using System.Linq;
 using Xunit;
 
@@ -56,6 +58,16 @@ namespace Squidex.Infrastructure.Collections
             Assert.NotEqual(list1a, listOtherSize);
             Assert.NotEqual(list1a.GetHashCode(), listOtherSize.GetHashCode());
             Assert.False(list1a.Equals((object)listOtherSize));
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize()
+        {
+            var sut = ImmutableList.Create(1, 2, 3);
+
+            var serialized = sut.SerializeAndDeserialize();
+
+            Assert.Equal(sut, serialized);
         }
     }
 }
