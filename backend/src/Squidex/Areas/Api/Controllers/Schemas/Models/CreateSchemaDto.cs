@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Set to true to allow a single content item only.
         /// </summary>
-        [Obsolete("Use Type now")]
+        [Obsolete("Use 'type' field now.")]
         public bool IsSingleton
         {
             get => Type == SchemaType.Singleton;
@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             {
                 if (value)
                 {
-                    IsSingleton = true;
+                    Type = SchemaType.Singleton;
                 }
             }
         }

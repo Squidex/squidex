@@ -65,7 +65,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Indicates if the schema is a singleton.
         /// </summary>
-        [Obsolete("Use Type now")]
+        [Obsolete("Use 'type' field now.")]
         public bool IsSingleton
         {
             get => Type == SchemaType.Singleton;

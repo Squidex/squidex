@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// True to automatically publish the content.
         /// </summary>
-        [Obsolete("Use Jobs.Status")]
+        [Obsolete("Use 'jobs.status' fields now.")]
         public bool Publish { get; set; }
 
         /// <summary>

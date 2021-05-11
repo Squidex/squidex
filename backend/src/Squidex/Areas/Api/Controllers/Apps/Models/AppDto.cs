@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Indicates if the user can access the api.
         /// </summary>
-        [Obsolete("Usage role properties")]
+        [Obsolete("Use 'roleProperties' field now.")]
         public bool CanAccessApi { get; set; }
 
         /// <summary>

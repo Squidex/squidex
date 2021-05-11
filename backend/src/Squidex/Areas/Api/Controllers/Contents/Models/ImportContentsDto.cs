@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// True to automatically publish the content.
         /// </summary>
-        [Obsolete("Use Bulk endpoint")]
+        [Obsolete("Use bulk endpoint now.")]
         public bool Publish { get; set; }
 
         /// <summary>
