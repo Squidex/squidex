@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public IEnumerable<IValidator> Visit(IField<ComponentsFieldProperties> field, Args args)
+        public IEnumerable<IValidator> Visit(IField<ComponentFieldProperties> field, Args args)
         {
             var properties = field.Properties;
 

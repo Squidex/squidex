@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 
         public override FieldProperties ToProperties()
         {
-            var result = SimpleMapper.Map(this, new ComponentsFieldProperties());
+            var result = SimpleMapper.Map(this, new ComponentFieldProperties());
 
             return result;
         }

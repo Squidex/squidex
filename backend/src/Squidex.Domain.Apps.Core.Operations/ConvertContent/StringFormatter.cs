@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             }
         }
 
-        public string Visit(ComponentsFieldProperties properties, Args args)
+        public string Visit(ComponentFieldProperties properties, Args args)
         {
             return string.Empty;
         }

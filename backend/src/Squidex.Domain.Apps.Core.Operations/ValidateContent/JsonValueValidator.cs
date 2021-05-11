@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return args.Value is JsonBoolean;
         }
 
-        public bool Visit(IField<ComponentsFieldProperties> field, Args args)
+        public bool Visit(IField<ComponentFieldProperties> field, Args args)
         {
             var value = args.Value;
 

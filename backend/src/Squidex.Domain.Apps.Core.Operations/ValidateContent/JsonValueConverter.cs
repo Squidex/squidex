@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public (object? Result, JsonError? Error) Visit(IField<ComponentsFieldProperties> field, Args args)
+        public (object? Result, JsonError? Error) Visit(IField<ComponentFieldProperties> field, Args args)
         {
             return (args.Value, null);
         }

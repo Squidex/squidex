@@ -34,10 +34,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new RootField<BooleanFieldProperties>(id, name, partitioning, properties, settings);
         }
 
-        public static RootField<ComponentsFieldProperties> Components(long id, string name, Partitioning partitioning,
-            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+        public static RootField<ComponentFieldProperties> Components(long id, string name, Partitioning partitioning,
+            ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
-            return new RootField<ComponentsFieldProperties>(id, name, partitioning, properties, settings);
+            return new RootField<ComponentFieldProperties>(id, name, partitioning, properties, settings);
         }
 
         public static RootField<DateTimeFieldProperties> DateTime(long id, string name, Partitioning partitioning,
@@ -100,10 +100,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new NestedField<BooleanFieldProperties>(id, name, properties, settings);
         }
 
-        public static NestedField<ComponentsFieldProperties> Components(long id, string name,
-            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+        public static NestedField<ComponentFieldProperties> Components(long id, string name,
+            ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
-            return new NestedField<ComponentsFieldProperties>(id, name, properties, settings);
+            return new NestedField<ComponentFieldProperties>(id, name, properties, settings);
         }
 
         public static NestedField<DateTimeFieldProperties> DateTime(long id, string name,
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         public static Schema AddComponents(this Schema schema, long id, string name, Partitioning partitioning,
-            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+            ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
             return schema.AddField(Components(id, name, partitioning, properties, settings));
         }
@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         public static ArrayField AddComponents(this ArrayField field, long id, string name,
-            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+            ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
             return field.AddField(Components(id, name, properties, settings));
         }

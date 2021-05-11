@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return SchemaBuilder.BooleanProperty();
         }
 
-        public JsonSchemaProperty? Visit(IField<ComponentsFieldProperties> field, Args args)
+        public JsonSchemaProperty? Visit(IField<ComponentFieldProperties> field, Args args)
         {
             return null;
         }

@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         T Visit(IField<BooleanFieldProperties> field, TArgs args);
 
-        T Visit(IField<ComponentsFieldProperties> field, TArgs args);
+        T Visit(IField<ComponentFieldProperties> field, TArgs args);
 
         T Visit(IField<DateTimeFieldProperties> field, TArgs args);
 

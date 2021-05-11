@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             return CreatePrimitive(EdmPrimitiveTypeKind.Boolean, field);
         }
 
-        public IEdmTypeReference? Visit(IField<ComponentsFieldProperties> field, Args args)
+        public IEdmTypeReference? Visit(IField<ComponentFieldProperties> field, Args args)
         {
             return null;
         }

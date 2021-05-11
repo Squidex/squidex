@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             }
         }
 
-        public IEnumerable<ValidationError> Visit(ComponentsFieldProperties properties, None args)
+        public IEnumerable<ValidationError> Visit(ComponentFieldProperties properties, None args)
         {
             yield break;
         }

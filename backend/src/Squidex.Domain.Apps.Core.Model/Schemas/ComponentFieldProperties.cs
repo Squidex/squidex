@@ -5,44 +5,34 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class ComponentsFieldProperties : FieldProperties
+    public sealed record ComponentFieldProperties : FieldProperties
     {
-        public int? MinItems { get; set; }
-
-        public int? MaxItems { get; set; }
-
-        public bool Multiple { get; set; }
-
         public DomainId SchemaId
         {
-            get
-            {
-                return SchemaIds?.FirstOrDefault() ?? default;
-            }
-            set
+            init
             {
                 if (value != default)
                 {
-                    SchemaIds = new ReadOnlyCollection<DomainId>(new List<DomainId> { value });
+                    SchemaIds = ImmutableList.Create(value);
                 }
                 else
                 {
                     SchemaIds = null;
                 }
             }
+            get
+            {
+                return SchemaIds?.FirstOrDefault() ?? default;
+            }
         }
 
-        public ReadOnlyCollection<DomainId>? SchemaIds { get; set; }
-
-        public IReadOnlyDictionary<string, Schema>? ResolvedSchemas { get; set; }
+        public ImmutableList<DomainId>? SchemaIds { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {
@@ -51,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args)
         {
-            return visitor.Visit((IField<ComponentsFieldProperties>)field, args);
+            return visitor.Visit((IField<ComponentFieldProperties>)field, args);
         }
 
         public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)

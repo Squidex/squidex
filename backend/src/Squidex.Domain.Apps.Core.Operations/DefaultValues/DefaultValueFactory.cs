@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             return JsonValue.Create(value);
         }
 
-        public IJsonValue Visit(ComponentsFieldProperties properties, Args args)
+        public IJsonValue Visit(ComponentFieldProperties properties, Args args)
         {
             var multiple = properties.Multiple;
 
