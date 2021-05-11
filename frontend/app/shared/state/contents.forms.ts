@@ -13,7 +13,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime, onErrorResumeNext } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
-import { NestedFieldDto, RootFieldDto, SchemaDetailsDto, TableField } from './../services/schemas.service';
+import { NestedFieldDto, RootFieldDto, SchemaDto, TableField } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
 import { AbstractContentForm, AbstractContentFormState, CompiledRule, FieldSection, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
@@ -91,7 +91,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         return this.valueChange$.value;
     }
 
-    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDetailsDto,
+    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDto,
         private context: any, debounce = 100
     ) {
         super(new FormGroup({}));

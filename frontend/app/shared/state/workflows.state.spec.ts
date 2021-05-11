@@ -54,7 +54,7 @@ describe('WorkflowsState', () => {
 
         it('should reset loading state if loading failed', () => {
             workflowsService.setup(x => x.getWorkflows(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             workflowsState.load().pipe(onErrorResumeNext()).subscribe();
 

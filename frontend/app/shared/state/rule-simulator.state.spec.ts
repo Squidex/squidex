@@ -7,6 +7,7 @@
 
 import { DialogService, RulesService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SimulatedRuleEventsDto } from '../services/rules.service';
 import { createSimulatedRuleEvent } from './../services/rules.service.spec';
@@ -53,10 +54,10 @@ describe('RuleSimulatorState', () => {
 
     it('should reset loading state if loading failed', () => {
         rulesService.setup(x => x.getSimulatedEvents(app, '12'))
-            .returns(() => throwError('error'));
+            .returns(() => throwError('Service Error'));
 
         ruleSimulatorState.selectRule('12');
-        ruleSimulatorState.load().subscribe();
+        ruleSimulatorState.load().pipe(onErrorResumeNext()).subscribe();
 
         expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
     });

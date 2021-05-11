@@ -48,7 +48,7 @@ describe('EventConsumersState', () => {
 
         it('should reset loading state if loading failed', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
 
@@ -68,7 +68,7 @@ describe('EventConsumersState', () => {
 
         it('should show notification on load error if silent is false', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
-                .returns(() => throwError({})).verifiable();
+                .returns(() => throwError('Service Error')).verifiable();
 
             eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
 

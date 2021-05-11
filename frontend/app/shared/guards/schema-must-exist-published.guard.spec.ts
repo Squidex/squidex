@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
+import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SchemaMustExistPublishedGuard } from './schema-must-exist-published.guard';
@@ -30,7 +30,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
     it('should load schema and return true if found', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => of(<SchemaDetailsDto>{ isPublished: true }));
+            .returns(() => of(<SchemaDto>{ isPublished: true }));
 
         let result: boolean;
 
@@ -45,7 +45,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
     it('should load schema and return false if not found', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => of(<SchemaDetailsDto>{ isPublished: false }));
+            .returns(() => of(<SchemaDto>{ isPublished: false }));
 
         let result: boolean;
 

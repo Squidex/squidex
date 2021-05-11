@@ -9,7 +9,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDetailsDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 import { ContentReferencesComponent } from './references/content-references.component';
@@ -29,7 +29,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     @ViewChild(ContentReferencesComponent)
     public references: ContentReferencesComponent;
 
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public formContext: any;
 

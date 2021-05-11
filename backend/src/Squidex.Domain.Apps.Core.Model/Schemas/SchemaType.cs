@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Collections;
-
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class ConfigurePreviewUrls : SchemaUpdateCommand
+    public enum SchemaType
     {
-        public ImmutableDictionary<string, string> PreviewUrls { get; set; }
+        Default,
+        Singleton
     }
 }

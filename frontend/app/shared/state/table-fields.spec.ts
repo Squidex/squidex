@@ -6,7 +6,7 @@
  */
 
 import { DateTime, Version } from '@app/framework';
-import { createProperties, MetaFields, RootFieldDto, SchemaDetailsDto, TableField, TableFields, UIState } from '@app/shared/internal';
+import { createProperties, MetaFields, RootFieldDto, SchemaDto, TableField, TableFields, UIState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
@@ -14,12 +14,16 @@ describe('TableFields', () => {
     let uiState: IMock<UIState>;
 
     const schema =
-        new SchemaDetailsDto({}, '1', 'my-schema', '', {},
-            false,
-            false,
+        new SchemaDto({},
+            '1',
             DateTime.now(), 'me',
             DateTime.now(), 'me',
             new Version('1'),
+            'my-schema',
+            'my-category',
+            'Default',
+            false,
+            {},
             [
                 new RootFieldDto({}, 1, 'string', createProperties('String'), 'invariant')
             ]);

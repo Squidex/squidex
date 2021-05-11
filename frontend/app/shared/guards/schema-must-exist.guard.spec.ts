@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
+import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { SchemaMustExistGuard } from './schema-must-exist.guard';
@@ -30,7 +30,7 @@ describe('SchemaMustExistGuard', () => {
 
     it('should load schema and return true if found', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => of(<SchemaDetailsDto>{}));
+            .returns(() => of(<SchemaDto>{}));
 
         let result: boolean;
 

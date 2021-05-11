@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed record SchemaProperties : NamedElementPropertiesBase
     {
+        public static readonly SchemaProperties Empty = new SchemaProperties();
+
         public ImmutableList<string>? Tags { get; init; }
 
         public string? ContentsSidebarUrl { get; init; }

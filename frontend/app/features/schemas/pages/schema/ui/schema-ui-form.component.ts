@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { SchemaDetailsDto, SchemasState } from '@app/shared';
+import { SchemaDto, SchemasState } from '@app/shared';
 
 type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: ReadonlyArray<string> };
 
@@ -17,7 +17,7 @@ type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: Readonl
 })
 export class SchemaUIFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public selectedTab = 0;
 

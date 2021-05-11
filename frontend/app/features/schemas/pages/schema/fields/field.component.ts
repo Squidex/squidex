@@ -8,7 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
+import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-field',
@@ -23,7 +23,7 @@ export class FieldComponent implements OnChanges {
     public field: NestedFieldDto | RootFieldDto;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     @Input()
     public parent: RootFieldDto;

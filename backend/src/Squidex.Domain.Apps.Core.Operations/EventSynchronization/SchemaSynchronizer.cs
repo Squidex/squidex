@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (!source.PreviewUrls.EqualsDictionary(target.PreviewUrls))
                 {
-                    yield return new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary() };
+                    yield return new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls };
                 }
 
                 if (source.IsPublished != target.IsPublished)

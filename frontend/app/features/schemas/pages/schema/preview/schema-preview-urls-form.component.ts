@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ConfigurePreviewUrlsForm, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { ConfigurePreviewUrlsForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-preview-urls-form',
@@ -16,7 +16,7 @@ import { ConfigurePreviewUrlsForm, SchemaDetailsDto, SchemasState } from '@app/s
 })
 export class SchemaPreviewUrlsFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public editForm = new ConfigurePreviewUrlsForm(this.formBuilder);
 

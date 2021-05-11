@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -386,7 +386,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
-        [Obsolete("Use bulk endpoint")]
+        [Obsolete("Use bulk endpoint now.")]
         public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
         {
             var command = request.ToCommand();

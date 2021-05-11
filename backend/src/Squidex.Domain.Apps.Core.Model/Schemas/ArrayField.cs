@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {

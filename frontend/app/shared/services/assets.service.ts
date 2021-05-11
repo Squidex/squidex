@@ -59,6 +59,7 @@ export class AssetDto {
         public readonly createdBy: string,
         public readonly lastModified: DateTime,
         public readonly lastModifiedBy: string,
+        public readonly version: Version,
         public readonly fileName: string,
         public readonly fileHash: string,
         public readonly fileType: string,
@@ -71,8 +72,7 @@ export class AssetDto {
         public readonly metadataText: string,
         public readonly metadata: any,
         public readonly slug: string,
-        public readonly tags: ReadonlyArray<string>,
-        public readonly version: Version
+        public readonly tags: ReadonlyArray<string>
     ) {
         this.canPreview =
             (this.mimeType !== MIME_TIFF && this.type === 'Image') ||
@@ -417,6 +417,7 @@ function parseAsset(response: any) {
         response.id,
         DateTime.parseISO(response.created), response.createdBy,
         DateTime.parseISO(response.lastModified), response.lastModifiedBy,
+        new Version(response.version.toString()),
         response.fileName,
         response.fileHash,
         response.fileType,
@@ -429,8 +430,7 @@ function parseAsset(response: any) {
         response.metadataText,
         response.metadata,
         response.slug,
-        response.tags || [],
-        new Version(response.version.toString()));
+        response.tags || []);
 }
 
 function parseAssetFolder(response: any) {

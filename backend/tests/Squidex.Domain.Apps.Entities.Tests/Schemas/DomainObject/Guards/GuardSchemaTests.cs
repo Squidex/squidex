@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -657,7 +657,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanConfigurePreviewUrls_should_not_throw_exception_if_valid()
         {
-            var command = new ConfigurePreviewUrls { PreviewUrls = new Dictionary<string, string>() };
+            var command = new ConfigurePreviewUrls { PreviewUrls = ImmutableDictionary.Empty<string, string>() };
 
             GuardSchema.CanConfigurePreviewUrls(command);
         }

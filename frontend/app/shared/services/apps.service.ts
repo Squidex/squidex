@@ -36,18 +36,20 @@ export class AppDto {
 
     constructor(links: ResourceLinks,
         public readonly id: string,
+        public readonly created: DateTime,
+        public readonly createdBy: string,
+        public readonly lastModified: DateTime,
+        public readonly lastModifiedBy: string,
+        public readonly version: Version,
         public readonly name: string,
         public readonly label: string | undefined,
         public readonly description: string | undefined,
         public readonly permissions: ReadonlyArray<string>,
-        public readonly created: DateTime,
-        public readonly lastModified: DateTime,
         public readonly canAccessApi: boolean,
         public readonly canAccessContent: boolean,
         public readonly planName: string | undefined,
         public readonly planUpgrade: string | undefined,
-        public readonly roleProperties: {},
-        public readonly version: Version
+        public readonly roleProperties: {}
     ) {
         this._links = links;
 
@@ -283,18 +285,18 @@ export class AppsService {
 function parseApp(response: any) {
     return new AppDto(response._links,
         response.id,
+        DateTime.parseISO(response.created), response.createdBy,
+        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
+        new Version(response.version.toString()),
         response.name,
         response.label,
         response.description,
         response.permissions,
-        DateTime.parseISO(response.created),
-        DateTime.parseISO(response.lastModified),
         response.canAccessApi,
         response.canAccessContent,
         response.planName,
         response.planUpgrade,
-        response.roleProperties,
-        new Version(response.version.toString()));
+        response.roleProperties);
 }
 
 function parseAppSettings(response: any) {

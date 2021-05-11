@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// True to resolve first image in the content list.
         /// </summary>
-        [Obsolete("Use ResolveFirst now")]
+        [Obsolete("Use 'resolveFirst' field now")]
         public bool ResolveImage
         {
             get => ResolveFirst;
