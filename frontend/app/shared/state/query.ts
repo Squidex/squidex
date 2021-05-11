@@ -10,7 +10,7 @@
 import { QueryParams, RouteSynchronizer, Types } from '@app/framework';
 import { StatusInfo } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
-import { MetaFields, SchemaDetailsDto } from './../services/schemas.service';
+import { MetaFields, SchemaDto } from './../services/schemas.service';
 
 export type QueryValueType =
     'boolean' |
@@ -304,7 +304,7 @@ const DEFAULT_FIELDS: QueryModelFields = {
     }
 };
 
-export function queryModelFromSchema(schema: SchemaDetailsDto, languages: ReadonlyArray<LanguageDto>, statuses: ReadonlyArray<StatusInfo> | undefined) {
+export function queryModelFromSchema(schema: SchemaDto, languages: ReadonlyArray<LanguageDto>, statuses: ReadonlyArray<StatusInfo> | undefined) {
     const languagesCodes = languages.map(x => x.iso2Code);
 
     const model: QueryModel = {

@@ -7,6 +7,7 @@
 
 import { AuthService, Profile, UserDto, UsersProviderService, UsersService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock, Times } from 'typemoq';
 
 describe('UsersProviderService', () => {
@@ -81,11 +82,11 @@ describe('UsersProviderService', () => {
             .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
 
         usersService.setup(x => x.getUser('123'))
-            .returns(() => throwError('NOT FOUND')).verifiable(Times.once());
+            .returns(() => throwError('Service Error')).verifiable(Times.once());
 
         let resultingUser: UserDto;
 
-        usersProviderService.getUser('123').subscribe(result => {
+        usersProviderService.getUser('123').pipe(onErrorResumeNext()).subscribe(result => {
             resultingUser = result;
         }).unsubscribe();
 

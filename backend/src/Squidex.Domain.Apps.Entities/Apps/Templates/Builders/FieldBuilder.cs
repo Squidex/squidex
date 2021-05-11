@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -16,11 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         private readonly UpsertSchemaField field;
         private readonly CreateSchema schema;
 
-        protected T Properties<T>() where T : FieldProperties
-        {
-            return (T)field.Properties;
-        }
-
         protected FieldBuilder(UpsertSchemaField field, CreateSchema schema)
         {
             this.field = field;
@@ -29,14 +25,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder Label(string? label)
         {
-            field.Properties.Label = label;
+            field.Properties = field.Properties with { Label = label };
 
             return this;
         }
 
         public FieldBuilder Hints(string? hints)
         {
-            field.Properties.Hints = hints;
+            field.Properties = field.Properties with { Hints = hints };
 
             return this;
         }
@@ -57,9 +53,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder Required()
         {
-            field.Properties.IsRequired = true;
+            field.Properties = field.Properties with { IsRequired = true };
 
             return this;
+        }
+
+        protected void Properties<T>(Func<T, T> updater) where T : FieldProperties
+        {
+            field.Properties = updater((T)field.Properties);
         }
 
         public FieldBuilder ShowInList()

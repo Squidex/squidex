@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_string_not_allowed()
         {
-            var sut = Field(new StringFieldProperties { AllowedValues = ReadOnlyCollection.Create("Foo") });
+            var sut = Field(new StringFieldProperties { AllowedValues = ImmutableList.Create("Foo") });
 
             await sut.ValidateAsync(CreateValue("Bar"), errors);
 

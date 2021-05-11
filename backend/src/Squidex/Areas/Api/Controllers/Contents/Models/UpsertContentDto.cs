@@ -32,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// True to automatically publish the content.
         /// </summary>
         [FromQuery]
-        [Obsolete("Use status query string.")]
+        [Obsolete("Use 'status' query string now.")]
         public bool Publish { get; set; }
 
         public UpsertContent ToCommand(DomainId id)

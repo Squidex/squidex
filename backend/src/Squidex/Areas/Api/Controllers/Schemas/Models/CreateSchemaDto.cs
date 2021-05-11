@@ -22,28 +22,29 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// Set to true to allow a single content item only.
-        /// </summary>
-        [Obsolete("Use Type property.")]
-        public bool IsSingleton { get; set; }
-
-        /// <summary>
         /// The type of the schema.
         /// </summary>
         public SchemaType Type { get; set; }
 
+        /// <summary>
+        /// Set to true to allow a single content item only.
+        /// </summary>
+        [Obsolete("Use 'type' field now.")]
+        public bool IsSingleton
+        {
+            get => Type == SchemaType.Singleton;
+            set
+            {
+                if (value)
+                {
+                    Type = SchemaType.Singleton;
+                }
+            }
+        }
+
         public CreateSchema ToCommand()
         {
-            var command = ToCommand(this, new CreateSchema());
-
-#pragma warning disable CS0618 // Type or member is obsolete
-            if (IsSingleton)
-            {
-                command.Type = SchemaType.Singleton;
-            }
-#pragma warning restore CS0618 // Type or member is obsolete
-
-            return command;
+            return ToCommand(this, new CreateSchema());
         }
     }
 }

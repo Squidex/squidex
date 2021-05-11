@@ -9,7 +9,7 @@
 
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { MetaFields, SchemaDetailsDto } from '@app/shared';
+import { MetaFields, SchemaDto } from '@app/shared';
 
 const META_FIELD_NAMES = Object.values(MetaFields);
 
@@ -24,7 +24,7 @@ export class FieldListComponent implements OnChanges {
     public emptyText = '';
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     @Input()
     public fieldNames: ReadonlyArray<string>;

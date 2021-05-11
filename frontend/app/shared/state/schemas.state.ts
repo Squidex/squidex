@@ -6,10 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
+import { compareStrings, DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
@@ -28,7 +28,7 @@ interface Snapshot {
     isLoading?: boolean;
 
     // The selected schema.
-    selectedSchema?: SchemaDetailsDto | null;
+    selectedSchema?: SchemaDto | null;
 
     // Indicates if the user can create a schema.
     canCreate?: boolean;
@@ -79,7 +79,7 @@ export class SchemasState extends State<Snapshot> {
         super({ schemas: [], categories: [] }, 'Schemas');
     }
 
-    public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
+    public select(idOrName: string | null): Observable<SchemaDto | null> {
         return this.loadSchema(idOrName).pipe(
             tap(selectedSchema => {
                 this.next({ selectedSchema }, 'Selected');
@@ -91,12 +91,10 @@ export class SchemasState extends State<Snapshot> {
             return of(null);
         }
 
-        if (cached) {
-            const found = this.snapshot.schemas.find(x => x.id === idOrName || x.name === idOrName);
+        const found = this.snapshot.schemas.find(x => x.id === idOrName || x.name === idOrName);
 
-            if (Types.is(found, SchemaDetailsDto)) {
-                return of(found);
-            }
+        if (cached || !found) {
+            return of(found || null);
         }
 
         return this.schemasService.getSchema(this.appName, idOrName).pipe(
@@ -146,7 +144,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: CreateSchemaDto): Observable<SchemaDetailsDto> {
+    public create(request: CreateSchemaDto): Observable<SchemaDto> {
         return this.schemasService.postSchema(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
@@ -215,7 +213,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public configurePreviewUrls(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
+    public configurePreviewUrls(schema: SchemaDto, request: {}): Observable<SchemaDto> {
         return this.schemasService.putPreviewUrls(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
@@ -223,7 +221,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public configureFieldRules(schema: SchemaDto, request: ReadonlyArray<FieldRule>): Observable<SchemaDetailsDto> {
+    public configureFieldRules(schema: SchemaDto, request: ReadonlyArray<FieldRule>): Observable<SchemaDto> {
         return this.schemasService.putFieldRules(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
@@ -231,7 +229,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public configureScripts(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
+    public configureScripts(schema: SchemaDto, request: {}): Observable<SchemaDto> {
         return this.schemasService.putScripts(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
@@ -239,7 +237,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public synchronize(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
+    public synchronize(schema: SchemaDto, request: {}): Observable<SchemaDto> {
         return this.schemasService.putSchemaSync(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.synchronized');
@@ -247,7 +245,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(schema: SchemaDto, request: UpdateSchemaDto): Observable<SchemaDetailsDto> {
+    public update(schema: SchemaDto, request: UpdateSchemaDto): Observable<SchemaDto> {
         return this.schemasService.putSchema(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
@@ -263,7 +261,7 @@ export class SchemasState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => getField(x, request, parent), { silent: true }));
     }
 
-    public configureUIFields(schema: SchemaDto, request: UpdateUIFields): Observable<SchemaDetailsDto> {
+    public configureUIFields(schema: SchemaDto, request: UpdateUIFields): Observable<SchemaDto> {
         return this.schemasService.putUIFields(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
@@ -271,7 +269,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public orderFields(schema: SchemaDto, fields: ReadonlyArray<any>, parent?: RootFieldDto): Observable<SchemaDetailsDto> {
+    public orderFields(schema: SchemaDto, fields: ReadonlyArray<any>, parent?: RootFieldDto): Observable<SchemaDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
@@ -279,7 +277,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public lockField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+    public lockField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDto> {
         return this.schemasService.lockField(this.appName, field, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -287,7 +285,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public enableField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+    public enableField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDto> {
         return this.schemasService.enableField(this.appName, field, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -295,7 +293,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public disableField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+    public disableField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDto> {
         return this.schemasService.disableField(this.appName, field, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -303,7 +301,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public showField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+    public showField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDto> {
         return this.schemasService.showField(this.appName, field, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -311,7 +309,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public hideField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+    public hideField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDto> {
         return this.schemasService.hideField(this.appName, field, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -319,7 +317,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public updateField<T extends FieldDto>(schema: SchemaDto, field: T, request: UpdateFieldDto): Observable<SchemaDetailsDto> {
+    public updateField<T extends FieldDto>(schema: SchemaDto, field: T, request: UpdateFieldDto): Observable<SchemaDto> {
         return this.schemasService.putField(this.appName, field, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
@@ -327,7 +325,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public deleteField(schema: SchemaDto, field: AnyFieldDto): Observable<SchemaDetailsDto> {
+    public deleteField(schema: SchemaDto, field: AnyFieldDto): Observable<SchemaDto> {
         return this.schemasService.deleteField(this.appName, field, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -345,7 +343,6 @@ export class SchemasState extends State<Snapshot> {
                 const schemas = s.schemas.replacedBy('id', schema).sortedByString(x => x.displayName);
 
                 const selectedSchema =
-                    Types.is(schema, SchemaDetailsDto) &&
                     schema &&
                     s.selectedSchema &&
                     s.selectedSchema.id === schema.id ?
@@ -366,7 +363,7 @@ export class SchemasState extends State<Snapshot> {
     }
 }
 
-function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldDto): FieldDto {
+function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto): FieldDto {
     if (parent) {
         return x.fields.find(f => f.fieldId === parent.fieldId)!.nested.find(f => f.name === request.name)!;
     } else {

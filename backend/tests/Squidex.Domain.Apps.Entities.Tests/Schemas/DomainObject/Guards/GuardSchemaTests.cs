@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -331,8 +331,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                         Partitioning = Partitioning.Invariant.Key
                     }
                 },
-                FieldsInLists = new FieldNames("field1"),
-                FieldsInReferences = new FieldNames("field1"),
+                FieldsInLists = FieldNames.Create("field1"),
+                FieldsInReferences = FieldNames.Create("field1"),
                 Name = "new-schema"
             });
 
@@ -367,7 +367,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                         Partitioning = Partitioning.Invariant.Key
                     }
                 },
-                FieldsInLists = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
+                FieldsInLists = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
                 FieldsInReferences = null,
                 Name = "new-schema"
             });
@@ -406,7 +406,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                     }
                 },
                 FieldsInLists = null,
-                FieldsInReferences = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
+                FieldsInReferences = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
                 Name = "new-schema"
             });
 
@@ -429,7 +429,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             var command = CreateCommand(new CreateSchema
             {
                 FieldsInLists = null,
-                FieldsInReferences = new FieldNames("meta.id"),
+                FieldsInReferences = FieldNames.Create("meta.id"),
                 Name = "new-schema"
             });
 
@@ -479,8 +479,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
                         }
                     }
                 },
-                FieldsInLists = new FieldNames("field1", "meta.id"),
-                FieldsInReferences = new FieldNames("field1"),
+                FieldsInLists = FieldNames.Create("field1", "meta.id"),
+                FieldsInReferences = FieldNames.Create("field1"),
                 Name = "new-schema"
             });
 
@@ -492,7 +492,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         {
             var command = new ConfigureUIFields
             {
-                FieldsInLists = new FieldNames(null!, null!, "field3", "field1", "field1", "field4"),
+                FieldsInLists = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4"),
                 FieldsInReferences = null
             };
 
@@ -515,7 +515,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             var command = new ConfigureUIFields
             {
                 FieldsInLists = null,
-                FieldsInReferences = new FieldNames(null!, null!, "field3", "field1", "field1", "field4")
+                FieldsInReferences = FieldNames.Create(null!, null!, "field3", "field1", "field1", "field4")
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
@@ -537,7 +537,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             var command = new ConfigureUIFields
             {
                 FieldsInLists = null,
-                FieldsInReferences = new FieldNames("meta.id")
+                FieldsInReferences = FieldNames.Create("meta.id")
             };
 
             ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, schema_0),
@@ -550,8 +550,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         {
             var command = new ConfigureUIFields
             {
-                FieldsInLists = new FieldNames("field1", "meta.id"),
-                FieldsInReferences = new FieldNames("field2")
+                FieldsInLists = FieldNames.Create("field1", "meta.id"),
+                FieldsInReferences = FieldNames.Create("field2")
             };
 
             GuardSchema.CanConfigureUIFields(command, schema_0);
@@ -657,7 +657,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanConfigurePreviewUrls_should_not_throw_exception_if_valid()
         {
-            var command = new ConfigurePreviewUrls { PreviewUrls = new Dictionary<string, string>() };
+            var command = new ConfigurePreviewUrls { PreviewUrls = ImmutableDictionary.Empty<string, string>() };
 
             GuardSchema.CanConfigurePreviewUrls(command);
         }

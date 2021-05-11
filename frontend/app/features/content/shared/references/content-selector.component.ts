@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-selector',
@@ -35,7 +35,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public alreadySelected: ReadonlyArray<ContentDto>;
 
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
 
     public queryModel: QueryModel;

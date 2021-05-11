@@ -54,7 +54,7 @@ describe('ClientsState', () => {
 
         it('should reset loading state if loading failed', () => {
             clientsService.setup(x => x.getClients(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError('Service Error'));
 
             clientsState.load().pipe(onErrorResumeNext()).subscribe();
 

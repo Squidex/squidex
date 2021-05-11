@@ -35,27 +35,27 @@ namespace Migrations.OldEvents
 
             if (!string.IsNullOrWhiteSpace(ScriptQuery))
             {
-                scripts.Query = ScriptQuery;
+                scripts = scripts with { Query = ScriptQuery };
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptCreate))
             {
-                scripts.Create = ScriptCreate;
+                scripts = scripts with { Create = ScriptCreate };
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptUpdate))
             {
-                scripts.Update = ScriptUpdate;
+                scripts = scripts with { Update = ScriptUpdate };
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptDelete))
             {
-                scripts.Delete = ScriptDelete;
+                scripts = scripts with { Delete = ScriptDelete };
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptChange))
             {
-                scripts.Change = ScriptChange;
+                scripts = scripts with { Change = ScriptChange };
             }
 
             return SimpleMapper.Map(this, new SchemaScriptsConfigured { Scripts = scripts });

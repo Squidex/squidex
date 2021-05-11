@@ -15,8 +15,7 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class Role : Named
+    public sealed record Role : Named
     {
         private static readonly HashSet<string> ExtraPermissions = new HashSet<string>
         {
@@ -41,7 +40,6 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public JsonObject Properties { get; }
 
-        [IgnoreDuringEquals]
         public bool IsDefault
         {
             get => Roles.IsDefault(this);

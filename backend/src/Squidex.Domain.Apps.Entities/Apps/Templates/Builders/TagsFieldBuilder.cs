@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
@@ -20,7 +20,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public TagsFieldBuilder WithAllowedValues(params string[] values)
         {
-            Properties<TagsFieldProperties>().AllowedValues = new ReadOnlyCollection<string>(values);
+            Properties<TagsFieldProperties>(p => p with
+            {
+                AllowedValues = ImmutableList.Create(values)
+            });
 
             return this;
         }

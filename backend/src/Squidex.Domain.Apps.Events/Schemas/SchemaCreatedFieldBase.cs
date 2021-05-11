@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    public abstract class SchemaCreatedFieldBase
+    public abstract class SchemaCreatedFieldBase : IFieldSettings
     {
         public string Name { get; set; }
 

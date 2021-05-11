@@ -5,26 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class TagsFieldProperties : FieldProperties
+    public sealed record TagsFieldProperties : FieldProperties
     {
-        public ReadOnlyCollection<string>? AllowedValues { get; set; }
+        public ImmutableList<string>? AllowedValues { get; init; }
 
-        public LocalizedValue<string[]?> DefaultValues { get; set; }
+        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; init; }
 
-        public string[]? DefaultValue { get; set; }
+        public ImmutableList<string>? DefaultValue { get; init; }
 
-        public int? MinItems { get; set; }
+        public int? MinItems { get; init; }
 
-        public int? MaxItems { get; set; }
+        public int? MaxItems { get; init; }
 
-        public TagsFieldEditor Editor { get; set; }
+        public TagsFieldEditor Editor { get; init; }
 
-        public TagsFieldNormalization Normalization { get; set; }
+        public TagsFieldNormalization Normalization { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

@@ -19,7 +19,7 @@ namespace Squidex.Extensions.Actions.Fastly
         Display = "Purge fastly cache",
         Description = "Remove entries from the fastly CDN cache.",
         ReadMore = "https://www.fastly.com/")]
-    public sealed class FastlyAction : RuleAction
+    public sealed record FastlyAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Api Key", Description = "The API key to grant access to Squidex.")]

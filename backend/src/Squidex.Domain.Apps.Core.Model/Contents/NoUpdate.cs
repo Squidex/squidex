@@ -5,35 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class NoUpdate : WorkflowCondition
+    public sealed record NoUpdate : WorkflowCondition
     {
-        public static readonly NoUpdate Always = new NoUpdate(null, null);
-
-        public NoUpdate(string? expression, ReadOnlyCollection<string>? roles)
-            : base(expression, roles)
-        {
-        }
+        public static readonly NoUpdate Always = new NoUpdate();
 
         public static NoUpdate When(string? expression, params string[]? roles)
         {
             if (roles?.Length > 0)
             {
-                return new NoUpdate(expression, ReadOnlyCollection.Create(roles));
+                return new NoUpdate { Expression = expression, Roles = roles?.ToImmutableList() };
             }
-            else if (!string.IsNullOrWhiteSpace(expression))
+
+            if (!string.IsNullOrWhiteSpace(expression))
             {
-                return new NoUpdate(expression, null);
+                return new NoUpdate { Expression = expression };
             }
-            else
-            {
-                return Always;
-            }
+
+            return Always;
         }
     }
 }

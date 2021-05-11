@@ -7,13 +7,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.Linq;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class PropertyPath : ReadOnlyCollection<string>
+    public sealed class PropertyPath : ImmutableList<string>
     {
         private static readonly char[] Separators = { '.', '/' };
 
@@ -28,27 +27,36 @@ namespace Squidex.Infrastructure.Queries
 
         public static implicit operator PropertyPath(string path)
         {
-            return new PropertyPath(path?.Split(Separators, StringSplitOptions.RemoveEmptyEntries).ToList()!);
+            return Create(path?.Split(Separators, StringSplitOptions.RemoveEmptyEntries).ToList());
         }
 
         public static implicit operator PropertyPath(string[] path)
         {
-            return new PropertyPath(path?.ToList()!);
+            return Create(path);
         }
 
         public static implicit operator PropertyPath(List<string> path)
         {
-            return new PropertyPath(path);
-        }
-
-        public static implicit operator PropertyPath(ImmutableList<string> path)
-        {
-            return new PropertyPath(path);
+            return Create(path);
         }
 
         public override string ToString()
         {
             return string.Join(".", this);
+        }
+
+        private static PropertyPath Create(IEnumerable<string>? source)
+        {
+            var inner = source?.ToList();
+
+            if (inner == null || inner.Count == 0)
+            {
+                throw new ArgumentException("Path cannot be empty.", nameof(source));
+            }
+            else
+            {
+                return new PropertyPath(inner);
+            }
         }
     }
 }

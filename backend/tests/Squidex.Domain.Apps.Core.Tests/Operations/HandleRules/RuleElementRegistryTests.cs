@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Display = "Action display",
             Description = "Action description.",
             ReadMore = "https://www.readmore.com/")]
-        public sealed class MyInvalidRuleAction : RuleAction
+        public sealed record MyInvalidRuleAction : RuleAction
         {
             [DataType(DataType.Custom)]
             public string Custom { get; set; }
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Display = "Action display",
             Description = "Action description.",
             ReadMore = "https://www.readmore.com/")]
-        public sealed class MyRuleAction : RuleAction
+        public sealed record MyRuleAction : RuleAction
         {
             [LocalizedRequired]
             [Display(Name = "Url Name", Description = "Url Description")]

@@ -60,21 +60,21 @@ export class ContentDto {
 
     constructor(links: ResourceLinks,
         public readonly id: string,
-        public readonly status: string,
-        public readonly statusColor: string,
-        public readonly newStatus: string | undefined,
-        public readonly newStatusColor: string | undefined,
         public readonly created: DateTime,
         public readonly createdBy: string,
         public readonly lastModified: DateTime,
         public readonly lastModifiedBy: string,
+        public readonly version: Version,
+        public readonly status: string,
+        public readonly statusColor: string,
+        public readonly newStatus: string | undefined,
+        public readonly newStatusColor: string | undefined,
         public readonly scheduleJob: ScheduleDto | null,
         public readonly data: ContentData,
         public readonly schemaName: string,
         public readonly schemaDisplayName: string,
         public readonly referenceData: ContentReferences,
-        public readonly referenceFields: ReadonlyArray<RootFieldDto>,
-        public readonly version: Version
+        public readonly referenceFields: ReadonlyArray<RootFieldDto>
     ) {
         this._links = links;
 
@@ -389,19 +389,19 @@ function buildQuery(q?: ContentQueryDto) {
 function parseContent(response: any) {
     return new ContentDto(response._links,
         response.id,
+        DateTime.parseISO(response.created), response.createdBy,
+        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
+        new Version(response.version.toString()),
         response.status,
         response.statusColor,
         response.newStatus,
         response.newStatusColor,
-        DateTime.parseISO(response.created), response.createdBy,
-        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
         parseScheduleJob(response.scheduleJob),
         response.data,
         response.schemaName,
         response.schemaDisplayName,
         response.referenceData,
-        response.referenceFields.map(parseField),
-        new Version(response.version.toString()));
+        response.referenceFields.map(parseField));
 }
 
 function parseScheduleJob(response: any) {

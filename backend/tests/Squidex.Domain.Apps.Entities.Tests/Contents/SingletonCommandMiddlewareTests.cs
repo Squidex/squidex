@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_not_create_content_if_non_singleton_schema_is_created()
         {
-            var command = new CreateSchema { Type = SchemaType.Default };
+            var command = new CreateSchema();
 
             var context =
                 new CommandContext(command, commandBus)

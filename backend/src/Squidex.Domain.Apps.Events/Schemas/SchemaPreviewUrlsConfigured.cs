@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Schemas
@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaPreviewUrlsConfigured))]
     public sealed class SchemaPreviewUrlsConfigured : SchemaEvent
     {
-        public Dictionary<string, string> PreviewUrls { get; set; }
+        public ImmutableDictionary<string, string> PreviewUrls { get; set; }
     }
 }

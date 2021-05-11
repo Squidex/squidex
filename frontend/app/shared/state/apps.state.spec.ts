@@ -7,6 +7,7 @@
 
 import { AppDto, AppsService, AppsState, DialogService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { createApp, createAppSettings } from './../services/apps.service.spec';
 
@@ -107,9 +108,9 @@ describe('AppsState', () => {
         let appSelected: AppDto;
 
         appsService.setup(x => x.getApp('unknown'))
-            .returns(() => throwError(new Error('404')));
+            .returns(() => throwError('Service Error'));
 
-        appsState.select('unknown').subscribe(x => {
+        appsState.select('unknown').pipe(onErrorResumeNext()).subscribe(x => {
             appSelected = x!;
         });
 

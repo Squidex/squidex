@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var ctx = ContextWithPermission();
 
-            var schema1 = CreateSchema("schemaA1", SchemaType.Default);
+            var schema1 = CreateSchema("schemaA1");
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
                 .Returns(new List<ISchemaEntity> { schema1 });
@@ -61,9 +61,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var ctx = ContextWithPermission(permission.Id);
 
-            var schema1 = CreateSchema("schemaA1", SchemaType.Default);
-            var schema2 = CreateSchema("schemaA2", SchemaType.Default);
-            var schema3 = CreateSchema("schemaB2", SchemaType.Default);
+            var schema1 = CreateSchema("schemaA1");
+            var schema2 = CreateSchema("schemaA2");
+            var schema3 = CreateSchema("schemaB2");
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
                 .Returns(new List<ISchemaEntity> { schema1, schema2, schema3 });
@@ -112,11 +112,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     .Add("schemaA1 Content", SearchResultType.Content, "schemaA1-content-url", "schemaA1"));
         }
 
-        private ISchemaEntity CreateSchema(string name, SchemaType type)
+        private ISchemaEntity CreateSchema(string name, SchemaType type = SchemaType.Default)
         {
-            var schemaDef = new Schema(name, null, type);
-
-            return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), name), schemaDef);
+            return Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), name), new Schema(name, type: type));
         }
 
         private Context ContextWithPermission(string? permission = null)

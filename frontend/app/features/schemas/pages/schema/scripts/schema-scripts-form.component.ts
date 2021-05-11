@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AppsState, EditScriptsForm, SchemaCompletions, SchemaDetailsDto, SchemasService, SchemasState } from '@app/shared';
+import { AppsState, EditScriptsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 import { EMPTY, Observable } from 'rxjs';
 
 @Component({
@@ -17,7 +17,7 @@ import { EMPTY, Observable } from 'rxjs';
 })
 export class SchemaScriptsFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public schemaScript = 'query';
     public schemaCompletions: Observable<SchemaCompletions> = EMPTY;

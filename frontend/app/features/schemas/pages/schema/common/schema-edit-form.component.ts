@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { EditSchemaForm, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { EditSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-edit-form',
@@ -16,7 +16,7 @@ import { EditSchemaForm, SchemaDetailsDto, SchemasState } from '@app/shared';
 })
 export class SchemaEditFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public fieldForm = new EditSchemaForm(this.formBuilder);
 

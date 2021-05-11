@@ -20,7 +20,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
         Display = "Populate Elasticsearch index",
         Description = "Populate a full text search index in ElasticSearch.",
         ReadMore = "https://www.elastic.co/")]
-    public sealed class ElasticSearchAction : RuleAction
+    public sealed record ElasticSearchAction : RuleAction
     {
         [AbsoluteUrl]
         [LocalizedRequired]

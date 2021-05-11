@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
 using Squidex.Log;
 using Xunit;
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, command.Type) })
+                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, SchemaType.Singleton) })
                 );
         }
 
@@ -174,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Disable("field1")) })
+                    CreateEvent(new SchemaFieldRulesConfigured { FieldRules = FieldRules.Create(FieldRule.Disable("field1")) })
                 );
         }
 
@@ -183,7 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var command = new ConfigureUIFields
             {
-                FieldsInLists = new FieldNames(fieldName)
+                FieldsInLists = FieldNames.Create(fieldName)
             };
 
             await ExecuteCreateAsync();
@@ -206,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var command = new ConfigureUIFields
             {
-                FieldsInReferences = new FieldNames(fieldName)
+                FieldsInReferences = FieldNames.Create(fieldName)
             };
 
             await ExecuteCreateAsync();
@@ -290,7 +291,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["Web"] = "web-url"
-                }
+                }.ToImmutableDictionary()
             };
 
             await ExecuteCreateAsync();

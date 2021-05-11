@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDto, SchemasState, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',
@@ -24,7 +24,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     public initialData: any;
 
     @Input()
-    public schemaName: string;
+    public schemaName?: string | null;
 
     @Input()
     public schemaIds: ReadonlyArray<string>;
@@ -38,7 +38,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     @Input()
     public formContext: any;
 
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
 
     public contentForm: EditContentForm;

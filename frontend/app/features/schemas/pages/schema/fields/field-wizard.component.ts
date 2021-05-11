@@ -7,7 +7,7 @@
 
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto, fieldTypes, LanguagesState, RootFieldDto, SchemaDetailsDto, SchemasState, Types } from '@app/shared';
+import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto, fieldTypes, LanguagesState, RootFieldDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 
@@ -21,7 +21,7 @@ export class FieldWizardComponent implements OnInit {
     public nameInput: ElementRef<HTMLElement>;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     @Input()
     public settings: AppSettingsDto;

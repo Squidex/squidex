@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             get => DomainId.Combine(AppId, ruleId);
         }
 
-        public sealed class TestAction : RuleAction
+        public sealed record TestAction : RuleAction
         {
             public int Value { get; set; }
         }

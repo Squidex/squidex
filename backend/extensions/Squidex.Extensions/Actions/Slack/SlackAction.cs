@@ -20,7 +20,7 @@ namespace Squidex.Extensions.Actions.Slack
         Display = "Send to Slack",
         Description = "Create a status update to a slack channel.",
         ReadMore = "https://slack.com")]
-    public sealed class SlackAction : RuleAction
+    public sealed record SlackAction : RuleAction
     {
         [AbsoluteUrl]
         [LocalizedRequired]

@@ -8,7 +8,7 @@
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
-import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
 import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };
@@ -31,22 +31,26 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
                     ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage')
                 ]
             ],
+            type: ['Default',
+                [
+                    Validators.required
+                ]
+            ],
             initialCategory: undefined,
-            isSingleton: false,
             importing: {}
         }));
     }
 
     public transformLoad(value: CreateSchemaDto) {
-        const { name, isSingleton, category, ...importing } = value;
+        const { name, type, category, ...importing } = value;
 
-        return { name, isSingleton, importing, initialCategory: category };
+        return { name, type, importing, initialCategory: category };
     }
 
     public transformSubmit(value: any): CreateSchemaDto {
-        const { name, isSingleton, importing, initialCategory } = value;
+        const { name, type, importing, initialCategory } = value;
 
-        return { name, isSingleton, category: initialCategory, ...importing };
+        return { name, type, category: initialCategory, ...importing };
     }
 }
 
@@ -59,7 +63,7 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
         }));
     }
 
-    public loadSchema(schema: SchemaDetailsDto) {
+    public loadSchema(schema: SchemaDto) {
         this.form.get('json')!.setValue(schema.export());
     }
 
@@ -72,7 +76,7 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
     }
 }
 
-export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDetailsDto> {
+export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDto> {
     public get rulesControls(): ReadonlyArray<FormGroup> {
         return this.form.controls as any;
     }
@@ -108,7 +112,7 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
         this.form.removeAt(index);
     }
 
-    public transformLoad(value: Partial<SchemaDetailsDto>) {
+    public transformLoad(value: Partial<SchemaDto>) {
         const result = value.fieldRules || [];
 
         while (this.form.controls.length < result.length) {
@@ -125,7 +129,7 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
 
 type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
-export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType, SchemaDetailsDto> {
+export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType, SchemaDto> {
     public get previewControls(): ReadonlyArray<FormGroup> {
         return this.form.controls as any;
     }
@@ -156,7 +160,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         this.form.removeAt(index);
     }
 
-    public transformLoad(value: Partial<SchemaDetailsDto>) {
+    public transformLoad(value: Partial<SchemaDto>) {
         const result = [];
 
         const previewUrls = value.previewUrls || {};
@@ -191,7 +195,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
     }
 }
 
-export class EditScriptsForm extends Form<FormGroup, {}, SchemaDetailsDto> {
+export class EditScriptsForm extends Form<FormGroup, {}, SchemaDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             query: '',

@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
 using SchemaField = Squidex.Domain.Apps.Entities.Schemas.Commands.UpsertSchemaField;
 
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public SchemaProperties Properties { get; set; }
 
-        public Dictionary<string, string>? PreviewUrls { get; set; }
+        public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
 
         public Schema BuildSchema(string name, SchemaType type)
         {

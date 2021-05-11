@@ -202,33 +202,6 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void OrderedHashCode_should_return_same_hash_codes_for_list_with_same_order()
-        {
-            var collection1 = new[] { 3, 5, 6 };
-            var collection2 = new[] { 3, 5, 6 };
-
-            Assert.Equal(collection2.OrderedHashCode(), collection1.OrderedHashCode());
-        }
-
-        [Fact]
-        public void OrderedHashCode_should_return_different_hash_codes_for_list_with_different_items()
-        {
-            var collection1 = new[] { 3, 5, 6 };
-            var collection2 = new[] { 3, 4, 1 };
-
-            Assert.NotEqual(collection2.OrderedHashCode(), collection1.OrderedHashCode());
-        }
-
-        [Fact]
-        public void OrderedHashCode_should_return_same_hash_codes_for_list_with_different_order()
-        {
-            var collection1 = new[] { 3, 5, 6 };
-            var collection2 = new[] { 6, 5, 3 };
-
-            Assert.Equal(collection2.OrderedHashCode(), collection1.OrderedHashCode());
-        }
-
-        [Fact]
         public void EqualsDictionary_should_return_true_for_equal_dictionaries()
         {
             var lhs = new Dictionary<int, int>
@@ -310,6 +283,73 @@ namespace Squidex.Infrastructure
             };
 
             Assert.NotEqual(lhs.DictionaryHashCode(), rhs.DictionaryHashCode());
+        }
+
+        [Fact]
+        public void EqualsList_should_return_true_for_equal_lists()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                1,
+                2
+            };
+
+            Assert.True(lhs.EqualsList(rhs));
+        }
+
+        [Fact]
+        public void EqualsList_should_return_false_for_different_sizes()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                1
+            };
+
+            Assert.False(lhs.EqualsList(rhs));
+        }
+
+        [Fact]
+        public void EqualsList_should_return_false_for_different_values()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                1,
+                3
+            };
+
+            Assert.False(lhs.EqualsList(rhs));
+        }
+
+        [Fact]
+        public void EqualsList_should_return_false_for_different_order()
+        {
+            var lhs = new List<int>
+            {
+                1,
+                2
+            };
+            var rhs = new List<int>
+            {
+                2,
+                1
+            };
+
+            Assert.False(lhs.EqualsList(rhs));
         }
 
         [Fact]

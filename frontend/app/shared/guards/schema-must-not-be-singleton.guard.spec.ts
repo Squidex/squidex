@@ -6,7 +6,7 @@
  */
 
 import { Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
-import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
+import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SchemaMustNotBeSingletonGuard } from './schema-must-not-be-singleton.guard';
@@ -37,7 +37,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDetailsDto>{ id: '123', isSingleton: false }));
+            .returns(() => of(<SchemaDto>{ id: '123', isSingleton: false }));
 
         let result: boolean;
 
@@ -54,7 +54,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDetailsDto>{ id: '123', isSingleton: true }));
+            .returns(() => of(<SchemaDto>{ id: '123', isSingleton: true }));
 
         let result: boolean;
 
@@ -71,7 +71,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/new/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDetailsDto>{ id: '123', isSingleton: true }));
+            .returns(() => of(<SchemaDto>{ id: '123', isSingleton: true }));
 
         let result: boolean;
 

@@ -10,6 +10,7 @@ using FluentAssertions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
@@ -23,8 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 IsPublished = true,
                 Properties = new SchemaProperties { Hints = "MyHints" },
-                FieldsInLists = new FieldNames("meta.id", "myString"),
-                FieldsInReferences = new FieldNames("myString"),
                 Fields = new[]
                 {
                     new UpsertSchemaField
@@ -40,6 +39,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         Partitioning = "language"
                     }
                 },
+                FieldsInLists = FieldNames.Create("meta.id", "myString"),
+                FieldsInReferences = FieldNames.Create("myString"),
                 Scripts = new SchemaScripts
                 {
                     Change = "change-script"
@@ -47,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["mobile"] = "http://mobile"
-                },
+                }.ToImmutableDictionary(),
                 Category = "myCategory"
             };
 
@@ -60,8 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     })
                     .HideField(1).DisableField(1).LockField(1)
                     .ChangeCategory("myCategory")
-                    .SetFieldsInLists(new FieldNames("meta.id", "myString"))
-                    .SetFieldsInReferences(new FieldNames("myString"))
+                    .SetFieldsInLists(FieldNames.Create("meta.id", "myString"))
+                    .SetFieldsInReferences(FieldNames.Create("myString"))
                     .SetScripts(new SchemaScripts
                     {
                         Change = "change-script"
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     .SetPreviewUrls(new Dictionary<string, string>
                     {
                         ["mobile"] = "http://mobile"
-                    })
+                    }.ToImmutableDictionary())
                     .Publish();
 
             var actual = command.BuildSchema("my-schema", SchemaType.Default);

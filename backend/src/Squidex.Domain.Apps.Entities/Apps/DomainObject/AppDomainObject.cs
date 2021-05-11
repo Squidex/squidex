@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -310,8 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var events = new List<AppEvent>
             {
-                CreateInitalEvent(command.Name),
-                CreateInitialLanguage()
+                CreateInitalEvent(command.Name)
             };
 
             if (command.Actor.IsUser)
@@ -448,11 +447,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private static AppCreated CreateInitalEvent(string name)
         {
             return new AppCreated { Name = name };
-        }
-
-        private static AppLanguageAdded CreateInitialLanguage()
-        {
-            return new AppLanguageAdded { Language = Language.EN };
         }
 
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)

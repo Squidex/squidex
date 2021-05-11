@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -17,12 +17,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value as a list of content ids.
         /// </summary>
-        public LocalizedValue<string[]?> DefaultValues { get; set; }
+        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; set; }
 
         /// <summary>
         /// The default value as a list of content ids.
         /// </summary>
-        public string[]? DefaultValue { get; set; }
+        public ImmutableList<string>? DefaultValue { get; set; }
 
         /// <summary>
         /// The minimum allowed items for the field value.
@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The id of the referenced schemas.
         /// </summary>
-        public ReadOnlyCollection<DomainId>? SchemaIds { get; set; }
+        public ImmutableList<DomainId>? SchemaIds { get; set; }
 
         public override FieldProperties ToProperties()
         {

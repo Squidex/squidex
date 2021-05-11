@@ -18,7 +18,7 @@ namespace Squidex.Extensions.Actions.Notification
         IconColor = "#3389ff",
         Display = "Send a notification",
         Description = "Send an integrated notification to a user.")]
-    public sealed class NotificationAction : RuleAction
+    public sealed record NotificationAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "User", Description = "The user id or email.")]

@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers
         /// <summary>
         /// The id of the entity that has been handled successfully or not.
         /// </summary>
-        [Obsolete("Use Id instead.")]
+        [Obsolete("Use 'id' field now.")]
         public DomainId? ContentId => Id;
 
         public static BulkResultDto FromBulkResult(BulkUpdateResultItem result, HttpContext httpContext)

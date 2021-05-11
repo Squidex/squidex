@@ -10,114 +10,71 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class Schema : Cloneable<Schema>
+    public sealed class Schema
     {
-        private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
-        private readonly string name;
-        private readonly SchemaType type;
-        private string category;
-        private FieldNames fieldsInLists = FieldNames.Empty;
-        private FieldNames fieldsInReferences = FieldNames.Empty;
-        private FieldRules fieldRules = FieldRules.Empty;
-        private FieldCollection<RootField> fields = FieldCollection<RootField>.Empty;
-        private IReadOnlyDictionary<string, string> previewUrls = EmptyPreviewUrls;
-        private SchemaScripts scripts = SchemaScripts.Empty;
-        private SchemaProperties properties;
-        private bool isPublished;
+        public SchemaType Type { get; }
 
-        public string Name
-        {
-            get => name;
-        }
+        public string Name { get; }
 
-        public string Category
-        {
-            get => category;
-        }
+        public string Category { get; private set; }
 
-        public bool IsPublished
-        {
-            get => isPublished;
-        }
+        public bool IsPublished { get; private set; }
 
-        public SchemaType Type
-        {
-            get => type;
-        }
+        public FieldCollection<RootField> FieldCollection { get; private set; } = FieldCollection<RootField>.Empty;
+
+        public FieldRules FieldRules { get; private set; } = FieldRules.Empty;
+
+        public FieldNames FieldsInLists { get; private set; } = FieldNames.Empty;
+
+        public FieldNames FieldsInReferences { get; private set; } = FieldNames.Empty;
+
+        public SchemaScripts Scripts { get; private set; } = SchemaScripts.Empty;
+
+        public SchemaProperties Properties { get; private set; } = new SchemaProperties();
+
+        public ImmutableDictionary<string, string> PreviewUrls { get; private set; } = ImmutableDictionary.Empty<string, string>();
 
         public IReadOnlyList<RootField> Fields
         {
-            get => fields.Ordered;
+            get => FieldCollection.Ordered;
         }
 
         public IReadOnlyDictionary<long, RootField> FieldsById
         {
-            get => fields.ById;
+            get => FieldCollection.ById;
         }
 
         public IReadOnlyDictionary<string, RootField> FieldsByName
         {
-            get => fields.ByName;
+            get => FieldCollection.ByName;
         }
 
-        public IReadOnlyDictionary<string, string> PreviewUrls
-        {
-            get => previewUrls;
-        }
-
-        public FieldCollection<RootField> FieldCollection
-        {
-            get => fields;
-        }
-
-        public FieldRules FieldRules
-        {
-            get => fieldRules;
-        }
-
-        public FieldNames FieldsInLists
-        {
-            get => fieldsInLists;
-        }
-
-        public FieldNames FieldsInReferences
-        {
-            get => fieldsInReferences;
-        }
-
-        public SchemaScripts Scripts
-        {
-            get => scripts;
-        }
-
-        public SchemaProperties Properties
-        {
-            get => properties;
-        }
-
-        public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Singleton)
+        public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Default)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
-            this.name = name;
+            Name = name;
 
-            this.properties = properties ?? new SchemaProperties();
-            this.properties.Freeze();
+            if (properties != null)
+            {
+                Properties = properties;
+            }
 
-            this.type = type;
+            Type = type;
         }
 
-        public Schema(string name, RootField[] fields, SchemaProperties properties, bool isPublished, SchemaType type = SchemaType.Singleton)
+        public Schema(string name, RootField[] fields, SchemaProperties? properties, bool isPublished = false, SchemaType type = SchemaType.Default)
             : this(name, properties, type)
         {
             Guard.NotNull(fields, nameof(fields));
 
-            this.fields = new FieldCollection<RootField>(fields);
+            FieldCollection = new FieldCollection<RootField>(fields);
 
-            this.isPublished = isPublished;
+            IsPublished = isPublished;
         }
 
         [Pure]
@@ -125,15 +82,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             newProperties ??= new SchemaProperties();
 
-            if (properties.Equals(newProperties))
+            if (Properties.Equals(newProperties))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.properties = newProperties;
-                clone.Properties.Freeze();
+                clone.Properties = newProperties;
             });
         }
 
@@ -142,15 +98,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             newScripts ??= new SchemaScripts();
 
-            if (scripts.Equals(newScripts))
+            if (Scripts.Equals(newScripts))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.scripts = newScripts;
-                clone.scripts.Freeze();
+                clone.Scripts = newScripts;
             });
         }
 
@@ -159,14 +114,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInLists.SequenceEqual(names))
+            if (FieldsInLists.SequenceEqual(names))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.fieldsInLists = names;
+                clone.FieldsInLists = names;
             });
         }
 
@@ -181,14 +136,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             names ??= FieldNames.Empty;
 
-            if (fieldsInReferences.SequenceEqual(names))
+            if (FieldsInReferences.SequenceEqual(names))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.fieldsInReferences = names;
+                clone.FieldsInReferences = names;
             });
         }
 
@@ -203,14 +158,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             rules ??= FieldRules.Empty;
 
-            if (fieldRules.SetEquals(rules))
+            if (FieldRules.Equals(rules))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.fieldRules = rules;
+                clone.FieldRules = rules;
             });
         }
 
@@ -223,58 +178,58 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema Publish()
         {
-            if (isPublished)
+            if (IsPublished)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isPublished = true;
+                clone.IsPublished = true;
             });
         }
 
         [Pure]
         public Schema Unpublish()
         {
-            if (!isPublished)
+            if (!IsPublished)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isPublished = false;
+                clone.IsPublished = false;
             });
         }
 
         [Pure]
-        public Schema ChangeCategory(string newCategory)
+        public Schema ChangeCategory(string category)
         {
-            if (string.Equals(category, newCategory))
+            if (string.Equals(Category, category))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.category = newCategory;
+                clone.Category = category;
             });
         }
 
         [Pure]
-        public Schema SetPreviewUrls(IReadOnlyDictionary<string, string> newPreviewUrls)
+        public Schema SetPreviewUrls(ImmutableDictionary<string, string> previewUrls)
         {
-            previewUrls ??= EmptyPreviewUrls;
+            previewUrls ??= ImmutableDictionary.Empty<string, string>();
 
-            if (previewUrls.EqualsDictionary(newPreviewUrls))
+            if (PreviewUrls.Equals(previewUrls))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.previewUrls = newPreviewUrls;
+                clone.PreviewUrls = previewUrls;
             });
         }
 
@@ -288,9 +243,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             return Clone(clone =>
             {
-                clone.fields = fields.Remove(fieldId);
-                clone.fieldsInLists = fieldsInLists.Remove(field.Name);
-                clone.fieldsInReferences = fieldsInReferences.Remove(field.Name);
+                clone.FieldCollection = FieldCollection.Remove(fieldId);
+                clone.FieldsInLists = FieldsInLists.Remove(field.Name);
+                clone.FieldsInReferences = FieldsInReferences.Remove(field.Name);
             });
         }
 
@@ -314,17 +269,26 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         private Schema UpdateFields(Func<FieldCollection<RootField>, FieldCollection<RootField>> updater)
         {
-            var newFields = updater(fields);
+            var newFields = updater(FieldCollection);
 
-            if (ReferenceEquals(newFields, fields))
+            if (ReferenceEquals(newFields, FieldCollection))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.fields = newFields;
+                clone.FieldCollection = newFields;
             });
+        }
+
+        private Schema Clone(Action<Schema> updater)
+        {
+            var clone = (Schema)MemberwiseClone();
+
+            updater(clone);
+
+            return clone;
         }
     }
 }

@@ -6,11 +6,14 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
@@ -25,11 +28,28 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public DomainId Id { get; set; }
 
         /// <summary>
+        /// The user that has created the schema.
+        /// </summary>
+        [LocalizedRequired]
+        public RefToken CreatedBy { get; set; }
+
+        /// <summary>
+        /// The user that has updated the schema.
+        /// </summary>
+        [LocalizedRequired]
+        public RefToken LastModifiedBy { get; set; }
+
+        /// <summary>
         /// The name of the schema. Unique within the app.
         /// </summary>
         [LocalizedRequired]
         [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// The type of the schema.
+        /// </summary>
+        public SchemaType Type { get; set; }
 
         /// <summary>
         /// The name of the category.
@@ -43,34 +63,18 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public SchemaPropertiesDto Properties { get; set; } = new SchemaPropertiesDto();
 
         /// <summary>
-        /// The type of the schema.
-        /// </summary>
-        [Obsolete("Use Type property.")]
-        public SchemaType Type { get; set; }
-
-        /// <summary>
         /// Indicates if the schema is a singleton.
         /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
-        public bool IsSingleton => Type == SchemaType.Singleton;
-#pragma warning restore CS0618 // Type or member is obsolete
+        [Obsolete("Use 'type' field now.")]
+        public bool IsSingleton
+        {
+            get => Type == SchemaType.Singleton;
+        }
 
         /// <summary>
         /// Indicates if the schema is published.
         /// </summary>
         public bool IsPublished { get; set; }
-
-        /// <summary>
-        /// The user that has created the schema.
-        /// </summary>
-        [LocalizedRequired]
-        public RefToken CreatedBy { get; set; }
-
-        /// <summary>
-        /// The user that has updated the schema.
-        /// </summary>
-        [LocalizedRequired]
-        public RefToken LastModifiedBy { get; set; }
 
         /// <summary>
         /// The date and time when the schema has been created.
@@ -87,15 +91,60 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static SchemaDto FromSchema(ISchemaEntity schema, Resources controller)
+        /// <summary>
+        /// The scripts.
+        /// </summary>
+        [LocalizedRequired]
+        public SchemaScriptsDto Scripts { get; set; } = new SchemaScriptsDto();
+
+        /// <summary>
+        /// The preview Urls.
+        /// </summary>
+        [LocalizedRequired]
+        public ImmutableDictionary<string, string> PreviewUrls { get; set; }
+
+        /// <summary>
+        /// The name of fields that are used in content lists.
+        /// </summary>
+        [LocalizedRequired]
+        public FieldNames FieldsInLists { get; set; }
+
+        /// <summary>
+        /// The name of fields that are used in content references.
+        /// </summary>
+        [LocalizedRequired]
+        public FieldNames FieldsInReferences { get; set; }
+
+        /// <summary>
+        /// The field rules.
+        /// </summary>
+        public List<FieldRuleDto> FieldRules { get; set; }
+
+        /// <summary>
+        /// The list of fields.
+        /// </summary>
+        [LocalizedRequired]
+        public List<FieldDto> Fields { get; set; }
+
+        public static SchemaDto FromSchema(ISchemaEntity schema, Resources resources)
         {
             var result = new SchemaDto();
 
             SimpleMapper.Map(schema, result);
             SimpleMapper.Map(schema.SchemaDef, result);
+            SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
-            result.CreateLinks(controller);
+            result.FieldRules = schema.SchemaDef.FieldRules.Select(FieldRuleDto.FromFieldRule).ToList();
+
+            result.Fields = new List<FieldDto>();
+
+            foreach (var field in schema.SchemaDef.Fields)
+            {
+                result.Fields.Add(FieldDto.FromField(field));
+            }
+
+            result.CreateLinks(resources);
 
             return result;
         }
@@ -153,6 +202,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             if (resources.CanDeleteSchema(Name))
             {
                 AddDeleteLink("delete", resources.Url<SchemasController>(x => nameof(x.DeleteSchema), values));
+            }
+
+            if (Fields != null)
+            {
+                foreach (var nested in Fields)
+                {
+                    nested.CreateLinks(resources, Name, allowUpdate);
+                }
             }
         }
     }

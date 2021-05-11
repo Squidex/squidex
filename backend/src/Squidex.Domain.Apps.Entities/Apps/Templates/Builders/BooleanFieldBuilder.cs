@@ -19,7 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public BooleanFieldBuilder AsToggle()
         {
-            Properties<BooleanFieldProperties>().Editor = BooleanFieldEditor.Toggle;
+            Properties<BooleanFieldProperties>(p => p with
+            {
+                Editor = BooleanFieldEditor.Toggle,
+                EditorUrl = null
+            });
 
             return this;
         }

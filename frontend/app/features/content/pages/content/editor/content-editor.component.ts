@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, RootFieldDto, SchemaDetailsDto, Version } from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, RootFieldDto, SchemaDto, Version } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-editor',
@@ -30,7 +30,7 @@ export class ContentEditorComponent {
     public contentFormCompare?: EditContentForm | null;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     @Input()
     public formContext: any;

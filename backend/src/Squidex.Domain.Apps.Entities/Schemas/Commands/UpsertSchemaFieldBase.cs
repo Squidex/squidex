@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public abstract class UpsertSchemaFieldBase
+    public abstract class UpsertSchemaFieldBase : IFieldSettings
     {
         public string Name { get; set; }
 

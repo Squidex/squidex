@@ -38,7 +38,9 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateEdmSchema
                 return (new EdmComplexType("Squidex", string.Join(".", names)), true);
             });
 
-            var edmModel = TestUtils.MixedSchema().BuildEdmType(true, languagesConfig.ToResolver(), typeFactory);
+            var edmModel =
+                TestUtils.MixedSchema()
+                    .BuildEdmType(true, languagesConfig.ToResolver(), typeFactory);
 
             Assert.NotNull(edmModel);
         }
