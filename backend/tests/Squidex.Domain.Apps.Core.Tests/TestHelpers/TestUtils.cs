@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
@@ -83,6 +84,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
         public static Schema MixedSchema(SchemaType type = SchemaType.Default)
         {
+            var componentId = DomainId.NewGuid();
+
             var schema = new Schema("user", type: type)
                 .Publish()
                 .AddArray(101, "root-array", Partitioning.Language, f => f
@@ -121,12 +124,16 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new TagsFieldProperties())
                 .AddUI(113, "root-ui", Partitioning.Language,
                     new UIFieldProperties())
+                .AddComponent(114, "root-component", Partitioning.Language,
+                    new ComponentFieldProperties { SchemaId = componentId })
                 .Update(new SchemaProperties { Hints = "The User" })
                 .HideField(104)
                 .HideField(211, 101)
                 .DisableField(109)
                 .DisableField(212, 101)
                 .LockField(105);
+
+            schema.FieldsById[114].SetResolvedSchema(componentId, schema);
 
             return schema;
         }

@@ -8,14 +8,15 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class ComponentValidator : IValidator
     {
-        private readonly Func<string, IValidator?> validatorFactory;
+        private readonly Func<Schema, IValidator?> validatorFactory;
 
-        public ComponentValidator(Func<string, IValidator?> validatorFactory)
+        public ComponentValidator(Func<Schema, IValidator?> validatorFactory)
         {
             this.validatorFactory = validatorFactory;
         }
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (value is Component component)
             {
-                var validator = validatorFactory(component.Type);
+                var validator = validatorFactory(component.Schema);
 
                 if (validator != null)
                 {

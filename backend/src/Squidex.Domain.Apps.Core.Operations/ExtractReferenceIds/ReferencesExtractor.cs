@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -86,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             if (args.Value is JsonObject obj)
             {
-                if (obj.TryGetValue<JsonString>("$type", out var type))
+                if (obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
                 {
                     var schema = field.GetResolvedSchema(type.Value);
 

@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 if (newData != null)
                 {
-                    newData = ConvertData(converters, field, newData);
+                    newData = ConvertData(field, newData, converters);
                 }
 
                 if (newData != null)
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return result;
         }
 
-        private static ContentFieldData? ConvertData(FieldConverter[] converters, IRootField field, ContentFieldData data)
+        private static ContentFieldData? ConvertData(IRootField field, ContentFieldData data, FieldConverter[] converters)
         {
             if (converters != null)
             {

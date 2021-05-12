@@ -8,6 +8,8 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
@@ -20,60 +22,75 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             schema =
                 new Schema("my-schema")
-                    .AddNumber(1, "field1", Partitioning.Language)
-                    .AddNumber(2, "field2", Partitioning.Invariant)
-                    .AddNumber(3, "field3", Partitioning.Invariant)
-                    .AddAssets(5, "assets1", Partitioning.Invariant)
-                    .AddAssets(6, "assets2", Partitioning.Invariant)
-                    .AddArray(7, "array", Partitioning.Invariant, h => h
-                        .AddNumber(71, "nested1")
-                        .AddNumber(72, "nested2"))
-                    .AddJson(4, "json", Partitioning.Language)
-                    .HideField(2)
-                    .HideField(71, 7)
-                    .UpdateField(3, f => f.Hide());
+                    .AddComponent(1, "component", Partitioning.Invariant)
+                    .AddAssets(2, "assets1", Partitioning.Invariant)
+                    .AddAssets(3, "assets2", Partitioning.Invariant)
+                    .AddReferences(4, "references", Partitioning.Invariant)
+                    .AddArray(5, "array", Partitioning.Invariant, a => a
+                        .AddAssets(31, "nested"));
+
+            schema.FieldsById[1].SetResolvedSchema(DomainId.Empty, schema);
         }
 
         [Fact]
-        public void Should_convert_name_to_name()
+        public void Should_apply_value_conversion_on_all_levels()
         {
-            var input =
+            var source =
                 new ContentData()
-                    .AddField("field1",
+                    .AddField("references",
                         new ContentFieldData()
-                            .AddLocalized("en", "EN"))
-                    .AddField("field2",
+                            .AddInvariant(JsonValue.Array(1, 2)))
+                    .AddField("assets1",
                         new ContentFieldData()
-                            .AddInvariant(1))
-                    .AddField("invalid",
+                            .AddInvariant(JsonValue.Array(1)))
+                    .AddField("array",
                         new ContentFieldData()
-                            .AddInvariant(2));
-
-            var actual = input.Convert(schema, (data, field) => field.Name == "field2" ? null : data);
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add("nested", JsonValue.Array(1, 2)))))
+                    .AddField("component",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("references",
+                                        JsonValue.Array(1, 2))
+                                    .Add("assets1",
+                                        JsonValue.Array(1))
+                                    .Add("array",
+                                        JsonValue.Array(
+                                            JsonValue.Object()
+                                                .Add("nested", JsonValue.Array(1, 2))))
+                                    .Add(Component.Discriminator, DomainId.Empty)));
 
             var expected =
                 new ContentData()
-                    .AddField("field1",
+                    .AddField("references",
+                        new ContentFieldData())
+                    .AddField("assets1",
                         new ContentFieldData()
-                            .AddLocalized("en", "EN"));
+                            .AddInvariant(JsonValue.Array(1)))
+                    .AddField("array",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    JsonValue.Object())))
+                    .AddField("component",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("assets1",
+                                        JsonValue.Array(1))
+                                    .Add("array",
+                                        JsonValue.Array(
+                                            JsonValue.Object()))
+                                    .Add(Component.Discriminator, DomainId.Empty)));
+
+            var actual =
+                source.Convert(schema,
+                    FieldConverters.ForValues((data, field, parent) => field.Name != "assets1" ? null : data));
 
             Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_be_equal_fields_if_they_have_same_value()
-        {
-            var lhs =
-                new ContentFieldData()
-                    .AddInvariant(2);
-
-            var rhs =
-                new ContentFieldData()
-                    .AddInvariant(2);
-
-            Assert.True(lhs.Equals(rhs));
-            Assert.True(lhs.Equals((object)rhs));
-            Assert.Equal(lhs.GetHashCode(), rhs.GetHashCode());
         }
     }
 }

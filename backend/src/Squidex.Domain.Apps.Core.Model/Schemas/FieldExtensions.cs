@@ -35,8 +35,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 field.Properties.SchemaIds
                     .Select(x => field.GetResolvedSchema(x)).NotNull()
                     .SelectMany(x => x.Fields.ForApi(withHidden))
-                    .GroupBy(x => new { x.Name, Type = x.RawProperties.GetType() })
-                    .Where(x => x.Count() == 1)
+                    .GroupBy(x => new { x.Name, Type = x.RawProperties.GetType() }).Where(x => x.Count() == 1)
                     .Select(x => x.First());
 
             return allFields;
@@ -44,25 +43,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public static T SetResolvedSchema<T>(this T metadataProvider, DomainId id, Schema schema) where T : IMetadataProvider
         {
-            var keyByName = $"ResolvedSchemaByName_{schema.Name}";
-            var keyById = $"ResolvedSchemaById_{id}";
+            var key = $"ResolvedSchema_{id}";
 
-            metadataProvider.Metadata[keyByName] = schema;
-            metadataProvider.Metadata[keyById] = schema;
+            metadataProvider.Metadata[key] = schema;
 
             return metadataProvider;
         }
 
-        public static Schema? GetResolvedSchema<T>(this T metadataProvider, string name) where T : IMetadataProvider
+        public static Schema? GetResolvedSchema<T>(this T metadataProvider, object id) where T : IMetadataProvider
         {
-            var key = $"ResolvedSchemaByName_{name}";
-
-            return metadataProvider.GetMetadata<Schema>(key);
-        }
-
-        public static Schema? GetResolvedSchema<T>(this T metadataProvider, DomainId id) where T : IMetadataProvider
-        {
-            var key = $"ResolvedSchemaById_{id}";
+            var key = $"ResolvedSchema_{id}";
 
             return metadataProvider.GetMetadata<Schema>(key);
         }

@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
         }
 
-        public static IEnumerable<IValidator> CreateValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
+        public static IEnumerable<IValidator> CreateValidators(ValidatorContext context, IField field, ValidatorFactory factory)
         {
-            var args = new Args(context, createFieldValidator);
+            var args = new Args(context, factory);
 
             return field.Accept(Instance, args);
         }
@@ -92,15 +92,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new RequiredValidator();
             }
 
-            yield return new ComponentValidator(type =>
+            yield return new ComponentValidator(schema =>
             {
-                var schema = field.GetResolvedSchema(type);
-
-                if (schema == null || schema.Fields.Count == 0)
-                {
-                    return null;
-                }
-
                 var nestedValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(schema.Fields.Count);
 
                 foreach (var nestedField in schema.Fields)

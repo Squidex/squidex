@@ -7,8 +7,11 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using NJsonSchema;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
@@ -37,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
         }
 
-        public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver? schemaResolver, bool withHiddenFields)
+        public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver? schemaResolver = null, bool withHiddenFields = false)
         {
             var args = new Args(schemaResolver, withHiddenFields);
 
@@ -76,22 +79,54 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            var componentSchema = SchemaBuilder.Object();
+            var property = SchemaBuilder.ObjectProperty();
 
-            foreach (var sharedField in field.GetSharedFields(args.WithHiddenFields))
+            property.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
+
+            if (args.SchemaResolver != null)
             {
-                var sharedProperty = sharedField.Accept(this, args);
+                var schemas =
+                    field.Properties.SchemaIds?
+                        .Select(x => field.GetResolvedSchema(x)).NotNull() ?? Enumerable.Empty<Schema>();
 
-                if (sharedProperty != null)
+                var discriminator = new OpenApiDiscriminator
                 {
-                    sharedProperty.Description = sharedField.RawProperties.Hints;
-                    sharedProperty.SetRequired(sharedField.RawProperties.IsRequired);
+                    PropertyName = Component.Discriminator
+                };
 
-                    componentSchema.Properties.Add(sharedField.Name, sharedProperty);
+                foreach (var schema in schemas)
+                {
+                    var schemaName = $"{schema.TypeName()}ComponentDto";
+
+                    var componentSchema = args.SchemaResolver(schemaName, () =>
+                    {
+                        var componentSchema = SchemaBuilder.Object();
+
+                        foreach (var sharedField in schema.Fields.ForApi(args.WithHiddenFields))
+                        {
+                            var sharedProperty = sharedField.Accept(this, args);
+
+                            if (sharedProperty != null)
+                            {
+                                sharedProperty.Description = sharedField.RawProperties.Hints;
+                                sharedProperty.SetRequired(sharedField.RawProperties.IsRequired);
+
+                                componentSchema.Properties.Add(sharedField.Name, sharedProperty);
+                            }
+                        }
+
+                        return componentSchema;
+                    });
+
+                    discriminator.Mapping[schemaName] = componentSchema;
                 }
             }
+            else
+            {
+                property.AllowAdditionalProperties = true;
+            }
 
-            return SchemaBuilder.ObjectProperty(componentSchema);
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)

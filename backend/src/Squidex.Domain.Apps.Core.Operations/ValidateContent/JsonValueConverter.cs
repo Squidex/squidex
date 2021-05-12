@@ -138,19 +138,28 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            if (args.Value is JsonObject obj)
+            if (args.Value is not JsonObject obj)
             {
-                if (obj.TryGetValue<JsonString>("$type", out var type))
-                {
-                    var data = new JsonObject(obj);
-
-                    data.Remove("$type");
-
-                    return (new Component(type.Value, data), null);
-                }
+                return (null, new JsonError(T.Get("contents.invalidComponentNoObject")));
             }
 
-            return (null, new JsonError("Invalid json type, expected object with $type property."));
+            if (!obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
+            {
+                return (null, new JsonError(T.Get("contents.invalidComponentNoType")));
+            }
+
+            var schema = field.GetResolvedSchema(type);
+
+            if (schema == null)
+            {
+                return (null, new JsonError(T.Get("contents.invalidComponentUnknownSchema")));
+            }
+
+            var data = new JsonObject(obj);
+
+            data.Remove(Component.Discriminator);
+
+            return (new Component(type.Value, data, schema), null);
         }
 
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field, Args args)
@@ -172,14 +181,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                     }
                     else
                     {
-                        return (null, new JsonError("Invalid json type, expected array of strings."));
+                        return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
                     }
                 }
 
                 return (result, null);
             }
 
-            return (null, new JsonError("Invalid json type, expected array of strings."));
+            return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
         }
 
         private static (object? Result, JsonError? Error) ConvertToStringList(IJsonValue value)

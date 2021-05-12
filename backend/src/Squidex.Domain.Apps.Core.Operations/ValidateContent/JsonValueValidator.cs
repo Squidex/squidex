@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return false;
             }
 
-            if (!obj.TryGetValue<JsonString>("$type", out var type))
+            if (!obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
             {
                 return false;
             }

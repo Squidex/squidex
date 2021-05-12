@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new RootField<BooleanFieldProperties>(id, name, partitioning, properties, settings);
         }
 
-        public static RootField<ComponentFieldProperties> Components(long id, string name, Partitioning partitioning,
+        public static RootField<ComponentFieldProperties> Component(long id, string name, Partitioning partitioning,
             ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
             return new RootField<ComponentFieldProperties>(id, name, partitioning, properties, settings);
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new NestedField<BooleanFieldProperties>(id, name, properties, settings);
         }
 
-        public static NestedField<ComponentFieldProperties> Components(long id, string name,
+        public static NestedField<ComponentFieldProperties> Component(long id, string name,
             ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
             return new NestedField<ComponentFieldProperties>(id, name, properties, settings);
@@ -179,10 +179,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return schema.AddField(Boolean(id, name, partitioning, properties, settings));
         }
 
-        public static Schema AddComponents(this Schema schema, long id, string name, Partitioning partitioning,
+        public static Schema AddComponent(this Schema schema, long id, string name, Partitioning partitioning,
             ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
-            return schema.AddField(Components(id, name, partitioning, properties, settings));
+            return schema.AddField(Component(id, name, partitioning, properties, settings));
         }
 
         public static Schema AddDateTime(this Schema schema, long id, string name, Partitioning partitioning,
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static ArrayField AddComponents(this ArrayField field, long id, string name,
             ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
-            return field.AddField(Components(id, name, properties, settings));
+            return field.AddField(Component(id, name, properties, settings));
         }
 
         public static ArrayField AddDateTime(this ArrayField field, long id, string name,

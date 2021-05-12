@@ -460,6 +460,15 @@
   <data name="contents.invalidBoolean" xml:space="preserve">
     <value>Invalid json type, expected boolean.</value>
   </data>
+  <data name="contents.invalidComponentNoObject" xml:space="preserve">
+    <value>Invalid json object, expected object with 'schemaId' field.</value>
+  </data>
+  <data name="contents.invalidComponentNoType" xml:space="preserve">
+    <value>Invalid component. No 'schemaId' field found.</value>
+  </data>
+  <data name="contents.invalidComponentUnknownSchema" xml:space="preserve">
+    <value>Invalid component. Cannot find schema.</value>
+  </data>
   <data name="contents.invalidGeolocation" xml:space="preserve">
     <value>Invalid json type, expected latitude/longitude object.</value>
   </data>

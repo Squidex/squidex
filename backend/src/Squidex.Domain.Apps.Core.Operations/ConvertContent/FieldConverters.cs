@@ -180,32 +180,144 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                foreach (var (key, value) in data.ToList())
+                ContentFieldData? newData = null;
+
+                foreach (var (key, value) in data)
                 {
-                    var newValue = value;
+                    var newValue = ConvertByType(field, value, null, converters);
 
-                    for (var i = 0; i < converters.Length; i++)
+                    if (newValue == null)
                     {
-                        newValue = converters[i](newValue!, field, null);
+                        newData ??= new ContentFieldData(data);
+                        newData.Remove(key);
+                    }
+                    else if (!ReferenceEquals(newValue, value))
+                    {
+                        newData ??= new ContentFieldData(data);
+                        newData[key] = newValue;
+                    }
+                }
 
-                        if (newValue == null)
-                        {
-                            break;
-                        }
+                return newData ?? data;
+            };
+        }
+
+        private static IJsonValue? ConvertByType<T>(T field, IJsonValue? value, IArrayField? parent, ValueConverter[] converters) where T : IField
+        {
+            if (field is IArrayField arrayField)
+            {
+                return ConvertArray(arrayField, value, converters);
+            }
+            else if (field.RawProperties is ComponentFieldProperties)
+            {
+                return ConvertComponent(field, value, converters);
+            }
+            else
+            {
+                return ConvertValue(field, value, parent, converters);
+            }
+        }
+
+        private static IJsonValue? ConvertArray(IArrayField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonArray array)
+            {
+                JsonArray? result = null;
+
+                for (int i = 0, j = 0; i < array.Count; i++, j++)
+                {
+                    var newValue = array[i];
+
+                    if (array[i] is not JsonObject obj)
+                    {
+                        newValue = null;
+                    }
+                    else
+                    {
+                        newValue = ConvertNested(field.FieldCollection, obj, field, converters);
                     }
 
                     if (newValue == null)
                     {
-                        data.Remove(key);
+                        result ??= new JsonArray(array);
+                        result.RemoveAt(j);
+                        j--;
                     }
-                    else if (!ReferenceEquals(newValue, value))
+                    else if (!ReferenceEquals(newValue, array[i]))
                     {
-                        data[key] = newValue;
+                        result ??= new JsonArray(array);
+                        result[j] = newValue;
                     }
                 }
 
-                return data;
-            };
+                return result ?? array;
+            }
+
+            return null;
+        }
+
+        private static IJsonValue? ConvertComponent(IField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
+            {
+                var schema = field.GetResolvedSchema(type.Value);
+
+                if (schema != null)
+                {
+                    return ConvertNested(schema.FieldCollection, obj, null, converters);
+                }
+            }
+
+            return null;
+        }
+
+        private static IJsonValue ConvertNested<T>(FieldCollection<T> fields, JsonObject source, IArrayField? parent, ValueConverter[] converters) where T : IField
+        {
+            JsonObject? result = null;
+
+            foreach (var (key, value) in source)
+            {
+                var newValue = value;
+
+                if (fields.ByName.TryGetValue(key, out var field))
+                {
+                    newValue = ConvertByType(field, value, parent, converters);
+                }
+                else if (key != Component.Discriminator)
+                {
+                    newValue = null;
+                }
+
+                if (newValue == null)
+                {
+                    result ??= new JsonObject(source);
+                    result.Remove(key);
+                }
+                else if (!ReferenceEquals(newValue, value))
+                {
+                    result ??= new JsonObject(source);
+                    result[key] = newValue;
+                }
+            }
+
+            return result ?? source;
+        }
+
+        private static IJsonValue? ConvertValue(IField field, IJsonValue? value, IArrayField? parent, ValueConverter[] converters)
+        {
+            var newValue = value;
+
+            for (var i = 0; i < converters.Length; i++)
+            {
+                newValue = converters[i](newValue!, field, parent);
+
+                if (newValue == null)
+                {
+                    break;
+                }
+            }
+
+            return newValue;
         }
     }
 }

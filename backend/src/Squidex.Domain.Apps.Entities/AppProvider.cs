@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Caching;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Rules;
@@ -112,6 +113,8 @@ namespace Squidex.Domain.Apps.Entities
 
             if (schema != null)
             {
+                await ResolveSchemaAsync(appId, schema.SchemaDef);
+
                 localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
             }
@@ -132,6 +135,8 @@ namespace Squidex.Domain.Apps.Entities
 
             if (schema != null)
             {
+                await ResolveSchemaAsync(appId, schema.SchemaDef);
+
                 localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
             }
@@ -174,6 +179,42 @@ namespace Squidex.Domain.Apps.Entities
             var rules = await GetRulesAsync(appId);
 
             return rules.Find(x => x.Id == id);
+        }
+
+        private async Task ResolveSchemaAsync(DomainId appId, Schema schema)
+        {
+            async Task ResolveAsync(IField field)
+            {
+                if (field.RawProperties is ComponentFieldProperties component && component.SchemaIds != null)
+                {
+                    foreach (var schemaId in component.SchemaIds)
+                    {
+                        var resolved = field.GetResolvedSchema(schemaId);
+
+                        if (resolved == null)
+                        {
+                            var resolvedEntity = await GetSchemaAsync(appId, schemaId, true);
+
+                            if (resolvedEntity != null)
+                            {
+                                field.SetResolvedSchema(schemaId, resolvedEntity.SchemaDef);
+                            }
+                        }
+                    }
+                }
+                else if (field is IArrayField arrayField)
+                {
+                    foreach (var nestedField in arrayField.Fields)
+                    {
+                        await ResolveAsync(nestedField);
+                    }
+                }
+            }
+
+            foreach (var field in schema.Fields)
+            {
+                await ResolveAsync(field);
+            }
         }
 
         private static string AppCacheKey(DomainId appId)

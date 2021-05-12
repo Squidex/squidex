@@ -46,12 +46,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings? settings = null)
         {
-            return Fields.Components(id, name, partitioning, this, settings);
+            return Fields.Component(id, name, partitioning, this, settings);
         }
 
         public override NestedField CreateNestedField(long id, string name, IFieldSettings? settings = null)
         {
-            return Fields.Components(id, name, this, settings);
+            return Fields.Component(id, name, this, settings);
         }
     }
 }

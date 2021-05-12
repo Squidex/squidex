@@ -43,10 +43,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             this.contentRepository = contentRepository;
 
             excludedChangedField = FieldConverters.ExcludeChangedTypes(jsonSerializer);
-            excludedChangedValue = FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeChangedTypes(jsonSerializer)));
+            excludedChangedValue = FieldConverters.ForValues(ValueConverters.ExcludeChangedTypes(jsonSerializer));
 
             excludedHiddenField = FieldConverters.ExcludeHidden;
-            excludedHiddenValue = FieldConverters.ForValues(ValueConverters.ForNested(ValueConverters.ExcludeHidden));
+            excludedHiddenValue = FieldConverters.ForValues(ValueConverters.ExcludeHidden);
         }
 
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
@@ -125,7 +125,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             if (cleanReferences != null)
             {
                 yield return FieldConverters.ForValues(cleanReferences);
-                yield return FieldConverters.ForValues(ValueConverters.ForNested(cleanReferences));
             }
 
             yield return FieldConverters.ResolveInvariant(context.App.Languages);
@@ -154,7 +153,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     var resolveAssetUrls = ValueConverters.ResolveAssetUrls(appId, assetUrls, urlGenerator);
 
                     yield return FieldConverters.ForValues(resolveAssetUrls);
-                    yield return FieldConverters.ForValues(ValueConverters.ForNested(resolveAssetUrls));
                 }
             }
         }
