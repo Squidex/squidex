@@ -62,16 +62,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public bool Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            var value = args.Value;
-
-            if (field.Properties.Multiple)
-            {
-                return IsValidComponentList(value);
-            }
-            else
-            {
-                return IsValidComponent(value);
-            }
+            return IsValidComponent(args.Value);
         }
 
         public bool Visit(IField<DateTimeFieldProperties> field, Args args)
@@ -148,24 +139,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 foreach (var item in array)
                 {
                     if (item is not JsonObject)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsValidComponentList(IJsonValue value)
-        {
-            if (value is JsonArray array)
-            {
-                foreach (var item in array)
-                {
-                    if (!IsValidComponent(item))
                     {
                         return false;
                     }

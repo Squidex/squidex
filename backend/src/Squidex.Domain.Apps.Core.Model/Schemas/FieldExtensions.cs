@@ -24,6 +24,49 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return fields.Where(x => IsForApi(x, withHidden));
         }
 
+        public static IEnumerable<IRootField> GetSharedFields(this IField<ComponentFieldProperties> field, bool withHidden)
+        {
+            if (field.Properties.SchemaIds == null || field.Properties.SchemaIds.Count == 0)
+            {
+                return Enumerable.Empty<IRootField>();
+            }
+
+            var allFields =
+                field.Properties.SchemaIds
+                    .Select(x => field.GetResolvedSchema(x)).NotNull()
+                    .SelectMany(x => x.Fields.ForApi(withHidden))
+                    .GroupBy(x => new { x.Name, Type = x.RawProperties.GetType() })
+                    .Where(x => x.Count() == 1)
+                    .Select(x => x.First());
+
+            return allFields;
+        }
+
+        public static T SetResolvedSchema<T>(this T metadataProvider, DomainId id, Schema schema) where T : IMetadataProvider
+        {
+            var keyByName = $"ResolvedSchemaByName_{schema.Name}";
+            var keyById = $"ResolvedSchemaById_{id}";
+
+            metadataProvider.Metadata[keyByName] = schema;
+            metadataProvider.Metadata[keyById] = schema;
+
+            return metadataProvider;
+        }
+
+        public static Schema? GetResolvedSchema<T>(this T metadataProvider, string name) where T : IMetadataProvider
+        {
+            var key = $"ResolvedSchemaByName_{name}";
+
+            return metadataProvider.GetMetadata<Schema>(key);
+        }
+
+        public static Schema? GetResolvedSchema<T>(this T metadataProvider, DomainId id) where T : IMetadataProvider
+        {
+            var key = $"ResolvedSchemaById_{id}";
+
+            return metadataProvider.GetMetadata<Schema>(key);
+        }
+
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField
         {
             return (withHidden || !field.IsHidden) && !field.RawProperties.IsUIProperty();

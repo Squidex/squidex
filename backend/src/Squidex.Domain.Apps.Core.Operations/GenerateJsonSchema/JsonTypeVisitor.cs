@@ -76,7 +76,22 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            return null;
+            var componentSchema = SchemaBuilder.Object();
+
+            foreach (var sharedField in field.GetSharedFields(args.WithHiddenFields))
+            {
+                var sharedProperty = sharedField.Accept(this, args);
+
+                if (sharedProperty != null)
+                {
+                    sharedProperty.Description = sharedField.RawProperties.Hints;
+                    sharedProperty.SetRequired(sharedField.RawProperties.IsRequired);
+
+                    componentSchema.Properties.Add(sharedField.Name, sharedProperty);
+                }
+            }
+
+            return SchemaBuilder.ObjectProperty(componentSchema);
         }
 
         public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)

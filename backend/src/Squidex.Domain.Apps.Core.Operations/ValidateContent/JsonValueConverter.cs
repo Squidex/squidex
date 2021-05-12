@@ -138,7 +138,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            return (args.Value, null);
+            if (args.Value is JsonObject obj)
+            {
+                if (obj.TryGetValue<JsonString>("$type", out var type))
+                {
+                    var data = new JsonObject(obj);
+
+                    data.Remove("$type");
+
+                    return (new Component(type.Value, data), null);
+                }
+            }
+
+            return (null, new JsonError("Invalid json type, expected object with $type property."));
         }
 
         public (object? Result, JsonError? Error) Visit(IField<JsonFieldProperties> field, Args args)

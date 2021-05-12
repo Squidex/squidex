@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -22,6 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             this.fields = fields;
             this.fieldType = fieldType;
+
             this.isPartial = isPartial;
         }
 

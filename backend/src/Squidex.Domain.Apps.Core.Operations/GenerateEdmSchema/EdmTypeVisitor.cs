@@ -69,7 +69,22 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public IEdmTypeReference? Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            return null;
+            var (fieldEdmType, created) = args.Factory($"Data.{field.Name.ToPascalCase()}.Component");
+
+            if (created)
+            {
+                foreach (var sharedField in field.GetSharedFields(false))
+                {
+                    var nestedEdmType = sharedField.Accept(this, args);
+
+                    if (nestedEdmType != null)
+                    {
+                        fieldEdmType.AddStructuralProperty(sharedField.Name.EscapeEdmField(), nestedEdmType);
+                    }
+                }
+            }
+
+            return new EdmComplexTypeReference(fieldEdmType, false);
         }
 
         public IEdmTypeReference? Visit(IField<DateTimeFieldProperties> field, Args args)

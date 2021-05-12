@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 schemaResolver,
                 schemaGenerator);
 
-            foreach (var [schema] in schemas.Where(x => x.SchemaDef.IsPublished))
+            foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished))
             {
                 requestCache.AddDependency(schema.UniqueId, schema.Version);
 

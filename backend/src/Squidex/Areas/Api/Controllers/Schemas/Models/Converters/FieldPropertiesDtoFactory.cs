@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
 
         public FieldPropertiesDto Visit(ComponentFieldProperties properties, None args)
         {
-            return SimpleMapper.Map(properties, new ComponentsFieldPropertiesDto());
+            return SimpleMapper.Map(properties, new ComponentFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(DateTimeFieldProperties properties, None args)

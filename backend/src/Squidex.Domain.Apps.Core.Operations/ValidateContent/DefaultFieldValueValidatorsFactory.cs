@@ -91,6 +91,25 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 yield return new RequiredValidator();
             }
+
+            yield return new ComponentValidator(type =>
+            {
+                var schema = field.GetResolvedSchema(type);
+
+                if (schema == null || schema.Fields.Count == 0)
+                {
+                    return null;
+                }
+
+                var nestedValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(schema.Fields.Count);
+
+                foreach (var nestedField in schema.Fields)
+                {
+                    nestedValidators[nestedField.Name] = (false, args.Factory(nestedField));
+                }
+
+                return new ObjectValidator<IJsonValue>(nestedValidators, false, "field");
+            });
         }
 
         public IEnumerable<IValidator> Visit(IField<DateTimeFieldProperties> field, Args args)

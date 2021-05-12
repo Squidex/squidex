@@ -84,6 +84,25 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public None Visit(IField<ComponentFieldProperties> field, Args args)
         {
+            if (args.Value is JsonObject obj)
+            {
+                if (obj.TryGetValue<JsonString>("$type", out var type))
+                {
+                    var schema = field.GetResolvedSchema(type.Value);
+
+                    if (schema != null)
+                    {
+                        foreach (var componentField in schema.Fields)
+                        {
+                            if (obj.TryGetValue(componentField.Name, out var componentValue))
+                            {
+                                componentField.Accept(this, new Args(componentValue, args.Result, args.ResultLimit));
+                            }
+                        }
+                    }
+                }
+            }
+
             return None.Value;
         }
 

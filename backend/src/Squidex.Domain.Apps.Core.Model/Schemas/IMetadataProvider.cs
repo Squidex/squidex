@@ -5,16 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IField : IFieldSettings, IMetadataProvider
+    public interface IMetadataProvider
     {
-        long Id { get; }
+        IDictionary<string, object> Metadata { get; }
 
-        string Name { get; }
+        T? GetMetadata<T>(string key, T? defaultValue = default);
 
-        FieldProperties RawProperties { get; }
+        T GetMetadata<T>(string key, Func<T> defaultValueFactory);
 
-        T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, TArgs args);
+        bool HasMetadata(string key);
     }
 }

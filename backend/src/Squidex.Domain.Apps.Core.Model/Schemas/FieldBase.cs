@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class FieldBase
+    public abstract class FieldBase : IMetadataProvider
     {
         private Dictionary<string, object> metadata;
 

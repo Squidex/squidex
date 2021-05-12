@@ -12,23 +12,8 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 {
-    public sealed class ComponentsFieldPropertiesDto : FieldPropertiesDto
+    public sealed class ComponentFieldPropertiesDto : FieldPropertiesDto
     {
-        /// <summary>
-        /// The minimum allowed items for the field value.
-        /// </summary>
-        public int? MinItems { get; set; }
-
-        /// <summary>
-        /// The maximum allowed items for the field value.
-        /// </summary>
-        public int? MaxItems { get; set; }
-
-        /// <summary>
-        /// True, if the field accepts multiple values.
-        /// </summary>
-        public bool Multiple { get; set; }
-
         /// <summary>
         /// The id of the embedded schemas.
         /// </summary>
