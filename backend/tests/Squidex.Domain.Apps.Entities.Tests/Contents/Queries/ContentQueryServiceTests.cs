@@ -41,6 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schemaDef =
                 new Schema(schemaId.Name)
+                    .Publish()
                     .SetScripts(new SchemaScripts { Query = "<query-script>" });
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
@@ -101,6 +102,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<string>._, true))
                 .Returns((ISchemaEntity?)null);
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(requestContext, schemaId.Name));
+        }
+
+        [Fact]
+        public async Task Should_throw_notfound_exception_if_schema_to_get_is_not_published()
+        {
+            var requestContext = CreateContext();
+
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<string>._, true))
+                .Returns(Mocks.Schema(appId, schemaId, new Schema(schemaId.Name)));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(requestContext, schemaId.Name));
         }

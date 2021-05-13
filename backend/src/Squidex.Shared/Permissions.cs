@@ -138,33 +138,33 @@ namespace Squidex.Shared
         public const string AppSchemas = "squidex.apps.{app}.schemas";
         public const string AppSchemasRead = "squidex.apps.{app}.schemas.read";
         public const string AppSchemasCreate = "squidex.apps.{app}.schemas.create";
-        public const string AppSchemasUpdate = "squidex.apps.{app}.schemas.{name}.update";
-        public const string AppSchemasScripts = "squidex.apps.{app}.schemas.{name}.scripts";
-        public const string AppSchemasPublish = "squidex.apps.{app}.schemas.{name}.publish";
-        public const string AppSchemasDelete = "squidex.apps.{app}.schemas.{name}.delete";
+        public const string AppSchemasUpdate = "squidex.apps.{app}.schemas.{schema}.update";
+        public const string AppSchemasScripts = "squidex.apps.{app}.schemas.{schema}.scripts";
+        public const string AppSchemasPublish = "squidex.apps.{app}.schemas.{schema}.publish";
+        public const string AppSchemasDelete = "squidex.apps.{app}.schemas.{schema}.delete";
 
         // Contents
-        public const string AppContents = "squidex.apps.{app}.contents.{name}";
-        public const string AppContentsRead = "squidex.apps.{app}.contents.{name}.read";
-        public const string AppContentsReadOwn = "squidex.apps.{app}.contents.{name}.read.own";
-        public const string AppContentsCreate = "squidex.apps.{app}.contents.{name}.create";
-        public const string AppContentsUpdate = "squidex.apps.{app}.contents.{name}.update";
-        public const string AppContentsUpdateOwn = "squidex.apps.{app}.contents.{name}.update.own";
-        public const string AppContentsChangeStatus = "squidex.apps.{app}.contents.{name}.changestatus";
-        public const string AppContentsChangeStatusOwn = "squidex.apps.{app}.contents.{name}.changestatus.own";
-        public const string AppContentsUpsert = "squidex.apps.{app}.contents.{name}.upsert";
-        public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{name}.version.create";
-        public const string AppContentsVersionCreateOwn = "squidex.apps.{app}.contents.{name}.version.create.own";
-        public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{name}.version.delete";
-        public const string AppContentsVersionDeleteOwn = "squidex.apps.{app}.contents.{name}.version.delete.own";
-        public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
-        public const string AppContentsDeleteOwn = "squidex.apps.{app}.contents.{name}.delete.own";
+        public const string AppContents = "squidex.apps.{app}.contents.{schema}";
+        public const string AppContentsRead = "squidex.apps.{app}.contents.{schema}.read";
+        public const string AppContentsReadOwn = "squidex.apps.{app}.contents.{schema}.read.own";
+        public const string AppContentsCreate = "squidex.apps.{app}.contents.{schema}.create";
+        public const string AppContentsUpdate = "squidex.apps.{app}.contents.{schema}.update";
+        public const string AppContentsUpdateOwn = "squidex.apps.{app}.contents.{schema}.update.own";
+        public const string AppContentsChangeStatus = "squidex.apps.{app}.contents.{schema}.changestatus";
+        public const string AppContentsChangeStatusOwn = "squidex.apps.{app}.contents.{schema}.changestatus.own";
+        public const string AppContentsUpsert = "squidex.apps.{app}.contents.{schema}.upsert";
+        public const string AppContentsVersionCreate = "squidex.apps.{app}.contents.{schema}.version.create";
+        public const string AppContentsVersionCreateOwn = "squidex.apps.{app}.contents.{schema}.version.create.own";
+        public const string AppContentsVersionDelete = "squidex.apps.{app}.contents.{schema}.version.delete";
+        public const string AppContentsVersionDeleteOwn = "squidex.apps.{app}.contents.{schema}.version.delete.own";
+        public const string AppContentsDelete = "squidex.apps.{app}.contents.{schema}.delete";
+        public const string AppContentsDeleteOwn = "squidex.apps.{app}.contents.{schema}.delete.own";
 
         public static Permission ForApp(string id, string app = Permission.Any, string schema = Permission.Any)
         {
             Guard.NotNull(id, nameof(id));
 
-            return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{name}", schema ?? Permission.Any));
+            return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{schema}", schema ?? Permission.Any));
         }
     }
 }

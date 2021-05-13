@@ -490,6 +490,9 @@
   <data name="contents.referenced" xml:space="preserve">
     <value>Er wordt naar de inhoud verwezen door een andere item en kan niet worden verwijderd.</value>
   </data>
+  <data name="contents.schemaNotPublished" xml:space="preserve">
+    <value>Schema not published.</value>
+  </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Singleton-inhoud kan niet worden bijgewerkt.</value>
   </data>

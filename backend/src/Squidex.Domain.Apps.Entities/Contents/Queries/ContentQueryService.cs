@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schema = await GetSchemaAsync(context, schemaIdOrName);
 
-            if (schema == null || !IsAccessible(context, schema))
+            if (schema == null || !IsAccessible(schema))
             {
                 throw new DomainObjectNotFoundException(schemaIdOrName);
             }
@@ -206,12 +206,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schemas = await appProvider.GetSchemasAsync(context.App.Id);
 
-            return schemas.Where(x => IsAccessible(context, x) && HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
+            return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
         }
 
-        private static bool IsAccessible(Context context, ISchemaEntity schema)
+        private static bool IsAccessible(ISchemaEntity schema)
         {
-            return schema.SchemaDef.IsPublished || context.IsFrontendClient;
+            return schema.SchemaDef.IsPublished;
         }
 
         private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)

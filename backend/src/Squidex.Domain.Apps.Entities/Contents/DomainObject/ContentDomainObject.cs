@@ -223,6 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private async Task CreateCore(CreateContent c, OperationContext operation)
         {
             operation.MustNotCreateSingleton();
+            operation.MustNotCreateForUnpublishedSchema();
             operation.MustHaveData(c.Data);
 
             if (!c.DoNotValidate)

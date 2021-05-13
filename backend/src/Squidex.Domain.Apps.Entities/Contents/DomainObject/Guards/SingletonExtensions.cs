@@ -12,8 +12,16 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
-    public static class SingletonExtensions
+    public static class SchemaExtensions
     {
+        public static void MustNotCreateForUnpublishedSchema(this OperationContext context)
+        {
+            if (!context.SchemaDef.IsPublished && context.SchemaDef.Type != SchemaType.Singleton)
+            {
+                throw new DomainException(T.Get("contents.schemaNotPublished"));
+            }
+        }
+
         public static void MustNotCreateSingleton(this OperationContext context)
         {
             if (context.SchemaDef.Type == SchemaType.Singleton && context.ContentId != context.Schema.Id)

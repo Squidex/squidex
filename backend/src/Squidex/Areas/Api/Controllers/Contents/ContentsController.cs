@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Queries contents.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
         /// <param name="q">The optional json query.</param>
         /// <returns>
@@ -136,15 +136,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
-        [Route("content/{app}/{name}/")]
+        [Route("content/{app}/{publishedSchema}/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string? ids = null, [FromQuery] string? q = null)
+        public async Task<IActionResult> GetContents(string app, string publishedSchema, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
+            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, publishedSchema);
 
-            var contents = await contentQuery.QueryAsync(Context, name, CreateQuery(ids, q));
+            var contents = await contentQuery.QueryAsync(Context, publishedSchema, CreateQuery(ids, q));
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -158,7 +158,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Queries contents.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="query">The required query object.</param>
         /// <returns>
         /// 200 => Contents returned.
@@ -168,15 +168,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPost]
-        [Route("content/{app}/{name}/query")]
+        [Route("content/{app}/{publishedSchema}/query")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContentsPost(string app, string name, [FromBody] QueryDto query)
+        public async Task<IActionResult> GetContentsPost(string app, string publishedSchema, [FromBody] QueryDto query)
         {
-            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
+            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, publishedSchema);
 
-            var contents = await contentQuery.QueryAsync(Context, name, query?.ToQuery() ?? Q.Empty);
+            var contents = await contentQuery.QueryAsync(Context, publishedSchema, query?.ToQuery() ?? Q.Empty);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -190,7 +190,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Get a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content to fetch.</param>
         /// <returns>
         /// 200 => Content returned.
@@ -200,13 +200,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
-        [Route("content/{app}/{name}/{id}/")]
+        [Route("content/{app}/{publishedSchema}/{id}/")]
         [ProducesResponseType(typeof(ContentDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContent(string app, string name, DomainId id)
+        public async Task<IActionResult> GetContent(string app, string publishedSchema, DomainId id)
         {
-            var content = await contentQuery.FindAsync(Context, name, id);
+            var content = await contentQuery.FindAsync(Context, publishedSchema, id);
 
             if (content == null)
             {
@@ -222,7 +222,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Get a content item validity.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content to fetch.</param>
         /// <returns>
         /// 204 => Content is valid.
@@ -233,10 +233,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
-        [Route("content/{app}/{name}/{id}/validity")]
+        [Route("content/{app}/{publishedSchema}/{id}/validity")]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContentValidity(string app, string name, DomainId id)
+        public async Task<IActionResult> GetContentValidity(string app, string publishedSchema, DomainId id)
         {
             var command = new ValidateContent { ContentId = id };
 
@@ -249,7 +249,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Get all references of a content.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content to fetch.</param>
         /// <param name="q">The optional json query.</param>
         /// <returns>
@@ -260,11 +260,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
-        [Route("content/{app}/{name}/{id}/references")]
+        [Route("content/{app}/{publishedSchema}/{id}/references")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetReferences(string app, string name, DomainId id, [FromQuery] string? q = null)
+        public async Task<IActionResult> GetReferences(string app, string publishedSchema, DomainId id, [FromQuery] string? q = null)
         {
             var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReferencing(id));
 
@@ -280,7 +280,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Get a referencing contents of a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content to fetch.</param>
         /// <param name="q">The optional json query.</param>
         /// <returns>
@@ -291,11 +291,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
-        [Route("content/{app}/{name}/{id}/referencing")]
+        [Route("content/{app}/{publishedSchema}/{id}/referencing")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetReferencing(string app, string name, DomainId id, [FromQuery] string? q = null)
+        public async Task<IActionResult> GetReferencing(string app, string publishedSchema, DomainId id, [FromQuery] string? q = null)
         {
             var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReference(id));
 
@@ -311,7 +311,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Get a content by version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content to fetch.</param>
         /// <param name="version">The version fo the content to fetch.</param>
         /// <returns>
@@ -322,12 +322,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
-        [Route("content/{app}/{name}/{id}/{version}/")]
+        [Route("content/{app}/{publishedSchema}/{id}/{version}/")]
         [ApiPermissionOrAnonymous(Permissions.AppContentsReadOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContentVersion(string app, string name, DomainId id, int version)
+        public async Task<IActionResult> GetContentVersion(string app, string publishedSchema, DomainId id, int version)
         {
-            var content = await contentQuery.FindAsync(Context, name, id, version);
+            var content = await contentQuery.FindAsync(Context, publishedSchema, id, version);
 
             if (content == null)
             {
@@ -343,7 +343,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Create a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
         /// 201 => Content created.
@@ -354,24 +354,24 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPost]
-        [Route("content/{app}/{name}/")]
+        [Route("content/{app}/{publishedSchema}/")]
         [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContent(string app, string name, CreateContentDto request)
+        public async Task<IActionResult> PostContent(string app, string publishedSchema, CreateContentDto request)
         {
             var command = request.ToCommand();
 
             var response = await InvokeCommandAsync(command);
 
-            return CreatedAtAction(nameof(GetContent), new { app, name, id = command.ContentId }, response);
+            return CreatedAtAction(nameof(GetContent), new { app, publishedSchema, id = command.ContentId }, response);
         }
 
         /// <summary>
         /// Import content items.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="request">The import request.</param>
         /// <returns>
         /// 200 => Contents created.
@@ -382,12 +382,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPost]
-        [Route("content/{app}/{name}/import")]
+        [Route("content/{app}/{publishedSchema}/import")]
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsCreate)]
         [ApiCosts(5)]
         [Obsolete("Use bulk endpoint now.")]
-        public async Task<IActionResult> PostContents(string app, string name, [FromBody] ImportContentsDto request)
+        public async Task<IActionResult> PostContents(string app, string publishedSchema, [FromBody] ImportContentsDto request)
         {
             var command = request.ToCommand();
 
@@ -403,7 +403,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Bulk update content items.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="request">The bulk update request.</param>
         /// <returns>
         /// 201 => Contents created, update or delete.
@@ -414,11 +414,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPost]
-        [Route("content/{app}/{name}/bulk")]
+        [Route("content/{app}/{publishedSchema}/bulk")]
         [ProducesResponseType(typeof(BulkResultDto[]), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsReadOwn)]
         [ApiCosts(5)]
-        public async Task<IActionResult> BulkUpdateContents(string app, string name, [FromBody] BulkUpdateContentsDto request)
+        public async Task<IActionResult> BulkUpdateContents(string app, string publishedSchema, [FromBody] BulkUpdateContentsDto request)
         {
             var command = request.ToCommand();
 
@@ -434,7 +434,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Upsert a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content item to update.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
@@ -446,11 +446,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPost]
-        [Route("content/{app}/{name}/{id}/")]
+        [Route("content/{app}/{publishedSchema}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpsert)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostUpsertContent(string app, string name, DomainId id, UpsertContentDto request)
+        public async Task<IActionResult> PostUpsertContent(string app, string publishedSchema, DomainId id, UpsertContentDto request)
         {
             var command = request.ToCommand(id);
 
@@ -463,7 +463,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Update a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content item to update.</param>
         /// <param name="request">The full data for the content item.</param>
         /// <returns>
@@ -475,11 +475,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
-        [Route("content/{app}/{name}/{id}/")]
+        [Route("content/{app}/{publishedSchema}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdateOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(string app, string name, DomainId id, [FromBody] ContentData request)
+        public async Task<IActionResult> PutContent(string app, string publishedSchema, DomainId id, [FromBody] ContentData request)
         {
             var command = new UpdateContent { ContentId = id, Data = request };
 
@@ -492,7 +492,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Patchs a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content item to patch.</param>
         /// <param name="request">The patch for the content item.</param>
         /// <returns>
@@ -504,11 +504,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPatch]
-        [Route("content/{app}/{name}/{id}/")]
+        [Route("content/{app}/{publishedSchema}/{id}/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsUpdateOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(string app, string name, DomainId id, [FromBody] ContentData request)
+        public async Task<IActionResult> PatchContent(string app, string publishedSchema, DomainId id, [FromBody] ContentData request)
         {
             var command = new PatchContent { ContentId = id, Data = request };
 
@@ -521,7 +521,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Change status of a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content item to change.</param>
         /// <param name="request">The status request.</param>
         /// <returns>
@@ -533,11 +533,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
-        [Route("content/{app}/{name}/{id}/status/")]
+        [Route("content/{app}/{publishedSchema}/{id}/status/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsChangeStatusOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContentStatus(string app, string name, DomainId id, [FromBody] ChangeStatusDto request)
+        public async Task<IActionResult> PutContentStatus(string app, string publishedSchema, DomainId id, [FromBody] ChangeStatusDto request)
         {
             var command = request.ToCommand(id);
 
@@ -550,7 +550,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Create a new draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content item to create the draft for.</param>
         /// <returns>
         /// 200 => Content draft created.
@@ -560,11 +560,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPost]
-        [Route("content/{app}/{name}/{id}/draft/")]
+        [Route("content/{app}/{publishedSchema}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsVersionCreateOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> CreateDraft(string app, string name, DomainId id)
+        public async Task<IActionResult> CreateDraft(string app, string publishedSchema, DomainId id)
         {
             var command = new CreateContentDraft { ContentId = id };
 
@@ -577,7 +577,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Delete the draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content item to delete the draft from.</param>
         /// <returns>
         /// 200 => Content draft deleted.
@@ -587,11 +587,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpDelete]
-        [Route("content/{app}/{name}/{id}/draft/")]
+        [Route("content/{app}/{publishedSchema}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsDeleteOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteVersion(string app, string name, DomainId id)
+        public async Task<IActionResult> DeleteVersion(string app, string publishedSchema, DomainId id)
         {
             var command = new DeleteContentDraft { ContentId = id };
 
@@ -604,7 +604,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Delete a content item.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="publishedSchema">The name of the schema.</param>
         /// <param name="id">The id of the content item to delete.</param>
         /// <param name="request">The request parameters.</param>
         /// <returns>
@@ -616,10 +616,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// You can create an generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpDelete]
-        [Route("content/{app}/{name}/{id}/")]
+        [Route("content/{app}/{publishedSchema}/{id}/")]
         [ApiPermissionOrAnonymous(Permissions.AppContentsDeleteOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteContent(string app, string name, DomainId id, DeleteContentDto request)
+        public async Task<IActionResult> DeleteContent(string app, string publishedSchema, DomainId id, DeleteContentDto request)
         {
             var command = request.ToCommand(id);
 

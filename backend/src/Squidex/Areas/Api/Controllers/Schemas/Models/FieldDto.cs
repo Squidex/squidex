@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             if (allowUpdate)
             {
-                var values = new { app = resources.App, name = schema, id = FieldId };
+                var values = new { app = resources.App, schema, id = FieldId };
 
                 AddPutLink("update", resources.Url<SchemaFieldsController>(x => nameof(x.PutField), values));
 
@@ -132,7 +132,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
                 if (Properties is ArrayFieldPropertiesDto)
                 {
-                    var parentValues = new { values.app, values.name, parentId = FieldId };
+                    var parentValues = new { values.app, values.schema, parentId = FieldId };
 
                     AddPostLink("fields/add", resources.Url<SchemaFieldsController>(x => nameof(x.PostNestedField), parentValues));
 

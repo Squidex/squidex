@@ -490,6 +490,9 @@
   <data name="contents.referenced" xml:space="preserve">
     <value>Content is referenced by another content and cannot be deleted or unpublished.</value>
   </data>
+  <data name="contents.schemaNotPublished" xml:space="preserve">
+    <value>Schema not published.</value>
+  </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Singleton content cannot be updated.</value>
   </data>

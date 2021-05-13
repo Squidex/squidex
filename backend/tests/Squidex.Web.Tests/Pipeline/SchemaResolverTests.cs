@@ -61,10 +61,12 @@ namespace Squidex.Web.Pipeline
             sut = new SchemaResolver(appProvider);
         }
 
-        [Fact]
-        public async Task Should_return_not_found_if_schema_not_found()
+        [Theory]
+        [InlineData("schema")]
+        [InlineData("publishedSchema")]
+        public async Task Should_return_not_found_if_schema_not_found(string parameter)
         {
-            actionContext.RouteData.Values["name"] = schemaId.Id.ToString();
+            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
@@ -75,12 +77,32 @@ namespace Squidex.Web.Pipeline
             Assert.False(isNextCalled);
         }
 
-        [Fact]
-        public async Task Should_resolve_schema_from_id()
+        [Theory]
+        [InlineData("schema", false)]
+        [InlineData("publishedSchema", true)]
+        public async Task Should_return_not_found_if_schema_not_published(string parameter, bool expect404)
         {
-            actionContext.RouteData.Values["name"] = schemaId.Id.ToString();
+            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
 
-            var schema = CreateSchema();
+            var schema = CreateSchema(false);
+
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
+                .Returns(schema);
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            Assert.Equal(expect404, actionExecutingContext.Result is NotFoundResult);
+            Assert.Equal(expect404, isNextCalled);
+        }
+
+        [Theory]
+        [InlineData("schema")]
+        [InlineData("publishedSchema")]
+        public async Task Should_resolve_schema_from_id(string parameter)
+        {
+            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
+
+            var schema = CreateSchema(true);
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true))
                 .Returns(schema);
@@ -91,14 +113,16 @@ namespace Squidex.Web.Pipeline
             Assert.True(isNextCalled);
         }
 
-        [Fact]
-        public async Task Should_resolve_schema_from_id_without_caching_if_frontend()
+        [Theory]
+        [InlineData("schema")]
+        [InlineData("publishedSchema")]
+        public async Task Should_resolve_schema_from_id_without_caching_if_frontend(string parameter)
         {
             user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-            actionContext.RouteData.Values["name"] = schemaId.Id.ToString();
+            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
 
-            var schema = CreateSchema();
+            var schema = CreateSchema(true);
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
                 .Returns(schema);
@@ -109,12 +133,14 @@ namespace Squidex.Web.Pipeline
             Assert.True(isNextCalled);
         }
 
-        [Fact]
-        public async Task Should_resolve_schema_from_name()
+        [Theory]
+        [InlineData("schema")]
+        [InlineData("publishedSchema")]
+        public async Task Should_resolve_schema_from_name(string parameter)
         {
-            actionContext.RouteData.Values["name"] = schemaId.Name;
+            actionContext.RouteData.Values[parameter] = schemaId.Name;
 
-            var schema = CreateSchema();
+            var schema = CreateSchema(true);
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true))
                 .Returns(schema);
@@ -125,14 +151,16 @@ namespace Squidex.Web.Pipeline
             Assert.True(isNextCalled);
         }
 
-        [Fact]
-        public async Task Should_resolve_schema_from_name_without_caching_if_frontend()
+        [Theory]
+        [InlineData("schema")]
+        [InlineData("publishedSchema")]
+        public async Task Should_resolve_schema_from_name_without_caching_if_frontend(string parameter)
         {
             user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-            actionContext.RouteData.Values["name"] = schemaId.Name;
+            actionContext.RouteData.Values[parameter] = schemaId.Name;
 
-            var schema = CreateSchema();
+            var schema = CreateSchema(true);
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false))
                 .Returns(schema);
@@ -141,6 +169,22 @@ namespace Squidex.Web.Pipeline
 
             Assert.Equal(schemaId, actionContext.HttpContext.Features.Get<ISchemaFeature>().SchemaId);
             Assert.True(isNextCalled);
+        }
+
+        [Theory]
+        [InlineData("schema")]
+        [InlineData("publishedSchema")]
+        public async Task Should_do_nothing_if_app_feature_not_set(string parameter)
+        {
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(null!);
+            actionExecutingContext.RouteData.Values[parameter] = schemaId.Name;
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            Assert.True(isNextCalled);
+
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -154,26 +198,19 @@ namespace Squidex.Web.Pipeline
                 .MustNotHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_do_nothing_if_app_feature_not_set()
+        private ISchemaEntity CreateSchema(bool published)
         {
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(null!);
-            actionExecutingContext.RouteData.Values["name"] = schemaId.Name;
+            var schema = new Schema(schemaId.Name);
 
-            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+            if (published)
+            {
+                schema = schema.Publish();
+            }
 
-            Assert.True(isNextCalled);
-
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
-                .MustNotHaveHappened();
-        }
-
-        private ISchemaEntity CreateSchema()
-        {
             var schemaEntity = A.Fake<ISchemaEntity>();
 
             A.CallTo(() => schemaEntity.SchemaDef)
-                .Returns(new Schema(schemaId.Name));
+                .Returns(schema);
 
             A.CallTo(() => schemaEntity.Id)
                 .Returns(schemaId.Id);

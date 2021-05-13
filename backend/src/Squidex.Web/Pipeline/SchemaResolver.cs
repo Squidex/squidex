@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -35,7 +36,7 @@ namespace Squidex.Web.Pipeline
 
             if (appId != default)
             {
-                var schemaIdOrName = context.RouteData.Values["name"]?.ToString();
+                var schemaIdOrName = context.RouteData.Values["schema"]?.ToString();
 
                 if (!string.IsNullOrWhiteSpace(schemaIdOrName))
                 {
@@ -48,6 +49,23 @@ namespace Squidex.Web.Pipeline
                     }
 
                     context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema.NamedId()));
+                }
+                else
+                {
+                    schemaIdOrName = context.RouteData.Values["publishedSchema"]?.ToString();
+
+                    if (!string.IsNullOrWhiteSpace(schemaIdOrName))
+                    {
+                        var schema = await GetSchemaAsync(appId, schemaIdOrName, context.HttpContext.User);
+
+                        if (schema == null || !schema.SchemaDef.IsPublished)
+                        {
+                            context.Result = new NotFoundResult();
+                            return;
+                        }
+
+                        context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema.NamedId()));
+                    }
                 }
             }
 

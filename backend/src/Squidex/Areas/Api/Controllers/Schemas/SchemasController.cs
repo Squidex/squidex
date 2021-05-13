@@ -70,31 +70,31 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Get a schema by name.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema to retrieve.</param>
+        /// <param name="schema">The name of the schema to retrieve.</param>
         /// <returns>
         /// 200 => Schema found.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpGet]
-        [Route("apps/{app}/schemas/{name}/")]
+        [Route("apps/{app}/schemas/{schema}/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetSchema(string app, string name)
+        public async Task<IActionResult> GetSchema(string app, string schema)
         {
-            var schema = await GetSchemaAsync(name);
+            var schemaEntity = await GetSchemaAsync(schema);
 
-            if (schema == null)
+            if (schemaEntity == null)
             {
                 return NotFound();
             }
 
             var response = Deferred.Response(() =>
             {
-                return SchemaDto.FromSchema(schema, Resources);
+                return SchemaDto.FromSchema(schemaEntity, Resources);
             });
 
-            Response.Headers[HeaderNames.ETag] = schema.ToEtag();
+            Response.Headers[HeaderNames.ETag] = schemaEntity.ToEtag();
 
             return Ok(response);
         }
@@ -127,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Update a schema.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="schema">The name of the schema.</param>
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
@@ -135,11 +135,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/")]
+        [Route("apps/{app}/schemas/{schema}/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutSchema(string app, string name, [FromBody] UpdateSchemaDto request)
+        public async Task<IActionResult> PutSchema(string app, string schema, [FromBody] UpdateSchemaDto request)
         {
             var command = request.ToCommand();
 
@@ -152,7 +152,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Synchronize a schema.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="schema">The name of the schema.</param>
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
@@ -160,11 +160,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/sync")]
+        [Route("apps/{app}/schemas/{schema}/sync")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutSchemaSync(string app, string name, [FromBody] SynchronizeSchemaDto request)
+        public async Task<IActionResult> PutSchemaSync(string app, string schema, [FromBody] SynchronizeSchemaDto request)
         {
             var command = request.ToCommand();
 
@@ -177,7 +177,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Update a schema category.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="schema">The name of the schema.</param>
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
@@ -185,11 +185,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/category")]
+        [Route("apps/{app}/schemas/{schema}/category")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutCategory(string app, string name, [FromBody] ChangeCategoryDto request)
+        public async Task<IActionResult> PutCategory(string app, string schema, [FromBody] ChangeCategoryDto request)
         {
             var command = request.ToCommand();
 
@@ -202,7 +202,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Update the preview urls.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="schema">The name of the schema.</param>
         /// <param name="request">The preview urls for the schema.</param>
         /// <returns>
         /// 200 => Schema updated.
@@ -210,11 +210,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/preview-urls")]
+        [Route("apps/{app}/schemas/{schema}/preview-urls")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutPreviewUrls(string app, string name, [FromBody] ConfigurePreviewUrlsDto request)
+        public async Task<IActionResult> PutPreviewUrls(string app, string schema, [FromBody] ConfigurePreviewUrlsDto request)
         {
             var command = request.ToCommand();
 
@@ -227,7 +227,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Update the scripts.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="schema">The name of the schema.</param>
         /// <param name="request">The schema scripts object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
@@ -235,11 +235,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/scripts/")]
+        [Route("apps/{app}/schemas/{schema}/scripts/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasScripts)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutScripts(string app, string name, [FromBody] SchemaScriptsDto request)
+        public async Task<IActionResult> PutScripts(string app, string schema, [FromBody] SchemaScriptsDto request)
         {
             var command = request.ToCommand();
 
@@ -252,7 +252,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Update the rules.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
+        /// <param name="schema">The name of the schema.</param>
         /// <param name="request">The schema rules object that needs to updated.</param>
         /// <returns>
         /// 200 => Schema updated.
@@ -260,11 +260,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/rules/")]
+        [Route("apps/{app}/schemas/{schema}/rules/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutRules(string app, string name, [FromBody] ConfigureFieldRulesDto request)
+        public async Task<IActionResult> PutRules(string app, string schema, [FromBody] ConfigureFieldRulesDto request)
         {
             var command = request.ToCommand();
 
@@ -277,17 +277,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Publish a schema.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema to publish.</param>
+        /// <param name="schema">The name of the schema to publish.</param>
         /// <returns>
         /// 200 => Schema published.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/publish/")]
+        [Route("apps/{app}/schemas/{schema}/publish/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasPublish)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PublishSchema(string app, string name)
+        public async Task<IActionResult> PublishSchema(string app, string schema)
         {
             var command = new PublishSchema();
 
@@ -300,17 +300,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Unpublish a schema.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema to unpublish.</param>
+        /// <param name="schema">The name of the schema to unpublish.</param>
         /// <returns>
         /// 200 => Schema unpublished.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/unpublish/")]
+        [Route("apps/{app}/schemas/{schema}/unpublish/")]
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasPublish)]
         [ApiCosts(1)]
-        public async Task<IActionResult> UnpublishSchema(string app, string name)
+        public async Task<IActionResult> UnpublishSchema(string app, string schema)
         {
             var command = new UnpublishSchema();
 
@@ -323,16 +323,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// Delete a schema.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema to delete.</param>
+        /// <param name="schema">The name of the schema to delete.</param>
         /// <returns>
         /// 204 => Schema deleted.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpDelete]
-        [Route("apps/{app}/schemas/{name}/")]
+        [Route("apps/{app}/schemas/{schema}/")]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteSchema(string app, string name)
+        public async Task<IActionResult> DeleteSchema(string app, string schema)
         {
             await CommandBus.PublishAsync(new DeleteSchema());
 
@@ -340,30 +340,30 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         [HttpGet]
-        [Route("apps/{app}/schemas/{name}/completion")]
+        [Route("apps/{app}/schemas/{schema}/completion")]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public async Task<IActionResult> GetScriptCompletiong(string app, string name)
+        public async Task<IActionResult> GetScriptCompletion(string app, string schema)
         {
-            var schema = await GetSchemaAsync(name);
+            var schemaEntity = await GetSchemaAsync(schema);
 
-            if (schema == null)
+            if (schemaEntity == null)
             {
                 return NotFound();
             }
 
             var completer = new ScriptingCompletion();
-            var completion = completer.GetCompletion(schema.SchemaDef, App.PartitionResolver());
+            var completion = completer.GetCompletion(schemaEntity.SchemaDef, App.PartitionResolver());
 
             var result = completion.Select(x => new { x.Name, x.Description });
 
             return Ok(result);
         }
 
-        private Task<ISchemaEntity?> GetSchemaAsync(string name)
+        private Task<ISchemaEntity?> GetSchemaAsync(string schema)
         {
-            if (Guid.TryParse(name, out var guid))
+            if (Guid.TryParse(schema, out var guid))
             {
                 var schemaId = DomainId.Create(guid);
 
@@ -371,7 +371,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             }
             else
             {
-                return appProvider.GetSchemaAsync(AppId, name);
+                return appProvider.GetSchemaAsync(AppId, schema);
             }
         }
 

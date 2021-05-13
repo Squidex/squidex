@@ -135,6 +135,7 @@
   "contents.invalidString": "Invalid json type, expected string.",
   "contents.listReferences": "{count} Reference(s)",
   "contents.referenced": "Content is referenced by another content and cannot be deleted or unpublished.",
+  "contents.schemaNotPublished": "Schema not published.",
   "contents.singletonNotChangeable": "Singleton content cannot be updated.",
   "contents.singletonNotCreatable": "Singleton content cannot be created.",
   "contents.singletonNotDeletable": "Singleton content cannot be deleted.",
