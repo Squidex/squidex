@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
-    public static class SchemaExtensions
+    public static class SingletonExtensions
     {
         public static void MustNotCreateForUnpublishedSchema(this OperationContext context)
         {
