@@ -161,6 +161,17 @@ namespace Squidex.Domain.Apps.Entities
                 return indexSchemas.GetSchemasAsync(appId);
             });
 
+            foreach (var schema in schemas)
+            {
+                localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
+                localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+            }
+
+            foreach (var schema in schemas)
+            {
+                await ResolveSchemaAsync(appId, schema.SchemaDef);
+            }
+
             return schemas;
         }
 

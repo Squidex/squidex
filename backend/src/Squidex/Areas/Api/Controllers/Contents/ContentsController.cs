@@ -142,13 +142,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string publishedSchema, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, publishedSchema);
-
             var contents = await contentQuery.QueryAsync(Context, publishedSchema, CreateQuery(ids, q));
 
             var response = Deferred.AsyncResponse(() =>
             {
-                return ContentsDto.FromContentsAsync(contents, Resources, schema, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Resources, Schema, contentWorkflow);
             });
 
             return Ok(response);
@@ -174,13 +172,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentsPost(string app, string publishedSchema, [FromBody] QueryDto query)
         {
-            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, publishedSchema);
-
             var contents = await contentQuery.QueryAsync(Context, publishedSchema, query?.ToQuery() ?? Q.Empty);
 
             var response = Deferred.AsyncResponse(() =>
             {
-                return ContentsDto.FromContentsAsync(contents, Resources, schema, contentWorkflow);
+                return ContentsDto.FromContentsAsync(contents, Resources, Schema, contentWorkflow);
             });
 
             return Ok(response);

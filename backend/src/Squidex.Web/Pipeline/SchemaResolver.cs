@@ -10,7 +10,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -32,7 +31,7 @@ namespace Squidex.Web.Pipeline
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var appId = context.HttpContext.Features.Get<IAppFeature>()?.AppId.Id ?? default;
+            var appId = context.HttpContext.Features.Get<IAppFeature>()?.App.Id ?? default;
 
             if (appId != default)
             {
@@ -48,7 +47,7 @@ namespace Squidex.Web.Pipeline
                         return;
                     }
 
-                    context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema.NamedId()));
+                    context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema));
                 }
                 else
                 {
@@ -64,7 +63,7 @@ namespace Squidex.Web.Pipeline
                             return;
                         }
 
-                        context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema.NamedId()));
+                        context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema));
                     }
                 }
             }

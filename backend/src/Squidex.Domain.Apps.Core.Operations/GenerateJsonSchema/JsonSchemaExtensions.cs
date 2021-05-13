@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
-                var propertyItem = JsonTypeVisitor.BuildProperty(field, withHiddenFields: withHidden);
+                var propertyItem = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
 
                 if (propertyItem != null)
                 {

@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -49,7 +50,7 @@ namespace Squidex.Web.Pipeline
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
             actionExecutingContext.HttpContext = httpContext;
             actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
-            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
 
             next = () =>
             {
@@ -109,7 +110,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Equal(schemaId, actionContext.HttpContext.Features.Get<ISchemaFeature>().SchemaId);
+            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>().Schema);
             Assert.True(isNextCalled);
         }
 
@@ -129,7 +130,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Equal(schemaId, actionContext.HttpContext.Features.Get<ISchemaFeature>().SchemaId);
+            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>().Schema);
             Assert.True(isNextCalled);
         }
 
@@ -147,7 +148,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Equal(schemaId, actionContext.HttpContext.Features.Get<ISchemaFeature>().SchemaId);
+            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>().Schema);
             Assert.True(isNextCalled);
         }
 
@@ -167,7 +168,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Equal(schemaId, actionContext.HttpContext.Features.Get<ISchemaFeature>().SchemaId);
+            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>().Schema);
             Assert.True(isNextCalled);
         }
 

@@ -213,7 +213,7 @@ namespace Squidex.Web
 
             if (schema == Permission.Any)
             {
-                var falback = Controller.HttpContext.Features.Get<ISchemaFeature>()?.SchemaId.Name;
+                var falback = Controller.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
 
                 if (!string.IsNullOrWhiteSpace(falback))
                 {

@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -51,7 +52,7 @@ namespace Squidex.Web.CommandMiddlewares
                 throw new InvalidOperationException("Cannot resolve schema.");
             }
 
-            return feature.SchemaId;
+            return feature.Schema.NamedId();
         }
     }
 }

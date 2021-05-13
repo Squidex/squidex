@@ -120,6 +120,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateObjectMap<AssetMetadata>()
             };
 
+            settings.SchemaType = SchemaType.OpenApi3;
+
             settings.FlattenInheritanceHierarchy = flatten;
         }
 

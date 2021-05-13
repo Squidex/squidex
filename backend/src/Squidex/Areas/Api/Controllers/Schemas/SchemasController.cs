@@ -80,21 +80,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ProducesResponseType(typeof(SchemaDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppSchemasRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetSchema(string app, string schema)
+        public IActionResult GetSchema(string app, string schema)
         {
-            var schemaEntity = await GetSchemaAsync(schema);
-
-            if (schemaEntity == null)
-            {
-                return NotFound();
-            }
-
             var response = Deferred.Response(() =>
             {
-                return SchemaDto.FromSchema(schemaEntity, Resources);
+                return SchemaDto.FromSchema(Schema, Resources);
             });
 
-            Response.Headers[HeaderNames.ETag] = schemaEntity.ToEtag();
+            Response.Headers[HeaderNames.ETag] = Schema.ToEtag();
 
             return Ok(response);
         }
@@ -344,17 +337,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public async Task<IActionResult> GetScriptCompletion(string app, string schema)
+        public IActionResult GetScriptCompletion(string app, string schema)
         {
-            var schemaEntity = await GetSchemaAsync(schema);
-
-            if (schemaEntity == null)
-            {
-                return NotFound();
-            }
-
             var completer = new ScriptingCompletion();
-            var completion = completer.GetCompletion(schemaEntity.SchemaDef, App.PartitionResolver());
+            var completion = completer.GetCompletion(Schema.SchemaDef, App.PartitionResolver());
 
             var result = completion.Select(x => new { x.Name, x.Description });
 
