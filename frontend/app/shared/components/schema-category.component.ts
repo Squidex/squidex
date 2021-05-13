@@ -1,3 +1,4 @@
+
 /*
  * Squidex Headless CMS
  *
@@ -58,7 +59,7 @@ export class SchemaCategoryComponent implements OnChanges {
         if (this.forContent) {
             const app = this.appsState.snapshot.selectedApp!;
 
-            this.filteredSchemas = this.filteredSchemas.filter(x => x.canReadContents && x.isPublished);
+            this.filteredSchemas = this.filteredSchemas.filter(x => x.canReadContents && x.isPublished && x.type !== 'Component');
             this.filteredSchemas = this.filteredSchemas.filter(x => !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(x.name)]);
         }
 
@@ -72,7 +73,7 @@ export class SchemaCategoryComponent implements OnChanges {
     }
 
     public schemaRoute(schema: SchemaDto) {
-        if (schema.isSingleton && this.forContent) {
+        if (schema.type === 'Singleton' && this.forContent) {
             return [schema.name, schema.id, 'history'];
         } else {
             return [schema.name];

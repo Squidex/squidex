@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         await CreateCore(c, operation);
 
-                        if (operation.Schema.SchemaDef.IsSingleton())
+                        if (operation.Schema.SchemaDef.Type == SchemaType.Singleton)
                         {
                             ChangeStatus(c.AsChange(Status.Published));
                         }

@@ -61,9 +61,10 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: '', upper: '', schemas: [] },
-                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
-                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] }
+                { displayName: 'i18n:common.components', schemas: [] },
+                { displayName: 'i18n:common.schemas', schemas: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] }
             ]);
 
             schemasService.verifyAll();
@@ -83,10 +84,11 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: '', upper: '', schemas: [] },
-                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
-                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] },
-                { name: 'schema-category3', upper: 'SCHEMA-CATEGORY3', schemas: [] }
+                { displayName: 'i18n:common.components', schemas: [] },
+                { displayName: 'i18n:common.schemas', schemas: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] }
             ]);
 
             schemasService.verifyAll();
@@ -151,35 +153,49 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: '', upper: '', schemas: [] },
-                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
-                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] },
-                { name: 'schema-category3', upper: 'SCHEMA-CATEGORY3', schemas: [] }
+                { displayName: 'i18n:common.components', schemas: [] },
+                { displayName: 'i18n:common.schemas', schemas: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] }
             ]);
         });
 
         it('should not remove category with schemas', () => {
-            schemasState.addCategory('schema-category1');
+            schemasState.removeCategory('schema-category1');
 
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
-                { name: '', upper: '', schemas: [] },
-                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
-                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] }
+                { displayName: 'i18n:common.components', schemas: [] },
+                { displayName: 'i18n:common.schemas', schemas: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] }
             ]);
         });
 
         it('should remove category', () => {
             schemasState.addCategory('schema-category3');
+
+            const categories1 = getCategories(schemasState);
+
+            expect(categories1).toEqual([
+                { displayName: 'i18n:common.components', schemas: [] },
+                { displayName: 'i18n:common.schemas', schemas: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] }
+            ]);
+
             schemasState.removeCategory('schema-category3');
 
-            const categories = getCategories(schemasState);
+            const categories2 = getCategories(schemasState);
 
-            expect(categories!).toEqual([
-                { name: '', upper: '', schemas: [] },
-                { name: 'schema-category1', upper: 'SCHEMA-CATEGORY1', schemas: [schema1] },
-                { name: 'schema-category2', upper: 'SCHEMA-CATEGORY2', schemas: [schema2] }
+            expect(categories2).toEqual([
+                { displayName: 'i18n:common.components', schemas: [] },
+                { displayName: 'i18n:common.schemas', schemas: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] }
             ]);
         });
 
@@ -206,40 +222,6 @@ describe('SchemasState', () => {
             expect(schemaSelected!).toBe(schema1);
             expect(schemasState.snapshot.selectedSchema).toBe(schema1);
             expect(schemasState.snapshot.selectedSchema).toBe(<SchemaDto>schemasState.snapshot.schemas[0]);
-        });
-
-        it('should return loaded schema on get', () => {
-            schemasService.setup(x => x.getSchema(app, schema2.name))
-                .returns(() => of(schema2)).verifiable(Times.never());
-
-            schemasState.loadSchema(schema2.name, true).subscribe();
-            schemasState.loadSchema(schema2.name, true).subscribe();
-
-            expect().nothing();
-        });
-
-        it('should return schema on get and reuse it from selected if caching', () => {
-            schemasService.setup(x => x.getSchema(app, schema1.name))
-                .returns(() => of(schema1)).verifiable(Times.once());
-
-            schemasState.select(schema1.name).subscribe();
-            schemasState.loadSchema(schema1.name, true).subscribe();
-
-            expect().nothing();
-        });
-
-        it('should not try to load if not found', () => {
-            schemasService.setup(x => x.getSchema(app, 'failed'))
-                .returns(() => throwError('Service Error')).verifiable(Times.never());
-
-            let schemaSelected: SchemaDto;
-
-            schemasState.select('failed').pipe(onErrorResumeNext()).subscribe(x => {
-                schemaSelected = x!;
-            });
-
-            expect(schemaSelected!).toBeNull();
-            expect(schemasState.snapshot.selectedSchema).toBeNull();
         });
 
         it('should return null on select if unselecting schema', () => {

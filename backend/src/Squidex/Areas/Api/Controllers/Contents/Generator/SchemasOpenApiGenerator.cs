@@ -19,6 +19,7 @@ using Squidex.Hosting;
 using Squidex.Infrastructure.Caching;
 using Squidex.Properties;
 using Squidex.Shared;
+using SchemaDefType = Squidex.Domain.Apps.Core.Schemas.SchemaType;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
@@ -49,16 +50,24 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             requestCache.AddDependency(app.UniqueId, app.Version);
 
+            foreach (var schema in schemas)
+            {
+                requestCache.AddDependency(schema.UniqueId, schema.Version);
+            }
+
             var builder = new Builder(
                 app,
                 document,
                 schemaResolver,
                 schemaGenerator);
 
-            foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished))
-            {
-                requestCache.AddDependency(schema.UniqueId, schema.Version);
+            var validSchemas = schemas.Where(x =>
+                x.SchemaDef.IsPublished &&
+                x.SchemaDef.Type != SchemaDefType.Component &&
+                x.SchemaDef.Fields.Count > 0);
 
+            foreach (var schema in validSchemas)
+            {
                 GenerateSchemaOperations(builder.Schema(schema.SchemaDef, flat));
             }
 

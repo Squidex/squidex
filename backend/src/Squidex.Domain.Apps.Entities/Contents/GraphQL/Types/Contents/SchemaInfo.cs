@@ -57,7 +57,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             var names = new Names();
 
-            foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished && x.SchemaDef.Fields.Count > 0).OrderBy(x => x.Created))
+            var validSchemas = schemas.Where(x =>
+                x.SchemaDef.IsPublished &&
+                x.SchemaDef.Type != SchemaType.Component &&
+                x.SchemaDef.Fields.Count > 0);
+
+            foreach (var schema in validSchemas.OrderBy(x => x.Created))
             {
                 var typeName = schema.TypeName();
 

@@ -673,6 +673,6 @@ describe('ContentForm', () => {
 
     function createForm(fields: RootFieldDto[], fieldRules: FieldRule[] = []) {
         return new EditContentForm(languages,
-            createSchema({ fields, fieldRules }), {}, 0);
+            createSchema({ fields, fieldRules }), {}, {}, 0);
     }
 });

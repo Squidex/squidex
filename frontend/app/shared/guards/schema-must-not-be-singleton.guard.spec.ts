@@ -33,11 +33,11 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         schemaGuard = new SchemaMustNotBeSingletonGuard(schemasState.object, router.object);
     });
 
-    it('should subscribe to schema and return true if not singleton', () => {
+    it('should subscribe to schema and return true if default', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', isSingleton: false }));
+            .returns(() => of(<SchemaDto>{ id: '123', type: 'Default' }));
 
         let result: boolean;
 
@@ -54,7 +54,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', isSingleton: true }));
+            .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
         let result: boolean;
 
@@ -71,7 +71,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/new/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDto>{ id: '123', isSingleton: true }));
+            .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
         let result: boolean;
 

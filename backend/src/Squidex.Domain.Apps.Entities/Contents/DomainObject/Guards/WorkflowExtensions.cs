@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static async Task CheckTransitionAsync(this OperationContext context, Status status)
         {
-            if (!context.SchemaDef.IsSingleton())
+            if (context.SchemaDef.Type != SchemaType.Singleton)
             {
                 var workflow = GetWorkflow(context);
 
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static async Task CheckStatusAsync(this OperationContext context, Status status)
         {
-            if (!context.SchemaDef.IsSingleton())
+            if (context.SchemaDef.Type != SchemaType.Singleton)
             {
                 var workflow = GetWorkflow(context);
 

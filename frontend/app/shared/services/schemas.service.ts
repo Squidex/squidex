@@ -28,7 +28,7 @@ export const MetaFields = {
     version: 'meta.version'
 };
 
-export type SchemaType = 'Default' | 'Singleton';
+export type SchemaType = 'Default' | 'Singleton' | 'Component';
 
 export class SchemaDto {
     public readonly _links: ResourceLinks;
@@ -56,9 +56,6 @@ export class SchemaDto {
 
     public readonly defaultListFields: ReadonlyArray<TableField>;
     public readonly defaultReferenceFields: ReadonlyArray<TableField>;
-
-    public readonly isSingleton: boolean;
-    public readonly isDefault: boolean;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
@@ -99,9 +96,6 @@ export class SchemaDto {
         this.canUpdateRules = hasAnyLink(links, 'update/rules');
 
         this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
-
-        this.isDefault = type === 'Default';
-        this.isSingleton = type === 'Singleton';
 
         if (fields) {
             this.contentFields = fields.filter(x => x.properties.isContentField);
@@ -265,10 +259,6 @@ export class FieldDto {
 export class RootFieldDto extends FieldDto {
     public get isLocalizable() {
         return this.partitioning === 'language';
-    }
-
-    public get isArray() {
-        return this.properties.fieldType === 'Array';
     }
 
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,

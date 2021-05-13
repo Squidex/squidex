@@ -38,8 +38,8 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public ngOnInit() {
         this.own(
             this.messageBus.of(SchemaCloning)
-                .subscribe(m => {
-                    this.import = m.schema;
+                .subscribe(event => {
+                    this.import = event.schema;
 
                     this.addSchemaDialog.show();
                 }));
@@ -51,8 +51,6 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
                         this.addSchemaDialog.show();
                     }
                 }));
-
-        this.schemasState.load();
     }
 
     public removeCategory(name: string) {

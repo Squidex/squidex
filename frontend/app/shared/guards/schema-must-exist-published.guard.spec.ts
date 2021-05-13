@@ -28,7 +28,7 @@ describe('SchemaMustExistPublishedGuard', () => {
         schemaGuard = new SchemaMustExistPublishedGuard(schemasState.object, router.object);
     });
 
-    it('should load schema and return true if found', () => {
+    it('should load schema and return true if published', () => {
         schemasState.setup(x => x.select('123'))
             .returns(() => of(<SchemaDto>{ isPublished: true }));
 
@@ -43,9 +43,39 @@ describe('SchemaMustExistPublishedGuard', () => {
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
+    it('should load schema and return false if component', () => {
+        schemasState.setup(x => x.select('123'))
+            .returns(() => of(<SchemaDto>{ isPublished: true, type: 'Component' }));
+
+        let result: boolean;
+
+        schemaGuard.canActivate(route).subscribe(x => {
+            result = x;
+        }).unsubscribe();
+
+        expect(result!).toBeFalsy();
+
+        router.verify(x => x.navigate(['/404']), Times.once());
+    });
+
     it('should load schema and return false if not found', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => of(<SchemaDto>{ isPublished: false }));
+            .returns(() => of(null));
+
+        let result: boolean;
+
+        schemaGuard.canActivate(route).subscribe(x => {
+            result = x;
+        }).unsubscribe();
+
+        expect(result!).toBeFalsy();
+
+        router.verify(x => x.navigate(['/404']), Times.once());
+    });
+
+    it('should load schema and return false if not published', () => {
+        schemasState.setup(x => x.select('123'))
+            .returns(() => of(<SchemaDto>{ isPublished: false, type: 'Default' }));
 
         let result: boolean;
 

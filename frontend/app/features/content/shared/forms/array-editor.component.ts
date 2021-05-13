@@ -7,7 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ArrayFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, FieldArrayItemForm, sorted } from '@app/shared';
+import { AppLanguageDto, ArrayFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldArrayForm, sorted } from '@app/shared';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
@@ -73,7 +73,7 @@ export class ArrayEditorComponent implements OnChanges {
         this.formModel.removeItemAt(index);
     }
 
-    public addItem(value?: FieldArrayItemForm) {
+    public addItem(value?: ComponentForm) {
         this.formModel.addItem(value);
     }
 
@@ -81,13 +81,13 @@ export class ArrayEditorComponent implements OnChanges {
         this.formModel.reset();
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<FieldArrayItemForm>>) {
+    public sort(event: CdkDragDrop<ReadonlyArray<ComponentForm>>) {
         this.formModel.sort(sorted(event));
 
         this.reset();
     }
 
-    public move(item: FieldArrayItemForm, index: number) {
+    public move(item: ComponentForm, index: number) {
         this.formModel.move(index, item);
 
         this.reset();

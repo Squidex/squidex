@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: readonly-array
+
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
@@ -16,7 +18,7 @@ type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
 interface Snapshot {
     // The schema categories.
-    categories: ReadonlyArray<string>;
+    categories: Set<string>;
 
     // The current schemas.
     schemas: SchemasList;
@@ -35,7 +37,7 @@ interface Snapshot {
 }
 
 export type SchemasList = ReadonlyArray<SchemaDto>;
-export type SchemaCategory = { name: string; schemas: SchemasList; upper: string; };
+export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[]; };
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
@@ -71,12 +73,16 @@ export class SchemasState extends State<Snapshot> {
         return this.snapshot.selectedSchema?.name || '';
     }
 
+    public get schemaMap() {
+        return this.snapshot.schemas.toMap(x => x.id);
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: [], categories: [] }, 'Schemas');
+        super({ schemas: [], categories: new Set() }, 'Schemas');
     }
 
     public select(idOrName: string | null): Observable<SchemaDto | null> {
@@ -86,15 +92,9 @@ export class SchemasState extends State<Snapshot> {
             }));
     }
 
-    public loadSchema(idOrName: string | null, cached = false) {
+    private loadSchema(idOrName: string | null) {
         if (!idOrName) {
             return of(null);
-        }
-
-        const found = this.snapshot.schemas.find(x => x.id === idOrName || x.name === idOrName);
-
-        if (cached || !found) {
-            return of(found || null);
         }
 
         return this.schemasService.getSchema(this.appName, idOrName).pipe(
@@ -175,7 +175,7 @@ export class SchemasState extends State<Snapshot> {
 
     public addCategory(name: string) {
         this.next(s => {
-            const categories = [...s.categories, name];
+            const categories = new Set([...s.categories, name]);
 
             return { ...s, categories };
         }, 'Category Added');
@@ -183,7 +183,7 @@ export class SchemasState extends State<Snapshot> {
 
     public removeCategory(name: string) {
         this.next(s => {
-            const categories = s.categories.removed(name);
+            const categories = new Set([...s.categories].remove(name));
 
             return { ...s, categories };
         }, 'Category Removed');
@@ -205,7 +205,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public changeCategory(schema: SchemaDto, name: string): Observable<SchemaDto> {
+    public changeCategory(schema: SchemaDto, name?: string): Observable<SchemaDto> {
         return this.schemasService.putCategory(this.appName, schema, { name }, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -371,38 +371,55 @@ function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto): Fi
     }
 }
 
-const NO_NAME = '';
+const SPECIAL_SCHEMAS = 'i18n:common.schemas';
+const SPECIAL_COMPONENTS = 'i18n:common.components';
 
-function buildCategories(categories: ReadonlyArray<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
-    const uniqueCategories: { [name: string]: true } = {
-        [NO_NAME]: true
+function buildCategories(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
+    const schemas: SchemaCategory = {
+        displayName: SPECIAL_SCHEMAS,
+        schemas: []
     };
 
-    for (const category of categories) {
-        uniqueCategories[category] = true;
+    const components: SchemaCategory = {
+        displayName: SPECIAL_COMPONENTS,
+        schemas: []
+    };
+
+    const result: SchemaCategory[] = [schemas, components];
+
+    for (const name of categories) {
+        result.push({
+            displayName: name,
+            name,
+            schemas: []
+        });
     }
 
     for (const schema of allSchemas) {
-        uniqueCategories[getCategory(schema)] = true;
+        const name = schema.category;
+
+        if (name) {
+            let category = result.find(x => x.name === name);
+
+            if (!category) {
+                category = {
+                    displayName: name,
+                    name,
+                    schemas: []
+                };
+
+                result.push(category);
+            }
+
+            category.schemas.push(schema);
+        } else if (schema.type === 'Component') {
+            components.schemas.push(schema);
+        } else {
+            schemas.schemas.push(schema);
+        }
     }
 
-    const result: SchemaCategory[] = [];
-
-    for (const name of Object.keys(uniqueCategories)) {
-        const schemas = allSchemas.filter(x => isSameCategory(name, x));
-
-        result.push({ name, upper: name.toUpperCase(), schemas });
-    }
-
-    result.sort((a, b) => compareStrings(a.upper, b.upper));
+    result.sortByString(x => x.displayName);
 
     return result;
-}
-
-function getCategory(schema: SchemaDto) {
-    return schema.category || NO_NAME;
-}
-
-export function isSameCategory(name: string, schema: SchemaDto): boolean {
-    return getCategory(schema) === name;
 }

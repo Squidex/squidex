@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     {
                         AddSchemaUrl(result, appId, schemaId, name);
 
-                        if (HasPermission(context, schemaId))
+                        if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
                         {
                             AddContentsUrl(result, appId, schema, schemaId, name);
                         }
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
         {
-            if (schema.SchemaDef.IsSingleton())
+            if (schema.SchemaDef.Type == SchemaType.Singleton)
             {
                 var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 

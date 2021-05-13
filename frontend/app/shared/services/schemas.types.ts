@@ -9,6 +9,7 @@ export type FieldType =
     'Array' |
     'Assets' |
     'Boolean' |
+    'Component' |
     'DateTime' |
     'Json' |
     'Geolocation' |
@@ -28,6 +29,9 @@ export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }>
     }, {
         type: 'Boolean',
         description: 'i18n:schemas.fieldTypes.boolean.description'
+    }, {
+        type: 'Component',
+        description: 'i18n:schemas.fieldTypes.component.description'
     }, {
         type: 'DateTime',
         description: 'i18n:schemas.fieldTypes.dateTime.description'
@@ -70,6 +74,9 @@ export function createProperties(fieldType: FieldType, values?: any): FieldPrope
         case 'Boolean':
             properties = new BooleanFieldPropertiesDto();
             break;
+        case 'Component':
+            properties = new ComponentFieldPropertiesDto();
+            break;
         case 'DateTime':
             properties = new DateTimeFieldPropertiesDto();
             break;
@@ -111,6 +118,8 @@ export interface FieldPropertiesVisitor<T> {
     visitAssets(properties: AssetsFieldPropertiesDto): T;
 
     visitBoolean(properties: BooleanFieldPropertiesDto): T;
+
+    visitComponent(properties: ComponentFieldPropertiesDto): T;
 
     visitDateTime(properties: DateTimeFieldPropertiesDto): T;
 
@@ -229,6 +238,20 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
         return visitor.visitBoolean(this);
+    }
+}
+
+export class ComponentFieldPropertiesDto extends FieldPropertiesDto {
+    public readonly fieldType = 'Component';
+
+    public readonly schemaIds?: ReadonlyArray<string>;
+
+    public get isComplexUI() {
+        return false;
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitComponent(this);
     }
 }
 

@@ -26,11 +26,11 @@ export class SchemaMustExistPublishedGuard implements CanActivate {
         const result =
             this.schemasState.select(schemaName).pipe(
                 tap(schema => {
-                    if (!schema || !schema.isPublished) {
+                    if (!schema || !schema.isPublished || schema.type === 'Component') {
                         this.router.navigate(['/404']);
                     }
                 }),
-                map(schema => !!schema && schema.isPublished));
+                map(schema => schema?.isPublished === true && schema.type !== 'Component'));
 
         return result;
     }

@@ -46,6 +46,16 @@
                         </ng-container>
                     </ng-container>
                 </ng-container>
+                <ng-container *ngSwitchCase="'Component'">
+                    <sqx-component
+                        [canUnset]="canUnset"
+                        [form]="form"
+                        [formModel]="$any(formModel)"
+                        [formContext]="formContext"
+                        [language]="language"
+                        [languages]="languages">
+                    </sqx-component>
+                </ng-container>
                 <ng-container *ngSwitchCase="'DateTime'">
                     <sqx-date-time-editor [formControl]="editorControl" [mode]="field.rawProperties.editor" [enforceTime]="true"></sqx-date-time-editor>
                 </ng-container>

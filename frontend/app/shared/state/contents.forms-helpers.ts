@@ -9,7 +9,7 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
-import { FieldDto, FieldRule, RootFieldDto } from './../services/schemas.service';
+import { FieldDto, FieldRule, RootFieldDto, SchemaDto } from './../services/schemas.service';
 import { fieldInvariant } from './../services/schemas.types';
 
 export abstract class Hidden {
@@ -37,8 +37,7 @@ export abstract class Hidden {
 export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extends Hidden {
     constructor(
         public readonly separator: TSeparator | undefined,
-        public readonly fields: ReadonlyArray<TChild>,
-        public readonly remoteValidator?: ValidatorFn
+        public readonly fields: ReadonlyArray<TChild>
     ) {
         super();
     }
@@ -115,8 +114,17 @@ export type AbstractContentFormState = {
     isRequired?: boolean
 };
 
+export interface FormStructure {
+    allRules: ReadonlyArray<CompiledRule>;
+    partitions: PartitionConfig;
+    schema: SchemaDto;
+    schemas: { [id: string ]: SchemaDto };
+    remoteValidator?: ValidatorFn;
+}
+
 export abstract class AbstractContentForm<T extends FieldDto, TForm extends AbstractControl> extends Hidden {
     private readonly disabled$ = new BehaviorSubject<boolean>(false);
+    private readonly rules: ReadonlyArray<CompiledRule>;
 
     public get disabled() {
         return this.disabled$.value;
@@ -127,12 +135,17 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
     }
 
     protected constructor(
+        public readonly globals: FormStructure,
+        public readonly fieldPath: string,
         public readonly field: T,
         public readonly form: TForm,
-        public readonly isOptional: boolean,
-        private readonly rules?: ReadonlyArray<CompiledRule>
+        public readonly isOptional: boolean
     ) {
         super();
+
+        const simplifiedPath = fieldPath.replace('.iv.', '.');
+
+        this.rules = globals.allRules.filter(x => x.field === fieldPath || x.field === simplifiedPath);
     }
 
     public updateState(context: RuleContext, parentState: AbstractContentFormState) {

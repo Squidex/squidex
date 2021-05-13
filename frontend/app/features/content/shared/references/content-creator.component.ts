@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDto, SchemasState, Types } from '@app/shared';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',
@@ -45,8 +45,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
 
     constructor(
         private readonly contentsState: ComponentContentsState,
-        private readonly schemasState: SchemasState,
-        private readonly changeDetector: ChangeDetectorRef
+        private readonly schemasState: SchemasState
     ) {
         super();
     }
@@ -63,28 +62,19 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         this.selectSchema(selectedSchema);
     }
 
-    public selectSchema(selected: string | SchemaDto) {
-        if (Types.is(selected, SchemaDto)) {
-            selected = selected.id;
+    public selectSchema(schema: SchemaDto) {
+        this.schema = schema;
+
+        if (schema) {
+            this.contentsState.schema = schema;
+            this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, { user: this.formContext.user });
+
+            if (this.initialData) {
+                this.contentForm.load(this.initialData, true);
+
+                this.initialData = null;
+            }
         }
-
-        this.schemasState.loadSchema(selected, true)
-            .subscribe(schema => {
-                if (schema) {
-                    this.schema = schema;
-
-                    this.contentsState.schema = schema;
-                    this.contentForm = new EditContentForm(this.languages, this.schema, { user: this.formContext.user });
-
-                    if (this.initialData) {
-                        this.contentForm.load(this.initialData, true);
-
-                        this.initialData = null;
-                    }
-
-                    this.changeDetector.markForCheck();
-                }
-            });
     }
 
     public saveAndPublish() {

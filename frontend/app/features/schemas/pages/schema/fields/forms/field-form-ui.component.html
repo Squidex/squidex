@@ -19,6 +19,9 @@
     <ng-container *ngSwitchCase="'Boolean'">
         <sqx-boolean-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-boolean-ui>
     </ng-container>
+    <ng-container *ngSwitchCase="'Component'">
+        <sqx-component-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-component-ui>
+    </ng-container>
     <ng-container *ngSwitchCase="'DateTime'">
         <sqx-date-time-ui [fieldForm]="fieldForm" [field]="field" [properties]="field.rawProperties"></sqx-date-time-ui>
     </ng-container>

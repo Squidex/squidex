@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schema = await GetSchemaAsync(context, schemaIdOrName);
 
-            if (schema == null)
+            if (schema == null || !IsAccessible(context, schema))
             {
                 throw new DomainObjectNotFoundException(schemaIdOrName);
             }
@@ -206,7 +206,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schemas = await appProvider.GetSchemasAsync(context.App.Id);
 
-            return schemas.Where(x => HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
+            return schemas.Where(x => IsAccessible(context, x) && HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
+        }
+
+        private static bool IsAccessible(Context context, ISchemaEntity schema)
+        {
+            return schema.SchemaDef.IsPublished || context.IsFrontendClient;
         }
 
         private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)

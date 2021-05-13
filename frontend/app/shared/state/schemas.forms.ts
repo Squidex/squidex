@@ -284,6 +284,10 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['defaultValue'] = undefined;
     }
 
+    public visitComponent() {
+        this.config['schemaIds'] = undefined;
+    }
+
     public visitDateTime() {
         this.config['calculatedDefaultValue'] = undefined;
         this.config['defaultValue'] = undefined;

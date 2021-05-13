@@ -26,7 +26,7 @@ export class SchemaMustNotBeSingletonGuard implements CanActivate {
                 defined(),
                 take(1),
                 tap(schema => {
-                    if (schema.isSingleton) {
+                    if (schema.type === 'Singleton') {
                         if (state.url.indexOf('/new') >= 0) {
                             const parentUrl = state.url.slice(0, state.url.indexOf(route.url[route.url.length - 1].path));
 
@@ -36,7 +36,7 @@ export class SchemaMustNotBeSingletonGuard implements CanActivate {
                         }
                     }
                 }),
-                map(schema => !schema.isSingleton));
+                map(schema => schema.type === 'Default'));
 
         return result;
     }

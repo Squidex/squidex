@@ -6,16 +6,16 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, QueryList, ViewChildren } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldArrayItemForm, FieldSection, NestedFieldDto } from '@app/shared';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSection } from '@app/shared';
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
-    selector: 'sqx-array-section',
-    styleUrls: ['./array-section.component.scss'],
-    templateUrl: './array-section.component.html',
+    selector: 'sqx-component-section',
+    styleUrls: ['./component-section.component.scss'],
+    templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArraySectionComponent {
+export class ComponentSectionComponent {
     @Input()
     public form: EditContentForm;
 
@@ -23,7 +23,7 @@ export class ArraySectionComponent {
     public formContext: any;
 
     @Input()
-    public formSection: FieldSection<NestedFieldDto, FieldArrayItemForm>;
+    public formSection: FieldSection<FieldDto, any>;
 
     @Input()
     public language: AppLanguageDto;
@@ -46,7 +46,7 @@ export class ArraySectionComponent {
         });
     }
 
-    public trackByField(_index: number, field: FieldArrayItemForm) {
+    public trackByField(_index: number, field: AbstractContentForm<any, any>) {
         return field.field.fieldId;
     }
 }

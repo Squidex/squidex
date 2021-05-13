@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState, Types } from '@app/shared';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-selector',
@@ -19,6 +19,9 @@ import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDt
 export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
+
+    @Input()
+    public schemaName?: string | null;
 
     @Input()
     public schemaIds: ReadonlyArray<string>;
@@ -48,8 +51,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,
         public readonly contentsState: ComponentContentsState,
-        public readonly schemasState: SchemasState,
-        private readonly changeDetector: ChangeDetectorRef
+        public readonly schemasState: SchemasState
     ) {
         super();
     }
@@ -70,24 +72,15 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         this.selectSchema(this.schemas[0]);
     }
 
-    public selectSchema(selected: string | SchemaDto) {
-        if (Types.is(selected, SchemaDto)) {
-            selected = selected.id;
+    public selectSchema(schema: SchemaDto) {
+        this.schema = schema;
+
+        if (schema) {
+            this.contentsState.schema = schema;
+            this.contentsState.load();
+
+            this.updateModel();
         }
-
-        this.schemasState.loadSchema(selected, true)
-            .subscribe(schema => {
-                if (schema) {
-                    this.schema = schema;
-
-                    this.contentsState.schema = schema;
-                    this.contentsState.load();
-
-                    this.updateModel();
-
-                    this.changeDetector.markForCheck();
-                }
-            });
     }
 
     public reload() {
