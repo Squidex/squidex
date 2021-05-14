@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schema = await GetSchemaAsync(context, schemaIdOrName);
 
-            if (schema == null || !IsAccessible(schema))
+            if (schema == null)
             {
                 throw new DomainObjectNotFoundException(schemaIdOrName);
             }

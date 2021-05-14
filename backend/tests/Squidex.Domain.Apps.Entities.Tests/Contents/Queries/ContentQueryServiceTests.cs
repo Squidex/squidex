@@ -107,17 +107,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_throw_notfound_exception_if_schema_to_get_is_not_published()
-        {
-            var requestContext = CreateContext();
-
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<string>._, true))
-                .Returns(Mocks.Schema(appId, schemaId, new Schema(schemaId.Name)));
-
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(requestContext, schemaId.Name));
-        }
-
-        [Fact]
         public async Task Should_throw_permission_exception_if_content_to_find_is_restricted()
         {
             var requestContext = CreateContext(allowSchema: false);
