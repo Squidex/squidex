@@ -33,6 +33,7 @@ export * from './angular/forms/model';
 export * from './angular/forms/progress-bar.component';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/undefinable-form-array';
+export * from './angular/forms/undefinable-form-group';
 export * from './angular/forms/validators';
 export * from './angular/hover-background.directive';
 export * from './angular/http/caching.interceptor';

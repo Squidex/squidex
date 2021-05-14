@@ -7,7 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ArrayFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, FieldArrayItemForm, sorted } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, fadeAnimation, FieldArrayForm, ModalModel, ObjectForm, SchemaDto, sorted, Types } from '@app/shared';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
@@ -16,7 +16,10 @@ import { ArrayItemComponent } from './array-item.component';
     selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    animations: [
+        fadeAnimation
+    ]
 })
 export class ArrayEditorComponent implements OnChanges {
     @Input()
@@ -40,23 +43,28 @@ export class ArrayEditorComponent implements OnChanges {
     @ViewChildren(ArrayItemComponent)
     public children: QueryList<ArrayItemComponent>;
 
+    public isArray = false;
+
+    public schemasDropdown = new ModalModel();
+    public schemasList: ReadonlyArray<SchemaDto>;
+
     public isDisabled: Observable<boolean>;
 
     public isFull: Observable<boolean>;
 
-    public get field() {
-        return this.formModel.field;
-    }
-
-    public get hasFields() {
-        return this.field.nested.length > 0;
+    public get hasField() {
+        return this.formModel.field['nested']?.length > 0;
     }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
-            const properties = this.field.properties as ArrayFieldPropertiesDto;
+            const maxItems = this.formModel.field.properties['maxItems'] || Number.MAX_VALUE;
 
-            const maxItems = properties.maxItems || Number.MAX_VALUE;
+            if (Types.is(this.formModel.field.properties, ComponentsFieldPropertiesDto)) {
+                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).filter(x => !!x) || [];
+            } else {
+                this.isArray = true;
+            }
 
             this.isDisabled = disabled$(this.formModel.form);
 
@@ -73,21 +81,29 @@ export class ArrayEditorComponent implements OnChanges {
         this.formModel.removeItemAt(index);
     }
 
-    public addItem(value?: FieldArrayItemForm) {
-        this.formModel.addItem(value);
+    public addCopy(value: ObjectForm) {
+        this.formModel.addCopy(value);
+    }
+
+    public addItem() {
+        this.formModel.addItem();
+    }
+
+    public addComponent(schema: SchemaDto) {
+        this.formModel.addComponent(schema.id);
     }
 
     public clear() {
         this.formModel.reset();
     }
 
-    public sort(event: CdkDragDrop<ReadonlyArray<FieldArrayItemForm>>) {
+    public sort(event: CdkDragDrop<ReadonlyArray<ObjectForm>>) {
         this.formModel.sort(sorted(event));
 
         this.reset();
     }
 
-    public move(item: FieldArrayItemForm, index: number) {
+    public move(item: ObjectForm, index: number) {
         this.formModel.move(index, item);
 
         this.reset();

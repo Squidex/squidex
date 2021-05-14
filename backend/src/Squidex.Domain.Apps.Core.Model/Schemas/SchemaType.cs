@@ -10,6 +10,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     public enum SchemaType
     {
         Default,
-        Singleton
+        Singleton,
+        Component
     }
 }

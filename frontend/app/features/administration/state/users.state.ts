@@ -80,7 +80,8 @@ export class UsersState extends State<Snapshot> {
             return of(found);
         }
 
-        return this.usersService.getUser(id).pipe(catchError(() => of(null)));
+        return this.usersService.getUser(id).pipe(
+            catchError(() => of(null)));
     }
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {

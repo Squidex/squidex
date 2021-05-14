@@ -35,11 +35,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Should_return_result_to_schema_only_if_user_has_no_permission()
+        public async Task Should_not_add_result_to_contents_if_user_has_no_permission()
         {
             var ctx = ContextWithPermission();
 
             var schema1 = CreateSchema("schemaA1");
+
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+                .Returns(new List<ISchemaEntity> { schema1 });
+
+            A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
+                .Returns("schemaA1-url");
+
+            var result = await sut.SearchAsync("schema", ctx);
+
+            result.Should().BeEquivalentTo(
+                new SearchResults()
+                    .Add("schemaA1 Schema", SearchResultType.Schema, "schemaA1-url"));
+        }
+
+        [Fact]
+        public async Task Should_not_add_result_to_contents_if_schema_is_component()
+        {
+            var permission = Permissions.ForApp(Permissions.AppContentsReadOwn, appId.Name, "schemaA1");
+
+            var ctx = ContextWithPermission();
+
+            var schema1 = CreateSchema("schemaA1", SchemaType.Component);
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
                 .Returns(new List<ISchemaEntity> { schema1 });

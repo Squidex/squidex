@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -29,7 +30,7 @@ namespace Squidex.Web
         {
             get
             {
-                var app = HttpContext.Context().App;
+                var app = HttpContext.Features.Get<IAppFeature>()?.App;
 
                 if (app == null)
                 {
@@ -37,6 +38,21 @@ namespace Squidex.Web
                 }
 
                 return app;
+            }
+        }
+
+        protected ISchemaEntity Schema
+        {
+            get
+            {
+                var schema = HttpContext.Features.Get<ISchemaFeature>()?.Schema;
+
+                if (schema == null)
+                {
+                    throw new InvalidOperationException("Not in a schema context.");
+                }
+
+                return schema;
             }
         }
 

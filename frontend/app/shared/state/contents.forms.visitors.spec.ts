@@ -81,8 +81,28 @@ describe('AssetsField', () => {
     });
 });
 
-describe('TagsField', () => {
-    const field = createField({ properties: createProperties('Tags', { isRequired: true, minItems: 1, maxItems: 5 }) });
+describe('ComponentField', () => {
+    const field = createField({ properties: createProperties('Component', { isRequired: true }) });
+
+    it('should create validators', () => {
+        expect(FieldsValidators.create(field, false).length).toBe(1);
+    });
+
+    it('should format to empty string if null', () => {
+        expect(FieldFormatter.format(field, null)).toBe('');
+    });
+
+    it('should format to constant', () => {
+        expect(FieldFormatter.format(field, {})).toBe('{ Component }');
+    });
+
+    it('should return default value as null', () => {
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
+    });
+});
+
+describe('ComponentsField', () => {
+    const field = createField({ properties: createProperties('Components', { isRequired: true, minItems: 1, maxItems: 5 }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(2);
@@ -92,24 +112,20 @@ describe('TagsField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to asset count', () => {
-        expect(FieldFormatter.format(field, ['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
+    it('should format to plural count for many items', () => {
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Components');
+    });
+
+    it('should format to plural count for single item', () => {
+        expect(FieldFormatter.format(field, [1])).toBe('1 Component');
     });
 
     it('should return zero formatting if other type', () => {
-        expect(FieldFormatter.format(field, 1)).toBe('');
+        expect(FieldFormatter.format(field, 1)).toBe('0 Components');
     });
 
-    it('should return default value from properties', () => {
-        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'] }) });
-
-        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(['1', '2']);
-    });
-
-    it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
-
-        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
+    it('should return default value as null', () => {
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
     });
 });
 
@@ -390,6 +406,38 @@ describe('StringField', () => {
 
     it('should override default value from localizable properties', () => {
         const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault', defaultValues: { 'iv': null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
+    });
+});
+
+describe('TagsField', () => {
+    const field = createField({ properties: createProperties('Tags', { isRequired: true, minItems: 1, maxItems: 5 }) });
+
+    it('should create validators', () => {
+        expect(FieldsValidators.create(field, false).length).toBe(2);
+    });
+
+    it('should format to empty string if null', () => {
+        expect(FieldFormatter.format(field, null)).toBe('');
+    });
+
+    it('should format to asset count', () => {
+        expect(FieldFormatter.format(field, ['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
+    });
+
+    it('should return zero formatting if other type', () => {
+        expect(FieldFormatter.format(field, 1)).toBe('');
+    });
+
+    it('should return default value from properties', () => {
+        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'] }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(['1', '2']);
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });

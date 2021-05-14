@@ -44,6 +44,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return AllTypes.Boolean;
         }
 
+        public IGraphType? Visit(IField<ComponentFieldProperties> field, FieldInfo args)
+        {
+            return AllTypes.Json;
+        }
+
+        public IGraphType? Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
+        {
+            return AllTypes.Json;
+        }
+
         public IGraphType? Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
             return AllTypes.DateTime;

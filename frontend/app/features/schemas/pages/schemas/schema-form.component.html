@@ -62,6 +62,23 @@
                             </div>
                         </label>
                     </div>
+                    <div class="col-6 type">
+                        <label>
+                            <input type="radio" class="radio-input" name="type" formControlName="type" [value]="'Component'">
+                        
+                            <div class="row no-gutters">
+                                <div class="col-auto">
+                                    <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Component'">
+                                        <i class="icon-component"></i>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="type-title">{{ 'schemas.modeComponent' | sqxTranslate }}</div>
+                                    <div class="type-text text-muted">{{ 'schemas.modeComponentDescription' | sqxTranslate }}</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
 

@@ -138,13 +138,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var app = resources.App;
 
-            var values = new { app, name = schema, id = Id };
+            var values = new { app, schema, id = Id };
 
             AddSelfLink(resources.Url<ContentsController>(x => nameof(x.GetContent), values));
 
             if (Version > 0)
             {
-                var versioned = new { app, name = schema, id = Id, version = Version - 1 };
+                var versioned = new { app, schema, id = Id, version = Version - 1 };
 
                 AddGetLink("previous", resources.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
             }
@@ -179,8 +179,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (content.CanUpdate && resources.CanUpdateContent(schema))
             {
-                AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
                 AddPatchLink("patch", resources.Url<ContentsController>(x => nameof(x.PatchContent), values));
+            }
+
+            if (content.CanUpdate && resources.CanUpdateContent(schema))
+            {
+                AddPutLink("update", resources.Url<ContentsController>(x => nameof(x.PutContent), values));
             }
 
             return this;

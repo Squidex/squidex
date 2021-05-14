@@ -6,10 +6,10 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldArrayItemForm, FieldArrayItemValueForm, FieldFormatter, FieldSection, invalid$, NestedFieldDto, StatefulComponent, value$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectForm, RootFieldDto, StatefulComponent, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ArraySectionComponent } from './array-section.component';
+import { ComponentSectionComponent } from './component-section.component';
 
 interface State {
     // The when the section is collapsed.
@@ -39,7 +39,7 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public formContext: any;
 
     @Input()
-    public formModel: FieldArrayItemForm;
+    public formModel: ObjectForm;
 
     @Input()
     public canUnset?: boolean | null;
@@ -62,8 +62,8 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
-    @ViewChildren(ArraySectionComponent)
-    public sections: QueryList<ArraySectionComponent>;
+    @ViewChildren(ComponentSectionComponent)
+    public sections: QueryList<ComponentSectionComponent>;
 
     public isCollapsed = false;
     public isInvalid: Observable<boolean>;
@@ -88,14 +88,20 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     private getTitle(value: any) {
         const values: string[] = [];
 
-        for (const field of this.formModel.field.nested) {
-            const fieldValue = value[field.name];
+        if (Types.is(this.formModel, ComponentForm) && this.formModel.schema) {
+            values.push(this.formModel.schema.displayName);
+        }
 
-            if (fieldValue) {
-                const formatted = FieldFormatter.format(field, fieldValue);
+        if (Types.is(this.formModel.field, RootFieldDto)) {
+            for (const field of this.formModel.field.nested) {
+                const fieldValue = value[field.name];
 
-                if (formatted) {
-                    values.push(formatted);
+                if (fieldValue) {
+                    const formatted = FieldFormatter.format(field, fieldValue);
+
+                    if (formatted) {
+                        values.push(formatted);
+                    }
                 }
             }
         }
@@ -133,7 +139,7 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
         });
     }
 
-    public trackBySection(_index: number, section: FieldSection<NestedFieldDto, FieldArrayItemValueForm>) {
+    public trackBySection(_index: number, section: FieldSection<FieldDto, any>) {
         return section.separator?.fieldId;
     }
 }

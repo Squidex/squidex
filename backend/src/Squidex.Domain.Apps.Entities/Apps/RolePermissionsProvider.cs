@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                     if (value?.StartsWith(Permissions.App, StringComparison.OrdinalIgnoreCase) == true)
                     {
-                        if (value.IndexOf("{name}", Permissions.App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (value.IndexOf("{schema}", Permissions.App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             forAppSchemas.Add(value);
                         }
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 foreach (var schema in schemaNames)
                 {
-                    var replaced = trimmed.Replace("{name}", schema);
+                    var replaced = trimmed.Replace("{schema}", schema);
 
                     result.Add(replaced);
                 }

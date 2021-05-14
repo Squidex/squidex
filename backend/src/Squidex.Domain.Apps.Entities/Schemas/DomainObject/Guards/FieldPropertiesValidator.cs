@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -88,6 +88,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             {
                 yield return new ValidationError(Not.Valid(nameof(properties.Editor)),
                     nameof(properties.Editor));
+            }
+        }
+
+        public IEnumerable<ValidationError> Visit(ComponentFieldProperties properties, None args)
+        {
+            yield break;
+        }
+
+        public IEnumerable<ValidationError> Visit(ComponentsFieldProperties properties, None args)
+        {
+            if (IsMaxGreaterThanMin(properties.MaxItems, properties.MinItems))
+            {
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
+                    nameof(properties.MinItems),
+                    nameof(properties.MaxItems));
             }
         }
 

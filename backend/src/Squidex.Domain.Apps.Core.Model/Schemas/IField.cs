@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IField : IFieldSettings
+    public interface IField : IFieldSettings, IMetadataProvider
     {
         long Id { get; }
 

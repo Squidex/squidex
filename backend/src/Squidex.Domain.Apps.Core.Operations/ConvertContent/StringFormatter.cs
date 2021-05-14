@@ -65,6 +65,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             }
         }
 
+        public string Visit(ComponentFieldProperties properties, Args args)
+        {
+            return "{ Component }";
+        }
+
+        public string Visit(ComponentsFieldProperties properties, Args args)
+        {
+            return FormatArray(args.Value, "Component", "Components");
+        }
+
         public string Visit(DateTimeFieldProperties properties, Args args)
         {
             return args.Value.ToString();

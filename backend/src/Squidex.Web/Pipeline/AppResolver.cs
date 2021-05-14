@@ -110,7 +110,7 @@ namespace Squidex.Web.Pipeline
                     return;
                 }
 
-                context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app.NamedId()));
+                context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
                 context.HttpContext.Response.Headers.Add("X-AppId", app.Id.ToString());
             }
             else

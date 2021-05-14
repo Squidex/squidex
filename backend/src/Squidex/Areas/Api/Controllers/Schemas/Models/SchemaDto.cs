@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         protected virtual void CreateLinks(Resources resources)
         {
-            var values = new { app = resources.App, name = Name };
+            var values = new { app = resources.App, schema = Name };
 
             var allowUpdate = resources.CanUpdateSchema(Name);
 

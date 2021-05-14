@@ -29,17 +29,57 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ISchemaEntity normalSchema;
+        private readonly ISchemaEntity normalUnpublishedSchema;
         private readonly ISchemaEntity singletonSchema;
+        private readonly ISchemaEntity singletonUnpublishedSchema;
         private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly RefToken actor = RefToken.User("123");
 
         public GuardContentTests()
         {
-            normalSchema =
+            normalUnpublishedSchema =
                 Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
 
-            singletonSchema =
+            normalSchema =
+                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name).Publish());
+
+            singletonUnpublishedSchema =
                 Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Singleton));
+
+            singletonSchema =
+                Mocks.Schema(appId, schemaId, new Schema(schemaId.Name, type: SchemaType.Singleton).Publish());
+        }
+
+        [Fact]
+        public void Should_throw_exception_if_creating_content_for_unpublished_schema()
+        {
+            var context = CreateContext(CreateContent(Status.Draft), normalUnpublishedSchema);
+
+            Assert.Throws<DomainException>(() => context.MustNotCreateForUnpublishedSchema());
+        }
+
+        [Fact]
+        public void Should_not_throw_exception_if_creating_content_for_unpublished_singleton()
+        {
+            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), singletonUnpublishedSchema);
+
+            context.MustNotCreateSingleton();
+        }
+
+        [Fact]
+        public void Should_not_throw_exception_if_creating_content_for_published_schema()
+        {
+            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
+
+            context.MustNotCreateSingleton();
+        }
+
+        [Fact]
+        public void Should_not_throw_exception_if_creating_content_for_published_singleton_schema()
+        {
+            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), singletonSchema);
+
+            context.MustNotCreateSingleton();
         }
 
         [Fact]

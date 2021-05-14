@@ -3,7 +3,7 @@
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
     <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="!!content" [grid]="true" (close)="back()">
         <ng-container title>
-            <a class="btn btn-text" (click)="back()" *ngIf="!schema.isSingleton">
+            <a class="btn btn-text" (click)="back()" *ngIf="schema.type === 'Default'">
                 <i class="icon-angle-left"></i>
             </a>
 
@@ -62,7 +62,7 @@
                         <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
 
                         <ng-container *ngIf="content?.canDelete">
-                            <button type="button" class="btn btn-outline-secondary ml-2" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
+                            <button type="button" class="btn btn-outline-secondary ml-2" (click)="dropdown.toggle()" #buttonOptions>
                                 <i class="icon-dots"></i>
                             </button>
 

@@ -3,7 +3,7 @@
         <h4 class="card-title">{{planInfo.plan.name}}</h4>
         <h5 class="plan-price">{{planInfo.plan.costs}}</h5>
 
-        <small class="text-muted">{{ 'plans.perMonth' | sqxTranslate }}</small>
+        <sqx-form-hint>{{ 'plans.perMonth' | sqxTranslate }}</sqx-form-hint>
     </div>
     <div class="card-body">
         <div class="plan-fact text-center">
@@ -38,7 +38,7 @@
         <div class="text-center">
             <h5 class="plan-price">{{planInfo.plan.yearlyCosts}}</h5>
 
-            <small class="text-muted">{{ 'plans.perYear' | sqxTranslate }}</small>
+            <sqx-form-hint>{{ 'plans.perYear' | sqxTranslate }}</sqx-form-hint>
         </div>
 
         <button *ngIf="planInfo.isYearlySelected" class="btn btn-block btn-text-success plan-selected">

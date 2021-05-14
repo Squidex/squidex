@@ -180,32 +180,171 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                foreach (var (key, value) in data.ToList())
+                ContentFieldData? newData = null;
+
+                foreach (var (key, value) in data)
                 {
-                    var newValue = value;
-
-                    for (var i = 0; i < converters.Length; i++)
-                    {
-                        newValue = converters[i](newValue!, field, null);
-
-                        if (newValue == null)
-                        {
-                            break;
-                        }
-                    }
+                    var newValue = ConvertByType(field, value, null, converters);
 
                     if (newValue == null)
                     {
-                        data.Remove(key);
+                        newData ??= new ContentFieldData(data);
+                        newData.Remove(key);
                     }
                     else if (!ReferenceEquals(newValue, value))
                     {
-                        data[key] = newValue;
+                        newData ??= new ContentFieldData(data);
+                        newData[key] = newValue;
                     }
                 }
 
-                return data;
+                return newData ?? data;
             };
+        }
+
+        private static IJsonValue? ConvertByType<T>(T field, IJsonValue? value, IArrayField? parent, ValueConverter[] converters) where T : IField
+        {
+            switch (field)
+            {
+                case IArrayField arrayField:
+                    return ConvertArray(arrayField, value, converters);
+
+                case IField<ComponentFieldProperties>:
+                    return ConvertComponent(field, value, converters);
+
+                case IField<ComponentsFieldProperties>:
+                    return ConvertComponents(field, value, converters);
+
+                default:
+                    return ConvertValue(field, value, parent, converters);
+            }
+        }
+
+        private static IJsonValue? ConvertArray(IArrayField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonArray array)
+            {
+                JsonArray? result = null;
+
+                for (int i = 0, j = 0; i < array.Count; i++, j++)
+                {
+                    var newValue = ConvertArrayItem(field, array[i], converters);
+
+                    if (newValue == null)
+                    {
+                        result ??= new JsonArray(array);
+                        result.RemoveAt(j);
+                        j--;
+                    }
+                    else if (!ReferenceEquals(newValue, array[i]))
+                    {
+                        result ??= new JsonArray(array);
+                        result[j] = newValue;
+                    }
+                }
+
+                return result ?? array;
+            }
+
+            return null;
+        }
+
+        private static IJsonValue? ConvertComponents(IField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonArray array)
+            {
+                JsonArray? result = null;
+
+                for (int i = 0, j = 0; i < array.Count; i++, j++)
+                {
+                    var newValue = ConvertComponent(field, array[i], converters);
+
+                    if (newValue == null)
+                    {
+                        result ??= new JsonArray(array);
+                        result.RemoveAt(j);
+                        j--;
+                    }
+                    else if (!ReferenceEquals(newValue, array[i]))
+                    {
+                        result ??= new JsonArray(array);
+                        result[j] = newValue;
+                    }
+                }
+
+                return result ?? array;
+            }
+
+            return null;
+        }
+
+        private static IJsonValue? ConvertComponent(IField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type) && field.TryGetResolvedSchema(type.Value, out var schema))
+            {
+                return ConvertNested(schema.FieldCollection, obj, null, converters);
+            }
+
+            return null;
+        }
+
+        private static IJsonValue? ConvertArrayItem(IArrayField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonObject obj)
+            {
+                return ConvertNested(field.FieldCollection, obj, field, converters);
+            }
+
+            return null;
+        }
+
+        private static IJsonValue ConvertNested<T>(FieldCollection<T> fields, JsonObject source, IArrayField? parent, ValueConverter[] converters) where T : IField
+        {
+            JsonObject? result = null;
+
+            foreach (var (key, value) in source)
+            {
+                var newValue = value;
+
+                if (fields.ByName.TryGetValue(key, out var field))
+                {
+                    newValue = ConvertByType(field, value, parent, converters);
+                }
+                else if (key != Component.Discriminator)
+                {
+                    newValue = null;
+                }
+
+                if (newValue == null)
+                {
+                    result ??= new JsonObject(source);
+                    result.Remove(key);
+                }
+                else if (!ReferenceEquals(newValue, value))
+                {
+                    result ??= new JsonObject(source);
+                    result[key] = newValue;
+                }
+            }
+
+            return result ?? source;
+        }
+
+        private static IJsonValue? ConvertValue(IField field, IJsonValue? value, IArrayField? parent, ValueConverter[] converters)
+        {
+            var newValue = value;
+
+            for (var i = 0; i < converters.Length; i++)
+            {
+                newValue = converters[i](newValue!, field, parent);
+
+                if (newValue == null)
+                {
+                    break;
+                }
+            }
+
+            return newValue;
         }
     }
 }

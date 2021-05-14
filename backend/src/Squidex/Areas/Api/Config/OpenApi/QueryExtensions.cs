@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using NJsonSchema;
 using NSwag;
 
@@ -26,6 +27,11 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
             void AddQuery(OpenApiParameter parameter)
             {
+                if (operation.Parameters.Any(x => x.Name == parameter.Name && x.Kind == OpenApiParameterKind.Query))
+                {
+                    return;
+                }
+
                 parameter.Kind = OpenApiParameterKind.Query;
 
                 operation.Parameters.Add(parameter);

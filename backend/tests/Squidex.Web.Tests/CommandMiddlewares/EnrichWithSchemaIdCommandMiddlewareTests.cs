@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web.Pipeline;
@@ -29,7 +30,7 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithSchemaIdCommandMiddlewareTests()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
 
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(httpContext);
@@ -46,7 +47,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_assign_schema_id_and_name_to_app_command()
         {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
+            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
 
             var context = await HandleAsync(new CreateContent());
 
@@ -56,7 +57,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_assign_schema_id_from_id()
         {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
+            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
 
             var context = await HandleAsync(new UpdateSchema());
 
@@ -66,7 +67,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_not_override_schema_id()
         {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
+            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
 
             var customId = DomainId.NewGuid();
 
@@ -78,7 +79,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_not_override_schema_id_and_name()
         {
-            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schemaId));
+            httpContext.Features.Set<ISchemaFeature>(new SchemaFeature(Mocks.Schema(appId, schemaId)));
 
             var customId = NamedId.Of(DomainId.NewGuid(), "other-app");
 

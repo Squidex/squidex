@@ -18,7 +18,7 @@ describe('UndefinableFormArray', () => {
     }];
 
     tests.map(x => {
-        it(`should set value as ${x.name}`, () => {
+        it(`should set value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormArray([
                     new FormControl('')
@@ -31,7 +31,7 @@ describe('UndefinableFormArray', () => {
     });
 
     tests.map(x => {
-        it(`should patch value as ${x.name}`, () => {
+        it(`should patch value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormArray([
                     new FormControl('')
@@ -44,7 +44,7 @@ describe('UndefinableFormArray', () => {
     });
 
     tests.map(x => {
-        it(`should reset value as ${x.name}`, () => {
+        it(`should reset value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormArray([
                     new FormControl('')

@@ -14,9 +14,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class SingletonExtensions
     {
+        public static void MustNotCreateForUnpublishedSchema(this OperationContext context)
+        {
+            if (!context.SchemaDef.IsPublished && context.SchemaDef.Type != SchemaType.Singleton)
+            {
+                throw new DomainException(T.Get("contents.schemaNotPublished"));
+            }
+        }
+
         public static void MustNotCreateSingleton(this OperationContext context)
         {
-            if (context.SchemaDef.IsSingleton() && context.ContentId != context.Schema.Id)
+            if (context.SchemaDef.Type == SchemaType.Singleton && context.ContentId != context.Schema.Id)
             {
                 throw new DomainException(T.Get("contents.singletonNotCreatable"));
             }
@@ -24,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static void MustNotChangeSingleton(this OperationContext context, Status status)
         {
-            if (context.SchemaDef.IsSingleton() && (context.Content.NewStatus == null || status != Status.Published))
+            if (context.SchemaDef.Type == SchemaType.Singleton && (context.Content.NewStatus == null || status != Status.Published))
             {
                 throw new DomainException(T.Get("contents.singletonNotChangeable"));
             }
@@ -32,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static void MustNotDeleteSingleton(this OperationContext context)
         {
-            if (context.SchemaDef.IsSingleton())
+            if (context.SchemaDef.Type == SchemaType.Singleton)
             {
                 throw new DomainException(T.Get("contents.singletonNotDeletable"));
             }

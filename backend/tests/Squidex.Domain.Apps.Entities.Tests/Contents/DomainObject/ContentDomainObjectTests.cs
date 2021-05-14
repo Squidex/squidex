@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             };
 
             var schemaDef =
-                 new Schema("my-schema")
+                 new Schema("my-schema").Publish()
                      .AddNumber(1, "my-field1", Partitioning.Invariant,
                          new NumberFieldProperties { IsRequired = true })
                      .AddNumber(2, "my-field2", Partitioning.Invariant,

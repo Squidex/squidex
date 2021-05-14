@@ -56,6 +56,16 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return args.Value;
         }
 
+        public IJsonValue Visit(IField<ComponentFieldProperties> field, Args args)
+        {
+            return args.Value;
+        }
+
+        public IJsonValue Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            return args.Value;
+        }
+
         public IJsonValue Visit(IField<DateTimeFieldProperties> field, Args args)
         {
             return args.Value;
