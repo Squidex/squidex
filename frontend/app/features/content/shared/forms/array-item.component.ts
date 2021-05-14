@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, RootFieldDto, StatefulComponent, Types, value$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectForm, RootFieldDto, StatefulComponent, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ComponentSectionComponent } from './component-section.component';
@@ -39,7 +39,7 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public formContext: any;
 
     @Input()
-    public formModel: ComponentForm;
+    public formModel: ObjectForm;
 
     @Input()
     public canUnset?: boolean | null;
@@ -87,6 +87,10 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
 
     private getTitle(value: any) {
         const values: string[] = [];
+
+        if (Types.is(this.formModel, ComponentForm) && this.formModel.schema) {
+            values.push(this.formModel.schema.displayName);
+        }
 
         if (Types.is(this.formModel.field, RootFieldDto)) {
             for (const field of this.formModel.field.nested) {

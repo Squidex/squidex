@@ -21,6 +21,8 @@ export * from './pages/schema/fields/types/boolean-ui.component';
 export * from './pages/schema/fields/types/boolean-validation.component';
 export * from './pages/schema/fields/types/component-ui.component';
 export * from './pages/schema/fields/types/component-validation.component';
+export * from './pages/schema/fields/types/components-ui.component';
+export * from './pages/schema/fields/types/components-validation.component';
 export * from './pages/schema/fields/types/date-time-ui.component';
 export * from './pages/schema/fields/types/date-time-validation.component';
 export * from './pages/schema/fields/types/geolocation-ui.component';

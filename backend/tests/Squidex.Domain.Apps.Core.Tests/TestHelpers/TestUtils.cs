@@ -126,6 +126,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new UIFieldProperties())
                 .AddComponent(114, "root-component", Partitioning.Language,
                     new ComponentFieldProperties { SchemaId = componentId })
+                .AddComponents(115, "root-components", Partitioning.Language,
+                    new ComponentsFieldProperties { SchemaId = componentId })
                 .Update(new SchemaProperties { Hints = "The User" })
                 .HideField(104)
                 .HideField(211, 101)
@@ -134,6 +136,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 .LockField(105);
 
             schema.FieldsById[114].SetResolvedSchema(componentId, schema);
+            schema.FieldsById[115].SetResolvedSchema(componentId, schema);
 
             return schema;
         }

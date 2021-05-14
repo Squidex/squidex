@@ -68,6 +68,11 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             return JsonValue.Null;
         }
 
+        public IJsonValue Visit(ComponentsFieldProperties properties, Args args)
+        {
+            return JsonValue.Array();
+        }
+
         public IJsonValue Visit(GeolocationFieldProperties properties, Args args)
         {
             return JsonValue.Null;

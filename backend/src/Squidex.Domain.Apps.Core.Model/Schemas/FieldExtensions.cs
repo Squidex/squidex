@@ -6,8 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using NamedIdStatic = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -24,15 +26,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return fields.Where(x => IsForApi(x, withHidden));
         }
 
-        public static IEnumerable<IRootField> GetSharedFields(this IField<ComponentFieldProperties> field, bool withHidden)
+        public static IEnumerable<IRootField> GetSharedFields(this IField field, ImmutableList<DomainId>? schemaIds, bool withHidden)
         {
-            if (field.Properties.SchemaIds == null || field.Properties.SchemaIds.Count == 0)
+            if (schemaIds == null || schemaIds.Count == 0)
             {
                 return Enumerable.Empty<IRootField>();
             }
 
             var allFields =
-                field.Properties.SchemaIds
+                schemaIds
                     .Select(x => field.GetResolvedSchema(x)).NotNull()
                     .SelectMany(x => x.Fields.ForApi(withHidden))
                     .GroupBy(x => new { x.Name, Type = x.RawProperties.GetType() }).Where(x => x.Count() == 1)
@@ -55,6 +57,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
             var key = $"ResolvedSchema_{id}";
 
             return metadataProvider.GetMetadata<Schema>(key);
+        }
+
+        public static bool TryGetResolvedSchema<T>(this T metadataProvider, object id, [MaybeNullWhen(false)] out Schema schema) where T : IMetadataProvider
+        {
+            var key = $"ResolvedSchema_{id}";
+
+            schema = metadataProvider.GetMetadata<Schema>(key);
+
+            return schema != null;
         }
 
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField

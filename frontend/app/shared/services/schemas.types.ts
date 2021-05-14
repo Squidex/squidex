@@ -10,6 +10,7 @@ export type FieldType =
     'Assets' |
     'Boolean' |
     'Component' |
+    'Components' |
     'DateTime' |
     'Json' |
     'Geolocation' |
@@ -32,6 +33,9 @@ export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }>
     }, {
         type: 'Component',
         description: 'i18n:schemas.fieldTypes.component.description'
+    }, {
+        type: 'Components',
+        description: 'i18n:schemas.fieldTypes.components.description'
     }, {
         type: 'DateTime',
         description: 'i18n:schemas.fieldTypes.dateTime.description'
@@ -77,6 +81,9 @@ export function createProperties(fieldType: FieldType, values?: any): FieldPrope
         case 'Component':
             properties = new ComponentFieldPropertiesDto();
             break;
+        case 'Components':
+            properties = new ComponentsFieldPropertiesDto();
+            break;
         case 'DateTime':
             properties = new DateTimeFieldPropertiesDto();
             break;
@@ -120,6 +127,8 @@ export interface FieldPropertiesVisitor<T> {
     visitBoolean(properties: BooleanFieldPropertiesDto): T;
 
     visitComponent(properties: ComponentFieldPropertiesDto): T;
+
+    visitComponents(properties: ComponentsFieldPropertiesDto): T;
 
     visitDateTime(properties: DateTimeFieldPropertiesDto): T;
 
@@ -247,11 +256,27 @@ export class ComponentFieldPropertiesDto extends FieldPropertiesDto {
     public readonly schemaIds?: ReadonlyArray<string>;
 
     public get isComplexUI() {
-        return false;
+        return true;
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
         return visitor.visitComponent(this);
+    }
+}
+
+export class ComponentsFieldPropertiesDto extends FieldPropertiesDto {
+    public readonly fieldType = 'Components';
+
+    public readonly schemaIds?: ReadonlyArray<string>;
+    public readonly maxItems?: number;
+    public readonly minItems?: number;
+
+    public get isComplexUI() {
+        return true;
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitComponents(this);
     }
 }
 

@@ -8,7 +8,7 @@
                 <div class="badge badge-pill badge-primary">{{model.fields[field].displayName}}</div>
             </div>
             <div class="col text-right">
-                <small class="text-muted">{{model.fields[field].description | sqxTranslate: model.fields[field]}}</small>
+                <sqx-form-hint>{{model.fields[field].description | sqxTranslate: model.fields[field]}}</sqx-form-hint>
             </div>
         </div>
     </ng-template>

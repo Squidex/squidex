@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -47,24 +48,13 @@ namespace Squidex.Web.Pipeline
                         return;
                     }
 
-                    context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema));
-                }
-                else
-                {
-                    schemaIdOrName = context.RouteData.Values["publishedSchema"]?.ToString();
-
-                    if (!string.IsNullOrWhiteSpace(schemaIdOrName))
+                    if (context.ActionDescriptor.EndpointMetadata.Any(x => x is SchemaMustBePublishedAttribute) && !schema.SchemaDef.IsPublished)
                     {
-                        var schema = await GetSchemaAsync(appId, schemaIdOrName, context.HttpContext.User);
-
-                        if (schema == null || !schema.SchemaDef.IsPublished)
-                        {
-                            context.Result = new NotFoundResult();
-                            return;
-                        }
-
-                        context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema));
+                        context.Result = new NotFoundResult();
+                        return;
                     }
+
+                    context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema));
                 }
             }
 

@@ -62,16 +62,11 @@ namespace Squidex.Web.Pipeline
             sut = new SchemaResolver(appProvider);
         }
 
-        public static IEnumerable<object[]> FieldNames()
-        {
-            yield return new object[] { "schema" };
-            yield return new object[] { "publishedSchema" };
-        }
-
         [Fact]
-        public async Task Should_return_not_found_if_schema_not_published_for_publishedSchema_argument()
+        public async Task Should_return_not_found_if_schema_not_published_when_attribute_applied()
         {
-            actionContext.RouteData.Values["publishedSchema"] = schemaId.Id.ToString();
+            actionContext.ActionDescriptor.EndpointMetadata.Add(new SchemaMustBePublishedAttribute());
+            actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 
             var schema = CreateSchema(false);
 
@@ -84,7 +79,7 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
-        public async Task Should_resolve_schema_if_schema_not_published_for_schema_argument()
+        public async Task Should_resolve_schema_if_schema_not_published()
         {
             actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 
@@ -98,11 +93,10 @@ namespace Squidex.Web.Pipeline
             AssertSchema(schema);
         }
 
-        [Theory]
-        [MemberData(nameof(FieldNames))]
-        public async Task Should_return_not_found_if_schema_not_found(string parameter)
+        [Fact]
+        public async Task Should_return_not_found_if_schema_not_found()
         {
-            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
+            actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
@@ -112,35 +106,10 @@ namespace Squidex.Web.Pipeline
             AssetNotFound();
         }
 
-        [Theory]
-        [InlineData("schema", false)]
-        [InlineData("publishedSchema", true)]
-        public async Task Should_return_not_found_if_schema_not_published(string parameter, bool expect404)
+        [Fact]
+        public async Task Should_resolve_schema_from_id()
         {
-            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
-
-            var schema = CreateSchema(false);
-
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
-                .Returns(schema);
-
-            await sut.OnActionExecutionAsync(actionExecutingContext, next);
-
-            if (expect404)
-            {
-                AssetNotFound();
-            }
-            else
-            {
-                AssertSchema(schema);
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(FieldNames))]
-        public async Task Should_resolve_schema_from_id(string parameter)
-        {
-            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
+            actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 
             var schema = CreateSchema(true);
 
@@ -152,13 +121,12 @@ namespace Squidex.Web.Pipeline
             AssertSchema(schema);
         }
 
-        [Theory]
-        [MemberData(nameof(FieldNames))]
-        public async Task Should_resolve_schema_from_id_without_caching_if_frontend(string parameter)
+        [Fact]
+        public async Task Should_resolve_schema_from_id_without_caching_if_frontend()
         {
             user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-            actionContext.RouteData.Values[parameter] = schemaId.Id.ToString();
+            actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 
             var schema = CreateSchema(true);
 
@@ -170,11 +138,10 @@ namespace Squidex.Web.Pipeline
             AssertSchema(schema);
         }
 
-        [Theory]
-        [MemberData(nameof(FieldNames))]
-        public async Task Should_resolve_schema_from_name(string parameter)
+        [Fact]
+        public async Task Should_resolve_schema_from_name()
         {
-            actionContext.RouteData.Values[parameter] = schemaId.Name;
+            actionContext.RouteData.Values["schema"] = schemaId.Name;
 
             var schema = CreateSchema(true);
 
@@ -186,13 +153,12 @@ namespace Squidex.Web.Pipeline
             AssertSchema(schema);
         }
 
-        [Theory]
-        [MemberData(nameof(FieldNames))]
-        public async Task Should_resolve_schema_from_name_without_caching_if_frontend(string parameter)
+        [Fact]
+        public async Task Should_resolve_schema_from_name_without_caching_if_frontend()
         {
             user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-            actionContext.RouteData.Values[parameter] = schemaId.Name;
+            actionContext.RouteData.Values["schema"] = schemaId.Name;
 
             var schema = CreateSchema(true);
 
@@ -204,12 +170,11 @@ namespace Squidex.Web.Pipeline
             AssertSchema(schema);
         }
 
-        [Theory]
-        [MemberData(nameof(FieldNames))]
-        public async Task Should_do_nothing_if_app_feature_not_set(string parameter)
+        [Fact]
+        public async Task Should_do_nothing_if_app_feature_not_set()
         {
             actionExecutingContext.HttpContext.Features.Set<IAppFeature>(null!);
-            actionExecutingContext.RouteData.Values[parameter] = schemaId.Name;
+            actionExecutingContext.RouteData.Values["schema"] = schemaId.Name;
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 

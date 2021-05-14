@@ -40,9 +40,8 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
     @ViewChildren(ComponentSectionComponent)
     public sections: QueryList<ComponentSectionComponent>;
 
-    public dropdown = new ModalModel();
-
-    public schemas: ReadonlyArray<SchemaDto>;
+    public schemasDropdown = new ModalModel();
+    public schemasList: ReadonlyArray<SchemaDto>;
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef
@@ -61,7 +60,7 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
                     }));
 
             if (Types.is(this.formModel.field.properties, ComponentFieldPropertiesDto)) {
-                this.schemas = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).filter(x => !!x) || [];
+                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).filter(x => !!x) || [];
             }
         }
     }
@@ -73,7 +72,7 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
     }
 
     public setSchema(schema: SchemaDto) {
-        this.formModel.init(schema.fields, schema.id);
+        this.formModel.selectSchema(schema.id);
     }
 
     public trackBySection(_index: number, section: FieldSection<FieldDto, any>) {

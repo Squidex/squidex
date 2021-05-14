@@ -1,5 +1,9 @@
 <div class="component">
     <div *ngIf="formModel.schema; else noSchema">
+        <sqx-form-hint>
+            {{formModel.schema.displayName}}
+        </sqx-form-hint>
+
         <div class="form-group" *ngFor="let section of formModel.sections">
             <sqx-component-section
                 [canUnset]="canUnset"
@@ -13,23 +17,28 @@
     </div>
     
     <ng-template #noSchema>
-        <ng-container *ngIf="schemas.length > 1">
-            <button type="button" class="btn btn-outline-success dropdown-toggle" (click)="dropdown.show()" #buttonSelect>
+        <ng-container *ngIf="schemasList.length > 1">
+            <button type="button" class="btn btn-outline-success dropdown-toggle" (click)="schemasDropdown.show()" #buttonSelect>
                 {{ 'contents.addComponent' | sqxTranslate}}
             </button>
             
-            <ng-container *sqxModal="dropdown;closeAlways:true">
+            <ng-container *sqxModal="schemasDropdown;closeAlways:true">
                 <div class="dropdown-menu" [sqxAnchoredTo]="buttonSelect" @fade>
-                    <a class="dropdown-item" *ngFor="let schema of schemas" (click)="setSchema(schema)">
+                    <a class="dropdown-item" *ngFor="let schema of schemasList" (click)="setSchema(schema)">
                         {{schema.displayName}}
                     </a>
                 </div>
             </ng-container>
         </ng-container>
-        <ng-container *ngIf="schemas.length === 1">
-            <button type="button" class="btn btn-outline-success" (click)="setSchema(schemas[0])">
+        <ng-container *ngIf="schemasList.length === 1">
+            <button type="button" class="btn btn-outline-success" (click)="setSchema(schemasList[0])">
                 {{ 'contents.addComponent' | sqxTranslate}}
             </button>
+        </ng-container>
+        <ng-container *ngIf="schemasList.length === 0">
+            <sqx-form-hint>
+                {{ 'contents.componentNoSchema' | sqxTranslate }}
+            </sqx-form-hint>
         </ng-container>
     </ng-template>
 </div>

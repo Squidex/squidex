@@ -12,6 +12,7 @@ using NJsonSchema;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
@@ -81,61 +82,18 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             var property = SchemaBuilder.ObjectProperty();
 
-            property.Description = field.RawProperties.Hints;
-            property.SetRequired(field.RawProperties.IsRequired);
-
-            property.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
-
-            if (args.SchemaResolver != null)
-            {
-                var schemas =
-                    field.Properties.SchemaIds?
-                        .Select(x => field.GetResolvedSchema(x)).NotNull() ?? Enumerable.Empty<Schema>();
-
-                var discriminator = new OpenApiDiscriminator
-                {
-                    PropertyName = Component.Discriminator
-                };
-
-                foreach (var schema in schemas)
-                {
-                    var schemaName = $"{schema.TypeName()}ComponentDto";
-
-                    var componentSchema = args.SchemaResolver(schemaName, () =>
-                    {
-                        var componentSchema = SchemaBuilder.Object();
-
-                        foreach (var sharedField in schema.Fields.ForApi(args.WithHiddenFields))
-                        {
-                            var sharedProperty = sharedField.Accept(this, args);
-
-                            if (sharedProperty != null)
-                            {
-                                sharedProperty.Description = sharedField.RawProperties.Hints;
-                                sharedProperty.SetRequired(sharedField.RawProperties.IsRequired);
-
-                                componentSchema.Properties.Add(sharedField.Name, sharedProperty);
-                            }
-                        }
-
-                        componentSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
-
-                        return componentSchema;
-                    });
-
-                    property.OneOf.Add(componentSchema);
-
-                    discriminator.Mapping[schemaName] = componentSchema;
-                }
-
-                property.DiscriminatorObject = discriminator;
-            }
-            else
-            {
-                property.AllowAdditionalProperties = true;
-            }
+            BuildComponent(property, field, field.Properties.SchemaIds, args);
 
             return property;
+        }
+
+        public JsonSchemaProperty? Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            var itemSchema = SchemaBuilder.Object();
+
+            BuildComponent(itemSchema, field, field.Properties.SchemaIds, args);
+
+            return SchemaBuilder.ArrayProperty(itemSchema);
         }
 
         public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)
@@ -209,6 +167,58 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         public JsonSchemaProperty? Visit(IField<UIFieldProperties> field, Args args)
         {
             return null;
+        }
+
+        private void BuildComponent(JsonSchema jsonSchema, IField field, ImmutableList<DomainId>? schemaIds, Args args)
+        {
+            jsonSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
+
+            if (args.SchemaResolver != null)
+            {
+                var schemas = schemaIds?.Select(x => field.GetResolvedSchema(x)).NotNull() ?? Enumerable.Empty<Schema>();
+
+                var discriminator = new OpenApiDiscriminator
+                {
+                    PropertyName = Component.Discriminator
+                };
+
+                foreach (var schema in schemas)
+                {
+                    var schemaName = $"{schema.TypeName()}ComponentDto";
+
+                    var componentSchema = args.SchemaResolver(schemaName, () =>
+                    {
+                        var componentSchema = SchemaBuilder.Object();
+
+                        foreach (var sharedField in schema.Fields.ForApi(args.WithHiddenFields))
+                        {
+                            var sharedProperty = sharedField.Accept(this, args);
+
+                            if (sharedProperty != null)
+                            {
+                                sharedProperty.Description = sharedField.RawProperties.Hints;
+                                sharedProperty.SetRequired(sharedField.RawProperties.IsRequired);
+
+                                componentSchema.Properties.Add(sharedField.Name, sharedProperty);
+                            }
+                        }
+
+                        componentSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
+
+                        return componentSchema;
+                    });
+
+                    jsonSchema.OneOf.Add(componentSchema);
+
+                    discriminator.Mapping[schemaName] = componentSchema;
+                }
+
+                jsonSchema.DiscriminatorObject = discriminator;
+            }
+            else
+            {
+                jsonSchema.AllowAdditionalProperties = true;
+            }
         }
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Text;
@@ -39,22 +40,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public IEdmTypeReference? Visit(IArrayField field, Args args)
         {
-            var (fieldEdmType, created) = args.Factory($"Data.{field.Name.ToPascalCase()}.Item");
-
-            if (created)
-            {
-                foreach (var nestedField in field.Fields)
-                {
-                    var nestedEdmType = nestedField.Accept(this, args);
-
-                    if (nestedEdmType != null)
-                    {
-                        fieldEdmType.AddStructuralProperty(nestedField.Name.EscapeEdmField(), nestedEdmType);
-                    }
-                }
-            }
-
-            return new EdmComplexTypeReference(fieldEdmType, false);
+            return CreateNestedType(field, field.Fields.ForApi(true), args);
         }
 
         public IEdmTypeReference? Visit(IField<AssetsFieldProperties> field, Args args)
@@ -69,22 +55,12 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public IEdmTypeReference? Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            var (fieldEdmType, created) = args.Factory($"Data.{field.Name.ToPascalCase()}.Component");
+            return CreateNestedType(field, field.GetSharedFields(field.Properties.SchemaIds, true), args);
+        }
 
-            if (created)
-            {
-                foreach (var sharedField in field.GetSharedFields(false))
-                {
-                    var nestedEdmType = sharedField.Accept(this, args);
-
-                    if (nestedEdmType != null)
-                    {
-                        fieldEdmType.AddStructuralProperty(sharedField.Name.EscapeEdmField(), nestedEdmType);
-                    }
-                }
-            }
-
-            return new EdmComplexTypeReference(fieldEdmType, false);
+        public IEdmTypeReference? Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            return CreateNestedType(field, field.GetSharedFields(field.Properties.SchemaIds, true), args);
         }
 
         public IEdmTypeReference? Visit(IField<DateTimeFieldProperties> field, Args args)
@@ -140,6 +116,26 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
         private static IEdmTypeReference CreateJson(IField<JsonFieldProperties> field)
         {
             return new EdmComplexTypeReference(JsonType, !field.RawProperties.IsRequired);
+        }
+
+        private IEdmTypeReference CreateNestedType(IField field, IEnumerable<IField> nested, Args args)
+        {
+            var (fieldEdmType, created) = args.Factory($"Data.{field.Name.ToPascalCase()}.Nested");
+
+            if (created)
+            {
+                foreach (var sharedField in nested)
+                {
+                    var nestedEdmType = sharedField.Accept(this, args);
+
+                    if (nestedEdmType != null)
+                    {
+                        fieldEdmType.AddStructuralProperty(sharedField.Name.EscapeEdmField(), nestedEdmType);
+                    }
+                }
+            }
+
+            return new EdmComplexTypeReference(fieldEdmType, false);
         }
     }
 }

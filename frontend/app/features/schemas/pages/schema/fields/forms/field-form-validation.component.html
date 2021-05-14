@@ -55,6 +55,13 @@
             [properties]="field.rawProperties">
         </sqx-component-validation>
     </ng-container>
+    <ng-container *ngSwitchCase="'Components'">
+        <sqx-components-validation
+            [fieldForm]="fieldForm"
+            [field]="field"
+            [properties]="field.rawProperties">
+        </sqx-components-validation>
+    </ng-container>
     <ng-container *ngSwitchCase="'DateTime'">
         <sqx-date-time-validation
             [languages]="languages"

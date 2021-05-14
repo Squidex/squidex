@@ -92,17 +92,21 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new RequiredValidator();
             }
 
-            yield return new ComponentValidator(schema =>
+            yield return ComponentValidator(args.Factory);
+        }
+
+        public IEnumerable<IValidator> Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            var properties = field.Properties;
+
+            var isRequired = IsRequired(properties, args.Context);
+
+            if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
-                var nestedValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(schema.Fields.Count);
+                yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
+            }
 
-                foreach (var nestedField in schema.Fields)
-                {
-                    nestedValidators[nestedField.Name] = (false, args.Factory(nestedField));
-                }
-
-                return new ObjectValidator<IJsonValue>(nestedValidators, false, "field");
-            });
+            yield return new CollectionItemValidator(ComponentValidator(args.Factory));
         }
 
         public IEnumerable<IValidator> Visit(IField<DateTimeFieldProperties> field, Args args)
@@ -261,6 +265,21 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
 
             return isRequired;
+        }
+
+        private static IValidator ComponentValidator(ValidatorFactory factory)
+        {
+            return new ComponentValidator(schema =>
+            {
+                var nestedValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(schema.Fields.Count);
+
+                foreach (var nestedField in schema.Fields)
+                {
+                    nestedValidators[nestedField.Name] = (false, factory(nestedField));
+                }
+
+                return new ObjectValidator<IJsonValue>(nestedValidators, false, "field");
+            });
         }
     }
 }

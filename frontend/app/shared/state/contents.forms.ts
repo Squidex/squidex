@@ -8,13 +8,13 @@
 // tslint:disable: readonly-array
 
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Form, Types, UndefinableFormArray, UndefinableFormGroup, valueAll$ } from '@app/framework';
+import { Form, getRawValue, Types, UndefinableFormArray, UndefinableFormGroup, valueAll$ } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { debounceTime, onErrorResumeNext } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDto, TableField } from './../services/schemas.service';
-import { ArrayFieldPropertiesDto, ComponentFieldPropertiesDto, fieldInvariant } from './../services/schemas.types';
+import { ComponentFieldPropertiesDto, fieldInvariant } from './../services/schemas.types';
 import { AbstractContentForm, AbstractContentFormState, CompiledRule, FieldSection, FormStructure as FormGlobals, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
@@ -226,17 +226,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
 
         for (const { key, isOptional } of globals.partitions.getAll(field)) {
             const childPath = `${fieldPath}.${key}`;
-
-            let childForm: FieldItemForm;
-
-            if (Types.is(field, RootFieldDto) && Types.is(field.properties, ArrayFieldPropertiesDto)) {
-                childForm = new FieldArrayForm(this.globals, childPath, field, isOptional, key);
-            } else if (Types.is(field.properties, ComponentFieldPropertiesDto)) {
-                childForm = new ComponentForm(this.globals, childPath, field, isOptional, key);
-                childForm.initAsComponent();
-            } else {
-                childForm = new FieldValueForm(this.globals, childPath, field, isOptional, key);
-            }
+            const childForm = buildForm(this.globals, childPath, field, isOptional, key);
 
             this.partitions[key] = childForm;
 
@@ -363,10 +353,10 @@ export class FieldValueForm extends AbstractContentForm<FieldDto, FormControl> {
     }
 }
 
-export class FieldArrayForm extends AbstractContentForm<RootFieldDto, UndefinableFormArray> {
-    private readonly item$ = new BehaviorSubject<ReadonlyArray<ComponentForm>>([]);
+export class FieldArrayForm extends AbstractContentForm<FieldDto, UndefinableFormArray> {
+    private readonly item$ = new BehaviorSubject<ReadonlyArray<ObjectForm>>([]);
 
-    public get itemChanges(): Observable<ReadonlyArray<ComponentForm>> {
+    public get itemChanges(): Observable<ReadonlyArray<ObjectForm>> {
         return this.item$;
     }
 
@@ -374,12 +364,13 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, Undefinabl
         return this.item$.value;
     }
 
-    public set items(value: ReadonlyArray<ComponentForm>) {
+    public set items(value: ReadonlyArray<ObjectForm>) {
         this.item$.next(value);
     }
 
-    constructor(globals: FormGlobals, path: string, field: RootFieldDto, isOptional: boolean,
-        private readonly partition: string
+    constructor(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean,
+        private readonly partition: string,
+        private readonly isComponents: boolean
     ) {
         super(globals, path, field,
             FieldArrayForm.buildControl(field, isOptional),
@@ -391,13 +382,35 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, Undefinabl
         return this.items[index];
     }
 
-    public addItem(source?: ComponentForm) {
-        const child = new ComponentForm(this.globals, this.fieldPath, this.field, this.isOptional, this.partition).init(this.field.nested);
+    public addCopy(source: ObjectForm) {
+        if (this.isComponents) {
+            const child = new ComponentForm(this.globals, this.fieldPath, this.field as RootFieldDto, this.isOptional, this.partition);
 
-        if (source) {
-            child.form.setValue(source.form.value);
+            child.load(getRawValue(source.form));
+
+            this.addChild(child);
+        } else {
+            const child = new ArrayItemForm(this.globals, this.fieldPath, this.field as RootFieldDto, this.isOptional, this.partition);
+
+            child.load(getRawValue(source.form));
+
+            this.addChild(child);
         }
+    }
 
+    public addComponent(schemaId?: string) {
+        const child = new ComponentForm(this.globals, this.fieldPath, this.field, this.isOptional, this.partition, schemaId);
+
+        this.addChild(child);
+    }
+
+    public addItem() {
+        const child = new ArrayItemForm(this.globals, this.fieldPath, this.field as RootFieldDto, this.isOptional, this.partition);
+
+        this.addChild(child);
+    }
+
+    public addChild(child: ObjectForm) {
         this.items = [...this.items, child];
 
         this.form.push(child.form);
@@ -423,7 +436,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, Undefinabl
         this.form.removeAt(index);
     }
 
-    public move(index: number, item: ComponentForm) {
+    public move(index: number, item: ObjectForm) {
         const children = [...this.items];
 
         children.splice(children.indexOf(item), 1);
@@ -434,7 +447,7 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, Undefinabl
         this.sort(children);
     }
 
-    public sort(children: ReadonlyArray<ComponentForm>) {
+    public sort(children: ReadonlyArray<ObjectForm>) {
         for (let i = 0; i < children.length; i++) {
             this.form.setControl(i, children[i].form);
         }
@@ -449,16 +462,24 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, Undefinabl
     public prepareLoad(value: any) {
         if (Types.isArray(value)) {
             while (this.items.length < value.length) {
-                this.addItem();
+                if (this.isComponents) {
+                    this.addComponent();
+                } else {
+                    this.addItem();
+                }
             }
 
             while (this.items.length > value.length) {
                 this.removeItemAt(this.items.length - 1);
             }
         }
+
+        for (let i = 0; i < this.items.length; i++) {
+            this.items[i].prepareLoad(value?.[i]);
+        }
     }
 
-    private static buildControl(field: RootFieldDto, isOptional: boolean) {
+    private static buildControl(field: FieldDto, isOptional: boolean) {
         const validators = FieldsValidators.create(field, isOptional);
 
         return new UndefinableFormArray([], validators);
@@ -467,74 +488,42 @@ export class FieldArrayForm extends AbstractContentForm<RootFieldDto, Undefinabl
 
 export type FieldItemForm = ComponentForm | FieldValueForm | FieldArrayForm;
 
-export class ComponentForm extends AbstractContentForm<FieldDto, UndefinableFormGroup>  {
+export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractContentForm<TField, UndefinableFormGroup>  {
     private fields: { [key: string]: FieldItemForm } = {};
-    private schemaFields?: ReadonlyArray<FieldDto>;
-    private schemaId?: string;
-    private sectionsValue: FieldSection<FieldDto, FieldItemForm>[] = [];
+    private fieldSections: FieldSection<FieldDto, FieldItemForm>[] = [];
 
     public get sections() {
-        return this.sectionsValue;
+        return this.fieldSections;
     }
 
-    public get schema() {
-        return this.globals.schemas[this.schemaId!];
-    }
-
-    constructor(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean,
+    constructor(globals: FormGlobals, path: string, field: TField, isOptional: boolean,
         private readonly partition: string
     ) {
-        super(globals, path, field, ComponentForm.buildControl(field, isOptional, true), isOptional);
+        super(globals, path, field, ObjectForm.buildControl(field, isOptional, true), isOptional);
     }
 
-    public get(field: string | FieldDto): FieldItemForm | undefined {
+    public get(field: string | { name: string }): FieldItemForm | undefined {
         return this.fields[field['name'] || field];
     }
 
-    public initAsComponent() {
-        let schema: SchemaDto | undefined = undefined;
-
-        if (Types.is(this.field.properties, ComponentFieldPropertiesDto) && this.field.properties.schemaIds?.length === 1) {
-            schema = this.globals.schemas[this.field.properties.schemaIds[0]];
-        }
-
-        this.init(schema?.fields, schema?.id);
-    }
-
-    public init(schemaFields?: ReadonlyArray<FieldDto>, schemaId?: string) {
-        if (this.schemaFields === schemaFields) {
-            return this;
-        }
-
+    protected init(schema?: ReadonlyArray<FieldDto>) {
         this.fields = {};
-        this.schemaFields = schemaFields;
-        this.schemaId = schemaId;
-        this.sectionsValue = [];
+        this.fieldSections = [];
 
         for (const key of Object.keys(this.form.controls)) {
             this.form.removeControl(key);
         }
 
-        if (schemaFields) {
+        if (schema) {
             this.form.reset({});
 
             let currentSeparator: FieldDto | undefined = undefined;
             let currentFields: FieldItemForm[] = [];
 
-            for (const field of schemaFields) {
+            for (const field of schema) {
                 if (field.properties.isContentField) {
                     const childPath = `${this.fieldPath}.${field.name}`;
-
-                    let childForm: FieldItemForm;
-
-                    if (Types.is(field, RootFieldDto) && Types.is(field.properties, ArrayFieldPropertiesDto)) {
-                        childForm = new FieldArrayForm(this.globals, childPath, field, this.isOptional, this.partition);
-                    } else if (Types.is(field.properties, ComponentFieldPropertiesDto)) {
-                        childForm = new ComponentForm(this.globals, childPath, field, this.isOptional, this.partition);
-                        childForm.initAsComponent();
-                    } else {
-                        childForm = new FieldValueForm(this.globals, childPath, field, this.isOptional, this.partition);
-                    }
+                    const childForm = buildForm(this.globals, childPath, field, this.isOptional, this.partition);
 
                     this.form.setControl(field.name, childForm.form);
 
@@ -543,7 +532,7 @@ export class ComponentForm extends AbstractContentForm<FieldDto, UndefinableForm
                     this.fields[field.name] = childForm;
 
                 } else {
-                    this.sectionsValue.push(new FieldSection<FieldDto, FieldItemForm>(currentSeparator, currentFields));
+                    this.fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(currentSeparator, currentFields));
 
                     currentFields = [];
                     currentSeparator = field;
@@ -551,34 +540,20 @@ export class ComponentForm extends AbstractContentForm<FieldDto, UndefinableForm
             }
 
             if (currentFields.length > 0) {
-                this.sectionsValue.push(new FieldSection<FieldDto, FieldItemForm>(currentSeparator, currentFields));
+                this.fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(currentSeparator, currentFields));
             }
-
-            if (schemaId) {
-                this.form.setControl('schemaId', new FormControl(schemaId));
-            }
-
         } else {
             this.form.reset(undefined);
         }
-
-        return this;
     }
 
-    public unset() {
-        this.init(undefined);
+    public load(data: any) {
+        this.prepareLoad(data);
 
-        super.unset();
+        this.form.reset(data);
     }
 
     public prepareLoad(value: any) {
-        if (Types.is(this.field.properties, ComponentFieldPropertiesDto)) {
-            const schemaId = value?.['schemaId'];
-            const schema = this.globals.schemas[schemaId];
-
-            this.init(schema?.fields, schemaId);
-        }
-
         for (const key of Object.keys(this.fields)) {
             this.fields[key].prepareLoad(value?.[key]);
         }
@@ -604,5 +579,74 @@ export class ComponentForm extends AbstractContentForm<FieldDto, UndefinableForm
         }
 
         return new UndefinableFormGroup({}, validators);
+    }
+}
+
+export class ArrayItemForm extends ObjectForm<RootFieldDto> {
+    constructor(globals: FormGlobals, path: string, field: RootFieldDto, isOptional: boolean, partition: string) {
+        super(globals, path, field, isOptional, partition);
+
+        this.init(field.nested);
+    }
+}
+
+export class ComponentForm extends ObjectForm {
+    private schemaId?: string;
+
+    public readonly properties: ComponentFieldPropertiesDto;
+
+    public get schema() {
+        return this.globals.schemas[this.schemaId!];
+    }
+
+    constructor(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean, partition: string, schemaId?: string) {
+        super(globals, path, field, isOptional, partition);
+
+        this.properties = field.properties as ComponentFieldPropertiesDto;
+
+        if (schemaId) {
+            this.selectSchema(schemaId);
+        } else if (this.properties.schemaIds?.length === 1) {
+            this.selectSchema(this.properties.schemaIds[0]);
+        }
+    }
+
+    public selectSchema(schemaId?: string) {
+        if (this.schemaId !== schemaId) {
+            this.schemaId = schemaId;
+
+            if (this.schema) {
+                this.init(this.schema.fields);
+
+                this.form.setControl('schemaId', new FormControl(schemaId));
+            } else {
+                this.init(undefined);
+            }
+        }
+    }
+
+    public unset() {
+        this.selectSchema(undefined);
+
+        super.unset();
+    }
+
+    public prepareLoad(value: any) {
+        this.selectSchema(value?.['schemaId']);
+
+        super.prepareLoad(value);
+    }
+}
+
+function buildForm(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean, partition: string) {
+    switch (field.properties.fieldType) {
+        case 'Array':
+            return new FieldArrayForm(globals, path, field, isOptional, partition, false);
+        case 'Component':
+            return new ComponentForm(globals, path, field, isOptional, partition);
+        case 'Components':
+            return new FieldArrayForm(globals, path, field, isOptional, partition, true);
+        default:
+            return new FieldValueForm(globals, path, field, isOptional, partition);
     }
 }

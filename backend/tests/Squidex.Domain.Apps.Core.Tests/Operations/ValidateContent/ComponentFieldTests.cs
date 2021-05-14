@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_null_component_is_valid()
+        public async Task Should_not_add_error_if_component_is_null_and_valid()
         {
             var (_, sut) = Field(new ComponentFieldProperties());
 

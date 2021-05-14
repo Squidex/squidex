@@ -45,6 +45,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return SimpleMapper.Map(properties, new ComponentFieldPropertiesDto());
         }
 
+        public FieldPropertiesDto Visit(ComponentsFieldProperties properties, None args)
+        {
+            return SimpleMapper.Map(properties, new ComponentsFieldPropertiesDto());
+        }
+
         public FieldPropertiesDto Visit(DateTimeFieldProperties properties, None args)
         {
             return SimpleMapper.Map(properties, new DateTimeFieldPropertiesDto());

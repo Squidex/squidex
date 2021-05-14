@@ -26,13 +26,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             schema =
                 new Schema("my-schema")
                     .AddComponent(1, "component", Partitioning.Invariant)
-                    .AddAssets(2, "assets1", Partitioning.Invariant)
-                    .AddAssets(3, "assets2", Partitioning.Invariant)
-                    .AddReferences(4, "references", Partitioning.Invariant)
-                    .AddArray(5, "array", Partitioning.Invariant, a => a
+                    .AddComponents(2, "components", Partitioning.Invariant)
+                    .AddAssets(3, "assets1", Partitioning.Invariant)
+                    .AddAssets(4, "assets2", Partitioning.Invariant)
+                    .AddReferences(5, "references", Partitioning.Invariant)
+                    .AddArray(6, "array", Partitioning.Invariant, a => a
                         .AddAssets(31, "nested"));
 
             schema.FieldsById[1].SetResolvedSchema(DomainId.Empty, schema);
+            schema.FieldsById[2].SetResolvedSchema(DomainId.Empty, schema);
         }
 
         [Fact]
@@ -105,7 +107,21 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                                         JsonValue.Array(
                                             JsonValue.Object()
                                                 .Add("nested", JsonValue.Array(id1, id2))))
-                                    .Add(Component.Discriminator, DomainId.Empty)));
+                                    .Add(Component.Discriminator, DomainId.Empty)))
+                    .AddField("components",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add("references",
+                                            JsonValue.Array(id1, id2))
+                                        .Add("assets1",
+                                            JsonValue.Array(id1))
+                                        .Add("array",
+                                            JsonValue.Array(
+                                                JsonValue.Object()
+                                                    .Add("nested", JsonValue.Array(id1, id2))))
+                                        .Add(Component.Discriminator, DomainId.Empty))));
 
             var expected =
                 new ContentData()
@@ -133,7 +149,21 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                                         JsonValue.Array(
                                             JsonValue.Object()
                                                 .Add("nested", JsonValue.Array(id2))))
-                                    .Add(Component.Discriminator, DomainId.Empty)));
+                                    .Add(Component.Discriminator, DomainId.Empty)))
+                    .AddField("components",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add("references",
+                                            JsonValue.Array(id2))
+                                        .Add("assets1",
+                                            JsonValue.Array())
+                                        .Add("array",
+                                            JsonValue.Array(
+                                                JsonValue.Object()
+                                                    .Add("nested", JsonValue.Array(id2))))
+                                        .Add(Component.Discriminator, DomainId.Empty))));
 
             var converter =
                 FieldConverters.ForValues(

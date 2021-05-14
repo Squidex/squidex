@@ -13,7 +13,7 @@ import { DateTime, Types, ValidatorsEx } from '@app/framework';
 import { ContentDto, ContentReferencesValue } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto } from './../services/schemas.service';
-import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './../services/schemas.types';
+import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './../services/schemas.types';
 
 export class HtmlValue {
     constructor(
@@ -126,7 +126,11 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitComponent(_: ComponentFieldPropertiesDto): string {
-        return this.formatArray('Component', 'Components');
+        return '{ Component }';
+    }
+
+    public visitComponents(_: ComponentsFieldPropertiesDto): string {
+        return this.formatArray('Component', 'Component');
     }
 
     public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {
@@ -267,6 +271,14 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return [];
     }
 
+    public visitComponents(properties: ComponentsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
+
+        return validators;
+    }
+
     public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         return [];
     }
@@ -386,6 +398,10 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 
     public visitComponent(_: ComponentFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitComponents(_: ComponentsFieldPropertiesDto): any {
         return null;
     }
 

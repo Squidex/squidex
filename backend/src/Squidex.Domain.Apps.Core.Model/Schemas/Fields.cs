@@ -40,6 +40,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new RootField<ComponentFieldProperties>(id, name, partitioning, properties, settings);
         }
 
+        public static RootField<ComponentsFieldProperties> Components(long id, string name, Partitioning partitioning,
+            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+        {
+            return new RootField<ComponentsFieldProperties>(id, name, partitioning, properties, settings);
+        }
+
         public static RootField<DateTimeFieldProperties> DateTime(long id, string name, Partitioning partitioning,
             DateTimeFieldProperties? properties = null, IFieldSettings? settings = null)
         {
@@ -104,6 +110,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
             return new NestedField<ComponentFieldProperties>(id, name, properties, settings);
+        }
+
+        public static NestedField<ComponentsFieldProperties> Components(long id, string name,
+            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+        {
+            return new NestedField<ComponentsFieldProperties>(id, name, properties, settings);
         }
 
         public static NestedField<DateTimeFieldProperties> DateTime(long id, string name,
@@ -183,6 +195,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
             return schema.AddField(Component(id, name, partitioning, properties, settings));
+        }
+
+        public static Schema AddComponents(this Schema schema, long id, string name, Partitioning partitioning,
+            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+        {
+            return schema.AddField(Components(id, name, partitioning, properties, settings));
         }
 
         public static Schema AddDateTime(this Schema schema, long id, string name, Partitioning partitioning,

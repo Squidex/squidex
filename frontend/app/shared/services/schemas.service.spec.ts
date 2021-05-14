@@ -703,7 +703,7 @@ describe('SchemasService', () => {
                     isDisabled: true,
                     partitioning: 'language',
                     properties: {
-                        fieldType: 'DateTime'
+                        fieldType: 'Component'
                     },
                     _links: {}
                 },
@@ -715,7 +715,7 @@ describe('SchemasService', () => {
                     isDisabled: true,
                     partitioning: 'language',
                     properties: {
-                        fieldType: 'Geolocation'
+                        fieldType: 'Components'
                     },
                     _links: {}
                 },
@@ -727,7 +727,7 @@ describe('SchemasService', () => {
                     isDisabled: true,
                     partitioning: 'language',
                     properties: {
-                        fieldType: 'Json'
+                        fieldType: 'DateTime'
                     },
                     _links: {}
                 },
@@ -739,7 +739,7 @@ describe('SchemasService', () => {
                     isDisabled: true,
                     partitioning: 'language',
                     properties: {
-                        fieldType: 'Number'
+                        fieldType: 'Geolocation'
                     },
                     _links: {}
                 },
@@ -751,7 +751,7 @@ describe('SchemasService', () => {
                     isDisabled: true,
                     partitioning: 'language',
                     properties: {
-                        fieldType: 'References'
+                        fieldType: 'Json'
                     },
                     _links: {}
                 },
@@ -763,13 +763,37 @@ describe('SchemasService', () => {
                     isDisabled: true,
                     partitioning: 'language',
                     properties: {
-                        fieldType: 'String'
+                        fieldType: 'Number'
                     },
                     _links: {}
                 },
                 {
                     fieldId: 20,
                     name: 'field20',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'References'
+                    },
+                    _links: {}
+                },
+                {
+                    fieldId: 21,
+                    name: 'field21',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'String'
+                    },
+                    _links: {}
+                },
+                {
+                    fieldId: 22,
+                    name: 'field22',
                     isLocked: true,
                     isHidden: true,
                     isDisabled: true,
@@ -840,13 +864,15 @@ export function createSchema(id: number, suffix = '') {
             ]),
             new RootFieldDto({}, 12, 'field12', createProperties('Assets'), 'language', true, true, true),
             new RootFieldDto({}, 13, 'field13', createProperties('Boolean'), 'language', true, true, true),
-            new RootFieldDto({}, 14, 'field14', createProperties('DateTime'), 'language', true, true, true),
-            new RootFieldDto({}, 15, 'field15', createProperties('Geolocation'), 'language', true, true, true),
-            new RootFieldDto({}, 16, 'field16', createProperties('Json'), 'language', true, true, true),
-            new RootFieldDto({}, 17, 'field17', createProperties('Number'), 'language', true, true, true),
-            new RootFieldDto({}, 18, 'field18', createProperties('References'), 'language', true, true, true),
-            new RootFieldDto({}, 19, 'field19', createProperties('String'), 'language', true, true, true),
-            new RootFieldDto({}, 20, 'field20', createProperties('Tags'), 'language', true, true, true)
+            new RootFieldDto({}, 14, 'field14', createProperties('Component'), 'language', true, true, true),
+            new RootFieldDto({}, 15, 'field15', createProperties('Components'), 'language', true, true, true),
+            new RootFieldDto({}, 16, 'field16', createProperties('DateTime'), 'language', true, true, true),
+            new RootFieldDto({}, 17, 'field17', createProperties('Geolocation'), 'language', true, true, true),
+            new RootFieldDto({}, 18, 'field18', createProperties('Json'), 'language', true, true, true),
+            new RootFieldDto({}, 19, 'field19', createProperties('Number'), 'language', true, true, true),
+            new RootFieldDto({}, 20, 'field20', createProperties('References'), 'language', true, true, true),
+            new RootFieldDto({}, 21, 'field21', createProperties('String'), 'language', true, true, true),
+            new RootFieldDto({}, 22, 'field22', createProperties('Tags'), 'language', true, true, true)
         ],
         ['field1'],
         ['field1'],

@@ -96,6 +96,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
             yield break;
         }
 
+        public IEnumerable<ValidationError> Visit(ComponentsFieldProperties properties, None args)
+        {
+            if (IsMaxGreaterThanMin(properties.MaxItems, properties.MinItems))
+            {
+                yield return new ValidationError(Not.GreaterEqualsThan(nameof(properties.MaxItems), nameof(properties.MinItems)),
+                    nameof(properties.MinItems),
+                    nameof(properties.MaxItems));
+            }
+        }
+
         public IEnumerable<ValidationError> Visit(DateTimeFieldProperties properties, None args)
         {
             if (!properties.Editor.IsEnumValue())

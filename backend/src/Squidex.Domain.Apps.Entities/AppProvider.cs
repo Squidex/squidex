@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities
@@ -194,15 +195,13 @@ namespace Squidex.Domain.Apps.Entities
 
         private async Task ResolveSchemaAsync(DomainId appId, Schema schema)
         {
-            async Task ResolveAsync(IField field)
+            async Task ResolveWithIdsAsync(IField field, ImmutableList<DomainId>? schemaIds)
             {
-                if (field.RawProperties is ComponentFieldProperties component && component.SchemaIds != null)
+                if (schemaIds != null)
                 {
-                    foreach (var schemaId in component.SchemaIds)
+                    foreach (var schemaId in schemaIds)
                     {
-                        var resolved = field.GetResolvedSchema(schemaId);
-
-                        if (resolved == null)
+                        if (!field.TryGetResolvedSchema(schemaId, out _))
                         {
                             var resolvedEntity = await GetSchemaAsync(appId, schemaId, true);
 
@@ -213,12 +212,31 @@ namespace Squidex.Domain.Apps.Entities
                         }
                     }
                 }
-                else if (field is IArrayField arrayField)
+            }
+
+            async Task ResolveArrayAsync(IArrayField arrayField)
+            {
+                foreach (var nestedField in arrayField.Fields)
                 {
-                    foreach (var nestedField in arrayField.Fields)
-                    {
-                        await ResolveAsync(nestedField);
-                    }
+                    await ResolveAsync(nestedField);
+                }
+            }
+
+            async Task ResolveAsync(IField field)
+            {
+                switch (field)
+                {
+                    case IField<ComponentFieldProperties> component:
+                        await ResolveWithIdsAsync(field, component.Properties.SchemaIds);
+                        break;
+
+                    case IField<ComponentsFieldProperties> components:
+                        await ResolveWithIdsAsync(field, components.Properties.SchemaIds);
+                        break;
+
+                    case IArrayField arrayField:
+                        await ResolveArrayAsync(arrayField);
+                        break;
                 }
             }
 

@@ -204,17 +204,19 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         private static IJsonValue? ConvertByType<T>(T field, IJsonValue? value, IArrayField? parent, ValueConverter[] converters) where T : IField
         {
-            if (field is IArrayField arrayField)
+            switch (field)
             {
-                return ConvertArray(arrayField, value, converters);
-            }
-            else if (field.RawProperties is ComponentFieldProperties)
-            {
-                return ConvertComponent(field, value, converters);
-            }
-            else
-            {
-                return ConvertValue(field, value, parent, converters);
+                case IArrayField arrayField:
+                    return ConvertArray(arrayField, value, converters);
+
+                case IField<ComponentFieldProperties>:
+                    return ConvertComponent(field, value, converters);
+
+                case IField<ComponentsFieldProperties>:
+                    return ConvertComponents(field, value, converters);
+
+                default:
+                    return ConvertValue(field, value, parent, converters);
             }
         }
 
@@ -226,16 +228,36 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 for (int i = 0, j = 0; i < array.Count; i++, j++)
                 {
-                    var newValue = array[i];
+                    var newValue = ConvertArrayItem(field, array[i], converters);
 
-                    if (array[i] is not JsonObject obj)
+                    if (newValue == null)
                     {
-                        newValue = null;
+                        result ??= new JsonArray(array);
+                        result.RemoveAt(j);
+                        j--;
                     }
-                    else
+                    else if (!ReferenceEquals(newValue, array[i]))
                     {
-                        newValue = ConvertNested(field.FieldCollection, obj, field, converters);
+                        result ??= new JsonArray(array);
+                        result[j] = newValue;
                     }
+                }
+
+                return result ?? array;
+            }
+
+            return null;
+        }
+
+        private static IJsonValue? ConvertComponents(IField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonArray array)
+            {
+                JsonArray? result = null;
+
+                for (int i = 0, j = 0; i < array.Count; i++, j++)
+                {
+                    var newValue = ConvertComponent(field, array[i], converters);
 
                     if (newValue == null)
                     {
@@ -258,14 +280,19 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         private static IJsonValue? ConvertComponent(IField field, IJsonValue? value, ValueConverter[] converters)
         {
-            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
+            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type) && field.TryGetResolvedSchema(type.Value, out var schema))
             {
-                var schema = field.GetResolvedSchema(type.Value);
+                return ConvertNested(schema.FieldCollection, obj, null, converters);
+            }
 
-                if (schema != null)
-                {
-                    return ConvertNested(schema.FieldCollection, obj, null, converters);
-                }
+            return null;
+        }
+
+        private static IJsonValue? ConvertArrayItem(IArrayField field, IJsonValue? value, ValueConverter[] converters)
+        {
+            if (value is JsonObject obj)
+            {
+                return ConvertNested(field.FieldCollection, obj, field, converters);
             }
 
             return null;

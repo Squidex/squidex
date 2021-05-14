@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NJsonSchema;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Commands;
