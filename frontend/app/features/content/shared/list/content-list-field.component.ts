@@ -18,7 +18,7 @@ interface State {
     selector: 'sqx-content-list-field',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentListFieldComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
@@ -38,7 +38,7 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            formatted: ''
+            formatted: '',
         });
     }
 

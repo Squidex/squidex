@@ -16,7 +16,7 @@ export class SearchSource implements AutocompleteSource {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly searchService: SearchService
+        private readonly searchService: SearchService,
     ) {
     }
 
@@ -34,9 +34,9 @@ export class SearchSource implements AutocompleteSource {
     styleUrls: ['./search-menu.component.scss'],
     templateUrl: './search-menu.component.html',
     providers: [
-        SearchSource
+        SearchSource,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })
@@ -47,7 +47,7 @@ export class SearchMenuComponent {
     constructor(
         private readonly router: Router,
         private readonly apiUrl: ApiUrlConfig,
-        public readonly searchSource: SearchSource
+        public readonly searchSource: SearchSource,
     ) {
     }
 

@@ -15,15 +15,15 @@ import { ResourceOwner, Router2State } from '@app/framework';
     styleUrls: ['./users-page.component.scss'],
     templateUrl: './users-page.component.html',
     providers: [
-        Router2State
-    ]
+        Router2State,
+    ],
 })
 export class UsersPageComponent extends ResourceOwner implements OnInit {
     public usersFilter = new FormControl();
 
     constructor(
         public readonly usersRoute: Router2State,
-        public readonly usersState: UsersState
+        public readonly usersState: UsersState,
     ) {
         super();
 

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AppDto, AppsState, AuthService, DialogModel, DialogService, fadeAnimation, ModalModel, Types, UIState } from '@app/shared';
 import { GridsterItem } from 'angular-gridster2';
@@ -17,8 +15,8 @@ import { take } from 'rxjs/operators';
     styleUrls: ['./dashboard-config.component.scss'],
     templateUrl: './dashboard-config.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class DashboardConfigComponent implements OnChanges {
     @Input()
@@ -44,7 +42,7 @@ export class DashboardConfigComponent implements OnChanges {
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
         private readonly dialogs: DialogService,
-        private readonly uiState: UIState
+        private readonly uiState: UIState,
     ) {
     }
 
@@ -123,5 +121,5 @@ const DEFAULT_CONFIG: GridsterItem[] = [
     { cols: 2, rows: 1, x: 2, y: 3, type: 'api-traffic', name: 'i18n:dashboard.trafficChart' },
 
     { cols: 1, rows: 1, x: 0, y: 4, type: 'api-traffic-summary', name: 'i18n:dashboard.trafficSummaryCard' },
-    { cols: 2, rows: 1, x: 1, y: 4, type: 'history', name: 'i18n:dashboard.historyCard' }
+    { cols: 2, rows: 1, x: 1, y: 4, type: 'history', name: 'i18n:dashboard.historyCard' },
 ];

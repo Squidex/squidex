@@ -13,12 +13,12 @@ describe('HistoryService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 HistoryService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -28,41 +28,40 @@ describe('HistoryService', () => {
 
     it('should make get request to get history events',
         inject([HistoryService, HttpTestingController], (historyService: HistoryService, httpMock: HttpTestingController) => {
+            let events: ReadonlyArray<HistoryEventDto>;
 
-        let events: ReadonlyArray<HistoryEventDto>;
+            historyService.getHistory('my-app', 'settings.contributors').subscribe(result => {
+                events = result;
+            });
 
-        historyService.getHistory('my-app', 'settings.contributors').subscribe(result => {
-            events = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/history?channel=settings.contributors');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/history?channel=settings.contributors');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush([
-            {
-                actor: 'User1',
-                eventId: '1',
-                eventType: 'Type 1',
-                message: 'Message 1',
-                version: 2,
-                created: '2016-12-12T10:10'
-            },
-            {
-                actor: 'User2',
-                eventId: '2',
-                eventType: 'Type 2',
-                message: 'Message 2',
-                version: 3,
-                created: '2016-12-13T10:10'
-            }
-        ]);
-
-        expect(events!).toEqual(
-            [
-                new HistoryEventDto('1', 'User1', 'Type 1', 'Message 1', DateTime.parseISO('2016-12-12T10:10Z'), new Version('2')),
-                new HistoryEventDto('2', 'User2', 'Type 2', 'Message 2', DateTime.parseISO('2016-12-13T10:10Z'), new Version('3'))
+            req.flush([
+                {
+                    actor: 'User1',
+                    eventId: '1',
+                    eventType: 'Type 1',
+                    message: 'Message 1',
+                    version: 2,
+                    created: '2016-12-12T10:10',
+                },
+                {
+                    actor: 'User2',
+                    eventId: '2',
+                    eventType: 'Type 2',
+                    message: 'Message 2',
+                    version: 3,
+                    created: '2016-12-13T10:10',
+                },
             ]);
-    }));
+
+            expect(events!).toEqual(
+                [
+                    new HistoryEventDto('1', 'User1', 'Type 1', 'Message 1', DateTime.parseISO('2016-12-12T10:10Z'), new Version('2')),
+                    new HistoryEventDto('2', 'User2', 'Type 2', 'Message 2', DateTime.parseISO('2016-12-13T10:10Z'), new Version('3')),
+                ]);
+        }));
 });

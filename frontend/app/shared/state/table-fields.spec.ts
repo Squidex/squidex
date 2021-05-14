@@ -25,7 +25,7 @@ describe('TableFields', () => {
             false,
             {},
             [
-                new RootFieldDto({}, 1, 'string', createProperties('String'), 'invariant')
+                new RootFieldDto({}, 1, 'string', createProperties('String'), 'invariant'),
             ]);
 
     beforeEach(() => {
@@ -34,10 +34,10 @@ describe('TableFields', () => {
 
     const INVALID_CONFIGS = [
         { case: 'empty', fields: [] },
-        { case: 'invalid', fields: ['invalid'] }
+        { case: 'invalid', fields: ['invalid'] },
     ];
 
-    INVALID_CONFIGS.map(test => {
+    INVALID_CONFIGS.forEach(test => {
         it(`should provide default fields if config is ${test.case}`, () => {
             let fields: ReadonlyArray<TableField>;
             let fieldNames: ReadonlyArray<string>;
@@ -47,26 +47,31 @@ describe('TableFields', () => {
 
             const tableFields = new TableFields(uiState.object, schema);
 
-            tableFields.listFields.subscribe(result => fields = result);
-            tableFields.listFieldNames.subscribe(result => fieldNames = result);
+            tableFields.listFields.subscribe(result => {
+                fields = result;
+            });
+
+            tableFields.listFieldNames.subscribe(result => {
+                fieldNames = result;
+            });
 
             expect(fields!).toEqual([
                 MetaFields.lastModifiedByAvatar,
                 schema.fields[0],
                 MetaFields.statusColor,
-                MetaFields.lastModified
+                MetaFields.lastModified,
             ]);
 
             expect(fieldNames!).toEqual([
                 MetaFields.lastModifiedByAvatar,
                 schema.fields[0].name,
                 MetaFields.statusColor,
-                MetaFields.lastModified
+                MetaFields.lastModified,
             ]);
         });
     });
 
-    INVALID_CONFIGS.map(test => {
+    INVALID_CONFIGS.forEach(test => {
         it(`should remove ui state if config is ${test.case}`, () => {
             uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
                 .returns(() => of([]));
@@ -92,15 +97,20 @@ describe('TableFields', () => {
 
         const tableFields = new TableFields(uiState.object, schema);
 
-        tableFields.listFields.subscribe(result => fields = result);
-        tableFields.listFieldNames.subscribe(result => fieldNames = result);
+        tableFields.listFields.subscribe(result => {
+            fields = result;
+        });
+
+        tableFields.listFieldNames.subscribe(result => {
+            fieldNames = result;
+        });
 
         expect(fields!).toEqual([
-            MetaFields.version
+            MetaFields.version,
         ]);
 
         expect(fieldNames!).toEqual([
-            MetaFields.version
+            MetaFields.version,
         ]);
     });
 

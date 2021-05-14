@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -7,7 +7,7 @@
 
 export class UIOptions {
     constructor(
-        private readonly value: any
+        private readonly value: any,
     ) {
     }
 
@@ -58,7 +58,7 @@ export class CurrencyConfig {
     constructor(
         public readonly code: string,
         public readonly symbol: string,
-        public readonly showAfter: boolean = true
+        public readonly showAfter: boolean = true,
     ) {
     }
 }

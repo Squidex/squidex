@@ -10,7 +10,7 @@ import { positionModal, ResourceOwner } from '@app/framework/internal';
 import { timer } from 'rxjs';
 
 @Directive({
-    selector: '[sqxAnchoredTo]'
+    selector: '[sqxAnchoredTo]',
 })
 export class ModalPlacementDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
     private targetElement: Element;
@@ -40,7 +40,7 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
 
     constructor(
         private readonly renderer: Renderer2,
-        private readonly element: ElementRef<Element>
+        private readonly element: ElementRef<Element>,
     ) {
         super();
     }

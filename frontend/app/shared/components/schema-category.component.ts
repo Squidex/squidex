@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  *
@@ -19,9 +18,9 @@ const ITEM_HEIGHT = 3.125;
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchemaCategoryComponent implements OnChanges {
     @Output()
@@ -43,7 +42,7 @@ export class SchemaCategoryComponent implements OnChanges {
     constructor(
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 

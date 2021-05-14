@@ -12,7 +12,7 @@ import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 @Component({
     selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
-    templateUrl: 'assets-ui.component.html'
+    templateUrl: 'assets-ui.component.html',
 })
 export class AssetsUIComponent {
     @Input()

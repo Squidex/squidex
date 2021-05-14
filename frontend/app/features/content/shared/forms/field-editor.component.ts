@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
 @Component({
     selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
-    templateUrl: './field-editor.component.html'
+    templateUrl: './field-editor.component.html',
 })
 export class FieldEditorComponent implements OnChanges {
     @Input()

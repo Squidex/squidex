@@ -15,7 +15,7 @@ import { FocusComponent } from './../forms-helper';
 declare module 'pikaday/pikaday';
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true,
 };
 
 const NO_EMIT = { emitEvent: false };
@@ -30,9 +30,9 @@ interface State {
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
     providers: [
-        SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
     private readonly hideDateButtonsSettings: boolean;
@@ -91,7 +91,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
 
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions) {
         super(changeDetector, {
-            isLocal: true
+            isLocal: true,
         });
 
         this.hideDateButtonsSettings = !!uiOptions.get('hideDateButtons');
@@ -159,7 +159,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
                 this.dateControl.setValue(this.picker.toString('YYYY-MM-DD'));
 
                 this.callTouched();
-            }
+            },
         });
 
         this.updateControls();
@@ -265,7 +265,7 @@ function getLocalizationSettings() {
         localizedValues = {
             months: [],
             weekdays: [],
-            weekdaysShort: []
+            weekdaysShort: [],
         };
 
         const options = { locale: DateHelper.getFnsLocale() };

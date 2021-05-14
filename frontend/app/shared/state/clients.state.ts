@@ -48,7 +48,7 @@ export class ClientsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly clientsService: ClientsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super({ clients: [], version: Version.EMPTY });
     }
@@ -110,7 +110,7 @@ export class ClientsState extends State<Snapshot> {
             clients,
             isLoaded: true,
             isLoading: false,
-            version
+            version,
         }, 'Loading Success / Updated');
     }
 

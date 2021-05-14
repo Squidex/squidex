@@ -13,14 +13,14 @@ import { AddClientForm, ClientsState } from '@app/shared';
     selector: 'sqx-client-add-form',
     styleUrls: ['./client-add-form.component.scss'],
     templateUrl: './client-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClientAddFormComponent {
     public addClientForm = new AddClientForm(this.formBuilder);
 
     constructor(
         private readonly clientsState: ClientsState,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

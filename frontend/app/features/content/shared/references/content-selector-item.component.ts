@@ -14,7 +14,7 @@ import { ContentDto, LanguageDto, SchemaDto } from '@app/shared';
     selector: '[sqxContentSelectorItem]',
     styleUrls: ['./content-selector-item.component.scss'],
     templateUrl: './content-selector-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentSelectorItemComponent {
     @Output()

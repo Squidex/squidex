@@ -13,7 +13,7 @@ import { AppsState } from '@app/shared/state/apps.state';
 import { ROOT_ITEM } from '@app/shared/state/assets.state';
 
 export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetFolderDropdownComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetFolderDropdownComponent), multi: true,
 };
 
 interface State {
@@ -26,11 +26,11 @@ interface State {
     styleUrls: ['./asset-folder-dropdown.component.scss'],
     templateUrl: './asset-folder-dropdown.component.html',
     providers: [
-        SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR
+        SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AssetFolderDropdownComponent extends StatefulControlComponent<State, any> implements OnInit  {
+export class AssetFolderDropdownComponent extends StatefulControlComponent<State, any> implements OnInit {
     @Input()
     public set disabled(value: boolean | null | undefined) {
         this.setDisabledState(value === true);
@@ -40,10 +40,10 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<State
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
     ) {
         super(changeDetector, {
-            assetFolders: []
+            assetFolders: [],
         });
 
         this.own(

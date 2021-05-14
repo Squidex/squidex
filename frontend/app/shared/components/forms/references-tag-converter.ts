@@ -11,7 +11,7 @@ export class ReferencesTagsConverter implements TagConverter {
     public suggestions: ReadonlyArray<TagValue> = [];
 
     constructor(language: LanguageDto, contents: ReadonlyArray<ContentDto>,
-        private readonly localizer: LocalizerService
+        private readonly localizer: LocalizerService,
     ) {
         this.suggestions = this.createTags(language, contents);
     }

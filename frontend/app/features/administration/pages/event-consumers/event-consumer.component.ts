@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: component-selector
-
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
 
@@ -14,7 +12,7 @@ import { EventConsumerDto, EventConsumersState } from '@app/features/administrat
     selector: '[sqxEventConsumer]',
     styleUrls: ['./event-consumer.component.scss'],
     templateUrl: './event-consumer.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventConsumerComponent {
     @Output()
@@ -24,7 +22,7 @@ export class EventConsumerComponent {
     public eventConsumer: EventConsumerDto;
 
     constructor(
-        private readonly eventConsumersState: EventConsumersState
+        private readonly eventConsumersState: EventConsumersState,
     ) {
     }
 

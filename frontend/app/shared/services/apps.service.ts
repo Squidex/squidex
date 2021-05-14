@@ -49,7 +49,7 @@ export class AppDto {
         public readonly canAccessContent: boolean,
         public readonly planName: string | undefined,
         public readonly planUpgrade: string | undefined,
-        public readonly roleProperties: {}
+        public readonly roleProperties: {},
     ) {
         this._links = links;
 
@@ -85,7 +85,7 @@ export class AppSettingsDto {
         public readonly hideScheduler: boolean,
         public readonly patterns: ReadonlyArray<PatternDto>,
         public readonly editors: ReadonlyArray<EditorDto>,
-        public readonly version: Version
+        public readonly version: Version,
     ) {
         this._links = links;
 
@@ -97,7 +97,7 @@ export class PatternDto {
     constructor(
         public readonly name: string,
         public readonly regex: string,
-        public readonly message?: string
+        public readonly message?: string,
     ) {
     }
 }
@@ -105,26 +105,26 @@ export class PatternDto {
 export class EditorDto {
     constructor(
         public readonly name: string,
-        public readonly url: string
+        public readonly url: string,
     ) {
     }
 }
 
 export type UpdateAppSettingsDto =
-    Readonly<{ patterns: ReadonlyArray<PatternDto>, editors: ReadonlyArray<EditorDto>, hideScheduler?: boolean }>;
+    Readonly<{ patterns: ReadonlyArray<PatternDto>; editors: ReadonlyArray<EditorDto>; hideScheduler?: boolean }>;
 
 export type CreateAppDto =
-    Readonly<{ name: string; template?: string; }>;
+    Readonly<{ name: string; template?: string }>;
 
 export type UpdateAppDto =
-    Readonly<{ label?: string, description?: string }>;
+    Readonly<{ label?: string; description?: string }>;
 
 @Injectable()
 export class AppsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -224,7 +224,7 @@ export class AppsService {
                 } else if (Types.is(event, HttpResponse)) {
                     return parseApp(event.body);
                 } else {
-                    throw 'Invalid';
+                    throw new Error('Invalid');
                 }
             }),
             catchError(error => {

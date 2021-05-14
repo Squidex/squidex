@@ -12,7 +12,7 @@ import { LanguageDto, MetaFields, Query, RootFieldDto, TableField, Types } from 
     selector: 'sqx-content-list-header',
     styleUrls: ['./content-list-header.component.scss'],
     templateUrl: './content-list-header.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentListHeaderComponent {
     @Input()

@@ -12,7 +12,7 @@ import { picasso } from '@app/framework/internal';
     selector: 'sqx-avatar',
     styleUrls: ['./avatar.component.scss'],
     templateUrl: './avatar.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvatarComponent implements OnChanges {
     @Input()

@@ -15,8 +15,8 @@ import { ComponentSectionComponent } from './component-section.component';
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class ComponentComponent extends ResourceOwner implements OnChanges {
     @Input()
@@ -44,7 +44,7 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
     public schemasList: ReadonlyArray<SchemaDto>;
 
     constructor(
-        private readonly changeDetector: ChangeDetectorRef
+        private readonly changeDetector: ChangeDetectorRef,
     ) {
         super();
     }

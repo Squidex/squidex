@@ -14,8 +14,8 @@ import { SchemaMustExistPublishedGuard } from './schema-must-exist-published.gua
 describe('SchemaMustExistPublishedGuard', () => {
     const route: any = {
         params: {
-            schemaName: '123'
-        }
+            schemaName: '123',
+        },
     };
 
     let schemasState: IMock<SchemasState>;

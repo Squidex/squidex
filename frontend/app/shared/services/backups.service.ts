@@ -36,7 +36,7 @@ export class BackupDto {
         public readonly stopped: DateTime | null,
         public readonly handledEvents: number,
         public readonly handledAssets: number,
-        public readonly status: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending'
+        public readonly status: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending',
     ) {
         this._links = links;
 
@@ -53,27 +53,27 @@ export class RestoreDto {
         public readonly started: DateTime,
         public readonly stopped: DateTime | null,
         public readonly status: string,
-        public readonly log: ReadonlyArray<string>
+        public readonly log: ReadonlyArray<string>,
     ) {
     }
 }
 
 export type StartRestoreDto =
-    Readonly<{ url: string, newAppName?: string }>;
+    Readonly<{ url: string; newAppName?: string }>;
 
 @Injectable()
 export class BackupsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
     public getBackups(appName: string): Observable<BackupsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
-        return this.http.get<{ items: any[], _links: {} } & Resource>(url).pipe(
+        return this.http.get<{ items: any[]; _links: {} } & Resource>(url).pipe(
             map(({ items, _links }) => {
                 const backups = items.map(parseBackup);
 
@@ -83,7 +83,7 @@ export class BackupsService {
     }
 
     public getRestore(): Observable<RestoreDto | null> {
-        const url = this.apiUrl.buildUrl(`api/apps/restore`);
+        const url = this.apiUrl.buildUrl('api/apps/restore');
 
         return this.http.get(url).pipe(
             map(body => {
@@ -112,7 +112,7 @@ export class BackupsService {
     }
 
     public postRestore(dto: StartRestoreDto): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/restore`);
+        const url = this.apiUrl.buildUrl('api/apps/restore');
 
         return this.http.post(url, dto).pipe(
             tap(() => {

@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: no-pipe-impure
-
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@app/shared/internal';
 import { Subscription } from 'rxjs';
 
 @Pipe({
     name: 'sqxHistoryMessage',
-    pure: false
+    pure: false,
 })
 export class HistoryMessagePipe implements OnDestroy, PipeTransform {
     private subscription: Subscription;
@@ -22,7 +20,7 @@ export class HistoryMessagePipe implements OnDestroy, PipeTransform {
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
-        private readonly users: UsersProviderService
+        private readonly users: UsersProviderService,
     ) {
     }
 
@@ -44,7 +42,7 @@ export class HistoryMessagePipe implements OnDestroy, PipeTransform {
                 this.subscription.unsubscribe();
             }
 
-            this.subscription =  formatHistoryMessage(event.message, this.users).subscribe(value => {
+            this.subscription = formatHistoryMessage(event.message, this.users).subscribe(value => {
                 this.lastValue = value;
 
                 this.changeDetector.markForCheck();

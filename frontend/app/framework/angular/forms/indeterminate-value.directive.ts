@@ -10,14 +10,14 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 
 export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IndeterminateValueDirective), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IndeterminateValueDirective), multi: true,
 };
 
 @Directive({
     selector: '[sqxIndeterminateValue]',
     providers: [
-        SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR
-    ]
+        SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR,
+    ],
 })
 export class IndeterminateValueDirective implements ControlValueAccessor {
     private callChange = (_: any) => { /* NOOP */ };
@@ -29,7 +29,7 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
 
     constructor(
         private readonly element: ElementRef<HTMLInputElement>,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

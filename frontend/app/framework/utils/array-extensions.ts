@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
+/* eslint-disable */
 
 interface ReadonlyArray<T> {
     replacedBy(field: keyof T, value: T): ReadonlyArray<T>;

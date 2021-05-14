@@ -20,7 +20,7 @@ describe('MarkdownInlinePipe', () => {
         expect(actual).toBe('<em>bold</em>');
     });
 
-    [null, undefined, ''].map(x => {
+    [null, undefined, ''].forEach(x => {
         it('should return empty string for invalid value', () => {
             const actual = new MarkdownInlinePipe().transform(x);
 
@@ -42,7 +42,7 @@ describe('MarkdownPipe', () => {
         expect(actual).toBe('<p><em>bold</em></p>\n');
     });
 
-    [null, undefined, ''].map(x => {
+    [null, undefined, ''].forEach(x => {
         it('should return empty string for invalid value', () => {
             const actual = new MarkdownPipe().transform(x);
 

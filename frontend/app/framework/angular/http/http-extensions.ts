@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable no-inner-declarations */
+
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { ErrorDto, Types, Version, Versioned } from '@app/framework/internal';
 import { Observable, throwError } from 'rxjs';

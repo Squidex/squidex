@@ -13,12 +13,12 @@ describe('UsagesService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 UsagesService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -28,124 +28,120 @@ describe('UsagesService', () => {
 
     it('should make get request to get calls usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
+            let usages: CallsUsageDto;
 
-        let usages: CallsUsageDto;
+            usagesService.getCallsUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
+                usages = result;
+            });
 
-        usagesService.getCallsUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
-            usages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/calls/2017-10-12/2017-10-13');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/calls/2017-10-12/2017-10-13');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({
+                allowedBytes: 512,
+                allowedCalls: 100,
+                blockingCalls: 200,
+                totalBytes: 1024,
+                totalCalls: 40,
+                monthCalls: 5120,
+                monthBytes: 256,
+                averageElapsedMs: 12.4,
+                details: {
+                    category1: [
+                        {
+                            date: '2017-10-12',
+                            totalBytes: 10,
+                            totalCalls: 130,
+                            averageElapsedMs: 12.3,
+                        },
+                        {
+                            date: '2017-10-13',
+                            totalBytes: 13,
+                            totalCalls: 170,
+                            averageElapsedMs: 33.3,
+                        },
+                    ],
+                },
+            });
 
-        req.flush({
-            allowedBytes: 512,
-            allowedCalls: 100,
-            blockingCalls: 200,
-            totalBytes: 1024,
-            totalCalls: 40,
-            monthCalls: 5120,
-            monthBytes: 256,
-            averageElapsedMs: 12.4,
-            details: {
-                category1: [
-                    {
-                        date: '2017-10-12',
-                        totalBytes: 10,
-                        totalCalls: 130,
-                        averageElapsedMs: 12.3
-                    },
-                    {
-                        date: '2017-10-13',
-                        totalBytes: 13,
-                        totalCalls: 170,
-                        averageElapsedMs: 33.3
-                    }
-                ]
-            }
-        });
-
-        expect(usages!).toEqual(
-            new CallsUsageDto(512, 100, 200, 1024, 40, 256, 5120, 12.4, {
-                category1: [
-                    new CallsUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130, 12.3),
-                    new CallsUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170, 33.3)
-                ]
-            })
-        );
-    }));
+            expect(usages!).toEqual(
+                new CallsUsageDto(512, 100, 200, 1024, 40, 256, 5120, 12.4, {
+                    category1: [
+                        new CallsUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130, 12.3),
+                        new CallsUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170, 33.3),
+                    ],
+                }),
+            );
+        }));
 
     it('should make get request to get storage usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
+            let usages: ReadonlyArray<StorageUsagePerDateDto>;
 
-        let usages: ReadonlyArray<StorageUsagePerDateDto>;
+            usagesService.getStorageUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
+                usages = result;
+            });
 
-        usagesService.getStorageUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
-            usages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/storage/2017-10-12/2017-10-13');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/storage/2017-10-12/2017-10-13');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush([
-            {
-                date: '2017-10-12',
-                totalCount: 10,
-                totalSize: 130
-            },
-            {
-                date: '2017-10-13',
-                totalCount: 13,
-                totalSize: 170
-            }
-        ]);
-
-        expect(usages!).toEqual(
-            [
-                new StorageUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130),
-                new StorageUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170)
+            req.flush([
+                {
+                    date: '2017-10-12',
+                    totalCount: 10,
+                    totalSize: 130,
+                },
+                {
+                    date: '2017-10-13',
+                    totalCount: 13,
+                    totalSize: 170,
+                },
             ]);
-    }));
+
+            expect(usages!).toEqual(
+                [
+                    new StorageUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130),
+                    new StorageUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170),
+                ]);
+        }));
 
     it('should make get request to get today storage',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
+            let usages: CurrentStorageDto;
 
-        let usages: CurrentStorageDto;
+            usagesService.getTodayStorage('my-app').subscribe(result => {
+                usages = result;
+            });
 
-        usagesService.getTodayStorage('my-app').subscribe(result => {
-            usages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/storage/today');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/storage/today');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({ size: 130, maxAllowed: 150 });
 
-        req.flush({ size: 130, maxAllowed: 150 });
-
-        expect(usages!).toEqual(new CurrentStorageDto(130, 150));
-    }));
+            expect(usages!).toEqual(new CurrentStorageDto(130, 150));
+        }));
 
     it('should make get request to get log',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
+            let url: string;
 
-        let url: string;
+            usagesService.getLog('my-app').subscribe(result => {
+                url = result;
+            });
 
-        usagesService.getLog('my-app').subscribe(result => {
-            url = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/log');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/log');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({ downloadUrl: 'download/url' });
 
-        req.flush({ downloadUrl: 'download/url' });
-
-        expect(url!).toEqual('download/url');
-    }));
+            expect(url!).toEqual('download/url');
+        }));
 });

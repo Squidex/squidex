@@ -13,7 +13,7 @@ import { FieldDto, MathHelper } from '@app/shared';
     selector: 'sqx-content-value-editor',
     styleUrls: ['./content-value-editor.component.scss'],
     templateUrl: './content-value-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentValueEditorComponent {
     @Input()

@@ -30,8 +30,8 @@ describe('RuleMustExistGuard', () => {
 
         const route: any = {
             params: {
-                ruleId: '123'
-            }
+                ruleId: '123',
+            },
         };
 
         ruleGuard.canActivate(route).subscribe(x => {
@@ -51,8 +51,8 @@ describe('RuleMustExistGuard', () => {
 
         const route: any = {
             params: {
-                ruleId: '123'
-            }
+                ruleId: '123',
+            },
         };
 
         ruleGuard.canActivate(route).subscribe(x => {
@@ -72,8 +72,8 @@ describe('RuleMustExistGuard', () => {
 
         const route: any = {
             params: {
-                ruleId: undefined
-            }
+                ruleId: undefined,
+            },
         };
 
         ruleGuard.canActivate(route).subscribe(x => {
@@ -93,8 +93,8 @@ describe('RuleMustExistGuard', () => {
 
         const route: any = {
             params: {
-                ruleId: 'new'
-            }
+                ruleId: 'new',
+            },
         };
 
         ruleGuard.canActivate(route).subscribe(x => {

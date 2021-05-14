@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     selector: 'sqx-notifications-menu',
     styleUrls: ['./notifications-menu.component.scss'],
     templateUrl: './notifications-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsMenuComponent {
 }

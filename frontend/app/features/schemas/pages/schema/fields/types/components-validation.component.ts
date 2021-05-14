@@ -12,7 +12,7 @@ import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/sh
 @Component({
     selector: 'sqx-components-validation',
     styleUrls: ['components-validation.component.scss'],
-    templateUrl: 'components-validation.component.html'
+    templateUrl: 'components-validation.component.html',
 })
 export class ComponentsValidationComponent {
     @Input()
@@ -25,7 +25,7 @@ export class ComponentsValidationComponent {
     public properties: ReferencesFieldPropertiesDto;
 
     constructor(
-        public readonly schemasSource: SchemaTagSource
+        public readonly schemasSource: SchemaTagSource,
     ) {
     }
 }

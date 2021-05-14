@@ -21,7 +21,7 @@ export class CallsUsageDto {
         public readonly monthBytes: number,
         public readonly monthCalls: number,
         public readonly averageElapsedMs: number,
-        public readonly details: { [category: string]: ReadonlyArray<CallsUsagePerDateDto> }
+        public readonly details: { [category: string]: ReadonlyArray<CallsUsagePerDateDto> },
     ) {
     }
 }
@@ -31,7 +31,7 @@ export class CallsUsagePerDateDto {
         public readonly date: DateTime,
         public readonly totalBytes: number,
         public readonly totalCalls: number,
-        public readonly averageElapsedMs: number
+        public readonly averageElapsedMs: number,
     ) {
     }
 }
@@ -40,7 +40,7 @@ export class StorageUsagePerDateDto {
     constructor(
         public readonly date: DateTime,
         public readonly totalCount: number,
-        public readonly totalSize: number
+        public readonly totalSize: number,
     ) {
     }
 }
@@ -48,7 +48,7 @@ export class StorageUsagePerDateDto {
 export class CurrentStorageDto {
     constructor(
         public readonly size: number,
-        public readonly maxAllowed: number
+        public readonly maxAllowed: number,
     ) {
     }
 }
@@ -57,7 +57,7 @@ export class CurrentStorageDto {
 export class UsagesService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 

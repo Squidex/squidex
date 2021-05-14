@@ -8,12 +8,12 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { SchemaDto, SchemasState } from '@app/shared';
 
-type State = { fieldsInLists: ReadonlyArray<string>, fieldsInReferences: ReadonlyArray<string> };
+type State = { fieldsInLists: ReadonlyArray<string>; fieldsInReferences: ReadonlyArray<string> };
 
 @Component({
     selector: 'sqx-schema-ui-form',
     styleUrls: ['./schema-ui-form.component.scss'],
-    templateUrl: './schema-ui-form.component.html'
+    templateUrl: './schema-ui-form.component.html',
 })
 export class SchemaUIFormComponent implements OnChanges {
     @Input()
@@ -25,11 +25,11 @@ export class SchemaUIFormComponent implements OnChanges {
 
     public state: State = {
         fieldsInLists: [],
-        fieldsInReferences: []
+        fieldsInReferences: [],
     };
 
     constructor(
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 
@@ -38,7 +38,7 @@ export class SchemaUIFormComponent implements OnChanges {
 
         this.state = {
             fieldsInLists: this.schema.fieldsInLists,
-            fieldsInReferences: this.schema.fieldsInReferences
+            fieldsInReferences: this.schema.fieldsInReferences,
         };
     }
 

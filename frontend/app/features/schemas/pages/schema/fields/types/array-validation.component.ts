@@ -12,7 +12,7 @@ import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared'
 @Component({
     selector: 'sqx-array-validation',
     styleUrls: ['array-validation.component.scss'],
-    templateUrl: 'array-validation.component.html'
+    templateUrl: 'array-validation.component.html',
 })
 export class ArrayValidationComponent {
     @Input()
@@ -25,7 +25,7 @@ export class ArrayValidationComponent {
     public properties: ArrayFieldPropertiesDto;
 
     constructor(
-        public readonly schemasSource: SchemaTagSource
+        public readonly schemasSource: SchemaTagSource,
     ) {
     }
 }

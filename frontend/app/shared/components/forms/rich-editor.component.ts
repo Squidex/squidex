@@ -5,16 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: prefer-for-of
-
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, LocalizerService, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 
-declare var tinymce: any;
+declare const tinymce: any;
 
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true,
 };
 
 @Component({
@@ -22,9 +20,9 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
     providers: [
-        SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
@@ -50,7 +48,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService,
-        private readonly localizer: LocalizerService
+        private readonly localizer: LocalizerService,
     ) {
         super(changeDetector, {});
     }
@@ -90,9 +88,10 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         }
 
         this.assetsDialog.show();
-    }
+    };
 
     private getEditorOptions(target: any): any {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
         return {
@@ -118,7 +117,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                     onAction: self.showSelector,
                     icon: 'gallery',
                     text: '',
-                    tooltip: this.localizer.getOrKey('assets.insertAssets')
+                    tooltip: this.localizer.getOrKey('assets.insertAssets'),
                 });
 
                 editor.on('init', () => {
@@ -152,6 +151,8 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                     } else {
                         return false;
                     }
+
+                    return undefined;
                 });
 
                 editor.on('drop', (event: DragEvent) => {
@@ -181,7 +182,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                 });
             },
 
-            target
+            target,
         };
     }
 
@@ -239,7 +240,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         this.tinyEditor.execCommand('mceInsertContent', false, uploadText);
 
         const replaceText = (replacement: string) => {
-            const content =  this.tinyEditor.getContent().replace(uploadText, replacement);
+            const content = this.tinyEditor.getContent().replace(uploadText, replacement);
 
             this.tinyEditor.setContent(content);
         };
@@ -247,7 +248,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         this.assetUploader.uploadFile(file, undefined, this.folderId)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                        replaceText(this.buildMarkup(asset));
+                    replaceText(this.buildMarkup(asset));
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {
@@ -288,5 +289,5 @@ const DEFAULT_PROPS = {
     max_height: 800,
     removed_menuitems: 'newdocument',
     resize: true,
-    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets'
+    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets',
 };

@@ -18,9 +18,9 @@ interface State {
     styleUrls: ['./content-summary-card.component.scss'],
     templateUrl: './content-summary-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentSummaryCardComponent extends StatefulComponent<State> implements OnInit {
     @Input()
@@ -30,10 +30,10 @@ export class ContentSummaryCardComponent extends StatefulComponent<State> implem
     public options: any;
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly contentsService: ContentsService
+        private readonly contentsService: ContentsService,
     ) {
         super(changeDetector, {
-            itemCount: 0
+            itemCount: 0,
         });
     }
 

@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
+
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TagItem, TagsSelected } from '@app/shared';
 
@@ -12,7 +14,7 @@ import { TagItem, TagsSelected } from '@app/shared';
     selector: 'sqx-asset-tags',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetTagsComponent {
     @Output()

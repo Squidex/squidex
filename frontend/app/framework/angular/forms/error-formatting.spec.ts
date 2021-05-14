@@ -35,14 +35,14 @@ describe('formatErrors', () => {
         'validation.uniquestrings': '{field|upper} must not contain duplicate values.',
         'validation.validarrayvalues': '{field|upper} contains an invalid value: {invalidvalue}.',
         'validation.validdatetime': '{field|upper} is not a valid date time.',
-        'validation.validvalues': '{field|upper} is not a valid value.'
+        'validation.validvalues': '{field|upper} is not a valid value.',
     });
 
     it('should format custom', () => {
         const error = formatError(localizer, 'field', 'custom', {
-             errors: [
-                'My Message.'
-            ]
+            errors: [
+                'My Message.',
+            ],
         }, 123);
 
         expect(error).toEqual(['Backend Error: My Message.']);
@@ -50,10 +50,10 @@ describe('formatErrors', () => {
 
     it('should format custom errors', () => {
         const error = formatError(localizer, 'field', 'custom', {
-             errors: [
+            errors: [
                 'My Message1.',
-                'My Message2.'
-            ]
+                'My Message2.',
+            ],
         }, 123);
 
         expect(error).toEqual(['Backend Error: My Message1.', 'Backend Error: My Message2.']);
@@ -61,10 +61,10 @@ describe('formatErrors', () => {
 
     it('should format custom errors without dots', () => {
         const error = formatError(localizer, 'field', 'custom', {
-             errors: [
+            errors: [
                 'My Message1',
-                'My Message2'
-            ]
+                'My Message2',
+            ],
         }, 123);
 
         expect(error).toEqual(['Backend Error: My Message1.', 'Backend Error: My Message2.']);
@@ -202,7 +202,7 @@ describe('formatErrors', () => {
 
         const formGroup = new FormGroup({
             field1: formControl1,
-            field2: formControl2
+            field2: formControl2,
         });
 
         const formError = ValidatorsEx.match('field2', 'i18n:users.passwordConfirmValidationMessage')!(formControl1)!;

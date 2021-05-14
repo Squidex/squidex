@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
- // tslint:disable: readonly-array
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
@@ -25,7 +23,7 @@ export const MetaFields = {
     status: 'meta.status',
     statusColor: 'meta.status.color',
     statusNext: 'meta.status.next',
-    version: 'meta.version'
+    version: 'meta.version',
 };
 
 export type SchemaType = 'Default' | 'Singleton' | 'Component';
@@ -74,7 +72,7 @@ export class SchemaDto {
         public readonly fieldsInReferences: Tags = [],
         public readonly fieldRules: ReadonlyArray<FieldRule> = [],
         public readonly previewUrls = {},
-        public readonly scripts = {}
+        public readonly scripts = {},
     ) {
         this._links = links;
 
@@ -134,7 +132,7 @@ export class SchemaDto {
             'fieldId',
             'parentId',
             'parentFieldId',
-            '_links'
+            '_links',
         ];
 
         const cleanup = (source: any, ...exclude: string[]): any => {
@@ -180,7 +178,7 @@ export class SchemaDto {
 
                 return copy;
             }),
-            type: this.type
+            type: this.type,
         };
 
         return result;
@@ -240,7 +238,7 @@ export class FieldDto {
         public readonly properties: FieldPropertiesDto,
         public readonly isLocked: boolean = false,
         public readonly isHidden: boolean = false,
-        public readonly isDisabled: boolean = false
+        public readonly isDisabled: boolean = false,
     ) {
         this._links = links;
 
@@ -266,7 +264,7 @@ export class RootFieldDto extends FieldDto {
         isLocked: boolean = false,
         isHidden: boolean = false,
         isDisabled: boolean = false,
-        public readonly nested: ReadonlyArray<NestedFieldDto> = []
+        public readonly nested: ReadonlyArray<NestedFieldDto> = [],
     ) {
         super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
@@ -277,7 +275,7 @@ export class NestedFieldDto extends FieldDto {
         public readonly parentId: number,
         isLocked: boolean = false,
         isHidden: boolean = false,
-        isDisabled: boolean = false
+        isDisabled: boolean = false,
     ) {
         super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
@@ -291,7 +289,7 @@ export class SchemaPropertiesDto {
         public readonly contentSidebarUrl?: string,
         public readonly contentEditorUrl?: string,
         public readonly validateOnPublish?: boolean,
-        public readonly tags?: ReadonlyArray<string>
+        public readonly tags?: ReadonlyArray<string>,
     ) {
     }
 }
@@ -299,7 +297,7 @@ export class SchemaPropertiesDto {
 export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
     'Disable',
     'Hide',
-    'Require'
+    'Require',
 ];
 
 type Tags = readonly string[];
@@ -307,8 +305,8 @@ type Tags = readonly string[];
 export type TableField = RootFieldDto | string;
 
 export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
-export type FieldRule = { field: string, action: FieldRuleAction, condition: string };
-export type SchemaCompletions = ReadonlyArray<{ name: string, description: string }>;
+export type FieldRule = { field: string; action: FieldRuleAction; condition: string };
+export type SchemaCompletions = ReadonlyArray<{ name: string; description: string }>;
 
 export type SchemasDto =
     Readonly<{ items: ReadonlyArray<SchemaDto>; canCreate: boolean } & Resource>;
@@ -317,29 +315,29 @@ export type AddFieldDto =
     Readonly<{ name: string; partitioning?: string; properties: FieldPropertiesDto }>;
 
 export type UpdateUIFields =
-    Readonly<{ fieldsInLists?: Tags; fieldsInReferences?: Tags; }>;
+    Readonly<{ fieldsInLists?: Tags; fieldsInReferences?: Tags }>;
 
 export type CreateSchemaDto =
-    Readonly<{ name: string; fields?: ReadonlyArray<RootFieldDto>; category?: string; type?: string; isPublished?: boolean; properties?: SchemaPropertiesDto; }>;
+    Readonly<{ name: string; fields?: ReadonlyArray<RootFieldDto>; category?: string; type?: string; isPublished?: boolean; properties?: SchemaPropertiesDto }>;
 
 export type UpdateSchemaCategoryDto =
-    Readonly<{ name?: string; }>;
+    Readonly<{ name?: string }>;
 
 export type UpdateFieldDto =
-    Readonly<{ properties: FieldPropertiesDto; }>;
+    Readonly<{ properties: FieldPropertiesDto }>;
 
 export type SynchronizeSchemaDto =
-    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; [key: string]: any; }>;
+    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; [key: string]: any }>;
 
 export type UpdateSchemaDto =
-    Readonly<{ label?: string; hints?: string; contentsSidebarUrl?: string; contentSidebarUrl?: string; contentEditorUrl?: string; validateOnPublish?: boolean; tags?: Tags; }>;
+    Readonly<{ label?: string; hints?: string; contentsSidebarUrl?: string; contentSidebarUrl?: string; contentEditorUrl?: string; validateOnPublish?: boolean; tags?: Tags }>;
 
 @Injectable()
 export class SchemasService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 

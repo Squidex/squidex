@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
@@ -22,15 +20,15 @@ const routes: Routes = [
                 children: [
                     {
                         path: 'event-consumers',
-                        component: EventConsumersPageComponent
+                        component: EventConsumersPageComponent,
                     },
                     {
                         path: 'cluster',
-                        component: ClusterPageComponent
+                        component: ClusterPageComponent,
                     },
                     {
                         path: 'restore',
-                        component: RestorePageComponent
+                        component: RestorePageComponent,
                     },
                     {
                         path: 'users',
@@ -39,21 +37,21 @@ const routes: Routes = [
                             {
                                 path: ':userId',
                                 component: UserPageComponent,
-                                canActivate: [UserMustExistGuard]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
+                                canActivate: [UserMustExistGuard],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     declarations: [
         AdministrationAreaComponent,
@@ -63,14 +61,14 @@ const routes: Routes = [
         RestorePageComponent,
         UserComponent,
         UserPageComponent,
-        UsersPageComponent
+        UsersPageComponent,
     ],
     providers: [
         EventConsumersService,
         EventConsumersState,
         UserMustExistGuard,
         UsersService,
-        UsersState
-    ]
+        UsersState,
+    ],
 })
 export class SqxFeatureAdministrationModule {}

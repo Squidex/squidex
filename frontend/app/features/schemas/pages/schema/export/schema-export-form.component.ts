@@ -12,7 +12,7 @@ import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 @Component({
     selector: 'sqx-schema-export-form',
     styleUrls: ['./schema-export-form.component.scss'],
-    templateUrl: './schema-export-form.component.html'
+    templateUrl: './schema-export-form.component.html',
 })
 export class SchemaExportFormComponent implements OnChanges {
     @Input()
@@ -24,7 +24,7 @@ export class SchemaExportFormComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 

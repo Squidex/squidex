@@ -17,7 +17,7 @@ describe('ClientsState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const oldClients = createClients(1, 2);
@@ -134,7 +134,6 @@ describe('ClientsState', () => {
         function expectNewClients(updated: ClientsPayload) {
             expect(clientsState.snapshot.clients).toEqual(updated.items);
             expect(clientsState.snapshot.version).toEqual(newVersion);
-
         }
     });
 });

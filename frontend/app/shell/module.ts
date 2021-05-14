@@ -1,11 +1,9 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
-// tslint:disable: max-line-length
 
 import { NgModule } from '@angular/core';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
@@ -14,14 +12,14 @@ import { AppAreaComponent, AppsMenuComponent, ForbiddenPageComponent, HomePageCo
 @NgModule({
     imports: [
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     exports: [
         AppAreaComponent,
         HomePageComponent,
         ForbiddenPageComponent,
         InternalAreaComponent,
-        NotFoundPageComponent
+        NotFoundPageComponent,
     ],
     declarations: [
         AppAreaComponent,
@@ -36,7 +34,7 @@ import { AppAreaComponent, AppsMenuComponent, ForbiddenPageComponent, HomePageCo
         NotFoundPageComponent,
         NotificationsMenuComponent,
         ProfileMenuComponent,
-        SearchMenuComponent
-    ]
+        SearchMenuComponent,
+    ],
 })
 export class SqxShellModule { }

@@ -18,7 +18,7 @@ describe('SchemasState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const schema1 = createSchema(1);
@@ -28,9 +28,9 @@ describe('SchemasState', () => {
         canCreate: true,
         items: [
             schema1,
-            schema2
+            schema2,
         ],
-        _links: {}
+        _links: {},
     };
 
     let dialogs: IMock<DialogService>;
@@ -64,7 +64,7 @@ describe('SchemasState', () => {
                 { displayName: 'i18n:common.components', schemas: [] },
                 { displayName: 'i18n:common.schemas', schemas: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] }
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
             ]);
 
             schemasService.verifyAll();
@@ -88,7 +88,7 @@ describe('SchemasState', () => {
                 { displayName: 'i18n:common.schemas', schemas: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] }
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] },
             ]);
 
             schemasService.verifyAll();
@@ -157,7 +157,7 @@ describe('SchemasState', () => {
                 { displayName: 'i18n:common.schemas', schemas: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] }
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] },
             ]);
         });
 
@@ -170,7 +170,7 @@ describe('SchemasState', () => {
                 { displayName: 'i18n:common.components', schemas: [] },
                 { displayName: 'i18n:common.schemas', schemas: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] }
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
             ]);
         });
 
@@ -184,7 +184,7 @@ describe('SchemasState', () => {
                 { displayName: 'i18n:common.schemas', schemas: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] }
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] },
             ]);
 
             schemasState.removeCategory('schema-category3');
@@ -195,7 +195,7 @@ describe('SchemasState', () => {
                 { displayName: 'i18n:common.components', schemas: [] },
                 { displayName: 'i18n:common.schemas', schemas: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] }
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
             ]);
         });
 

@@ -30,8 +30,8 @@ describe('ContentMustExistGuard', () => {
 
         const route: any = {
             params: {
-                contentId: '123'
-            }
+                contentId: '123',
+            },
         };
 
         contentGuard.canActivate(route).subscribe(x => {
@@ -51,8 +51,8 @@ describe('ContentMustExistGuard', () => {
 
         const route: any = {
             params: {
-                contentId: '123'
-            }
+                contentId: '123',
+            },
         };
 
         contentGuard.canActivate(route).subscribe(x => {
@@ -72,8 +72,8 @@ describe('ContentMustExistGuard', () => {
 
         const route: any = {
             params: {
-                contentId: undefined
-            }
+                contentId: undefined,
+            },
         };
 
         contentGuard.canActivate(route).subscribe(x => {
@@ -93,8 +93,8 @@ describe('ContentMustExistGuard', () => {
 
         const route: any = {
             params: {
-                contentId: 'new'
-            }
+                contentId: 'new',
+            },
         };
 
         contentGuard.canActivate(route).subscribe(x => {

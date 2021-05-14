@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: component-selector
-
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsDto, fadeAnimation, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
 
@@ -15,9 +13,9 @@ import { ActionsDto, fadeAnimation, ModalModel, RuleDto, RulesState, TriggersDto
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RuleComponent {
     @Input()
@@ -36,7 +34,7 @@ export class RuleComponent {
     }
 
     constructor(
-        private readonly rulesState: RulesState
+        private readonly rulesState: RulesState,
     ) {
     }
 

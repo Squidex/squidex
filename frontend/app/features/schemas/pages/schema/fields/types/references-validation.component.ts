@@ -12,7 +12,7 @@ import { FieldDto, LanguageDto, ReferencesFieldPropertiesDto, SchemaTagSource } 
 @Component({
     selector: 'sqx-references-validation',
     styleUrls: ['references-validation.component.scss'],
-    templateUrl: 'references-validation.component.html'
+    templateUrl: 'references-validation.component.html',
 })
 export class ReferencesValidationComponent {
     @Input()
@@ -31,7 +31,7 @@ export class ReferencesValidationComponent {
     public isLocalizable?: boolean | null;
 
     constructor(
-        public readonly schemasSource: SchemaTagSource
+        public readonly schemasSource: SchemaTagSource,
     ) {
     }
 }

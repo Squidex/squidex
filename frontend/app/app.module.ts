@@ -1,10 +1,12 @@
-
 /*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
+
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
 
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -78,10 +80,10 @@ function configLocalizerService() {
         SqxFrameworkModule.forRoot(),
         SqxSharedModule.forRoot(),
         SqxShellModule,
-        routing
+        routing,
     ],
     declarations: [
-        AppComponent
+        AppComponent,
     ],
     providers: [
         { provide: ApiUrlConfig, useFactory: configApiUrl },
@@ -89,15 +91,16 @@ function configLocalizerService() {
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
         { provide: LocalizerService, useFactory: configLocalizerService },
         { provide: TitlesConfig, useFactory: configTitles },
-        { provide: UIOptions, useFactory: configUIOptions }
+        { provide: UIOptions, useFactory: configUIOptions },
     ],
-    entryComponents: [AppComponent]
+    entryComponents: [AppComponent],
 })
 export class AppModule {
     public ngDoBootstrap(appRef: ApplicationRef) {
         try {
             appRef.bootstrap(AppComponent);
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.log('Application element not found');
         }
     }

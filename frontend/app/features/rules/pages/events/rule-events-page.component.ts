@@ -14,8 +14,8 @@ import { ResourceOwner, Router2State, RuleEventDto, RuleEventsState } from '@app
     styleUrls: ['./rule-events-page.component.scss'],
     templateUrl: './rule-events-page.component.html',
     providers: [
-        Router2State
-    ]
+        Router2State,
+    ],
 })
 export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
     public selectedEventId: string | null = null;
@@ -23,7 +23,7 @@ export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
     constructor(
         private readonly route: ActivatedRoute,
         public readonly ruleEventsRoute: Router2State,
-        public readonly ruleEventsState: RuleEventsState
+        public readonly ruleEventsState: RuleEventsState,
     ) {
         super();
     }

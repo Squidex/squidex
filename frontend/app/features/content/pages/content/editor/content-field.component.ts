@@ -13,7 +13,7 @@ import { map } from 'rxjs/operators';
 @Component({
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
-    templateUrl: './content-field.component.html'
+    templateUrl: './content-field.component.html',
 })
 export class ContentFieldComponent implements OnChanges {
     @Output()
@@ -67,7 +67,7 @@ export class ContentFieldComponent implements OnChanges {
     constructor(
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
-        private readonly translations: TranslationsService
+        private readonly translations: TranslationsService,
     ) {
     }
 
@@ -82,7 +82,7 @@ export class ContentFieldComponent implements OnChanges {
             this.isDifferent =
                 combineLatest([
                     value$(this.formModel.form),
-                    value$(this.formModelCompare!.form)
+                    value$(this.formModelCompare!.form),
                 ]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs, true)));
         }
     }

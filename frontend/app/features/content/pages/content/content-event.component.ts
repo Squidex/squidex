@@ -12,7 +12,7 @@ import { ContentDto, HistoryEventDto } from '@app/shared';
     selector: 'sqx-content-event',
     styleUrls: ['./content-event.component.scss'],
     templateUrl: './content-event.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentEventComponent implements OnChanges {
     @Output()

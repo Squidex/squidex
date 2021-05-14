@@ -5,9 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-// tslint:disable: prefer-for-of
-
 import { ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types, ValidatorsEx } from '@app/framework';
 import { ContentDto, ContentReferencesValue } from './../services/contents.service';
@@ -17,14 +14,14 @@ import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldProperti
 
 export class HtmlValue {
     constructor(
-        public readonly html: string
+        public readonly html: string,
     ) {
     }
 }
 
 export type FieldValue = string | HtmlValue;
 
-export function getContentValue(content: ContentDto, language: LanguageDto, field: RootFieldDto, allowHtml = true): { value: any, formatted: FieldValue } {
+export function getContentValue(content: ContentDto, language: LanguageDto, field: RootFieldDto, allowHtml = true): { value: any; formatted: FieldValue } {
     if (content.referenceData) {
         const reference = content.referenceData[field.name];
 
@@ -66,6 +63,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                     }
                 }
             } else {
+                // eslint-disable-next-line no-multi-assign
                 value = formatted = '-';
             }
 
@@ -101,7 +99,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
 export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     private constructor(
         private readonly value: any,
-        private readonly allowHtml: boolean
+        private readonly allowHtml: boolean,
     ) {
     }
 
@@ -229,7 +227,7 @@ export function thumbnail(url: string, width?: number, height?: number) {
 
 export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<ValidatorFn>> {
     private constructor(
-        private readonly isOptional: boolean
+        private readonly isOptional: boolean,
     ) {
     }
 
@@ -245,7 +243,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
     public visitArray(properties: ArrayFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
         return validators;
@@ -253,7 +251,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
     public visitAssets(properties: AssetsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
         if (!properties.allowDuplicates) {
@@ -273,7 +271,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
     public visitComponents(properties: ComponentsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
         return validators;
@@ -293,7 +291,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
     public visitNumber(properties: NumberFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.between(properties.minValue, properties.maxValue)
+            ValidatorsEx.between(properties.minValue, properties.maxValue),
         ];
 
         if (properties.allowedValues && properties.allowedValues.length > 0) {
@@ -311,7 +309,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
     public visitReferences(properties: ReferencesFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
         if (!properties.allowDuplicates) {
@@ -323,7 +321,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
     public visitString(properties: StringFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minLength, properties.maxLength)
+            ValidatorsEx.betweenLength(properties.minLength, properties.maxLength),
         ];
 
         if (properties.pattern && properties.pattern.length > 0) {
@@ -345,7 +343,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 
     public visitTags(properties: TagsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
         if (properties.allowedValues && properties.allowedValues.length > 0) {
@@ -365,7 +363,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
 export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     private constructor(
         private readonly partitionKey: string,
-        private readonly now?: DateTime
+        private readonly now?: DateTime,
     ) {
     }
 

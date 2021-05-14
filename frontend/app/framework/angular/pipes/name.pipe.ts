@@ -10,10 +10,10 @@ import { StringHelper } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxDisplayName',
-    pure: true
+    pure: true,
 })
 export class DisplayNamePipe implements PipeTransform {
-    public transform(value: any, field1 = 'label', field2  = 'name'): any {
+    public transform(value: any, field1 = 'label', field2 = 'name'): any {
         if (!value) {
             return '';
         }

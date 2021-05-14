@@ -15,12 +15,12 @@ import { map } from 'rxjs/operators';
     selector: 'sqx-sidebar-page',
     styleUrls: ['./sidebar-page.component.scss'],
     templateUrl: './sidebar-page.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarPageComponent {
     public url = combineLatest([
         this.schemasState.selectedSchema.pipe(defined()),
-        this.contentsState.selectedContent
+        this.contentsState.selectedContent,
     ]).pipe(map(([schema, content]) => {
         const url =
             content ?
@@ -32,7 +32,7 @@ export class SidebarPageComponent {
 
     constructor(
         public readonly contentsState: ContentsState,
-        public readonly schemasState: SchemasState
+        public readonly schemasState: SchemasState,
     ) {
     }
 }

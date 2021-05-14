@@ -13,7 +13,7 @@ import { catchError } from 'rxjs/operators';
 @Injectable()
 export class HelpService {
     constructor(
-        private readonly http: HttpClient
+        private readonly http: HttpClient,
     ) {
     }
 

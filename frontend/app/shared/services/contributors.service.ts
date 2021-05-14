@@ -26,7 +26,7 @@ export class ContributorDto {
         public readonly contributorId: string,
         public readonly contributorName: string,
         public readonly contributorEmail: string,
-        public readonly role: string
+        public readonly role: string,
     ) {
         this._links = links;
 
@@ -39,17 +39,17 @@ export type ContributorsDto =
     Versioned<ContributorsPayload>;
 
 export type ContributorsPayload =
-    Readonly<{ items: ReadonlyArray<ContributorDto>; maxContributors: number; canCreate: boolean; } & Resource>;
+    Readonly<{ items: ReadonlyArray<ContributorDto>; maxContributors: number; canCreate: boolean } & Resource>;
 
 export type AssignContributorDto =
-    Readonly<{ contributorId: string; role: string; invite?: boolean; }>;
+    Readonly<{ contributorId: string; role: string; invite?: boolean }>;
 
 @Injectable()
 export class ContributorsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 

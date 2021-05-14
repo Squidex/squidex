@@ -14,8 +14,8 @@ import { SchemaMustExistGuard } from './schema-must-exist.guard';
 describe('SchemaMustExistGuard', () => {
     const route: any = {
         params: {
-            schemaName: '123'
-        }
+            schemaName: '123',
+        },
     };
 
     let schemasState: IMock<SchemasState>;

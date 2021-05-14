@@ -13,14 +13,14 @@ import { AddRoleForm, RolesState } from '@app/shared';
     selector: 'sqx-role-add-form',
     styleUrls: ['./role-add-form.component.scss'],
     templateUrl: './role-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoleAddFormComponent {
     public addRoleForm = new AddRoleForm(this.formBuilder);
 
     constructor(
         private readonly rolesState: RolesState,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

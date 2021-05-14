@@ -55,7 +55,7 @@ describe('FormHelpers', () => {
 
         it('should calculate path for nested control', () => {
             const control = new FormGroup({
-                nested: new FormControl()
+                nested: new FormControl(),
             });
 
             const path = getControlPath(control.get('nested'));
@@ -66,8 +66,8 @@ describe('FormHelpers', () => {
         it('should calculate path for deeply nested control', () => {
             const control = new FormGroup({
                 nested1: new FormGroup({
-                    nested2: new FormControl()
-                })
+                    nested2: new FormControl(),
+                }),
             });
 
             const path = getControlPath(control.get('nested1.nested2'));
@@ -79,9 +79,9 @@ describe('FormHelpers', () => {
             const control = new FormGroup({
                 nested1: new FormArray([
                     new FormGroup({
-                        nested2: new FormControl()
-                    })
-                ])
+                        nested2: new FormControl(),
+                    }),
+                ]),
             });
 
             const path = getControlPath(control.get('nested1.0.nested2'));
@@ -93,9 +93,9 @@ describe('FormHelpers', () => {
             const control = new FormGroup({
                 nested1: new FormArray([
                     new FormGroup({
-                        nested2: new FormControl()
-                    })
-                ])
+                        nested2: new FormControl(),
+                    }),
+                ]),
             });
 
             const path = getControlPath(control.get('nested1.0.nested2'), true);

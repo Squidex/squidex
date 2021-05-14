@@ -1,18 +1,16 @@
- /*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { createProperties, MetaFields, SchemaPropertiesDto } from '@app/shared/internal';
 import { TestValues } from './../state/_test-helpers';
 
 const {
     createField,
-    createSchema
+    createSchema,
 } = TestValues;
 
 describe('SchemaDto', () => {

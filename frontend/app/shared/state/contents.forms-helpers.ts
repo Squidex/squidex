@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable no-useless-return */
+
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -37,7 +39,7 @@ export abstract class Hidden {
 export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extends Hidden {
     constructor(
         public readonly separator: TSeparator | undefined,
-        public readonly fields: ReadonlyArray<TChild>
+        public readonly fields: ReadonlyArray<TChild>,
     ) {
         super();
     }
@@ -53,7 +55,7 @@ export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extend
     }
 }
 
-type Partition = { key: string, isOptional: boolean };
+type Partition = { key: string; isOptional: boolean };
 
 export class PartitionConfig {
     private readonly invariant: ReadonlyArray<Partition> = [{ key: fieldInvariant, isOptional: false }];
@@ -76,7 +78,7 @@ export class PartitionConfig {
     }
 }
 
-type RuleContext = { data: any, itemData?: any, user?: any };
+type RuleContext = { data: any; itemData?: any; user?: any };
 
 export class CompiledRule {
     private readonly function: Function;
@@ -90,9 +92,10 @@ export class CompiledRule {
     }
 
     constructor(
-        private readonly rule: FieldRule
+        private readonly rule: FieldRule,
     ) {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-implied-eval
             this.function = new Function(`return function(user, ctx, data, itemData) { return ${rule.condition} }`)();
         } catch {
             this.function = () => false;
@@ -111,10 +114,10 @@ export class CompiledRule {
 export type AbstractContentFormState = {
     isDisabled?: boolean;
     isHidden?: boolean;
-    isRequired?: boolean
+    isRequired?: boolean;
 };
 
-export interface FormStructure {
+export interface FormGlobals {
     allRules: ReadonlyArray<CompiledRule>;
     partitions: PartitionConfig;
     schema: SchemaDto;
@@ -135,11 +138,11 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
     }
 
     protected constructor(
-        public readonly globals: FormStructure,
+        public readonly globals: FormGlobals,
         public readonly fieldPath: string,
         public readonly field: T,
         public readonly form: TForm,
-        public readonly isOptional: boolean
+        public readonly isOptional: boolean,
     ) {
         super();
 
@@ -152,7 +155,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         const state = {
             isDisabled: this.field.isDisabled || parentState.isDisabled === true,
             isHidden: parentState.isHidden === true,
-            isRequired: this.field.properties.isRequired && !this.isOptional
+            isRequired: this.field.properties.isRequired && !this.isOptional,
         };
 
         if (this.rules) {
@@ -186,11 +189,11 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         this.form.setValue(undefined);
     }
 
-    protected updateCustomState(_context: RuleContext, _state: AbstractContentFormState) {
+    protected updateCustomState(_context: RuleContext, _state: AbstractContentFormState): void {
         return;
     }
 
-    public prepareLoad(_data: any) {
+    public prepareLoad(_data: any): void {
         return;
     }
 }

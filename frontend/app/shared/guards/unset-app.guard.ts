@@ -14,7 +14,7 @@ import { AppsState } from './../state/apps.state';
 @Injectable()
 export class UnsetAppGuard implements CanActivate {
     constructor(
-        private readonly appsState: AppsState
+        private readonly appsState: AppsState,
     ) {
     }
 

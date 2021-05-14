@@ -12,7 +12,7 @@ import { AppLanguageDto, RootFieldDto } from '@app/shared';
     selector: 'sqx-field-languages',
     styleUrls: ['./field-languages.component.scss'],
     templateUrl: './field-languages.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FieldLanguagesComponent {
     @Output()

@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
- // tslint:disable: whitespace
-
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { fadeAnimation, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Language } from './../../language-selector.component';
 
 export const SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => LocalizedInputComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => LocalizedInputComponent), multi: true,
 };
 
 const DEFAULT_LANGUAGE = { iso2Code: 'iv', englishName: 'Invariant' };
@@ -28,12 +26,12 @@ interface State {
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
     providers: [
-        SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR
+        SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR,
     ],
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
     private value: { [key: string]: any } | undefined;
@@ -75,7 +73,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            language: DEFAULT_LANGUAGE
+            language: DEFAULT_LANGUAGE,
         });
     }
 
@@ -99,7 +97,7 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
     }
 
     public unset() {
-        this.value= { ...this.value || {} };
+        this.value = { ...this.value || {} };
 
         delete this.value[this.snapshot.language.iso2Code];
 

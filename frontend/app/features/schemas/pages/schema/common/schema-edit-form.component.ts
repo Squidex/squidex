@@ -12,7 +12,7 @@ import { EditSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 @Component({
     selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
-    templateUrl: './schema-edit-form.component.html'
+    templateUrl: './schema-edit-form.component.html',
 })
 export class SchemaEditFormComponent implements OnChanges {
     @Input()
@@ -24,7 +24,7 @@ export class SchemaEditFormComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 

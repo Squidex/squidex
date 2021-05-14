@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, Version } from '@app/shared';
@@ -19,8 +17,8 @@ import { ContentReferencesComponent } from './references/content-references.comp
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
     private isLoadingContent: boolean;
@@ -46,7 +44,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();
-    }
+    };
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService, appsState: AppsState,
         public readonly contentsState: ContentsState,
@@ -56,7 +54,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly schemasState: SchemasState,
-        private readonly tempService: TempService
+        private readonly tempService: TempService,
     ) {
         super();
 
@@ -64,7 +62,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             apiUrl: apiUrl.buildUrl('api'),
             appId: contentsState.appId,
             appName: appsState.appName,
-            user: authService.user
+            user: authService.user,
         };
     }
 
@@ -104,7 +102,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     this.autoSaveKey = {
                         schemaId: this.schema.id,
                         schemaVersion: this.schema.version,
-                        contentId: content?.id
+                        contentId: content?.id,
                     };
 
                     const dataAutosaved = this.autoSaveService.fetch(this.autoSaveKey);
@@ -139,7 +137,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 if (confirmed) {
                     this.autoSaveService.remove(this.autoSaveKey);
                 }
-            })
+            }),
         );
     }
 

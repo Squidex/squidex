@@ -37,13 +37,13 @@ export class RuleSimulatorState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService
+        private readonly rulesService: RulesService,
     ) {
         super({
             simulatedRuleEvents: [],
             page: 0,
             pageSize: 0,
-            total: 0
+            total: 0,
         }, 'Simulated Rule Events');
     }
 
@@ -74,7 +74,7 @@ export class RuleSimulatorState extends State<Snapshot> {
                     isLoaded: true,
                     isLoading: false,
                     simulatedRuleEvents,
-                    total
+                    total,
                 }, 'Loading Success');
             }),
             finalize(() => {

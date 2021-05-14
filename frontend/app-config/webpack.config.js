@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const webpack = require('webpack'), path = require('path');
 
 const appRoot = path.resolve(__dirname, '..');
@@ -23,8 +25,8 @@ const plugins = {
     NgToolsWebpack: require('@ngtools/webpack'),
     // https://github.com/NMFR/optimize-css-assets-webpack-plugin
     OptimizeCSSAssetsPlugin: require("optimize-css-assets-webpack-plugin"),
-    // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('tslint-webpack-plugin'),
+    // https://webpack.js.org/plugins/eslint-webpack-plugin/
+    ESLintPlugin: require('eslint-webpack-plugin'),
     // https://www.npmjs.com/package/sass-lint-webpack
     SassLintPlugin: require('sass-lint-webpack'),
     // https://www.npmjs.com/package/webpack-bundle-analyzer
@@ -315,19 +317,15 @@ module.exports = function (env) {
             })
         );
 
-        config.plugins.push(
-            new plugins.TsLintPlugin({
-                files: ['./app/**/*.ts'],
-                /**
-                 * Path to a configuration file.
-                 */
-                config: root('tslint.json'),
-                /**
-                 * Wait for linting and fail the build when linting error occur.
-                 */
-                waitForLinting: isProduction
-            })
-        );
+        if (isProduction) {
+            config.plugins.push(
+                new plugins.ESLintPlugin({
+                    files: [
+                        './app/**/*.ts'
+                    ]
+                })
+            );
+        }
     }
 
     if (!isTestCoverage) {

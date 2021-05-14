@@ -17,7 +17,7 @@ export class UsersProviderService {
 
     constructor(
         private readonly usersService: UsersService,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
     ) {
     }
 
@@ -34,6 +34,7 @@ export class UsersProviderService {
 
             (<ConnectableObservable<any>>request).connect();
 
+            // eslint-disable-next-line no-multi-assign
             result = this.caches[id] = request;
         }
 

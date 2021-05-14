@@ -19,7 +19,7 @@ export class SearchResultDto {
     constructor(links: ResourceLinks,
         public readonly name: string,
         public readonly type: string,
-        public readonly label?: string
+        public readonly label?: string,
     ) {
         this._links = links;
 
@@ -31,7 +31,7 @@ export class SearchResultDto {
 export class SearchService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 

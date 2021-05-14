@@ -17,7 +17,7 @@ import { CommentComponent } from './comment.component';
 @Component({
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
-    templateUrl: './comments.component.html'
+    templateUrl: './comments.component.html',
 })
 export class CommentsComponent extends ResourceOwner implements OnChanges {
     @ViewChild('commentsList', { static: false })
@@ -45,7 +45,7 @@ export class CommentsComponent extends ResourceOwner implements OnChanges {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         super();
 

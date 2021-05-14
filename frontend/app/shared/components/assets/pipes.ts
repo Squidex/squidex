@@ -11,11 +11,11 @@ import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } 
 
 @Pipe({
     name: 'sqxAssetUrl',
-    pure: true
+    pure: true,
 })
 export class AssetUrlPipe implements PipeTransform {
     constructor(
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 
@@ -38,17 +38,17 @@ export class AssetUrlPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxAssetPreviewUrl',
-    pure: true
+    pure: true,
 })
 export class AssetPreviewUrlPipe implements PipeTransform {
     constructor(
         private readonly apiUrl: ApiUrlConfig,
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
     ) {
     }
 
     public transform(asset: AssetDto): string {
-        let url =  asset.fullUrl(this.apiUrl, this.authService);
+        let url = asset.fullUrl(this.apiUrl, this.authService);
 
         url = StringHelper.appendToUrl(url, 'version', asset.version);
 
@@ -58,10 +58,10 @@ export class AssetPreviewUrlPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxFileIcon',
-    pure: true
+    pure: true,
 })
 export class FileIconPipe implements PipeTransform {
-    public transform(asset: { mimeType: string, fileType: string }): string {
+    public transform(asset: { mimeType: string; fileType: string }): string {
         let mimeIcon: string;
 
         const mimeParts = asset.mimeType.split('/');
@@ -78,10 +78,10 @@ export class FileIconPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxPreviewable',
-    pure: true
+    pure: true,
 })
 export class PreviewableType implements PipeTransform {
-    public transform(asset: { fileSize: number, fileType: string }): boolean {
+    public transform(asset: { fileSize: number; fileType: string }): boolean {
         return PREVIEW_TYPES.indexOf(asset.fileType) >= 0 && asset.fileSize < 25_000_000;
     }
 }
@@ -94,7 +94,7 @@ const KNOWN_TYPES: ReadonlyArray<string> = [
     'pptx',
     'video',
     'xls',
-    'xlsx'
+    'xlsx',
 ];
 
 const PREVIEW_TYPES: ReadonlyArray<string> = [
@@ -116,5 +116,5 @@ const PREVIEW_TYPES: ReadonlyArray<string> = [
     'xls',
     'xlsx',
     'xps',
-    'zip'
+    'zip',
 ];

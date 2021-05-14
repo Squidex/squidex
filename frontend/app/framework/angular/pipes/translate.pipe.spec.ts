@@ -31,7 +31,7 @@ describe('TranslatePipe', () => {
         const key = {
             translate: () => {
                 return 'translated';
-            }
+            },
         };
 
         const pipe = new TranslatePipe(localizer.object);
@@ -45,7 +45,7 @@ describe('TranslatePipe', () => {
         const key = {
             format: () => {
                 return 'translated';
-            }
+            },
         };
 
         const pipe = new TranslatePipe(localizer.object);

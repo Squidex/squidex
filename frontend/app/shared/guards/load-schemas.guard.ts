@@ -14,7 +14,7 @@ import { SchemasState } from './../state/schemas.state';
 @Injectable()
 export class LoadSchemasGuard implements CanActivate {
     constructor(
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 

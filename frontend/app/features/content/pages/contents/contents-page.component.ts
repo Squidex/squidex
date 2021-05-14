@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
+/* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,11 +19,11 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
     providers: [
-        Router2State
+        Router2State,
     ],
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     @ViewChild('dueTimeSelector', { static: false })
@@ -36,7 +36,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public searchModal = new ModalModel();
 
-    public selectedItems:  { [id: string]: boolean; } = {};
+    public selectedItems: { [id: string]: boolean } = {};
     public selectedAll = false;
     public selectionCount = 0;
     public selectionCanDelete = false;
@@ -53,7 +53,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         combineLatest([
             this.schemasState.selectedSchema.pipe(defined()),
             this.languagesState.isoLanguages,
-            this.contentsState.statuses
+            this.contentsState.statuses,
         ]).pipe(
             map(values => queryModelFromSchema(values[0], values[1], values[2])));
 
@@ -71,7 +71,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly router: Router,
         private readonly schemasState: SchemasState,
         private readonly tempService: TempService,
-        private readonly uiState: UIState
+        private readonly uiState: UIState,
     ) {
         super();
     }

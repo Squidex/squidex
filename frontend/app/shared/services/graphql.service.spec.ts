@@ -13,12 +13,12 @@ describe('GraphQlService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 GraphQlService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -28,20 +28,19 @@ describe('GraphQlService', () => {
 
     it('should make get request to get history events',
         inject([GraphQlService, HttpTestingController], (graphQlService: GraphQlService, httpMock: HttpTestingController) => {
+            let graphQlResult: any = null;
 
-        let graphQlResult: any = null;
+            graphQlService.query('my-app', {}).subscribe(result => {
+                graphQlResult = result;
+            });
 
-        graphQlService.query('my-app', {}).subscribe(result => {
-            graphQlResult = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/graphql');
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/graphql');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({ result: true });
 
-        req.flush({ result: true });
-
-        expect(graphQlResult).toEqual({ result: true });
-    }));
+            expect(graphQlResult).toEqual({ result: true });
+        }));
 });

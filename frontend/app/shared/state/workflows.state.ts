@@ -52,7 +52,7 @@ export class WorkflowsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly workflowsService: WorkflowsService
+        private readonly workflowsService: WorkflowsService,
     ) {
         super({ errors: [], workflows: [], version: Version.EMPTY }, 'Workflows');
     }
@@ -117,7 +117,7 @@ export class WorkflowsState extends State<Snapshot> {
             isLoaded: true,
             isLoading: false,
             version,
-            workflows
+            workflows,
         }, 'Loading Success / Updated');
     }
 

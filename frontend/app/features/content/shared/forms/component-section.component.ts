@@ -13,7 +13,7 @@ import { FieldEditorComponent } from './field-editor.component';
     selector: 'sqx-component-section',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ComponentSectionComponent {
     @Input()

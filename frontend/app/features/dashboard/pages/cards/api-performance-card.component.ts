@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  *
@@ -15,9 +14,9 @@ import { ChartHelpers, ChartOptions } from './shared';
     styleUrls: ['./api-performance-card.component.scss'],
     templateUrl: './api-performance-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiPerformanceCardComponent implements OnChanges {
     @Input()
@@ -51,8 +50,8 @@ export class ApiPerformanceCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(i),
                         borderColor: ChartHelpers.getBorderColor(i),
                         borderWidth: 1,
-                        data: this.usage.details[k].map(x => x.averageElapsedMs)
-                    }))
+                        data: this.usage.details[k].map(x => x.averageElapsedMs),
+                    })),
             };
 
             this.chartSummary = this.usage.averageElapsedMs;

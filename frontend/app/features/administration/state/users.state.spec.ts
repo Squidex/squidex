@@ -234,7 +234,7 @@ describe('UsersState', () => {
         it('should update selected user if reloaded', () => {
             const newUsers = [
                 createUser(1, '_new'),
-                createUser(2, '_new')
+                createUser(2, '_new'),
             ];
 
             usersService.setup(x => x.getUsers(10, 0, undefined))

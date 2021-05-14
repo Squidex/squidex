@@ -15,12 +15,12 @@ import { TestValues } from './_test-helpers';
 describe('RuleEventsState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     const oldRuleEvents = [
-         createRuleEvent(1),
-         createRuleEvent(2)
+        createRuleEvent(1),
+        createRuleEvent(2),
     ];
 
     let dialogs: IMock<DialogService>;

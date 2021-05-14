@@ -13,21 +13,21 @@ import { AppComponent, AppsPageComponent, NewsDialogComponent, OnboardingDialogC
 const routes: Routes = [
     {
         path: '',
-        component: AppsPageComponent
-    }
+        component: AppsPageComponent,
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     declarations: [
         AppComponent,
         AppsPageComponent,
         NewsDialogComponent,
-        OnboardingDialogComponent
-    ]
+        OnboardingDialogComponent,
+    ],
 })
 export class SqxFeatureAppsModule {}

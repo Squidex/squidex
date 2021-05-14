@@ -12,7 +12,7 @@ import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 @Component({
     selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
-    templateUrl: 'assets-validation.component.html'
+    templateUrl: 'assets-validation.component.html',
 })
 export class AssetsValidationComponent {
     @Input()

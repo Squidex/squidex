@@ -17,7 +17,7 @@ interface State {
     selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
@@ -52,10 +52,10 @@ export class CommentComponent extends StatefulComponent<State> implements OnChan
     public editingText: string;
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super(changeDetector, {
-            isEditing: false
+            isEditing: false,
         });
     }
 

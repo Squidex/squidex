@@ -10,12 +10,12 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActionForm, ALL_TRIGGERS, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm } from '@app/shared';
 
-type ComponentState<T> = { type: string; values: any; form: T; };
+type ComponentState<T> = { type: string; values: any; form: T };
 
 @Component({
     selector: 'sqx-rule-page',
     styleUrls: ['./rule-page.component.scss'],
-    templateUrl: './rule-page.component.html'
+    templateUrl: './rule-page.component.html',
 })
 export class RulePageComponent extends ResourceOwner implements OnInit {
     public supportedActions: { [name: string]: RuleElementDto };
@@ -43,7 +43,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
         public readonly schemasState: SchemasState,
         private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         super();
     }
@@ -81,7 +81,6 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
             this.resetAction();
             this.resetTrigger();
         }
-
     }
 
     public selectAction(type: string, values = {}) {

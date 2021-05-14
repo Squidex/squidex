@@ -44,7 +44,7 @@ export function addValidator(form: AbstractControl, validator: ValidatorFn) {
     }
 }
 
-export function getControlPath(control: AbstractControl | undefined | null, apiCompatible = false): string  {
+export function getControlPath(control: AbstractControl | undefined | null, apiCompatible = false): string {
     if (!control || !control.parent) {
         return '';
     }
@@ -142,7 +142,7 @@ export function hasNonCustomError(form: AbstractControl) {
                 return true;
             }
         }
-    } else {
-        return false;
     }
+
+    return false;
 }

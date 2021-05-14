@@ -8,7 +8,7 @@
 import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 
 @Directive({
-    selector: '[sqxTemplateWrapper]'
+    selector: '[sqxTemplateWrapper]',
 })
 export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     @Input()
@@ -26,7 +26,7 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     public view: EmbeddedViewRef<any>;
 
     public constructor(
-        private readonly viewContainer: ViewContainerRef
+        private readonly viewContainer: ViewContainerRef,
     ) {
     }
 
@@ -40,9 +40,9 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
         const { index, context } = this;
 
         const data = {
-            '\$implicit': this.item,
+            $implicit: this.item,
             index,
-            context
+            context,
         };
 
         this.view = this.viewContainer.createEmbeddedView(this.templateRef, data);

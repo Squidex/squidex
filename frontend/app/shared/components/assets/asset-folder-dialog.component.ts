@@ -12,7 +12,7 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
 @Component({
     selector: 'sqx-asset-folder-dialog',
     styleUrls: ['./asset-folder-dialog.component.scss'],
-    templateUrl: './asset-folder-dialog.component.html'
+    templateUrl: './asset-folder-dialog.component.html',
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()
@@ -25,7 +25,7 @@ export class AssetFolderDialogComponent implements OnInit {
 
     constructor(
         private readonly assetsState: AssetsState,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

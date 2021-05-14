@@ -9,12 +9,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'sqxKNumber',
-    pure: true
+    pure: true,
 })
 export class KNumberPipe implements PipeTransform {
     public transform(value: number) {
         if (value > 1000) {
-            value = value / 1000;
+            value /= 1000;
 
             if (value < 10) {
                 value = Math.round(value * 10) / 10;
@@ -33,7 +33,7 @@ export class KNumberPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxFileSize',
-    pure: true
+    pure: true,
 })
 export class FileSizePipe implements PipeTransform {
     public transform(value: number) {
@@ -49,6 +49,6 @@ export function calculateFileSize(value: number, factor = 1024) {
         u++;
     }
 
-    // tslint:disable-next-line: prefer-template
+    // eslint-disable-next-line prefer-template
     return (u ? `${value.toFixed(1)} ` : value) + ' kMGTPEZY'[u] + 'B';
 }

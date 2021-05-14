@@ -11,7 +11,7 @@ import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, 
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesTagsComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesTagsComponent), multi: true,
 };
 
 interface State {
@@ -26,9 +26,9 @@ const NO_EMIT = { emitEvent: false };
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
     providers: [
-        SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR
+        SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
     private readonly itemCount: number;
@@ -54,10 +54,10 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly localizer: LocalizerService
+        private readonly localizer: LocalizerService,
     ) {
         super(changeDetector, {
-            converter: new ReferencesTagsConverter(null!, [], localizer)
+            converter: new ReferencesTagsConverter(null!, [], localizer),
         });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');

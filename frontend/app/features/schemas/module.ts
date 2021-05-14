@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, LoadSchemasGuard, SchemaMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
@@ -29,23 +27,23 @@ const routes: Routes = [
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/schemas'
-                        }
-                    }
-                ]
-            }
-        ]
-    }
+                            helpPage: '05-integrated/schemas',
+                        },
+                    },
+                ],
+            },
+        ],
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     providers: [
-        SchemaMustExistGuard
+        SchemaMustExistGuard,
     ],
     declarations: [
         ArrayValidationComponent,
@@ -87,7 +85,7 @@ const routes: Routes = [
         StringUIComponent,
         StringValidationComponent,
         TagsUIComponent,
-        TagsValidationComponent
-    ]
+        TagsValidationComponent,
+    ],
 })
 export class SqxFeatureSchemasModule {}

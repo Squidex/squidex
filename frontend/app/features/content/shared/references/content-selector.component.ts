@@ -13,8 +13,8 @@ import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDt
     styleUrls: ['./content-selector.component.scss'],
     templateUrl: './content-selector.component.html',
     providers: [
-        ComponentContentsState
-    ]
+        ComponentContentsState,
+    ],
 })
 export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Output()
@@ -43,7 +43,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
 
     public queryModel: QueryModel;
 
-    public selectedItems:  { [id: string]: ContentDto; } = {};
+    public selectedItems: { [id: string]: ContentDto } = {};
     public selectionCount = 0;
     public selectedAll = false;
 
@@ -51,7 +51,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,
         public readonly contentsState: ComponentContentsState,
-        public readonly schemasState: SchemasState
+        public readonly schemasState: SchemasState,
     ) {
         super();
     }

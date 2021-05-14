@@ -11,7 +11,7 @@ import { ALL_TRIGGERS, RuleDto, RuleElementDto, RulesService, RulesState, Schema
 @Component({
     selector: 'sqx-rules-page',
     styleUrls: ['./rules-page.component.scss'],
-    templateUrl: './rules-page.component.html'
+    templateUrl: './rules-page.component.html',
 })
 export class RulesPageComponent implements OnInit {
     public supportedActions: { [name: string]: RuleElementDto };
@@ -20,7 +20,7 @@ export class RulesPageComponent implements OnInit {
     constructor(
         public readonly rulesState: RulesState,
         public readonly rulesService: RulesService,
-        public readonly schemasState: SchemasState
+        public readonly schemasState: SchemasState,
     ) {
     }
 

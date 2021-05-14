@@ -18,7 +18,7 @@ describe('ContributorsState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const allIds: number[] = [];
@@ -161,7 +161,7 @@ describe('ContributorsState', () => {
                     error = err;
 
                     return EMPTY;
-                })
+                }),
             ).subscribe();
 
             expect(error!.message).toBe('i18n:contributors.userNotFound');
@@ -180,7 +180,7 @@ describe('ContributorsState', () => {
                     error = err;
 
                     return EMPTY;
-                })
+                }),
             ).subscribe();
 
             expect(error!.message).toBe('500');

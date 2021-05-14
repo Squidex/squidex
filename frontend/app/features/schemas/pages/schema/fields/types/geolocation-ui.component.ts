@@ -12,7 +12,7 @@ import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 @Component({
     selector: 'sqx-geolocation-ui',
     styleUrls: ['geolocation-ui.component.scss'],
-    templateUrl: 'geolocation-ui.component.html'
+    templateUrl: 'geolocation-ui.component.html',
 })
 export class GeolocationUIComponent {
     @Input()

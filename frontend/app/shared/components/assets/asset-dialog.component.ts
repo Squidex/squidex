@@ -19,7 +19,7 @@ import { ImageFocusPointComponent } from './image-focus-point.component';
 @Component({
     selector: 'sqx-asset-dialog',
     styleUrls: ['./asset-dialog.component.scss'],
-    templateUrl: './asset-dialog.component.html'
+    templateUrl: './asset-dialog.component.html',
 })
 export class AssetDialogComponent implements OnChanges {
     @Output()
@@ -75,7 +75,7 @@ export class AssetDialogComponent implements OnChanges {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
-        public readonly authService: AuthService
+        public readonly authService: AuthService,
     ) {
     }
 

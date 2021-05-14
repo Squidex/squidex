@@ -15,16 +15,16 @@ describe('AnnotateAssetForm', () => {
         slug: 'my-file.png',
         tags: [
             'Tag1',
-            'Tag2'
+            'Tag2',
         ],
         isProtected: false,
         metadata: {
             key1: null,
             key2: 'String',
             key3: 13,
-            key4: true
+            key4: true,
         },
-        fileName: 'My File.png'
+        fileName: 'My File.png',
     };
 
     beforeEach(() => {
@@ -68,7 +68,7 @@ describe('AnnotateAssetForm', () => {
             { name: 'key1', value: '' },
             { name: 'key2', value: 'String' },
             { name: 'key3', value: '13' },
-            { name: 'key4', value: 'true' }
+            { name: 'key4', value: 'true' },
         ]);
     });
 
@@ -93,8 +93,8 @@ describe('AnnotateAssetForm', () => {
     it('should remove previous metadata if loaded', () => {
         const newAsset: any = {
             metadata: {
-                key1: 'Value'
-            }
+                key1: 'Value',
+            },
         };
 
         form.load(newAsset);
@@ -102,7 +102,7 @@ describe('AnnotateAssetForm', () => {
         const metadata = form.metadata.value;
 
         expect(metadata).toEqual([
-            { name: 'key1', value: 'Value' }
+            { name: 'key1', value: 'Value' },
         ]);
     });
 });

@@ -20,7 +20,7 @@ interface State {
     selector: 'sqx-array-item',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArrayItemComponent extends StatefulComponent<State> implements OnChanges {
     @Output()
@@ -70,10 +70,10 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
 
     public title: Observable<string>;
 
-    constructor(changeDetector: ChangeDetectorRef
+    constructor(changeDetector: ChangeDetectorRef,
     ) {
         super(changeDetector, {
-            isCollapsed: false
+            isCollapsed: false,
         });
     }
 

@@ -10,7 +10,7 @@ import { Component } from '@angular/core';
 @Component({
     selector: 'sqx-cluster-area',
     styleUrls: ['./cluster-page.component.scss'],
-    templateUrl: './cluster-page.component.html'
+    templateUrl: './cluster-page.component.html',
 })
 export class ClusterPageComponent {
 }

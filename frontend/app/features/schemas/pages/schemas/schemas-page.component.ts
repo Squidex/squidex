@@ -15,7 +15,7 @@ import { SchemaCloning } from './../messages';
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
-    templateUrl: './schemas-page.component.html'
+    templateUrl: './schemas-page.component.html',
 })
 export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public addSchemaDialog = new DialogModel();
@@ -30,7 +30,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
         private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         super();
     }
@@ -62,7 +62,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
 
         if (value) {
             try {
-               this.schemasState.addCategory(value.name);
+                this.schemasState.addCategory(value.name);
             } finally {
                 this.addCategoryForm.submitCompleted();
             }

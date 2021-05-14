@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable object-curly-newline */
+
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
 import { DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
@@ -24,7 +26,7 @@ interface Snapshot extends ListState<string> {
 }
 
 export type UsersList = ReadonlyArray<UserDto>;
-export type UsersResult = { total: number, users: UsersList };
+export type UsersResult = { total: number; users: UsersList };
 
 @Injectable()
 export class UsersState extends State<Snapshot> {
@@ -51,13 +53,13 @@ export class UsersState extends State<Snapshot> {
 
     constructor(
         private readonly dialogs: DialogService,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
     ) {
         super({
             users: [],
             page: 0,
             pageSize: 10,
-            total: 0
+            total: 0,
         }, 'Users');
     }
 
@@ -119,7 +121,7 @@ export class UsersState extends State<Snapshot> {
                         isLoaded: true,
                         isLoading: false,
                         selectedUser,
-                        total
+                        total,
                     };
                 }, 'Loading Success');
             }),
@@ -190,7 +192,7 @@ export class UsersState extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    public page(paging: { page: number, pageSize: number }) {
+    public page(paging: { page: number; pageSize: number }) {
         if (!this.next(paging, 'Loading Paged')) {
             return EMPTY;
         }
@@ -200,7 +202,7 @@ export class UsersState extends State<Snapshot> {
 
     private replaceUser(user: UserDto) {
         return this.next(s => {
-            const users = s.users.map(u => u.id === user.id ? user : u);
+            const users = s.users.map(u => (u.id === user.id ? user : u));
 
             const selectedUser =
                 s.selectedUser?.id !== user.id ?

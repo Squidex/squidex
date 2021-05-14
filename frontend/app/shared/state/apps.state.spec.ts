@@ -194,7 +194,7 @@ describe('AppsState', () => {
         it('should update selected app if reloaded', () => {
             const newApps = [
                 createApp(1, '_new'),
-                createApp(2, '_new')
+                createApp(2, '_new'),
             ];
 
             appsService.setup(x => x.getApps())

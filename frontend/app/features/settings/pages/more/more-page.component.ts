@@ -13,7 +13,7 @@ import { AppDto, AppsState, defined, ResourceOwner, Types, UpdateAppForm } from 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
-    templateUrl: './more-page.component.html'
+    templateUrl: './more-page.component.html',
 })
 export class MorePageComponent extends ResourceOwner implements OnInit {
     public app: AppDto;
@@ -30,7 +30,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     constructor(
         private readonly appsState: AppsState,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         super();
     }

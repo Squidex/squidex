@@ -1,4 +1,6 @@
-﻿const webpackConfig = require('./webpack.config');
+﻿/* eslint-disable */
+
+const webpackConfig = require('./webpack.config');
 
 module.exports = function (config) {
     var _config = {

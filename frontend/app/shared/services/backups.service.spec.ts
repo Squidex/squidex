@@ -13,13 +13,13 @@ describe('BackupsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 BackupsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() }
-            ]
+                { provide: AnalyticsService, useValue: new AnalyticsService() },
+            ],
         });
     });
 
@@ -29,156 +29,149 @@ describe('BackupsService', () => {
 
     it('should make get request to get backups',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
+            let backups: BackupsDto;
 
-        let backups: BackupsDto;
+            backupsService.getBackups('my-app').subscribe(result => {
+                backups = result;
+            });
 
-        backupsService.getBackups('my-app').subscribe(result => {
-            backups = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/backups');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/backups');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({
+                items: [
+                    backupResponse(12),
+                    backupResponse(13),
+                ],
+            });
 
-        req.flush({
-            items: [
-                backupResponse(12),
-                backupResponse(13)
-            ]
-        });
-
-        expect(backups!).toEqual(
-            new BackupsDto(2, [
-                createBackup(12),
-                createBackup(13)
-            ], {}));
-    }));
+            expect(backups!).toEqual(
+                new BackupsDto(2, [
+                    createBackup(12),
+                    createBackup(13),
+                ], {}));
+        }));
 
     it('should make get request to get restore',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
+            let restore: RestoreDto;
 
-        let restore: RestoreDto;
+            backupsService.getRestore().subscribe(result => {
+                restore = result!;
+            });
 
-        backupsService.getRestore().subscribe(result => {
-            restore = result!;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/restore');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({
-            url: 'http://url',
-            started: '2017-02-03',
-            stopped: '2017-02-04',
-            status: 'Failed',
-            log: [
-                'log1',
-                'log2'
-            ]
-        });
-
-        expect(restore!).toEqual(
-            new RestoreDto('http://url',
-                DateTime.parseISO('2017-02-03'),
-                DateTime.parseISO('2017-02-04'),
-                'Failed',
-                [
+            req.flush({
+                url: 'http://url',
+                started: '2017-02-03',
+                stopped: '2017-02-04',
+                status: 'Failed',
+                log: [
                     'log1',
-                    'log2'
-                ]));
-    }));
+                    'log2',
+                ],
+            });
+
+            expect(restore!).toEqual(
+                new RestoreDto('http://url',
+                    DateTime.parseISO('2017-02-03'),
+                    DateTime.parseISO('2017-02-04'),
+                    'Failed',
+                    [
+                        'log1',
+                        'log2',
+                    ]));
+        }));
 
     it('should return null if get restore return 404',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
+            let restore: RestoreDto | null;
 
-        let restore: RestoreDto | null;
+            backupsService.getRestore().subscribe(result => {
+                restore = result;
+            });
 
-        backupsService.getRestore().subscribe(result => {
-            restore = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/restore');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({}, { status: 404, statusText: '404' });
 
-        req.flush({}, { status: 404, statusText: '404' });
-
-        expect(restore!).toBeNull();
-    }));
+            expect(restore!).toBeNull();
+        }));
 
     it('should throw error if get restore return non 404',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
+            let restore: RestoreDto | null;
+            let error: any;
 
-        let restore: RestoreDto | null;
-        let error: any;
+            backupsService.getRestore().subscribe(result => {
+                restore = result;
+            }, err => {
+                error = err;
+            });
 
-        backupsService.getRestore().subscribe(result => {
-            restore = result;
-        }, err => {
-            error = err;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/restore');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({}, { status: 500, statusText: '500' });
 
-        req.flush({}, { status: 500, statusText: '500' });
-
-        expect(restore!).toBeUndefined();
-        expect(error)!.toBeDefined();
-    }));
+            expect(restore!).toBeUndefined();
+            expect(error)!.toBeDefined();
+        }));
 
     it('should make post request to start backup',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
+            backupsService.postBackup('my-app').subscribe();
 
-        backupsService.postBackup('my-app').subscribe();
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/backups');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/backups');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({});
-    }));
+            req.flush({});
+        }));
 
     it('should make post request to start restore',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
+            const dto = { url: 'http://url' };
 
-        const dto = { url: 'http://url' };
+            backupsService.postRestore(dto).subscribe();
 
-        backupsService.postRestore(dto).subscribe();
+            const req = httpMock.expectOne('http://service/p/api/apps/restore');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/restore');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({});
-    }));
+            req.flush({});
+        }));
 
     it('should make delete request to remove language',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    delete: { method: 'DELETE', href: '/api/apps/my-app/backups/1' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: '/api/apps/my-app/backups/1' }
-            }
-        };
+            backupsService.deleteBackup('my-app', resource).subscribe();
 
-        backupsService.deleteBackup('my-app', resource).subscribe();
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/backups/1');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/backups/1');
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({});
-    }));
+            req.flush({});
+        }));
 
     function backupResponse(id: number) {
         return {
@@ -189,15 +182,15 @@ describe('BackupsService', () => {
             handledAssets: id * 23,
             status: id % 2 === 0 ? 'Success' : 'Failed',
             _links: {
-                download: { method: 'GET', href: '/api/backups/1' }
-            }
+                download: { method: 'GET', href: '/api/backups/1' },
+            },
         };
     }
 });
 
 export function createBackup(id: number) {
     const links: ResourceLinks = {
-        download: { method: 'GET', href: '/api/backups/1' }
+        download: { method: 'GET', href: '/api/backups/1' },
     };
 
     return new BackupDto(links,

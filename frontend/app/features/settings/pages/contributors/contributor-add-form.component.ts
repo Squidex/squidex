@@ -15,7 +15,7 @@ import { withLatestFrom } from 'rxjs/operators';
 export class UsersDataSource implements AutocompleteSource {
     constructor(
         private readonly contributorsState: ContributorsState,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
     ) {
     }
 
@@ -39,8 +39,8 @@ export class UsersDataSource implements AutocompleteSource {
     styleUrls: ['./contributor-add-form.component.scss'],
     templateUrl: './contributor-add-form.component.html',
     providers: [
-        UsersDataSource
-    ]
+        UsersDataSource,
+    ],
 })
 export class ContributorAddFormComponent implements OnChanges {
     private defaultValue: any;
@@ -56,7 +56,7 @@ export class ContributorAddFormComponent implements OnChanges {
         public readonly contributorsState: ContributorsState,
         public readonly usersDataSource: UsersDataSource,
         private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

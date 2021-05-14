@@ -19,30 +19,30 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
     }
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
         super(formBuilder.group({
             isProtected: [false,
                 [
-                    Validators.nullValidator
-                ]
+                    Validators.nullValidator,
+                ],
             ],
             fileName: ['',
                 [
-                    Validators.required
-                ]
+                    Validators.required,
+                ],
             ],
             slug: ['',
                 [
-                    Validators.required
-                ]
+                    Validators.required,
+                ],
             ],
             tags: [[],
                 [
-                    Validators.nullValidator
-                ]
+                    Validators.nullValidator,
+                ],
             ],
-            metadata: formBuilder.array([])
+            metadata: formBuilder.array([]),
         }));
     }
 
@@ -51,10 +51,10 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
             this.formBuilder.group({
                 name: ['',
                     [
-                        Validators.required
-                    ]
+                        Validators.required,
+                    ],
                 ],
-                value: ['']
+                value: [''],
             }));
     }
 
@@ -199,9 +199,9 @@ export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto,
         super(formBuilder.group({
             folderName: ['',
                 [
-                    Validators.required
-                ]
-            ]
+                    Validators.required,
+                ],
+            ],
         }));
     }
 }

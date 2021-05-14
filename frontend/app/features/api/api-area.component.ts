@@ -11,11 +11,11 @@ import { AppsState } from '@app/shared';
 @Component({
     selector: 'sqx-api-area',
     styleUrls: ['./api-area.component.scss'],
-    templateUrl: './api-area.component.html'
+    templateUrl: './api-area.component.html',
 })
 export class ApiAreaComponent {
     constructor(
-        public readonly appsState: AppsState
+        public readonly appsState: AppsState,
     ) {
     }
 }

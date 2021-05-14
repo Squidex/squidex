@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     selector: 'sqx-form-hint',
     styleUrls: ['./form-hint.component.scss'],
     templateUrl: './form-hint.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormHintComponent {
     @Input()

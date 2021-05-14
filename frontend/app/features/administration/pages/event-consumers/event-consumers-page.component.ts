@@ -14,14 +14,14 @@ import { switchMap } from 'rxjs/operators';
 @Component({
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
-    templateUrl: './event-consumers-page.component.html'
+    templateUrl: './event-consumers-page.component.html',
 })
 export class EventConsumersPageComponent extends ResourceOwner implements OnInit {
     public eventConsumerErrorDialog = new DialogModel();
     public eventConsumerError?: string;
 
     constructor(
-        public readonly eventConsumersState: EventConsumersState
+        public readonly eventConsumersState: EventConsumersState,
     ) {
         super();
     }

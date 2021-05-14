@@ -10,7 +10,7 @@ import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, Types, UIOptions, value$ } from '@app/shared/internal';
 
 export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesDropdownComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesDropdownComponent), multi: true,
 };
 
 interface State {
@@ -24,7 +24,7 @@ interface State {
     selectedItem?: ContentName;
 }
 
-type ContentName = { name: string, id?: string };
+type ContentName = { name: string; id?: string };
 
 const NO_EMIT = { emitEvent: false };
 
@@ -33,9 +33,9 @@ const NO_EMIT = { emitEvent: false };
     styleUrls: ['./references-dropdown.component.scss'],
     templateUrl: './references-dropdown.component.html',
     providers: [
-        SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR
+        SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
     private readonly itemCount: number;
@@ -59,7 +59,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
         this.next(s => ({
             ...s,
-            contentNames: this.createContentNames(s.contents)
+            contentNames: this.createContentNames(s.contents),
         }));
     }
 
@@ -72,11 +72,11 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly localizer: LocalizerService
+        private readonly localizer: LocalizerService,
     ) {
         super(changeDetector, {
             contents: [],
-            contentNames: []
+            contentNames: [],
         });
 
         this.itemCount = uiOptions.get('referencesDropdownItemCount');
@@ -91,12 +91,10 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                             } else {
                                 this.callChange([value.id]);
                             }
+                        } else if (this.mode === 'Single') {
+                            this.callChange(null);
                         } else {
-                            if (this.mode === 'Single') {
-                                this.callChange(null);
-                            } else {
-                                this.callChange([]);
-                            }
+                            this.callChange([]);
                         }
 
                         this.callTouched();

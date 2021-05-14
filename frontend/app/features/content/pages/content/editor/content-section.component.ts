@@ -17,7 +17,7 @@ interface State {
     selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentSectionComponent extends StatefulComponent<State> implements OnChanges {
     @Output()
@@ -48,10 +48,10 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
     public languages: ReadonlyArray<AppLanguageDto>;
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
         super(changeDetector, {
-            isCollapsed: false
+            isCollapsed: false,
         });
 
         this.changes.subscribe(state => {
@@ -68,7 +68,7 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
     public toggle() {
         this.next(s => ({
             ...s,
-            isCollapsed: !s.isCollapsed
+            isCollapsed: !s.isCollapsed,
         }));
     }
 

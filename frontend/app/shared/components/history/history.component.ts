@@ -15,7 +15,7 @@ import { delay } from 'rxjs/operators';
     selector: 'sqx-history',
     styleUrls: ['./history.component.scss'],
     templateUrl: './history.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoryComponent {
     private readonly channel = this.calculateChannel();
@@ -23,7 +23,7 @@ export class HistoryComponent {
     public events: Observable<ReadonlyArray<HistoryEventDto>> =
         merge(
             timer(0, 10000),
-            this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))
+            this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000)),
         ).pipe(
             switchSafe(() => this.historyService.getHistory(this.appsState.appName, this.channel)));
 
@@ -31,7 +31,7 @@ export class HistoryComponent {
         private readonly appsState: AppsState,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
     ) {
     }
 

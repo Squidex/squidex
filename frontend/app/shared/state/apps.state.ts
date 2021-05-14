@@ -43,12 +43,13 @@ export class AppsState extends State<Snapshot> {
 
     constructor(
         private readonly appsService: AppsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super({
             apps: [],
             selectedApp: null,
-            selectedSettings: null}, 'Apps');
+            selectedSettings: null,
+        }, 'Apps');
     }
 
     public reloadApps() {

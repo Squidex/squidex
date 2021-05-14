@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -17,13 +17,14 @@ describe('LocalStore', () => {
     it('should call local store for set function', () => {
         const localStoreService = new LocalStoreService();
 
-        let passedKey = '', passedVal = '';
+        let passedKey = '';
+        let passedVal = '';
 
         localStoreService.configureStore({
             setItem: (k: string, v: string) => {
                 passedKey = k;
                 passedVal = v;
-            }
+            },
         });
 
         localStoreService.set('mykey', 'myval');
@@ -42,7 +43,7 @@ describe('LocalStore', () => {
                 passedKey = key;
 
                 return 'myval';
-            }
+            },
         });
 
         const returnedVal = localStoreService.get('mykey');
@@ -56,11 +57,11 @@ describe('LocalStore', () => {
 
         localStoreService.configureStore({
             setItem: () => {
-                throw 'Not supported';
+                throw new Error('Not supported');
             },
             getItem: () => {
-                throw 'Not supported';
-            }
+                throw new Error('Not supported');
+            },
         });
 
         localStoreService.set('mykey', 'myval');

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license

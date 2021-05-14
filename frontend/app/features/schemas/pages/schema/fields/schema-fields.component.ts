@@ -12,7 +12,7 @@ import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, SchemaDto
 @Component({
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
-    templateUrl: './schema-fields.component.html'
+    templateUrl: './schema-fields.component.html',
 })
 export class SchemaFieldsComponent implements OnInit {
     public fieldTypes = fieldTypes;
@@ -27,7 +27,7 @@ export class SchemaFieldsComponent implements OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
-        public readonly languageState: LanguagesState
+        public readonly languageState: LanguagesState,
     ) {
         this.trackByFieldFn = this.trackByField.bind(this);
     }

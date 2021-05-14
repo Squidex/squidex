@@ -14,7 +14,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
 @Component({
     selector: 'sqx-due-time-selector',
     styleUrls: ['./due-time-selector.component.scss'],
-    templateUrl: './due-time-selector.component.html'
+    templateUrl: './due-time-selector.component.html',
 })
 export class DueTimeSelectorComponent {
     private dueTimeResult: Subject<string | null>;

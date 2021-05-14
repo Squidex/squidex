@@ -13,12 +13,12 @@ describe('LanguageService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 LanguagesService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -28,33 +28,32 @@ describe('LanguageService', () => {
 
     it('should make get request to get languages',
         inject([LanguagesService, HttpTestingController], (languagesService: LanguagesService, httpMock: HttpTestingController) => {
+            let languages: ReadonlyArray<LanguageDto>;
 
-        let languages: ReadonlyArray<LanguageDto>;
+            languagesService.getLanguages().subscribe(result => {
+                languages = result;
+            });
 
-        languagesService.getLanguages().subscribe(result => {
-            languages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/languages');
 
-        const req = httpMock.expectOne('http://service/p/api/languages');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush([
-            {
-                iso2Code: 'de',
-                englishName: 'German'
-            },
-            {
-                iso2Code: 'en',
-                englishName: 'English'
-            }
-        ]);
-
-        expect(languages!).toEqual(
-            [
-                new LanguageDto('de', 'German'),
-                new LanguageDto('en', 'English')
+            req.flush([
+                {
+                    iso2Code: 'de',
+                    englishName: 'German',
+                },
+                {
+                    iso2Code: 'en',
+                    englishName: 'English',
+                },
             ]);
-    }));
+
+            expect(languages!).toEqual(
+                [
+                    new LanguageDto('de', 'German'),
+                    new LanguageDto('en', 'English'),
+                ]);
+        }));
 });

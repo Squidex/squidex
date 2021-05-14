@@ -12,7 +12,7 @@ import { ApiUrlConfig, PlanDto, PlansState } from '@app/shared';
 @Component({
     selector: 'sqx-plans-page',
     styleUrls: ['./plans-page.component.scss'],
-    templateUrl: './plans-page.component.html'
+    templateUrl: './plans-page.component.html',
 })
 export class PlansPageComponent implements OnInit {
     private overridePlanId: string;
@@ -22,7 +22,7 @@ export class PlansPageComponent implements OnInit {
     constructor(
         public readonly plansState: PlansState,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
     ) {
     }
 

@@ -12,7 +12,7 @@ import { Queries, Query } from '@app/shared/internal';
     selector: 'sqx-shared-queries',
     styleUrls: ['./shared-queries.component.scss'],
     templateUrl: './shared-queries.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SavedQueriesComponent {
     @Output()

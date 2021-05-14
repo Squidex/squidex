@@ -16,9 +16,9 @@ export class AddWorkflowForm extends Form<FormGroup, CreateWorkflowDto> {
         super(formBuilder.group({
             name: ['',
                 [
-                    Validators.required
-                ]
-            ]
+                    Validators.required,
+                ],
+            ],
         }));
     }
 }

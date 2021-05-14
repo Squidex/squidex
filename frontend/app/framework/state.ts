@@ -23,7 +23,7 @@ export class Model<T> {
         let values: Partial<V>;
 
         if (Types.isFunction(update)) {
-            values = update(<any>this);
+            values = update(this as any);
         } else {
             values = update;
         }
@@ -54,7 +54,7 @@ export class ResultSet<T> {
     constructor(
         public readonly total: number,
         public readonly items: ReadonlyArray<T>,
-        links?: ResourceLinks
+        links?: ResourceLinks,
     ) {
         this._links = links || {};
     }
@@ -131,7 +131,7 @@ export class State<T extends {}> {
 
     constructor(
         private readonly initialState: Readonly<T>,
-        private readonly debugName?: string
+        private readonly debugName?: string,
     ) {
         this.state = new BehaviorSubject(initialState);
 

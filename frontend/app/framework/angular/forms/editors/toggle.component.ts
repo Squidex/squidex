@@ -10,7 +10,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_TOGGLE_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true,
 };
 
 interface State {
@@ -23,8 +23,8 @@ interface State {
     styleUrls: ['./toggle.component.scss'],
     templateUrl: './toggle.component.html',
     providers: [
-        SQX_TOGGLE_CONTROL_VALUE_ACCESSOR
-    ]
+        SQX_TOGGLE_CONTROL_VALUE_ACCESSOR,
+    ],
 })
 export class ToggleComponent extends StatefulControlComponent<State, boolean | null> {
     @Input()
@@ -37,7 +37,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            isChecked: null
+            isChecked: null,
         });
     }
 

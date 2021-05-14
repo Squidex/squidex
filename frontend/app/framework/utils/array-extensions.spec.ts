@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import './array-extensions';
 
 describe('ArrayExtensions', () => {
@@ -125,7 +127,7 @@ describe('ArrayExtensions', () => {
 
         expect(map).toEqual({
             A: { id: 'A', value: 1 },
-            B: { id: 'B', value: 3 }
+            B: { id: 'B', value: 3 },
         });
     });
 });

@@ -12,7 +12,7 @@ import { ScheduleDto } from '@app/shared';
     selector: 'sqx-content-status',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentStatusComponent {
     @Input()

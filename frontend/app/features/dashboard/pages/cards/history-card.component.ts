@@ -14,9 +14,9 @@ import { Observable } from 'rxjs';
     styleUrls: ['./history-card.component.scss'],
     templateUrl: './history-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoryCardComponent implements OnChanges {
     @Input()
@@ -25,7 +25,7 @@ export class HistoryCardComponent implements OnChanges {
     public history: Observable<ReadonlyArray<HistoryEventDto>>;
 
     constructor(
-        private readonly historyService: HistoryService
+        private readonly historyService: HistoryService,
     ) {
     }
 

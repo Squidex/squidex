@@ -14,7 +14,7 @@ export class OnboardingService {
     private readonly disabled: boolean;
 
     constructor(uiOptions: UIOptions,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
         this.disabled = uiOptions.get('hideOnboarding');
     }

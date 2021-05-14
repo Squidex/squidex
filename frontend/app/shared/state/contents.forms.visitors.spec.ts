@@ -5,14 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { DateHelper } from '@app/framework';
 import { createProperties, DateTime, FieldDefaultValue, FieldFormatter, FieldsValidators, HtmlValue } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 const {
-    createField
+    createField,
 } = TestValues;
 
 const now = DateTime.parseISO('2017-10-12T16:30:10Z');
@@ -75,7 +73,7 @@ describe('AssetsField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'], defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -155,7 +153,7 @@ describe('BooleanField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Boolean', { defaultValue: true, defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('Boolean', { defaultValue: true, defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -205,7 +203,7 @@ describe('DateTimeField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('DateTime', { defaultValue: '2017-10-12T16:00:00Z', defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('DateTime', { defaultValue: '2017-10-12T16:00:00Z', defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -323,7 +321,7 @@ describe('NumberField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Number', { defaultValue: 13, defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('Number', { defaultValue: 13, defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -359,7 +357,7 @@ describe('ReferencesField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('References', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('References', { defaultValue: ['1', '2'], defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -405,7 +403,7 @@ describe('StringField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault', defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault', defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -437,7 +435,7 @@ describe('TagsField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'], defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });

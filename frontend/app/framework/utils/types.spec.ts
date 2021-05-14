@@ -183,8 +183,8 @@ describe('Types', () => {
         expect(Types.equals(undefined, '', false)).toBeFalsy();
     });
 
-    FalsyValues.map(x => {
-        it(`should compare empty string with {x}`, () => {
+    FalsyValues.forEach(x => {
+        it('should compare empty string with {x}', () => {
             expect(Types.equals('', x, true)).toBeFalsy();
             expect(Types.equals('', x, false)).toBeFalsy();
 
@@ -240,18 +240,18 @@ describe('Types', () => {
             rootShared: 1,
             rootA: 2,
             nested: {
-                a: 3
+                a: 3,
             },
-            array: [4]
+            array: [4],
         });
 
         Types.mergeInto(source, {
             rootShared: 5,
             rootB: 6,
             nested: {
-                b: 7
+                b: 7,
             },
-            array: [8]
+            array: [8],
         });
 
         expect(source).toEqual({
@@ -260,16 +260,16 @@ describe('Types', () => {
             rootB: 6,
             nested: {
                 a: 3,
-                b: 7
+                b: 7,
             },
-            array: [4, 8]
+            array: [4, 8],
         });
     });
 });
 
 class MyClass {
     constructor(
-        public readonly value: number
+        public readonly value: number,
     ) {
     }
 }

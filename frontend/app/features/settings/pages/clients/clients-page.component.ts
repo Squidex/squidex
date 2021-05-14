@@ -11,12 +11,12 @@ import { ClientDto, ClientsState, RolesState } from '@app/shared';
 @Component({
     selector: 'sqx-clients-page',
     styleUrls: ['./clients-page.component.scss'],
-    templateUrl: './clients-page.component.html'
+    templateUrl: './clients-page.component.html',
 })
 export class ClientsPageComponent implements OnInit {
     constructor(
         public readonly clientsState: ClientsState,
-        public readonly rolesState: RolesState
+        public readonly rolesState: RolesState,
     ) {
     }
 

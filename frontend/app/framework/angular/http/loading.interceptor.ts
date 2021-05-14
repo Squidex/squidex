@@ -14,7 +14,7 @@ import { finalize } from 'rxjs/operators';
 @Injectable()
 export class LoadingInterceptor implements HttpInterceptor {
     constructor(
-        private readonly loadingService: LoadingService
+        private readonly loadingService: LoadingService,
     ) {
     }
 

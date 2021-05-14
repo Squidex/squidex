@@ -16,8 +16,8 @@ import { SchemaCloning } from './../messages';
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public readonly exact = { exact: true };
@@ -31,7 +31,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         public readonly schemasState: SchemasState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly messageBus: MessageBus
+        private readonly messageBus: MessageBus,
     ) {
         super();
     }

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { MetaFields, SchemaDto } from '@app/shared';
@@ -17,7 +15,7 @@ const META_FIELD_NAMES = Object.values(MetaFields);
     selector: 'sqx-field-list',
     styleUrls: ['./field-list.component.scss'],
     templateUrl: './field-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FieldListComponent implements OnChanges {
     @Input()

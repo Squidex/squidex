@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: component-selector
-
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UserDto, UsersState } from '@app/features/administration/internal';
 
@@ -14,14 +12,14 @@ import { UserDto, UsersState } from '@app/features/administration/internal';
     selector: '[sqxUser]',
     styleUrls: ['./user.component.scss'],
     templateUrl: './user.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {
     @Input('sqxUser')
     public user: UserDto;
 
     constructor(
-        private readonly usersState: UsersState
+        private readonly usersState: UsersState,
     ) {
     }
 

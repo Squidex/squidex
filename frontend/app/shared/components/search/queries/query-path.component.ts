@@ -12,7 +12,7 @@ import { QueryModel } from '@app/shared/internal';
     selector: 'sqx-query-path',
     styleUrls: ['./query-path.component.scss'],
     templateUrl: './query-path.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QueryPathComponent {
     @Output()

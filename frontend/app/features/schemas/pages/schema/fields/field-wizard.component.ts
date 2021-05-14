@@ -14,7 +14,7 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
 @Component({
     selector: 'sqx-field-wizard',
     styleUrls: ['./field-wizard.component.scss'],
-    templateUrl: './field-wizard.component.html'
+    templateUrl: './field-wizard.component.html',
 })
 export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput', { static: false })
@@ -46,7 +46,7 @@ export class FieldWizardComponent implements OnInit {
     constructor(
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
-        public readonly languagesState: LanguagesState
+        public readonly languagesState: LanguagesState,
     ) {
     }
 

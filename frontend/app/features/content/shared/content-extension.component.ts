@@ -14,7 +14,7 @@ import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto } from 
     selector: 'sqx-content-extension',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentExtensionComponent extends ResourceOwner implements AfterViewInit, OnChanges {
     private readonly context: any;
@@ -36,7 +36,7 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         private readonly appsState: AppsState,
         private readonly renderer: Renderer2,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         super();
 
@@ -44,7 +44,7 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
             apiUrl: apiUrl.buildUrl('api'),
             appId: appsState.snapshot.selectedApp!.id,
             appName: appsState.snapshot.selectedApp!.name,
-            user: authService.user
+            user: authService.user,
         };
     }
 

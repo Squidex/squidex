@@ -17,7 +17,7 @@ describe('RolesState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const oldRoles = createRoles(1, 2);

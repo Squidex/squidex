@@ -12,7 +12,7 @@ import { ConfigurePreviewUrlsForm, SchemaDto, SchemasState } from '@app/shared';
 @Component({
     selector: 'sqx-schema-preview-urls-form',
     styleUrls: ['./schema-preview-urls-form.component.scss'],
-    templateUrl: './schema-preview-urls-form.component.html'
+    templateUrl: './schema-preview-urls-form.component.html',
 })
 export class SchemaPreviewUrlsFormComponent implements OnChanges {
     @Input()
@@ -24,7 +24,7 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 

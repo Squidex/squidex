@@ -38,7 +38,7 @@ export class CommentsState extends State<Snapshot> {
         private readonly commentsService: CommentsService,
         private readonly dialogs: DialogService,
         private readonly orderDescending = false,
-        initialVersion = -1
+        initialVersion = -1,
     ) {
         super({ comments: [], version: new Version(initialVersion.toString()) }, 'Comments');
     }

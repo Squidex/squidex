@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
@@ -21,7 +19,7 @@ const routes: Routes = [
         children: [
             {
                 path: '',
-                component: MorePageComponent
+                component: MorePageComponent,
             },
             {
                 path: 'backups',
@@ -31,10 +29,10 @@ const routes: Routes = [
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/backups'
-                        }
-                    }
-                ]
+                            helpPage: '05-integrated/backups',
+                        },
+                    },
+                ],
             },
             {
                 path: 'clients',
@@ -44,17 +42,17 @@ const routes: Routes = [
                         path: 'history',
                         component: HistoryComponent,
                         data: {
-                            channel: 'settings.clients'
-                        }
+                            channel: 'settings.clients',
+                        },
                     },
                     {
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/clients'
-                        }
-                    }
-                ]
+                            helpPage: '05-integrated/clients',
+                        },
+                    },
+                ],
             },
             {
                 path: 'contributors',
@@ -64,17 +62,17 @@ const routes: Routes = [
                         path: 'history',
                         component: HistoryComponent,
                         data: {
-                            channel: 'settings.contributors'
-                        }
+                            channel: 'settings.contributors',
+                        },
                     },
                     {
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/contributors'
-                        }
-                    }
-                ]
+                            helpPage: '05-integrated/contributors',
+                        },
+                    },
+                ],
             },
             {
                 path: 'languages',
@@ -84,21 +82,21 @@ const routes: Routes = [
                         path: 'history',
                         component: HistoryComponent,
                         data: {
-                            channel: 'settings.languages'
-                        }
+                            channel: 'settings.languages',
+                        },
                     },
                     {
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/languages'
-                        }
-                    }
-                ]
+                            helpPage: '05-integrated/languages',
+                        },
+                    },
+                ],
             },
             {
                 path: 'settings',
-                component: SettingsPageComponent
+                component: SettingsPageComponent,
             },
             {
                 path: 'plans',
@@ -108,10 +106,10 @@ const routes: Routes = [
                         path: 'history',
                         component: HistoryComponent,
                         data: {
-                            channel: 'settings.plan'
-                        }
-                    }
-                ]
+                            channel: 'settings.plan',
+                        },
+                    },
+                ],
             },
             {
                 path: 'roles',
@@ -121,17 +119,17 @@ const routes: Routes = [
                         path: 'history',
                         component: HistoryComponent,
                         data: {
-                            channel: 'settings.roles'
-                        }
+                            channel: 'settings.roles',
+                        },
                     },
                     {
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/roles'
-                        }
-                    }
-                ]
+                            helpPage: '05-integrated/roles',
+                        },
+                    },
+                ],
             },
             {
                 path: 'workflows',
@@ -141,20 +139,20 @@ const routes: Routes = [
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/workflows'
-                        }
-                    }
-                ]
-            }
-        ]
-    }
+                            helpPage: '05-integrated/workflows',
+                        },
+                    },
+                ],
+            },
+        ],
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     declarations: [
         BackupComponent,
@@ -183,7 +181,7 @@ const routes: Routes = [
         WorkflowDiagramComponent,
         WorkflowsPageComponent,
         WorkflowStepComponent,
-        WorkflowTransitionComponent
-    ]
+        WorkflowTransitionComponent,
+    ],
 })
 export class SqxFeatureSettingsModule {}

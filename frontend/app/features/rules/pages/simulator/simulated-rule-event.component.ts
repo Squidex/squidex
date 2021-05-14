@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: component-selector
-
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { SimulatedRuleEventDto } from '@app/shared';
 
@@ -14,7 +12,7 @@ import { SimulatedRuleEventDto } from '@app/shared';
     selector: '[sqxSimulatedRuleEvent]',
     styleUrls: ['./simulated-rule-event.component.scss'],
     templateUrl: './simulated-rule-event.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimulatedRuleEventComponent {
     @Input('sqxSimulatedRuleEvent')

@@ -13,12 +13,12 @@ describe('TranslationsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 TranslationsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -28,24 +28,23 @@ describe('TranslationsService', () => {
 
     it('should make post request to translate text',
         inject([TranslationsService, HttpTestingController], (translationsService: TranslationsService, httpMock: HttpTestingController) => {
+            const dto = { text: 'Hello', sourceLanguage: 'en', targetLanguage: 'de' };
 
-        const dto = { text: 'Hello', sourceLanguage: 'en', targetLanguage: 'de' };
+            let translation: TranslationDto;
 
-        let translation: TranslationDto;
+            translationsService.translate('my-app', dto).subscribe(result => {
+                translation = result;
+            });
 
-        translationsService.translate('my-app', dto).subscribe(result => {
-            translation = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/translations');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/translations');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({
+                text: 'Hallo', result: 'Translated',
+            });
 
-        req.flush({
-            text: 'Hallo', result: 'Translated'
-        });
-
-        expect(translation!).toEqual(new TranslationDto('Translated', 'Hallo'));
-    }));
+            expect(translation!).toEqual(new TranslationDto('Translated', 'Hallo'));
+        }));
 });

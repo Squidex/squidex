@@ -12,7 +12,7 @@ import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel } 
     selector: 'sqx-filter-node',
     styleUrls: ['./filter-node.component.scss'],
     templateUrl: './filter-node.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterNodeComponent {
     public comparison: FilterComparison;

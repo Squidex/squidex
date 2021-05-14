@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { EventEmitter } from '@angular/core';
 import { AbstractControl, AbstractControlOptions, AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { Types } from '@app/framework/internal';
@@ -14,7 +12,7 @@ import { Types } from '@app/framework/internal';
 export class UndefinableFormGroup extends FormGroup {
     private isUndefined = false;
 
-    constructor(controls: { [key: string]: AbstractControl; }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
+    constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);
 
         const reduce = this['_reduceValue'];
@@ -38,7 +36,7 @@ export class UndefinableFormGroup extends FormGroup {
         }
     }
 
-    public setValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean; }) {
+    public setValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
         this.isUndefined = Types.isUndefined(value);
 
         if (this.isUndefined) {
@@ -48,7 +46,7 @@ export class UndefinableFormGroup extends FormGroup {
         }
     }
 
-    public patchValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean; }) {
+    public patchValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
         this.isUndefined = Types.isUndefined(value);
 
         if (this.isUndefined) {
@@ -58,13 +56,13 @@ export class UndefinableFormGroup extends FormGroup {
         }
     }
 
-    public reset(value?: {}, options: {onlySelf?: boolean, emitEvent?: boolean} = {}) {
+    public reset(value?: {}, options: { onlySelf?: boolean; emitEvent?: boolean } = {}) {
         this.isUndefined = Types.isUndefined(value);
 
         super.reset(value || {}, options);
     }
 
-    public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean; } = {}) {
+    public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean } = {}) {
         super.updateValueAndValidity({ emitEvent: false, onlySelf: true });
 
         if (this.isUndefined) {

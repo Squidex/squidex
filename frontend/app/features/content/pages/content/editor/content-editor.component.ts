@@ -11,7 +11,7 @@ import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, RootFieldDto,
 @Component({
     selector: 'sqx-content-editor',
     styleUrls: ['./content-editor.component.scss'],
-    templateUrl: './content-editor.component.html'
+    templateUrl: './content-editor.component.html',
 })
 export class ContentEditorComponent {
     @Output()

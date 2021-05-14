@@ -14,11 +14,11 @@ export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
     selector: 'sqx-pager',
     styleUrls: ['./pager.component.scss'],
     templateUrl: './pager.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PagerComponent implements OnChanges {
     @Output()
-    public pagingChange = new EventEmitter<{ page: number, pageSize: number }>();
+    public pagingChange = new EventEmitter<{ page: number; pageSize: number }>();
 
     @Input()
     public paging: PagingInfo | undefined | null;
@@ -63,7 +63,7 @@ export class PagerComponent implements OnChanges {
         this.translationInfo = {
             itemFirst: this.itemFirst,
             itemLast: this.itemLast,
-            numberOfItems: total
+            numberOfItems: total,
         };
     }
 

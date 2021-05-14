@@ -14,19 +14,19 @@ import { map } from 'rxjs/operators';
 export class TranslationDto {
     constructor(
         public readonly result: string,
-        public readonly text: string
+        public readonly text: string,
     ) {
     }
 }
 
 export type TranslateDto =
-    Readonly<{ text: string; sourceLanguage: string; targetLanguage: string; }>;
+    Readonly<{ text: string; sourceLanguage: string; targetLanguage: string }>;
 
 @Injectable()
 export class TranslationsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 

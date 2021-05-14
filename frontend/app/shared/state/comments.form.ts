@@ -12,7 +12,7 @@ import { UpsertCommentDto } from './../services/comments.service';
 export class UpsertCommentForm extends Form<FormGroup, UpsertCommentDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            text: ''
+            text: '',
         }));
     }
 }

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Form, getRawValue, Types, UndefinableFormArray, UndefinableFormGroup, valueAll$ } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -15,22 +13,20 @@ import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDto, TableField } from './../services/schemas.service';
 import { ComponentFieldPropertiesDto, fieldInvariant } from './../services/schemas.types';
-import { AbstractContentForm, AbstractContentFormState, CompiledRule, FieldSection, FormStructure as FormGlobals, PartitionConfig } from './contents.forms-helpers';
+import { AbstractContentForm, AbstractContentFormState, CompiledRule, FieldSection, FormGlobals, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
-export { FieldSection } from './contents.forms-helpers';
-
-type SaveQueryFormType = { name: string, user: boolean };
+type SaveQueryFormType = { name: string; user: boolean };
 
 export class SaveQueryForm extends Form<FormGroup, SaveQueryFormType> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',
                 [
-                    Validators.required
-                ]
+                    Validators.required,
+                ],
             ],
-            user: false
+            user: false,
         }));
     }
 }
@@ -40,11 +36,11 @@ export class PatchContentForm extends Form<FormGroup, any> {
 
     constructor(
         private readonly listFields: ReadonlyArray<TableField>,
-        private readonly language: AppLanguageDto
+        private readonly language: AppLanguageDto,
     ) {
         super(new FormGroup({}));
 
-        this.editableFields = <any>this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable);
+        this.editableFields = this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable) as any;
 
         for (const field of this.editableFields) {
             const validators = FieldsValidators.create(field, this.language.isOptional);
@@ -92,7 +88,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDto, schemas: { [id: string ]: SchemaDto },
-        private context: any, debounce = 100
+        private context: any, debounce = 100,
     ) {
         super(new FormGroup({}));
 
@@ -101,12 +97,12 @@ export class EditContentForm extends Form<FormGroup, any> {
             schema,
             schemas,
             partitions: new PartitionConfig(languages),
-            remoteValidator: this.remoteValidator
+            remoteValidator: this.remoteValidator,
         };
 
         const sections: FieldSection<RootFieldDto, FieldForm>[] = [];
 
-        let currentSeparator: RootFieldDto | undefined = undefined;
+        let currentSeparator: RootFieldDto | undefined;
         let currentFields: FieldForm[] = [];
 
         for (const field of schema.fields) {
@@ -194,7 +190,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         this.updateState(this.value);
     }
 
-    public submitCompleted(options?: { newValue?: any, noReset?: boolean }) {
+    public submitCompleted(options?: { newValue?: any; noReset?: boolean }) {
         super.submitCompleted(options);
 
         this.updateInitialData();
@@ -311,11 +307,11 @@ export class FieldValueForm extends AbstractContentForm<FieldDto, FormControl> {
     private isRequired = false;
 
     constructor(globals: FormGlobals, path: string, field: FieldDto,
-        isOptional: boolean, partition: string
+        isOptional: boolean, partition: string,
     ) {
         super(globals, path, field,
             FieldValueForm.buildControl(field, isOptional, partition, globals),
-            isOptional
+            isOptional,
         );
 
         this.isRequired = field.properties.isRequired && !isOptional;
@@ -370,11 +366,11 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, UndefinableFor
 
     constructor(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean,
         private readonly partition: string,
-        private readonly isComponents: boolean
+        private readonly isComponents: boolean,
     ) {
         super(globals, path, field,
             FieldArrayForm.buildControl(field, isOptional),
-            isOptional
+            isOptional,
         );
     }
 
@@ -488,7 +484,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, UndefinableFor
 
 export type FieldItemForm = ComponentForm | FieldValueForm | FieldArrayForm;
 
-export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractContentForm<TField, UndefinableFormGroup>  {
+export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractContentForm<TField, UndefinableFormGroup> {
     private fields: { [key: string]: FieldItemForm } = {};
     private fieldSections: FieldSection<FieldDto, FieldItemForm>[] = [];
 
@@ -497,7 +493,7 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
     }
 
     constructor(globals: FormGlobals, path: string, field: TField, isOptional: boolean,
-        private readonly partition: string
+        private readonly partition: string,
     ) {
         super(globals, path, field, ObjectForm.buildControl(field, isOptional, true), isOptional);
     }
@@ -517,7 +513,7 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
         if (schema) {
             this.form.reset({});
 
-            let currentSeparator: FieldDto | undefined = undefined;
+            let currentSeparator: FieldDto | undefined;
             let currentFields: FieldItemForm[] = [];
 
             for (const field of schema) {
@@ -530,7 +526,6 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
                     currentFields.push(childForm);
 
                     this.fields[field.name] = childForm;
-
                 } else {
                     this.fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(currentSeparator, currentFields));
 

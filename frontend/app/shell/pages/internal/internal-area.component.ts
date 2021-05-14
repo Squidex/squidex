@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -12,13 +12,13 @@ import { DialogService, LoadingService, Notification, ResourceOwner } from '@app
 @Component({
     selector: 'sqx-internal-area',
     styleUrls: ['./internal-area.component.scss'],
-    templateUrl: './internal-area.component.html'
+    templateUrl: './internal-area.component.html',
 })
 export class InternalAreaComponent extends ResourceOwner implements OnInit {
     constructor(
         public readonly loadingService: LoadingService,
         private readonly dialogs: DialogService,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
     ) {
         super();
     }
@@ -39,4 +39,4 @@ export class InternalAreaComponent extends ResourceOwner implements OnInit {
                 }
             }));
     }
- }
+}

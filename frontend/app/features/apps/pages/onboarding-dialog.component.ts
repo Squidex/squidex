@@ -13,8 +13,8 @@ import { fadeAnimation, slideAnimation } from '@app/framework';
     styleUrls: ['./onboarding-dialog.component.scss'],
     templateUrl: './onboarding-dialog.component.html',
     animations: [
-        fadeAnimation, slideAnimation
-    ]
+        fadeAnimation, slideAnimation,
+    ],
 })
 export class OnboardingDialogComponent {
     public step = 0;

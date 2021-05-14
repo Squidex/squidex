@@ -12,7 +12,7 @@ import { ActionForm } from '@app/shared';
     selector: 'sqx-generic-action',
     styleUrls: ['./generic-action.component.scss'],
     templateUrl: './generic-action.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenericActionComponent {
     @Input()

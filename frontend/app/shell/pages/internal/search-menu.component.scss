@@ -1,4 +1,4 @@
-:host /deep/ {
+:host ::ng-deep {
     .form-control {
         @include placeholder-color($color-theme-blue-light);
         background: darken($color-theme-blue-dark, 5%);

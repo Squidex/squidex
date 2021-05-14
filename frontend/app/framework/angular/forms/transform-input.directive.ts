@@ -19,14 +19,14 @@ export const TransformSlugifyCased: Transform = value => slugify(value, { lower:
 export const TransformUpperCase: Transform = value => value.toUpperCase();
 
 export const SQX_TRANSFORM_INPUT_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TransformInputDirective), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TransformInputDirective), multi: true,
 };
 
 @Directive({
     selector: '[sqxTransformInput]',
     providers: [
-        SQX_TRANSFORM_INPUT_VALUE_ACCESSOR
-    ]
+        SQX_TRANSFORM_INPUT_VALUE_ACCESSOR,
+    ],
 })
 export class TransformInputDirective implements ControlValueAccessor {
     private callChange = (_: any) => { /* NOOP */ };
@@ -52,7 +52,7 @@ export class TransformInputDirective implements ControlValueAccessor {
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

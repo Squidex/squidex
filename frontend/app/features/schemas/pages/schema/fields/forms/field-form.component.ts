@@ -12,7 +12,7 @@ import { AppSettingsDto, FieldDto, LanguageDto } from '@app/shared';
 @Component({
     selector: 'sqx-field-form',
     styleUrls: ['./field-form.component.scss'],
-    templateUrl: './field-form.component.html'
+    templateUrl: './field-form.component.html',
 })
 export class FieldFormComponent implements AfterViewInit {
     @Input()

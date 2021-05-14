@@ -15,8 +15,8 @@ import { Observable } from 'rxjs';
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class StringValidationComponent extends ResourceOwner implements OnChanges {
     @Input()

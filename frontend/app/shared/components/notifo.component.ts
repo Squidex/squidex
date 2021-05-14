@@ -13,7 +13,7 @@ import { AuthService } from '@app/shared/internal';
     selector: 'sqx-notifo',
     styleUrls: ['./notifo.component.scss'],
     templateUrl: './notifo.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     private readonly notifoApiUrl: string;
@@ -34,14 +34,14 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     constructor(resourceLoader: ResourceLoaderService, uiOptions: UIOptions, authService: AuthService,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
         this.notifoApiKey = authService.user?.notifoToken;
         this.notifoApiUrl = uiOptions.get('more.notifoApi');
 
         if (this.isConfigured) {
             if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {
-                resourceLoader.loadScript(`https://localhost:3002/notifo-sdk.js`);
+                resourceLoader.loadScript('https://localhost:3002/notifo-sdk.js');
             } else {
                 resourceLoader.loadScript(`${this.notifoApiUrl}/build/notifo-sdk.js`);
             }

@@ -72,7 +72,7 @@ describe('TitleService', () => {
     });
 
     it('should append suffix to title', () => {
-        const titleService = new TitleService(new TitlesConfig( undefined, 'i18n:suffix'), localizer.object);
+        const titleService = new TitleService(new TitlesConfig(undefined, 'i18n:suffix'), localizer.object);
 
         titleService.push('i18n:my-title');
 

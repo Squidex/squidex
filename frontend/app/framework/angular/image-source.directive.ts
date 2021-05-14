@@ -8,10 +8,10 @@
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { MathHelper, ResourceOwner, StringHelper } from '@app/framework/internal';
 
-const LAYOUT_CACHE: { [key: string]: { width: number, height: number } } = {};
+const LAYOUT_CACHE: { [key: string]: { width: number; height: number } } = {};
 
 @Directive({
-    selector: '[sqxImageSource]'
+    selector: '[sqxImageSource]',
 })
 export class ImageSourceDirective extends ResourceOwner implements OnChanges, OnDestroy, OnInit, AfterViewInit {
     private size: any;
@@ -34,7 +34,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
     constructor(
         private readonly zone: NgZone,
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
         super();
     }
@@ -90,7 +90,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
     }
 
     private resize() {
-        let size: { width: number, height: number } = null!;
+        let size: { width: number; height: number } = null!;
 
         if (this.layoutKey) {
             size = LAYOUT_CACHE[this.layoutKey];
