@@ -458,19 +458,19 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_serialize_and_deserialize_schema()
         {
             var schemaSource =
-                TestUtils.MixedSchema(SchemaType.Singleton)
+                TestUtils.MixedSchema(SchemaType.Singleton, false)
                     .ChangeCategory("Category")
                     .SetFieldRules(FieldRule.Hide("2"))
                     .SetFieldsInLists("field2")
                     .SetFieldsInReferences("field1")
-                    .SetPreviewUrls(new Dictionary<string, string>
-                    {
-                        ["web"] = "Url"
-                    }.ToImmutableDictionary())
                     .SetScripts(new SchemaScripts
                     {
                         Create = "<create-script>"
-                    });
+                    })
+                    .SetPreviewUrls(new Dictionary<string, string>
+                    {
+                        ["web"] = "Url"
+                    }.ToImmutableDictionary());
 
             var schemaTarget = schemaSource.SerializeAndDeserialize();
 

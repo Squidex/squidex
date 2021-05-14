@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
     internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonTypeVisitor.Args>
     {
+        private const int MaxDepth = 5;
         private static readonly JsonTypeVisitor Instance = new JsonTypeVisitor();
 
         public readonly struct Args
@@ -29,11 +30,20 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             public readonly bool WithHiddenFields;
 
-            public Args(SchemaResolver? schemaResolver, bool withHiddenFields)
+            public readonly int Level;
+
+            public Args(SchemaResolver? schemaResolver, bool withHiddenFields, int level)
             {
                 SchemaResolver = schemaResolver;
 
                 WithHiddenFields = withHiddenFields;
+
+                Level = level;
+            }
+
+            public Args Increment()
+            {
+                return new Args(SchemaResolver, WithHiddenFields, Level + 1);
             }
         }
 
@@ -43,18 +53,25 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver? schemaResolver = null, bool withHiddenFields = false)
         {
-            var args = new Args(schemaResolver, withHiddenFields);
+            var args = new Args(schemaResolver, withHiddenFields, 0);
 
             return field.Accept(Instance, args);
         }
 
         public JsonSchemaProperty? Visit(IArrayField field, Args args)
         {
+            if (args.Level > MaxDepth)
+            {
+                return null;
+            }
+
             var itemSchema = SchemaBuilder.Object();
+
+            var nestedArgs = args.Increment();
 
             foreach (var nestedField in field.Fields.ForApi(args.WithHiddenFields))
             {
-                var nestedProperty = nestedField.Accept(this, args);
+                var nestedProperty = nestedField.Accept(this, nestedArgs);
 
                 if (nestedProperty != null)
                 {
@@ -80,6 +97,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ComponentFieldProperties> field, Args args)
         {
+            if (args.Level > MaxDepth)
+            {
+                return null;
+            }
+
             var property = SchemaBuilder.ObjectProperty();
 
             BuildComponent(property, field, field.Properties.SchemaIds, args);
@@ -89,6 +111,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ComponentsFieldProperties> field, Args args)
         {
+            if (args.Level > MaxDepth)
+            {
+                return null;
+            }
+
             var itemSchema = SchemaBuilder.Object();
 
             BuildComponent(itemSchema, field, field.Properties.SchemaIds, args);
@@ -188,11 +215,13 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                     var componentSchema = args.SchemaResolver(schemaName, () =>
                     {
+                        var nestedArgs = args.Increment();
+
                         var componentSchema = SchemaBuilder.Object();
 
-                        foreach (var sharedField in schema.Fields.ForApi(args.WithHiddenFields))
+                        foreach (var sharedField in schema.Fields.ForApi(nestedArgs.WithHiddenFields))
                         {
-                            var sharedProperty = sharedField.Accept(this, args);
+                            var sharedProperty = sharedField.Accept(this, nestedArgs);
 
                             if (sharedProperty != null)
                             {

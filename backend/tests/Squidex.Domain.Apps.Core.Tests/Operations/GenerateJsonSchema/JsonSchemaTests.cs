@@ -18,6 +18,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 {
     public class JsonSchemaTests
     {
+        private const int MaxDepth = 5;
         private readonly Schema schema = TestUtils.MixedSchema();
 
         [Fact]

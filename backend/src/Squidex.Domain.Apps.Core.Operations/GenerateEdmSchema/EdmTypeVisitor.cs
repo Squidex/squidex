@@ -14,6 +14,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 {
     internal sealed class EdmTypeVisitor : IFieldVisitor<IEdmTypeReference?, EdmTypeVisitor.Args>
     {
+        private const int MaxDepth = 5;
         private static readonly EdmComplexType JsonType = new EdmComplexType("Squidex", "Json", null, false, true);
         private static readonly EdmTypeVisitor Instance = new EdmTypeVisitor();
 
@@ -21,9 +22,18 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
         {
             public readonly EdmTypeFactory Factory;
 
-            public Args(EdmTypeFactory factory)
+            public readonly int Level;
+
+            public Args(EdmTypeFactory factory, int level)
             {
                 Factory = factory;
+
+                Level = level;
+            }
+
+            public Args Increment()
+            {
+                return new Args(Factory, Level + 1);
             }
         }
 
@@ -33,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public static IEdmTypeReference? BuildType(IField field, EdmTypeFactory factory)
         {
-            var args = new Args(factory);
+            var args = new Args(factory, 0);
 
             return field.Accept(Instance, args);
         }
@@ -118,15 +128,22 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             return new EdmComplexTypeReference(JsonType, !field.RawProperties.IsRequired);
         }
 
-        private IEdmTypeReference CreateNestedType(IField field, IEnumerable<IField> nested, Args args)
+        private IEdmTypeReference? CreateNestedType(IField field, IEnumerable<IField> nested, Args args)
         {
+            if (args.Level > MaxDepth)
+            {
+                return null;
+            }
+
             var (fieldEdmType, created) = args.Factory($"Data.{field.Name.ToPascalCase()}.Nested");
 
             if (created)
             {
+                var nestedArgs = args.Increment();
+
                 foreach (var sharedField in nested)
                 {
-                    var nestedEdmType = sharedField.Accept(this, args);
+                    var nestedEdmType = sharedField.Accept(this, nestedArgs);
 
                     if (nestedEdmType != null)
                     {

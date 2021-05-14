@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
-        public static Schema MixedSchema(SchemaType type = SchemaType.Default)
+        public static Schema MixedSchema(SchemaType type = SchemaType.Default, bool withMetadata = true)
         {
             var componentId = DomainId.NewGuid();
 
@@ -135,8 +135,11 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 .DisableField(212, 101)
                 .LockField(105);
 
-            schema.FieldsById[114].SetResolvedSchema(componentId, schema);
-            schema.FieldsById[115].SetResolvedSchema(componentId, schema);
+            if (withMetadata)
+            {
+                schema.FieldsById[114].SetResolvedSchema(componentId, schema);
+                schema.FieldsById[115].SetResolvedSchema(componentId, schema);
+            }
 
             return schema;
         }
