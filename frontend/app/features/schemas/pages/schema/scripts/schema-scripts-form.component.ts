@@ -13,7 +13,7 @@ import { EMPTY, Observable } from 'rxjs';
 @Component({
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
-    templateUrl: './schema-scripts-form.component.html'
+    templateUrl: './schema-scripts-form.component.html',
 })
 export class SchemaScriptsFormComponent implements OnChanges {
     @Input()
@@ -30,7 +30,7 @@ export class SchemaScriptsFormComponent implements OnChanges {
         private readonly appsState: AppsState,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
-        private readonly schemasService: SchemasService
+        private readonly schemasService: SchemasService,
     ) {
     }
 

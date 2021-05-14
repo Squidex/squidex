@@ -8,14 +8,14 @@
 import { Directive, HostListener, Input, Renderer2 } from '@angular/core';
 
 @Directive({
-    selector: '[sqxSyncScrolling]'
+    selector: '[sqxSyncScrolling]',
 })
 export class SyncScollingDirective {
     @Input('sqxSyncScrolling')
     public target: HTMLElement;
 
     constructor(
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

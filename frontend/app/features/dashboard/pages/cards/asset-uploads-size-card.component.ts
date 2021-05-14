@@ -14,9 +14,9 @@ import { ChartHelpers, ChartOptions } from './shared';
     styleUrls: ['./asset-uploads-size-card.component.scss'],
     templateUrl: './asset-uploads-size-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetUploadsSizeCardComponent implements OnChanges {
     @Input()
@@ -42,9 +42,9 @@ export class AssetUploadsSizeCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(),
                         borderColor: ChartHelpers.getBorderColor(),
                         borderWidth: 1,
-                        data: this.usage.map(x => Math.round(100 * (x.totalSize / (1024 * 1024))) / 100)
-                    }
-                ]
+                        data: this.usage.map(x => Math.round(100 * (x.totalSize / (1024 * 1024))) / 100),
+                    },
+                ],
             };
         }
     }

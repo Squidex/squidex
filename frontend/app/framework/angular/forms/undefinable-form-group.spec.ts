@@ -11,17 +11,17 @@ import { UndefinableFormGroup } from './undefinable-form-group';
 describe('UndefinableFormGroup', () => {
     const tests = [{
         name: 'undefined',
-        value: undefined
+        value: undefined,
     }, {
         name: 'defined',
-        value: { field: ['1'] }
+        value: { field: ['1'] },
     }];
 
-    tests.map(x => {
+    tests.forEach(x => {
         it(`should set value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormGroup({
-                    field: new FormControl()
+                    field: new FormControl(),
                 });
 
             assertValue(control, x.value, () => {
@@ -30,11 +30,11 @@ describe('UndefinableFormGroup', () => {
         });
     });
 
-    tests.map(x => {
+    tests.forEach(x => {
         it(`should patch value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormGroup({
-                    field: new FormControl()
+                    field: new FormControl(),
                 });
 
             assertValue(control, x.value, () => {
@@ -43,11 +43,11 @@ describe('UndefinableFormGroup', () => {
         });
     });
 
-    tests.map(x => {
+    tests.forEach(x => {
         it(`should reset value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormGroup({
-                    field: new FormControl()
+                    field: new FormControl(),
                 });
 
             assertValue(control, x.value, () => {

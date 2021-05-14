@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { Component, Input, OnChanges } from '@angular/core';
 import { ErrorDto, MathHelper, SchemaTagSource, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
 
 @Component({
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
-    templateUrl: './workflow.component.html'
+    templateUrl: './workflow.component.html',
 })
 export class WorkflowComponent implements OnChanges {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
@@ -35,7 +33,7 @@ export class WorkflowComponent implements OnChanges {
     public selectedTab = 0;
 
     constructor(
-        private readonly workflowsState: WorkflowsState
+        private readonly workflowsState: WorkflowsState,
     ) {
     }
 
@@ -97,7 +95,7 @@ export class WorkflowComponent implements OnChanges {
         this.workflow = this.workflow.removeTransition(from.name, transition.to);
     }
 
-    public updateTransition(update: { transition: WorkflowTransition, values: WorkflowTransitionValues }) {
+    public updateTransition(update: { transition: WorkflowTransition; values: WorkflowTransitionValues }) {
         this.workflow = this.workflow.setTransition(update.transition.from, update.transition.to, update.values);
     }
 

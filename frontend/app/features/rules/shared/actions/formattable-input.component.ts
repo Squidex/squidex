@@ -10,7 +10,7 @@ import { ControlValueAccessor, DefaultValueAccessor, NG_VALUE_ACCESSOR } from '@
 import { CodeEditorComponent, Types } from '@app/framework';
 
 export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true,
 };
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
@@ -22,9 +22,9 @@ const MODES: ReadonlyArray<TemplateMode> = ['Text', 'Script', 'Liquid'];
     styleUrls: ['./formattable-input.component.scss'],
     templateUrl: './formattable-input.component.html',
     providers: [
-        SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR
+        SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormattableInputComponent implements ControlValueAccessor, AfterViewInit {
     private fnChanged = (_: any) => { /* NOOP */ };

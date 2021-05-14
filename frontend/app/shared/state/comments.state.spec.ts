@@ -13,14 +13,14 @@ import { TestValues } from './_test-helpers';
 describe('CommentsState', () => {
     const {
         creator,
-        modified
+        modified,
     } = TestValues;
 
     const commentsUrl = 'my-comments';
 
     const oldComments = new CommentsDto([
         new CommentDto('1', modified, 'text1', undefined, creator),
-        new CommentDto('2', modified, 'text2', undefined, creator)
+        new CommentDto('2', modified, 'text2', undefined, creator),
     ], [], [], new Version('1'));
 
     let dialogs: IMock<DialogService>;
@@ -41,10 +41,10 @@ describe('CommentsState', () => {
     describe('Loading', () => {
         it('should load and merge comments', () => {
             const newComments = new CommentsDto([
-                    new CommentDto('3', modified, 'text3', undefined, creator)
-                ], [
-                    new CommentDto('2', modified, 'text2_2', undefined, creator)
-                ], ['1'], new Version('2'));
+                new CommentDto('3', modified, 'text3', undefined, creator),
+            ], [
+                new CommentDto('2', modified, 'text2_2', undefined, creator),
+            ], ['1'], new Version('2'));
 
             commentsService.setup(x => x.getComments(commentsUrl, new Version('-1')))
                 .returns(() => of(oldComments)).verifiable();
@@ -58,7 +58,7 @@ describe('CommentsState', () => {
             expect(commentsState.snapshot.isLoaded).toBeTruthy();
             expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('2', modified, 'text2_2', undefined, creator),
-                new CommentDto('3', modified, 'text3', undefined, creator)
+                new CommentDto('3', modified, 'text3', undefined, creator),
             ]);
         });
     });
@@ -84,7 +84,7 @@ describe('CommentsState', () => {
             expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('1', modified, 'text1', undefined, creator),
                 new CommentDto('2', modified, 'text2', undefined, creator),
-                new CommentDto('3', modified, 'text3', undefined, creator)
+                new CommentDto('3', modified, 'text3', undefined, creator),
             ]);
         });
 
@@ -98,7 +98,7 @@ describe('CommentsState', () => {
 
             expect(commentsState.snapshot.comments).toEqual([
                 new CommentDto('1', modified, 'text1', undefined, creator),
-                new CommentDto('2', modified, 'text2_2', undefined, creator)
+                new CommentDto('2', modified, 'text2_2', undefined, creator),
             ]);
         });
 
@@ -109,7 +109,7 @@ describe('CommentsState', () => {
             commentsState.delete(oldComments.createdComments[1]).subscribe();
 
             expect(commentsState.snapshot.comments).toEqual([
-                new CommentDto('1', modified, 'text1', undefined, creator)
+                new CommentDto('1', modified, 'text1', undefined, creator),
             ]);
         });
     });

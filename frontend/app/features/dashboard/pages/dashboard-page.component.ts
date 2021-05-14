@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, LocalStoreService, ResourceOwner, Settings, StorageUsagePerDateDto, switchSafe, UsagesService } from '@app/shared';
 import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
@@ -16,8 +14,8 @@ import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angul
     styleUrls: ['./dashboard-page.component.scss'],
     templateUrl: './dashboard-page.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class DashboardPageComponent extends ResourceOwner implements AfterViewInit, OnInit {
     @ViewChild('grid')
@@ -45,7 +43,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
         private readonly localStore: LocalStoreService,
         private readonly renderer: Renderer2,
         private readonly usagesService: UsagesService,
-        private readonly zone: NgZone
+        private readonly zone: NgZone,
     ) {
         super();
 
@@ -107,7 +105,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
 const DEFAULT_OPTIONS: GridsterConfig = {
     displayGrid: 'onDrag&Resize',
     draggable: {
-        enabled: true
+        enabled: true,
     },
     fixedColWidth: 254,
     fixedRowHeight: 254,
@@ -120,6 +118,6 @@ const DEFAULT_OPTIONS: GridsterConfig = {
     outerMarginRight: 16,
     outerMarginTop: 120,
     resizable: {
-        enabled: true
-    }
+        enabled: true,
+    },
 };

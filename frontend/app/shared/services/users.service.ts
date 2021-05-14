@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
 export class UserDto {
     constructor(
         public readonly id: string,
-        public readonly displayName: string
+        public readonly displayName: string,
     ) {
     }
 }
@@ -31,7 +31,7 @@ export class ResourcesDto {
 export class UsersService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 
@@ -65,7 +65,7 @@ export class UsersService {
     }
 
     public getResources(): Observable<ResourcesDto> {
-        const url = this.apiUrl.buildUrl(`api`);
+        const url = this.apiUrl.buildUrl('api');
 
         return this.http.get<{ _links: {} }>(url).pipe(
             map(({ _links }) => {

@@ -37,7 +37,7 @@ export class EventConsumersState extends State<Snapshot> {
 
     constructor(
         private readonly dialogs: DialogService,
-        private readonly eventConsumersService: EventConsumersService
+        private readonly eventConsumersService: EventConsumersService,
     ) {
         super({ eventConsumers: [] }, 'EventConsumers');
     }
@@ -64,7 +64,7 @@ export class EventConsumersState extends State<Snapshot> {
                 this.next({
                     eventConsumers,
                     isLoaded: true,
-                    isLoading: false
+                    isLoading: false,
                 }, 'Loading Success');
             }),
             finalize(() => {

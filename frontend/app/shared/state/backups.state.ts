@@ -48,7 +48,7 @@ export class BackupsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly backupsService: BackupsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super({ backups: [] }, 'Backups');
     }
@@ -76,7 +76,7 @@ export class BackupsState extends State<Snapshot> {
                     backups,
                     canCreate,
                     isLoaded: true,
-                    isLoading: false
+                    isLoading: false,
                 }, 'Loading Success');
             }),
             finalize(() => {

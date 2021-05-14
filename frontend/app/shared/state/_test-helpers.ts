@@ -63,10 +63,10 @@ function createSchema({ properties, id, fields, fieldsInLists, fieldsInReference
 type FieldValues = {
     id?: number;
     properties: FieldPropertiesDto;
-    isDisabled?: boolean,
-    isHidden?: boolean,
+    isDisabled?: boolean;
+    isHidden?: boolean;
     partitioning?: string;
-    nested?: ReadonlyArray<NestedFieldDto>
+    nested?: ReadonlyArray<NestedFieldDto>;
 };
 
 function createField({ properties, id, partitioning, isDisabled, nested }: FieldValues) {
@@ -93,5 +93,5 @@ export const TestValues = {
     modified,
     modifier,
     newVersion,
-    version
+    version,
 };

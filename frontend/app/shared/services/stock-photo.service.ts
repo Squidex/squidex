@@ -11,11 +11,11 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 export class StockPhotoDto {
-    constructor (
+    constructor(
         public readonly url: string,
         public readonly thumbUrl: string,
         public readonly user: string,
-        public readonly userProfileUrl: string
+        public readonly userProfileUrl: string,
     ) {
     }
 }
@@ -23,7 +23,7 @@ export class StockPhotoDto {
 @Injectable()
 export class StockPhotoService {
     constructor(
-        private readonly http: HttpClient
+        private readonly http: HttpClient,
     ) {
     }
 
@@ -37,7 +37,7 @@ export class StockPhotoService {
                         x.url,
                         x.thumbUrl,
                         x.user,
-                        x.userProfileUrl
+                        x.userProfileUrl,
                     ));
             }),
             catchError(() => of([])));

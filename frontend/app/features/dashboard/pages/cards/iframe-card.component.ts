@@ -13,9 +13,9 @@ import { AppDto, fadeAnimation } from '@app/shared';
     styleUrls: ['./iframe-card.component.scss'],
     templateUrl: './iframe-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IFrameCardComponent implements AfterViewInit {
     @ViewChild('iframe', { static: false })

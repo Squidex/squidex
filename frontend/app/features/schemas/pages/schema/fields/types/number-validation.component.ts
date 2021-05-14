@@ -12,7 +12,7 @@ import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } 
 @Component({
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
-    templateUrl: 'number-validation.component.html'
+    templateUrl: 'number-validation.component.html',
 })
 export class NumberValidationComponent {
     @Input()

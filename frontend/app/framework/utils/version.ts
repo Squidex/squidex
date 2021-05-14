@@ -9,7 +9,7 @@ export class Version {
     public static readonly EMPTY = new Version('');
 
     constructor(
-        public readonly value: string
+        public readonly value: string,
     ) {
     }
 
@@ -34,4 +34,4 @@ export function versioned<T = any>(version: Version, payload: T = undefined!): V
     return { version, payload };
 }
 
-export type Versioned<T> = Readonly<{ version: Version, payload: T }>;
+export type Versioned<T> = Readonly<{ version: Version; payload: T }>;

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: only-arrow-functions
-
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, onErrorResumeNext, publishReplay, refCount, switchMap } from 'rxjs/operators';
 import { DialogService } from './../services/dialog.service';
@@ -20,7 +18,7 @@ export function mapVersioned<T = any, R = any>(project: (value: T, version: Vers
     };
 }
 
-type Options = { silent?: boolean, throw?: boolean };
+type Options = { silent?: boolean; throw?: boolean };
 
 export function shareSubscribed<T>(dialogs: DialogService, options?: Options) {
     return shareMapSubscribed<T, T>(dialogs, x => x, options);

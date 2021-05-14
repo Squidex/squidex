@@ -1,4 +1,6 @@
-﻿Error.stackTraceLimit = Infinity;
+﻿/* eslint-disable */
+
+Error.stackTraceLimit = Infinity;
 
 require('core-js/proposals/reflect-metadata');
 

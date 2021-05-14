@@ -1,11 +1,9 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
-// tslint:disable: max-line-length
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -22,7 +20,7 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         MentionModule,
         NgxDocViewerModule,
         RouterModule,
-        SqxFrameworkModule
+        SqxFrameworkModule,
     ],
     declarations: [
         AppFormComponent,
@@ -73,7 +71,7 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
     ],
     exports: [
         AppFormComponent,
@@ -116,8 +114,8 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
-    ]
+        UserPictureRefPipe,
+    ],
 })
 export class SqxSharedModule {
     public static forRoot(): ModuleWithProviders<SqxSharedModule> {
@@ -183,9 +181,9 @@ export class SqxSharedModule {
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: AuthInterceptor,
-                    multi: true
-                }
-            ]
+                    multi: true,
+                },
+            ],
         };
     }
 }

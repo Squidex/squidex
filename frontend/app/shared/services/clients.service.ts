@@ -25,7 +25,7 @@ export class ClientDto {
         public readonly role: string,
         public readonly apiCallsLimit: number,
         public readonly apiTrafficLimit: number,
-        public readonly allowAnonymous: boolean
+        public readonly allowAnonymous: boolean,
     ) {
         this._links = links;
 
@@ -37,7 +37,7 @@ export class ClientDto {
 export class AccessTokenDto {
     constructor(
         public readonly accessToken: string,
-        public readonly tokenType: string
+        public readonly tokenType: string,
     ) {
     }
 }
@@ -46,20 +46,20 @@ export type ClientsDto =
     Versioned<ClientsPayload>;
 
 export type ClientsPayload =
-    Readonly<{ items: ReadonlyArray<ClientDto>, canCreate: boolean } & Resource>;
+    Readonly<{ items: ReadonlyArray<ClientDto>; canCreate: boolean } & Resource>;
 
 export type CreateClientDto =
     Readonly<{ id: string }>;
 
 export type UpdateClientDto =
-    Readonly<{ name?: string; role?: string; allowAnonymous?: boolean; apiCallsLimit?: number; }>;
+    Readonly<{ name?: string; role?: string; allowAnonymous?: boolean; apiCallsLimit?: number }>;
 
 @Injectable()
 export class ClientsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -119,8 +119,8 @@ export class ClientsService {
     public createToken(appName: string, client: ClientDto): Observable<AccessTokenDto> {
         const options = {
             headers: new HttpHeaders({
-                'Content-Type': 'application/x-www-form-urlencoded', 'NoAuth': 'true'
-            })
+                'Content-Type': 'application/x-www-form-urlencoded', NoAuth: 'true',
+            }),
         };
 
         const body = `grant_type=client_credentials&scope=squidex-api&client_id=${appName}:${client.id}&client_secret=${client.secret}`;

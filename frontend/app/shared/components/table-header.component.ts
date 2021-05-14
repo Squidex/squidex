@@ -12,7 +12,7 @@ import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
     selector: 'sqx-table-header',
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableHeaderComponent implements OnChanges {
     @Output()
@@ -62,7 +62,7 @@ export class TableHeaderComponent implements OnChanges {
             const newQuery = Types.clone(this.query || {});
 
             newQuery.sort = [
-                { path: this.fieldPath, order: this.order! }
+                { path: this.fieldPath, order: this.order! },
             ];
 
             this.queryChange.emit(newQuery);

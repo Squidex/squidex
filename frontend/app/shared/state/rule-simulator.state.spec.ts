@@ -17,12 +17,12 @@ import { TestValues } from './_test-helpers';
 describe('RuleSimulatorState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     const oldSimulatedRuleEvents = [
-         createSimulatedRuleEvent(1),
-         createSimulatedRuleEvent(2)
+        createSimulatedRuleEvent(1),
+        createSimulatedRuleEvent(2),
     ];
 
     let dialogs: IMock<DialogService>;

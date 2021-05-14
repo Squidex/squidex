@@ -12,7 +12,7 @@ import { FieldDto, TagsFieldPropertiesDto, TAGS_FIELD_EDITORS } from '@app/share
 @Component({
     selector: 'sqx-tags-ui',
     styleUrls: ['tags-ui.component.scss'],
-    templateUrl: 'tags-ui.component.html'
+    templateUrl: 'tags-ui.component.html',
 })
 export class TagsUIComponent {
     @Input()

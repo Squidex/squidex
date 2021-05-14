@@ -12,14 +12,14 @@ import { PlanInfo, PlansState } from '@app/shared';
     selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlanComponent {
     @Input()
     public planInfo: PlanInfo;
 
     constructor(
-        public readonly plansState: PlansState
+        public readonly plansState: PlansState,
     ) {
     }
 

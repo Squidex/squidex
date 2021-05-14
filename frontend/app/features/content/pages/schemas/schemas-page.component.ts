@@ -12,7 +12,7 @@ import { LocalStoreService, SchemaCategory, SchemasState, Settings } from '@app/
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
-    templateUrl: './schemas-page.component.html'
+    templateUrl: './schemas-page.component.html',
 })
 export class SchemasPageComponent {
     public schemasFilter = new FormControl();
@@ -25,7 +25,7 @@ export class SchemasPageComponent {
 
     constructor(
         public readonly schemasState: SchemasState,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
         this.isCollapsed = localStore.getBoolean(Settings.Local.SCHEMAS_COLLAPSED);
     }

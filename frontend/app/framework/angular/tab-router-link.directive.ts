@@ -9,7 +9,7 @@ import { Directive, HostListener, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Directive({
-    selector: '[sqxTabRouterLink]'
+    selector: '[sqxTabRouterLink]',
 })
 export class TabRouterlinkDirective {
     @Input('sqxTabRouterLink')
@@ -17,14 +17,14 @@ export class TabRouterlinkDirective {
 
     constructor(
         private readonly router: Router,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
     ) {
     }
 
     @HostListener('click', ['$event'])
     public onClick(event: MouseEvent) {
         const urlTree = this.router.createUrlTree(this.commands, {
-            relativeTo: this.route
+            relativeTo: this.route,
         });
 
         if (event.ctrlKey) {

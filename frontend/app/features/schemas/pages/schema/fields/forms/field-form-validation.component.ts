@@ -12,7 +12,7 @@ import { AppSettingsDto, FieldDto, LanguageDto } from '@app/shared';
 @Component({
     selector: 'sqx-field-form-validation',
     styleUrls: ['./field-form-validation.component.scss'],
-    templateUrl: './field-form-validation.component.html'
+    templateUrl: './field-form-validation.component.html',
 })
 export class FieldFormValidationComponent {
     @Input()

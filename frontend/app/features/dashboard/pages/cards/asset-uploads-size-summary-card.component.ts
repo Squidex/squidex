@@ -13,9 +13,9 @@ import { AppDto, CurrentStorageDto, fadeAnimation } from '@app/shared';
     styleUrls: ['./asset-uploads-size-summary-card.component.scss'],
     templateUrl: './asset-uploads-size-summary-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetUploadsSizeSummaryCardComponent implements OnChanges {
     @Input()

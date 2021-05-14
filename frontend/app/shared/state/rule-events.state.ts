@@ -40,13 +40,13 @@ export class RuleEventsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService
+        private readonly rulesService: RulesService,
     ) {
         super({
             ruleEvents: [],
             page: 0,
             pageSize: 30,
-            total: 0
+            total: 0,
         }, 'Rule Events');
     }
 
@@ -76,7 +76,7 @@ export class RuleEventsState extends State<Snapshot> {
                     isLoaded: true,
                     isLoading: false,
                     ruleEvents,
-                    total
+                    total,
                 }, 'Loading Success');
             }),
             finalize(() => {
@@ -113,7 +113,7 @@ export class RuleEventsState extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    public page(paging: { page: number, pageSize: number }) {
+    public page(paging: { page: number; pageSize: number }) {
         if (!this.next(paging, 'Loading Paged')) {
             return EMPTY;
         }

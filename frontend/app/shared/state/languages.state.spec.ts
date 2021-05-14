@@ -17,7 +17,7 @@ describe('LanguagesState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const languageDE = new LanguageDto('de', 'German');
@@ -57,15 +57,15 @@ describe('LanguagesState', () => {
             languagesState.load().subscribe();
 
             expect(languagesState.snapshot.languages).toEqual([
-               {
-                   language: oldLanguages.items[0],
-                   fallbackLanguages: [oldLanguages.items[1]],
-                   fallbackLanguagesNew: []
-               }, {
-                   language: oldLanguages.items[1],
-                   fallbackLanguages: [oldLanguages.items[0]],
-                   fallbackLanguagesNew: []
-               }
+                {
+                    language: oldLanguages.items[0],
+                    fallbackLanguages: [oldLanguages.items[1]],
+                    fallbackLanguagesNew: [],
+                }, {
+                    language: oldLanguages.items[1],
+                    fallbackLanguages: [oldLanguages.items[0]],
+                    fallbackLanguagesNew: [],
+                },
             ]);
             expect(languagesState.snapshot.allLanguagesNew).toEqual([languageIT, languageES]);
             expect(languagesState.snapshot.isLoaded).toBeTruthy();
@@ -138,8 +138,8 @@ describe('LanguagesState', () => {
                 {
                     language: updated.items[0],
                     fallbackLanguages: [],
-                    fallbackLanguagesNew: []
-                }
+                    fallbackLanguagesNew: [],
+                },
             ]);
             expect(languagesState.snapshot.allLanguagesNew).toEqual([languageEN, languageIT, languageES]);
             expect(languagesState.snapshot.version).toEqual(newVersion);

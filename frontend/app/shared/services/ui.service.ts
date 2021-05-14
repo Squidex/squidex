@@ -18,12 +18,12 @@ export type UISettingsDto =
 export class UIService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 
     public getCommonSettings(): Observable<UISettingsDto> {
-        const url = this.apiUrl.buildUrl(`api/ui/settings`);
+        const url = this.apiUrl.buildUrl('api/ui/settings');
 
         return this.http.get<UISettingsDto>(url).pipe(
             catchError(() => {

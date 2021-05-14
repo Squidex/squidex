@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
 @Component({
     selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
-    templateUrl: 'string-ui.component.html'
+    templateUrl: 'string-ui.component.html',
 })
 export class StringUIComponent extends ResourceOwner implements OnChanges {
     @Input()

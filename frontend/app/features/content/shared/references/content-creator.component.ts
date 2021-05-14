@@ -13,8 +13,8 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, Re
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
     providers: [
-        ComponentContentsState
-    ]
+        ComponentContentsState,
+    ],
 })
 export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     @Output()
@@ -45,7 +45,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
 
     constructor(
         private readonly contentsState: ComponentContentsState,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
         super();
     }

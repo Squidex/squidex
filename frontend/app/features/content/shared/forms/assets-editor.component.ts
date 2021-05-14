@@ -11,13 +11,13 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, AssetDto, AssetsService, DialogModel, LocalStoreService, MessageBus, Settings, sorted, StatefulControlComponent, Types } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true,
 };
 
 class AssetUpdated {
     constructor(
         public readonly asset: AssetDto,
-        public readonly source: any
+        public readonly source: any,
     ) {
     }
 }
@@ -41,9 +41,9 @@ interface State {
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
     providers: [
-        SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
     @Input()
@@ -60,12 +60,12 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly localStore: LocalStoreService,
-        private readonly messageBus: MessageBus
+        private readonly messageBus: MessageBus,
     ) {
         super(changeDetector, {
             assets: [],
             assetFiles: [],
-            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE)
+            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
         });
     }
 
@@ -116,7 +116,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
         for (const file of files) {
             this.next(s => ({
                 ...s,
-                assetFiles: [file, ...s.assetFiles]
+                assetFiles: [file, ...s.assetFiles],
             }));
         }
     }
@@ -136,7 +136,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
             this.next(s => ({
                 ...s,
                 assetFiles: s.assetFiles.removed(file),
-                assets: [asset, ...s.assets]
+                assets: [asset, ...s.assets],
             }));
 
             this.updateValue();
@@ -162,7 +162,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     public removeLoadingAsset(file: File) {
         this.next(s => ({
             ...s,
-            assetFiles: s.assetFiles.removed(file)
+            assetFiles: s.assetFiles.removed(file),
         }));
     }
 

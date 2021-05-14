@@ -48,7 +48,7 @@ export class AssetUploaderState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super({ uploads: [] }, 'AssetUploader');
     }
@@ -66,7 +66,7 @@ export class AssetUploaderState extends State<Snapshot> {
     public uploadFile(file: File, target?: AssetsState, parentId?: string): Observable<UploadResult> {
         const stream = this.assetsService.postAssetFile(this.appName, file, parentId ?? target?.parentId);
 
-        return this.upload(stream, MathHelper.guid(), file.name, asset  => {
+        return this.upload(stream, MathHelper.guid(), file.name, asset => {
             if (asset.isDuplicate) {
                 this.dialogs.notifyError('i18n:assets.duplicateFile');
             } else if (target) {
@@ -92,12 +92,10 @@ export class AssetUploaderState extends State<Snapshot> {
             map(event => {
                 if (Types.isNumber(event)) {
                     return event;
+                } else if (complete) {
+                    return complete(event);
                 } else {
-                    if (complete) {
-                        return complete(event);
-                    } else {
-                        return event;
-                    }
+                    return event;
                 }
             }),
             publishReplay(), refCount());
@@ -124,7 +122,6 @@ export class AssetUploaderState extends State<Snapshot> {
 
                 return { ...s, uploads };
             }, 'Upload Done');
-
         }, 10000);
 
         return upload;

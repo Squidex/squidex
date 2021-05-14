@@ -21,9 +21,9 @@ interface State {
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private displayFieldName: string;
@@ -42,10 +42,10 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
 
     constructor(changeDetector: ChangeDetectorRef,
         @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
-        private readonly localizer: LocalizerService
+        private readonly localizer: LocalizerService,
     ) {
         super(changeDetector, {
-            errorMessages: []
+            errorMessages: [],
         });
     }
 
@@ -68,7 +68,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
 
                 this.displayFieldName = translation;
             } else {
-                this.displayFieldName = this.localizer.get(`common.field`)!;
+                this.displayFieldName = this.localizer.get('common.field')!;
             }
         }
 
@@ -97,9 +97,12 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
 
                 this.controlOriginalMarkAsTouched = this.control.markAsTouched;
 
+                // eslint-disable-next-line @typescript-eslint/no-this-alias
                 const self = this;
 
+                // eslint-disable-next-line func-names
                 this.control['markAsTouched'] = function () {
+                    // eslint-disable-next-line prefer-rest-params
                     self.controlOriginalMarkAsTouched.apply(this, arguments);
 
                     self.createMessages();
@@ -120,7 +123,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         const errorMessages: string[] = [];
 
         if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
-            for (const key in <any>this.control.errors) {
+            for (const key in this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
                     const message = formatError(this.localizer, this.displayFieldName, key, this.control.errors[key], this.control.value);
 

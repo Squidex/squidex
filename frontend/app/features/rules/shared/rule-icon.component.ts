@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: component-selector
-
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RuleElementDto } from '@app/shared';
 
@@ -14,7 +12,7 @@ import { RuleElementDto } from '@app/shared';
     selector: 'sqx-rule-icon',
     styleUrls: ['./rule-icon.component.scss'],
     templateUrl: './rule-icon.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RuleIconComponent {
     @Input()

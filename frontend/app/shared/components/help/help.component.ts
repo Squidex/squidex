@@ -13,14 +13,14 @@ import { HelpService } from '@app/shared/internal';
     selector: 'sqx-help',
     styleUrls: ['./help.component.scss'],
     templateUrl: './help.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HelpComponent {
     public helpMarkdown = this.helpService.getHelp(this.route.snapshot.data.helpPage);
 
     constructor(
         private readonly helpService: HelpService,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
     ) {
     }
 }

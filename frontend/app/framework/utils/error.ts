@@ -14,7 +14,7 @@ export class ErrorDetailsDto {
     public readonly properties: ReadonlyArray<string> = [];
 
     constructor(
-        public readonly originalMessage: string
+        public readonly originalMessage: string,
     ) {
         const propertySeparator = originalMessage.indexOf(': ');
 
@@ -29,7 +29,6 @@ export class ErrorDetailsDto {
         } else {
             this.message = originalMessage;
         }
-
     }
 }
 
@@ -41,7 +40,7 @@ export class ErrorDto {
         public readonly message: string,
         public readonly errorCode?: string | null,
         details?: ReadonlyArray<string> | ReadonlyArray<ErrorDetailsDto>,
-        public readonly inner?: any
+        public readonly inner?: any,
     ) {
         if (Types.isArrayOfString(details)) {
             this.details = details.map(x => new ErrorDetailsDto(x));

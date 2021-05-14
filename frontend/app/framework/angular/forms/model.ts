@@ -43,7 +43,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
     }
 
     constructor(
-        public readonly form: T
+        public readonly form: T,
     ) {
         addValidator(form, this.errorValidator.validator);
     }
@@ -104,7 +104,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         }
     }
 
-    public submitCompleted(options?: { newValue?: TOut, noReset?: boolean }) {
+    public submitCompleted(options?: { newValue?: TOut; noReset?: boolean }) {
         this.updateSubmitState(null, false);
 
         this.enable();
@@ -128,7 +128,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         this.state.next(s => ({
             submitCount: s.submitCount + (submitting ? 1 : 0),
             submitting,
-            error
+            error,
         }));
 
         if (replaceDetails) {

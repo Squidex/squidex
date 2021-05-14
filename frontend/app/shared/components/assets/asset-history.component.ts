@@ -10,12 +10,12 @@ import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/share
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean; }
+interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 
 @Component({
     selector: 'sqx-asset-history',
     styleUrls: ['./asset-history.component.scss'],
-    templateUrl: './asset-history.component.html'
+    templateUrl: './asset-history.component.html',
 })
 export class AssetHistoryComponent implements OnChanges {
     @Input()
@@ -25,7 +25,7 @@ export class AssetHistoryComponent implements OnChanges {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly historyService: HistoryService
+        private readonly historyService: HistoryService,
     ) {
     }
 

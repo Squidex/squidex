@@ -11,11 +11,11 @@ import { LanguagesState, SnapshotLanguage } from '@app/shared';
 @Component({
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
-    templateUrl: './languages-page.component.html'
+    templateUrl: './languages-page.component.html',
 })
 export class LanguagesPageComponent implements OnInit {
     constructor(
-        public readonly languagesState: LanguagesState
+        public readonly languagesState: LanguagesState,
     ) {
     }
 

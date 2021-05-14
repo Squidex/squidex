@@ -11,7 +11,7 @@ import { FeatureDto } from '@app/shared';
 @Component({
     selector: 'sqx-news-dialog',
     styleUrls: ['./news-dialog.component.scss'],
-    templateUrl: './news-dialog.component.html'
+    templateUrl: './news-dialog.component.html',
 })
 export class NewsDialogComponent {
     @Output()

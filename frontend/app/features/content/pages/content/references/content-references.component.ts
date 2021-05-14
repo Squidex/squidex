@@ -14,8 +14,8 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, 
     templateUrl: './content-references.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
-        Router2State, ComponentContentsState
-    ]
+        Router2State, ComponentContentsState,
+    ],
 })
 export class ContentReferencesComponent implements OnChanges {
     @Input()
@@ -29,7 +29,7 @@ export class ContentReferencesComponent implements OnChanges {
 
     constructor(
         public readonly contentsRoute: Router2State,
-        public readonly contentsState: ComponentContentsState
+        public readonly contentsState: ComponentContentsState,
     ) {
     }
 

@@ -13,9 +13,9 @@ import { fadeAnimation } from '@app/framework/internal';
     styleUrls: ['./modal-dialog.component.scss'],
     templateUrl: './modal-dialog.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ModalDialogComponent implements AfterViewInit {
     @Output()
@@ -46,7 +46,7 @@ export class ModalDialogComponent implements AfterViewInit {
     public footerElement: ElementRef<ParentNode>;
 
     constructor(
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

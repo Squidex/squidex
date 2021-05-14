@@ -13,7 +13,7 @@ import { AddLanguageForm, LanguageDto, LanguagesState } from '@app/shared';
     selector: 'sqx-language-add-form',
     styleUrls: ['./language-add-form.component.scss'],
     templateUrl: './language-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LanguageAddFormComponent implements OnChanges {
     @Input()
@@ -23,7 +23,7 @@ export class LanguageAddFormComponent implements OnChanges {
 
     constructor(
         private readonly languagesState: LanguagesState,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

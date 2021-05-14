@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -98,7 +98,7 @@ export class DateTime {
             date = parseISO(value);
         }
 
-        if (isNaN(date.getTime())) {
+        if (Number.isNaN(date.getTime())) {
             return null;
         }
 
@@ -202,5 +202,4 @@ export class DateTime {
 
         return result;
     }
-
 }

@@ -24,7 +24,7 @@ export class RoleDto {
         public readonly numContributors: number,
         public readonly permissions: ReadonlyArray<string>,
         public readonly properties: {},
-        public readonly isDefaultRole: boolean
+        public readonly isDefaultRole: boolean,
     ) {
         this._links = links;
 
@@ -39,20 +39,20 @@ export type RolesDto =
     Versioned<RolesPayload>;
 
 export type RolesPayload =
-    Readonly<{ items: ReadonlyArray<RoleDto>; canCreate: boolean; } & Resource>;
+    Readonly<{ items: ReadonlyArray<RoleDto>; canCreate: boolean } & Resource>;
 
 export type CreateRoleDto =
-    Readonly<{ name: string; }>;
+    Readonly<{ name: string }>;
 
 export type UpdateRoleDto =
-    Readonly<{ permissions: Permissions; properties: {}; }>;
+    Readonly<{ permissions: Permissions; properties: {} }>;
 
 @Injectable()
 export class RolesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 

@@ -16,7 +16,7 @@ import { catchError } from 'rxjs/operators';
 @Component({
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
-    templateUrl: './graphql-page.component.html'
+    templateUrl: './graphql-page.component.html',
 })
 export class GraphQLPageComponent implements AfterViewInit {
     @ViewChild('graphiQLContainer', { static: false })
@@ -24,7 +24,7 @@ export class GraphQLPageComponent implements AfterViewInit {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly graphQlService: GraphQlService
+        private readonly graphQlService: GraphQlService,
     ) {
     }
 
@@ -33,9 +33,9 @@ export class GraphQLPageComponent implements AfterViewInit {
             React.createElement(GraphiQL, {
                 fetcher: (params: any) => {
                     return this.request(params);
-                }
+                },
             }),
-            this.graphiQLContainer.nativeElement
+            this.graphiQLContainer.nativeElement,
         );
     }
 

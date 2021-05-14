@@ -5,13 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: directive-selector
-
 import { Directive, ElementRef, HostListener, Input, OnDestroy, Renderer2 } from '@angular/core';
 import { DialogService, Tooltip } from '@app/framework/internal';
 
 @Directive({
-    selector: '[title]'
+    selector: '[title]',
 })
 export class TooltipDirective implements OnDestroy {
     private titleText: string;
@@ -33,7 +31,7 @@ export class TooltipDirective implements OnDestroy {
     constructor(
         private readonly dialogs: DialogService,
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 
@@ -83,8 +81,10 @@ export class TooltipDirective implements OnDestroy {
     private unsetAttribute() {
         try {
             this.renderer.setProperty(this.element.nativeElement, 'title', '');
+
+            return true;
         } catch (ex) {
-            return;
+            return false;
         }
     }
 }

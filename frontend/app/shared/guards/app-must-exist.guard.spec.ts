@@ -14,8 +14,8 @@ import { AppMustExistGuard } from './app-must-exist.guard';
 describe('AppMustExistGuard', () => {
     const route: any = {
         params: {
-            appName: 'my-app'
-        }
+            appName: 'my-app',
+        },
     };
 
     let router: IMock<Router>;

@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     selector: 'sqx-form-alert',
     styleUrls: ['./form-alert.component.scss'],
     templateUrl: './form-alert.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormAlertComponent {
     @Input()

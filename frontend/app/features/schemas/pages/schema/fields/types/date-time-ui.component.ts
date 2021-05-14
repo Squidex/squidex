@@ -12,7 +12,7 @@ import { DateTimeFieldPropertiesDto, DATETIME_FIELD_EDITORS, FieldDto, FloatConv
 @Component({
     selector: 'sqx-date-time-ui',
     styleUrls: ['date-time-ui.component.scss'],
-    templateUrl: 'date-time-ui.component.html'
+    templateUrl: 'date-time-ui.component.html',
 })
 export class DateTimeUIComponent {
     public readonly converter = FloatConverter.INSTANCE;

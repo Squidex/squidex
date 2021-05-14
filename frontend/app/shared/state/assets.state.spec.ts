@@ -17,7 +17,7 @@ describe('AssetsState', () => {
     const {
         app,
         appsState,
-        newVersion
+        newVersion,
     } = TestValues;
 
     const asset1 = createAsset(1, ['tag1', 'shared']);

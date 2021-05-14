@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  *
@@ -14,9 +13,9 @@ import { AppDto, CallsUsageDto, fadeAnimation } from '@app/shared';
     styleUrls: ['./api-traffic-summary-card.component.scss'],
     templateUrl: './api-traffic-summary-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiTrafficSummaryCardComponent implements OnChanges {
     @Input()

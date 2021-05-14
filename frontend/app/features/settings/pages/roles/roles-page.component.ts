@@ -13,6 +13,7 @@ class PermissionsAutocomplete implements AutocompleteSource {
     private permissions: ReadonlyArray<string> = [];
 
     constructor(appsState: AppsState, rolesService: RolesService) {
+        // eslint-disable-next-line no-return-assign
         rolesService.getPermissions(appsState.appName).subscribe(x => this.permissions = x);
     }
 
@@ -24,7 +25,7 @@ class PermissionsAutocomplete implements AutocompleteSource {
 @Component({
     selector: 'sqx-roles-page',
     styleUrls: ['./roles-page.component.scss'],
-    templateUrl: './roles-page.component.html'
+    templateUrl: './roles-page.component.html',
 })
 export class RolesPageComponent implements OnInit {
     public allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
@@ -33,7 +34,7 @@ export class RolesPageComponent implements OnInit {
         private readonly appsState: AppsState,
         public readonly rolesService: RolesService,
         public readonly rolesState: RolesState,
-        public readonly schemasState: SchemasState
+        public readonly schemasState: SchemasState,
     ) {
     }
 

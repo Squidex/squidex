@@ -12,7 +12,7 @@ import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
 @Component({
     selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
-    templateUrl: 'tags-validation.component.html'
+    templateUrl: 'tags-validation.component.html',
 })
 export class TagsValidationComponent {
     @Input()

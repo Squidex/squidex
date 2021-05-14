@@ -5,6 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable one-var-declaration-per-line */
+/* eslint-disable one-var */
+/* eslint-disable no-sequences */
+
 import { Pipe, PipeTransform } from '@angular/core';
 
 interface RGBColor {
@@ -31,25 +35,25 @@ const ColorDefinitions: ReadonlyArray<ColorDefinition> = [
         process: (bits) => ({
             r: parseInt(bits[1], 10) / 255,
             g: parseInt(bits[2], 10) / 255,
-            b: parseInt(bits[3], 10) / 255
-        })
+            b: parseInt(bits[3], 10) / 255,
+        }),
     },
     {
         regex: /^(\w{2})(\w{2})(\w{2})$/,
         process: (bits) => ({
             r: parseInt(bits[1], 16) / 255,
             g: parseInt(bits[2], 16) / 255,
-            b: parseInt(bits[3], 16) / 255
-        })
+            b: parseInt(bits[3], 16) / 255,
+        }),
     },
     {
         regex: /^(\w{1})(\w{1})(\w{1})$/,
         process: (bits) => ({
             r: parseInt(bits[1] + bits[1], 16) / 255,
             g: parseInt(bits[2] + bits[2], 16) / 255,
-            b: parseInt(bits[3] + bits[3], 16) / 255
-        })
-    }
+            b: parseInt(bits[3] + bits[3], 16) / 255,
+        }),
+    },
 ];
 
 function parseColor(value: string) {
@@ -135,7 +139,7 @@ function colorString({ r, g, b }: RGBColor) {
 
 @Pipe({
     name: 'sqxDarken',
-    pure: true
+    pure: true,
 })
 export class DarkenPipe implements PipeTransform {
     public transform(value: string, percentage: number): any {
@@ -150,7 +154,7 @@ export class DarkenPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxLighten',
-    pure: true
+    pure: true,
 })
 export class LightenPipe implements PipeTransform {
     public transform(value: string, percentage: number): any {

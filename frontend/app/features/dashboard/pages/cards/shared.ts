@@ -18,7 +18,7 @@ const ColorSchema: ReadonlyArray<string> = [
     ' 50, 211,  50',
     '131,  50, 211',
     '211,  50, 211',
-    '211,  50, 131'
+    '211,  50, 131',
 ];
 
 export module ChartHelpers {
@@ -49,16 +49,16 @@ export module ChartOptions {
         scales: {
             xAxes: [{
                 display: true,
-                stacked: false
+                stacked: false,
             }],
             yAxes: [{
                 ticks: {
-                    beginAtZero: true
+                    beginAtZero: true,
                 },
-                stacked: false
-            }]
+                stacked: false,
+            }],
         },
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
     };
 
     export const Stacked = {
@@ -66,15 +66,15 @@ export module ChartOptions {
         scales: {
             xAxes: [{
                 display: true,
-                stacked: true
+                stacked: true,
             }],
             yAxes: [{
                 ticks: {
-                    beginAtZero: true
+                    beginAtZero: true,
                 },
-                stacked: true
-            }]
+                stacked: true,
+            }],
         },
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
     };
 }

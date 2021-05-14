@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  *
@@ -15,9 +14,9 @@ import { ChartHelpers, ChartOptions } from './shared';
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiTrafficCardComponent implements OnChanges {
     @Input()
@@ -51,8 +50,8 @@ export class ApiTrafficCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(i),
                         borderColor: ChartHelpers.getBorderColor(i),
                         borderWidth: 1,
-                        data: this.usage.details[k].map(x => Math.round(100 * (x.totalBytes / (1024 * 1024))) / 100)
-                    }))
+                        data: this.usage.details[k].map(x => Math.round(100 * (x.totalBytes / (1024 * 1024))) / 100),
+                    })),
             };
 
             this.chartSummary = this.usage.totalBytes;

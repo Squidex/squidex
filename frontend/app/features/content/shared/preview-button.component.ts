@@ -23,9 +23,9 @@ interface State {
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewButtonComponent extends StatefulComponent<State> implements OnInit {
     @Input()
@@ -40,10 +40,10 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     public dropdown = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
         super(changeDetector, {
-            previewNamesMore: []
+            previewNamesMore: [],
         });
     }
 

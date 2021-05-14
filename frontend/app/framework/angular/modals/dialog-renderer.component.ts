@@ -25,15 +25,15 @@ interface State {
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     public dialogView = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super(changeDetector, { notifications: [] });
     }
@@ -50,7 +50,7 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
             this.dialogs.notifications.subscribe(notification => {
                 this.next(s => ({
                     ...s,
-                    notifications: [...s.notifications, notification]
+                    notifications: [...s.notifications, notification],
                 }));
 
                 if (notification.displayTime > 0) {
@@ -102,7 +102,7 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
     public close(notification: Notification) {
         this.next(s => ({
             ...s,
-            notifications: s.notifications.filter(n => notification !== n)
+            notifications: s.notifications.filter(n => notification !== n),
         }));
     }
 }

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { Injectable } from '@angular/core';
 import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
@@ -37,7 +35,7 @@ interface Snapshot {
 }
 
 export type SchemasList = ReadonlyArray<SchemaDto>;
-export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[]; };
+export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[] };
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
@@ -80,7 +78,7 @@ export class SchemasState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly schemasService: SchemasService
+        private readonly schemasService: SchemasService,
     ) {
         super({ schemas: [], categories: new Set() }, 'Schemas');
     }
@@ -135,7 +133,7 @@ export class SchemasState extends State<Snapshot> {
                     canCreate,
                     isLoaded: true,
                     isLoading: true,
-                    schemas
+                    schemas,
                 }, 'Loading Success');
             }),
             finalize(() => {
@@ -351,10 +349,8 @@ export class SchemasState extends State<Snapshot> {
 
                 return { ...s, schemas, selectedSchema };
             }, 'Updated');
-        } else {
-            if (updateText) {
-                this.dialogs.notifyInfo('i18n:common.nothingChanged');
-            }
+        } else if (updateText) {
+            this.dialogs.notifyInfo('i18n:common.nothingChanged');
         }
     }
 
@@ -377,12 +373,12 @@ const SPECIAL_COMPONENTS = 'i18n:common.components';
 function buildCategories(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
     const schemas: SchemaCategory = {
         displayName: SPECIAL_SCHEMAS,
-        schemas: []
+        schemas: [],
     };
 
     const components: SchemaCategory = {
         displayName: SPECIAL_COMPONENTS,
-        schemas: []
+        schemas: [],
     };
 
     const result: SchemaCategory[] = [schemas, components];
@@ -391,7 +387,7 @@ function buildCategories(categories: Set<string>, allSchemas: SchemasList): Read
         result.push({
             displayName: name,
             name,
-            schemas: []
+            schemas: [],
         });
     }
 
@@ -405,7 +401,7 @@ function buildCategories(categories: Set<string>, allSchemas: SchemasList): Read
                 category = {
                     displayName: name,
                     name,
-                    schemas: []
+                    schemas: [],
                 };
 
                 result.push(category);

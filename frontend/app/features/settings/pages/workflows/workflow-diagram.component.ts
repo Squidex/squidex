@@ -8,12 +8,12 @@
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
 import { ResourceLoaderService, WorkflowDto } from '@app/shared';
 
-declare var vis: any;
+declare const vis: any;
 
 @Component({
     selector: 'sqx-workflow-diagram',
     styleUrls: ['./workflow-diagram.component.scss'],
-    templateUrl: './workflow-diagram.component.html'
+    templateUrl: './workflow-diagram.component.html',
 })
 export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy, OnChanges {
     private network: any;
@@ -27,7 +27,7 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy, OnCha
     public isLoaded = false;
 
     constructor(
-        private readonly resourceLoader: ResourceLoaderService
+        private readonly resourceLoader: ResourceLoaderService,
     ) {
     }
 
@@ -55,7 +55,7 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy, OnCha
                         let label = `<b>${step.name}</b>`;
 
                         if (step.noUpdate) {
-                            label += `\nPrevent updates`;
+                            label += '\nPrevent updates';
 
                             if (step.noUpdateExpression) {
                                 label += `\nwhen (${step.noUpdateExpression})`;
@@ -67,7 +67,7 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy, OnCha
                         }
 
                         if (step.name === 'Published') {
-                            label += `\nAvailable in the API`;
+                            label += '\nAvailable in the API';
                         }
 
                         const node: any = { id: step.name, label, color: step.color };
@@ -115,37 +115,38 @@ const GRAPH_OPTIONS = {
     nodes: {
         borderWidth: 2,
         font: {
-            multi: true, align: 'left',
+            multi: true,
+            align: 'left',
             ital: {
-                size: 16
+                size: 16,
             },
             bold: {
-                size: 20
+                size: 20,
             },
-            size: 16
+            size: 16,
         },
         shape: 'dot',
-        shadow: true
+        shadow: true,
     },
     edges: {
         arrows: 'to',
         font: {
             multi: true,
             ital: {
-                size: 16
+                size: 16,
             },
-            size: 16
+            size: 16,
         },
-        color: 'gray'
+        color: 'gray',
     },
     layout: {
-        randomSeed: 2
+        randomSeed: 2,
     },
     physics: {
         enabled: false,
         repulsion: {
-            nodeDistance: 300
+            nodeDistance: 300,
         },
-        solver: 'repulsion'
-    }
+        solver: 'repulsion',
+    },
 };

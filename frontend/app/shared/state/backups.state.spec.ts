@@ -15,7 +15,7 @@ import { TestValues } from './_test-helpers';
 describe('BackupsState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     const backup1 = createBackup(12);

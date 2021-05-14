@@ -72,7 +72,7 @@ export class RulesState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService
+        private readonly rulesService: RulesService,
     ) {
         super({ rules: [] }, 'Rules');
     }
@@ -125,7 +125,7 @@ export class RulesState extends State<Snapshot> {
                         isLoading: false,
                         runningRuleId,
                         rules,
-                        selectedRule
+                        selectedRule,
                     };
                 }, 'Loading Success');
             }),

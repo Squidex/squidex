@@ -12,7 +12,7 @@ import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
 @Component({
     selector: 'sqx-json-validation',
     styleUrls: ['json-validation.component.scss'],
-    templateUrl: 'json-validation.component.html'
+    templateUrl: 'json-validation.component.html',
 })
 export class JsonValidationComponent {
     @Input()

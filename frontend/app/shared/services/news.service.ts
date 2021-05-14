@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
 export class FeatureDto {
     constructor(
         public readonly name: string,
-        public readonly text: string
+        public readonly text: string,
     ) {
     }
 }
@@ -22,7 +22,7 @@ export class FeatureDto {
 export class FeaturesDto {
     constructor(
         public readonly features: ReadonlyArray<FeatureDto>,
-        public readonly version: number
+        public readonly version: number,
     ) {
     }
 }
@@ -31,7 +31,7 @@ export class FeaturesDto {
 export class NewsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 
@@ -46,7 +46,7 @@ export class NewsService {
                     items.map(item =>
                         new FeatureDto(
                             item.name,
-                            item.text)
+                            item.text),
                     ),
                     body.version);
 

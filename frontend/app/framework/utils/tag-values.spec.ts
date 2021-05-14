@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/object-curly-spacing */
 /*
  * Squidex Headless CMS
  *
@@ -23,7 +24,7 @@ describe('TagValue', () => {
         const input = [
             '2',
             '1',
-            '0'
+            '0',
         ];
 
         const result = getTagValues(input);
@@ -31,7 +32,7 @@ describe('TagValue', () => {
         expect(result).toEqual([
             new TagValue('0', '0', '0'),
             new TagValue('1', '1', '1'),
-            new TagValue('2', '2', '2')
+            new TagValue('2', '2', '2'),
         ]);
     });
 
@@ -39,7 +40,7 @@ describe('TagValue', () => {
         const input = [
             new TagValue(2, '2', 2),
             new TagValue(1, '1', 1),
-            new TagValue(0, '0', 0)
+            new TagValue(0, '0', 0),
         ];
 
         const result = getTagValues(input);
@@ -47,25 +48,24 @@ describe('TagValue', () => {
         expect(result).toEqual([
             new TagValue(0, '0', 0),
             new TagValue(1, '1', 1),
-            new TagValue(2, '2', 2)
+            new TagValue(2, '2', 2),
         ]);
     });
 
-    [null, undefined, []].map(input => {
+    [null, undefined, []].forEach(input => {
         it(`should get tags as empty array if input is <${input}>`, () => {
             const result = getTagValues(input);
 
             expect(result).toEqual([]);
         });
-
     });
 
     describe('IntConverter', () => {
         [
             { input: '7.5', result: new TagValue(7, '7.5', 7) },
-            { input: '7',   result: new TagValue(7, '7', 7) },
-            { input: '0',   result: new TagValue(0, '0', 0) }
-        ].map(x => {
+            { input: '7', result: new TagValue(7, '7', 7) },
+            { input: '0', result: new TagValue(0, '0', 0) },
+        ].forEach(x => {
             it(`should return tag value if input is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertInput(x.input);
 
@@ -77,8 +77,8 @@ describe('TagValue', () => {
             { input: undefined },
             { input: null },
             { input: 'text' },
-            { input: '' }
-        ].map(x => {
+            { input: '' },
+        ].forEach(x => {
             it(`should not return tag value if input is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertInput(x.input!);
 
@@ -88,8 +88,8 @@ describe('TagValue', () => {
 
         [
             { input: 7, result: new TagValue(7, '7', 7) },
-            { input: 0, result: new TagValue(0, '0', 0) }
-        ].map(x => {
+            { input: 0, result: new TagValue(0, '0', 0) },
+        ].forEach(x => {
             it(`should return tag value if value is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertValue(x.input);
 
@@ -101,8 +101,8 @@ describe('TagValue', () => {
             { input: undefined },
             { input: null },
             { input: 'text' },
-            { input: '' }
-        ].map(x => {
+            { input: '' },
+        ].forEach(x => {
             it(`should not return tag value if value is <${x.input}>`, () => {
                 const result = IntConverter.INSTANCE.convertValue(x.input!);
 
@@ -115,8 +115,8 @@ describe('TagValue', () => {
         [
             { input: '7.5', result: new TagValue(7.5, '7.5', 7.5) },
             { input: '0.0', result: new TagValue(0, '0.0', 0) },
-            { input: '0',   result: new TagValue(0, '0', 0) }
-        ].map(x => {
+            { input: '0', result: new TagValue(0, '0', 0) },
+        ].forEach(x => {
             it(`should return tag value if input is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertInput(x.input);
 
@@ -128,8 +128,8 @@ describe('TagValue', () => {
             { input: undefined },
             { input: null },
             { input: 'text' },
-            { input: '' }
-        ].map(x => {
+            { input: '' },
+        ].forEach(x => {
             it(`should not return tag value if input is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertInput(x.input!);
 
@@ -139,9 +139,9 @@ describe('TagValue', () => {
 
         [
             { input: 7.5, result: new TagValue(7.5, '7.5', 7.5) },
-            { input: 7,   result: new TagValue(7, '7', 7) },
-            { input: 0,   result: new TagValue(0, '0', 0) }
-        ].map(x => {
+            { input: 7, result: new TagValue(7, '7', 7) },
+            { input: 0, result: new TagValue(0, '0', 0) },
+        ].forEach(x => {
             it(`should return tag value if value is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertValue(x.input);
 
@@ -153,8 +153,8 @@ describe('TagValue', () => {
             { input: undefined },
             { input: null },
             { input: 'text' },
-            { input: '' }
-        ].map(x => {
+            { input: '' },
+        ].forEach(x => {
             it(`should not return tag value if value is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertValue(x.input!);
 
@@ -165,9 +165,9 @@ describe('TagValue', () => {
 
     describe('StringConverter', () => {
         [
-            { input: 'text',  result: new TagValue('text', 'text', 'text') },
-            { input: 'text ', result: new TagValue('text', 'text', 'text') }
-        ].map(x => {
+            { input: 'text', result: new TagValue('text', 'text', 'text') },
+            { input: 'text ', result: new TagValue('text', 'text', 'text') },
+        ].forEach(x => {
             it(`should return tag value if input is <${x.input}>`, () => {
                 const result = StringConverter.INSTANCE.convertInput(x.input);
 
@@ -178,8 +178,8 @@ describe('TagValue', () => {
         [
             { input: undefined },
             { input: null },
-            { input: ''}
-        ].map(x => {
+            { input: '' },
+        ].forEach(x => {
             it(`should not return tag value if input is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertInput(x.input!);
 
@@ -188,9 +188,9 @@ describe('TagValue', () => {
         });
 
         [
-            { input: 'text',  result: new TagValue('text', 'text', 'text') },
-            { input: 'text ', result: new TagValue('text', 'text', 'text') }
-        ].map(x => {
+            { input: 'text', result: new TagValue('text', 'text', 'text') },
+            { input: 'text ', result: new TagValue('text', 'text', 'text') },
+        ].forEach(x => {
             it(`should return tag value if value is <${x.input}>`, () => {
                 const result = StringConverter.INSTANCE.convertValue(x.input);
 
@@ -201,8 +201,8 @@ describe('TagValue', () => {
         [
             { input: undefined },
             { input: null },
-            { input: ''}
-        ].map(x => {
+            { input: ''},
+        ].forEach(x => {
             it(`should not return tag value if value is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertValue(x.input!);
 

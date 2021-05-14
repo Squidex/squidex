@@ -12,7 +12,7 @@ import { Keys } from '@app/framework/internal';
 @Component({
     selector: 'sqx-editable-title',
     styleUrls: ['./editable-title.component.scss'],
-    templateUrl: './editable-title.component.html'
+    templateUrl: './editable-title.component.html',
 })
 export class EditableTitleComponent {
     @Output()
@@ -44,13 +44,13 @@ export class EditableTitleComponent {
     public renameForm = this.formBuilder.group({
         name: ['',
             [
-                Validators.required
-            ]
-        ]
+                Validators.required,
+            ],
+        ],
     });
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

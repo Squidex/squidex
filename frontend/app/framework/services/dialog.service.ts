@@ -32,7 +32,7 @@ export class DialogRequest {
         public readonly title: string,
         public readonly text: string,
         private readonly rememberKey: string | undefined,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
         if (rememberKey) {
             this.rememberKey = `dialogs.confirm.${rememberKey}`;
@@ -60,7 +60,7 @@ export class Tooltip {
     constructor(
         public readonly target: any,
         public readonly text: string | null,
-        public readonly position: string
+        public readonly position: string,
     ) {
     }
 }
@@ -69,7 +69,7 @@ export class Notification {
     constructor(
         public readonly message: string | ErrorDto,
         public readonly messageType: string,
-        public readonly displayTime: number = 10000
+        public readonly displayTime: number = 10000,
     ) {
     }
 
@@ -101,7 +101,7 @@ export class DialogService {
     }
 
     constructor(
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
     }
 

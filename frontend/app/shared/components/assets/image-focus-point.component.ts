@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
 import { Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto } from '@app/shared/services/assets.service';
@@ -16,7 +14,7 @@ import { FocusedImage, FocusPicker } from 'image-focus';
     selector: 'sqx-image-focus-point',
     styleUrls: ['./image-focus-point.component.scss'],
     templateUrl: './image-focus-point.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageFocusPointComponent implements AfterViewInit, OnDestroy, OnChanges {
     private readonly previewImages: FocusedImage[] = [];
@@ -73,7 +71,7 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy, OnCha
                 for (const preview of this.previewImages) {
                     preview.setFocus(newFocus);
                 }
-            }
+            },
         });
     }
 
@@ -90,7 +88,7 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy, OnCha
     }
 }
 
-function getFocusPoint(value: any): { x: number, y: number } {
+function getFocusPoint(value: any): { x: number; y: number } {
     let x = 0;
     let y = 0;
 

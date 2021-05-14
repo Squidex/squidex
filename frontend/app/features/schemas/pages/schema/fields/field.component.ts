@@ -15,8 +15,8 @@ import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnima
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class FieldComponent implements OnChanges {
     @Input()
@@ -51,7 +51,7 @@ export class FieldComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
         this.trackByFieldFn = this.trackByField.bind(this);
     }
@@ -94,7 +94,7 @@ export class FieldComponent implements OnChanges {
     }
 
     public sortFields(event: CdkDragDrop<ReadonlyArray<NestedFieldDto>>) {
-        this.schemasState.orderFields(this.schema, sorted(event), <any>this.field).subscribe();
+        this.schemasState.orderFields(this.schema, sorted(event), this.field as any).subscribe();
     }
 
     public lockField() {

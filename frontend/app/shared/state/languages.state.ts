@@ -80,13 +80,13 @@ export class LanguagesState extends State<Snapshot> {
         private readonly appLanguagesService: AppLanguagesService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly languagesService: LanguagesService
+        private readonly languagesService: LanguagesService,
     ) {
         super({
             allLanguages: [],
             allLanguagesNew: [],
             languages: [],
-            version: Version.EMPTY
+            version: Version.EMPTY,
         }, 'Languages');
     }
 
@@ -160,7 +160,7 @@ export class LanguagesState extends State<Snapshot> {
                 isLoaded: true,
                 isLoading: false,
                 languages: languages.map(x => this.createLanguage(x, languages)),
-                version
+                version,
             };
         }, 'Loading Success / Updated');
     }
@@ -199,7 +199,7 @@ export class LanguagesState extends State<Snapshot> {
                     .filter(l =>
                         language.iso2Code !== l.iso2Code &&
                         language.fallback.indexOf(l.iso2Code) < 0)
-                    .sortByString(x => x.englishName)
+                    .sortByString(x => x.englishName),
         };
     }
 }

@@ -13,9 +13,9 @@ import { AppDto, fadeAnimation } from '@app/shared';
     styleUrls: ['./github-card.component.scss'],
     templateUrl: './github-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GithubCardComponent {
     @Input()

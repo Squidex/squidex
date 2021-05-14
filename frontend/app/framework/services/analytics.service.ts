@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: only-arrow-functions
-
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -22,11 +20,13 @@ export class AnalyticsService {
     constructor(
         private readonly uiOptions?: UIOptions,
         private readonly router?: Router,
-        private readonly resourceLoader?: ResourceLoaderService
+        private readonly resourceLoader?: ResourceLoaderService,
     ) {
         window['dataLayer'] = window['dataLayer'] || [];
 
+        // eslint-disable-next-line func-names
         this.gtag = function () {
+            // eslint-disable-next-line prefer-rest-params
             window['dataLayer'].push(arguments);
         };
 
@@ -42,7 +42,7 @@ export class AnalyticsService {
             event_category: category,
             event_action: action,
             event_label: label,
-            value
+            value,
         });
     }
 

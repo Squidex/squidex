@@ -14,11 +14,11 @@ import { AppsState } from './../state/apps.state';
 @Injectable()
 export class LoadAppsGuard implements CanActivate {
     constructor(
-        private readonly appsState: AppsState
+        private readonly appsState: AppsState,
     ) {
     }
 
     public canActivate(): Observable<boolean> {
-        return this.appsState.load().pipe(map(_ => true));
+        return this.appsState.load().pipe(map(() => true));
     }
 }

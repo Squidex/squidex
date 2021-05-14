@@ -14,7 +14,7 @@ export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppL
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             isMaster: false,
-            isOptional: false
+            isOptional: false,
         }));
 
         valueAll$(this.form.controls['isMaster'])
@@ -40,9 +40,9 @@ export class AddLanguageForm extends Form<FormGroup, AddLanguageFormType> {
         super(formBuilder.group({
             language: [null,
                 [
-                    Validators.required
-                ]
-            ]
+                    Validators.required,
+                ],
+            ],
         }));
     }
 }

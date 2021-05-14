@@ -17,22 +17,22 @@ const routes: Routes = [
         children: [
             {
                 path: 'filters',
-                component: AssetsFiltersPageComponent
-            }
-        ]
-    }
+                component: AssetsFiltersPageComponent,
+            },
+        ],
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     declarations: [
         AssetsFiltersPageComponent,
         AssetsPageComponent,
-        AssetTagsComponent
-    ]
+        AssetTagsComponent,
+    ],
 })
 export class SqxFeatureAssetsModule {}

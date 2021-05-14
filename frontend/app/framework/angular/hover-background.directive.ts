@@ -8,7 +8,7 @@
 import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 
 @Directive({
-    selector: '[sqxHoverBackground]'
+    selector: '[sqxHoverBackground]',
 })
 export class HoverBackgroundDirective {
     private previousBackground: string | null;
@@ -17,14 +17,14 @@ export class HoverBackgroundDirective {
     public background: string;
 
     constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly element: ElementRef<HTMLElement>,
+        private readonly renderer: Renderer2,
     ) {
     }
 
     @HostListener('mouseenter')
     public onEnter() {
-        this.previousBackground = (<HTMLElement>this.element.nativeElement).style.background;
+        this.previousBackground = this.element.nativeElement.style.background;
 
         this.renderer.setStyle(this.element.nativeElement, 'background', this.background);
     }

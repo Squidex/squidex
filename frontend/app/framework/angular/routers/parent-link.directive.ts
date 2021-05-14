@@ -10,7 +10,7 @@ import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@ang
 import { ResourceOwner } from '@app/framework/internal';
 
 @Directive({
-    selector: '[sqxParentLink]'
+    selector: '[sqxParentLink]',
 })
 export class ParentLinkDirective extends ResourceOwner implements OnInit {
     private url: string;
@@ -25,7 +25,7 @@ export class ParentLinkDirective extends ResourceOwner implements OnInit {
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
         super();
     }

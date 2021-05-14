@@ -74,7 +74,7 @@ export class PlansState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly authState: AuthService,
         private readonly dialogs: DialogService,
-        private readonly plansService: PlansService
+        private readonly plansService: PlansService,
     ) {
         super({ plans: [], version: Version.EMPTY }, 'Plans');
     }
@@ -105,7 +105,7 @@ export class PlansState extends State<Snapshot> {
                     isLoading: false,
                     isOwner: !payload.planOwner || payload.planOwner === this.userId,
                     plans,
-                    version
+                    version,
                 }, 'Loading Success');
             }),
             finalize(() => {
@@ -147,6 +147,6 @@ function createPlan(plan: PlanDto, id: string) {
     return {
         plan,
         isSelected: plan.id === id,
-        isYearlySelected: plan.yearlyId === id
+        isYearlySelected: plan.yearlyId === id,
     };
 }

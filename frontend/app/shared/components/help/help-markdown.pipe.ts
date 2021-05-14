@@ -20,7 +20,7 @@ renderer.link = (href, _, text) => {
 
 @Pipe({
     name: 'sqxHelpMarkdown',
-    pure: true
+    pure: true,
 })
 export class HelpMarkdownPipe implements PipeTransform {
     public transform(text: string | undefined | null): string {

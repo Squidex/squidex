@@ -26,7 +26,7 @@ describe('MarkdownPipe', () => {
         expect(actual).toBe('<p><em>bold</em></p>\n');
     });
 
-    [null, undefined, ''].map(x => {
+    [null, undefined, ''].forEach(x => {
         it('should return empty string for invalid value', () => {
             const actual = new HelpMarkdownPipe().transform(x);
 

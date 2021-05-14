@@ -28,7 +28,7 @@ inlinerRenderer.link = renderer.link;
 
 @Pipe({
     name: 'sqxMarkdown',
-    pure: true
+    pure: true,
 })
 export class MarkdownPipe implements PipeTransform {
     public transform(text: string | undefined | null): string {
@@ -42,7 +42,7 @@ export class MarkdownPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxMarkdownInline',
-    pure: true
+    pure: true,
 })
 export class MarkdownInlinePipe implements PipeTransform {
     public transform(text: string | undefined | null): string {

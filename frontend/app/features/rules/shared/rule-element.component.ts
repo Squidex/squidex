@@ -12,7 +12,7 @@ import { RuleElementDto } from '@app/shared';
     selector: 'sqx-rule-element',
     styleUrls: ['./rule-element.component.scss'],
     templateUrl: './rule-element.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RuleElementComponent {
     @Input()

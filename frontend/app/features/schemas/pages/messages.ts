@@ -7,7 +7,7 @@
 
 export class SchemaCloning {
     constructor(
-        public readonly schema: any
+        public readonly schema: any,
     ) {
     }
 }

@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable object-property-newline */
+
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { AnalyticsService, ApiUrlConfig, Resource, Version, WorkflowDto, WorkflowsDto, WorkflowsPayload, WorkflowsService } from '@app/shared/internal';
@@ -15,13 +17,13 @@ describe('WorkflowsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 WorkflowsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() }
-            ]
+                { provide: AnalyticsService, useValue: new AnalyticsService() },
+            ],
         });
     });
 
@@ -31,119 +33,115 @@ describe('WorkflowsService', () => {
 
     it('should make a get request to get app workflows',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+            let workflows: WorkflowsDto;
 
-        let workflows: WorkflowsDto;
-
-        workflowsService.getWorkflows('my-app').subscribe(result => {
-            workflows = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush(workflowsResponse('1', '2'),
-            {
-                headers: {
-                    etag: '2'
-                }
+            workflowsService.getWorkflows('my-app').subscribe(result => {
+                workflows = result;
             });
 
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
-    }));
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush(workflowsResponse('1', '2'),
+                {
+                    headers: {
+                        etag: '2',
+                    },
+                });
+
+            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
+        }));
 
     it('should make a post request to create a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+            let workflows: WorkflowsDto;
 
-        let workflows: WorkflowsDto;
+            workflowsService.postWorkflow('my-app', { name: 'New' }, version).subscribe(result => {
+                workflows = result;
+            });
 
-        workflowsService.postWorkflow('my-app', { name: 'New' }, version).subscribe(result => {
-            workflows = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            req.flush(workflowsResponse('1', '2'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        req.flush(workflowsResponse('1', '2'), {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
-    }));
+            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
+        }));
 
     it('should make a put request to update a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    update: { method: 'PUT', href: '/api/apps/my-app/workflows/123' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                update: { method: 'PUT', href: '/api/apps/my-app/workflows/123' }
-            }
-        };
+            let workflows: WorkflowsDto;
 
-        let workflows: WorkflowsDto;
+            workflowsService.putWorkflow('my-app', resource, {}, version).subscribe(result => {
+                workflows = result;
+            });
 
-        workflowsService.putWorkflow('my-app', resource, {}, version).subscribe(result => {
-            workflows = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            req.flush(workflowsResponse('1', '2'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        req.flush(workflowsResponse('1', '2'), {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
-    }));
+            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
+        }));
 
     it('should make a delete request to delete a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    delete: { method: 'DELETE', href: '/api/apps/my-app/workflows/123' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: '/api/apps/my-app/workflows/123' }
-            }
-        };
+            let workflows: WorkflowsDto;
 
-        let workflows: WorkflowsDto;
+            workflowsService.deleteWorkflow('my-app', resource, version).subscribe(result => {
+                workflows = result;
+            });
 
-        workflowsService.deleteWorkflow('my-app', resource, version).subscribe(result => {
-            workflows = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            req.flush(workflowsResponse('1', '2'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        req.flush(workflowsResponse('1', '2'), {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
-    }));
+            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
+        }));
 
     function workflowsResponse(...names: string[]) {
         return {
             errors: [
                 'Error1',
-                'Error2'
+                'Error2',
             ],
             items: names.map(workflowResponse),
             _links: {
-                create: { method: 'POST', href: '/workflows' }
-            }
+                create: { method: 'POST', href: '/workflows' },
+            },
         };
     }
 
@@ -157,23 +155,23 @@ describe('WorkflowsService', () => {
                 [`${name}1`]: {
                     transitions: {
                         [`${name}2`]: {
-                            expression: 'Expression1', roles: ['Role1']
-                        }
+                            expression: 'Expression1', roles: ['Role1'],
+                        },
                     },
-                    color: `${name}1`, noUpdate: true
+                    color: `${name}1`, noUpdate: true,
                 },
                 [`${name}2`]: {
                     transitions: {
                         [`${name}1`]: {
-                            expression: 'Expression2', roles: ['Role2']
-                        }
+                            expression: 'Expression2', roles: ['Role2'],
+                        },
                     },
-                    color: `${name}2`, noUpdate: true
-                }
+                    color: `${name}2`, noUpdate: true,
+                },
             },
             _links: {
-                update: { method: 'PUT', href: `/workflows/${name}` }
-            }
+                update: { method: 'PUT', href: `/workflows/${name}` },
+            },
         };
     }
 });
@@ -182,32 +180,32 @@ export function createWorkflows(...names: ReadonlyArray<string>): WorkflowsPaylo
     return {
         errors: [
             'Error1',
-            'Error2'
+            'Error2',
         ],
         items: names.map(createWorkflow),
         _links: {
-            create: { method: 'POST', href: '/workflows' }
+            create: { method: 'POST', href: '/workflows' },
         },
-        canCreate: true
+        canCreate: true,
     };
 }
 
 export function createWorkflow(name: string): WorkflowDto {
     return new WorkflowDto(
         {
-            update: { method: 'PUT', href: `/workflows/${name}` }
+            update: { method: 'PUT', href: `/workflows/${name}` },
         },
         `id_${name}`, `name_${name}`, `${name}1`,
         [
-            `schema_${name}`
+            `schema_${name}`,
         ],
         [
             { name: `${name}1`, color: `${name}1`, noUpdate: true, isLocked: false },
-            { name: `${name}2`, color: `${name}2`, noUpdate: true, isLocked: false }
+            { name: `${name}2`, color: `${name}2`, noUpdate: true, isLocked: false },
         ],
         [
             { from: `${name}1`, to: `${name}2`, expression: 'Expression1', roles: ['Role1'] },
-            { from: `${name}2`, to: `${name}1`, expression: 'Expression2', roles: ['Role2'] }
+            { from: `${name}2`, to: `${name}1`, expression: 'Expression2', roles: ['Role2'] },
         ]);
 }
 
@@ -227,9 +225,9 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '1': { transitions: {}, color: '#00ff00' }
+                1: { transitions: {}, color: '#00ff00' },
             },
-            initial: '1'
+            initial: '1',
         });
     });
 
@@ -243,9 +241,9 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '1': { transitions: {}, color: 'red', noUpdate: true }
+                1: { transitions: {}, color: 'red', noUpdate: true },
             },
-            initial: '1'
+            initial: '1',
         });
     });
 
@@ -257,7 +255,7 @@ describe('Workflow', () => {
 
         expect(workflow.steps).toEqual([
             { name: 'a' },
-            { name: 'Z' }
+            { name: 'Z' },
         ]);
     });
 
@@ -296,15 +294,15 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '2': {
+                2: {
                     transitions: {
-                        '3': { expression: '2 === 3' }
+                        3: { expression: '2 === 3' },
                     },
-                    color: '#ff0000'
+                    color: '#ff0000',
                 },
-                '3': { transitions: {}, color: '#0000ff' }
+                3: { transitions: {}, color: '#0000ff' },
             },
-            initial: '2'
+            initial: '2',
         });
     });
 
@@ -320,10 +318,10 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '2': { transitions: {}, isLocked: true },
-                '3': { transitions: {} }
+                2: { transitions: {}, isLocked: true },
+                3: { transitions: {} },
             },
-            initial: '3'
+            initial: '3',
         });
     });
 
@@ -351,22 +349,22 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                'a': {
+                a: {
                     transitions: {
-                        '2': { expression: '1 === 2' }
+                        2: { expression: '1 === 2' },
                     },
-                    color: '#00ff00'
+                    color: '#00ff00',
                 },
-                '2': {
+                2: {
                     transitions: {
-                        'a': { expression: '2 === 1' },
-                        '3': { expression: '2 === 3' }
+                        a: { expression: '2 === 1' },
+                        3: { expression: '2 === 3' },
                     },
-                    color: '#ff0000'
+                    color: '#ff0000',
                 },
-                '3': { transitions: {}, color: '#0000ff' }
+                3: { transitions: {}, color: '#0000ff' },
             },
-            initial: 'a'
+            initial: 'a',
         });
     });
 
@@ -382,18 +380,18 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '1': {
+                1: {
                     transitions: {
-                        '2': { expression: '1 === 2' }
-                    }
+                        2: { expression: '1 === 2' },
+                    },
                 },
-                '2': {
+                2: {
                     transitions: {
-                        '1': { expression: '2 === 1' }
-                    }
-                }
+                        1: { expression: '2 === 1' },
+                    },
+                },
             },
-            initial: '1'
+            initial: '1',
         });
     });
 
@@ -410,14 +408,14 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '1': { transitions: {}},
-                '2': {
+                1: { transitions: {} },
+                2: {
                     transitions: {
-                        '1': { expression: '2 === 1' }
-                    }
-                }
+                        1: { expression: '2 === 1' },
+                    },
+                },
             },
-            initial: '1'
+            initial: '1',
         });
     });
 
@@ -433,14 +431,14 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '1': { transitions: {} },
-                '2': {
+                1: { transitions: {} },
+                2: {
                     transitions: {
-                        '1': { expression: '2 !== 1', roles: ['Role'] }
-                    }
-                }
+                        1: { expression: '2 !== 1', roles: ['Role'] },
+                    },
+                },
             },
-            initial: '1'
+            initial: '1',
         });
     });
 
@@ -502,10 +500,10 @@ describe('Workflow', () => {
             name: null,
             schemaIds: [],
             steps: {
-                '1': { transitions: {} },
-                '2': { transitions: {} }
+                1: { transitions: {} },
+                2: { transitions: {} },
             },
-            initial: '2'
+            initial: '2',
         });
     });
 

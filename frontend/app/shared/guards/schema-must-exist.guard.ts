@@ -16,7 +16,7 @@ import { SchemasState } from './../state/schemas.state';
 export class SchemaMustExistGuard implements CanActivate {
     constructor(
         private readonly schemasState: SchemasState,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 

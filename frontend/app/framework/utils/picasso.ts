@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
- import MersenneTwister from 'mersenne-twister';
+import MersenneTwister from 'mersenne-twister';
 
 const ALL_COLORS: ReadonlyArray<string> = [
     'rgb(226,27,12)',
@@ -22,7 +22,7 @@ const ALL_COLORS: ReadonlyArray<string> = [
     'rgb(174,188,33)',
     'rgb(210,157,0)',
     'rgb(204,122,0)',
-    'rgb(231,55,0)'
+    'rgb(231,55,0)',
 ];
 
 const LAYERS = 3;
@@ -41,7 +41,7 @@ function hash(str: string) {
 
     for (let i = 0; i < str.length; i++) {
         result = result * 31 + str.charCodeAt(i);
-        result = result % (2 ** 32);
+        result %= (2 ** 32);
     }
 
     return result;

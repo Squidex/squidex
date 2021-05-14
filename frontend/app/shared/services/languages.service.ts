@@ -14,7 +14,7 @@ import { map } from 'rxjs/operators';
 export class LanguageDto {
     constructor(
         public readonly iso2Code: string,
-        public readonly englishName: string
+        public readonly englishName: string,
     ) {
     }
 }
@@ -23,7 +23,7 @@ export class LanguageDto {
 export class LanguagesService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 

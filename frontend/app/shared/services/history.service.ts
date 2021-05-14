@@ -19,7 +19,7 @@ export class HistoryEventDto {
         public readonly eventType: string,
         public readonly message: string,
         public readonly created: DateTime,
-        public readonly version: Version
+        public readonly version: Version,
     ) {
     }
 }
@@ -34,12 +34,10 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
             return users.getUser(parts[0], null).pipe(map(u => u.displayName));
         } else if (parts[0] === 'subject') {
             return users.getUser(parts[1], null).pipe(map(u => u.displayName));
+        } else if (parts[1].endsWith('client')) {
+            return of(parts[1]);
         } else {
-            if (parts[1].endsWith('client')) {
-                return of(parts[1]);
-            } else {
-                return of(`${parts[1]}-client`);
-            }
+            return of(`${parts[1]}-client`);
         }
     };
 
@@ -69,7 +67,7 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
 export class HistoryService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 
@@ -78,8 +76,8 @@ export class HistoryService {
 
         const options = {
             headers: new HttpHeaders({
-                'X-Silent': '1'
-            })
+                'X-Silent': '1',
+            }),
         };
 
         return this.http.get<any[]>(url, options).pipe(

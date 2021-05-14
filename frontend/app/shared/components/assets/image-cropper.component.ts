@@ -13,7 +13,7 @@ import Cropper from 'cropperjs';
     selector: 'sqx-image-editor',
     styleUrls: ['./image-cropper.component.scss'],
     templateUrl: './image-cropper.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChanges {
     private cropper: Cropper | null = null;
@@ -51,7 +51,7 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChange
             movable: false,
             zoomOnTouch: false,
             zoomOnWheel: false,
-            viewMode: 0
+            viewMode: 0,
         });
 
         this.cropper.replace(this.imageSource);
@@ -69,7 +69,7 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChange
 
             this.cropper.zoomTo(Math.min(dx, dy), {
                 x: containerData.width / 2,
-                y: containerData.height / 2
+                y: containerData.height / 2,
             });
         }
     }
@@ -92,13 +92,13 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChange
 
     public zoomIn() {
         if (this.cropper) {
-            this.cropper.zoom(.1);
+            this.cropper.zoom(0.1);
         }
     }
 
     public zoomOut() {
         if (this.cropper) {
-            this.cropper.zoom(-.1);
+            this.cropper.zoom(-0.1);
         }
     }
 
@@ -128,6 +128,8 @@ export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChange
                     });
                 }
             }
+
+            return undefined;
         });
     }
 }

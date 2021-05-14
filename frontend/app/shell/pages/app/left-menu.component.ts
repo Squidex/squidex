@@ -12,7 +12,7 @@ import { AppDto, Settings } from '@app/shared';
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeftMenuComponent {
     @Input()

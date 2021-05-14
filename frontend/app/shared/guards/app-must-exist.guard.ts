@@ -15,7 +15,7 @@ import { AppsState } from './../state/apps.state';
 export class AppMustExistGuard implements CanActivate {
     constructor(
         private readonly appsState: AppsState,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 

@@ -10,12 +10,12 @@ import { CurrencyConfig, DecimalSeparatorConfig } from '@app/framework/internal'
 
 @Pipe({
     name: 'sqxMoney',
-    pure: true
+    pure: true,
 })
 export class MoneyPipe implements PipeTransform {
     constructor(
         private readonly currency: CurrencyConfig,
-        private readonly separator: DecimalSeparatorConfig
+        private readonly separator: DecimalSeparatorConfig,
     ) {
     }
 

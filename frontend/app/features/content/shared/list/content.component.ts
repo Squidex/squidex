@@ -16,9 +16,9 @@ import { ContentListFieldComponent } from './content-list-field.component';
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentComponent implements OnChanges {
     @Output()
@@ -65,7 +65,7 @@ export class ContentComponent implements OnChanges {
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
-        private readonly contentsState: ContentsState
+        private readonly contentsState: ContentsState,
     ) {
     }
 
@@ -89,7 +89,7 @@ export class ContentComponent implements OnChanges {
         if (value) {
             this.contentsState.patch(this.content, value)
                 .subscribe(() => {
-                    this.patchForm.submitCompleted({ noReset: true});
+                    this.patchForm.submitCompleted({ noReset: true });
 
                     this.changeDetector.markForCheck();
                 }, error => {

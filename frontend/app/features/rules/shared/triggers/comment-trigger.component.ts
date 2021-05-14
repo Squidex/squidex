@@ -11,7 +11,7 @@ import { TriggerForm } from '@app/shared';
 @Component({
     selector: 'sqx-comment-trigger',
     styleUrls: ['./comment-trigger.component.scss'],
-    templateUrl: './comment-trigger.component.html'
+    templateUrl: './comment-trigger.component.html',
 })
 export class CommentTriggerComponent {
     @Input()

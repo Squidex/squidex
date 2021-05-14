@@ -18,7 +18,7 @@ interface State {
     selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetsListComponent extends StatefulComponent<State> {
     @Output()
@@ -44,7 +44,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            newFiles: []
+            newFiles: [],
         });
     }
 
@@ -91,7 +91,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public remove(file: File) {
         this.next(s => ({
             ...s,
-            newFiles: s.newFiles.removed(file)
+            newFiles: s.newFiles.removed(file),
         }));
 
         return true;
@@ -100,7 +100,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public addFiles(files: ReadonlyArray<File>) {
         this.next(s => ({
             ...s,
-            newFiles: [...getFiles(files), ...s.newFiles]
+            newFiles: [...getFiles(files), ...s.newFiles],
         }));
 
         return true;

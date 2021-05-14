@@ -13,7 +13,7 @@ describe('ShortcutComponent', () => {
     const changeDetector: any = {
         detach: () => {
             return 0;
-        }
+        },
     };
 
     let shortcutService: ShortcutService;

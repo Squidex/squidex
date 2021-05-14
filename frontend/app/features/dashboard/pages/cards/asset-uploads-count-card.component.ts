@@ -14,9 +14,9 @@ import { ChartHelpers, ChartOptions } from './shared';
     styleUrls: ['./asset-uploads-count-card.component.scss'],
     templateUrl: './asset-uploads-count-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetUploadsCountCardComponent implements OnChanges {
     @Input()
@@ -42,9 +42,9 @@ export class AssetUploadsCountCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(),
                         borderColor: ChartHelpers.getBorderColor(),
                         borderWidth: 1,
-                        data: this.usage.map(x => x.totalCount)
-                    }
-                ]
+                        data: this.usage.map(x => x.totalCount),
+                    },
+                ],
             };
         }
     }

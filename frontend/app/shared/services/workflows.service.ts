@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AnalyticsService, ApiUrlConfig, compareStrings, hasAnyLink, HTTP, mapVersioned, Model, pretifyError, Resource, ResourceLinks, StringHelper, Version, Versioned } from '@app/framework';
@@ -28,7 +26,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
         public readonly initial: string | null = null,
         public readonly schemaIds: string[] = [],
         public readonly steps: WorkflowStep[] = [],
-        public readonly transitions: WorkflowTransition[] = []
+        public readonly transitions: WorkflowTransition[] = [],
     ) {
         super();
 
@@ -175,7 +173,8 @@ export class WorkflowDto extends Model<WorkflowDto> {
             const s = { ...values, transitions: {} };
 
             for (const transition of this.getTransitions(step)) {
-                const { from, to, step: _, ...t } = transition;
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                const { to, step: _, from: __, ...t } = transition;
 
                 s.transitions[to] = t;
             }
@@ -194,7 +193,7 @@ export type WorkflowStep =
     Readonly<{ name: string } & WorkflowStepValues>;
 
 export type WorkflowTransitionValues =
-    Readonly<{ expression?: string; roles?: string[]; }>;
+    Readonly<{ expression?: string; roles?: string[] }>;
 
 export type WorkflowTransition =
     Readonly<{ from: string; to: string } & WorkflowTransitionValues>;
@@ -206,7 +205,7 @@ export type WorkflowsDto =
     Versioned<WorkflowsPayload>;
 
 export type WorkflowsPayload =
-    Readonly<{ items: WorkflowDto[]; errors: string[]; canCreate: boolean; } & Resource>;
+    Readonly<{ items: WorkflowDto[]; errors: string[]; canCreate: boolean } & Resource>;
 
 export type CreateWorkflowDto =
     Readonly<{ name: string }>;
@@ -216,7 +215,7 @@ export class WorkflowsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 

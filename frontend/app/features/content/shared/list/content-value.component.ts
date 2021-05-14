@@ -12,7 +12,7 @@ import { HtmlValue, Types } from '@app/shared';
     selector: 'sqx-content-value',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentValueComponent {
     @Input()

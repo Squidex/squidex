@@ -13,9 +13,9 @@ import { AppDto, AppsState, DialogModel, fadeAnimation, ModalModel, UIState } fr
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppsMenuComponent {
     public addAppDialog = new DialogModel();
@@ -24,7 +24,7 @@ export class AppsMenuComponent {
 
     constructor(
         public readonly appsState: AppsState,
-        public readonly uiState: UIState
+        public readonly uiState: UIState,
     ) {
     }
 

@@ -11,17 +11,17 @@ import { UndefinableFormArray } from './undefinable-form-array';
 describe('UndefinableFormArray', () => {
     const tests = [{
         name: 'undefined',
-        value: undefined
+        value: undefined,
     }, {
         name: 'defined',
-        value: ['1']
+        value: ['1'],
     }];
 
-    tests.map(x => {
+    tests.forEach(x => {
         it(`should set value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormArray([
-                    new FormControl('')
+                    new FormControl(''),
                 ]);
 
             assertValue(control, x.value, () => {
@@ -30,11 +30,11 @@ describe('UndefinableFormArray', () => {
         });
     });
 
-    tests.map(x => {
+    tests.forEach(x => {
         it(`should patch value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormArray([
-                    new FormControl('')
+                    new FormControl(''),
                 ]);
 
             assertValue(control, x.value, () => {
@@ -43,11 +43,11 @@ describe('UndefinableFormArray', () => {
         });
     });
 
-    tests.map(x => {
+    tests.forEach(x => {
         it(`should reset value as <${x.name}>`, () => {
             const control =
                 new UndefinableFormArray([
-                    new FormControl('')
+                    new FormControl(''),
                 ]);
 
             assertValue(control, x.value, () => {

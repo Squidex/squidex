@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -13,7 +13,7 @@ import { take } from 'rxjs/operators';
 @Component({
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
-    templateUrl: './apps-page.component.html'
+    templateUrl: './apps-page.component.html',
 })
 export class AppsPageComponent implements OnInit {
     public addAppDialog = new DialogModel();
@@ -33,7 +33,7 @@ export class AppsPageComponent implements OnInit {
         private readonly localStore: LocalStoreService,
         private readonly newsService: NewsService,
         private readonly onboardingService: OnboardingService,
-        private readonly uiOptions: UIOptions
+        private readonly uiOptions: UIOptions,
     ) {
         if (uiOptions.get('showInfo')) {
             this.info = uiOptions.get('more.info');

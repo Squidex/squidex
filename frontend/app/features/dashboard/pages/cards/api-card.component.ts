@@ -13,9 +13,9 @@ import { AppDto, fadeAnimation } from '@app/shared';
     styleUrls: ['./api-card.component.scss'],
     templateUrl: './api-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiCardComponent {
     @Input()

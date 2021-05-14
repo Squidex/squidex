@@ -1,11 +1,12 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* tslint:disable: no-bitwise */
+/* eslint-disable no-useless-escape */
+/* eslint-disable no-bitwise */
 
 import { Types } from './types';
 
@@ -31,7 +32,7 @@ const ColorDefinitions: ReadonlyArray<ColorDefinition> = [
                 parseInt(bits[2], 10) / 255,
                 parseInt(bits[3], 10) / 255,
                 parseFloat(bits[4]));
-        }
+        },
     }, {
         regex: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
         process: (bits) => {
@@ -39,7 +40,7 @@ const ColorDefinitions: ReadonlyArray<ColorDefinition> = [
                 parseInt(bits[1], 10) / 255,
                 parseInt(bits[2], 10) / 255,
                 parseInt(bits[3], 10) / 255);
-        }
+        },
     }, {
         regex: /^(\w{2})(\w{2})(\w{2})$/,
         process: (bits) => {
@@ -47,7 +48,7 @@ const ColorDefinitions: ReadonlyArray<ColorDefinition> = [
                 parseInt(bits[1], 16) / 255,
                 parseInt(bits[2], 16) / 255,
                 parseInt(bits[3], 16) / 255);
-        }
+        },
     }, {
         regex: /^(\w{1})(\w{1})(\w{1})$/,
         process: (bits) => {
@@ -55,8 +56,8 @@ const ColorDefinitions: ReadonlyArray<ColorDefinition> = [
                 parseInt(bits[1] + bits[1], 16) / 255,
                 parseInt(bits[2] + bits[2], 16) / 255,
                 parseInt(bits[3] + bits[3], 16) / 255);
-        }
-    }
+        },
+    },
 ];
 
 export module MathHelper {
@@ -64,6 +65,7 @@ export module MathHelper {
 
     const CRC32_TABLE: ReadonlyArray<number> = createCrc32Table();
 
+    // eslint-disable-next-line no-inner-declarations
     function createCrc32Table() {
         const crc: number[] = [];
 
@@ -161,7 +163,7 @@ export module MathHelper {
     }
 
     export function randomColor() {
-        return colorToString(colorFromHsv(Math.random() * 360, .9, .9));
+        return colorToString(colorFromHsv(Math.random() * 360, 0.9, 0.9));
     }
 
     export function colorToString(color: Color): string {

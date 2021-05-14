@@ -11,15 +11,15 @@ import { ApiUrlConfig, Resource, ResourceLinks } from '@app/framework';
 import { UserDto, UsersDto, UsersService } from './users.service';
 
 describe('UsersService', () => {
-     beforeEach(() => {
+    beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 UsersService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -29,197 +29,189 @@ describe('UsersService', () => {
 
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            let users: UsersDto;
 
-        let users: UsersDto;
+            userManagementService.getUsers(20, 30).subscribe(result => {
+                users = result;
+            });
 
-        userManagementService.getUsers(20, 30).subscribe(result => {
-            users = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/user-management?take=20&skip=30&query=');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management?take=20&skip=30&query=');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({
+                total: 100,
+                items: [
+                    userResponse(12),
+                    userResponse(13),
+                ],
+            });
 
-        req.flush({
-            total: 100,
-            items: [
-                userResponse(12),
-                userResponse(13)
-            ]
-        });
-
-        expect(users!).toEqual(
-            new UsersDto(100, [
-                createUser(12),
-                createUser(13)
-            ]));
-    }));
+            expect(users!).toEqual(
+                new UsersDto(100, [
+                    createUser(12),
+                    createUser(13),
+                ]));
+        }));
 
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            let users: UsersDto;
 
-        let users: UsersDto;
+            userManagementService.getUsers(20, 30, 'my-query').subscribe(result => {
+                users = result;
+            });
 
-        userManagementService.getUsers(20, 30, 'my-query').subscribe(result => {
-            users = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/user-management?take=20&skip=30&query=my-query');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management?take=20&skip=30&query=my-query');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({
+                total: 100,
+                items: [
+                    userResponse(12),
+                    userResponse(13),
+                ],
+            });
 
-        req.flush({
-            total: 100,
-            items: [
-                userResponse(12),
-                userResponse(13)
-            ]
-        });
-
-        expect(users!).toEqual(
-            new UsersDto(100, [
-                createUser(12),
-                createUser(13)
-            ]));
-    }));
+            expect(users!).toEqual(
+                new UsersDto(100, [
+                    createUser(12),
+                    createUser(13),
+                ]));
+        }));
 
     it('should make get request to get single user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            let user: UserDto;
 
-        let user: UserDto;
+            userManagementService.getUser('123').subscribe(result => {
+                user = result;
+            });
 
-        userManagementService.getUser('123').subscribe(result => {
-            user = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/user-management/123');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management/123');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(userResponse(12));
 
-        req.flush(userResponse(12));
-
-        expect(user!).toEqual(createUser(12));
-    }));
+            expect(user!).toEqual(createUser(12));
+        }));
 
     it('should make post request to create user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
 
-        const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
+            let user: UserDto;
 
-        let user: UserDto;
+            userManagementService.postUser(dto).subscribe(result => {
+                user = result;
+            });
 
-        userManagementService.postUser(dto).subscribe(result => {
-            user = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/user-management');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(userResponse(12));
 
-        req.flush(userResponse(12));
-
-        expect(user!).toEqual(createUser(12));
-    }));
+            expect(user!).toEqual(createUser(12));
+        }));
 
     it('should make put request to update user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
 
-        const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
+            const resource: Resource = {
+                _links: {
+                    update: { method: 'PUT', href: 'api/user-management/123' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                update: { method: 'PUT', href: 'api/user-management/123' }
-            }
-        };
+            let user: UserDto;
 
-        let user: UserDto;
+            userManagementService.putUser(resource, dto).subscribe(result => {
+                user = result;
+            });
 
-        userManagementService.putUser(resource, dto).subscribe(result => {
-            user = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/user-management/123');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management/123');
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(userResponse(12));
 
-        req.flush(userResponse(12));
-
-        expect(user!).toEqual(createUser(12));
-    }));
+            expect(user!).toEqual(createUser(12));
+        }));
 
     it('should make put request to lock user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    lock: { method: 'PUT', href: 'api/user-management/123/lock' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                lock: { method: 'PUT', href: 'api/user-management/123/lock' }
-            }
-        };
+            let user: UserDto;
 
-        let user: UserDto;
+            userManagementService.lockUser(resource).subscribe(result => {
+                user = result;
+            });
 
-        userManagementService.lockUser(resource).subscribe(result => {
-            user = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/user-management/123/lock');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management/123/lock');
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(userResponse(12));
 
-        req.flush(userResponse(12));
-
-        expect(user!).toEqual(createUser(12));
-    }));
+            expect(user!).toEqual(createUser(12));
+        }));
 
     it('should make put request to unlock user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    unlock: { method: 'PUT', href: 'api/user-management/123/unlock' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                unlock: { method: 'PUT', href: 'api/user-management/123/unlock' }
-            }
-        };
+            let user: UserDto;
 
-        let user: UserDto;
+            userManagementService.unlockUser(resource).subscribe(result => {
+                user = result;
+            });
 
-        userManagementService.unlockUser(resource).subscribe(result => {
-            user = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/user-management/123/unlock');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management/123/unlock');
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(userResponse(12));
 
-        req.flush(userResponse(12));
-
-        expect(user!).toEqual(createUser(12));
-    }));
+            expect(user!).toEqual(createUser(12));
+        }));
 
     it('should make delete request to delete user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    delete: { method: 'DELETE', href: 'api/user-management/123' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: 'api/user-management/123' }
-            }
-        };
+            userManagementService.deleteUser(resource).subscribe();
 
-        userManagementService.deleteUser(resource).subscribe();
+            const req = httpMock.expectOne('http://service/p/api/user-management/123');
 
-        const req = httpMock.expectOne('http://service/p/api/user-management/123');
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({});
-    }));
+            req.flush({});
+        }));
 
     function userResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
@@ -229,21 +221,21 @@ describe('UsersService', () => {
             email: `user${key}@domain.com`,
             displayName: `user${key}`,
             permissions: [
-                `Permission${key}`
+                `Permission${key}`,
             ],
             isLocked: true,
             _links: {
                 update: {
-                    method: 'PUT', href: `/users/${id}`
-                }
-            }
+                    method: 'PUT', href: `/users/${id}`,
+                },
+            },
         };
     }
 });
 
 export function createUser(id: number, suffix = '') {
     const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/users/${id}` }
+        update: { method: 'PUT', href: `/users/${id}` },
     };
 
     const key = `${id}${suffix}`;
@@ -253,7 +245,7 @@ export function createUser(id: number, suffix = '') {
         `user${key}@domain.com`,
         `user${key}`,
         [
-            `Permission${key}`
+            `Permission${key}`,
         ],
         true);
 }

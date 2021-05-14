@@ -16,25 +16,25 @@ const routes: Routes = [
         component: ApiAreaComponent,
         children: [
             {
-                path: ''
+                path: '',
             },
             {
                 path: 'graphql',
-                component: GraphQLPageComponent
-            }
-        ]
-    }
+                component: GraphQLPageComponent,
+            },
+        ],
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     declarations: [
         ApiAreaComponent,
-        GraphQLPageComponent
-    ]
+        GraphQLPageComponent,
+    ],
 })
 export class SqxFeatureApiModule {}

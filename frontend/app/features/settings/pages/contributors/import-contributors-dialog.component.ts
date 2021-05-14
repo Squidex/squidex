@@ -21,7 +21,7 @@ type ImportStatus = {
 @Component({
     selector: 'sqx-import-contributors-dialog',
     styleUrls: ['./import-contributors-dialog.component.scss'],
-    templateUrl: './import-contributors-dialog.component.html'
+    templateUrl: './import-contributors-dialog.component.html',
 })
 export class ImportContributorsDialogComponent {
     @Output()
@@ -36,7 +36,7 @@ export class ImportContributorsDialogComponent {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly contributorsState: ContributorsState
+        private readonly contributorsState: ContributorsState,
     ) {
     }
 
@@ -50,7 +50,7 @@ export class ImportContributorsDialogComponent {
                 email: contributor.contributorId,
                 result: 'Pending',
                 resultText: 'Pending',
-                role: 'Developer'
+                role: 'Developer',
             }));
         }
     }
@@ -78,8 +78,8 @@ export class ImportContributorsDialogComponent {
                         }
 
                         return EMPTY;
-                    })
-                ), 1)
+                    }),
+                ), 1),
         ).subscribe();
     }
 }

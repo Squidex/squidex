@@ -17,7 +17,7 @@ describe('WorkflowsState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const oldWorkflows = createWorkflows('1', '2');
@@ -87,7 +87,7 @@ describe('WorkflowsState', () => {
             workflowsService.setup(x => x.postWorkflow(app, { name: 'my-workflow' }, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            workflowsState.add('my-workflow' ).subscribe();
+            workflowsState.add('my-workflow').subscribe();
 
             expectNewWorkflows(updated);
         });

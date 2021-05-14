@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, RuleMustExistGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
@@ -23,20 +21,20 @@ const routes: Routes = [
         children: [
             {
                 path: 'events',
-                component: RuleEventsPageComponent
+                component: RuleEventsPageComponent,
             },
             {
                 path: 'simulator',
-                component: RuleSimulatorPageComponent
+                component: RuleSimulatorPageComponent,
             },
             {
                 path: 'help',
                 component: HelpComponent,
                 data: {
-                    helpPage: '05-integrated/rules'
-                }
-            }
-        ]
+                    helpPage: '05-integrated/rules',
+                },
+            },
+        ],
     }, {
         path: ':ruleId',
         component: RulePageComponent,
@@ -44,28 +42,28 @@ const routes: Routes = [
         children: [
             {
                 path: 'events',
-                component: RuleEventsPageComponent
+                component: RuleEventsPageComponent,
             },
             {
                 path: 'simulator',
-                component: RuleSimulatorPageComponent
+                component: RuleSimulatorPageComponent,
             },
             {
                 path: 'help',
                 component: HelpComponent,
                 data: {
-                    helpPage: '05-integrated/rules'
-                }
-            }
-        ]
-    }
+                    helpPage: '05-integrated/rules',
+                },
+            },
+        ],
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     declarations: [
         AssetChangedTriggerComponent,
@@ -83,7 +81,7 @@ const routes: Routes = [
         RulesPageComponent,
         SchemaChangedTriggerComponent,
         SimulatedRuleEventComponent,
-        UsageTriggerComponent
-    ]
+        UsageTriggerComponent,
+    ],
 })
 export class SqxFeatureRulesModule {}

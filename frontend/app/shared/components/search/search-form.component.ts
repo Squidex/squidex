@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
     templateUrl: './search-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchFormComponent implements OnChanges {
     private previousQuery?: Query | null;
@@ -57,7 +57,7 @@ export class SearchFormComponent implements OnChanges {
     public hasFilter: boolean;
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

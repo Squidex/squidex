@@ -18,8 +18,8 @@ import { ArrayItemComponent } from './array-item.component';
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class ArrayEditorComponent implements OnChanges {
     @Input()
@@ -70,7 +70,7 @@ export class ArrayEditorComponent implements OnChanges {
 
             this.isFull = combineLatest([
                 this.isDisabled,
-                this.formModel.itemChanges
+                this.formModel.itemChanges,
             ]).pipe(map(([disabled, items]) => {
                 return disabled || items.length >= maxItems;
             }));

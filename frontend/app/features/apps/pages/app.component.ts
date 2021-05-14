@@ -13,9 +13,9 @@ import { AppDto, fadeAnimation, ModalModel } from '@app/shared';
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
     @Input()

@@ -9,7 +9,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'sqxKeys',
-    pure: true
+    pure: true,
 })
 export class KeysPipe implements PipeTransform {
     public transform(value: any): any {

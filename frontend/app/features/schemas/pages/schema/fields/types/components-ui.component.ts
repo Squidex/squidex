@@ -12,7 +12,7 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 @Component({
     selector: 'sqx-components-ui',
     styleUrls: ['components-ui.component.scss'],
-    templateUrl: 'components-ui.component.html'
+    templateUrl: 'components-ui.component.html',
 })
 export class ComponentsUIComponent {
     @Input()

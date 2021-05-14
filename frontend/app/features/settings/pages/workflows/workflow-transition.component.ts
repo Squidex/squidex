@@ -11,7 +11,7 @@ import { RoleDto, WorkflowTransitionValues, WorkflowTransitionView } from '@app/
 @Component({
     selector: 'sqx-workflow-transition',
     styleUrls: ['./workflow-transition.component.scss'],
-    templateUrl: './workflow-transition.component.html'
+    templateUrl: './workflow-transition.component.html',
 })
 export class WorkflowTransitionComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

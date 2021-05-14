@@ -12,7 +12,7 @@ import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/s
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClientComponent implements OnChanges {
     @Input()
@@ -27,11 +27,11 @@ export class ClientComponent implements OnChanges {
 
     constructor(
         public readonly appsState: AppsState,
-        private readonly clientsState: ClientsState
+        private readonly clientsState: ClientsState,
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges ) {
+    public ngOnChanges(changes: SimpleChanges) {
         if (changes['client']) {
             this.apiCallsLimit = this.client.apiCallsLimit;
         }

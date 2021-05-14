@@ -13,30 +13,30 @@ const DESCRIPTIONS = {
     Developer: 'i18n:roles.defaults.developer',
     Editor: 'i18n:roles.defaults.editor',
     Owner: 'i18n:roles.default.owner',
-    Reader: 'i18n:roles.default.reader'
+    Reader: 'i18n:roles.default.reader',
 };
 
-type Property = { name: string, key: string };
+type Property = { name: string; key: string };
 
 const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
     name: 'i18n:roles.properties.hideSchemas',
-    key: Settings.AppProperties.HIDE_SCHEMAS
+    key: Settings.AppProperties.HIDE_SCHEMAS,
 }, {
     name: 'i18n:roles.properties.hideAssets',
-    key: Settings.AppProperties.HIDE_ASSETS
+    key: Settings.AppProperties.HIDE_ASSETS,
 }, {
     name: 'i18n:roles.properties.hideSettings',
-    key: Settings.AppProperties.HIDE_SETTINGS
+    key: Settings.AppProperties.HIDE_SETTINGS,
 }, {
     name: 'i18n:roles.properties.hideAPI',
-    key: Settings.AppProperties.HIDE_API
+    key: Settings.AppProperties.HIDE_API,
 }];
 
 @Component({
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoleComponent implements OnChanges {
     @Input()
@@ -70,7 +70,7 @@ export class RoleComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly rolesState: RolesState
+        private readonly rolesState: RolesState,
     ) {
     }
 

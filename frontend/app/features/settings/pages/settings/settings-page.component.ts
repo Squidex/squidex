@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -12,7 +12,7 @@ import { AppSettingsDto, AppsState, EditAppSettingsForm, ResourceOwner } from '@
 @Component({
     selector: 'sqx-settings-page',
     styleUrls: ['./settings-page.component.scss'],
-    templateUrl: './settings-page.component.html'
+    templateUrl: './settings-page.component.html',
 })
 export class SettingsPageComponent extends ResourceOwner implements OnInit {
     public isEditable = false;
@@ -22,7 +22,7 @@ export class SettingsPageComponent extends ResourceOwner implements OnInit {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
         super();
     }

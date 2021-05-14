@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, LoadSchemasGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
@@ -19,7 +17,7 @@ const routes: Routes = [
         canActivate: [LoadLanguagesGuard, LoadSchemasGuard],
         children: [
             {
-                path: ''
+                path: '',
             },
             {
                 path: ':schemaName',
@@ -33,19 +31,19 @@ const routes: Routes = [
                         children: [
                             {
                                 path: 'filters',
-                                component: ContentsFiltersPageComponent
+                                component: ContentsFiltersPageComponent,
                             },
                             {
-                               path: 'sidebar',
-                               component: SidebarPageComponent
-                            }
-                        ]
+                                path: 'sidebar',
+                                component: SidebarPageComponent,
+                            },
+                        ],
                     },
                     {
                         path: 'new',
                         component: ContentPageComponent,
                         canActivate: [SchemaMustNotBeSingletonGuard, ContentMustExistGuard],
-                        canDeactivate: [CanDeactivateGuard]
+                        canDeactivate: [CanDeactivateGuard],
                     },
                     {
                         path: ':contentId',
@@ -53,33 +51,33 @@ const routes: Routes = [
                         canActivate: [ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
                         children: [
-                             {
+                            {
                                 path: 'history',
                                 component: ContentHistoryPageComponent,
                                 data: {
-                                    channel: 'contents.{contentId}'
-                                }
+                                    channel: 'contents.{contentId}',
+                                },
                             },
                             {
-                               path: 'comments',
-                               component: CommentsPageComponent
+                                path: 'comments',
+                                component: CommentsPageComponent,
                             },
                             {
-                               path: 'sidebar',
-                               component: SidebarPageComponent
-                            }
-                        ]
-                    }
-                ]
-            }]
-    }
+                                path: 'sidebar',
+                                component: SidebarPageComponent,
+                            },
+                        ],
+                    },
+                ],
+            }],
+    },
 ];
 
 @NgModule({
     imports: [
         RouterModule.forChild(routes),
         SqxFrameworkModule,
-        SqxSharedModule
+        SqxSharedModule,
     ],
     declarations: [
         ArrayEditorComponent,
@@ -120,7 +118,7 @@ const routes: Routes = [
         ReferencesEditorComponent,
         SchemasPageComponent,
         SidebarPageComponent,
-        StockPhotoEditorComponent
-    ]
+        StockPhotoEditorComponent,
+    ],
 })
 export class SqxFeatureContentModule {}

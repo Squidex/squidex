@@ -12,7 +12,7 @@ import { LanguageDto, Query, QueryModel } from '@app/shared/internal';
     selector: 'sqx-query',
     styleUrls: ['./query.component.scss'],
     templateUrl: './query.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QueryComponent {
     @Output()

@@ -12,11 +12,11 @@ export interface Resource {
 }
 
 export type ResourceLinks = { [rel: string]: ResourceLink };
-export type ResourceLink = { href: string; method: ResourceMethod; metadata?: string; };
+export type ResourceLink = { href: string; method: ResourceMethod; metadata?: string };
 
 export type Metadata = { [rel: string]: string };
 
-export function getLinkUrl(value: Resource | ResourceLinks,  ...rels: ReadonlyArray<string>) {
+export function getLinkUrl(value: Resource | ResourceLinks, ...rels: ReadonlyArray<string>) {
     if (!value) {
         return false;
     }
@@ -34,7 +34,7 @@ export function getLinkUrl(value: Resource | ResourceLinks,  ...rels: ReadonlyAr
     return undefined;
 }
 
-export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: ReadonlyArray<string>) {
+export function hasAnyLink(value: Resource | ResourceLinks, ...rels: ReadonlyArray<string>) {
     return !!getLinkUrl(value, ...rels);
 }
 

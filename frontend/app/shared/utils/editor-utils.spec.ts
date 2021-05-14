@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable no-template-curly-in-string */
+
 import { Version } from '@app/framework';
 import { AppSettingsDto } from './../services/apps.service';
 import { computeEditorUrl } from './editor-utils';
@@ -12,13 +14,13 @@ import { computeEditorUrl } from './editor-utils';
 describe('EditorUtils', () => {
     const settings = new AppSettingsDto({}, false, [], [{
         name: 'editor1',
-        url: 'url/to/editor1'
+        url: 'url/to/editor1',
     }, {
         name: 'duplicate',
-        url: 'url/to/duplicate1'
+        url: 'url/to/duplicate1',
     }, {
         name: 'duplicate',
-        url: 'url/to/duplicate2'
+        url: 'url/to/duplicate2',
     }],
     new Version('1'));
 
@@ -52,7 +54,7 @@ describe('EditorUtils', () => {
         expect(result).toEqual('http://undefined?query=value');
     });
 
-    [null, undefined, ''].map(url => {
+    [null, undefined, ''].forEach(url => {
         it(`should return empty string if url is ${url}`, () => {
             const result = computeEditorUrl(url, settings);
 

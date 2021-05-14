@@ -10,11 +10,11 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Pipe({
     name: 'sqxSafeHtml',
-    pure: true
+    pure: true,
 })
 export class SafeHtmlPipe implements PipeTransform {
     constructor(
-        public readonly domSanitizer: DomSanitizer
+        public readonly domSanitizer: DomSanitizer,
     ) {
     }
 
@@ -25,11 +25,11 @@ export class SafeHtmlPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxSafeUrl',
-    pure: true
+    pure: true,
 })
 export class SafeUrlPipe implements PipeTransform {
     constructor(
-        public readonly domSanitizer: DomSanitizer
+        public readonly domSanitizer: DomSanitizer,
     ) {
     }
 

@@ -26,7 +26,7 @@ describe('AuthInterceptor', () => {
 
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 { provide: Router, useFactory: () => router.object },
@@ -35,9 +35,9 @@ describe('AuthInterceptor', () => {
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: AuthInterceptor,
-                    multi: true
-                }
-            ]
+                    multi: true,
+                },
+            ],
         });
     });
 
@@ -47,101 +47,95 @@ describe('AuthInterceptor', () => {
 
     it('should append headers to request',
         inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+            authService.setup(x => x.userChanges).returns(() => of(<any>{ authorization: 'letmein' }));
 
-        authService.setup(x => x.userChanges).returns(() => of(<any>{ authorization: 'letmein' }));
-
-        http.get('http://service/p/apps').subscribe();
-
-        const req = httpMock.expectOne('http://service/p/apps');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('Authorization')).toEqual('letmein');
-        expect(req.request.headers.get('Pragma')).toEqual('no-cache');
-    }));
-
-    it('should not append headers for no auth headers',
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-
-        authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
-
-        http.get('http://service/p/apps', { headers: new HttpHeaders().set('NoAuth', '') }).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/apps');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('Authorization')).toBeNull();
-        expect(req.request.headers.get('Accept-Language')).toBeNull();
-        expect(req.request.headers.get('Pragma')).toBeNull();
-    }));
-
-    it('should not append headers for other requests',
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-
-        authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
-
-        http.get('http://cloud/p/apps').subscribe();
-
-        const req = httpMock.expectOne('http://cloud/p/apps');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('Authorization')).toBeNull();
-        expect(req.request.headers.get('Accept-Language')).toBeNull();
-        expect(req.request.headers.get('Pragma')).toBeNull();
-    }));
-
-    it(`should logout for 401 status code`,
-        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-
-        authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
-        authService.setup(x => x.loginSilent()).returns(() => of(<any>{ authToken: 'letmereallyin' }));
-
-        http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
-
-        httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
-        httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
-
-        expect().nothing();
-
-        authService.verify(x => x.logoutRedirect(), Times.once());
-    }));
-
-    const AUTH_ERRORS = [403];
-
-    AUTH_ERRORS.map(statusCode => {
-        it(`should redirect for ${statusCode} status code`,
-            inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
-
-            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
-
-            http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
+            http.get('http://service/p/apps').subscribe();
 
             const req = httpMock.expectOne('http://service/p/apps');
 
-            req.error(<any>{}, { status: statusCode });
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('Authorization')).toEqual('letmein');
+            expect(req.request.headers.get('Pragma')).toEqual('no-cache');
+        }));
+
+    it('should not append headers for no auth headers',
+        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+
+            http.get('http://service/p/apps', { headers: new HttpHeaders().set('NoAuth', '') }).subscribe();
+
+            const req = httpMock.expectOne('http://service/p/apps');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('Authorization')).toBeNull();
+            expect(req.request.headers.get('Accept-Language')).toBeNull();
+            expect(req.request.headers.get('Pragma')).toBeNull();
+        }));
+
+    it('should not append headers for other requests',
+        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+
+            http.get('http://cloud/p/apps').subscribe();
+
+            const req = httpMock.expectOne('http://cloud/p/apps');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('Authorization')).toBeNull();
+            expect(req.request.headers.get('Accept-Language')).toBeNull();
+            expect(req.request.headers.get('Pragma')).toBeNull();
+        }));
+
+    it('should logout for 401 status code',
+        inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+            authService.setup(x => x.loginSilent()).returns(() => of(<any>{ authToken: 'letmereallyin' }));
+
+            http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
+
+            httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
+            httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
 
             expect().nothing();
 
-            router.verify(x => x.navigate(['/forbidden'], { replaceUrl: true }), Times.once());
+            authService.verify(x => x.logoutRedirect(), Times.once());
         }));
+
+    const AUTH_ERRORS = [403];
+
+    AUTH_ERRORS.forEach(statusCode => {
+        it(`should redirect for ${statusCode} status code`,
+            inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+                authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+
+                http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
+
+                const req = httpMock.expectOne('http://service/p/apps');
+
+                req.error(<any>{}, { status: statusCode });
+
+                expect().nothing();
+
+                router.verify(x => x.navigate(['/forbidden'], { replaceUrl: true }), Times.once());
+            }));
     });
 
     const SERVER_ERRORS = [500, 404, 405];
 
-    SERVER_ERRORS.map(statusCode => {
+    SERVER_ERRORS.forEach(statusCode => {
         it(`should not logout for ${statusCode} status code`,
             inject([HttpClient, HttpTestingController], (http: HttpClient, httpMock: HttpTestingController) => {
+                authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
 
-            authService.setup(x => x.userChanges).returns(() => of(<any>{ authToken: 'letmein' }));
+                http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
 
-            http.get('http://service/p/apps').pipe(onErrorResumeNext()).subscribe();
+                const req = httpMock.expectOne('http://service/p/apps');
 
-            const req = httpMock.expectOne('http://service/p/apps');
+                req.error(<any>{}, { status: statusCode });
 
-            req.error(<any>{}, { status: statusCode });
+                expect().nothing();
 
-            expect().nothing();
-
-            authService.verify(x => x.logoutRedirect(), Times.never());
-        }));
+                authService.verify(x => x.logoutRedirect(), Times.never());
+            }));
     });
 });

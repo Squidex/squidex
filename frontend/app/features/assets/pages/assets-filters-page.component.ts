@@ -11,13 +11,13 @@ import { AssetsState, Queries, Query, UIState } from '@app/shared';
 @Component({
     selector: 'sqx-assets-filters-page',
     styleUrls: ['./assets-filters-page.component.scss'],
-    templateUrl: './assets-filters-page.component.html'
+    templateUrl: './assets-filters-page.component.html',
 })
 export class AssetsFiltersPageComponent {
     public assetsQueries: Queries;
 
     constructor(uiState: UIState,
-        public readonly assetsState: AssetsState
+        public readonly assetsState: AssetsState,
     ) {
         this.assetsQueries = new Queries(uiState, 'assets');
     }

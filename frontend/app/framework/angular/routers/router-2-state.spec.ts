@@ -193,8 +193,8 @@ describe('Router2State', () => {
             router = Mock.ofType<Router>();
             route = {
                 snapshot: {
-                    queryParams
-                }
+                    queryParams,
+                },
             };
 
             state = new State<any>({});
@@ -233,7 +233,7 @@ describe('Router2State', () => {
 
             state.next({
                 state1: 'hello',
-                state2: { squidex: true, cms: true }
+                state2: { squidex: true, cms: true },
             });
 
             expect(routeExtras!.replaceUrl).toBeTrue();
@@ -251,12 +251,12 @@ describe('Router2State', () => {
 
             state.next({
                 state1: 'hello',
-                state2: { squidex: true, cms: true }
+                state2: { squidex: true, cms: true },
             });
 
             state.next({
                 state1: 'hello',
-                state2: { squidex: true, cms: true }
+                state2: { squidex: true, cms: true },
             });
 
             expect(routeExtras!.replaceUrl).toBeTrue();

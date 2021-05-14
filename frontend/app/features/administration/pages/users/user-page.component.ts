@@ -14,7 +14,7 @@ import { ResourceOwner } from '@app/shared';
 @Component({
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
-    templateUrl: './user-page.component.html'
+    templateUrl: './user-page.component.html',
 })
 export class UserPageComponent extends ResourceOwner implements OnInit {
     public isEditable = false;
@@ -26,7 +26,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
         public readonly usersState: UsersState,
         private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         super();
     }
@@ -41,7 +41,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
 
                     const permissions: string[] = [];
 
-                    this.userForm.load(user || { permissions } );
+                    this.userForm.load(user || { permissions });
                     this.userForm.setEnabled(this.isEditable);
                 }));
     }

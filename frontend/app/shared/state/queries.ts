@@ -24,8 +24,8 @@ export interface SavedQuery {
 
 const OLDEST_FIRST: Query = {
     sort: [
-        { path: 'lastModified', order: 'descending' }
-    ]
+        { path: 'lastModified', order: 'descending' },
+    ],
 };
 
 export class Queries {
@@ -35,12 +35,12 @@ export class Queries {
 
     public defaultQueries: ReadonlyArray<SavedQuery> = [
         { name: 'i18n:search.queryAllNewestFirst' },
-        { name: 'i18n:search.queryAllOldestFirst', query: OLDEST_FIRST }
+        { name: 'i18n:search.queryAllOldestFirst', query: OLDEST_FIRST },
     ];
 
     constructor(
         private readonly uiState: UIState,
-        private readonly prefix: string
+        private readonly prefix: string,
     ) {
         const path = `${prefix}.queries`;
 

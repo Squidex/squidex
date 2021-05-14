@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable import/no-cycle */
+
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { QueryParamsHandling } from '@angular/router';
 import { slideRightAnimation } from '@app/framework/internal';
@@ -15,9 +17,9 @@ import { PanelContainerDirective } from './panel-container.directive';
     styleUrls: ['./panel.component.scss'],
     templateUrl: './panel.component.html',
     animations: [
-        slideRightAnimation
+        slideRightAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnInit {
     private widthPrevious: string;
@@ -92,7 +94,7 @@ export class PanelComponent implements AfterViewInit, OnChanges, OnDestroy, OnIn
 
     constructor(
         private readonly container: PanelContainerDirective,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

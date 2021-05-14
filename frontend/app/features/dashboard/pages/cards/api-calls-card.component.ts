@@ -14,9 +14,9 @@ import { ChartHelpers, ChartOptions } from './shared';
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiCallsCardComponent implements OnChanges {
     @Input()
@@ -29,7 +29,7 @@ export class ApiCallsCardComponent implements OnChanges {
     public chartData: any;
 
     constructor(
-        private readonly usagesService: UsagesService
+        private readonly usagesService: UsagesService,
     ) {
     }
 
@@ -45,8 +45,8 @@ export class ApiCallsCardComponent implements OnChanges {
                         backgroundColor: ChartHelpers.getBackgroundColor(i),
                         borderColor: ChartHelpers.getBorderColor(i),
                         borderWidth: 1,
-                        data: this.usage.details[k].map(x => x.totalCalls)
-                    }))
+                        data: this.usage.details[k].map(x => x.totalCalls),
+                    })),
             };
         }
     }

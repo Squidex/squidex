@@ -61,7 +61,7 @@ describe('UsersProviderService', () => {
         const user = new UserDto('123', 'User1');
 
         authService.setup(x => x.user)
-            .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
+            .returns(() => new Profile(<any>{ profile: { sub: '123' } }));
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => of(user)).verifiable(Times.once());
@@ -79,7 +79,7 @@ describe('UsersProviderService', () => {
 
     it('should return invalid user if not found', () => {
         authService.setup(x => x.user)
-            .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
+            .returns(() => new Profile(<any>{ profile: { sub: '123' } }));
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => throwError('Service Error')).verifiable(Times.once());

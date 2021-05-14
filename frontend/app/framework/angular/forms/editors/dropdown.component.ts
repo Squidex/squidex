@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: prefer-for-of
-
 import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, forwardRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, TemplateRef } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { map } from 'rxjs/operators';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
 };
 
 interface State {
@@ -35,9 +33,9 @@ interface State {
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',
     providers: [
-        SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR
+        SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnChanges, OnInit {
     private value: any;
@@ -76,34 +74,34 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         super(changeDetector, {
             selectedItem: undefined,
             suggestedIndex: -1,
-            suggestedItems: []
+            suggestedItems: [],
         });
     }
 
     public ngOnInit() {
         this.own(
             this.queryInput.valueChanges.pipe(
-                    map((queryText: string) => {
-                        if (!this.items || !queryText) {
-                            return { query: undefined, items: this.items };
-                        } else {
-                            const query = new RegExp(queryText, 'i');
+                map((queryText: string) => {
+                    if (!this.items || !queryText) {
+                        return { query: undefined, items: this.items };
+                    } else {
+                        const query = new RegExp(queryText, 'i');
 
-                            const items = this.items.filter(x => {
-                                if (Types.isString(x)) {
-                                    return query.test(x);
-                                } else {
-                                    return query.test(x[this.searchProperty]);
-                                }
-                            });
+                        const items = this.items.filter(x => {
+                            if (Types.isString(x)) {
+                                return query.test(x);
+                            } else {
+                                return query.test(x[this.searchProperty]);
+                            }
+                        });
 
-                            return { query, items };
-                        }
-                    }))
+                        return { query, items };
+                    }
+                }))
                 .subscribe(({ query, items }) => {
                     this.next({
                         suggestedItems: items || [],
-                        query
+                        query,
                     });
                 }));
     }

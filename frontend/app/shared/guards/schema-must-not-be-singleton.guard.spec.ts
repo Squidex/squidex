@@ -14,13 +14,13 @@ import { SchemaMustNotBeSingletonGuard } from './schema-must-not-be-singleton.gu
 describe('SchemaMustNotBeSingletonGuard', () => {
     const route: any = {
         params: {
-            schemaName: '123'
+            schemaName: '123',
         },
         url: [
             new UrlSegment('schemas', {}),
             new UrlSegment('name', {}),
-            new UrlSegment('new', {})
-        ]
+            new UrlSegment('new', {}),
+        ],
     };
 
     let schemasState: IMock<SchemasState>;

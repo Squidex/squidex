@@ -16,7 +16,7 @@ import { ContentsState } from './../state/contents.state';
 export class ContentMustExistGuard implements CanActivate {
     constructor(
         private readonly contentsState: ContentsState,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 

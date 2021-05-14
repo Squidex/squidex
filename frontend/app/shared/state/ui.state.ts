@@ -12,7 +12,7 @@ import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';
 
-type Settings = { canCreateApps?: boolean, [key: string]: any };
+type Settings = { canCreateApps?: boolean; [key: string]: any };
 
 interface Snapshot {
     // All common settings.
@@ -87,11 +87,11 @@ export class UIState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly uiService: UIService,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
     ) {
         super({
             settings: {},
-            settingsCommon: {}
+            settingsCommon: {},
         }, 'Setting');
 
         this.loadResources();
@@ -108,7 +108,7 @@ export class UIState extends State<Snapshot> {
             ...s,
             settings: s.settingsCommon,
             settingsShared: undefined,
-            settingsUser: undefined
+            settingsUser: undefined,
         }), 'Loading Done');
 
         this.uiService.getSharedSettings(app)
@@ -136,7 +136,7 @@ export class UIState extends State<Snapshot> {
                     canReadEvents: hasAnyLink(payload, 'admin/events'),
                     canReadUsers: hasAnyLink(payload, 'admin/users'),
                     canRestore: hasAnyLink(payload, 'admin/restore'),
-                    canUseOrleans: hasAnyLink(payload, 'admin/orleans')
+                    canUseOrleans: hasAnyLink(payload, 'admin/orleans'),
                 }, 'Loading Resources Done');
             });
     }

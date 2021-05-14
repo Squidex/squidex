@@ -12,7 +12,7 @@ import { DialogModel, DialogService, StatefulControlComponent, Types } from '@ap
 import { AppsState, AssetDto, computeEditorUrl } from '@app/shared';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true,
 };
 
 interface State {
@@ -25,9 +25,9 @@ interface State {
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     providers: [
-        SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IFrameEditorComponent extends StatefulControlComponent<State, any> implements OnChanges, OnDestroy, AfterViewInit {
     private value: any;
@@ -72,10 +72,10 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
         private readonly renderer: Renderer2,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         super(changeDetector, {
-            isFullscreen: false
+            isFullscreen: false,
         });
     }
 

@@ -5,14 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: no-pipe-impure
-
 import { Pipe, PipeTransform } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxHighlight',
-    pure: false
+    pure: false,
 })
 export class HighlightPipe implements PipeTransform {
     public transform(text: string, highlight: string | RegExp | undefined | null): string {

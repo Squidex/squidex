@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable no-useless-escape */
+
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, ValidatorsEx } from '@app/framework';
 import { AppDto, AppSettingsDto, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
@@ -16,9 +18,9 @@ export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage')
-                ]
-            ]
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage'),
+                ],
+            ],
         }));
     }
 }
@@ -28,10 +30,10 @@ export class UpdateAppForm extends Form<FormGroup, UpdateAppDto, AppDto> {
         super(formBuilder.group({
             label: ['',
                 [
-                    Validators.maxLength(40)
-                ]
+                    Validators.maxLength(40),
+                ],
             ],
-            description: ''
+            description: '',
         }));
     }
 }
@@ -54,13 +56,13 @@ export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, A
     }
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
         super(formBuilder.group({
             patterns: formBuilder.array([]),
             hideScheduler: false,
             hideDateTimeButtons: false,
-            editors: formBuilder.array([])
+            editors: formBuilder.array([]),
         }));
     }
 
@@ -69,15 +71,15 @@ export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, A
             this.formBuilder.group({
                 name: ['',
                     [
-                        Validators.required
-                    ]
+                        Validators.required,
+                    ],
                 ],
                 regex: ['',
                     [
-                        Validators.required
-                    ]
+                        Validators.required,
+                    ],
                 ],
-                message: ''
+                message: '',
             }));
     }
 
@@ -86,14 +88,14 @@ export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, A
             this.formBuilder.group({
                 name: ['',
                     [
-                        Validators.required
-                    ]
+                        Validators.required,
+                    ],
                 ],
                 url: ['',
                     [
-                        Validators.required
-                    ]
-                ]
+                        Validators.required,
+                    ],
+                ],
             }));
     }
 

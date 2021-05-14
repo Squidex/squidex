@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { Component, Input, OnChanges } from '@angular/core';
 import { SchemaDto, TriggerForm } from '@app/shared';
 
@@ -19,7 +17,7 @@ export interface TriggerSchemaForm {
 @Component({
     selector: 'sqx-content-changed-trigger',
     styleUrls: ['./content-changed-trigger.component.scss'],
-    templateUrl: './content-changed-trigger.component.html'
+    templateUrl: './content-changed-trigger.component.html',
 })
 export class ContentChangedTriggerComponent implements OnChanges {
     @Input()
@@ -77,7 +75,7 @@ export class ContentChangedTriggerComponent implements OnChanges {
     }
 
     public updateCondition(schema: SchemaDto, condition: string) {
-        this.triggerSchemas = this.triggerSchemas.map(s => s.schema === schema ? { schema, condition } : s);
+        this.triggerSchemas = this.triggerSchemas.map(s => (s.schema === schema ? { schema, condition } : s));
 
         this.updateValue();
     }

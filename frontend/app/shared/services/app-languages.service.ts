@@ -23,7 +23,7 @@ export class AppLanguageDto {
         public readonly englishName: string,
         public readonly isMaster: boolean,
         public readonly isOptional: boolean,
-        public readonly fallback: ReadonlyArray<string>
+        public readonly fallback: ReadonlyArray<string>,
     ) {
         this._links = links;
 
@@ -36,20 +36,20 @@ export type AppLanguagesDto =
     Versioned<AppLanguagesPayload>;
 
 export type AppLanguagesPayload =
-    Readonly<{ items: ReadonlyArray<AppLanguageDto>, canCreate: boolean } & Resource>;
+    Readonly<{ items: ReadonlyArray<AppLanguageDto>; canCreate: boolean } & Resource>;
 
 export type AddAppLanguageDto =
     Readonly<{ language: string }>;
 
 export type UpdateAppLanguageDto =
-    Readonly<{ isMaster?: boolean, isOptional?: boolean, falback?: ReadonlyArray<string> }>;
+    Readonly<{ isMaster?: boolean; isOptional?: boolean; falback?: ReadonlyArray<string> }>;
 
 @Injectable()
 export class AppLanguagesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 

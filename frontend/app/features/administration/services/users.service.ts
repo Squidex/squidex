@@ -30,7 +30,7 @@ export class UserDto {
         public readonly email: string,
         public readonly displayName: string,
         public readonly permissions: ReadonlyArray<string> = [],
-        public readonly isLocked?: boolean
+        public readonly isLocked?: boolean,
     ) {
         this._links = links;
 
@@ -44,7 +44,7 @@ export class UserDto {
 type Permissions = readonly string[];
 
 export type CreateUserDto =
-    Readonly<{ email: string, displayName: string, permissions: Permissions, password: string }>;
+    Readonly<{ email: string; displayName: string; permissions: Permissions; password: string }>;
 
 export type UpdateUserDto =
     Partial<CreateUserDto>;
@@ -53,14 +53,14 @@ export type UpdateUserDto =
 export class UsersService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
-        return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
+        return this.http.get<{ total: number; items: any[] } & Resource>(url).pipe(
             map(({ total, items, _links }) => {
                 const users = items.map(parseUser);
 

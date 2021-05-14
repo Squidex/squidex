@@ -15,7 +15,7 @@ import { TestValues } from './_test-helpers';
 describe('AssetUploaderState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     let assetsService: IMock<AssetsService>;

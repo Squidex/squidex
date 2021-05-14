@@ -15,7 +15,7 @@ class SchemaConverter implements TagConverter {
     public suggestions: ReadonlyArray<TagValue>;
 
     constructor(
-        private readonly schemas: ReadonlyArray<SchemaDto>
+        private readonly schemas: ReadonlyArray<SchemaDto>,
     ) {
         this.suggestions = schemas.map(x => new TagValue(x.id, x.name, x.id));
     }
@@ -44,11 +44,11 @@ class SchemaConverter implements TagConverter {
 @Injectable()
 export class SchemaTagSource {
     public converter =
-         this.schemasState.schemas.pipe(
-             map(x => new SchemaConverter(x), shareReplay(1)));
+        this.schemasState.schemas.pipe(
+            map(x => new SchemaConverter(x), shareReplay(1)));
 
     constructor(
-        readonly schemasState: SchemasState
+        readonly schemasState: SchemasState,
     ) {
         this.schemasState.loadIfNotLoaded();
     }

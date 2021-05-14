@@ -16,7 +16,7 @@ import { map, tap } from 'rxjs/operators';
 export class UserMustExistGuard implements CanActivate {
     constructor(
         private readonly usersState: UsersState,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 

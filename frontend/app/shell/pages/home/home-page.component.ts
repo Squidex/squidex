@@ -12,14 +12,14 @@ import { AuthService } from '@app/shared';
 @Component({
     selector: 'sqx-home-page',
     styleUrls: ['./home-page.component.scss'],
-    templateUrl: './home-page.component.html'
+    templateUrl: './home-page.component.html',
 })
 export class HomePageComponent {
     public showLoginError = false;
 
     constructor(
         private readonly authService: AuthService,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 
@@ -30,7 +30,7 @@ export class HomePageComponent {
             this.authService.loginPopup()
                 .subscribe(() => {
                     this.router.navigate(['/app']);
-                }, _ => {
+                }, () => {
                     this.showLoginError = true;
                 });
         }

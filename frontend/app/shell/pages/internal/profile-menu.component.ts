@@ -30,9 +30,9 @@ interface State {
     styleUrls: ['./profile-menu.component.scss'],
     templateUrl: './profile-menu.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     public modalMenu = new ModalModel();
@@ -43,14 +43,14 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     constructor(changeDetector: ChangeDetectorRef, apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,
         public readonly uiOptions: UIOptions,
-        public readonly authService: AuthService
+        public readonly authService: AuthService,
     ) {
         super(changeDetector, {
             profileDisplayName: '',
             profileEmail: '',
             profileId: '',
             profileUrl: apiUrl.buildUrl('/identity-server/account/profile'),
-            showSubmenu: false
+            showSubmenu: false,
         });
     }
 
@@ -66,7 +66,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
                         this.next({
                             profileId,
                             profileEmail,
-                            profileDisplayName
+                            profileDisplayName,
                         });
                     }
                 }));
@@ -76,13 +76,14 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
         Cookies.remove('.AspNetCore.Culture');
         Cookies.set('.AspNetCore.Culture', `c=${code}|uic=${code}`, 365);
 
+        // eslint-disable-next-line no-restricted-globals
         location.reload();
     }
 
     public toggle() {
         this.next(s => ({
             ...s,
-            showSubmenu: !s.showSubmenu
+            showSubmenu: !s.showSubmenu,
         }));
     }
 

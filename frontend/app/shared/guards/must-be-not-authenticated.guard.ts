@@ -18,7 +18,7 @@ export class MustBeNotAuthenticatedGuard implements CanActivate {
 
     constructor(uiOptions: UIOptions,
         private readonly authService: AuthService,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         this.redirect = uiOptions.get('redirectToLogin');
     }

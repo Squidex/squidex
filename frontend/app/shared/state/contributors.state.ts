@@ -38,7 +38,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.query);
 
     public queryRegex =
-        this.projectFrom(this.query, x => x ? new RegExp(x, 'i') : undefined);
+        this.projectFrom(this.query, x => (x ? new RegExp(x, 'i') : undefined));
 
     public maxContributors =
         this.project(x => x.maxContributors);
@@ -62,7 +62,7 @@ export class ContributorsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly contributorsService: ContributorsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super({
             contributors: [],
@@ -70,7 +70,7 @@ export class ContributorsState extends State<Snapshot> {
             page: 0,
             pageSize: 10,
             total: 0,
-            version: Version.EMPTY
+            version: Version.EMPTY,
         }, 'Contributors');
     }
 
@@ -107,7 +107,7 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public page(paging: { page: number, pageSize: number }) {
+    public page(paging: { page: number; pageSize: number }) {
         this.next(paging, 'Results Paged');
     }
 
@@ -146,7 +146,7 @@ export class ContributorsState extends State<Snapshot> {
             isLoading: false,
             maxContributors,
             total: items.length,
-            version
+            version,
         }, 'Loading Success / Updated');
     }
 

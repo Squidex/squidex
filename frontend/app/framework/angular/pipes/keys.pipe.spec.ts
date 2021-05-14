@@ -11,7 +11,7 @@ describe('KeysPipe', () => {
     it('should return keys', () => {
         const value = {
             key1: 1,
-            key2: 2
+            key2: 2,
         };
 
         const pipe = new KeysPipe();
