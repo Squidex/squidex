@@ -35,7 +35,7 @@ export class CachingInterceptor implements HttpInterceptor {
                     if (Types.is(error, HttpErrorResponse) && error.status === 304 && cacheEntry) {
                         return of(cacheEntry);
                     } else {
-                        return throwError(error);
+                        return throwError(() => error);
                     }
                 }));
         } else {

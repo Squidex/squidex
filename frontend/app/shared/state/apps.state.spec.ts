@@ -108,7 +108,7 @@ describe('AppsState', () => {
         let appSelected: AppDto;
 
         appsService.setup(x => x.getApp('unknown'))
-            .returns(() => throwError('Service Error'));
+            .returns(() => throwError(() => 'Service Error'));
 
         appsState.select('unknown').pipe(onErrorResumeNext()).subscribe(x => {
             appSelected = x!;

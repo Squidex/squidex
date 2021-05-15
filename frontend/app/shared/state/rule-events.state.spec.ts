@@ -49,7 +49,7 @@ describe('RuleEventsState', () => {
 
     it('should reset loading state if loading failed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, undefined))
-            .returns(() => throwError('Service Error'));
+            .returns(() => throwError(() => 'Service Error'));
 
         ruleEventsState.load().pipe(onErrorResumeNext()).subscribe();
 

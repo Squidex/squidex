@@ -95,7 +95,7 @@ export class BackupsService {
                 if (Types.is(error, HttpErrorResponse) && error.status === 404) {
                     return of(null);
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             pretifyError('i18n:backups.loadFailed'));

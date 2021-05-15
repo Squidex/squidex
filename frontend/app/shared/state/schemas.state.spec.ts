@@ -96,7 +96,7 @@ describe('SchemasState', () => {
 
         it('should reset loading state if loading failed', () => {
             schemasService.setup(x => x.getSchemas(app))
-                .returns(() => throwError('Service Error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             schemasState.load().pipe(onErrorResumeNext()).subscribe();
 

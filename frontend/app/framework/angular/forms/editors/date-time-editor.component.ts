@@ -125,7 +125,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     }
 
     public callTouched() {
-        this.blur.next();
+        this.blur.next(true);
 
         super.callTouched();
     }

@@ -182,7 +182,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             });
 
             this.aceEditor.on('change', () => {
-                this.valueChanged.next();
+                this.valueChanged.next(true);
             });
 
             this.detach();

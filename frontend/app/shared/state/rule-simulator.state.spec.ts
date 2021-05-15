@@ -54,7 +54,7 @@ describe('RuleSimulatorState', () => {
 
     it('should reset loading state if loading failed', () => {
         rulesService.setup(x => x.getSimulatedEvents(app, '12'))
-            .returns(() => throwError('Service Error'));
+            .returns(() => throwError(() => 'Service Error'));
 
         ruleSimulatorState.selectRule('12');
         ruleSimulatorState.load().pipe(onErrorResumeNext()).subscribe();

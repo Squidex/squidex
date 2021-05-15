@@ -1,6 +1,7 @@
 /* eslint-disable */
 
-const webpack = require('webpack'), path = require('path');
+const webpack = require('webpack'),
+         path = require('path');
 
 const appRoot = path.resolve(__dirname, '..');
 
@@ -122,7 +123,7 @@ module.exports = function (env) {
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader?name=[name].[fullhash].[ext]',
                     options: {
                         outputPath: 'assets',
                         /*
@@ -134,7 +135,7 @@ module.exports = function (env) {
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader?name=[name].[fullhash].[ext]',
                     options: {
                         outputPath: 'assets'
                     }
@@ -208,6 +209,10 @@ module.exports = function (env) {
                 // Add errors to webpack instead of warnings
                 failOnError: true
             }),
+    
+            /* 
+             * Copy lazy loaded libraries to output.
+             */
             new plugins.CopyPlugin({
                 patterns: [
                     { from: './node_modules/simplemde/dist', to: 'dependencies/simplemde' },
@@ -257,8 +262,8 @@ module.exports = function (env) {
          * See: https://webpack.js.org/configuration/entry-context/
          */
         config.entry = {
-            'shims': './app/shims.ts',
-            'style': './app/style.js',
+            //'shims': './app/shims.ts',
+            //'style': './app/style.js',
               'app': './app/app.ts'
         };
 
@@ -285,7 +290,7 @@ module.exports = function (env) {
                  *
                  * See: https://webpack.js.org/configuration/output/#output-chunkfilename
                  */
-                chunkFilename: '[id].[hash].chunk.js'
+                chunkFilename: '[id].[fullhash].chunk.js'
             };
         } else {
             config.output = {
@@ -298,14 +303,16 @@ module.exports = function (env) {
             };
         }
 
+        /*
         config.plugins.push(
             new plugins.HtmlWebpackPlugin({
+                filename: 'index.html',
                 hash: true,
                 chunks: ['shims', 'app'],
                 chunksSortMode: 'manual',
-                template: 'app/index.html'
+                template: root('app', 'index.html')
             })
-        );
+        );*/
 
         config.plugins.push(
             new plugins.HtmlWebpackPlugin({
@@ -313,7 +320,7 @@ module.exports = function (env) {
                 hash: true,
                 chunks: ['style'],
                 chunksSortMode: 'none',
-                template: 'app/_theme.html'
+                template: root('app', '_theme.html')
             })
         );
 
@@ -330,11 +337,9 @@ module.exports = function (env) {
 
     if (!isTestCoverage) {
         config.plugins.push(
-            new plugins.NgToolsWebpack.AngularCompilerPlugin({
+            new plugins.NgToolsWebpack.AngularWebpackPlugin({
                 directTemplateLoading: true,
-                entryModule: 'app/app.module#AppModule',
-                skipCodeGeneration: !isAot,
-                sourceMap: !isProduction,
+                jitMode: !isAot,
                 tsConfigPath: configFile
             })
         );
@@ -399,9 +404,9 @@ module.exports = function (env) {
         });
     } else {
         config.module.rules.push({
-            test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+            test: /\.[jt]sx?$/,
             use: [{
-                loader: plugins.NgToolsWebpack.NgToolsLoader
+                loader: '@ngtools/webpack'
             }]
         })
     }

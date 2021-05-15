@@ -86,7 +86,7 @@ describe('PlansState', () => {
 
         it('should reset loading state if loading failed', () => {
             plansService.setup(x => x.getPlans(app))
-                .returns(() => throwError('Service Error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             plansState.load().pipe(onErrorResumeNext()).subscribe();
 

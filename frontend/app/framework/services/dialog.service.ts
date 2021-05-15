@@ -112,7 +112,7 @@ export class DialogService {
             this.notify(Notification.error(error));
         }
 
-        return throwError(error);
+        return throwError(() => error);
     }
 
     public notifyInfo(text: string) {

@@ -25,7 +25,7 @@ export class ResizeService implements OnDestroy {
 
     public listen(target: Element, listener: ResizeListener) {
         if (!this.observer) {
-            this.observer = new ResizeObserver(entries => {
+            this.observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
                 for (const entry of entries) {
                     if (this.listeners.has(entry.target)) {
                         const component = this.listeners.get(entry.target);

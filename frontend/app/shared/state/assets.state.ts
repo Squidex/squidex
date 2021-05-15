@@ -254,7 +254,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     return { ...s, assets };
                 }, 'Asset Moving Failed');
 
-                return throwError(error);
+                return throwError(() => error);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -278,7 +278,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     return { ...s, folders };
                 }, 'Folder Moving Done');
 
-                return throwError(error);
+                return throwError(() => error);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -301,7 +301,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                         }),
                     );
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(() => {

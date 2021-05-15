@@ -77,7 +77,7 @@ describe('LanguagesState', () => {
 
         it('should reset loading state if loading failed', () => {
             languagesService.setup(x => x.getLanguages(app))
-                .returns(() => throwError('Service Error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             languagesState.load().pipe(onErrorResumeNext()).subscribe();
 

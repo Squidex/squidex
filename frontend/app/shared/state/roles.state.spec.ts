@@ -50,7 +50,7 @@ describe('RolesState', () => {
 
         it('should reset loading state if loading failed', () => {
             rolesService.setup(x => x.getRoles(app))
-                .returns(() => throwError('Service Error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             rolesState.load().pipe(onErrorResumeNext()).subscribe();
 

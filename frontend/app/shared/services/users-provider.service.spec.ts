@@ -82,7 +82,7 @@ describe('UsersProviderService', () => {
             .returns(() => new Profile(<any>{ profile: { sub: '123' } }));
 
         usersService.setup(x => x.getUser('123'))
-            .returns(() => throwError('Service Error')).verifiable(Times.once());
+            .returns(() => throwError(() => 'Service Error')).verifiable(Times.once());
 
         let resultingUser: UserDto;
 
