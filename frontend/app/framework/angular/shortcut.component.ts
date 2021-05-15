@@ -47,7 +47,7 @@ export class ShortcutComponent extends StatefulComponent implements OnDestroy, O
             this.shortcutService.on(this.lastKeys, () => {
                 if (!this.disabled) {
                     this.zone.run(() => {
-                        this.trigger.next();
+                        this.trigger.next(true);
                     });
                 }
 

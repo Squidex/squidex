@@ -50,7 +50,7 @@ describe('ErrorDto', () => {
         expect(result).toBe('error.\n\n * detail.\n');
     });
 
-    it('should ccreate html list if detail has one item', () => {
+    it('should create html list if detail has one item', () => {
         const error = new ErrorDto(500, 'i18n:error.', null, ['i18n:detail.']);
 
         const result = error.translate(localizer.object);

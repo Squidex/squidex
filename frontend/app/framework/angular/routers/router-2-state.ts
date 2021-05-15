@@ -40,17 +40,17 @@ export class PagingSynchronizer implements RouteSynchronizer {
             pageSize = parseInt(pageSizeValue, 10);
         }
 
-        if (pageSize <= 0 || pageSize > 100 || Number.isNaN(pageSize)) {
+        if (pageSize <= 0 || pageSize > 100 || !Types.isNumber(pageSize) || Number.isNaN(pageSize)) {
             pageSize = this.localStore.getInt(`${this.storeName}.pageSize`, this.defaultSize);
         }
 
-        if (pageSize <= 0 || pageSize > 100 || Number.isNaN(pageSize)) {
+        if (pageSize <= 0 || pageSize > 100 || !Types.isNumber(pageSize) || Number.isNaN(pageSize)) {
             pageSize = this.defaultSize;
         }
 
         let page = parseInt(query['page'], 10);
 
-        if (page <= 0 || Number.isNaN(page)) {
+        if (page <= 0 || !Types.isNumber(page) || Number.isNaN(page)) {
             page = 0;
         }
 

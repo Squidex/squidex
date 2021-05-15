@@ -1,6 +1,4 @@
-﻿/* eslint-disable */
-
-Error.stackTraceLimit = Infinity;
+﻿Error.stackTraceLimit = Infinity;
 
 require('core-js/proposals/reflect-metadata');
 
@@ -12,7 +10,7 @@ const browser = require('@angular/platform-browser-dynamic/testing');
 
 testing.getTestBed().initTestEnvironment(
     browser.BrowserDynamicTestingModule,
-    browser.platformBrowserDynamicTesting()
+    browser.platformBrowserDynamicTesting(),
 );
 
 // Then we find all the tests.

@@ -1,0 +1,19 @@
+diff --git a/node_modules/resize-observer-polyfill/src/index.d.ts b/node_modules/resize-observer-polyfill/src/index.d.ts
+index 74aacc0..1b236d2 100644
+--- a/node_modules/resize-observer-polyfill/src/index.d.ts
++++ b/node_modules/resize-observer-polyfill/src/index.d.ts
+@@ -1,14 +1,3 @@
+-interface DOMRectReadOnly {
+-    readonly x: number;
+-    readonly y: number;
+-    readonly width: number;
+-    readonly height: number;
+-    readonly top: number;
+-    readonly right: number;
+-    readonly bottom: number;
+-    readonly left: number;
+-}
+-
+ declare global {
+     interface ResizeObserverCallback {
+         (entries: ResizeObserverEntry[], observer: ResizeObserver): void

@@ -108,6 +108,8 @@ export function createProperties(fieldType: FieldType, values?: any): FieldPrope
         case 'UI':
             properties = new UIFieldPropertiesDto();
             break;
+        default:
+            throw new Error(`Unknown field type ${fieldType}.`);
     }
 
     if (values) {

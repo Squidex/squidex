@@ -36,15 +36,22 @@ RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --co
 #
 # Stage 2, Build Frontend
 #
-FROM buildkite/puppeteer:5.2.1 as frontend
+FROM buildkite/puppeteer:8.0.0 as frontend
 
 WORKDIR /src
+
+ENV CONTINUOUS_INTEGRATION=1
 
 # Copy Node project files.
 COPY frontend/package*.json /tmp/
 
+# Copy patches for broken npm packages
+COPY frontend/patches /tmp/patches
+
+RUN cd /tmp/patches && dir
+
 # Install Node packages 
-RUN cd /tmp && npm install --loglevel=error
+RUN cd /tmp && npm set unsafe-perm true && npm install --loglevel=error
 
 COPY frontend .
 
@@ -68,8 +75,10 @@ RUN apt-get update \
 # Default AspNetCore directory
 WORKDIR /app
 
-# Copy from build stages
+# Copy from backend build stages
 COPY --from=backend /build/ .
+
+# Copy from backend build stages to webserver folder
 COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80

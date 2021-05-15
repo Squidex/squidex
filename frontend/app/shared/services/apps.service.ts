@@ -229,9 +229,9 @@ export class AppsService {
             }),
             catchError(error => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
+                    return throwError(() => new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(value => {

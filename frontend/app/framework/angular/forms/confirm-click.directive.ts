@@ -6,7 +6,7 @@
  */
 
 import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { DialogService } from '@app/framework/internal';
+import { DialogService, Types } from '@app/framework/internal';
 import { Subscriber } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -54,8 +54,10 @@ export class ConfirmClickDirective {
                         for (const observer of observers) {
                             const subscriber = observer as Subscriber<any>;
 
-                            if (subscriber['destination'] && subscriber['destination'].next) {
-                                subscriber['destination'].next(true);
+                            const internal = (subscriber as any).destination;
+
+                            if (Types.isFunction(internal.next)) {
+                                internal.next(true);
                             }
                         }
                     }

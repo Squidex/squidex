@@ -168,10 +168,10 @@ export class AuthService {
             retryWhen(errors =>
                 concat(
                     errors.pipe(
-                        mergeMap(e => (Types.is(e, TimeoutError) ? of(e) : throwError(e))),
+                        mergeMap(e => (Types.is(e, TimeoutError) ? of(e) : throwError(() => e))),
                         delay(500),
                         take(5)),
-                    throwError(new Error('Retry limit exceeded.')),
+                    throwError(() => new Error('Retry limit exceeded.')),
                 ),
             ),
         );

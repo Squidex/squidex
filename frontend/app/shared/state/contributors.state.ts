@@ -127,9 +127,9 @@ export class ContributorsState extends State<Snapshot> {
         return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {
-                    return throwError(new ErrorDto(404, 'i18n:contributors.userNotFound'));
+                    return throwError(() => new ErrorDto(404, 'i18n:contributors.userNotFound'));
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(({ version, payload }) => {

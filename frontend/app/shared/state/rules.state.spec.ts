@@ -66,7 +66,7 @@ describe('RulesState', () => {
 
         it('should reset loading state if loading failed', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => throwError('Service Error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             rulesState.load().pipe(onErrorResumeNext()).subscribe();
 

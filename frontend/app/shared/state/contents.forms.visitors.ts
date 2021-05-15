@@ -128,7 +128,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     public visitComponents(_: ComponentsFieldPropertiesDto): string {
-        return this.formatArray('Component', 'Component');
+        return this.formatArray('Component', 'Components');
     }
 
     public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {

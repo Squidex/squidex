@@ -32,7 +32,7 @@ describe('SchemasService', () => {
     it('should throw if creating invalid property type', () => {
         const type: any = 'invalid';
 
-        expect(() => createProperties(type)).toThrow('Invalid properties type');
+        expect(() => createProperties(type)).toThrowError();
     });
 
     it('should make get request to get schemas',

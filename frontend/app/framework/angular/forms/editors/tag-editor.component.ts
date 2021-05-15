@@ -371,7 +371,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public callTouched() {
-        this.blur.next();
+        this.blur.next(true);
 
         super.callTouched();
     }

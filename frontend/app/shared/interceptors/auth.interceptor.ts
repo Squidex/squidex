@@ -65,11 +65,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
                         return EMPTY;
                     } else {
-                        return throwError(new ErrorDto(403, 'i18n:common.errorNoPermission'));
+                        return throwError(() => new ErrorDto(403, 'i18n:common.errorNoPermission'));
                     }
                 }
 
-                return throwError(error);
+                return throwError(() => error);
             }));
     }
 }

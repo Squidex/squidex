@@ -296,9 +296,9 @@ export class AssetsService {
             }),
             catchError((error: any) => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'i18n:assets.fileTooBig'));
+                    return throwError(() => new ErrorDto(413, 'i18n:assets.fileTooBig'));
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(value => {
@@ -331,9 +331,9 @@ export class AssetsService {
             }),
             catchError(error => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'i18n:assets.fileTooBig'));
+                    return throwError(() => new ErrorDto(413, 'i18n:assets.fileTooBig'));
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(value => {
