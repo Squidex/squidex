@@ -14,7 +14,7 @@
     "build": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env production",
     "build:clean": "rimraf wwwroot/build",
     "build:analyze": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env production --env analyze",
-    "postinstall": "ngcc --properties esm5 browser module main --first-only --create-ivy-entry-points & npx patch-package"
+    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points & npx patch-package"
   },
   "dependencies": {
     "@angular/animations": "12.0.0",
@@ -83,9 +83,9 @@
     "@types/simplemde": "1.11.7",
     "@types/tapable": "2.2.2",
     "@types/tinymce": "4.6.1",
+    "@types/ws": "^7.4.4",
     "@typescript-eslint/eslint-plugin": "^4.23.0",
     "@typescript-eslint/parser": "^4.23.0",
-    "@types/ws": "^7.4.4",
     "browserslist": "4.16.6",
     "caniuse-lite": "1.0.30001228",
     "circular-dependency-plugin": "5.2.2",
@@ -138,6 +138,7 @@
     "webpack": "5.37.0",
     "webpack-bundle-analyzer": "4.4.1",
     "webpack-cli": "4.7.0",
-    "webpack-dev-server": "3.11.2"
+    "webpack-dev-server": "3.11.2",
+    "webpack-filter-warnings-plugin": "^1.2.1"
   }
 }

@@ -89,10 +89,10 @@ export module ValidatorsEx {
                 const value = parseFloat(control.value);
 
                 if (min === max) {
-                    if (Number.isNaN(value) || value !== min) {
+                    if (!Types.isNumber(value) || Number.isNaN(value) || value !== min) {
                         return { exactly: { expected: min, actual: value } };
                     }
-                } else if (Number.isNaN(value) || value < min || value > max) {
+                } else if (!Types.isNumber(value) || Number.isNaN(value) || value < min || value > max) {
                     return { between: { min, max, actual: value } };
                 }
 
@@ -119,10 +119,10 @@ export module ValidatorsEx {
                 const length: number = control.value?.length || 0;
 
                 if (minLength === maxLength) {
-                    if (Number.isNaN(length) || length !== minLength) {
+                    if (!Types.isNumber(length) || Number.isNaN(length) || length !== minLength) {
                         return { exactlylength: { expected: minLength, actual: length } };
                     }
-                } else if (Number.isNaN(length) || length < minLength || length > maxLength) {
+                } else if (!Types.isNumber(length) || Number.isNaN(length) || length < minLength || length > maxLength) {
                     return { betweenlength: { minlength: minLength, maxlength: maxLength, actual: length } };
                 }
 
