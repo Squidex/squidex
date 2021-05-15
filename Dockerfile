@@ -42,6 +42,7 @@ WORKDIR /src
 
 # Copy Node project files.
 COPY frontend/package*.json /tmp/
+COPY frontend/patches /tmp/
 
 # Install Node packages 
 RUN cd /tmp && npm install --loglevel=error
