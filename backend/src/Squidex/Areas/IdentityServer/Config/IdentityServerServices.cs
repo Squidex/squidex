@@ -68,10 +68,10 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddOpenIddict()
                 .AddCore(options =>
                 {
-                    options.Services.AddSingletonAs<InMemoryConfiguration.Scopes>()
+                    options.Services.AddSingletonAs<IdentityServerConfiguration.Scopes>()
                         .As<IOpenIddictScopeStore<ImmutableScope>>();
 
-                    options.Services.AddSingletonAs<LazyApplicationStore>()
+                    options.Services.AddSingletonAs<DynamicApplicationStore>()
                         .As<IOpenIddictApplicationStore<ImmutableApplication>>();
 
                     options.ReplaceApplicationManager(typeof(ApplicationManager<>));
@@ -94,7 +94,7 @@ namespace Squidex.Areas.IdentityServer.Config
                         Constants.ScopeApi,
                         Constants.ScopePermissions);
 
-                    options.SetAccessTokenLifetime(TimeSpan.FromDays(30))
+                    options.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                     options.AllowClientCredentialsFlow();
                     options.AllowImplicitFlow();

@@ -128,7 +128,9 @@ namespace Squidex.Config.Domain
                     services.AddOpenIddict()
                         .AddCore(options =>
                         {
-                            options.UseMongoDb();
+                            options.UseMongoDb<string>()
+                                .SetScopesCollectionName("Identity_Scopes")
+                                .SetTokensCollectionName("Identity_Tokens");
 
                             options.SetDefaultScopeEntity<ImmutableScope>();
                             options.SetDefaultApplicationEntity<ImmutableApplication>();

@@ -13,7 +13,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
-    public static class InMemoryConfiguration
+    public static class IdentityServerConfiguration
     {
         public sealed class Scopes : InMemoryScopeStore
         {

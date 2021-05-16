@@ -87,7 +87,10 @@ namespace Notifo.Areas.Account.Controllers
                         OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
                 }
 
-                await CreatePrincipalAsync(request, principal);
+                foreach (var claim in principal.Claims)
+                {
+                    claim.SetDestinations(GetDestinations(claim, principal));
+                }
 
                 return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
@@ -106,7 +109,7 @@ namespace Notifo.Areas.Account.Controllers
                     throw new InvalidOperationException("The application details cannot be found in the database.");
                 }
 
-                var principal = await CreatePrincipalAsync(request, application);
+                var principal = await CreateApplicationPrinicpalAsync(request, application);
 
                 return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
@@ -159,7 +162,7 @@ namespace Notifo.Areas.Account.Controllers
 
             var principal = await SignInManager.CreateUserPrincipalAsync((IdentityUser)user.Identity);
 
-            await CreatePrincipalAsync(request, principal);
+            await EnrichPrincipalAsync(request, principal);
 
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
@@ -172,32 +175,43 @@ namespace Notifo.Areas.Account.Controllers
             return SignOut(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
-        private async Task<ClaimsPrincipal> CreatePrincipalAsync(OpenIddictRequest request, object application)
+        private async Task<ClaimsPrincipal> CreateApplicationPrinicpalAsync(OpenIddictRequest request, object application)
         {
             var identity = new ClaimsIdentity(
                 TokenValidationParameters.DefaultAuthenticationType,
                 Claims.Name,
                 Claims.Role);
 
-            identity.AddClaim(Claims.Subject, request.ClientId!,
-                Destinations.AccessToken,
-                Destinations.IdentityToken);
+            var principal = new ClaimsPrincipal(identity);
+
+            var clientId = request.ClientId;
+            var clientName = await applicationManager.GetDisplayNameAsync(application);
+
+            if (clientId != null)
+            {
+                identity.AddClaim(Claims.Subject, clientId,
+                    Destinations.AccessToken, Destinations.IdentityToken);
+            }
+
+            if (clientName != null)
+            {
+                identity.AddClaim(Claims.Name, clientName,
+                    Destinations.AccessToken, Destinations.IdentityToken);
+            }
 
             var properties = await applicationManager.GetPropertiesAsync(application);
-
-            var principal = new ClaimsPrincipal(identity);
 
             foreach (var claim in properties.Claims())
             {
                 identity.AddClaim(claim);
             }
 
-            await CreatePrincipalAsync(request, principal);
+            await EnrichPrincipalAsync(request, principal);
 
             return principal;
         }
 
-        private async Task CreatePrincipalAsync(OpenIddictRequest request, ClaimsPrincipal principal)
+        private async Task EnrichPrincipalAsync(OpenIddictRequest request, ClaimsPrincipal principal)
         {
             var scopes = request.GetScopes();
 
@@ -216,20 +230,20 @@ namespace Notifo.Areas.Account.Controllers
             {
                 case SquidexClaimTypes.DisplayName when principal.HasScope(Scopes.Profile):
                     yield return Destinations.IdentityToken;
-                    break;
+                    yield break;
 
                 case SquidexClaimTypes.PictureUrl when principal.HasScope(Scopes.Profile):
                     yield return Destinations.IdentityToken;
-                    break;
+                    yield break;
 
                 case SquidexClaimTypes.NotifoKey when principal.HasScope(Scopes.Profile):
                     yield return Destinations.IdentityToken;
-                    break;
+                    yield break;
 
                 case SquidexClaimTypes.Permissions when principal.HasScope(Constants.ScopePermissions):
                     yield return Destinations.AccessToken;
                     yield return Destinations.IdentityToken;
-                    break;
+                    yield break;
 
                 case Claims.Name:
                     yield return Destinations.AccessToken;
@@ -239,7 +253,7 @@ namespace Notifo.Areas.Account.Controllers
                         yield return Destinations.IdentityToken;
                     }
 
-                    break;
+                    yield break;
 
                 case Claims.Email:
                     yield return Destinations.AccessToken;
@@ -249,7 +263,7 @@ namespace Notifo.Areas.Account.Controllers
                         yield return Destinations.IdentityToken;
                     }
 
-                    break;
+                    yield break;
 
                 case Claims.Role:
                     yield return Destinations.AccessToken;
@@ -259,7 +273,14 @@ namespace Notifo.Areas.Account.Controllers
                         yield return Destinations.IdentityToken;
                     }
 
-                    break;
+                    yield break;
+
+                case "AspNet.Identity.SecurityStamp":
+                    yield break;
+
+                default:
+                    yield return Destinations.AccessToken;
+                    yield break;
             }
         }
     }

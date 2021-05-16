@@ -7,8 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,11 +26,11 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
-    public class LazyApplicationStore : InMemoryApplicationStore
+    public class DynamicApplicationStore : InMemoryApplicationStore
     {
         private readonly IServiceProvider serviceProvider;
 
-        public LazyApplicationStore(IServiceProvider serviceProvider)
+        public DynamicApplicationStore(IServiceProvider serviceProvider)
             : base(CreateStaticClients(serviceProvider))
         {
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
@@ -106,7 +104,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
         private static ImmutableApplication CreateClientFromUser(IUser user, string secret)
         {
-            return new ImmutableApplication(ApplicationExtensions.BuildId(user.Id), new OpenIddictApplicationDescriptor
+            return new ImmutableApplication(user.Id, new OpenIddictApplicationDescriptor
             {
                 DisplayName = $"{user.Email} Client",
                 ClientId = user.Id,
@@ -127,7 +125,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
         private static ImmutableApplication CreateClientFromApp(string id, AppClient appClient)
         {
-            return new ImmutableApplication(ApplicationExtensions.BuildId(id), new OpenIddictApplicationDescriptor
+            return new ImmutableApplication(id, new OpenIddictApplicationDescriptor
             {
                 DisplayName = id,
                 ClientId = id,
@@ -154,7 +152,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
             var frontendId = Constants.ClientFrontendId;
 
-            yield return (ApplicationExtensions.BuildId(frontendId), new OpenIddictApplicationDescriptor
+            yield return (frontendId, new OpenIddictApplicationDescriptor
             {
                 DisplayName = "Frontend Client",
                 ClientId = frontendId,
@@ -186,12 +184,12 @@ namespace Squidex.Areas.IdentityServer.Config
                 Type = ClientTypes.Public
             });
 
-            var internalClient = Constants.ClientInternalId;
+            var internalClientId = Constants.ClientInternalId;
 
-            yield return (ApplicationExtensions.BuildId(internalClient), new OpenIddictApplicationDescriptor
+            yield return (internalClientId, new OpenIddictApplicationDescriptor
             {
                 DisplayName = "Internal Client",
-                ClientId = internalClient,
+                ClientId = internalClientId,
                 ClientSecret = Constants.ClientInternalSecret,
                 RedirectUris =
                 {
@@ -221,12 +219,12 @@ namespace Squidex.Areas.IdentityServer.Config
                 yield break;
             }
 
-            var adminClient = identityOptions.AdminClientId;
+            var adminClientId = identityOptions.AdminClientId;
 
-            yield return (ApplicationExtensions.BuildId(adminClient), new OpenIddictApplicationDescriptor
+            yield return (adminClientId, new OpenIddictApplicationDescriptor
             {
                 DisplayName = "Admin Client",
-                ClientId = adminClient,
+                ClientId = adminClientId,
                 ClientSecret = identityOptions.AdminClientSecret,
                 Permissions =
                 {
@@ -242,20 +240,5 @@ namespace Squidex.Areas.IdentityServer.Config
                 Type = ClientTypes.Public
             });
         }
-
-        /*
-        private static List<ClientClaim> GetClaims(IUser user)
-        {
-            var claims = new List<ClientClaim>
-            {
-                new ClientClaim(OpenIdClaims.Subject, user.Id)
-            };
-
-            claims.AddRange(
-                user.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions)
-                    .Select(x => new ClientClaim(x.Type, x.Value)));
-
-            return claims;
-        }*/
     }
 }
