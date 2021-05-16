@@ -29,8 +29,8 @@ namespace Squidex.Domain.Users
             A.CallTo(() => store.ReadAsync(A<DomainId>._))
                 .Returns((null!, true, 0));
 
-            var credentials1 = await sut.GetSigningCredentialsAsync();
-            var credentials2 = await sut.GetSigningCredentialsAsync();
+            var credentials1 = await sut.GetOrCreateKeyAsync();
+            var credentials2 = await sut.GetOrCreateKeyAsync();
 
             Assert.Same(credentials1, credentials2);
 
@@ -47,8 +47,8 @@ namespace Squidex.Domain.Users
             A.CallTo(() => store.ReadAsync(A<DomainId>._))
                 .Returns((null!, true, 0));
 
-            var credentials1 = await sut.GetValidationKeysAsync();
-            var credentials2 = await sut.GetValidationKeysAsync();
+            var credentials1 = await sut.GetOrCreateKeyAsync();
+            var credentials2 = await sut.GetOrCreateKeyAsync();
 
             Assert.Same(credentials1, credentials2);
 

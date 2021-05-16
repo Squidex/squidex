@@ -37,7 +37,7 @@ namespace Squidex.Domain.Users
             this.store = store;
         }
 
-        private async Task<RsaSecurityKey> GetOrCreateKeyAsync()
+        public async Task<RsaSecurityKey> GetOrCreateKeyAsync()
         {
             var (state, _, _) = await store.ReadAsync(default);
 

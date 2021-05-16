@@ -24,28 +24,26 @@ namespace Squidex.Config.Authentication
 
             if (useCustomAuthorityUrl)
             {
-                /*
-                authBuilder.AddOpenIdConnect(options =>
+                const string ExternalIdentityServerSchema = nameof(ExternalIdentityServerSchema);
+
+                authBuilder.AddOpenIdConnect(ExternalIdentityServerSchema, options =>
                 {
                     options.Authority = identityOptions.AuthorityUrl;
-                    options.ApiName = Constants.ApiScope;
-                    options.ApiSecret = null;
-                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                    options.SupportedTokens = SupportedTokens.Jwt;
-                });*/
+                    options.Scope.Add(Constants.ScopePermissions);
+                    options.Scope.Add(Constants.ScopeApi);
+                });
+
+                authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
+                {
+                    options.ForwardDefaultSelector = context => ExternalIdentityServerSchema;
+                });
             }
             else
             {
-                /*
-                authBuilder.AddLocalApi();
-
-                authBuilder.Services.AddOptions<LocalApiAuthenticationOptions>(IdentityServerConstants.LocalApi.PolicyName)
-                    .Configure<IUrlGenerator>((options, urlGenerator) =>
-                    {
-                        options.ClaimsIssuer = urlGenerator.BuildUrl(Constants.IdentityServerPrefix, false);
-
-                        options.ExpectedScope = Constants.ApiScope;
-                    });*/
+                authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
+                {
+                    options.ForwardDefaultSelector = _ => OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+                });
             }
 
             authBuilder.AddOpenIdConnect();
@@ -72,19 +70,6 @@ namespace Squidex.Config.Authentication
                     options.Scope.Add(Constants.ScopeRole);
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 });
-
-            authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
-            {
-                options.ForwardDefaultSelector = context =>
-                {
-                    if (useCustomAuthorityUrl)
-                    {
-                        return OpenIdConnectDefaults.AuthenticationScheme;
-                    }
-
-                    return OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-                };
-            });
 
             return authBuilder;
         }

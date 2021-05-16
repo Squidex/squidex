@@ -44,11 +44,11 @@ const plugins = {
 };
 
 module.exports = function calculateConfig(env) {
-    const isDevServer = path.basename(require.main.filename) === 'webpack-dev-server.js';
     const isProduction = env && env.production;
-    const isTests = env && env.target === 'tests';
-    const isTestCoverage = env && env.coverage;
     const isAnalyzing = isProduction && env.analyze;
+    const isDevServer = env.WEBPACK_SERVE;
+    const isTestCoverage = env && env.coverage;
+    const isTests = env && env.target === 'tests';
     const isAot = !isDevServer && !isTests && !isTestCoverage;
 
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
@@ -132,20 +132,24 @@ module.exports = function calculateConfig(env) {
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader',
                     options: {
+                        name: '[name].[hash].[ext]',
+
+                        // Store the assets in custom path because of fonts need relative urls.
                         outputPath: 'assets',
-                        /*
-                        * Use custom public path as ./ is not supported by fonts.
-                        */
+
+                        // Use custom public path as ./ is not supported by fonts.
                         publicPath: isDevServer ? undefined : 'assets',
                     },
                 }],
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader',
                     options: {
+                        name: '[name].[hash].[ext]',
+                        // Store the assets in custom path because of fonts need relative urls.
                         outputPath: 'assets',
                     },
                 }],
@@ -415,7 +419,10 @@ module.exports = function calculateConfig(env) {
         config.module.rules.push({
             test: /\.ts$/,
             use: [{
-                loader: 'istanbul-instrumenter-loader?esModules=true',
+                loader: 'istanbul-instrumenter-loader',
+                options: {
+                    esModules: true,
+                },
             }, {
                 loader: 'ts-loader',
             }],
@@ -467,9 +474,7 @@ module.exports = function calculateConfig(env) {
                     sourceMap: true,
                 },
             }],
-            /*
-             * Do not include component styles.
-             */
+            // Do not include component styles.
             include: root('app', 'theme'),
         });
     }
