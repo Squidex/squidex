@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.IdentityServer.Controllers.Error
-{
-    public class ErrorVM
-    {
-        public string? ErrorMessage { get; set; }
+using System.Threading.Tasks;
 
-        public string? ErrorCode { get; set; } = "400";
+namespace Squidex.Domain.Users.InMemory
+{
+    public static class Extensions
+    {
+        public static ValueTask<T> AsValueTask<T>(this T value)
+        {
+            return new ValueTask<T>(value);
+        }
     }
 }

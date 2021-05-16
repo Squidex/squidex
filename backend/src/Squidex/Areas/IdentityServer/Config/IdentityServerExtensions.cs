@@ -13,8 +13,6 @@ namespace Squidex.Areas.IdentityServer.Config
     {
         public static IApplicationBuilder UseSquidexIdentityServer(this IApplicationBuilder app)
         {
-             app.UseIdentityServer();
-
              return app;
         }
     }

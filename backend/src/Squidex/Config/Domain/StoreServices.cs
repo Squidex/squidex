@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
-using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,8 +27,8 @@ using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
+using Squidex.Domain.Users.InMemory;
 using Squidex.Domain.Users.MongoDb;
-using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
@@ -127,13 +125,14 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoTextIndexerState>()
                         .As<ITextIndexerState>();
 
-                    var registration = services.FirstOrDefault(x => x.ServiceType == typeof(IPersistedGrantStore));
+                    services.AddOpenIddict()
+                        .AddCore(options =>
+                        {
+                            options.UseMongoDb();
 
-                    if (registration == null || registration.ImplementationType == typeof(InMemoryPersistedGrantStore))
-                    {
-                        services.AddSingletonAs<MongoPersistedGrantStore>()
-                            .As<IPersistedGrantStore>();
-                    }
+                            options.SetDefaultScopeEntity<ImmutableScope>();
+                            options.SetDefaultApplicationEntity<ImmutableApplication>();
+                        });
                 }
             });
 

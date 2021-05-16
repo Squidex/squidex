@@ -37,11 +37,9 @@
     <PackageReference Include="GraphQL.Server.Core" Version="5.0.1" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="5.0.1" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.1" />
-    <PackageReference Include="IdentityServer4" Version="4.1.2" />
-    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.5" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
@@ -58,6 +56,7 @@
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.10.9" />
     <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
+    <PackageReference Include="OpenIddict.MongoDb" Version="3.0.4" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="3.3.0" />
     <PackageReference Include="OrleansDashboard" Version="3.1.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />

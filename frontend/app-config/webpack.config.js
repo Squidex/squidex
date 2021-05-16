@@ -132,7 +132,7 @@ module.exports = function calculateConfig(env) {
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[fullhash].[ext]',
+                    loader: 'file-loader?name=[name].[hash].[ext]',
                     options: {
                         outputPath: 'assets',
                         /*
@@ -144,7 +144,7 @@ module.exports = function calculateConfig(env) {
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[fullhash].[ext]',
+                    loader: 'file-loader?name=[name].[hash].[ext]',
                     options: {
                         outputPath: 'assets',
                     },

@@ -6,23 +6,14 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using IdentityServer4.Models;
-using IdentityServer4.Services;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Squidex.Infrastructure;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Error
 {
     public sealed class ErrorController : IdentityServerController
     {
-        private readonly IIdentityServerInteractionService interaction;
-
-        public ErrorController(IIdentityServerInteractionService interaction)
-        {
-            this.interaction = interaction;
-        }
-
         [Route("error/")]
         public async Task<IActionResult> Error(string? errorId = null)
         {
@@ -30,28 +21,16 @@ namespace Squidex.Areas.IdentityServer.Controllers.Error
 
             var vm = new ErrorVM();
 
-            if (!string.IsNullOrWhiteSpace(errorId))
+            var response = HttpContext.GetOpenIddictServerResponse();
+
+            vm.ErrorMessage = response?.ErrorDescription;
+            vm.ErrorCode = response?.Error;
+
+            if (string.IsNullOrWhiteSpace(vm.ErrorMessage))
             {
-                var message = await interaction.GetErrorContextAsync(errorId);
+                var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-                if (message != null)
-                {
-                    vm.Error = message;
-                }
-            }
-
-            if (vm.Error == null)
-            {
-                var error = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
-
-                if (error is DomainException exception)
-                {
-                    vm.Error = new ErrorMessage { ErrorDescription = exception.Message };
-                }
-                else if (error?.InnerException is DomainException exception2)
-                {
-                    vm.Error = new ErrorMessage { ErrorDescription = exception2.Message };
-                }
+                vm.ErrorMessage = exception?.Message;
             }
 
             return View("Error", vm);
