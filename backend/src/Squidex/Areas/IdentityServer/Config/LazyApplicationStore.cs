@@ -7,6 +7,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -104,7 +106,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
         private static ImmutableApplication CreateClientFromUser(IUser user, string secret)
         {
-            return new ImmutableApplication(Helper.BuildId(user.Id), new OpenIddictApplicationDescriptor
+            return new ImmutableApplication(ApplicationExtensions.BuildId(user.Id), new OpenIddictApplicationDescriptor
             {
                 DisplayName = $"{user.Email} Client",
                 ClientId = user.Id,
@@ -118,15 +120,14 @@ namespace Squidex.Areas.IdentityServer.Config
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Roles,
                     Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions,
-                    Permissions.Prefixes.Scope + Constants.ScopeProfile
+                    Permissions.Prefixes.Scope + Constants.ScopePermissions
                 }
-            });
+            }.CopyClaims(user));
         }
 
         private static ImmutableApplication CreateClientFromApp(string id, AppClient appClient)
         {
-            return new ImmutableApplication(Helper.BuildId(id), new OpenIddictApplicationDescriptor
+            return new ImmutableApplication(ApplicationExtensions.BuildId(id), new OpenIddictApplicationDescriptor
             {
                 DisplayName = id,
                 ClientId = id,
@@ -140,8 +141,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Roles,
                     Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions,
-                    Permissions.Prefixes.Scope + Constants.ScopeProfile
+                    Permissions.Prefixes.Scope + Constants.ScopePermissions
                 }
             });
         }
@@ -154,8 +154,9 @@ namespace Squidex.Areas.IdentityServer.Config
 
             var frontendId = Constants.ClientFrontendId;
 
-            yield return (Helper.BuildId(frontendId), new OpenIddictApplicationDescriptor
+            yield return (ApplicationExtensions.BuildId(frontendId), new OpenIddictApplicationDescriptor
             {
+                DisplayName = "Frontend Client",
                 ClientId = frontendId,
                 ClientSecret = null,
                 RedirectUris =
@@ -180,17 +181,16 @@ namespace Squidex.Areas.IdentityServer.Config
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Roles,
                     Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions,
-                    Permissions.Prefixes.Scope + Constants.ScopeProfile,
-                    Permissions.Prefixes.Scope + Constants.ScopeRole
+                    Permissions.Prefixes.Scope + Constants.ScopePermissions
                 },
                 Type = ClientTypes.Public
             });
 
             var internalClient = Constants.ClientInternalId;
 
-            yield return (Helper.BuildId(internalClient), new OpenIddictApplicationDescriptor
+            yield return (ApplicationExtensions.BuildId(internalClient), new OpenIddictApplicationDescriptor
             {
+                DisplayName = "Internal Client",
                 ClientId = internalClient,
                 ClientSecret = Constants.ClientInternalSecret,
                 RedirectUris =
@@ -204,14 +204,14 @@ namespace Squidex.Areas.IdentityServer.Config
                     Permissions.Endpoints.Logout,
                     Permissions.Endpoints.Token,
                     Permissions.GrantTypes.Implicit,
+                    Permissions.ResponseTypes.IdToken,
+                    Permissions.ResponseTypes.IdTokenToken,
                     Permissions.ResponseTypes.Token,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Roles,
                     Permissions.Prefixes.Scope + Constants.ScopeApi,
-                    Permissions.Prefixes.Scope + Constants.ScopePermissions,
-                    Permissions.Prefixes.Scope + Constants.ScopeProfile,
-                    Permissions.Prefixes.Scope + Constants.ScopeRole
+                    Permissions.Prefixes.Scope + Constants.ScopePermissions
                 },
                 Type = ClientTypes.Public
             });
@@ -223,20 +223,21 @@ namespace Squidex.Areas.IdentityServer.Config
 
             var adminClient = identityOptions.AdminClientId;
 
-            yield return (Helper.BuildId(adminClient), new OpenIddictApplicationDescriptor
+            yield return (ApplicationExtensions.BuildId(adminClient), new OpenIddictApplicationDescriptor
             {
+                DisplayName = "Admin Client",
                 ClientId = adminClient,
                 ClientSecret = identityOptions.AdminClientSecret,
                 Permissions =
                 {
                     Permissions.Endpoints.Token,
-                    Permissions.GrantTypes.AuthorizationCode,
-                    Permissions.GrantTypes.RefreshToken,
-                    Permissions.ResponseTypes.Code,
-                    Permissions.ResponseTypes.IdToken,
-                    Permissions.ResponseTypes.IdTokenToken,
+                    Permissions.GrantTypes.ClientCredentials,
                     Permissions.ResponseTypes.Token,
-                    Permissions.Prefixes.Scope + Constants.ScopeApi
+                    Permissions.Scopes.Email,
+                    Permissions.Scopes.Profile,
+                    Permissions.Scopes.Roles,
+                    Permissions.Prefixes.Scope + Constants.ScopeApi,
+                    Permissions.Prefixes.Scope + Constants.ScopePermissions
                 },
                 Type = ClientTypes.Public
             });

@@ -41,11 +41,11 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();
 
-            services.AddScopedAs<DefaultUserService>()
-                .As<IUserService>();
-
             services.AddSingletonAs<PwnedPasswordValidator>()
                 .As<IPasswordValidator<IdentityUser>>();
+
+            services.AddScopedAs<DefaultUserService>()
+                .As<IUserService>();
 
             services.AddScopedAs<UserClaimsPrincipalFactoryWithEmail>()
                 .As<IUserClaimsPrincipalFactory<IdentityUser>>();
@@ -91,9 +91,10 @@ namespace Squidex.Areas.IdentityServer.Config
                         Scopes.Email,
                         Scopes.Profile,
                         Scopes.Roles,
-                        Constants.ScopeRole,
                         Constants.ScopeApi,
                         Constants.ScopePermissions);
+
+                    options.SetAccessTokenLifetime(TimeSpan.FromDays(30))
 
                     options.AllowClientCredentialsFlow();
                     options.AllowImplicitFlow();

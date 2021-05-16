@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using Squidex.Areas.IdentityServer.Config;
 using Squidex.Areas.IdentityServer.Controllers;
 using Squidex.Domain.Users;
 using Squidex.Shared.Identity;
@@ -53,7 +54,7 @@ namespace Notifo.Areas.Account.Controllers
                 throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
             }
 
-            if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
+            if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType() || request.IsImplicitFlow())
             {
                 var principal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
 
@@ -86,14 +87,12 @@ namespace Notifo.Areas.Account.Controllers
                         OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
                 }
 
-                foreach (var claim in principal.Claims)
-                {
-                    claim.SetDestinations(GetDestinations(claim, principal));
-                }
+                await CreatePrincipalAsync(request, principal);
 
                 return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
-            else if (request.IsClientCredentialsGrantType())
+
+            if (request.IsClientCredentialsGrantType())
             {
                 if (request.ClientId == null)
                 {
@@ -107,16 +106,9 @@ namespace Notifo.Areas.Account.Controllers
                     throw new InvalidOperationException("The application details cannot be found in the database.");
                 }
 
-                var identity = new ClaimsIdentity(
-                    TokenValidationParameters.DefaultAuthenticationType,
-                    Claims.Name,
-                    Claims.Role);
+                var principal = await CreatePrincipalAsync(request, application);
 
-                identity.AddClaim(Claims.Subject, request.ClientId,
-                    Destinations.AccessToken,
-                    Destinations.IdentityToken);
-
-                return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
 
             throw new InvalidOperationException("The specified grant type is not supported.");
@@ -167,15 +159,7 @@ namespace Notifo.Areas.Account.Controllers
 
             var principal = await SignInManager.CreateUserPrincipalAsync((IdentityUser)user.Identity);
 
-            var scopes = request.GetScopes();
-
-            principal.SetScopes(request.GetScopes());
-            principal.SetResources(await scopeManager.ListResourcesAsync(scopes).ToListAsync());
-
-            foreach (var claim in principal.Claims)
-            {
-                claim.SetDestinations(GetDestinations(claim, principal));
-            }
+            await CreatePrincipalAsync(request, principal);
 
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
@@ -188,24 +172,63 @@ namespace Notifo.Areas.Account.Controllers
             return SignOut(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
+        private async Task<ClaimsPrincipal> CreatePrincipalAsync(OpenIddictRequest request, object application)
+        {
+            var identity = new ClaimsIdentity(
+                TokenValidationParameters.DefaultAuthenticationType,
+                Claims.Name,
+                Claims.Role);
+
+            identity.AddClaim(Claims.Subject, request.ClientId!,
+                Destinations.AccessToken,
+                Destinations.IdentityToken);
+
+            var properties = await applicationManager.GetPropertiesAsync(application);
+
+            var principal = new ClaimsPrincipal(identity);
+
+            foreach (var claim in properties.Claims())
+            {
+                identity.AddClaim(claim);
+            }
+
+            await CreatePrincipalAsync(request, principal);
+
+            return principal;
+        }
+
+        private async Task CreatePrincipalAsync(OpenIddictRequest request, ClaimsPrincipal principal)
+        {
+            var scopes = request.GetScopes();
+
+            principal.SetScopes(request.GetScopes());
+            principal.SetResources(await scopeManager.ListResourcesAsync(scopes).ToListAsync());
+
+            foreach (var claim in principal.Claims)
+            {
+                claim.SetDestinations(GetDestinations(claim, principal));
+            }
+        }
+
         private static IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal)
         {
             switch (claim.Type)
             {
-                case SquidexClaimTypes.DisplayName when principal.HasScope(Constants.ScopeProfile):
+                case SquidexClaimTypes.DisplayName when principal.HasScope(Scopes.Profile):
                     yield return Destinations.IdentityToken;
                     break;
 
-                case SquidexClaimTypes.PictureUrl when principal.HasScope(Constants.ScopeProfile):
+                case SquidexClaimTypes.PictureUrl when principal.HasScope(Scopes.Profile):
                     yield return Destinations.IdentityToken;
                     break;
 
-                case SquidexClaimTypes.NotifoKey when principal.HasScope(Constants.ScopeProfile):
+                case SquidexClaimTypes.NotifoKey when principal.HasScope(Scopes.Profile):
                     yield return Destinations.IdentityToken;
                     break;
 
                 case SquidexClaimTypes.Permissions when principal.HasScope(Constants.ScopePermissions):
                     yield return Destinations.AccessToken;
+                    yield return Destinations.IdentityToken;
                     break;
 
                 case Claims.Name:

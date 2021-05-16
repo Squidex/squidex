@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using Squidex.Hosting;
 using Squidex.Web;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Config.Authentication
 {
@@ -29,6 +30,8 @@ namespace Squidex.Config.Authentication
                 authBuilder.AddOpenIdConnect(ExternalIdentityServerSchema, options =>
                 {
                     options.Authority = identityOptions.AuthorityUrl;
+                    options.Scope.Add(Scopes.Email);
+                    options.Scope.Add(Scopes.Profile);
                     options.Scope.Add(Constants.ScopePermissions);
                     options.Scope.Add(Constants.ScopeApi);
                 });
@@ -65,9 +68,9 @@ namespace Squidex.Config.Authentication
                     options.CallbackPath = "/signin-internal";
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
                     options.SaveTokens = true;
+                    options.Scope.Add(Scopes.Email);
+                    options.Scope.Add(Scopes.Profile);
                     options.Scope.Add(Constants.ScopePermissions);
-                    options.Scope.Add(Constants.ScopeProfile);
-                    options.Scope.Add(Constants.ScopeRole);
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 });
 
