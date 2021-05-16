@@ -215,7 +215,7 @@ namespace Notifo.Areas.Account.Controllers
         {
             var scopes = request.GetScopes();
 
-            principal.SetScopes(request.GetScopes());
+            principal.SetScopes(scopes);
             principal.SetResources(await scopeManager.ListResourcesAsync(scopes).ToListAsync());
 
             foreach (var claim in principal.Claims)
