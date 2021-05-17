@@ -1,0 +1,137 @@
+name: Release
+concurrency: release
+
+on:
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and Push Temporary Tag
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }}
+          build-args: "SQUIDEX__VERSION=${{ env.GITHUB_REF_SLUG }}"
+          cache-from: type=registry,ref=squidex/squidex:cache-release
+          cache-to: type=registry,ref=squidex/squidex:cache-release
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - name: Replace Image Name
+        uses: mikefarah/yq@v4.9.1
+        with:
+          cmd: yq e '.services.squidex.image = "squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }}"' -i backend/tests/docker-compose.yml
+      - name: Start Test
+        run: docker-compose up -d
+        working-directory: backend/tests
+      - name: Run Rest
+        uses: kohlerdominik/docker-run-action@v1.0.0
+        with:
+          image: mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim
+          environment: |
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8080
+          default_network: host
+          options: --name test
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+      - name: Cleanup Test
+        if: always()
+        run: docker-compose down
+        working-directory: backend/tests
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Get Major Version
+        id: version
+        uses: rishabhgupta/split-by@v1
+        with:
+          string: '${{ env.GITHUB_REF_SLUG }}'
+          split-by: '.'
+      - name: Pull Temporary Tag
+        if: github.event_name != 'pull_request'
+        run: |
+          docker pull squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }}
+      - name: Rename Tags
+        run: |
+          docker tag squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }} squidex/squidex:latest
+          docker tag squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }} squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker tag squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }} squidex/squidex:${{ steps.version.outputs._0 }}
+      - name: Push Tags
+        run: |
+          docker push squidex/squidex:latest
+          docker push squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker push squidex/squidex:${{ steps.version.outputs._0 }}
+
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+      - name: Get Binaries
+        run: |
+          mkdir /build 2> /dev/null
+          docker create --name squidex-container squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker cp squidex-container:/app/. /build
+      - name: ZIP Binaries
+        run: |
+          mkdir /release 2> /dev/null
+          zip -r /release/binaries.zip .
+        working-directory: /build
+      - name: Get Changelog Entry
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          validation_depth: 10
+          version: ${{ env.GITHUB_REF_SLUG }}
+          path: ./CHANGELOG.md
+      - name: Publish Binaries
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifact: "/release/binaries.zip"
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          name: ${{ env.GITHUB_REF_SLUG }}
+          replaceArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Cleanup Binaries
+        if: always()
+        run: docker rm squidex-container
