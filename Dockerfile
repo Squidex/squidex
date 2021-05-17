@@ -42,6 +42,8 @@ WORKDIR /src
 
 ENV CONTINUOUS_INTEGRATION=1
 
+RUN npm i -g npm@latest
+
 # Copy Node project files.
 COPY frontend/package*.json /tmp/
 
