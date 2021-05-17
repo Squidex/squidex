@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: squidex-tmp.tar.gz
-          key: squidex-release-image
+          key: squidex-release-image-${{ github.sha }}
 
   test:
     needs: build
@@ -61,7 +61,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: squidex-tmp.tar.gz
-          key: squidex-release-image
+          key: squidex-release-image-${{ github.sha }}
 
       - name: Load Image
         run: docker load < squidex-tmp.tar.gz
@@ -116,7 +116,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: squidex-tmp.tar.gz
-          key: squidex-release-image
+          key: squidex-release-image-${{ github.sha }}
 
       - name: Load Image
         run: docker load < squidex-tmp.tar.gz
@@ -147,7 +147,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: squidex-tmp.tar.gz
-          key: squidex-release-image
+          key: squidex-release-image-${{ github.sha }}
 
       - name: Load Image
         run: docker load < squidex-tmp.tar.gz
