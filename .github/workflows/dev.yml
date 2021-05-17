@@ -15,6 +15,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Calculate Version
+          env:
+            BUILD_NUMBER: ${{ github.run_number }}
+          run: |
+            echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -37,8 +43,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: squidex/squidex:tmp-dev-${{ github.run_number }}
-          build-args: "SQUIDEX__VERSION=4.0.0-dev-${{ github.run_number }}"
+          tags: squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }}
+          build-args: "SQUIDEX__VERSION=4.0.0-dev-${{ env.BUILD_NUMBER }}"
           cache-from: type=registry,ref=squidex/squidex:cache-dev
           cache-to: type=registry,ref=squidex/squidex:cache-dev
 
@@ -46,6 +52,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Calculate Version
+          env:
+            BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+          run: |
+            echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -55,7 +67,7 @@ jobs:
       - name: Replace Image Name
         uses: mikefarah/yq@v4.9.1
         with:
-          cmd: yq e '.services.squidex.image = "squidex/squidex:tmp-dev-${{ github.run_number }}"' -i backend/tests/docker-compose.yml
+          cmd: yq e '.services.squidex.image = "squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }}"' -i backend/tests/docker-compose.yml
 
       - name: Start Test
         run: docker-compose up -d
@@ -82,6 +94,12 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - name: Calculate Version
+          env:
+            BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+          run: |
+            echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
+
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
@@ -95,16 +113,16 @@ jobs:
       - name: Pull Temporary Tag
         if: github.event_name != 'pull_request'
         run: |
-          docker pull squidex/squidex:tmp-dev-${{ github.run_number }}
+          docker pull squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }}
 
       - name: Rename Tags
         if: github.event_name != 'pull_request'
         run: |
-          docker tag squidex/squidex:tmp-dev-${{ github.run_number }} squidex/squidex:dev
-          docker tag squidex/squidex:tmp-dev-${{ github.run_number }} squidex/squidex:dev-${{ github.run_number }}
+          docker tag squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }} squidex/squidex:dev
+          docker tag squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }} squidex/squidex:dev-${{ env.BUILD_NUMBER }}
 
       - name: Push Tags
         if: github.event_name != 'pull_request'
         run: |
           docker push squidex/squidex:dev
-          docker push squidex/squidex:dev-${{ github.run_number }}
+          docker push squidex/squidex:dev-${{ env.BUILD_NUMBER }}
