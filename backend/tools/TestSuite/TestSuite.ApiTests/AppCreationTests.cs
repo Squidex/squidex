@@ -51,7 +51,7 @@ namespace TestSuite.ApiTests
             // STEP 3: Check contributors
             var contributors = await _.Apps.GetContributorsAsync(appName);
 
-            // Should not client itself as a contributor.
+            // Should not add client itself as a contributor.
             Assert.Empty(contributors.Items);
 
 

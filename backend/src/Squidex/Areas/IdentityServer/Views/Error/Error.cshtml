@@ -11,9 +11,9 @@
 <h1 class="splash-h1">@T.Get("users.error.headline")</h1>
 
 <p class="splash-text">
-    @if (Model.Error?.ErrorDescription != null)
+    @if (Model.ErrorMessage != null)
     {
-        @Model.Error.ErrorDescription
+        @Model.ErrorMessage
     }
     else
     {

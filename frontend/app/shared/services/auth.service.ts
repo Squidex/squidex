@@ -77,8 +77,8 @@ export class AuthService {
 
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
-                           scope: 'squidex-api openid profile email squidex-profile role permissions',
-                   response_type: 'id_token token',
+                           scope: 'squidex-api openid profile email permissions',
+                   response_type: 'code',
                     redirect_uri: apiUrl.buildUrl('login;'),
         post_logout_redirect_uri: apiUrl.buildUrl('logout'),
              silent_redirect_uri: apiUrl.buildUrl('client-callback-silent'),
