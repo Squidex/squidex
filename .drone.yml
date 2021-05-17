@@ -81,7 +81,6 @@ steps:
         path: /var/lib/docker
     when:
       status:
-        - failure
         - success
       event:
         - tag
