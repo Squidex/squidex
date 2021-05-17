@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: Calculate Version
         env:
-          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
           echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
 
@@ -96,7 +96,7 @@ jobs:
     steps:
       - name: Calculate Version
         env:
-          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
           echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
 
