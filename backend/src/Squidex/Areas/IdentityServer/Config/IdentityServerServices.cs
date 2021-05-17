@@ -5,20 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using IdentityModel;
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
+using System;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using OpenIddict.Abstractions;
+using OpenIddict.Server;
 using Squidex.Domain.Users;
-using Squidex.Shared.Identity;
+using Squidex.Domain.Users.InMemory;
+using Squidex.Hosting;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -40,14 +41,11 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();
 
-            services.AddSingletonAs<DefaultKeyStore>()
-                .As<ISigningCredentialStore>().As<IValidationKeysStore>();
+            services.AddSingletonAs<PwnedPasswordValidator>()
+                .As<IPasswordValidator<IdentityUser>>();
 
             services.AddScopedAs<DefaultUserService>()
                 .As<IUserService>();
-
-            services.AddSingletonAs<PwnedPasswordValidator>()
-                .As<IPasswordValidator<IdentityUser>>();
 
             services.AddScopedAs<UserClaimsPrincipalFactoryWithEmail>()
                 .As<IUserClaimsPrincipalFactory<IdentityUser>>();
@@ -55,59 +53,74 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<ApiPermissionUnifier>()
                 .As<IClaimsTransformation>();
 
-            services.AddSingletonAs<LazyClientStore>()
-                .As<IClientStore>();
-
-            services.AddSingletonAs<InMemoryResourcesStore>()
-                .As<IResourceStore>();
-
             services.AddSingletonAs<CreateAdminInitializer>()
                 .AsSelf();
 
-            services.AddIdentityServer(options =>
-                {
-                    options.UserInteraction.ErrorUrl = "/error/";
-                })
-                .AddAspNetIdentity<IdentityUser>()
-                .AddInMemoryApiScopes(GetApiScopes())
-                .AddInMemoryIdentityResources(GetIdentityResources());
-        }
+            services.ConfigureOptions<DefaultKeyStore>();
 
-        private static IEnumerable<ApiScope> GetApiScopes()
-        {
-            yield return new ApiScope(Constants.ApiScope)
+            services.Configure<IdentityOptions>(options =>
             {
-                UserClaims = new List<string>
-                {
-                    JwtClaimTypes.Email,
-                    JwtClaimTypes.Role,
-                    SquidexClaimTypes.Permissions
-                }
-            };
-        }
+                options.ClaimsIdentity.UserIdClaimType = Claims.Subject;
+                options.ClaimsIdentity.UserNameClaimType = Claims.Name;
+                options.ClaimsIdentity.RoleClaimType = Claims.Role;
+            });
 
-        private static IEnumerable<IdentityResource> GetIdentityResources()
-        {
-            yield return new IdentityResources.OpenId();
-            yield return new IdentityResources.Profile();
-            yield return new IdentityResources.Email();
-            yield return new IdentityResource(Constants.RoleScope,
-                new[]
+            services.AddOpenIddict()
+                .AddCore(builder =>
                 {
-                    JwtClaimTypes.Role
-                });
-            yield return new IdentityResource(Constants.PermissionsScope,
-                new[]
+                    builder.Services.AddSingletonAs<IdentityServerConfiguration.Scopes>()
+                        .As<IOpenIddictScopeStore<ImmutableScope>>();
+
+                    builder.Services.AddSingletonAs<DynamicApplicationStore>()
+                        .As<IOpenIddictApplicationStore<ImmutableApplication>>();
+
+                    builder.ReplaceApplicationManager(typeof(ApplicationManager<>));
+                })
+                .AddServer(builder =>
                 {
-                    SquidexClaimTypes.Permissions
-                });
-            yield return new IdentityResource(Constants.ProfileScope,
-                new[]
+                    builder
+                        .SetAuthorizationEndpointUris("/connect/authorize")
+                        .SetIntrospectionEndpointUris("/connect/introspect")
+                        .SetLogoutEndpointUris("/connect/logout")
+                        .SetTokenEndpointUris("/connect/token")
+                        .SetUserinfoEndpointUris("/connect/userinfo");
+
+                    builder.DisableAccessTokenEncryption();
+
+                    builder.RegisterScopes(
+                        Scopes.Email,
+                        Scopes.Profile,
+                        Scopes.Roles,
+                        Constants.ScopeApi,
+                        Constants.ScopePermissions);
+
+                    builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
+
+                    builder.AllowClientCredentialsFlow();
+                    builder.AllowImplicitFlow();
+                    builder.AllowAuthorizationCodeFlow();
+
+                    builder.UseAspNetCore()
+                        // Disable it mainly for our tests.
+                        .DisableTransportSecurityRequirement()
+                        .EnableAuthorizationEndpointPassthrough()
+                        .EnableLogoutEndpointPassthrough()
+                        .EnableStatusCodePagesIntegration()
+                        .EnableTokenEndpointPassthrough()
+                        .EnableUserinfoEndpointPassthrough();
+                })
+                .AddValidation(options =>
                 {
-                    SquidexClaimTypes.DisplayName,
-                    SquidexClaimTypes.PictureUrl,
-                    SquidexClaimTypes.NotifoKey
+                    options.UseLocalServer();
+                    options.UseAspNetCore();
                 });
+
+            services.Configure<OpenIddictServerOptions>((services, options) =>
+            {
+                var urlGenerator = services.GetRequiredService<IUrlGenerator>();
+
+                options.Issuer = new Uri(urlGenerator.BuildUrl("/identity-server", false));
+            });
         }
     }
 }

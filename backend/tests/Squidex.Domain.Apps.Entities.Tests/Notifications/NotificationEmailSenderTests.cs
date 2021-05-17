@@ -27,14 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         private readonly IUser assigned = UserMocks.User("2", "2@email.com", "user2");
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly string appName = "my-app";
-        private readonly string uiUrl = "my-ui";
+        private readonly string appUI = "my-ui";
         private readonly NotificationEmailTextOptions texts = new NotificationEmailTextOptions();
         private readonly NotificationEmailSender sut;
 
         public NotificationEmailSenderTests()
         {
             A.CallTo(() => urlGenerator.UI())
-                .Returns(uiUrl);
+                .Returns(appUI);
 
             sut = new NotificationEmailSender(Options.Create(texts), emailSender, urlGenerator, log);
         }

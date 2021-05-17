@@ -14,32 +14,30 @@ namespace Squidex.Web
     {
         public static readonly string SecurityDefinition = "squidex-oauth-auth";
 
-        public static readonly string ApiPrefix = "/api";
-
-        public static readonly string ApiScope = "squidex-api";
-
-        public static readonly string ApiSecurityScheme = "custom";
-
         public static readonly string OrleansClusterId = "squidex-v2";
 
-        public static readonly string OrleansPrefix = "/orleans";
+        public static readonly string ApiSecurityScheme = "API";
 
-        public static readonly string PortalPrefix = "/portal";
+        public static readonly string PrefixApi = "/api";
 
-        public static readonly string EmailScope = "email";
+        public static readonly string PrefixOrleans = "/orleans";
 
-        public static readonly string RoleScope = "role";
+        public static readonly string PrefixPortal = "/portal";
 
-        public static readonly string PermissionsScope = "permissions";
+        public static readonly string PrefixIdentityServer = "/identity-server";
 
-        public static readonly string ProfileScope = "squidex-profile";
+        public static readonly string ScopePermissions = "permissions";
 
-        public static readonly string FrontendClient = DefaultClients.Frontend;
+        public static readonly string ScopeProfile = "squidex-profile";
 
-        public static readonly string InternalClientId = "squidex-internal";
+        public static readonly string ScopeRole = "role";
 
-        public static readonly string InternalClientSecret = "squidex-internal".ToSha256Base64();
+        public static readonly string ScopeApi = "squidex-api";
 
-        public static readonly string IdentityServerPrefix = "/identity-server";
+        public static readonly string ClientFrontendId = DefaultClients.Frontend;
+
+        public static readonly string ClientInternalId = "squidex-internal";
+
+        public static readonly string ClientInternalSecret = "squidex-internal".ToSha256Base64();
     }
 }

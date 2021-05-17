@@ -74,6 +74,11 @@ namespace Squidex.Config.Domain
                     return false;
                 }
 
+                if (category.StartsWith("OpenIddict", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Warning;
+                }
+
                 if (category.StartsWith("Orleans.Runtime.NoOpHostEnvironmentStatistics", StringComparison.OrdinalIgnoreCase))
                 {
                     return level >= LogLevel.Error;
