@@ -78,7 +78,7 @@ jobs:
       - name: Replace Image Name
         uses: mikefarah/yq@v4.9.1
         with:
-          cmd: yq e '.services.squidex.image = "squidex-tmp' -i backend/tests/docker-compose.yml
+          cmd: yq e '.services.squidex.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
 
       - name: Start Test
         run: docker-compose up -d
