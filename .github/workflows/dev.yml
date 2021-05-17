@@ -37,6 +37,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: false
+          load: true
           tags: squidex-tmp
           build-args: "SQUIDEX__VERSION=4.0.0-dev-${{ env.BUILD_NUMBER }}"
 
