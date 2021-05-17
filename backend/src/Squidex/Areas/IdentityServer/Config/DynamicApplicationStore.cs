@@ -236,8 +236,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     Permissions.Scopes.Roles,
                     Permissions.Prefixes.Scope + Constants.ScopeApi,
                     Permissions.Prefixes.Scope + Constants.ScopePermissions
-                },
-                Type = ClientTypes.Public
+                }
             });
         }
     }
