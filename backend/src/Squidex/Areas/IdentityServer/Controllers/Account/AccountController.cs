@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -8,11 +8,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer4;
-using IdentityServer4.Extensions;
-using IdentityServer4.Models;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -31,15 +26,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
     {
         private readonly IUserService userService;
         private readonly MyIdentityOptions identityOptions;
-        private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
             IUserService userService,
-            IOptions<MyIdentityOptions> identityOptions,
-            IIdentityServerInteractionService interactions)
+            IOptions<MyIdentityOptions> identityOptions)
         {
             this.identityOptions = identityOptions.Value;
-            this.interactions = interactions;
             this.userService = userService;
         }
 
@@ -130,24 +122,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             await SignInManager.SignOutAsync();
 
-            if (User.Identity?.IsAuthenticated == true)
-            {
-                var provider = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
-
-                if (provider != null && provider != IdentityServerConstants.LocalIdentityProvider)
-                {
-                    var providerSupportsSignout = await HttpContext.GetSchemeSupportsSignOutAsync(provider);
-
-                    if (providerSupportsSignout)
-                    {
-                        return SignOut(provider);
-                    }
-                }
-            }
-
-            var context = await interactions.GetLogoutContextAsync(logoutId);
-
-            return RedirectToLogoutUrl(context);
+            return Redirect("~/../");
         }
 
         [HttpGet]
@@ -340,18 +315,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             var result = await SignInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
 
             return (result.Succeeded, result.IsLockedOut);
-        }
-
-        private IActionResult RedirectToLogoutUrl(LogoutRequest context)
-        {
-            if (!string.IsNullOrWhiteSpace(context.PostLogoutRedirectUri))
-            {
-                return Redirect(context.PostLogoutRedirectUri);
-            }
-            else
-            {
-                return Redirect("~/../");
-            }
         }
     }
 }

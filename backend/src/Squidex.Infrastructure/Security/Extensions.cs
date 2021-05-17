@@ -17,16 +17,16 @@ namespace Squidex.Infrastructure.Security
         {
             var subjectId = principal.OpenIdSubject();
 
+            var clientId = principal.OpenIdClientId();
+
+            if (!string.IsNullOrWhiteSpace(clientId) && (string.Equals(clientId, subjectId, StringComparison.Ordinal) || string.IsNullOrWhiteSpace(subjectId)))
+            {
+                return RefToken.Client(clientId);
+            }
+
             if (!string.IsNullOrWhiteSpace(subjectId))
             {
                 return RefToken.User(subjectId);
-            }
-
-            var clientId = principal.OpenIdClientId();
-
-            if (!string.IsNullOrWhiteSpace(clientId))
-            {
-                return RefToken.Client(clientId);
             }
 
             return null;

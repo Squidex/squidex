@@ -5,17 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Builder;
+using System.Threading.Tasks;
 
-namespace Squidex.Areas.IdentityServer.Config
+namespace Squidex.Domain.Users.InMemory
 {
-    public static class IdentityServerExtensions
+    public static class Extensions
     {
-        public static IApplicationBuilder UseSquidexIdentityServer(this IApplicationBuilder app)
+        public static ValueTask<T> AsValueTask<T>(this T value)
         {
-             app.UseIdentityServer();
-
-             return app;
+            return new ValueTask<T>(value);
         }
     }
 }

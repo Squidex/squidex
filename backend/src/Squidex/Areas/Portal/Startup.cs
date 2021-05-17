@@ -15,7 +15,7 @@ namespace Squidex.Areas.Portal
     {
         public static void ConfigurePortal(this IApplicationBuilder app)
         {
-            app.Map(Constants.PortalPrefix, portalApp =>
+            app.Map(Constants.PrefixPortal, portalApp =>
             {
                 portalApp.UseAuthentication();
                 portalApp.UseAuthorization();

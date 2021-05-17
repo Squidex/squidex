@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 Type = OpenApiSecuritySchemeType.OAuth2
             };
 
-            var tokenUrl = urlGenerator.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
+            var tokenUrl = urlGenerator.BuildUrl($"{Constants.PrefixIdentityServer}/connect/token", false);
 
             security.TokenUrl = tokenUrl;
 
@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
         {
             security.Scopes = new Dictionary<string, string>
             {
-                [Constants.ApiScope] = "Read and write access to the API"
+                [Constants.ScopeApi] = "Read and write access to the API"
             };
         }
 

@@ -6,23 +6,20 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using IdentityModel;
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using OpenIddict.Server;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users
 {
-    public sealed class DefaultKeyStore : ISigningCredentialStore, IValidationKeysStore
+    public sealed class DefaultKeyStore : IConfigureOptions<OpenIddictServerOptions>
     {
         private readonly ISnapshotStore<State> store;
-        private SigningCredentials? cachedKey;
-        private SecurityKeyInfo[]? cachedKeyInfo;
 
         [CollectionName("Identity_Keys")]
         public sealed class State
@@ -39,32 +36,28 @@ namespace Squidex.Domain.Users
             this.store = store;
         }
 
-        public async Task<SigningCredentials> GetSigningCredentialsAsync()
+        public void Configure(OpenIddictServerOptions options)
         {
-            var (_, key) = await GetOrCreateKeyAsync();
+            var securityKey = GetOrCreateKeyAsync().Result;
 
-            return key;
+            options.SigningCredentials.Add(
+                new SigningCredentials(securityKey,
+                    SecurityAlgorithms.RsaSha256));
+
+            options.EncryptionCredentials.Add(new EncryptingCredentials(securityKey,
+                SecurityAlgorithms.RsaOAEP,
+                SecurityAlgorithms.Aes256CbcHmacSha512));
         }
 
-        public async Task<IEnumerable<SecurityKeyInfo>> GetValidationKeysAsync()
+        private async Task<RsaSecurityKey> GetOrCreateKeyAsync()
         {
-            var (info, _) = await GetOrCreateKeyAsync();
-
-            return info;
-        }
-
-        private async Task<(SecurityKeyInfo[], SigningCredentials)> GetOrCreateKeyAsync()
-        {
-            if (cachedKey != null && cachedKeyInfo != null)
-            {
-                return (cachedKeyInfo, cachedKey);
-            }
-
             var (state, _, _) = await store.ReadAsync(default);
 
             RsaSecurityKey securityKey;
 
-            if (state == null)
+            var attempts = 0;
+
+            while (state == null && attempts < 10)
             {
                 securityKey = new RsaSecurityKey(RSA.Create(2048))
                 {
@@ -88,7 +81,7 @@ namespace Squidex.Domain.Users
                 {
                     await store.WriteAsync(default, state, 0, 0);
 
-                    return CreateCredentialsPair(securityKey);
+                    return securityKey;
                 }
                 catch (InconsistentStateException)
                 {
@@ -106,19 +99,7 @@ namespace Squidex.Domain.Users
                 KeyId = state.Key
             };
 
-            return CreateCredentialsPair(securityKey);
-        }
-
-        private (SecurityKeyInfo[], SigningCredentials) CreateCredentialsPair(RsaSecurityKey securityKey)
-        {
-            cachedKey = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
-
-            cachedKeyInfo = new[]
-            {
-                new SecurityKeyInfo { Key = cachedKey.Key, SigningAlgorithm = cachedKey.Algorithm }
-            };
-
-            return (cachedKeyInfo, cachedKey);
+            return securityKey;
         }
     }
 }

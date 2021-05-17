@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -20,10 +19,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
     {
         public SignInManager<IdentityUser> SignInManager
         {
-            get
-            {
-                return HttpContext.RequestServices.GetRequiredService<SignInManager<IdentityUser>>();
-            }
+            get => HttpContext.RequestServices.GetRequiredService<SignInManager<IdentityUser>>();
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -46,13 +42,6 @@ namespace Squidex.Areas.IdentityServer.Controllers
             var urlGenerator = HttpContext.RequestServices.GetRequiredService<IUrlGenerator>();
 
             if (urlGenerator.IsAllowedHost(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-
-            var interactions = HttpContext.RequestServices.GetRequiredService<IIdentityServerInteractionService>();
-
-            if (interactions.IsValidReturnUrl(returnUrl))
             {
                 return Redirect(returnUrl);
             }
