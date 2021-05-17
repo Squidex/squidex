@@ -36,13 +36,11 @@ RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --co
 #
 # Stage 2, Build Frontend
 #
-FROM buildkite/puppeteer:8.0.0 as frontend
+FROM buildkite/puppeteer:5.2.1 as frontend
 
 WORKDIR /src
 
 ENV CONTINUOUS_INTEGRATION=1
-
-RUN npm i -g npm@latest
 
 # Copy Node project files.
 COPY frontend/package*.json /tmp/
