@@ -50,8 +50,6 @@ COPY frontend/package*.json /tmp/
 # Copy patches for broken npm packages
 COPY frontend/patches /tmp/patches
 
-RUN cd /tmp/patches && dir
-
 # Install Node packages 
 RUN cd /tmp && npm set unsafe-perm true && npm install --loglevel=error
 
