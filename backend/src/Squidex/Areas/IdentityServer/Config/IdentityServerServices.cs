@@ -101,6 +101,8 @@ namespace Squidex.Areas.IdentityServer.Config
                     builder.AllowAuthorizationCodeFlow();
 
                     builder.UseAspNetCore()
+                        // Disable it mainly for our tests.
+                        .DisableTransportSecurityRequirement()
                         .EnableAuthorizationEndpointPassthrough()
                         .EnableLogoutEndpointPassthrough()
                         .EnableStatusCodePagesIntegration()
