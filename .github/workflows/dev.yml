@@ -33,20 +33,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: BUILD AND PUSH TEMPORARY TAG
+      - name: BUILD
         uses: docker/build-push-action@v2
         with:
-          push: true
-          tags: squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }}
+          push: false
+          tags: squidex-tmp
           build-args: "SQUIDEX__VERSION=4.0.0-dev-${{ env.BUILD_NUMBER }}"
-          cache-from: type=registry,ref=squidex/squidex:cache-dev
-          cache-to: type=registry,ref=squidex/squidex:cache-dev
+
+      - name: Export Image
+        run: docker save squidex-tmp | gzip > squidex-tmp.tar.gz
+
+      - name: Save Image to Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-dev-image
 
   test:
     needs: build
@@ -64,10 +65,19 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
+      - name: Get Image From Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-dev-image
+
+      - name: Load Image
+        run: docker load < squidex-tmp.tar.gz
+
       - name: Replace Image Name
         uses: mikefarah/yq@v4.9.1
         with:
-          cmd: yq e '.services.squidex.image = "squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }}"' -i backend/tests/docker-compose.yml
+          cmd: yq e '.services.squidex.image = "squidex-tmp' -i backend/tests/docker-compose.yml
 
       - name: Start Test
         run: docker-compose up -d
@@ -110,16 +120,22 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Pull Temporary Tag
+      - name: Get Image From Cache
         if: github.event_name != 'pull_request'
-        run: |
-          docker pull squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }}
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-dev-image
+
+      - name: Load Image
+        if: github.event_name != 'pull_request'
+        run: docker load < squidex-tmp.tar.gz
 
       - name: Rename Tags
         if: github.event_name != 'pull_request'
         run: |
-          docker tag squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }} squidex/squidex:dev
-          docker tag squidex/squidex:tmp-dev-${{ env.BUILD_NUMBER }} squidex/squidex:dev-${{ env.BUILD_NUMBER }}
+          docker tag squidex-tmp squidex/squidex:dev
+          docker tag squidex-tmp squidex/squidex:dev-${{ env.BUILD_NUMBER }}
 
       - name: Push Tags
         if: github.event_name != 'pull_request'
