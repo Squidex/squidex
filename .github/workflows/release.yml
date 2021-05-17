@@ -33,11 +33,18 @@ jobs:
       - name: BUILD AND PUSH TEMPORARY TAG
         uses: docker/build-push-action@v2
         with:
-          push: true
-          tags: squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }}
+          push: false
+          tags: squidex-tmp
           build-args: "SQUIDEX__VERSION=${{ env.GITHUB_REF_SLUG }}"
-          cache-from: type=registry,ref=squidex/squidex:cache-release
-          cache-to: type=registry,ref=squidex/squidex:cache-release
+
+      - name: Export Image
+        run: docker save squidex-tmp | gzip > squidex-tmp.tar.gz
+
+      - name: Save Image to Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image
 
   test:
     needs: build
@@ -49,10 +56,19 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
+      - name: Get Image From Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image
+
+      - name: Load Image
+        run: docker load < squidex-tmp.tar.gz
+
       - name: Replace Image Name
         uses: mikefarah/yq@v4.9.1
         with:
-          cmd: yq e '.services.squidex.image = "squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }}"' -i backend/tests/docker-compose.yml
+          cmd: yq e '.services.squidex.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
 
       - name: Start Test
         run: docker-compose up -d
@@ -95,16 +111,20 @@ jobs:
           string: '${{ env.GITHUB_REF_SLUG }}'
           split-by: '.'
 
-      - name: Pull Temporary Tag
-        if: github.event_name != 'pull_request'
-        run: |
-          docker pull squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }}
+      - name: Get Image From Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image
+
+      - name: Load Image
+        run: docker load < squidex-tmp.tar.gz
 
       - name: Rename Tags
         run: |
-          docker tag squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }} squidex/squidex:latest
-          docker tag squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }} squidex/squidex:${{ env.GITHUB_REF_SLUG }}
-          docker tag squidex/squidex:tmp-release-${{ env.GITHUB_REF_SLUG }} squidex/squidex:${{ steps.version.outputs._0 }}
+          docker tag squidex-tmp squidex/squidex:latest
+          docker tag squidex-tmp squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker tag squidex-tmp squidex/squidex:${{ steps.version.outputs._0 }}
 
       - name: Push Tags
         run: |
@@ -122,10 +142,19 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
 
+      - name: Get Image From Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image
+
+      - name: Load Image
+        run: docker load < squidex-tmp.tar.gz
+
       - name: Get Binaries
         run: |
           mkdir /build 2> /dev/null
-          docker create --name squidex-container squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker create --name squidex-container squidex-tmp
           docker cp squidex-container:/app/. /build
 
       - name: ZIP Binaries
