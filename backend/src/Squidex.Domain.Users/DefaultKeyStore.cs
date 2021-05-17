@@ -36,13 +36,28 @@ namespace Squidex.Domain.Users
             this.store = store;
         }
 
-        public async Task<RsaSecurityKey> GetOrCreateKeyAsync()
+        public void Configure(OpenIddictServerOptions options)
+        {
+            var securityKey = GetOrCreateKeyAsync().Result;
+
+            options.SigningCredentials.Add(
+                new SigningCredentials(securityKey,
+                    SecurityAlgorithms.RsaSha256));
+
+            options.EncryptionCredentials.Add(new EncryptingCredentials(securityKey,
+                SecurityAlgorithms.RsaOAEP,
+                SecurityAlgorithms.Aes256CbcHmacSha512));
+        }
+
+        private async Task<RsaSecurityKey> GetOrCreateKeyAsync()
         {
             var (state, _, _) = await store.ReadAsync(default);
 
             RsaSecurityKey securityKey;
 
-            if (state == null)
+            var attempts = 0;
+
+            while (state == null && attempts < 10)
             {
                 securityKey = new RsaSecurityKey(RSA.Create(2048))
                 {
@@ -85,19 +100,6 @@ namespace Squidex.Domain.Users
             };
 
             return securityKey;
-        }
-
-        public void Configure(OpenIddictServerOptions options)
-        {
-            var securityKey = GetOrCreateKeyAsync().Result;
-
-            options.SigningCredentials.Add(
-                new SigningCredentials(securityKey,
-                    SecurityAlgorithms.RsaSha256));
-
-            options.EncryptionCredentials.Add(new EncryptingCredentials(securityKey,
-                SecurityAlgorithms.RsaOAEP,
-                SecurityAlgorithms.Aes256CbcHmacSha512));
         }
     }
 }
