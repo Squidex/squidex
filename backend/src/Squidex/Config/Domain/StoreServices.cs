@@ -126,14 +126,14 @@ namespace Squidex.Config.Domain
                         .As<ITextIndexerState>();
 
                     services.AddOpenIddict()
-                        .AddCore(options =>
+                        .AddCore(builder =>
                         {
-                            options.UseMongoDb<string>()
+                            builder.UseMongoDb<string>()
                                 .SetScopesCollectionName("Identity_Scopes")
                                 .SetTokensCollectionName("Identity_Tokens");
 
-                            options.SetDefaultScopeEntity<ImmutableScope>();
-                            options.SetDefaultApplicationEntity<ImmutableApplication>();
+                            builder.SetDefaultScopeEntity<ImmutableScope>();
+                            builder.SetDefaultApplicationEntity<ImmutableApplication>();
                         });
                 }
             });

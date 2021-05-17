@@ -66,41 +66,41 @@ namespace Squidex.Areas.IdentityServer.Config
             });
 
             services.AddOpenIddict()
-                .AddCore(options =>
+                .AddCore(builder =>
                 {
-                    options.Services.AddSingletonAs<IdentityServerConfiguration.Scopes>()
+                    builder.Services.AddSingletonAs<IdentityServerConfiguration.Scopes>()
                         .As<IOpenIddictScopeStore<ImmutableScope>>();
 
-                    options.Services.AddSingletonAs<DynamicApplicationStore>()
+                    builder.Services.AddSingletonAs<DynamicApplicationStore>()
                         .As<IOpenIddictApplicationStore<ImmutableApplication>>();
 
-                    options.ReplaceApplicationManager(typeof(ApplicationManager<>));
+                    builder.ReplaceApplicationManager(typeof(ApplicationManager<>));
                 })
-                .AddServer(options =>
+                .AddServer(builder =>
                 {
-                    options
+                    builder
                         .SetAuthorizationEndpointUris("/connect/authorize")
                         .SetIntrospectionEndpointUris("/connect/introspect")
                         .SetLogoutEndpointUris("/connect/logout")
                         .SetTokenEndpointUris("/connect/token")
                         .SetUserinfoEndpointUris("/connect/userinfo");
 
-                    options.DisableAccessTokenEncryption();
+                    builder.DisableAccessTokenEncryption();
 
-                    options.RegisterScopes(
+                    builder.RegisterScopes(
                         Scopes.Email,
                         Scopes.Profile,
                         Scopes.Roles,
                         Constants.ScopeApi,
                         Constants.ScopePermissions);
 
-                    options.SetAccessTokenLifetime(TimeSpan.FromDays(30));
+                    builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
-                    options.AllowClientCredentialsFlow();
-                    options.AllowImplicitFlow();
-                    options.AllowAuthorizationCodeFlow();
+                    builder.AllowClientCredentialsFlow();
+                    builder.AllowImplicitFlow();
+                    builder.AllowAuthorizationCodeFlow();
 
-                    options.UseAspNetCore()
+                    builder.UseAspNetCore()
                         .EnableAuthorizationEndpointPassthrough()
                         .EnableLogoutEndpointPassthrough()
                         .EnableStatusCodePagesIntegration()

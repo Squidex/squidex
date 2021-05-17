@@ -30,6 +30,14 @@ namespace Squidex.Areas.IdentityServer
                     identityApp.UseExceptionHandler("/error");
                 }
 
+                identityApp.Use((context, next) =>
+                {
+                    // OpenId dict core only works with https, which sucks in our tests.
+                    context.Request.IsHttps = true;
+
+                    return next();
+                });
+
                 identityApp.UseRouting();
 
                 identityApp.UseAuthentication();
