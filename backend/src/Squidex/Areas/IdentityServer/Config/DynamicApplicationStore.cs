@@ -237,7 +237,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     Permissions.Prefixes.Scope + Constants.ScopeApi,
                     Permissions.Prefixes.Scope + Constants.ScopePermissions
                 }
-            });
+            }.SetAdmin());
         }
     }
 }

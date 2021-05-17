@@ -89,7 +89,7 @@ namespace Notifo.Areas.Account.Controllers
 
                 foreach (var claim in principal.Claims)
                 {
-                    claim.SetDestinations(GetDestinations(claim, principal));
+                    claim.SetDestinations(GetDestinations(claim, principal, false));
                 }
 
                 return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -162,7 +162,7 @@ namespace Notifo.Areas.Account.Controllers
 
             var principal = await SignInManager.CreateUserPrincipalAsync((IdentityUser)user.Identity);
 
-            await EnrichPrincipalAsync(request, principal);
+            await EnrichPrincipalAsync(request, principal, false);
 
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
@@ -206,12 +206,12 @@ namespace Notifo.Areas.Account.Controllers
                 identity.AddClaim(claim);
             }
 
-            await EnrichPrincipalAsync(request, principal);
+            await EnrichPrincipalAsync(request, principal, true);
 
             return principal;
         }
 
-        private async Task EnrichPrincipalAsync(OpenIddictRequest request, ClaimsPrincipal principal)
+        private async Task EnrichPrincipalAsync(OpenIddictRequest request, ClaimsPrincipal principal, bool alwaysDeliverPermissions)
         {
             var scopes = request.GetScopes();
 
@@ -220,11 +220,11 @@ namespace Notifo.Areas.Account.Controllers
 
             foreach (var claim in principal.Claims)
             {
-                claim.SetDestinations(GetDestinations(claim, principal));
+                claim.SetDestinations(GetDestinations(claim, principal, alwaysDeliverPermissions));
             }
         }
 
-        private static IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal)
+        private static IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal, bool alwaysDeliverPermissions)
         {
             switch (claim.Type)
             {
@@ -240,7 +240,7 @@ namespace Notifo.Areas.Account.Controllers
                     yield return Destinations.IdentityToken;
                     yield break;
 
-                case SquidexClaimTypes.Permissions when principal.HasScope(Constants.ScopePermissions):
+                case SquidexClaimTypes.Permissions when principal.HasScope(Constants.ScopePermissions) || alwaysDeliverPermissions:
                     yield return Destinations.AccessToken;
                     yield return Destinations.IdentityToken;
                     yield break;
