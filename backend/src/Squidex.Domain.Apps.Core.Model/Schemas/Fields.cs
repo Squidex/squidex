@@ -263,10 +263,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return field.AddField(Boolean(id, name, properties, settings));
         }
 
-        public static ArrayField AddComponents(this ArrayField field, long id, string name,
+        public static ArrayField AddComponent(this ArrayField field, long id, string name,
             ComponentFieldProperties? properties = null, IFieldSettings? settings = null)
         {
             return field.AddField(Component(id, name, properties, settings));
+        }
+
+        public static ArrayField AddComponents(this ArrayField field, long id, string name,
+            ComponentsFieldProperties? properties = null, IFieldSettings? settings = null)
+        {
+            return field.AddField(Components(id, name, properties, settings));
         }
 
         public static ArrayField AddDateTime(this ArrayField field, long id, string name,
