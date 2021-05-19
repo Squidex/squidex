@@ -39,4 +39,5 @@ jobs:
         env:
           PACKER_LOG: 1
           PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
+          DIGITALOCEAN_API_TOKEN: "${{ secrets.DIGITALOCEAN_API_TOKEN }}"
         working-directory: packer/
