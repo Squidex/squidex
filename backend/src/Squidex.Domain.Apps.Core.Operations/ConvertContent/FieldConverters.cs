@@ -280,9 +280,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         private static IJsonValue? ConvertComponent(IField field, IJsonValue? value, ValueConverter[] converters)
         {
-            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type) && field.TryGetResolvedSchema(type.Value, out var schema))
+            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
             {
-                return ConvertNested(schema.FieldCollection, obj, null, converters);
+                if (field.TryGetResolvedSchema(type.Value, out var schema))
+                {
+                    return ConvertNested(schema.FieldCollection, obj, null, converters);
+                }
+                else
+                {
+                    return obj;
+                }
             }
 
             return null;
