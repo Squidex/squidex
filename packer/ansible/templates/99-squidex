@@ -1,0 +1,6 @@
+#!/bin/bash
+echo -e "\033[0m"
+echo -e "Welcome to \033[0;36mSquidex\033[0m!"
+echo
+echo -e "Please run \033[1;32m/opt/squidex/setup-squidex.sh\033[0m to get started."
+echo
