@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, Instant timestamp = default, long take = long.MaxValue,
+        public async IAsyncEnumerable<StoredEvent> QueryAllReverseAsync(string? streamFilter = null, Instant timestamp = default, int take = int.MaxValue,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             if (take <= 0)
@@ -118,7 +118,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var find =
                 Collection.Find(filterDefinition, options: Batching.Options)
-                    .Limit((int)take).Sort(Sort.Descending(TimestampField).Ascending(EventStreamField));
+                    .Limit(take).Sort(Sort.Descending(TimestampField).Ascending(EventStreamField));
 
             var taken = 0;
 
@@ -149,7 +149,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, long take = long.MaxValue,
+        public async IAsyncEnumerable<StoredEvent> QueryAllAsync(string? streamFilter = null, string? position = null, int take = int.MaxValue,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
             StreamPosition lastPosition = position;
@@ -158,7 +158,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var find =
                 Collection.Find(filterDefinition)
-                    .Limit((int)take).Sort(Sort.Ascending(TimestampField).Ascending(EventStreamField));
+                    .Limit(take).Sort(Sort.Ascending(TimestampField).Ascending(EventStreamField));
 
             var taken = 0;
 

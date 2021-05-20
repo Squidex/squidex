@@ -43,7 +43,7 @@ export class Duration {
 
         seconds %= 60;
 
-        let secondsString = seconds.toString();
+        let secondsString = Math.ceil(seconds).toString();
 
         if (secondsString.length === 1) {
             secondsString = `0${secondsString}`;
