@@ -3,7 +3,7 @@ concurrency: marketplace-heroku
 
 on:
   release:
-    types: [released]
+    types: [ released ]
 
 jobs:
   validate:
