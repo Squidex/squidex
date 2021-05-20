@@ -3,7 +3,7 @@ concurrency: marketplace-render
 
 on:
   release:
-    types: [released]
+    types: [ released ]
 
 jobs:
   validate:
