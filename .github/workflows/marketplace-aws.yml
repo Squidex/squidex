@@ -3,7 +3,7 @@ concurrency: marketplace-aws
 
 on:
   release:
-    types: [released]
+    types: [ released ]
 
 jobs:
   validate:
@@ -13,7 +13,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Validate Template
-        if: false
         uses: hashicorp/packer-github-actions@master
         with:
           command: validate
@@ -32,7 +31,6 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
 
       - name: Build
-        if: false
         uses: hashicorp/packer-github-actions@master
         with:
           command: build
@@ -41,4 +39,6 @@ jobs:
         env:
           PACKER_LOG: 1
           PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
+          AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         working-directory: packer/
