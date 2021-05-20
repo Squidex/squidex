@@ -103,6 +103,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
         {
             settings.AllowReferencesWithProperties = true;
 
+            settings.ReflectionService = new ReflectionServices();
+
             settings.TypeMappers = new List<ITypeMapper>
             {
                 CreateStringMap<DomainId>(),
