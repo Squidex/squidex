@@ -33,7 +33,7 @@ export class Duration {
 
         seconds %= 3600;
 
-        const minutes = Math.floor(seconds / 60);
+        const minutes = Math.ceil(seconds / 60);
 
         let minutesString = minutes.toString();
 
