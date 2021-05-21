@@ -70,6 +70,7 @@ WORKDIR /app
 
 # Copy from build stages
 COPY --from=backend /build/ .
+
 COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80
