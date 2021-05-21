@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     .Returns(null);
             }
 
-            A.CallTo(() => eventStore.QueryAllAsync("^asset\\-", null, long.MaxValue, default))
+            A.CallTo(() => eventStore.QueryAllAsync("^asset\\-", null, int.MaxValue, default))
                 .Returns(storedEvents.ToAsyncEnumerable());
         }
     }
