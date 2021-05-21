@@ -3,10 +3,8 @@ concurrency: release
 
 on:
   push:
-    branches:
-      - "!*"
     tags:
-      - "*"
+      - '*'
 
 jobs:
   build:
