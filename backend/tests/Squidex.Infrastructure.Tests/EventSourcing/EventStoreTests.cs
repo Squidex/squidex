@@ -112,8 +112,8 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 new StoredEvent(streamName, "Position", 0, commit1[0]),
                 new StoredEvent(streamName, "Position", 1, commit1[1]),
-                new StoredEvent(streamName, "Position", 2, commit2[0]),
-                new StoredEvent(streamName, "Position", 3, commit2[1])
+                new StoredEvent(streamName, "Position", 2, commit2[2]),
+                new StoredEvent(streamName, "Position", 3, commit2[3])
             };
 
             ShouldBeEquivalentTo(readEvents1, expected);
