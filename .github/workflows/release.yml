@@ -67,7 +67,7 @@ jobs:
         run: docker-compose up -d
         working-directory: backend/tests
 
-      - name: Run Rest
+      - name: RUN TEST
         uses: kohlerdominik/docker-run-action@v1.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim
