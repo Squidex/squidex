@@ -12,13 +12,31 @@ noscript {
     margin-bottom: 20px;
 }
 
+@media (max-width: 550px) {
+    .profile {
+        background-color: $color-white;
+    }
+
+    .profile-card {
+        border: 0;
+    }
+
+    .profile-card-body {
+        padding: 0;
+    }
+
+    .profile-footer {
+        border: 0;
+    }
+}
+
 //
 // Profile element
 //
 .profile {
-    & {
+    &-container {
         margin: 0 auto;
-        max-width: 20rem;
+        max-width: 45rem;
         padding: 1rem 2rem;
     }
 
@@ -31,10 +49,6 @@ noscript {
     &-logo {
         @include absolute(1rem, 1rem, auto, auto);
         height: 1.75rem;
-    }
-
-    &-lg {
-        max-width: 40rem;
     }
 
     &-password-signup {
@@ -107,8 +121,6 @@ noscript {
     .external {
         &-button {
             line-height: 1.8rem;
-            text-align: left;
-            text-transform: none;
         }
 
         &-button-small {
@@ -122,7 +134,6 @@ noscript {
             display: inline-block;
             font-size: 1.1rem;
             font-weight: normal;
-            height: 20px;
             vertical-align: middle;
             width: 1.6rem;
         }

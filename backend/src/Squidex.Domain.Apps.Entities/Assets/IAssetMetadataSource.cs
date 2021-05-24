@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetMetadataSource
     {
+        int Order => 0;
+
         Task EnhanceAsync(UploadAssetCommand command);
 
         IEnumerable<string> Format(IAssetEntity asset);

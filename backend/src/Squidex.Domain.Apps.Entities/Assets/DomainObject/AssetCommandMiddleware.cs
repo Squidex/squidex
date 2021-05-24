@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Orleans;
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             this.assetEnricher = assetEnricher;
             this.assetFileStore = assetFileStore;
-            this.assetMetadataSources = assetMetadataSources;
+            this.assetMetadataSources = assetMetadataSources.OrderBy(x => x.Order).ToList();
             this.assetQuery = assetQuery;
             this.contextProvider = contextProvider;
         }
