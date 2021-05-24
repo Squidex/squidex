@@ -1,8 +1,6 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Account.LoginVM
 
 @{
-    ViewBag.ThemeColor = "white";
-
     var action = Model.IsLogin ? T.Get("common.login") : T.Get("common.signup");
 
     ViewBag.Title = action;

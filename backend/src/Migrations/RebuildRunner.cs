@@ -41,25 +41,27 @@ namespace Migrations
 
         public async Task RunAsync(CancellationToken ct)
         {
+            var batchSize = rebuildOptions.CalculateBatchSize();
+
             if (rebuildOptions.Apps)
             {
-                await rebuilder.RebuildAppsAsync(ct);
+                await rebuilder.RebuildAppsAsync(batchSize, ct);
             }
 
             if (rebuildOptions.Schemas)
             {
-                await rebuilder.RebuildSchemasAsync(ct);
+                await rebuilder.RebuildSchemasAsync(batchSize, ct);
             }
 
             if (rebuildOptions.Rules)
             {
-                await rebuilder.RebuildRulesAsync(ct);
+                await rebuilder.RebuildRulesAsync(batchSize, ct);
             }
 
             if (rebuildOptions.Assets)
             {
-                await rebuilder.RebuildAssetsAsync(ct);
-                await rebuilder.RebuildAssetFoldersAsync(ct);
+                await rebuilder.RebuildAssetsAsync(batchSize, ct);
+                await rebuilder.RebuildAssetFoldersAsync(batchSize, ct);
             }
 
             if (rebuildOptions.AssetFiles)
@@ -69,7 +71,7 @@ namespace Migrations
 
             if (rebuildOptions.Contents)
             {
-                await rebuilder.RebuildContentAsync(ct);
+                await rebuilder.RebuildContentAsync(batchSize, ct);
             }
 
             if (rebuildOptions.Indexes)

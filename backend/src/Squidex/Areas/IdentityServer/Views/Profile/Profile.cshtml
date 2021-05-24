@@ -1,9 +1,6 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Profile.ProfileVM
 
 @{
-    ViewBag.ThemeColor = "white";
-    ViewBag.ThemeSize = "profile-lg";
-
     ViewBag.Title = T.Get("users.profile.title");
 
     void RenderValidation(string field)
@@ -279,7 +276,7 @@
     }
 
     document.addEventListener('click',
-        function(event) {
+        function (event) {
             if (event.target.className.indexOf('remove-item') >= 0) {
                 event.target.parentNode.parentNode.remove();
 

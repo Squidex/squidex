@@ -24,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class BackupContents : IBackupHandler
     {
+        private const int BatchSize = 100;
         private delegate void ObjectSetter(IReadOnlyDictionary<string, IJsonValue> obj, string key, IJsonValue value);
 
         private const string UrlsFile = "Urls.json";
@@ -216,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (ids.Any())
             {
-                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids);
+                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize);
             }
         }
 

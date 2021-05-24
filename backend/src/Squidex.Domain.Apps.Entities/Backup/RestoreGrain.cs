@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -356,7 +356,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var batchBlock = new BatchBlock<(string, Envelope<IEvent>)>(BatchSize, new GroupingDataflowBlockOptions
             {
-                BoundedCapacity = BatchSize
+                BoundedCapacity = BatchSize * 2
             });
 
             batchBlock.LinkTo(writeBlock, new DataflowLinkOptions
