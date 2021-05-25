@@ -27,7 +27,7 @@ namespace Migrations.Migrations
 
         public Task UpdateAsync(CancellationToken ct)
         {
-            return rebuilder.RebuildContentAsync(rebuildOptions.BatchSize, ct);
+            return rebuilder.RebuildContentAsync(rebuildOptions.BatchSize);
         }
     }
 }
