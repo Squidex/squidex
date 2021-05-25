@@ -27,12 +27,12 @@ namespace Migrations.Migrations
 
         public async Task UpdateAsync(CancellationToken ct)
         {
-            await rebuilder.RebuildAppsAsync(rebuildOptions.BatchSize);
-            await rebuilder.RebuildSchemasAsync(rebuildOptions.BatchSize);
-            await rebuilder.RebuildRulesAsync(rebuildOptions.BatchSize);
-            await rebuilder.RebuildContentAsync(rebuildOptions.BatchSize);
-            await rebuilder.RebuildAssetsAsync(rebuildOptions.BatchSize);
-            await rebuilder.RebuildAssetFoldersAsync(rebuildOptions.BatchSize);
+            await rebuilder.RebuildAppsAsync(rebuildOptions.BatchSize, ct);
+            await rebuilder.RebuildSchemasAsync(rebuildOptions.BatchSize, ct);
+            await rebuilder.RebuildRulesAsync(rebuildOptions.BatchSize, ct);
+            await rebuilder.RebuildContentAsync(rebuildOptions.BatchSize, ct);
+            await rebuilder.RebuildAssetsAsync(rebuildOptions.BatchSize, ct);
+            await rebuilder.RebuildAssetFoldersAsync(rebuildOptions.BatchSize, ct);
         }
     }
 }
