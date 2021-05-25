@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Migrations;
 
@@ -14,15 +15,18 @@ namespace Migrations.Migrations
     public sealed class RebuildContents : IMigration
     {
         private readonly Rebuilder rebuilder;
+        private readonly RebuildOptions rebuildOptions;
 
-        public RebuildContents(Rebuilder rebuilder)
+        public RebuildContents(Rebuilder rebuilder,
+            IOptions<RebuildOptions> rebuildOptions)
         {
             this.rebuilder = rebuilder;
+            this.rebuildOptions = rebuildOptions.Value;
         }
 
         public Task UpdateAsync()
         {
-            return rebuilder.RebuildContentAsync();
+            return rebuilder.RebuildContentAsync(rebuildOptions.BatchSize);
         }
     }
 }
