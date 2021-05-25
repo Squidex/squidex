@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
@@ -39,15 +40,15 @@ namespace Migrations.Migrations
             this.eventStore = eventStore;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(CancellationToken ct)
         {
             return Task.WhenAll(
-                RebuildAppIndexes(),
-                RebuildRuleIndexes(),
-                RebuildSchemaIndexes());
+                RebuildAppIndexes(ct),
+                RebuildRuleIndexes(ct),
+                RebuildSchemaIndexes(ct));
         }
 
-        private async Task RebuildAppIndexes()
+        private async Task RebuildAppIndexes(CancellationToken ct)
         {
             var appsByName = new Dictionary<string, DomainId>();
             var appsByUser = new Dictionary<string, HashSet<DomainId>>();
@@ -75,7 +76,7 @@ namespace Migrations.Migrations
                 }
             }
 
-            await foreach (var storedEvent in eventStore.QueryAllAsync("^app\\-"))
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^app\\-", ct: ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -119,7 +120,7 @@ namespace Migrations.Migrations
             }
         }
 
-        private async Task RebuildRuleIndexes()
+        private async Task RebuildRuleIndexes(CancellationToken ct)
         {
             var rulesByApp = new Dictionary<DomainId, HashSet<DomainId>>();
 
@@ -128,7 +129,7 @@ namespace Migrations.Migrations
                 return rulesByApp!.GetOrAddNew(@event.AppId.Id);
             }
 
-            await foreach (var storedEvent in eventStore.QueryAllAsync("^rule\\-"))
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^rule\\-", ct: ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -152,7 +153,7 @@ namespace Migrations.Migrations
             }
         }
 
-        private async Task RebuildSchemaIndexes()
+        private async Task RebuildSchemaIndexes(CancellationToken ct)
         {
             var schemasByApp = new Dictionary<DomainId, Dictionary<string, DomainId>>();
 
@@ -161,7 +162,7 @@ namespace Migrations.Migrations
                 return schemasByApp!.GetOrAddNew(@event.AppId.Id);
             }
 
-            await foreach (var storedEvent in eventStore.QueryAllAsync("^schema\\-"))
+            await foreach (var storedEvent in eventStore.QueryAllAsync("^schema\\-", ct: ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 

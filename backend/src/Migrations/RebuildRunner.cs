@@ -17,23 +17,23 @@ namespace Migrations
 {
     public sealed class RebuildRunner
     {
-        private readonly RepairFiles repairFiles;
+        private readonly RebuildFiles rebuildFiles;
         private readonly Rebuilder rebuilder;
         private readonly PopulateGrainIndexes populateGrainIndexes;
         private readonly RebuildOptions rebuildOptions;
 
         public RebuildRunner(
-            RepairFiles repairFiles,
-            Rebuilder rebuilder,
             IOptions<RebuildOptions> rebuildOptions,
+            Rebuilder rebuilder,
+            RebuildFiles rebuildFiles,
             PopulateGrainIndexes populateGrainIndexes)
         {
-            Guard.NotNull(repairFiles, nameof(repairFiles));
+            Guard.NotNull(rebuildFiles, nameof(rebuildFiles));
             Guard.NotNull(rebuilder, nameof(rebuilder));
             Guard.NotNull(rebuildOptions, nameof(rebuildOptions));
             Guard.NotNull(populateGrainIndexes, nameof(populateGrainIndexes));
 
-            this.repairFiles = repairFiles;
+            this.rebuildFiles = rebuildFiles;
             this.rebuilder = rebuilder;
             this.rebuildOptions = rebuildOptions.Value;
             this.populateGrainIndexes = populateGrainIndexes;
@@ -66,7 +66,7 @@ namespace Migrations
 
             if (rebuildOptions.AssetFiles)
             {
-                await repairFiles.RepairAsync(ct);
+                await rebuildFiles.RepairAsync(ct);
             }
 
             if (rebuildOptions.Contents)
@@ -76,7 +76,7 @@ namespace Migrations
 
             if (rebuildOptions.Indexes)
             {
-                await populateGrainIndexes.UpdateAsync();
+                await populateGrainIndexes.UpdateAsync(ct);
             }
         }
     }

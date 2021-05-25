@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Log;
@@ -103,13 +104,13 @@ namespace Squidex.Infrastructure.Migrations
 
             await sut.MigrateAsync();
 
-            A.CallTo(() => migrator_0_1.UpdateAsync())
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync())
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_2_3.UpdateAsync())
+            A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
             A.CallTo(() => status.CompleteAsync(1))
@@ -136,13 +137,13 @@ namespace Squidex.Infrastructure.Migrations
 
             await sut.MigrateAsync();
 
-            A.CallTo(() => migrator_0_1.UpdateAsync())
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync())
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_2_3.UpdateAsync())
+            A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
             A.CallTo(() => status.CompleteAsync(1))
@@ -167,17 +168,17 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(status, path, log);
 
-            A.CallTo(() => migrator_1_2.UpdateAsync()).Throws(new ArgumentException());
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._)).Throws(new ArgumentException());
 
             await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
 
-            A.CallTo(() => migrator_0_1.UpdateAsync())
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync())
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_2_3.UpdateAsync())
+            A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             A.CallTo(() => status.CompleteAsync(1))
@@ -201,7 +202,7 @@ namespace Squidex.Infrastructure.Migrations
 
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => migrator_0_1.UpdateAsync())
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
                 .Throws(ex);
 
             var sut = new Migrator(status, path, log);
@@ -211,7 +212,7 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => log.Log(SemanticLogLevel.Fatal, ex, A<LogFormatter>._!))
                 .MustHaveHappened();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync())
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -225,10 +226,10 @@ namespace Squidex.Infrastructure.Migrations
 
             await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(() => sut.MigrateAsync())));
 
-            A.CallTo(() => migrator_0_1.UpdateAsync())
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => migrator_1_2.UpdateAsync())
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 

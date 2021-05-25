@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure.Migrations;
@@ -21,7 +22,7 @@ namespace Migrations.Migrations
             this.store = store;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(CancellationToken ct)
         {
             return store.ClearSnapshotsAsync();
         }

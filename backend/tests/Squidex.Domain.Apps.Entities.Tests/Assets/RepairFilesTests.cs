@@ -24,11 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly RepairFiles sut;
+        private readonly RebuildFiles sut;
 
         public RepairFilesTests()
         {
-            sut = new RepairFiles(assetFileStore, eventStore, eventDataFormatter);
+            sut = new RebuildFiles(assetFileStore, eventStore, eventDataFormatter);
         }
 
         [Fact]

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Commands;
@@ -24,9 +25,9 @@ namespace Migrations.Migrations
             this.rebuildOptions = rebuildOptions.Value;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(CancellationToken ct)
         {
-            return rebuilder.RebuildAppsAsync(rebuildOptions.BatchSize);
+            return rebuilder.RebuildAppsAsync(rebuildOptions.BatchSize, ct);
         }
     }
 }

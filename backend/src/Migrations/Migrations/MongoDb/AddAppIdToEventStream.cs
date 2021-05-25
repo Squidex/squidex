@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
@@ -26,7 +27,7 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 20;
@@ -122,7 +123,7 @@ namespace Migrations.Migrations.MongoDb
                 PropagateCompletion = true
             });
 
-            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync);
+            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync, ct);
 
             batchBlock.Complete();
 

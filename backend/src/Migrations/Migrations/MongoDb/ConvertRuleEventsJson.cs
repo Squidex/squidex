@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -21,9 +22,9 @@ namespace Migrations.Migrations.MongoDb
             collection = database.GetCollection<BsonDocument>("RuleEvents");
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(CancellationToken ct)
         {
-            foreach (var document in collection.Find(new BsonDocument()).ToEnumerable())
+            foreach (var document in collection.Find(new BsonDocument()).ToEnumerable(ct))
             {
                 try
                 {
@@ -31,7 +32,7 @@ namespace Migrations.Migrations.MongoDb
 
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].ToString());
 
-                    await collection.ReplaceOneAsync(filter, document);
+                    await collection.ReplaceOneAsync(filter, document, cancellationToken: ct);
                 }
                 catch
                 {
