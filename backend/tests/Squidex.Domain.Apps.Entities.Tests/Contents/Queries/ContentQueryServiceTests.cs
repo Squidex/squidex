@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -113,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(DomainId.NewGuid());
 
-            A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, A<SearchScope>._))
+            A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
                 .Returns(CreateContent(DomainId.NewGuid()));
 
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindAsync(requestContext, schemaId.Name, content.Id));
@@ -126,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(DomainId.NewGuid());
 
-            A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, A<SearchScope>._))
+            A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
                 .Returns<IContentEntity?>(null);
 
             Assert.Null(await sut.FindAsync(requestContext, schemaId.Name, content.Id));
@@ -143,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent(DomainId.NewGuid());
 
-            A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, scope))
+            A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, content.Id, scope, A<CancellationToken>._))
                 .Returns(content);
 
             var result = await sut.FindAsync(requestContext, schemaId.Name, content.Id);
@@ -171,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var requestContext = CreateContext(allowSchema: false);
 
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(requestContext, schemaId.Name, Q.Empty));
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, default));
         }
 
         [Theory]
@@ -188,10 +189,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var q = Q.Empty.WithReference(DomainId.NewGuid());
 
-            A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema, q, scope))
+            A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema, q, scope, A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(5, content1, content2));
 
-            var result = await sut.QueryAsync(requestContext, schemaId.Name, q);
+            var result = await sut.QueryAsync(requestContext, schemaId.Name, q, default);
 
             Assert.Equal(5, result.Total);
 
@@ -215,10 +216,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var q = Q.Empty.WithIds(ids);
 
             A.CallTo(() => contentRepository.QueryAsync(requestContext.App,
-                    A<List<ISchemaEntity>>.That.Matches(x => x.Count == 1), q, scope))
+                    A<List<ISchemaEntity>>.That.Matches(x => x.Count == 1), q, scope, A<CancellationToken>._))
                 .Returns(ResultList.Create(5, contents));
 
-            var result = await sut.QueryAsync(requestContext, q);
+            var result = await sut.QueryAsync(requestContext, q, default);
 
             Assert.Equal(5, result.Total);
 
@@ -238,10 +239,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var q = Q.Empty.WithIds(ids);
 
             A.CallTo(() => contentRepository.QueryAsync(requestContext.App,
-                    A<List<ISchemaEntity>>.That.Matches(x => x.Count == 0), q, SearchScope.All))
+                    A<List<ISchemaEntity>>.That.Matches(x => x.Count == 0), q, SearchScope.All, A<CancellationToken>._))
                 .Returns(ResultList.Create(0, ids.Select(CreateContent)));
 
-            var result = await sut.QueryAsync(requestContext, q);
+            var result = await sut.QueryAsync(requestContext, q, default);
 
             Assert.Empty(result);
         }
@@ -251,10 +252,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var requestContext = CreateContext(permissionId: Permissions.AppContentsReadOwn);
 
-            await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty);
+            await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, default);
 
             A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema,
-                    A<Q>.That.Matches(x => Equals(x.CreatedBy, requestContext.User.Token())), SearchScope.Published))
+                    A<Q>.That.Matches(x => Equals(x.CreatedBy, requestContext.User.Token())), SearchScope.Published, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -263,16 +264,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var requestContext = CreateContext(permissionId: Permissions.AppContentsRead);
 
-            await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty);
+            await sut.QueryAsync(requestContext, schemaId.Name, Q.Empty, default);
 
             A.CallTo(() => contentRepository.QueryAsync(requestContext.App, schema,
-                    A<Q>.That.Matches(x => x.CreatedBy == null), SearchScope.Published))
+                    A<Q>.That.Matches(x => x.CreatedBy == null), SearchScope.Published, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
         private void SetupEnricher()
         {
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>._, A<Context>._))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>._, A<Context>._, A<CancellationToken>._))
                 .ReturnsLazily(x =>
                 {
                     var input = x.GetArgument<IEnumerable<IContentEntity>>(0)!;

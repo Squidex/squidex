@@ -29,7 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.GeneratePublicUrl(fileName);
         }
 
-        public async Task<long> GetFileSizeAsync(DomainId appId, DomainId id, long fileVersion, CancellationToken ct = default)
+        public async Task<long> GetFileSizeAsync(DomainId appId, DomainId id, long fileVersion,
+            CancellationToken ct = default)
         {
             try
             {
@@ -45,7 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public async Task DownloadAsync(DomainId appId, DomainId id, long fileVersion, Stream stream, BytesRange range = default, CancellationToken ct = default)
+        public async Task DownloadAsync(DomainId appId, DomainId id, long fileVersion, Stream stream, BytesRange range = default,
+            CancellationToken ct = default)
         {
             try
             {
@@ -61,19 +63,22 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public Task UploadAsync(DomainId appId, DomainId id, long fileVersion, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(DomainId appId, DomainId id, long fileVersion, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(appId, id, fileVersion);
 
             return assetStore.UploadAsync(fileName, stream, true, ct);
         }
 
-        public Task UploadAsync(string tempFile, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string tempFile, Stream stream,
+            CancellationToken ct = default)
         {
             return assetStore.UploadAsync(tempFile, stream, false, ct);
         }
 
-        public Task CopyAsync(string tempFile, DomainId appId, DomainId id, long fileVersion, CancellationToken ct = default)
+        public Task CopyAsync(string tempFile, DomainId appId, DomainId id, long fileVersion,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(appId, id, fileVersion);
 

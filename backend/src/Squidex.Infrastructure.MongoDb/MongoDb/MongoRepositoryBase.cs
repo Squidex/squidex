@@ -84,7 +84,8 @@ namespace Squidex.Infrastructure.MongoDb
             return string.Format(CultureInfo.InvariantCulture, CollectionFormat, typeof(TEntity).Name);
         }
 
-        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection, CancellationToken ct = default)
+        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection,
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }

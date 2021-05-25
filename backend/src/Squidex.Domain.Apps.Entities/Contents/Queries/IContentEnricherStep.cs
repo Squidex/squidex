@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -16,9 +17,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
     public interface IContentEnricherStep
     {
-        Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas);
+        Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas, CancellationToken ct);
 
-        Task EnrichAsync(Context context)
+        Task EnrichAsync(Context context, CancellationToken ct)
         {
             return Task.CompletedTask;
         }

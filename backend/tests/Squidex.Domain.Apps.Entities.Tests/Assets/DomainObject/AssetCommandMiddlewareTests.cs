@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             A.CallTo(() => contextProvider.Context)
                 .Returns(requestContext);
 
-            A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._))
+            A.CallTo(() => assetQuery.FindByHashAsync(A<Context>._, A<string>._, A<string>._, A<long>._, A<CancellationToken>._))
                 .Returns(Task.FromResult<IEnrichedAssetEntity?>(null));
 
             sut = new AssetCommandMiddleware(grainFactory,
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             await HandleAsync(new AnnotateAsset(), 12);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 await HandleAsync(new AnnotateAsset(),
                     result);
 
-            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext))
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnrichedAssetEntity>._, requestContext, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var enriched = new AssetEntity();
 
-            A.CallTo(() => assetEnricher.EnrichAsync(result, requestContext))
+            A.CallTo(() => assetEnricher.EnrichAsync(result, requestContext, A<CancellationToken>._))
                 .Returns(enriched);
 
             var context =
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 FileSize = fileSize
             };
 
-            A.CallTo(() => assetQuery.FindByHashAsync(requestContext, A<string>._, fileName, fileSize))
+            A.CallTo(() => assetQuery.FindByHashAsync(requestContext, A<string>._, fileName, fileSize, A<CancellationToken>._))
                 .Returns(duplicate);
         }
 

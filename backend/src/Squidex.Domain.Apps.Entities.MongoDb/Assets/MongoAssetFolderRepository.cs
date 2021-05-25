@@ -30,7 +30,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return "States_AssetFolders2";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetFolderEntity> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetFolderEntity> collection,
+            CancellationToken ct = default)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
@@ -42,7 +43,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }, ct);
         }
 
-        public async Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId parentId)
+        public async Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId parentId,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>("QueryAsyncByQuery"))
             {
@@ -50,13 +52,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 var assetFolderEntities =
                     await Collection.Find(filter).SortBy(x => x.FolderName)
-                        .ToListAsync();
+                        .ToListAsync(ct = default);
 
                 return ResultList.Create<IAssetFolderEntity>(assetFolderEntities.Count, assetFolderEntities);
             }
         }
 
-        public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId)
+        public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -64,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 var assetFolderEntities =
                     await Collection.Find(filter).Only(x => x.Id)
-                        .ToListAsync();
+                        .ToListAsync(ct = default);
 
                 var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
 
@@ -72,7 +75,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id)
+        public async Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
@@ -80,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 var assetFolderEntity =
                     await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct = default);
 
                 return assetFolderEntity;
             }

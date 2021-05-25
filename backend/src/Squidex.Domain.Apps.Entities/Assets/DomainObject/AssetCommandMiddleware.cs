@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 if (payload is not IEnrichedAssetEntity)
                 {
-                    payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
+                    payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context, default);
                 }
             }
 

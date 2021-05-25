@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
                 .Returns("schemaA1-url");
 
-            var result = await sut.SearchAsync("schema", ctx);
+            var result = await sut.SearchAsync("schema", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.SchemaUI(appId, schema1.NamedId()))
                 .Returns("schemaA1-url");
 
-            var result = await sut.SearchAsync("schema", ctx);
+            var result = await sut.SearchAsync("schema", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.ContentsUI(appId, schema2.NamedId()))
                 .Returns("schemaA2-contents-url");
 
-            var result = await sut.SearchAsync("schemaA", ctx);
+            var result = await sut.SearchAsync("schemaA", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             A.CallTo(() => urlGenerator.ContentUI(appId, schema1.NamedId(), schema1.Id))
                 .Returns("schemaA1-content-url");
 
-            var result = await sut.SearchAsync("schemaA", ctx);
+            var result = await sut.SearchAsync("schemaA", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,10 +63,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 AppId = appId
             };
 
-            A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId1, EtagVersion.Any))
+            A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId1, EtagVersion.Any, A<CancellationToken>._))
                 .Returns(asset1);
 
-            A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId2, EtagVersion.Any))
+            A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId2, EtagVersion.Any, A<CancellationToken>._))
                 .Returns(asset2);
 
             var vars = new TemplateVars

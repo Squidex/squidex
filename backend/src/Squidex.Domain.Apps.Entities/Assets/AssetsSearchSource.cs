@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -30,7 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<SearchResults> SearchAsync(string query, Context context)
+        public async Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 
@@ -40,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 var clrQuery = new ClrQuery { Filter = filter, Take = 5 };
 
-                var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithQuery(clrQuery));
+                var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithQuery(clrQuery), ct);
 
                 if (assets.Count > 0)
                 {

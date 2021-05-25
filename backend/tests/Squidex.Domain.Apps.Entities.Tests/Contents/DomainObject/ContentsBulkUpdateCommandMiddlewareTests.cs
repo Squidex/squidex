@@ -7,6 +7,7 @@
 
 using System;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -88,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         x.ShouldSkipCleanup() &&
                         x.ShouldSkipContentEnrichment() &&
                         x.ShouldSkipTotal()),
-                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, CreateContent(id), CreateContent(id)));
 
             var command = BulkCommand(BulkUpdateContentType.ChangeStatus, query);
@@ -114,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         x.ShouldSkipCleanup() &&
                         x.ShouldSkipContentEnrichment() &&
                         x.ShouldSkipTotal()),
-                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, CreateContent(id)));
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
@@ -144,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         x.ShouldSkipCleanup() &&
                         x.ShouldSkipContentEnrichment() &&
                         x.ShouldSkipTotal()),
-                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query)))
+                    schemaId.Name, A<Q>.That.Matches(x => x.JsonQuery == query), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2,
                     CreateContent(id1),
                     CreateContent(id2)));

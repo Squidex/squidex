@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -36,24 +37,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.contentQuery = contentQuery;
         }
 
-        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context)
+        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context,
+            CancellationToken ct)
         {
             Guard.NotNull(content, nameof(content));
 
-            var enriched = await EnrichInternalAsync(Enumerable.Repeat(content, 1), cloneData, context);
+            var enriched = await EnrichInternalAsync(Enumerable.Repeat(content, 1), cloneData, context, ct);
 
             return enriched[0];
         }
 
-        public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
+        public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context,
+            CancellationToken ct)
         {
             Guard.NotNull(contents, nameof(contents));
             Guard.NotNull(context, nameof(context));
 
-            return EnrichInternalAsync(contents, false, context);
+            return EnrichInternalAsync(contents, false, context, ct);
         }
 
-        private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context)
+        private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<ContentEnricher>())
             {
@@ -63,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 {
                     foreach (var step in steps)
                     {
-                        await step.EnrichAsync(context);
+                        await step.EnrichAsync(context, ct);
                     }
                 }
 
@@ -92,9 +96,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                         foreach (var step in steps)
                         {
+                            ct.ThrowIfCancellationRequested();
+
                             using (Profiler.TraceMethod(step.ToString()!))
                             {
-                                await step.EnrichAsync(context, results, GetSchema);
+                                await step.EnrichAsync(context, results, GetSchema, ct);
                             }
                         }
                     }

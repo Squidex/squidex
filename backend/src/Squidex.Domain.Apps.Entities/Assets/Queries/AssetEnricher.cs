@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
@@ -34,17 +35,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.requestCache = requestCache;
         }
 
-        public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context)
+        public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context,
+            CancellationToken ct)
         {
             Guard.NotNull(asset, nameof(asset));
             Guard.NotNull(context, nameof(context));
 
-            var enriched = await EnrichAsync(Enumerable.Repeat(asset, 1), context);
+            var enriched = await EnrichAsync(Enumerable.Repeat(asset, 1), context, ct);
 
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets, Context context)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets, Context context,
+            CancellationToken ct)
         {
             Guard.NotNull(assets, nameof(assets));
             Guard.NotNull(context, nameof(context));
@@ -60,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 if (!context.ShouldSkipAssetEnrichment())
                 {
-                    await EnrichTagsAsync(results);
+                    await EnrichTagsAsync(results, ct);
 
                     EnrichWithMetadataText(results);
                 }
@@ -104,10 +107,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task EnrichTagsAsync(List<AssetEntity> assets)
+        private async Task EnrichTagsAsync(List<AssetEntity> assets,
+            CancellationToken ct)
         {
             foreach (var group in assets.GroupBy(x => x.AppId.Id))
             {
+                ct.ThrowIfCancellationRequested();
+
                 var tagsById = await CalculateTags(group);
 
                 foreach (var asset in group)

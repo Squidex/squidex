@@ -74,7 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return requestLogStore.LogAsync(storedRequest);
         }
 
-        public async Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream, CancellationToken ct = default)
+        public async Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream,
+            CancellationToken ct = default)
         {
             Guard.NotNull(appId, nameof(appId));
 

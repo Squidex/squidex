@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
@@ -24,7 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             this.scriptEngine = scriptEngine;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             if (ShouldEnrich(context))
             {
@@ -36,13 +38,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                     if (!string.IsNullOrWhiteSpace(script))
                     {
-                        await Task.WhenAll(group.Select(x => TransformAsync(context, script, x)));
+                        await Task.WhenAll(group.Select(x => TransformAsync(context, script, x, ct)));
                     }
                 }
             }
         }
 
-        private async Task TransformAsync(Context context, string script, ContentEntity content)
+        private async Task TransformAsync(Context context, string script, ContentEntity content,
+            CancellationToken ct)
         {
             var vars = new ScriptVars
             {
@@ -58,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 AsContext = true
             };
 
-            content.Data = await scriptEngine.TransformAsync(vars, script, options);
+            content.Data = await scriptEngine.TransformAsync(vars, script, options, ct);
         }
 
         private static bool ShouldEnrich(Context context)

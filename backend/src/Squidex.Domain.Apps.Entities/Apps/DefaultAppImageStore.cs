@@ -24,14 +24,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.assetStore = assetStore;
         }
 
-        public Task DownloadAsync(DomainId appId, Stream stream, CancellationToken ct = default)
+        public Task DownloadAsync(DomainId appId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(appId);
 
             return assetStore.DownloadAsync(fileName, stream, default, ct);
         }
 
-        public Task UploadAsync(DomainId appId, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(DomainId appId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(appId);
 

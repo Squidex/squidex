@@ -61,7 +61,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return name;
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection,
+            CancellationToken ct)
         {
             if (useWildcardIndex)
             {
@@ -82,89 +83,103 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await queryScheduled.PrepareAsync(collection, skipIndex, ct);
         }
 
-        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds, CancellationToken ct)
+        public Task ResetScheduledAsync(DomainId documentId,
+            CancellationToken ct)
+        {
+            return Collection.UpdateOneAsync(x => x.DocumentId == documentId, Update.Unset(x => x.ScheduleJob).Unset(x => x.ScheduledAt), cancellationToken: ct);
+        }
+
+        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
+            CancellationToken ct)
         {
             return queryAsStream.StreamAll(appId, schemaIds, ct);
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
-                    return await queryByIds.QueryAsync(app.Id, schemas, q);
+                    return await queryByIds.QueryAsync(app.Id, schemas, q, ct);
                 }
 
                 if (q.Referencing != default)
                 {
-                    return await queryReferences.QueryAsync(app.Id, schemas, q);
+                    return await queryReferences.QueryAsync(app.Id, schemas, q, ct);
                 }
 
                 if (q.Reference != default)
                 {
-                    return await queryByQuery.QueryAsync(app, schemas, q);
+                    return await queryByQuery.QueryAsync(app, schemas, q, ct);
                 }
 
                 return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
-                    return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q);
+                    return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
                 }
 
                 if (q.Referencing == default)
                 {
-                    return await queryByQuery.QueryAsync(app, schema, q);
+                    return await queryByQuery.QueryAsync(app, schema, q, ct);
                 }
 
                 return ResultList.CreateFrom<IContentEntity>(0);
             }
         }
 
-        public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, DomainId id)
+        public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, DomainId id,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await queryBdId.QueryAsync(schema, id);
+                return await queryBdId.QueryAsync(schema, id, ct);
             }
         }
 
-        public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
+        public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                await queryScheduled.QueryAsync(now, callback);
+                await queryScheduled.QueryAsync(now, callback, ct);
             }
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await queryByIds.QueryIdsAsync(appId, ids);
+                return await queryByIds.QueryIdsAsync(appId, ids, ct);
             }
         }
 
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await queryByQuery.QueryIdsAsync(appId, schemaId, filterNode);
+                return await queryByQuery.QueryIdsAsync(appId, schemaId, filterNode, ct);
             }
         }
 
-        public async Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId)
+        public async Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await queryReferrers.CheckExistsAsync(appId, contentId);
+                return await queryReferrers.CheckExistsAsync(appId, contentId, ct);
             }
         }
 
@@ -173,11 +188,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             var result = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.Version).FirstOrDefaultAsync();
 
             return result?["vs"].AsInt64 ?? EtagVersion.Empty;
-        }
-
-        public Task ResetScheduledAsync(DomainId documentId)
-        {
-            return Collection.UpdateOneAsync(x => x.DocumentId == documentId, Update.Unset(x => x.ScheduleJob).Unset(x => x.ScheduledAt));
         }
 
         public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity entity)

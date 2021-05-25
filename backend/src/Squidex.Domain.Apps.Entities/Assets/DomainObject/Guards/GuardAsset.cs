@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             if (command.CheckReferrers)
             {
-                var hasReferrer = await contentRepository.HasReferrersAsync(asset.AppId.Id, asset.Id, SearchScope.All);
+                var hasReferrer = await contentRepository.HasReferrersAsync(asset.AppId.Id, asset.Id, SearchScope.All, default);
 
                 if (hasReferrer)
                 {

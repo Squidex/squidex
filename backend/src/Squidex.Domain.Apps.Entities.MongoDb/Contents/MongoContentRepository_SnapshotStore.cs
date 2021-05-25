@@ -21,7 +21,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>
     {
-        Task ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(Func<ContentDomainObject.State, long, Task> callback, CancellationToken ct)
+        Task ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(Func<ContentDomainObject.State, long, Task> callback,
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }

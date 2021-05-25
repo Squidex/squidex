@@ -98,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] DomainId? parentId, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context, parentId, CreateQuery(ids, q));
+            var assets = await assetQuery.QueryAsync(Context, parentId, CreateQuery(ids, q), HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -127,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssetsPost(string app, [FromBody] QueryDto query)
         {
-            var assets = await assetQuery.QueryAsync(Context, query?.ParentId, query?.ToQuery() ?? Q.Empty);
+            var assets = await assetQuery.QueryAsync(Context, query?.ParentId, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -153,7 +153,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, DomainId id)
         {
-            var asset = await assetQuery.FindAsync(Context, id);
+            var asset = await assetQuery.FindAsync(Context, id, ct: HttpContext.RequestAborted);
 
             if (asset == null)
             {

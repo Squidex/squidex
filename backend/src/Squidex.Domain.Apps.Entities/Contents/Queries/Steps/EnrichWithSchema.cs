@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 
@@ -14,10 +15,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
     public sealed class EnrichWithSchema : IContentEnricherStep
     {
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
             {
+                ct.ThrowIfCancellationRequested();
+
                 var schema = await schemas(group.Key);
 
                 var schemaName = schema.SchemaDef.Name;

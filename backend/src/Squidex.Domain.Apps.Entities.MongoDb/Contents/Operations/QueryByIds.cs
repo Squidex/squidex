@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
@@ -20,7 +21,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryByIds : OperationBase
     {
-        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids)
+        public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
             if (ids == null || ids.Count == 0)
             {
@@ -29,12 +31,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var filter = CreateFilter(appId, null, ids);
 
-            var contentItems = await Collection.FindStatusAsync(filter);
+            var contentItems = await Collection.FindStatusAsync(filter, ct);
 
             return contentItems.Select(x => (x.IndexedSchemaId, x.Id, x.Status)).ToList();
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q)
+        public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q,
+            CancellationToken ct)
         {
             Guard.NotNull(q, nameof(q));
 
@@ -54,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
             else if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
             {
-                contentTotal = await Collection.Find(filter).CountDocumentsAsync();
+                contentTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
             }
 
             return ResultList.Create(contentTotal, contentEntities);

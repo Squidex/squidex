@@ -54,8 +54,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         public async Task<IActionResult> GetAssetFolders(string app, [FromQuery] DomainId parentId)
         {
             var (folders, path) = await AsyncHelper.WhenAll(
-                assetQuery.QueryAssetFoldersAsync(Context, parentId),
-                assetQuery.FindAssetFolderAsync(Context.App.Id, parentId));
+                assetQuery.QueryAssetFoldersAsync(Context, parentId, HttpContext.RequestAborted),
+                assetQuery.FindAssetFolderAsync(Context.App.Id, parentId, HttpContext.RequestAborted));
 
             var response = Deferred.Response(() =>
             {

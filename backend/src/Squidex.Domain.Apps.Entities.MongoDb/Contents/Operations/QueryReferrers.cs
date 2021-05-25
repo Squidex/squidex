@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryReferrers : OperationBase
     {
-        protected override Task PrepareAsync(CancellationToken ct = default)
+        protected override Task PrepareAsync(CancellationToken ct)
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
@@ -26,7 +26,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public async Task<bool> CheckExistsAsync(DomainId appId, DomainId contentId)
+        public async Task<bool> CheckExistsAsync(DomainId appId, DomainId contentId,
+            CancellationToken ct)
         {
             var filter =
                 Filter.And(
@@ -37,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var hasReferrerAsync =
                 await Collection.Find(filter).Only(x => x.Id)
-                    .AnyAsync();
+                    .AnyAsync(ct);
 
             return hasReferrerAsync;
         }

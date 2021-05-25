@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryScheduled : OperationBase
     {
-        protected override Task PrepareAsync(CancellationToken ct = default)
+        protected override Task PrepareAsync(CancellationToken ct)
         {
             var index =
                 new CreateIndexModel<MongoContentEntity>(Index
@@ -28,7 +28,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
         }
 
-        public Task QueryAsync(Instant now, Func<IContentEntity, Task> callback)
+        public Task QueryAsync(Instant now, Func<IContentEntity, Task> callback,
+            CancellationToken ct)
         {
             Guard.NotNull(callback, nameof(callback));
 
@@ -36,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 .ForEachAsync(c =>
                 {
                     callback(c);
-                });
+                }, ct);
         }
     }
 }

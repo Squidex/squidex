@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => requestCache.AddHeader(A<string>._))
                 .Invokes(new Action<string>(header => headers.Add(header)));
 
-            await sut.EnrichAsync(requestContext);
+            await sut.EnrichAsync(requestContext, default);
 
             Assert.Equal(new List<string>
             {
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = CreateContent();
 
-            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
+            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider, default);
 
             A.CallTo(() => requestCache.AddDependency(content.UniqueId, content.Version))
                 .MustHaveHappened();

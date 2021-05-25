@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
@@ -43,7 +44,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id)
+        public async Task<IReadOnlyList<IAssetFolderEntity>> FindAssetFolderAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<AssetQueryService>())
             {
@@ -51,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 while (id != DomainId.Empty)
                 {
-                    var folder = await assetFolderRepository.FindAssetFolderAsync(appId, id);
+                    var folder = await assetFolderRepository.FindAssetFolderAsync(appId, id, ct);
 
                     if (folder == null || result.Any(x => x.Id == folder.Id))
                     {
@@ -68,78 +70,84 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId)
+        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(DomainId appId, DomainId parentId,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var assetFolders = await assetFolderRepository.QueryAsync(appId, parentId);
+                var assetFolders = await assetFolderRepository.QueryAsync(appId, parentId, ct);
 
                 return assetFolders;
             }
         }
 
-        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId)
+        public async Task<IResultList<IAssetFolderEntity>> QueryAssetFoldersAsync(Context context, DomainId parentId,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var assetFolders = await assetFolderRepository.QueryAsync(context.App.Id, parentId);
+                var assetFolders = await assetFolderRepository.QueryAsync(context.App.Id, parentId, ct);
 
                 return assetFolders;
             }
         }
 
-        public async Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize)
+        public async Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var asset = await assetRepository.FindAssetByHashAsync(context.App.Id, hash, fileName, fileSize);
+                var asset = await assetRepository.FindAssetByHashAsync(context.App.Id, hash, fileName, fileSize, ct);
 
                 if (asset == null)
                 {
                     return null;
                 }
 
-                return await TransformAsync(context, asset);
+                return await TransformAsync(context, asset, ct);
             }
         }
 
-        public async Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug)
+        public async Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var asset = await assetRepository.FindAssetBySlugAsync(context.App.Id, slug);
+                var asset = await assetRepository.FindAssetBySlugAsync(context.App.Id, slug, ct);
 
                 if (asset == null)
                 {
                     return null;
                 }
 
-                return await TransformAsync(context, asset);
+                return await TransformAsync(context, asset, ct);
             }
         }
 
-        public async Task<IEnrichedAssetEntity?> FindGlobalAsync(Context context, DomainId id)
+        public async Task<IEnrichedAssetEntity?> FindGlobalAsync(Context context, DomainId id,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var asset = await assetRepository.FindAssetAsync(id);
+                var asset = await assetRepository.FindAssetAsync(id, ct);
 
                 if (asset == null)
                 {
                     return null;
                 }
 
-                return await TransformAsync(context, asset);
+                return await TransformAsync(context, asset, ct);
             }
         }
 
-        public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, long version = EtagVersion.Any)
+        public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, long version = EtagVersion.Any,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -153,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 }
                 else
                 {
-                    asset = await assetRepository.FindAssetAsync(context.App.Id, id);
+                    asset = await assetRepository.FindAssetAsync(context.App.Id, id, ct);
                 }
 
                 if (asset == null)
@@ -161,11 +169,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     return null;
                 }
 
-                return await TransformAsync(context, asset);
+                return await TransformAsync(context, asset, ct);
             }
         }
 
-        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q)
+        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -178,36 +187,39 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 q = await queryParser.ParseAsync(context, q);
 
-                var assets = await assetRepository.QueryAsync(context.App.Id, parentId, q);
+                var assets = await assetRepository.QueryAsync(context.App.Id, parentId, q, ct);
 
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
                     assets = assets.SortSet(x => x.Id, q.Ids);
                 }
 
-                return await TransformAsync(context, assets);
+                return await TransformAsync(context, assets, ct);
             }
         }
 
-        private async Task<IResultList<IEnrichedAssetEntity>> TransformAsync(Context context, IResultList<IAssetEntity> assets)
+        private async Task<IResultList<IEnrichedAssetEntity>> TransformAsync(Context context, IResultList<IAssetEntity> assets,
+            CancellationToken ct)
         {
-            var transformed = await TransformCoreAsync(context, assets);
+            var transformed = await TransformCoreAsync(context, assets, ct);
 
             return ResultList.Create(assets.Total, transformed);
         }
 
-        private async Task<IEnrichedAssetEntity> TransformAsync(Context context, IAssetEntity asset)
+        private async Task<IEnrichedAssetEntity> TransformAsync(Context context, IAssetEntity asset,
+            CancellationToken ct)
         {
-            var transformed = await TransformCoreAsync(context, Enumerable.Repeat(asset, 1));
+            var transformed = await TransformCoreAsync(context, Enumerable.Repeat(asset, 1), ct);
 
             return transformed[0];
         }
 
-        private async Task<IReadOnlyList<IEnrichedAssetEntity>> TransformCoreAsync(Context context, IEnumerable<IAssetEntity> assets)
+        private async Task<IReadOnlyList<IEnrichedAssetEntity>> TransformCoreAsync(Context context, IEnumerable<IAssetEntity> assets,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                return await assetEnricher.EnrichAsync(assets, context);
+                return await assetEnricher.EnrichAsync(assets, context, ct);
             }
         }
     }

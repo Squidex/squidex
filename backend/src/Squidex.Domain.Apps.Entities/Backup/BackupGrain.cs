@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -119,12 +119,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Process(job, actor, currentJobToken.Token);
         }
 
-        private void Process(BackupJob job, RefToken actor, CancellationToken ct)
+        private void Process(BackupJob job, RefToken actor,
+            CancellationToken ct)
         {
             ProcessAsync(job, actor, ct).Forget();
         }
 
-        private async Task ProcessAsync(BackupJob job, RefToken actor, CancellationToken ct)
+        private async Task ProcessAsync(BackupJob job, RefToken actor,
+            CancellationToken ct)
         {
             var handlers = CreateHandlers();
 

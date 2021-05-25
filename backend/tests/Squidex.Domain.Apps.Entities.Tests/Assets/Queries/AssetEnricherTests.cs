@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var source = new AssetEntity { AppId = appId };
 
-            var result = await sut.EnrichAsync(source, requestContext);
+            var result = await sut.EnrichAsync(source, requestContext, default);
 
             Assert.Empty(result.TagNames);
         }
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var source = new AssetEntity { AppId = appId, Id = DomainId.NewGuid(), Version = 13 };
 
-            var result = await sut.EnrichAsync(source, requestContext);
+            var result = await sut.EnrichAsync(source, requestContext, default);
 
             A.CallTo(() => requestCache.AddDependency(result.UniqueId, result.Version))
                 .MustHaveHappened();
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     ["id2"] = "name2"
                 });
 
-            var result = await sut.EnrichAsync(source, requestContext);
+            var result = await sut.EnrichAsync(source, requestContext, default);
 
             Assert.Equal(new HashSet<string> { "name1", "name2" }, result.TagNames);
         }
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 AppId = appId
             };
 
-            var result = await sut.EnrichAsync(source, requestContext.Clone(b => b.WithoutAssetEnrichment()));
+            var result = await sut.EnrichAsync(source, requestContext.Clone(b => b.WithoutAssetEnrichment()), default);
 
             Assert.Null(result.TagNames);
         }
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => assetMetadataSource2.Format(A<IAssetEntity>._))
                 .Returns(new[] { "metadata2", "metadata3" });
 
-            var result = await sut.EnrichAsync(source, requestContext);
+            var result = await sut.EnrichAsync(source, requestContext, default);
 
             Assert.Equal("metadata1, metadata2, metadata3, 2 kB", result.MetadataText);
         }
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     ["id3"] = "name3"
                 });
 
-            var result = await sut.EnrichAsync(new[] { source1, source2 }, requestContext);
+            var result = await sut.EnrichAsync(new[] { source1, source2 }, requestContext, default);
 
             Assert.Equal(new HashSet<string> { "name1", "name2" }, result[0].TagNames);
             Assert.Equal(new HashSet<string> { "name2", "name3" }, result[1].TagNames);

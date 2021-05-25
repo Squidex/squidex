@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -49,14 +50,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             excludedHiddenValue = FieldConverters.ForValues(ValueConverters.ExcludeHidden);
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
-            var referenceCleaner = await CleanReferencesAsync(context, contents, schemas);
+            var referenceCleaner = await CleanReferencesAsync(context, contents, schemas, ct);
 
             var converters = GenerateConverters(context, referenceCleaner).ToArray();
 
             foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
             {
+                ct.ThrowIfCancellationRequested();
+
                 var schema = await schemas(group.Key);
 
                 foreach (var content in group)
@@ -66,7 +70,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
         }
 
-        private async Task<ValueConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        private async Task<ValueConverter?> CleanReferencesAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             if (!context.ShouldSkipCleanup())
             {
@@ -85,8 +90,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 if (ids.Count > 0)
                 {
                     var (assets, refContents) = await AsyncHelper.WhenAll(
-                        QueryAssetIdsAsync(context, ids),
-                        QueryContentIdsAsync(context, ids));
+                        QueryAssetIdsAsync(context, ids, ct),
+                        QueryContentIdsAsync(context, ids, ct));
 
                     var foundIds = assets.Union(refContents).ToHashSet();
 
@@ -97,16 +102,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return null;
         }
 
-        private async Task<IEnumerable<DomainId>> QueryContentIdsAsync(Context context, HashSet<DomainId> ids)
+        private async Task<IEnumerable<DomainId>> QueryContentIdsAsync(Context context, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
-            var result = await contentRepository.QueryIdsAsync(context.App.Id, ids, context.Scope());
+            var result = await contentRepository.QueryIdsAsync(context.App.Id, ids, context.Scope(), ct);
 
             return result.Select(x => x.Id);
         }
 
-        private async Task<IEnumerable<DomainId>> QueryAssetIdsAsync(Context context, HashSet<DomainId> ids)
+        private async Task<IEnumerable<DomainId>> QueryAssetIdsAsync(Context context, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
-            var result = await assetRepository.QueryIdsAsync(context.App.Id, ids);
+            var result = await assetRepository.QueryIdsAsync(context.App.Id, ids, ct);
 
             return result;
         }

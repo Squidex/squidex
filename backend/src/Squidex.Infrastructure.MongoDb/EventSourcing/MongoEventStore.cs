@@ -53,7 +53,8 @@ namespace Squidex.Infrastructure.EventSourcing
             return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection,
+            CancellationToken ct)
         {
             await collection.Indexes.CreateManyAsync(new[]
             {

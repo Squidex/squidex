@@ -30,7 +30,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         {
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity> collection,
+            CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {

@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     public sealed class QueryAsStream : OperationBase
     {
-        protected override async Task PrepareAsync(CancellationToken ct = default)
+        protected override async Task PrepareAsync(CancellationToken ct)
         {
             var indexBySchema =
                 new CreateIndexModel<MongoContentEntity>(Index

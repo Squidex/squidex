@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
@@ -41,7 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             this.requestCache = requestCache;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             if (ShouldEnrich(context))
             {
@@ -54,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     AddReferenceIds(ids, schema, group);
                 }
 
-                var references = await GetReferencesAsync(context, ids);
+                var references = await GetReferencesAsync(context, ids, ct);
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
@@ -65,7 +67,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
         }
 
-        private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references, ProvideSchema schemas)
+        private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references,
+            ProvideSchema schemas)
         {
             var formatted = new Dictionary<IContentEntity, JsonObject>();
 
@@ -146,7 +149,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
         }
 
-        private async Task<ILookup<DomainId, IEnrichedContentEntity>> GetReferencesAsync(Context context, HashSet<DomainId> ids)
+        private async Task<ILookup<DomainId, IEnrichedContentEntity>> GetReferencesAsync(Context context, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
             if (ids.Count == 0)
             {
@@ -157,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 .WithoutContentEnrichment(true)
                 .WithoutTotal());
 
-            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids));
+            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids), ct);
 
             return references.ToLookup(x => x.Id);
         }

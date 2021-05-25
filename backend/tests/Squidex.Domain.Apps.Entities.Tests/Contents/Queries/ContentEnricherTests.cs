@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -30,7 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             public ISchemaEntity Schema { get; private set; }
 
-            public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+            public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+                CancellationToken ct)
             {
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
@@ -59,18 +61,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(new[] { step1, step2 }, new Lazy<IContentQueryService>(() => contentQuery));
 
-            await sut.EnrichAsync(source, requestContext);
+            await sut.EnrichAsync(source, requestContext, default);
 
-            A.CallTo(() => step1.EnrichAsync(requestContext))
+            A.CallTo(() => step1.EnrichAsync(requestContext, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => step2.EnrichAsync(requestContext))
+            A.CallTo(() => step2.EnrichAsync(requestContext, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
+            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
+            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -84,18 +86,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(new[] { step1, step2 }, new Lazy<IContentQueryService>(() => contentQuery));
 
-            await sut.EnrichAsync(source, false, requestContext);
+            await sut.EnrichAsync(source, false, requestContext, default);
 
-            A.CallTo(() => step1.EnrichAsync(requestContext))
+            A.CallTo(() => step1.EnrichAsync(requestContext, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => step2.EnrichAsync(requestContext))
+            A.CallTo(() => step2.EnrichAsync(requestContext, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
+            A.CallTo(() => step1.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._))
+            A.CallTo(() => step2.EnrichAsync(requestContext, A<IEnumerable<ContentEntity>>._, A<ProvideSchema>._, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -109,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(new[] { step1, step2 }, new Lazy<IContentQueryService>(() => contentQuery));
 
-            await sut.EnrichAsync(source, false, requestContext);
+            await sut.EnrichAsync(source, false, requestContext, default);
 
             Assert.Same(schema, step1.Schema);
             Assert.Same(schema, step1.Schema);
@@ -125,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), new Lazy<IContentQueryService>(() => contentQuery));
 
-            var result = await sut.EnrichAsync(source, true, requestContext);
+            var result = await sut.EnrichAsync(source, true, requestContext, default);
 
             Assert.NotSame(source.Data, result.Data);
         }
@@ -137,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), new Lazy<IContentQueryService>(() => contentQuery));
 
-            var result = await sut.EnrichAsync(source, false, requestContext);
+            var result = await sut.EnrichAsync(source, false, requestContext, default);
 
             Assert.Same(source.Data, result.Data);
         }

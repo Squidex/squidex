@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
         }
 
-        protected virtual Task PrepareAsync(CancellationToken ct = default)
+        protected virtual Task PrepareAsync(CancellationToken ct)
         {
             return Task.CompletedTask;
         }

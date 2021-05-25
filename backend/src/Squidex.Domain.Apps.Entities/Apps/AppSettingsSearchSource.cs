@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Search;
@@ -26,7 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.urlGenerator = urlGenerator;
         }
 
-        public Task<SearchResults> SearchAsync(string query, Context context)
+        public Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 

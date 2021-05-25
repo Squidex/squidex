@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -62,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             .AddInvariant(JsonValue.Array(assetId1)));
 
             A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1)))
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, asset1));
 
             var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
@@ -100,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             .AddInvariant(JsonValue.Array(assetId1, assetId2)));
 
             A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2)))
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, asset1, asset2));
 
             var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };

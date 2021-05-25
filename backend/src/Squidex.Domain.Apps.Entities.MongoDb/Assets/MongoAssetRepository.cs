@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -39,7 +39,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return "States_Assets2";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
+            CancellationToken ct = default)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
@@ -74,9 +75,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             var find = Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
 
-            using (var cursor = await find.ToCursorAsync(ct))
+            using (var cursor = await find.ToCursorAsync(ct = default))
             {
-                while (await cursor.MoveNextAsync(ct))
+                while (await cursor.MoveNextAsync(ct = default))
                 {
                     foreach (var entity in cursor.Current)
                     {
@@ -86,7 +87,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, Q q)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(DomainId appId, DomainId? parentId, Q q,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {
@@ -100,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             await Collection.Find(filter).SortByDescending(x => x.LastModified)
                                 .QueryLimit(q.Query)
                                 .QuerySkip(q.Query)
-                                .ToListAsync();
+                                .ToListAsync(ct = default);
                         long assetTotal = assetEntities.Count;
 
                         if (q.NoTotal)
@@ -109,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         }
                         else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            assetTotal = await Collection.Find(filter).CountDocumentsAsync();
+                            assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct = default);
                         }
 
                         return ResultList.Create(assetTotal, assetEntities.OfType<IAssetEntity>());
@@ -125,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .QueryLimit(query)
                                 .QuerySkip(query)
                                 .QuerySort(query)
-                                .ToListAsync();
+                                .ToListAsync(ct = default);
                         long assetTotal = assetEntities.Count;
 
                         if (q.NoTotal)
@@ -134,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         }
                         else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            assetTotal = await Collection.Find(filter).CountDocumentsAsync();
+                            assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct = default);
                         }
 
                         return ResultList.Create<IAssetEntity>(assetTotal, assetEntities);
@@ -147,13 +149,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids)
+        public async Task<IReadOnlyList<DomainId>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
             {
                 var assetEntities =
                     await Collection.Find(BuildFilter(appId, ids)).Only(x => x.Id)
-                        .ToListAsync();
+                        .ToListAsync(ct = default);
 
                 var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
 
@@ -161,13 +164,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId)
+        public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntities =
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
-                        .ToListAsync();
+                        .ToListAsync(ct = default);
 
                 var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
 
@@ -175,31 +179,34 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize)
+        public async Task<IAssetEntity?> FindAssetByHashAsync(DomainId appId, string hash, string fileName, long fileSize,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.FileHash == hash && x.FileName == fileName && x.FileSize == fileSize)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct = default);
 
                 return assetEntity;
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug)
+        public async Task<IAssetEntity?> FindAssetBySlugAsync(DomainId appId, string slug,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.Slug == slug)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct = default);
 
                 return assetEntity;
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id)
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -207,19 +214,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 var assetEntity =
                     await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct = default);
 
                 return assetEntity;
             }
         }
 
-        public async Task<IAssetEntity?> FindAssetAsync(DomainId id)
+        public async Task<IAssetEntity?> FindAssetAsync(DomainId id,
+            CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
                     await Collection.Find(x => x.Id == id && !x.IsDeleted)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct = default);
 
                 return assetEntity;
             }

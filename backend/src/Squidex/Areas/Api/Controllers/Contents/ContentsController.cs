@@ -83,7 +83,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
         {
-            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids));
+            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids), HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -112,7 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsIdsQueryDto query)
         {
-            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(query.Ids));
+            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(query.Ids), HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -143,7 +143,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string schema, [FromQuery] string? ids = null, [FromQuery] string? q = null)
         {
-            var contents = await contentQuery.QueryAsync(Context, schema, CreateQuery(ids, q));
+            var contents = await contentQuery.QueryAsync(Context, schema, CreateQuery(ids, q), HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -173,7 +173,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentsPost(string app, string schema, [FromBody] QueryDto query)
         {
-            var contents = await contentQuery.QueryAsync(Context, schema, query?.ToQuery() ?? Q.Empty);
+            var contents = await contentQuery.QueryAsync(Context, schema, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -203,7 +203,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string schema, DomainId id)
         {
-            var content = await contentQuery.FindAsync(Context, schema, id);
+            var content = await contentQuery.FindAsync(Context, schema, id, ct: HttpContext.RequestAborted);
 
             if (content == null)
             {
@@ -263,7 +263,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetReferences(string app, string schema, DomainId id, [FromQuery] string? q = null)
         {
-            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReferencing(id));
+            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReferencing(id), HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -294,7 +294,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetReferencing(string app, string schema, DomainId id, [FromQuery] string? q = null)
         {
-            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReference(id));
+            var contents = await contentQuery.QueryAsync(Context, CreateQuery(null, q).WithReference(id), HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -324,7 +324,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string schema, DomainId id, int version)
         {
-            var content = await contentQuery.FindAsync(Context, schema, id, version);
+            var content = await contentQuery.FindAsync(Context, schema, id, version, HttpContext.RequestAborted);
 
             if (content == null)
             {

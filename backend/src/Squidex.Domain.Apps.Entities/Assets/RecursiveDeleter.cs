@@ -88,14 +88,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 var appId = folderDeleted.AppId;
 
-                var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId);
+                var childAssetFolders = await assetFolderRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
 
                 foreach (var assetFolderId in childAssetFolders)
                 {
                     await PublishAsync(new DeleteAssetFolder { AppId = appId, AssetFolderId = assetFolderId });
                 }
 
-                var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId);
+                var childAssets = await assetRepository.QueryChildIdsAsync(appId.Id, folderDeleted.AssetFolderId, default);
 
                 foreach (var assetId in childAssets)
                 {

@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -155,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ctx = ContextWithPermissions();
 
-            var result = await sut.SearchAsync("query", ctx);
+            var result = await sut.SearchAsync("query", ctx, default);
 
             Assert.Empty(result);
 
@@ -171,11 +172,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope()))
                 .Returns(new List<DomainId>());
 
-            var result = await sut.SearchAsync("query", ctx);
+            var result = await sut.SearchAsync("query", ctx, default);
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -190,13 +191,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~" && x.Filter != null), ctx.Scope()))
                 .Returns(ids);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids)))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1, content));
 
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
                 .Returns("content-url");
 
-            var result = await sut.SearchAsync("query", ctx);
+            var result = await sut.SearchAsync("query", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()

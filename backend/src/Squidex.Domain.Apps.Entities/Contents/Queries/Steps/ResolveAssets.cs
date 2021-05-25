@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
@@ -40,7 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             this.requestCache = requestCache;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             if (ShouldEnrich(context))
             {
@@ -53,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     AddAssetIds(ids, schema, group);
                 }
 
-                var assets = await GetAssetsAsync(context, ids);
+                var assets = await GetAssetsAsync(context, ids, ct);
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
@@ -111,7 +113,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
         }
 
-        private async Task<ILookup<DomainId, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<DomainId> ids)
+        private async Task<ILookup<DomainId, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
             if (ids.Count == 0)
             {
@@ -122,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 .WithoutAssetEnrichment(true)
                 .WithoutTotal());
 
-            var assets = await assetQuery.QueryAsync(queryContext, null, Q.Empty.WithIds(ids));
+            var assets = await assetQuery.QueryAsync(queryContext, null, Q.Empty.WithIds(ids), ct);
 
             return assets.ToLookup(x => x.Id);
         }

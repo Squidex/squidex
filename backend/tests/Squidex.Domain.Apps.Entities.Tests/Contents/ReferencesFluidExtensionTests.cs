@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,10 +63,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 AppId = appId
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, reference1));
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId2)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId2), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, reference2));
 
             var vars = new TemplateVars

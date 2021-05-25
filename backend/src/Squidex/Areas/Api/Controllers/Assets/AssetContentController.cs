@@ -76,11 +76,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
 
-            var asset = await assetQuery.FindAsync(requestContext, DomainId.Create(idOrSlug));
+            var asset = await assetQuery.FindAsync(requestContext, DomainId.Create(idOrSlug), ct: HttpContext.RequestAborted);
 
             if (asset == null)
             {
-                asset = await assetQuery.FindBySlugAsync(requestContext, idOrSlug);
+                asset = await assetQuery.FindBySlugAsync(requestContext, idOrSlug, HttpContext.RequestAborted);
             }
 
             return await DeliverAssetAsync(requestContext, asset, request);
@@ -106,7 +106,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var requestContext = Context.Clone(b => b.WithoutAssetEnrichment());
 
-            var asset = await assetQuery.FindGlobalAsync(requestContext, id);
+            var asset = await assetQuery.FindGlobalAsync(requestContext, id, HttpContext.RequestAborted);
 
             return await DeliverAssetAsync(requestContext, asset, request);
         }
@@ -131,7 +131,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             {
                 if (context.App != null)
                 {
-                    asset = await assetQuery.FindAsync(context, asset.Id, request.Version);
+                    asset = await assetQuery.FindAsync(context, asset.Id, request.Version, HttpContext.RequestAborted);
                 }
                 else
                 {

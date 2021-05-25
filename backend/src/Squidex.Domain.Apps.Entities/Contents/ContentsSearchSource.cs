@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -45,7 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<SearchResults> SearchAsync(string query, Context context)
+        public async Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 
@@ -67,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var appId = context.App.NamedId();
 
-            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids));
+            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids), ct);
 
             foreach (var content in contents)
             {

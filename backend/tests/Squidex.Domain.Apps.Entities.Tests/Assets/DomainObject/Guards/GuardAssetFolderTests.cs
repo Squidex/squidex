@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -27,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var command = new CreateAssetFolder { AppId = appId };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity>());
 
             await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanCreate(command, assetQuery),
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder", ParentId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity>());
 
             await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanCreate(command, assetQuery),
@@ -51,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder", ParentId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { AssetFolder() });
 
             await GuardAssetFolder.CanCreate(command, assetQuery);
@@ -72,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity>
                 {
                     AssetFolder(id),
@@ -88,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity>());
 
             await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery),
@@ -100,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { AssetFolder() });
 
             await GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery);

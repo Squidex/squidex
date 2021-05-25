@@ -55,84 +55,93 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collectionPublished.InitializeAsync(ct);
         }
 
-        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds, CancellationToken ct)
+        public IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
+            CancellationToken ct = default)
         {
             return collectionAll.StreamAll(appId, schemaIds, ct);
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
+            CancellationToken ct = default)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schemas, q);
+                return collectionAll.QueryAsync(app, schemas, q, ct);
             }
             else
             {
-                return collectionPublished.QueryAsync(app, schemas, q);
+                return collectionPublished.QueryAsync(app, schemas, q, ct);
             }
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope)
+        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q, SearchScope scope,
+            CancellationToken ct = default)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryAsync(app, schema, q);
+                return collectionAll.QueryAsync(app, schema, q, ct);
             }
             else
             {
-                return collectionPublished.QueryAsync(app, schema, q);
+                return collectionPublished.QueryAsync(app, schema, q, ct);
             }
         }
 
-        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope)
+        public Task<IContentEntity?> FindContentAsync(IAppEntity app, ISchemaEntity schema, DomainId id, SearchScope scope,
+            CancellationToken ct = default)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.FindContentAsync(schema, id);
+                return collectionAll.FindContentAsync(schema, id, ct);
             }
             else
             {
-                return collectionPublished.FindContentAsync(schema, id);
+                return collectionPublished.FindContentAsync(schema, id, ct);
             }
         }
 
-        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids, SearchScope scope)
+        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids, SearchScope scope,
+            CancellationToken ct = default)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.QueryIdsAsync(appId, ids);
+                return collectionAll.QueryIdsAsync(appId, ids, ct);
             }
             else
             {
-                return collectionPublished.QueryIdsAsync(appId, ids);
+                return collectionPublished.QueryIdsAsync(appId, ids, ct);
             }
         }
 
-        public Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId, SearchScope scope)
+        public Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId, SearchScope scope,
+            CancellationToken ct = default)
         {
             if (scope == SearchScope.All)
             {
-                return collectionAll.HasReferrersAsync(appId, contentId);
+                return collectionAll.HasReferrersAsync(appId, contentId, ct);
             }
             else
             {
-                return collectionPublished.HasReferrersAsync(appId, contentId);
+                return collectionPublished.HasReferrersAsync(appId, contentId, ct);
             }
         }
 
-        public Task ResetScheduledAsync(DomainId documentId)
+        public Task ResetScheduledAsync(DomainId documentId,
+            CancellationToken ct = default)
         {
-            return collectionAll.ResetScheduledAsync(documentId);
+            return collectionAll.ResetScheduledAsync(documentId, ct);
         }
 
-        public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
+        public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
+            CancellationToken ct = default)
         {
-            return collectionAll.QueryScheduledWithoutDataAsync(now, callback);
+            return collectionAll.QueryScheduledWithoutDataAsync(now, callback, ct);
         }
 
-        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode)
+        public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
+            CancellationToken ct = default)
         {
-            return collectionAll.QueryIdsAsync(appId, schemaId, filterNode);
+            return collectionAll.QueryIdsAsync(appId, schemaId, filterNode, ct);
         }
 
         public IEnumerable<IMongoCollection<MongoContentEntity>> GetInternalCollections()

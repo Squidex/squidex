@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
@@ -40,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetDomainObjectTests()
         {
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))
@@ -330,7 +331,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
                 .Returns(true);
 
             var result = await PublishAsync(command);
@@ -348,7 +349,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
@@ -361,7 +362,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
                 .Returns(true);
 
             await PublishAsync(command);

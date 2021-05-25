@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent();
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
 
             Assert.NotNull(content.ReferenceFields);
         }
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = CreateContent();
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(source, 1), schemaProvider);
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(source, 1), schemaProvider, default);
 
             Assert.Null(source.ReferenceFields);
         }
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = CreateContent();
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
 
             Assert.Equal("my-schema", content.SchemaName);
             Assert.Equal("my-schema", content.SchemaDisplayName);

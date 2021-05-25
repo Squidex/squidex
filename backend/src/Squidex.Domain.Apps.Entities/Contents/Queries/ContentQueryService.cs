@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -49,7 +50,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any)
+        public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -65,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
                 else
                 {
-                    content = await contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
+                    content = await contentRepository.FindContentAsync(context.App, schema, id, context.Scope(), ct);
                 }
 
                 if (content == null || content.SchemaId.Id != schema.Id)
@@ -73,11 +75,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     return null;
                 }
 
-                return await TransformAsync(context, content);
+                return await TransformAsync(context, content, ct);
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q q)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q q,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -97,18 +100,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 q = await queryParser.ParseAsync(context, q, schema);
 
-                var contents = await contentRepository.QueryAsync(context.App, schema, q, context.Scope());
+                var contents = await contentRepository.QueryAsync(context.App, schema, q, context.Scope(), ct);
 
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }
 
-                return await TransformAsync(context, contents);
+                return await TransformAsync(context, contents, ct);
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -128,36 +132,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 q = await queryParser.ParseAsync(context, q);
 
-                var contents = await contentRepository.QueryAsync(context.App, schemas, q, context.Scope());
+                var contents = await contentRepository.QueryAsync(context.App, schemas, q, context.Scope(), ct);
 
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }
 
-                return await TransformAsync(context, contents);
+                return await TransformAsync(context, contents, ct);
             }
         }
 
-        private async Task<IResultList<IEnrichedContentEntity>> TransformAsync(Context context, IResultList<IContentEntity> contents)
+        private async Task<IResultList<IEnrichedContentEntity>> TransformAsync(Context context, IResultList<IContentEntity> contents,
+            CancellationToken ct)
         {
-            var transformed = await TransformCoreAsync(context, contents);
+            var transformed = await TransformCoreAsync(context, contents, ct);
 
             return ResultList.Create(contents.Total, transformed);
         }
 
-        private async Task<IEnrichedContentEntity> TransformAsync(Context context, IContentEntity content)
+        private async Task<IEnrichedContentEntity> TransformAsync(Context context, IContentEntity content,
+            CancellationToken ct)
         {
-            var transformed = await TransformCoreAsync(context, Enumerable.Repeat(content, 1));
+            var transformed = await TransformCoreAsync(context, Enumerable.Repeat(content, 1), ct);
 
             return transformed[0];
         }
 
-        private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, IEnumerable<IContentEntity> contents)
+        private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, IEnumerable<IContentEntity> contents,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                return await contentEnricher.EnrichAsync(contents, context);
+                return await contentEnricher.EnrichAsync(contents, context, ct);
             }
         }
 
