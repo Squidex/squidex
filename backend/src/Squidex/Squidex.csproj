@@ -66,7 +66,7 @@
     <PackageReference Include="Squidex.Assets.Mongo" Version="1.4.0" />
     <PackageReference Include="Squidex.Assets.S3" Version="1.4.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="6.19.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="7.3.0" />
     <PackageReference Include="Squidex.Hosting" Version="1.9.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />

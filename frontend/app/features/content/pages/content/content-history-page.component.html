@@ -29,7 +29,7 @@
             <ng-template #newVersion>
                 <label>{{ 'contents.draftStatus' | sqxTranslate }}</label>
 
-                <button type="button" class="btn btn-outline-secondary btn-block btn-status dropdown-toggle" (click)="dropdownNew.toggle()" #buttonOptions>
+                <button type="button" class="btn btn-outline-secondary btn-block btn-status" (click)="dropdownNew.toggle()" #buttonOptions>
                     <sqx-content-status
                         layout="multiline"
                         [status]="content.newStatus!"
