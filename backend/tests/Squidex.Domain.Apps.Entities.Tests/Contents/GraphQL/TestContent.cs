@@ -411,14 +411,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         }
                     }
                 },
-                ["myGeolocation"] = new
-                {
-                    iv = new
-                    {
-                        latitude = 10,
-                        longitude = 20
-                    }
-                },
                 ["myTags"] = new
                 {
                     iv = new[]
