@@ -91,49 +91,41 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   nestedNumber
                   nestedBoolean
                 }
-              }
-            }";
-
-        public const string AllFlatFields = @"
-            id
-            version
-            created
-            createdBy
-            createdByUser {
-              id
-              email
-              displayName
-            }
-            lastModified
-            lastModifiedBy
-            lastModifiedByUser {
-              id
-              email
-              displayName
-            }
-            status
-            statusColor
-            url
-            flatData {
-              myJson
-              myJsonValue: myJson(path: ""value"")
-              myString
-              myLocalizedString
-              myNumber
-              myBoolean
-              myDatetime
-              myGeolocation
-              myComponent__Dynamic
-              myComponent {
-                schemaId
-                schemaRef1Field
-              }
-              myComponents__Dynamic
-              myComponents {
-                __typename
-                ... on MyRefSchema1Component {
-                  schemaId
-                  schemaRef1Field
+                myString {
+                    de
+                }
+                myString2 {
+                    iv
+                }
+                myNumber {
+                    iv
+                }
+                myNumber2 {
+                    iv
+                }
+                myBoolean {
+                    iv
+                }
+                myDatetime {
+                    iv
+                }
+                myJson {
+                    iv
+                }
+                myGeolocation {
+                    iv
+                }
+                myComponent {
+                    iv
+                }
+                myComponents {
+                    iv
+                }
+                myTags {
+                    iv
+                }
+                myLocalized {
+                    de_DE
                 }
                 ... on MyRefSchema2Component {
                   schemaId
@@ -190,9 +182,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Object()
-                                    .Add(Component.Discriminator, TestSchemas.Ref1.Id)
-                                    .Add("schemaRef1Field", "Component1")))
+                                    .Add(Component.Discriminator, DomainId.Empty)
+                                    .Add("value1", 100)
+                                    .Add("value2", 200)))
                     .AddField("my-components",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add(Component.Discriminator, DomainId.Empty)
+                                        .Add("value1", 100)
+                                        .Add("value2", 200))))
+                    .AddField("my-json",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("value", 1)))
+                    .AddField("my-localized",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
@@ -382,6 +388,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
                             ["schemaRef2Field"] = "Component2"
                         },
+                    }
+                },
+                ["myComponent"] = new
+                {
+                    iv = new
+                    {
+                        schemaId = DomainId.Empty.ToString(),
+                        value1 = 100,
+                        value2 = 200
+                    }
+                },
+                ["myComponents"] = new
+                {
+                    iv = new[]
+                    {
+                        new
+                        {
+                            schemaId = DomainId.Empty.ToString(),
+                            value1 = 100,
+                            value2 = 200
+                        }
+                    }
+                },
+                ["myGeolocation"] = new
+                {
+                    iv = new
+                    {
+                        latitude = 10,
+                        longitude = 20
                     }
                 },
                 ["myTags"] = new
