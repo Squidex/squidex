@@ -69,6 +69,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 myGeolocation {
                     iv
                 }
+                myComponent {
+                    iv
+                }
+                myComponents {
+                    iv
+                }
                 myTags {
                     iv
                 }
@@ -131,10 +137,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddInvariant(JsonValue.Array(refId.ToString())))
                     .AddField("my-geolocation",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("latitude", 10)
+                                    .Add("longitude", 20)))
+                    .AddField("my-component",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add(Component.Discriminator, DomainId.Empty)
+                                    .Add("value1", 100)
+                                    .Add("value2", 200)))
+                    .AddField("my-components",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add(Component.Discriminator, DomainId.Empty)
+                                        .Add("value1", 100)
+                                        .Add("value2", 200))))
                     .AddField("my-json",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("value", 1)))
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("value", 1)))
                     .AddField("my-localized",
                         new ContentFieldData()
                             .AddLocalized("de-DE", "de-DE"))
@@ -269,6 +295,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     iv = new
                     {
                         value = 1
+                    }
+                },
+                ["myGeolocation"] = new
+                {
+                    iv = new
+                    {
+                        latitude = 10,
+                        longitude = 20
+                    }
+                },
+                ["myComponent"] = new
+                {
+                    iv = new
+                    {
+                        schemaId = DomainId.Empty.ToString(),
+                        value1 = 100,
+                        value2 = 200
+                    }
+                },
+                ["myComponents"] = new
+                {
+                    iv = new[]
+                    {
+                        new
+                        {
+                            schemaId = DomainId.Empty.ToString(),
+                            value1 = 100,
+                            value2 = 200
+                        }
                     }
                 },
                 ["myGeolocation"] = new

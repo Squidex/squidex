@@ -79,12 +79,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var schemaDef =
                 new Schema(schemaId.Name)
                     .Publish()
-                    .AddNumber(16, "2_numbers", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddNumber(17, "2-numbers", Partitioning.Invariant,
-                        new NumberFieldProperties())
-                    .AddNumber(18, "content", Partitioning.Invariant,
-                        new NumberFieldProperties())
                     .AddJson(1, "my-json", Partitioning.Invariant,
                         new JsonFieldProperties())
                     .AddString(2, "my-string", Partitioning.Language,
@@ -111,11 +105,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
                     .AddGeolocation(13, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties())
-                    .AddTags(14, "my-tags", Partitioning.Invariant,
+                    .AddComponent(14, "my-component", Partitioning.Invariant,
+                        new ComponentFieldProperties())
+                    .AddComponents(15, "my-components", Partitioning.Invariant,
+                        new ComponentsFieldProperties())
+                    .AddTags(16, "my-tags", Partitioning.Invariant,
                         new TagsFieldProperties())
-                    .AddArray(20, "my-empty-array", Partitioning.Invariant, null,
+                    .AddArray(17, "my-empty-array", Partitioning.Invariant, null,
                         new ArrayFieldProperties())
-                    .AddArray(15, "my-array", Partitioning.Invariant, f => f
+                    .AddNumber(50, "2_numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(51, "2-numbers", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddNumber(52, "content", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddArray(100, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number")
                         .AddNumber(123, "nested_number"))
