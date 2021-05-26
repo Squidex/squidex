@@ -8,7 +8,9 @@
 using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
@@ -93,6 +95,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Resolver = Resolve(x => x.StatusColor),
             Description = "The color status of the content."
         };
+
+        public static readonly FieldType SchemaId = new FieldType
+        {
+            Name = "schemaId",
+            ResolvedType = AllTypes.NonNullString,
+            Resolver = Resolve(x => x[Component.Discriminator].ToString()),
+            Description = "The id of the schema."
+        };
+
+        private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)
+        {
+            return Resolvers.Sync(resolver);
+        }
 
         private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, T> resolver)
         {

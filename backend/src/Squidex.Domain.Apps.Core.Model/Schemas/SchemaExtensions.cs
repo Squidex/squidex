@@ -45,11 +45,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return field.RawProperties.Label.Or(field.TypeName());
         }
 
-        public static bool IsSingleton(this Schema schema)
-        {
-            return schema.Type == SchemaType.Singleton;
-        }
-
         public static string TypeName(this Schema schema)
         {
             return schema.Name.ToPascalCase();
@@ -63,11 +58,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static string DisplayNameUnchanged(this Schema schema)
         {
             return schema.Properties.Label.Or(schema.Name);
-        }
-
-        public static DomainId SingleId(this ReferencesFieldProperties properties)
-        {
-            return properties.SchemaIds?.Count == 1 ? properties.SchemaIds[0] : default;
         }
 
         public static IEnumerable<RootField> ReferenceFields(this Schema schema)

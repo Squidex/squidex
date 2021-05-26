@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
         }
 
-        private (object? Result, JsonError? Error) ConvertToComponentList(IField<ComponentsFieldProperties> field, IJsonValue value)
+        private static (object? Result, JsonError? Error) ConvertToComponentList(IField<ComponentsFieldProperties> field, IJsonValue value)
         {
             if (value is JsonArray array)
             {

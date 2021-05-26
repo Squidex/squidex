@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await model.ExecuteAsync(options);
         }
 
-        private async Task<GraphQLModel> GetModelAsync(IAppEntity app)
+        public async Task<GraphQLModel> GetModelAsync(IAppEntity app)
         {
             var entry = await GetModelEntryAsync(app);
 

@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly GraphQLSchema schema;
         private readonly ISemanticLog log;
 
+        public GraphQLSchema Schema => schema;
+
         public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, SharedTypes typeFactory, ISemanticLog log)
         {
             this.log = log;
