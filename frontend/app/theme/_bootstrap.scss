@@ -572,10 +572,6 @@ a {
         &-warning {
             @include build-text-button($color-theme-orange);
         }
-
-        &-secondary2 {
-            @include build-text-button($color-input);
-        }
     }
 }
 

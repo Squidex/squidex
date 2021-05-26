@@ -39,9 +39,6 @@ export type SchemaCategory = { displayName: string; name?: string; schemas: Sche
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
-    public categoryNames =
-        this.project(x => x.categories);
-
     public selectedSchema =
         this.project(x => x.selectedSchema);
 
@@ -59,6 +56,9 @@ export class SchemasState extends State<Snapshot> {
 
     public publishedSchemas =
         this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
+
+    public categoryNames =
+        this.project(x => x.categories);
 
     public categories =
         this.projectFrom2(this.schemas, this.categoryNames, (s, c) => buildCategories(c, s));

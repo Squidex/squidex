@@ -86,13 +86,13 @@
                 {{ 'schemas.nameWarning' | sqxTranslate }}
             </sqx-form-alert>
 
-            <ng-container *ngIf="schemasState.categories | async; let categories">
-                <div class="form-group" *ngIf="categories.length > 1">
+            <ng-container *ngIf="schemasState.categoryNames | async; let categories">
+                <div class="form-group" *ngIf="categories.size > 0">
                     <label for="category">{{ 'common.category' | sqxTranslate }}</label>
             
                     <select class="custom-select" id="category" formControlName="initialCategory">
                         <option></option>
-                        <option *ngFor="let category of categories | slice:1" [ngValue]="category.name">{{category.name}}</option>
+                        <option *ngFor="let category of categories" [ngValue]="category">{{category}}</option>
                     </select>
                 </div>
             </ng-container>
@@ -110,7 +110,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-text-secondary2" (click)="cancel.emit()">
+            <button type="button" class="btn btn-text-secondary" (click)="cancel.emit()">
                 {{ 'common.cancel' | sqxTranslate }}
             </button>
 

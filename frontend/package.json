@@ -14,7 +14,8 @@
     "build": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env production",
     "build:clean": "rimraf wwwroot/build",
     "build:analyze": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env production --env analyze",
-    "postinstall": "npx patch-package && ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
+    "postinstall": "npx patch-package && ngcc",
+    "ngcc": "ngcc"
   },
   "dependencies": {
     "@angular/animations": "12.0.0",
