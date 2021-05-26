@@ -14,10 +14,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public abstract class FieldBuilder
     {
-        private readonly UpsertSchemaField field;
-        private readonly CreateSchema schema;
+        protected UpsertSchemaFieldBase field { get; init; }
+        protected readonly CreateSchema schema;
 
-        protected FieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        protected FieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
         {
             this.field = field;
             this.schema = schema;
@@ -39,7 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder Localizable()
         {
-            field.Partitioning = Partitioning.Language.Key;
+            if (field is UpsertSchemaField localizableField)
+            {
+                localizableField.Partitioning = Partitioning.Language.Key;
+            }
 
             return this;
         }

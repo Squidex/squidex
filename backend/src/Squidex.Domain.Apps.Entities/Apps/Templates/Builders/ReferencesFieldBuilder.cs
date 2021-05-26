@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class ReferencesFieldBuilder : FieldBuilder
     {
-        public ReferencesFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public ReferencesFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }

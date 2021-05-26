@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class DateTimeFieldBuilder : FieldBuilder
     {
-        public DateTimeFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public DateTimeFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }

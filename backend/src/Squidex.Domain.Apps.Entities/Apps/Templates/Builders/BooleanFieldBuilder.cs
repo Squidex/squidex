@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class BooleanFieldBuilder : FieldBuilder
     {
-        public BooleanFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public BooleanFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }
