@@ -44,20 +44,17 @@ export class ConfirmClickDirective {
             this.confirmTitle.length > 0 &&
             this.confirmText &&
             this.confirmText.length > 0) {
-            const observers = [...this.clickConfirmed.observers];
-
             this.beforeClick.emit();
+
+            const destinations =
+                this.clickConfirmed.observers?.map(x => (x as Subscriber<any>)['destination']) || [];
 
             this.dialogs.confirm(this.confirmTitle, this.confirmText, this.confirmRememberKey).pipe(take(1))
                 .subscribe(confirmed => {
                     if (confirmed) {
-                        for (const observer of observers) {
-                            const subscriber = observer as Subscriber<any>;
-
-                            const internal = (subscriber as any).destination;
-
-                            if (Types.isFunction(internal.next)) {
-                                internal.next(true);
+                        for (const destination of destinations) {
+                            if (Types.isFunction(destination?.next)) {
+                                destination.next(true);
                             }
                         }
                     }
