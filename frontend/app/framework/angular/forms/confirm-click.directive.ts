@@ -44,9 +44,10 @@ export class ConfirmClickDirective {
             this.confirmTitle.length > 0 &&
             this.confirmText &&
             this.confirmText.length > 0) {
-            const destinations = this.clickConfirmed.observers?.map(x => (x as Subscriber<any>)['destination']) || [];
-
             this.beforeClick.emit();
+
+            const destinations =
+                this.clickConfirmed.observers?.map(x => (x as Subscriber<any>)['destination']) || [];
 
             this.dialogs.confirm(this.confirmTitle, this.confirmText, this.confirmRememberKey).pipe(take(1))
                 .subscribe(confirmed => {
