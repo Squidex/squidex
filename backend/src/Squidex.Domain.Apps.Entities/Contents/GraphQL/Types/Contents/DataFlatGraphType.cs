@@ -7,6 +7,7 @@
 
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
@@ -18,18 +19,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             foreach (var fieldInfo in schemaInfo.Fields)
             {
-                var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
-
-                if (resolver != null)
+                if (fieldInfo.Field.RawProperties is ComponentFieldProperties ||
+                    fieldInfo.Field.RawProperties is ComponentsFieldProperties)
                 {
                     AddField(new FieldType
                     {
-                        Name = fieldInfo.FieldName,
-                        Arguments = args,
-                        ResolvedType = resolvedType,
-                        Resolver = resolver,
+                        Name = fieldInfo.FieldNameDynamic,
+                        Arguments = ContentActions.Json.Arguments,
+                        ResolvedType = AllTypes.Json,
+                        Resolver = FieldVisitor.JsonPath,
                         Description = fieldInfo.Field.RawProperties.Hints
                     }).WithSourceName(fieldInfo);
+                }
+                else
+                {
+                    var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
+
+                    if (resolver != null)
+                    {
+                        AddField(new FieldType
+                        {
+                            Name = fieldInfo.FieldName,
+                            Arguments = args,
+                            ResolvedType = resolvedType,
+                            Resolver = resolver,
+                            Description = fieldInfo.Field.RawProperties.Hints
+                        }).WithSourceName(fieldInfo);
+                    }
                 }
             }
 

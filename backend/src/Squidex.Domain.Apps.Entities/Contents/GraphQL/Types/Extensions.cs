@@ -11,12 +11,27 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.ObjectPool;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    internal static class Extensions
+    public static class Extensions
     {
-        public static string BuildODataQuery(this IResolveFieldContext context)
+        public static string AsDynamic(this string value, bool input = false)
+        {
+#pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
+            var result = CasingExtensions.ToCamelCase(value);
+#pragma warning restore RECS0015 // If an extension method is called as static method convert it to method syntax
+
+            if (!input)
+            {
+                result = $"{result}__Dynamic";
+            }
+
+            return result;
+        }
+
+        internal static string BuildODataQuery(this IResolveFieldContext context)
         {
             var sb = DefaultPools.StringBuilder.Get();
             try
@@ -49,37 +64,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
         }
 
-        public static FieldType WithSourceName(this FieldType field, string value)
+        internal static FieldType WithSourceName(this FieldType field, string value)
         {
             return field.WithMetadata(nameof(SourceName), value);
         }
 
-        public static FieldType WithSourceName(this FieldType field, FieldInfo value)
+        internal static FieldType WithSourceName(this FieldType field, FieldInfo value)
         {
             return field.WithMetadata(nameof(SourceName), value.Field.Name);
         }
 
-        public static string SourceName(this FieldType field)
+        internal static string SourceName(this FieldType field)
         {
             return field.GetMetadata<string>(nameof(SourceName));
         }
 
-        public static FieldType WithSchemaId(this FieldType field, SchemaInfo value)
+        internal static FieldType WithSchemaId(this FieldType field, SchemaInfo value)
         {
             return field.WithMetadata(nameof(SchemaId), value.Schema.Id.ToString());
         }
 
-        public static string SchemaId(this FieldType field)
+        internal static string SchemaId(this FieldType field)
         {
             return field.GetMetadata<string>(nameof(SchemaId));
         }
 
-        public static FieldType WithSchemaNamedId(this FieldType field, SchemaInfo value)
+        internal static FieldType WithSchemaNamedId(this FieldType field, SchemaInfo value)
         {
             return field.WithMetadata(nameof(SchemaNamedId), value.Schema.NamedId());
         }
 
-        public static NamedId<DomainId> SchemaNamedId(this FieldType field)
+        internal static NamedId<DomainId> SchemaNamedId(this FieldType field)
         {
             return field.GetMetadata<NamedId<DomainId>>(nameof(SchemaNamedId));
         }
@@ -91,12 +106,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return field;
         }
 
-        public static IGraphType Flatten(this QueryArgument type)
+        internal static IGraphType Flatten(this QueryArgument type)
         {
             return type.ResolvedType.Flatten();
         }
 
-        public static IGraphType Flatten(this IGraphType type)
+        internal static IGraphType Flatten(this IGraphType type)
         {
             if (type is IProvideResolvedType provider)
             {

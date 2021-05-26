@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
     internal sealed class FieldVisitor : IFieldVisitor<(IGraphType?, IFieldResolver?, QueryArguments?), FieldInfo>
     {
-        private static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value);
-        private static readonly IFieldResolver JsonPath = CreateValueResolver(ContentActions.Json.Resolver);
+        public static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value);
+        public static readonly IFieldResolver JsonPath = CreateValueResolver(ContentActions.Json.Resolver);
 
         private static readonly IFieldResolver JsonBoolean = CreateValueResolver((value, fieldContext, contex) =>
         {

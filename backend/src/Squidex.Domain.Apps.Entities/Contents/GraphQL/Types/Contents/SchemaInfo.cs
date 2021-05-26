@@ -76,7 +76,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                     foreach (var field in schema.SchemaDef.Fields)
                     {
-                        fields.Add(FieldInfo.Build(field, fieldNames[field], names[$"{typeName}Data{field.TypeName()}"], names));
+                        var fieldName = fieldNames[field];
+
+                        fields.Add(FieldInfo.Build(
+                            field,
+                            fieldName,
+                            fieldNames[fieldName.AsDynamic()],
+                            names[$"{typeName}Data{field.TypeName()}"],
+                            names));
                     }
                 }
 
@@ -93,6 +100,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string FieldName { get; }
 
+        public string FieldNameDynamic { get; }
+
         public string DisplayName { get; }
 
         public string LocalizedType { get; }
@@ -107,12 +116,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IReadOnlyList<FieldInfo> Fields { get; }
 
-        private FieldInfo(IField field, string fieldName, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
+        private FieldInfo(IField field, string fieldName, string fieldNameDynamic, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
         {
             DisplayName = field.DisplayName();
             Field = field;
             Fields = fields;
             FieldName = fieldName;
+            FieldNameDynamic = fieldNameDynamic;
             LocalizedType = names[$"{typeName}Dto"];
             LocalizedInputType = names[$"{typeName}InputDto"];
             NestedInputType = names[$"{typeName}ChildInputDto"];
@@ -125,23 +135,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return FieldName;
         }
 
-        internal static FieldInfo Build(IRootField rootField, string fieldName, string typeName, Names names)
+        internal static FieldInfo Build(IRootField rootField, string fieldName, string fieldNameDynamic, string typeName, Names names)
         {
             var fields = EmptyFields;
 
             if (rootField is IArrayField arrayField && arrayField.Fields.Count > 0)
             {
-                var fieldNames = new Names();
+                var nestedNames = new Names();
 
                 fields = new List<FieldInfo>(arrayField.Fields.Count);
 
                 foreach (var field in arrayField.Fields)
                 {
-                    fields.Add(new FieldInfo(field, fieldNames[field], $"{typeName}{field.TypeName()}", EmptyFields, names));
+                    var nestedName = nestedNames[field];
+
+                    fields.Add(new FieldInfo(field,
+                        nestedName,
+                        nestedNames[nestedName.AsDynamic()],
+                        $"{typeName}{field.TypeName()}",
+                        EmptyFields,
+                        names));
                 }
             }
 
-            return new FieldInfo(rootField, fieldName, typeName, fields, names);
+            return new FieldInfo(rootField, fieldName, fieldNameDynamic, typeName, fields, names);
         }
     }
 
@@ -150,9 +167,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         // Reserver names that are used for other GraphQL types.
         private static readonly HashSet<string> ReservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "Content",
             "Asset",
             "AssetResultDto",
+            "Content",
+            "EntityCreatedResultDto",
             "EntitySavedResultDto",
             "JsonScalar",
             "JsonPrimitive",
@@ -192,7 +210,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             takenNames[name] = ++offset;
 
-            // Add + 1 to all offset for backwars compatibility.
+            // Add + 1 to all offsets for backwards-compatibility.
             return $"{name}{offset + 1}";
         }
     }
