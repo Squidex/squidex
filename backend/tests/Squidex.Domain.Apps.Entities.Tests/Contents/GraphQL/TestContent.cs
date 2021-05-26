@@ -8,8 +8,10 @@
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -115,10 +117,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 myGeolocation {
                     iv
                 }
-                myComponent {
+                myComponent__Dynamic {
                     iv
                 }
-                myComponents {
+                myComponents__Dynamic {
                     iv
                 }
                 myTags {
@@ -294,11 +296,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 status = "DRAFT",
                 statusColor = "red",
                 url = $"contents/my-schema/{content.Id}",
-                data = Data(content)
+                data = Data(content, false)
             };
         }
 
-        public static object FlatResponse(IEnrichedContentEntity content)
+        public static object Data(IContentEntity content, bool input, DomainId refId = default, DomainId assetId = default)
         {
             return new
             {
@@ -390,7 +392,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         },
                     }
                 },
-                ["myComponent"] = new
+                ["myComponent".AsDynamic(input)] = new
                 {
                     iv = new
                     {
@@ -399,7 +401,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         value2 = 200
                     }
                 },
-                ["myComponents"] = new
+                ["myComponents".AsDynamic(input)] = new
                 {
                     iv = new[]
                     {

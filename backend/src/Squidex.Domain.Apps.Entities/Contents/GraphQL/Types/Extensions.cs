@@ -11,11 +11,26 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.ObjectPool;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public static class Extensions
     {
+        public static string AsDynamic(this string value, bool input = false)
+        {
+#pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
+            var result = CasingExtensions.ToCamelCase(value);
+#pragma warning restore RECS0015 // If an extension method is called as static method convert it to method syntax
+
+            if (!input)
+            {
+                result = $"{result}__Dynamic";
+            }
+
+            return result;
+        }
+
         internal static string BuildODataQuery(this IResolveFieldContext context)
         {
             var sb = DefaultPools.StringBuilder.Get();
@@ -96,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return type.ResolvedType.Flatten();
         }
 
-        public static IGraphType Flatten(this IGraphType type)
+        internal static IGraphType Flatten(this IGraphType type)
         {
             if (type is IProvideResolvedType provider)
             {

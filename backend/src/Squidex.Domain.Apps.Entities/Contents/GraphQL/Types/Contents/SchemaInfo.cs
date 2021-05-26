@@ -69,11 +69,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 foreach (var field in schema.SchemaDef.Fields.ForApi())
                 {
-                    fieldInfos.Add(FieldInfo.Build(
-                        field,
-                        names[$"{typeName}Data{field.TypeName()}"],
-                        names,
-                        fieldNames));
+                    var fieldNames = new Names();
+
+                    fields = new List<FieldInfo>(schema.SchemaDef.Fields.Count);
+
+                    foreach (var field in schema.SchemaDef.Fields)
+                    {
+                        var fieldName = fieldNames[field];
+
+                        fields.Add(FieldInfo.Build(
+                            field,
+                            fieldName,
+                            fieldNames[fieldName.AsDynamic()],
+                            names[$"{typeName}Data{field.TypeName()}"],
+                            names));
+                    }
                 }
 
                 yield return new SchemaInfo(schema, typeName, fieldInfos, names);
@@ -107,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IReadOnlyList<FieldInfo> Fields { get; }
 
-        private FieldInfo(IField field, string typeName, Names names, Names parentNames, IReadOnlyList<FieldInfo> fields)
+        private FieldInfo(IField field, string fieldName, string fieldNameDynamic, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
         {
             var fieldName = parentNames[field.Name.ToCamelCase(), false];
 
@@ -116,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Field = field;
             Fields = fields;
             FieldName = fieldName;
-            FieldNameDynamic = names[$"{fieldName}__Dynamic"];
+            FieldNameDynamic = fieldNameDynamic;
             LocalizedType = names[$"{typeName}Dto"];
             LocalizedInputType = names[$"{typeName}InputDto"];
             NestedInputType = names[$"{typeName}ChildInputDto"];
@@ -129,28 +139,30 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return FieldName;
         }
 
-        internal static FieldInfo Build(IRootField rootField, string typeName, Names names, Names parentNames)
+        internal static FieldInfo Build(IRootField rootField, string fieldName, string fieldNameDynamic, string typeName, Names names)
         {
             var fieldInfos = EmptyFields;
 
             if (rootField is IArrayField arrayField)
             {
-                var fieldNames = new Names();
+                var nestedNames = new Names();
 
                 fieldInfos = new List<FieldInfo>(arrayField.Fields.Count);
 
                 foreach (var nestedField in arrayField.Fields.ForApi())
                 {
-                    fieldInfos.Add(new FieldInfo(
-                        nestedField,
-                        names[$"{typeName}{nestedField.TypeName()}"],
-                        names,
-                        fieldNames,
-                        EmptyFields));
+                    var nestedName = nestedNames[field];
+
+                    fields.Add(new FieldInfo(field,
+                        nestedName,
+                        nestedNames[nestedName.AsDynamic()],
+                        $"{typeName}{field.TypeName()}",
+                        EmptyFields,
+                        names));
                 }
             }
 
-            return new FieldInfo(rootField, typeName, names, parentNames, fieldInfos);
+            return new FieldInfo(rootField, fieldName, fieldNameDynamic, typeName, fields, names);
         }
     }
 
@@ -162,7 +174,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             "Asset",
             "AssetResultDto",
             "Content",
-            "Component",
             "EntityCreatedResultDto",
             "EntitySavedResultDto",
             "JsonScalar",
