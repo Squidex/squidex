@@ -27,7 +27,7 @@ namespace Squidex.Translator.Processes
             foreach (var (locale, texts) in service.Translations.Where(x => x.Key != service.MainLocale))
             {
                 Console.WriteLine();
-                Console.WriteLine("Checking {0}", locale);
+                Console.WriteLine("----- CHECKING <{0}> -----", locale);
 
                 var notTranslated = mainTranslations.Keys.Except(texts.Keys).ToList();
                 var notRequired = texts.Keys.Except(mainTranslations.Keys).ToList();
