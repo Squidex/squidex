@@ -17,8 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
     {
         protected new UpsertSchemaField field
         {
-            get => base.field as UpsertSchemaField;
-            init => base.field = value;
+            get => base.Field as UpsertSchemaField;
+            init => base.Field = value;
         }
 
         public ArrayFieldBuilder(UpsertSchemaField field, CreateSchema schema)
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<AssetsFieldProperties>(name);
 
-            configure(new AssetFieldBuilder(field, schema));
+            configure(new AssetFieldBuilder(field, Schema));
 
             return this;
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<BooleanFieldProperties>(name);
 
-            configure(new BooleanFieldBuilder(field, schema));
+            configure(new BooleanFieldBuilder(field, Schema));
 
             return this;
         }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<DateTimeFieldProperties>(name);
 
-            configure(new DateTimeFieldBuilder(field, schema));
+            configure(new DateTimeFieldBuilder(field, Schema));
 
             return this;
         }
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<JsonFieldProperties>(name);
 
-            configure(new JsonFieldBuilder(field, schema));
+            configure(new JsonFieldBuilder(field, Schema));
 
             return this;
         }
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<NumberFieldProperties>(name);
 
-            configure(new NumberFieldBuilder(field, schema));
+            configure(new NumberFieldBuilder(field, Schema));
 
             return this;
         }
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<ReferencesFieldProperties>(name);
 
-            configure(new ReferencesFieldBuilder(field, schema));
+            configure(new ReferencesFieldBuilder(field, Schema));
 
             return this;
         }
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             var field = AddField<StringFieldProperties>(name);
 
-            configure(new StringFieldBuilder(field, schema));
+            configure(new StringFieldBuilder(field, Schema));
 
             return this;
         }
