@@ -140,6 +140,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_create_empty_schema_with_empty_schema_because_ui_field()
+        {
+            var schema =
+                Mocks.Schema(TestApp.DefaultId,
+                    NamedId.Of(DomainId.NewGuid(), "content"),
+                    new Schema("content").Publish()
+                        .AddUI(1, "ui", Partitioning.Invariant));
+
+            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+
+            Assert.NotNull(model);
+        }
+
+        [Fact]
+        public async Task Should_create_empty_schema_with_empty_schema_because_invalid_field()
+        {
+            var schema =
+                Mocks.Schema(TestApp.DefaultId,
+                    NamedId.Of(DomainId.NewGuid(), "content"),
+                    new Schema("content").Publish()
+                        .AddComponent(1, "component", Partitioning.Invariant));
+
+            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+
+            Assert.NotNull(model);
+        }
+
+        [Fact]
         public async Task Should_create_empty_schema_with_unpublished_schema()
         {
             var schema =

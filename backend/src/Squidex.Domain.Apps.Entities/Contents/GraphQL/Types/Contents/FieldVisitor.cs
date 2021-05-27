@@ -104,12 +104,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            var schemaFieldType =
-                new ListGraphType(
-                    new NonNullGraphType(
-                        new NestedGraphType(builder, args)));
+            var type = new NestedGraphType(builder, args);
 
-            return (schemaFieldType, JsonNoop, null);
+            if (type.Fields.Count == 0)
+            {
+                return default;
+            }
+
+            return (new ListGraphType(new NonNullGraphType(type)), JsonNoop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, FieldInfo args)
