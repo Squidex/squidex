@@ -13,7 +13,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class ArrayFieldBuilder : FieldBuilder
+    public class ArrayFieldBuilder : FieldBuilder<ArrayFieldBuilder>
     {
         protected new UpsertSchemaField field
         {
@@ -24,51 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         public ArrayFieldBuilder(UpsertSchemaField field, CreateSchema schema)
             : base(field, schema)
         {
-        }
-
-        public new ArrayFieldBuilder Label(string? label)
-        {
-            return base.Label(label) as ArrayFieldBuilder;
-        }
-
-        public new ArrayFieldBuilder Hints(string? hints)
-        {
-            return base.Hints(hints) as ArrayFieldBuilder;
-        }
-
-        public new ArrayFieldBuilder Localizable()
-        {
-            return base.Localizable() as ArrayFieldBuilder;
-        }
-
-        public new ArrayFieldBuilder Disabled()
-        {
-            return base.Disabled() as ArrayFieldBuilder;
-        }
-
-        public new ArrayFieldBuilder Required()
-        {
-            return base.Required() as ArrayFieldBuilder;
-        }
-
-        public new ArrayFieldBuilder ShowInList()
-        {
-            return base.ShowInList() as ArrayFieldBuilder;
-        }
-
-        public new ArrayFieldBuilder ShowInReferences()
-        {
-            return base.ShowInReferences() as ArrayFieldBuilder;
-        }
-
-        public ArrayFieldBuilder RequireSingle()
-        {
-            Properties<ArrayFieldProperties>(p => p with
-            {
-                MaxItems = 1
-            });
-
-            return this;
         }
 
         public ArrayFieldBuilder AddAssets(string name, Action<AssetFieldBuilder> configure)

@@ -15,50 +15,54 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
     public abstract class FieldBuilder
     {
         protected UpsertSchemaFieldBase field { get; init; }
-        protected readonly CreateSchema schema;
+        protected CreateSchema schema { get; init; }
+    }
 
+    public abstract class FieldBuilder<T> : FieldBuilder
+        where T : FieldBuilder
+    {
         protected FieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
         {
             this.field = field;
             this.schema = schema;
         }
 
-        public FieldBuilder Label(string? label)
+        public T Label(string? label)
         {
             field.Properties = field.Properties with { Label = label };
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Hints(string? hints)
+        public T Hints(string? hints)
         {
             field.Properties = field.Properties with { Hints = hints };
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Localizable()
+        public T Localizable()
         {
             if (field is UpsertSchemaField localizableField)
             {
                 localizableField.Partitioning = Partitioning.Language.Key;
             }
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Disabled()
+        public T Disabled()
         {
             field.IsDisabled = true;
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Required()
+        public T Required()
         {
             field.Properties = field.Properties with { IsRequired = true };
 
-            return this;
+            return this as T;
         }
 
         protected void Properties<T>(Func<T, T> updater) where T : FieldProperties
@@ -66,20 +70,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             field.Properties = updater((T)field.Properties);
         }
 
-        public FieldBuilder ShowInList()
+        public T ShowInList()
         {
             schema.FieldsInLists ??= new FieldNames();
             schema.FieldsInLists.Add(field.Name);
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder ShowInReferences()
+        public T ShowInReferences()
         {
             schema.FieldsInReferences ??= new FieldNames();
             schema.FieldsInReferences.Add(field.Name);
 
-            return this;
+            return this as T;
         }
     }
 }

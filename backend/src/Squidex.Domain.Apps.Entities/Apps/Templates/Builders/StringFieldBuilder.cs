@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class StringFieldBuilder : FieldBuilder
+    public class StringFieldBuilder : FieldBuilder<StringFieldBuilder>
     {
         public StringFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)

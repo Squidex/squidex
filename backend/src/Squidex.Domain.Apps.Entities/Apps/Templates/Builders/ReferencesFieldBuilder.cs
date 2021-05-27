@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class ReferencesFieldBuilder : FieldBuilder
+    public class ReferencesFieldBuilder : FieldBuilder<ReferencesFieldBuilder>
     {
         public ReferencesFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
