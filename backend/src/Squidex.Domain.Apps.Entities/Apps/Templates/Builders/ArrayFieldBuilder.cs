@@ -26,13 +26,40 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
         }
 
-        public new ArrayFieldBuilder Label(string? label) => base.Label(label) as ArrayFieldBuilder;
-        public new ArrayFieldBuilder Hints(string? hints) => base.Hints(hints) as ArrayFieldBuilder;
-        public new ArrayFieldBuilder Localizable() => base.Localizable() as ArrayFieldBuilder;
-        public new ArrayFieldBuilder Disabled() => base.Disabled() as ArrayFieldBuilder;
-        public new ArrayFieldBuilder Required() => base.Required() as ArrayFieldBuilder;
-        public new ArrayFieldBuilder ShowInList() => base.ShowInList() as ArrayFieldBuilder;
-        public new ArrayFieldBuilder ShowInReferences() => base.ShowInReferences() as ArrayFieldBuilder;
+        public new ArrayFieldBuilder Label(string? label)
+        {
+            return base.Label(label) as ArrayFieldBuilder;
+        }
+
+        public new ArrayFieldBuilder Hints(string? hints)
+        {
+            return base.Hints(hints) as ArrayFieldBuilder;
+        }
+
+        public new ArrayFieldBuilder Localizable()
+        {
+            return base.Localizable() as ArrayFieldBuilder;
+        }
+
+        public new ArrayFieldBuilder Disabled()
+        {
+            return base.Disabled() as ArrayFieldBuilder;
+        }
+
+        public new ArrayFieldBuilder Required()
+        {
+            return base.Required() as ArrayFieldBuilder;
+        }
+
+        public new ArrayFieldBuilder ShowInList()
+        {
+            return base.ShowInList() as ArrayFieldBuilder;
+        }
+
+        public new ArrayFieldBuilder ShowInReferences()
+        {
+            return base.ShowInReferences() as ArrayFieldBuilder;
+        }
 
         public ArrayFieldBuilder RequireSingle()
         {
@@ -47,7 +74,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         public ArrayFieldBuilder AddAssets(string name, Action<AssetFieldBuilder> configure)
         {
             var field = AddField<AssetsFieldProperties>(name);
+
             configure(new AssetFieldBuilder(field, schema));
+
             return this;
 
         }
@@ -55,14 +84,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         public ArrayFieldBuilder AddBoolean(string name, Action<BooleanFieldBuilder> configure)
         {
             var field = AddField<BooleanFieldProperties>(name);
+
             configure(new BooleanFieldBuilder(field, schema));
+
             return this;
         }
 
         public ArrayFieldBuilder AddDateTime(string name, Action<DateTimeFieldBuilder> configure)
         {
             var field = AddField<DateTimeFieldProperties>(name);
+
             configure(new DateTimeFieldBuilder(field, schema));
+
             return this;
         }
 
@@ -78,21 +111,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         public ArrayFieldBuilder AddNumber(string name, Action<NumberFieldBuilder> configure)
         {
             var field = AddField<NumberFieldProperties>(name);
+
             configure(new NumberFieldBuilder(field, schema));
+
             return this;
         }
 
         public ArrayFieldBuilder AddReferences(string name, Action<ReferencesFieldBuilder> configure)
         {
             var field = AddField<ReferencesFieldProperties>(name);
+
             configure(new ReferencesFieldBuilder(field, schema));
+
             return this;
         }
 
         public ArrayFieldBuilder AddString(string name, Action<StringFieldBuilder> configure)
         {
             var field = AddField<StringFieldProperties>(name);
+
             configure(new StringFieldBuilder(field, schema));
+
             return this;
         }
 
