@@ -38,14 +38,13 @@ namespace Squidex
             services.AddMemoryCache();
             services.AddNonBreakingSameSiteCookies();
 
-            services.AddSquidexMvcWithPlugins(config);
-
             services.AddSquidexApps();
             services.AddSquidexAssetInfrastructure(config);
             services.AddSquidexAssets(config);
             services.AddSquidexAuthentication(config);
             services.AddSquidexBackups();
             services.AddSquidexCommands(config);
+            services.AddSquidexMvcWithPlugins(config);
             services.AddSquidexComments();
             services.AddSquidexContents(config);
             services.AddSquidexControllerServices(config);
