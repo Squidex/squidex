@@ -23,20 +23,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
-                var publish = new Func<ICommand, Task>(command =>
+                var publish = new Func<IAppCommand, Task>(command =>
                 {
-                    if (command is IAppCommand appCommand)
-                    {
-                        appCommand.AppId = appId;
-                    }
+                    command.AppId = appId;
 
                     return context.CommandBus.PublishAsync(command);
                 });
 
-                await publish(new AttachClient
-                {
-                    Id = "default"
-                });
+                await publish(new AttachClient { Id = "default" });
             }
         }
     }

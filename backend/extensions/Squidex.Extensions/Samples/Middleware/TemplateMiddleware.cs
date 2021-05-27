@@ -25,12 +25,9 @@ namespace Squidex.Extensions.Samples.Middleware
             {
                 var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
-                var publish = new Func<ICommand, Task>(command =>
+                var publish = new Func<IAppCommand, Task>(command =>
                 {
-                    if (command is IAppCommand appCommand)
-                    {
-                        appCommand.AppId = appId;
-                    }
+                    command.AppId = appId;
 
                     return context.CommandBus.PublishAsync(command);
                 });

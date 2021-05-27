@@ -5,51 +5,26 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
-    public sealed class CreateBlogCommandMiddleware : ICommandMiddleware
+    public sealed class CreateBlog : ITemplate
     {
-        private const string TemplateName = "Blog";
+        public string Name { get; } = "blog";
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public Task RunAsync(PublishTemplate publish)
         {
-            if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
-            {
-                var appId = NamedId.Of(createApp.AppId, createApp.Name);
-
-                var publish = new Func<ICommand, Task>(command =>
-                {
-                    if (command is IAppCommand appCommand)
-                    {
-                        appCommand.AppId = appId;
-                    }
-
-                    return context.CommandBus.PublishAsync(command);
-                });
-
-                await Task.WhenAll(
-                    CreatePagesAsync(publish),
-                    CreatePostsAsync(publish));
-            }
-
-            await next(context);
+            return Task.WhenAll(
+                CreatePagesAsync(publish),
+                CreatePostsAsync(publish));
         }
 
-        private static bool IsRightTemplate(CreateApp createApp)
-        {
-            return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static async Task CreatePostsAsync(Func<ICommand, Task> publish)
+        private static async Task CreatePostsAsync(PublishTemplate publish)
         {
             var postsId = await CreatePostsSchemaAsync(publish);
 
@@ -68,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private static async Task CreatePagesAsync(Func<ICommand, Task> publish)
+        private static async Task CreatePagesAsync(PublishTemplate publish)
         {
             var pagesId = await CreatePagesSchemaAsync(publish);
 
@@ -87,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private static async Task<NamedId<DomainId>> CreatePostsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreatePostsSchemaAsync(PublishTemplate publish)
         {
             var schema =
                 SchemaBuilder.Create("Posts")
@@ -112,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<DomainId>> CreatePagesSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreatePagesSchemaAsync(PublishTemplate publish)
         {
             var schema =
                 SchemaBuilder.Create("Pages")

@@ -5,55 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
-    public sealed class CreateProfileCommandMiddleware : ICommandMiddleware
+    public sealed class CreateProfile : ITemplate
     {
-        private const string TemplateName = "Profile";
+        public string Name { get; } = "profile";
 
-        public async Task HandleAsync(CommandContext context, NextDelegate next)
+        public Task RunAsync(PublishTemplate publish)
         {
-            if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
-            {
-                var appId = NamedId.Of(createApp.AppId, createApp.Name);
-
-                var publish = new Func<ICommand, Task>(command =>
-                {
-                    if (command is IAppCommand appCommand)
-                    {
-                        appCommand.AppId = appId;
-                    }
-
-                    return context.CommandBus.PublishAsync(command);
-                });
-
-                await Task.WhenAll(
-                    CreateBasicsAsync(publish),
-                    CreateEducationSchemaAsync(publish),
-                    CreateExperienceSchemaAsync(publish),
-                    CreateProjectsSchemaAsync(publish),
-                    CreatePublicationsSchemaAsync(publish),
-                    CreateSkillsSchemaAsync(publish));
-            }
-
-            await next(context);
+            return Task.WhenAll(
+                CreateBasicsAsync(publish),
+                CreateEducationSchemaAsync(publish),
+                CreateExperienceSchemaAsync(publish),
+                CreateProjectsSchemaAsync(publish),
+                CreatePublicationsSchemaAsync(publish),
+                CreateSkillsSchemaAsync(publish));
         }
 
-        private static bool IsRightTemplate(CreateApp createApp)
-        {
-            return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static async Task CreateBasicsAsync(Func<ICommand, Task> publish)
+        private static async Task CreateBasicsAsync(PublishTemplate publish)
         {
             var postsId = await CreateBasicsSchemaAsync(publish);
 
@@ -75,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private static async Task<NamedId<DomainId>> CreateBasicsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateBasicsSchemaAsync(PublishTemplate publish)
         {
             var command =
                 SchemaBuilder.Create("Basics")
@@ -118,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(command.SchemaId, command.Name);
         }
 
-        private static async Task<NamedId<DomainId>> CreateProjectsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateProjectsSchemaAsync(PublishTemplate publish)
         {
             var schema =
                 SchemaBuilder.Create("Projects")
@@ -148,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<DomainId>> CreateExperienceSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateExperienceSchemaAsync(PublishTemplate publish)
         {
             var schema =
                 SchemaBuilder.Create("Experience")
@@ -175,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<DomainId>> CreateEducationSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateEducationSchemaAsync(PublishTemplate publish)
         {
             var schema =
                 SchemaBuilder.Create("Education")
@@ -202,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private static async Task<NamedId<DomainId>> CreatePublicationsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreatePublicationsSchemaAsync(PublishTemplate publish)
         {
             var command =
                 SchemaBuilder.Create("Publications")
@@ -224,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(command.SchemaId, command.Name);
         }
 
-        private static async Task<NamedId<DomainId>> CreateSkillsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<DomainId>> CreateSkillsSchemaAsync(PublishTemplate publish)
         {
             var command =
                 SchemaBuilder.Create("Skills")

@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Plugins;
 
@@ -17,6 +18,8 @@ namespace Squidex.Extensions.Samples.Middleware
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddSingleton<ICustomCommandMiddleware, TemplateMiddleware>();
+
+            services.AddSingleton<ITemplate, TemplateInstance>();
         }
     }
 }
