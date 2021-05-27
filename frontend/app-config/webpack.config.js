@@ -49,7 +49,6 @@ module.exports = function calculateConfig(env) {
     const isDevServer = env.WEBPACK_SERVE;
     const isTestCoverage = env && env.coverage;
     const isTests = env && env.target === 'tests';
-    const isAot = !isDevServer && !isTests && !isTestCoverage;
 
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 
@@ -201,6 +200,15 @@ module.exports = function calculateConfig(env) {
                 root('./app', '$_lazy_route_resources'),
                 {},
             ),
+
+            new plugins.NgToolsWebpack.AngularWebpackPlugin({
+                tsconfig: configFile,
+                // Load directly from file system and skip webpack.
+                directTemplateLoading: true,
+
+                // Only run in aot compiler in production.
+                jitMode: !isProduction,
+            }),
 
             /*
              * Puts each bundle into a file and appends the hash of the file to the path.
@@ -362,16 +370,6 @@ module.exports = function calculateConfig(env) {
         }
     }
 
-    if (!isTestCoverage) {
-        config.plugins.push(
-            new plugins.NgToolsWebpack.AngularWebpackPlugin({
-                directTemplateLoading: true,
-                jitMode: !isAot,
-                tsconfig: configFile,
-            }),
-        );
-    }
-
     if (isProduction) {
         config.optimization = {
             minimizer: [
@@ -408,23 +406,23 @@ module.exports = function calculateConfig(env) {
     if (isTestCoverage) {
         // Do not instrument tests.
         config.module.rules.push({
-            test: /\.ts$/,
+            test: /\.[jt]sx?$/,
             use: [{
-                loader: 'ts-loader',
+                loader: '@ngtools/webpack',
             }],
             include: [/\.(e2e|spec)\.ts$/],
         });
 
         // Use instrument loader for all normal files.
         config.module.rules.push({
-            test: /\.ts$/,
+            test: /\.[jt]sx?$/,
             use: [{
                 loader: 'istanbul-instrumenter-loader',
                 options: {
                     esModules: true,
                 },
             }, {
-                loader: 'ts-loader',
+                loader: '@ngtools/webpack',
             }],
             exclude: [/\.(e2e|spec)\.ts$/],
         });
