@@ -33,7 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             configure(new AssetFieldBuilder(field, Schema));
 
             return this;
-
         }
 
         public ArrayFieldBuilder AddBoolean(string name, Action<BooleanFieldBuilder> configure)
