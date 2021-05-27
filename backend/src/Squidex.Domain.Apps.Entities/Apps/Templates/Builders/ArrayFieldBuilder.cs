@@ -15,10 +15,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class ArrayFieldBuilder : FieldBuilder<ArrayFieldBuilder>
     {
-        protected new UpsertSchemaField field
+        private UpsertSchemaField TypedField
         {
-            get => base.Field as UpsertSchemaField;
-            init => base.Field = value;
+            get => (UpsertSchemaField)Field;
         }
 
         public ArrayFieldBuilder(UpsertSchemaField field, CreateSchema schema)
@@ -100,11 +99,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
                 }
             };
 
-            field.Nested ??= Array.Empty<UpsertSchemaNestedField>();
-            field.Nested = field.Nested.Union(new[] { nestedField }).ToArray();
+            TypedField.Nested ??= Array.Empty<UpsertSchemaNestedField>();
+            TypedField.Nested = TypedField.Nested.Union(new[] { nestedField }).ToArray();
 
             return nestedField;
         }
-
     }
 }

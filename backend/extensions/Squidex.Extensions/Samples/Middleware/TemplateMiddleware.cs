@@ -7,19 +7,21 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates
+namespace Squidex.Extensions.Samples.Middleware
 {
-    public sealed class AlwaysCreateClientCommandMiddleware : ICommandMiddleware
+    public sealed class TemplateMiddleware : ICustomCommandMiddleware
     {
         public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
             await next(context);
 
-            if (context.IsCompleted && context.Command is CreateApp createApp)
+            if (context.Command is CreateApp createApp && context.IsCompleted && createApp.Template == "custom")
             {
                 var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
@@ -30,7 +32,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     return context.CommandBus.PublishAsync(command);
                 });
 
-                await publish(new AttachClient { Id = "default" });
+                var schema =
+                    SchemaBuilder.Create("Pages")
+                        .AddString("Title", f => f
+                            .Length(100)
+                            .Required())
+                        .AddString("Slug", f => f
+                            .Length(100)
+                            .Required()
+                            .Disabled())
+                        .AddString("Text", f => f
+                            .Length(1000)
+                            .Required()
+                            .AsRichText())
+                        .Build();
+
+                await publish(schema);
             }
         }
     }

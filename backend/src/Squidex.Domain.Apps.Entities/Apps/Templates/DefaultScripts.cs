@@ -20,29 +20,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                 replace(data);
             }";
 
-        private const string ScriptToGenerateUsername = @"
-            var data = ctx.data;
-            
-            if (data.userName && data.userName.iv) {
-                data.normalizedUserName = { iv: data.userName.iv.toUpperCase() };
-            }
-            
-            if (data.email && data.email.iv) {
-                data.normalizedEmail = { iv: data.email.iv.toUpperCase() };
-            }
-
-            replace(data);";
-
         public static readonly SchemaScripts GenerateSlug = new SchemaScripts
         {
             Create = ScriptToGenerateSlug,
             Update = ScriptToGenerateSlug
-        };
-
-        public static readonly SchemaScripts GenerateUsername = new SchemaScripts
-        {
-            Create = ScriptToGenerateUsername,
-            Update = ScriptToGenerateUsername
         };
     }
 }
