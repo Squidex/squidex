@@ -31,14 +31,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
         {
             Field.Properties = Field.Properties with { Label = label };
 
-            return this as T;
+            return (T)(object)this;
         }
 
         public T Hints(string? hints)
         {
             Field.Properties = Field.Properties with { Hints = hints };
 
-            return this as T;
+            return (T)(object)this;
         }
 
         public T Localizable()
@@ -48,26 +48,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
                 localizableField.Partitioning = Partitioning.Language.Key;
             }
 
-            return this as T;
+            return (T)(object)this;
         }
 
         public T Disabled()
         {
             Field.IsDisabled = true;
 
-            return this as T;
+            return (T)(object)this;
         }
 
         public T Required()
         {
             Field.Properties = Field.Properties with { IsRequired = true };
 
-            return this as T;
+            return (T)(object)this;
         }
 
         protected void Properties<TProperties>(Func<TProperties, TProperties> updater) where TProperties : FieldProperties
         {
-            Field.Properties = updater((T)Field.Properties);
+            Field.Properties = updater((TProperties)Field.Properties);
         }
 
         public T ShowInList()
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             Schema.FieldsInLists ??= new FieldNames();
             Schema.FieldsInLists.Add(Field.Name);
 
-            return this as T;
+            return (T)(object)this;
         }
 
         public T ShowInReferences()
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             Schema.FieldsInReferences ??= new FieldNames();
             Schema.FieldsInReferences.Add(Field.Name);
 
-            return this as T;
+            return (T)(object)this;
         }
     }
 }
