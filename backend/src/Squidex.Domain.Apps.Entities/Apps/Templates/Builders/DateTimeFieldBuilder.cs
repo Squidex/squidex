@@ -10,9 +10,9 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class DateTimeFieldBuilder : FieldBuilder
+    public class DateTimeFieldBuilder : FieldBuilder<DateTimeFieldBuilder>
     {
-        public DateTimeFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public DateTimeFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }

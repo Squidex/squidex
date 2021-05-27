@@ -10,9 +10,9 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class AssetFieldBuilder : FieldBuilder
+    public class AssetFieldBuilder : FieldBuilder<AssetFieldBuilder>
     {
-        public AssetFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public AssetFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }

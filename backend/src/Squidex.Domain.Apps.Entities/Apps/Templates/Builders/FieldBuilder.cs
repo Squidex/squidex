@@ -14,69 +14,76 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public abstract class FieldBuilder
     {
-        private readonly UpsertSchemaField field;
-        private readonly CreateSchema schema;
+        protected UpsertSchemaFieldBase Field { get; init; }
+        protected CreateSchema Schema { get; init; }
+    }
 
-        protected FieldBuilder(UpsertSchemaField field, CreateSchema schema)
+    public abstract class FieldBuilder<T> : FieldBuilder
+        where T : FieldBuilder
+    {
+        protected FieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
         {
-            this.field = field;
-            this.schema = schema;
+            Field = field;
+            Schema = schema;
         }
 
-        public FieldBuilder Label(string? label)
+        public T Label(string? label)
         {
-            field.Properties = field.Properties with { Label = label };
+            Field.Properties = Field.Properties with { Label = label };
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Hints(string? hints)
+        public T Hints(string? hints)
         {
-            field.Properties = field.Properties with { Hints = hints };
+            Field.Properties = Field.Properties with { Hints = hints };
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Localizable()
+        public T Localizable()
         {
-            field.Partitioning = Partitioning.Language.Key;
+            if (Field is UpsertSchemaField localizableField)
+            {
+                localizableField.Partitioning = Partitioning.Language.Key;
+            }
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Disabled()
+        public T Disabled()
         {
-            field.IsDisabled = true;
+            Field.IsDisabled = true;
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder Required()
+        public T Required()
         {
-            field.Properties = field.Properties with { IsRequired = true };
+            Field.Properties = Field.Properties with { IsRequired = true };
 
-            return this;
+            return this as T;
         }
 
         protected void Properties<T>(Func<T, T> updater) where T : FieldProperties
         {
-            field.Properties = updater((T)field.Properties);
+            Field.Properties = updater((T)Field.Properties);
         }
 
-        public FieldBuilder ShowInList()
+        public T ShowInList()
         {
-            schema.FieldsInLists ??= new FieldNames();
-            schema.FieldsInLists.Add(field.Name);
+            Schema.FieldsInLists ??= new FieldNames();
+            Schema.FieldsInLists.Add(Field.Name);
 
-            return this;
+            return this as T;
         }
 
-        public FieldBuilder ShowInReferences()
+        public T ShowInReferences()
         {
-            schema.FieldsInReferences ??= new FieldNames();
-            schema.FieldsInReferences.Add(field.Name);
+            Schema.FieldsInReferences ??= new FieldNames();
+            Schema.FieldsInReferences.Add(Field.Name);
 
-            return this;
+            return this as T;
         }
     }
 }

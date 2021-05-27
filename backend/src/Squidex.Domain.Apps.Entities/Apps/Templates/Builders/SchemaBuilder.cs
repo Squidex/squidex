@@ -139,6 +139,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return this;
         }
 
+        public SchemaBuilder AddArray(string name, Action<ArrayFieldBuilder> configure)
+        {
+            var field = AddField<ArrayFieldProperties>(name);
+
+            configure(new ArrayFieldBuilder(field, command));
+
+            return this;
+        }
+
         private UpsertSchemaField AddField<T>(string name) where T : FieldProperties, new()
         {
             var field = new UpsertSchemaField

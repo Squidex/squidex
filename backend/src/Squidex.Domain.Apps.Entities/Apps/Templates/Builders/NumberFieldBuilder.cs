@@ -9,9 +9,9 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class NumberFieldBuilder : FieldBuilder
+    public class NumberFieldBuilder : FieldBuilder<NumberFieldBuilder>
     {
-        public NumberFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public NumberFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }
