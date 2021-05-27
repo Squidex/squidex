@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = DomainId.NewGuid();
             var content = TestContent.Create(contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(),
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                     A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.NoTotal == true), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = DomainId.NewGuid();
             var content = TestContent.Create(contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(),
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                     A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.NoTotal == true), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
@@ -258,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = DomainId.NewGuid();
             var content = TestContent.Create(contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.Id.ToString(),
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
                     A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5" && x.NoTotal == false), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, content));
 
@@ -352,7 +352,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), schemaId.Id.ToString(), contentId, 3, A<CancellationToken>._))
+            A.CallTo(() => contentQuery.FindAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(), contentId, 3, A<CancellationToken>._))
                 .Returns(content);
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });

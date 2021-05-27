@@ -19,8 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             foreach (var fieldInfo in schemaInfo.Fields)
             {
-                if (fieldInfo.Field.RawProperties is ComponentFieldProperties ||
-                    fieldInfo.Field.RawProperties is ComponentsFieldProperties)
+                if (fieldInfo.Field.IsComponentLike())
                 {
                     AddField(new FieldType
                     {
@@ -31,21 +30,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Description = fieldInfo.Field.RawProperties.Hints
                     }).WithSourceName(fieldInfo);
                 }
-                else
-                {
-                    var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
 
-                    if (resolver != null)
+                var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
+
+                if (resolver != null)
+                {
+                    AddField(new FieldType
                     {
-                        AddField(new FieldType
-                        {
-                            Name = fieldInfo.FieldName,
-                            Arguments = args,
-                            ResolvedType = resolvedType,
-                            Resolver = resolver,
-                            Description = fieldInfo.Field.RawProperties.Hints
-                        }).WithSourceName(fieldInfo);
-                    }
+                        Name = fieldInfo.FieldName,
+                        Arguments = args,
+                        ResolvedType = resolvedType,
+                        Resolver = resolver,
+                        Description = fieldInfo.Field.RawProperties.Hints
+                    }).WithSourceName(fieldInfo);
                 }
             }
 

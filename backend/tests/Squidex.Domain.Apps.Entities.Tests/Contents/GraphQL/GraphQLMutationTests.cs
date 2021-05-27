@@ -737,7 +737,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             if (query.Contains("<DATA>"))
             {
-                var data = TestContent.Data(content, true, schemaRefId1.Id, schemaRefId2.Id);
+                var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
 
                 var dataJson = JsonConvert.SerializeObject(data, Formatting.Indented);
                 var dataString = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty);
@@ -752,7 +752,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var input = new
             {
-                data = TestContent.Data(content, true, schemaRefId1.Id, schemaRefId2.Id)
+                data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
             };
 
             return JObject.FromObject(input).ToInputs();

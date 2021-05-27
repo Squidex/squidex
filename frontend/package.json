@@ -14,8 +14,8 @@
     "build": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env production",
     "build:clean": "rimraf wwwroot/build",
     "build:analyze": "node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env production --env analyze",
-    "postinstall": "npx patch-package && ngcc",
-    "ngcc": "ngcc"
+    "postinstall": "npx patch-package && ngcc --properties es2015 browser module main --create-ivy-entry-points",
+    "ngcc": "ngcc --properties es2015 browser module main --create-ivy-entry-points"
   },
   "dependencies": {
     "@angular/animations": "12.0.2",
@@ -123,7 +123,7 @@
     "raw-loader": "4.0.2",
     "resize-observer-polyfill": "1.5.1",
     "rimraf": "3.0.2",
-    "sass": "1.32.13",
+    "sass": "1.34.0",
     "sass-lint": "1.13.1",
     "sass-lint-webpack": "1.0.3",
     "sass-loader": "11.1.1",

@@ -8,10 +8,8 @@
 using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -93,41 +91,49 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   nestedNumber
                   nestedBoolean
                 }
-                myString {
-                    de
-                }
-                myString2 {
-                    iv
-                }
-                myNumber {
-                    iv
-                }
-                myNumber2 {
-                    iv
-                }
-                myBoolean {
-                    iv
-                }
-                myDatetime {
-                    iv
-                }
-                myJson {
-                    iv
-                }
-                myGeolocation {
-                    iv
-                }
-                myComponent__Dynamic {
-                    iv
-                }
-                myComponents__Dynamic {
-                    iv
-                }
-                myTags {
-                    iv
-                }
-                myLocalized {
-                    de_DE
+              }
+            }";
+
+        public const string AllFlatFields = @"
+            id
+            version
+            created
+            createdBy
+            createdByUser {
+              id
+              email
+              displayName
+            }
+            lastModified
+            lastModifiedBy
+            lastModifiedByUser {
+              id
+              email
+              displayName
+            }
+            status
+            statusColor
+            url
+            flatData {
+              myJson
+              myJsonValue: myJson(path: ""value"")
+              myString
+              myLocalizedString
+              myNumber
+              myBoolean
+              myDatetime
+              myGeolocation
+              myComponent__Dynamic
+              myComponent {
+                schemaId
+                schemaRef1Field
+              }
+              myComponents__Dynamic
+              myComponents {
+                __typename
+                ... on MyRefSchema1Component {
+                  schemaId
+                  schemaRef1Field
                 }
                 ... on MyRefSchema2Component {
                   schemaId
@@ -184,23 +190,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Object()
-                                    .Add(Component.Discriminator, DomainId.Empty)
-                                    .Add("value1", 100)
-                                    .Add("value2", 200)))
+                                    .Add(Component.Discriminator, TestSchemas.Ref1.Id)
+                                    .Add("schemaRef1Field", "Component1")))
                     .AddField("my-components",
-                        new ContentFieldData()
-                            .AddInvariant(
-                                JsonValue.Array(
-                                    JsonValue.Object()
-                                        .Add(Component.Discriminator, DomainId.Empty)
-                                        .Add("value1", 100)
-                                        .Add("value2", 200))))
-                    .AddField("my-json",
-                        new ContentFieldData()
-                            .AddInvariant(
-                                JsonValue.Object()
-                                    .Add("value", 1)))
-                    .AddField("my-localized",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
@@ -296,11 +288,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 status = "DRAFT",
                 statusColor = "red",
                 url = $"contents/my-schema/{content.Id}",
-                data = Data(content, false)
+                data = Data(content)
             };
         }
 
-        public static object Data(IContentEntity content, bool input, DomainId refId = default, DomainId assetId = default)
+        public static object FlatResponse(IEnrichedContentEntity content)
         {
             return new
             {
@@ -362,10 +354,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 ["myGeolocation"] = new
                 {
-                    iv = new
+                    iv = new Dictionary<string, object>
                     {
-                        latitude = 10,
-                        longitude = 20
+                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                        ["schemaRef1Field"] = "Component1"
+                    }
+                },
+                ["myComponents"] = new
+                {
+                    iv = new[]
+                    {
+                        new Dictionary<string, object>
+                        {
+                            ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                            ["schemaRef1Field"] = "Component1"
+                        },
+                        new Dictionary<string, object>
+                        {
+                            ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
+                            ["schemaRef2Field"] = "Component2"
+                        },
                     }
                 },
                 ["myComponent"] = new
@@ -390,27 +398,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
                             ["schemaRef2Field"] = "Component2"
                         },
-                    }
-                },
-                ["myComponent".AsDynamic(input)] = new
-                {
-                    iv = new
-                    {
-                        schemaId = DomainId.Empty.ToString(),
-                        value1 = 100,
-                        value2 = 200
-                    }
-                },
-                ["myComponents".AsDynamic(input)] = new
-                {
-                    iv = new[]
-                    {
-                        new
-                        {
-                            schemaId = DomainId.Empty.ToString(),
-                            value1 = 100,
-                            value2 = 200
-                        }
                     }
                 },
                 ["myTags"] = new
