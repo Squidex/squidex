@@ -184,6 +184,10 @@ module.exports = function calculateConfig(env) {
             }],
         },
 
+        performance: {
+            hints: false,
+        },
+
         plugins: [
             new plugins.FilterWarningsPlugin({
                 exclude: /System.import/,
@@ -386,10 +390,6 @@ module.exports = function calculateConfig(env) {
 
                 new plugins.OptimizeCSSAssetsPlugin({}),
             ],
-        };
-
-        config.performance = {
-            hints: false,
         };
 
         config.plugins.push(new plugins.BuildOptimizerWebpackPlugin());
