@@ -20,15 +20,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             foreach (var fieldInfo in schemaInfo.Fields)
             {
-                if (fieldInfo.Field.RawProperties is ComponentFieldProperties ||
-                    fieldInfo.Field.RawProperties is ComponentsFieldProperties)
+                var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
+
+                if (fieldInfo.Field.IsComponentLike())
                 {
                     var fieldGraphType = new ObjectGraphType
                     {
                         Name = fieldInfo.LocalizedType
                     };
-
-                    var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
 
                     foreach (var partitionKey in partitioning.AllKeys)
                     {
@@ -51,40 +50,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Resolver = ContentResolvers.Field
                     }).WithSourceName(fieldInfo);
                 }
-                else
+
+                var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
+
+                if (resolver != null)
                 {
-                    var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
-
-                    if (resolver != null)
+                    var fieldGraphType = new ObjectGraphType
                     {
-                        var fieldGraphType = new ObjectGraphType
+                        Name = fieldInfo.LocalizedType
+                    };
+
+                    foreach (var partitionKey in partitioning.AllKeys)
+                    {
+                        fieldGraphType.AddField(new FieldType
                         {
-                            Name = fieldInfo.LocalizedType
-                        };
-
-                        var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
-
-                        foreach (var partitionKey in partitioning.AllKeys)
-                        {
-                            fieldGraphType.AddField(new FieldType
-                            {
-                                Name = partitionKey.EscapePartition(),
-                                Arguments = args,
-                                ResolvedType = resolvedType,
-                                Resolver = resolver,
-                                Description = fieldInfo.Field.RawProperties.Hints
-                            }).WithSourceName(partitionKey);
-                        }
-
-                        fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content type.";
-
-                        AddField(new FieldType
-                        {
-                            Name = fieldInfo.FieldName,
-                            ResolvedType = fieldGraphType,
-                            Resolver = ContentResolvers.Field
-                        }).WithSourceName(fieldInfo);
+                            Name = partitionKey.EscapePartition(),
+                            Arguments = args,
+                            ResolvedType = resolvedType,
+                            Resolver = resolver,
+                            Description = fieldInfo.Field.RawProperties.Hints
+                        }).WithSourceName(partitionKey);
                     }
+
+                    fieldGraphType.Description = $"The structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content type.";
+
+                    AddField(new FieldType
+                    {
+                        Name = fieldInfo.FieldName,
+                        ResolvedType = fieldGraphType,
+                        Resolver = ContentResolvers.Field
+                    }).WithSourceName(fieldInfo);
                 }
             }
 

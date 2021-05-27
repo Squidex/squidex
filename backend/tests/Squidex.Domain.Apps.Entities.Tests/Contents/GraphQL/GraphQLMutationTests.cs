@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public GraphQLMutationTests()
         {
-            content = TestContent.Create(appId, schemaId, contentId, schemaRefId1.Id, schemaRefId2.Id, null);
+            content = TestContent.Create(contentId, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id, null);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
                 .Returns(commandContext);
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => commandBus.PublishAsync(
                 A<CreateContent>.That.Matches(x =>
                     x.ExpectedVersion == EtagVersion.Any &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<CreateContent>.That.Matches(x =>
                     x.ExpectedVersion == EtagVersion.Any &&
                     x.ContentId == DomainId.Create("123") &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => commandBus.PublishAsync(
                 A<CreateContent>.That.Matches(x =>
                     x.ExpectedVersion == EtagVersion.Any &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpdateContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -281,7 +281,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpdateContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -356,7 +356,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpsertContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
@@ -390,7 +390,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<UpsertContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
@@ -466,7 +466,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<PatchContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -499,7 +499,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<PatchContent>.That.Matches(x =>
                     x.ContentId == content.Id &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Data.Equals(content.Data))))
                 .MustHaveHappened();
         }
@@ -577,7 +577,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.DueTime == dueTime &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();
         }
@@ -611,7 +611,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.DueTime == null &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();
         }
@@ -645,7 +645,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     x.ContentId == contentId &&
                     x.DueTime == null &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId) &&
+                    x.SchemaId.Equals(TestSchemas.DefaultId) &&
                     x.Status == Status.Published)))
                 .MustHaveHappened();
         }
@@ -723,20 +723,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 A<DeleteContent>.That.Matches(x =>
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10 &&
-                    x.SchemaId.Equals(schemaId))))
+                    x.SchemaId.Equals(TestSchemas.DefaultId))))
                 .MustHaveHappened();
         }
 
         private string CreateQuery(string query)
         {
             query = query
-                .Replace("'", "\"")
                 .Replace("<ID>", contentId.ToString())
+                .Replace("'", "\"")
+                .Replace("`", "\"")
                 .Replace("<FIELDS>", TestContent.AllFields);
 
             if (query.Contains("<DATA>"))
             {
-                var data = TestContent.Data(content, true, schemaRefId1.Id, schemaRefId2.Id);
+                var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
 
                 var dataJson = JsonConvert.SerializeObject(data, Formatting.Indented);
                 var dataString = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty);
@@ -751,7 +752,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var input = new
             {
-                data = TestContent.Data(content, true, schemaRefId1.Id, schemaRefId2.Id)
+                data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
             };
 
             return JObject.FromObject(input).ToInputs();

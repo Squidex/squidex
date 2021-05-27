@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
@@ -33,7 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(ContentFields.LastModifiedByUser);
             AddField(ContentFields.Status);
             AddField(ContentFields.StatusColor);
-
             AddResolvedInterface(builder.SharedTypes.ContentInterface);
 
             Description = $"The structure of a {schemaInfo.DisplayName} content type.";
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private bool CheckType(object value)
         {
-           return value is IContentEntity content && content.SchemaId?.Id == schemaId;
+            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
         }
 
         public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> allSchemas)

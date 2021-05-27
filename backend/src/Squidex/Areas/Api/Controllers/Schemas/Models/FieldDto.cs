@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
-using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;

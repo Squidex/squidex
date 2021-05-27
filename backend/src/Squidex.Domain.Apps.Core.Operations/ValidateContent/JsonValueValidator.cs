@@ -175,17 +175,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private static bool IsValidComponent(IJsonValue value)
         {
-            if (value is not JsonObject obj)
-            {
-                return false;
-            }
-
-            if (!obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
-            {
-                return false;
-            }
-
-            return !string.IsNullOrWhiteSpace(type.Value);
+            return Component.IsValid(value, out _);
         }
     }
 }

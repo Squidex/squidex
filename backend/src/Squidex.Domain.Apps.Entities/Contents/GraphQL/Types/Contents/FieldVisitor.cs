@@ -12,6 +12,8 @@ using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
@@ -102,12 +104,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            var schemaFieldType =
-                new ListGraphType(
-                    new NonNullGraphType(
-                        new NestedGraphType(builder, args)));
+            var type = new NestedGraphType(builder, args);
 
-            return (schemaFieldType, JsonNoop, null);
+            if (type.Fields.Count == 0)
+            {
+                return default;
+            }
+
+            return (new ListGraphType(new NonNullGraphType(type)), JsonNoop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, FieldInfo args)
@@ -122,12 +126,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ComponentFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
+            var type = ResolveComponent(args, field.Properties.SchemaIds);
+
+            if (type == null)
+            {
+                return default;
+            }
+
+            return (type, JsonNoop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
+            var type = ResolveComponent(args, field.Properties.SchemaIds);
+
+            if (type == null)
+            {
+                return default;
+            }
+
+            return (new ListGraphType(new NonNullGraphType(type)), JsonNoop, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
@@ -162,7 +180,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
-            return ResolveReferences(field, args);
+            var type = ResolveReferences(args, field.Properties.SchemaIds);
+
+            if (type == null)
+            {
+                return default;
+            }
+
+            return (new ListGraphType(new NonNullGraphType(type)), References, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<UIFieldProperties> field, FieldInfo args)
@@ -170,15 +195,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return default;
         }
 
-        private (IGraphType?, IFieldResolver?, QueryArguments?) ResolveReferences(IField<ReferencesFieldProperties> field, FieldInfo args)
+        private IGraphType? ResolveReferences(FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
         {
-            IGraphType? contentType = builder.GetContentType(field.Properties.SingleId());
+            IGraphType? contentType = null;
+
+            if (schemaIds?.Count == 1)
+            {
+                contentType = builder.GetContentType(schemaIds[0]);
+            }
 
             if (contentType == null)
             {
-                var union = new ContentUnionGraphType(builder, args, field.Properties);
+                var union = new ReferenceUnionGraphType(builder, fieldInfo, schemaIds);
 
-                if (!union.PossibleTypes.Any())
+                if (!union.HasType)
                 {
                     return default;
                 }
@@ -186,9 +216,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 contentType = union;
             }
 
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(contentType));
+            return contentType;
+        }
 
-            return (schemaFieldType, References, null);
+        private IGraphType? ResolveComponent(FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        {
+            IGraphType? componentType = null;
+
+            if (schemaIds?.Count == 1)
+            {
+                componentType = builder.GetComponentType(schemaIds[0]);
+            }
+
+            if (componentType == null)
+            {
+                var union = new ComponentUnionGraphType(builder, fieldInfo, schemaIds);
+
+                if (!union.HasType)
+                {
+                    return default;
+                }
+
+                componentType = union;
+            }
+
+            return componentType;
         }
 
         private static IFieldResolver CreateValueResolver(ValueResolver valueResolver)

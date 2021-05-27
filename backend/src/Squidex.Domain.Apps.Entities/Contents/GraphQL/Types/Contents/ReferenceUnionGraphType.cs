@@ -8,22 +8,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    internal sealed class ContentUnionGraphType : UnionGraphType
+    internal sealed class ReferenceUnionGraphType : UnionGraphType
     {
         private readonly Dictionary<DomainId, IObjectGraphType> types = new Dictionary<DomainId, IObjectGraphType>();
 
-        public ContentUnionGraphType(Builder builder, FieldInfo fieldInfo, ReferencesFieldProperties properties)
-        {
-            Name = fieldInfo.UnionType;
+        public bool HasType => types.Count > 0;
 
-            if (properties.SchemaIds?.Any() == true)
+        public ReferenceUnionGraphType(Builder builder, FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        {
+            Name = fieldInfo.ReferenceType;
+
+            if (schemaIds?.Any() == true)
             {
-                foreach (var schemaId in properties.SchemaIds)
+                foreach (var schemaId in schemaIds)
                 {
                     var contentType = builder.GetContentType(schemaId);
 
@@ -41,20 +43,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             }
 
-            foreach (var type in types)
+            if (HasType)
             {
-                AddPossibleType(type.Value);
-            }
-
-            ResolveType = value =>
-            {
-                if (value is IContentEntity content)
+                foreach (var type in types)
                 {
-                    return types.GetOrDefault(content.SchemaId.Id);
+                    AddPossibleType(type.Value);
                 }
 
-                return null;
-            };
+                ResolveType = value =>
+                {
+                    if (value is IContentEntity content)
+                    {
+                        return types.GetOrDefault(content.SchemaId.Id);
+                    }
+
+                    return null;
+                };
+            }
         }
     }
 }

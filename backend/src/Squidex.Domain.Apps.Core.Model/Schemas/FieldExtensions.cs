@@ -73,6 +73,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return (withHidden || !field.IsHidden) && !field.RawProperties.IsUIProperty();
         }
 
+        public static bool IsComponentLike<T>(this T field) where T : IField
+        {
+            return field.RawProperties is ComponentFieldProperties || field.RawProperties is ComponentsFieldProperties;
+        }
+
         public static bool IsUI<T>(this T field) where T : IField
         {
             return field.RawProperties is UIFieldProperties;
