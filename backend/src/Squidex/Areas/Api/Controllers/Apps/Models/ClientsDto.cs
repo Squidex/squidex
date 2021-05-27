@@ -22,23 +22,20 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static ClientsDto FromApp(IAppEntity app, Resources resources)
         {
-            var appName = app.Name;
-
             var result = new ClientsDto
             {
-                Items =
-                    app.Clients
-                        .Select(x => ClientDto.FromClient(x.Key, x.Value))
-                        .Select(x => x.WithLinks(resources, appName))
-                        .ToArray()
+                Items = app.Clients
+                    .Select(x => ClientDto.FromClient(x.Key, x.Value))
+                    .Select(x => x.CreateLinks(resources))
+                    .ToArray()
             };
 
-            return result.CreateLinks(resources, appName);
+            return result;
         }
 
-        private ClientsDto CreateLinks(Resources resources, string app)
+        private ClientsDto CreateLinks(Resources resources)
         {
-            var values = new { app };
+            var values = new { app = resources.App };
 
             AddSelfLink(resources.Url<AppClientsController>(x => nameof(x.GetClients), values));
 

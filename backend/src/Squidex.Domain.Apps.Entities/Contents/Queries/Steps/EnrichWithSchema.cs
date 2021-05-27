@@ -24,14 +24,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 var schema = await schemas(group.Key);
 
-                var schemaName = schema.SchemaDef.Name;
                 var schemaDisplayName = schema.SchemaDef.DisplayNameUnchanged();
 
                 foreach (var content in group)
                 {
                     content.IsSingleton = schema.SchemaDef.Type == SchemaType.Singleton;
 
-                    content.SchemaName = schemaName;
                     content.SchemaDisplayName = schemaDisplayName;
                 }
 

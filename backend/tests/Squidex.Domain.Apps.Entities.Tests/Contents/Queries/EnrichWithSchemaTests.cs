@@ -64,7 +64,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
 
-            Assert.Equal("my-schema", content.SchemaName);
             Assert.Equal("my-schema", content.SchemaDisplayName);
         }
 

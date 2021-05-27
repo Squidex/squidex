@@ -46,8 +46,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public bool IsSingleton { get; set; }
 
-        public string SchemaName { get; set; }
-
         public string SchemaDisplayName { get; set; }
 
         public string StatusColor { get; set; }

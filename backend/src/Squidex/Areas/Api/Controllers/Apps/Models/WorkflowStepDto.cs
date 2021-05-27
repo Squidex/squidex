@@ -62,12 +62,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return response;
         }
 
-        public WorkflowStep ToStep()
+        public WorkflowStep ToWorkflowStep()
         {
             return new WorkflowStep(
                 Transitions?.ToImmutableDictionary(
                     y => y.Key,
-                    y => y.Value?.ToTransition()!),
+                    y => y.Value?.ToWorkflowTransition()!),
                 Color,
                 NoUpdate ?
                     NoUpdateType.When(NoUpdateExpression, NoUpdateRoles) :

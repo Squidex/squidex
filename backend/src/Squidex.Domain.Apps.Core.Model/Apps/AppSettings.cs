@@ -20,7 +20,5 @@ namespace Squidex.Domain.Apps.Core.Apps
         public bool HideScheduler { get; init; }
 
         public bool HideDateTimeModeButton { get; init; }
-
-        public bool HideDateTimeQuickButtons { get; init; }
     }
 }

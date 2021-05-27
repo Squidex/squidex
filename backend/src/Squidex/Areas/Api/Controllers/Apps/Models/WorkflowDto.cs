@@ -56,7 +56,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public WorkflowDto WithLinks(Resources resources)
+        public WorkflowDto CreateLinks(Resources resources)
         {
             var values = new { app = resources.App, id = Id };
 

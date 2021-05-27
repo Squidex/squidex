@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Initial,
                 Steps?.ToImmutableDictionary(
                     x => x.Key,
-                    x => x.Value?.ToStep()!),
+                    x => x.Value?.ToWorkflowStep()!),
                 SchemaIds,
                 Name);
 

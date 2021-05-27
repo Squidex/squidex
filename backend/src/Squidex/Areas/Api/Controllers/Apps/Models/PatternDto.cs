@@ -5,18 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class PatternDto
     {
-        /// <summary>
-        /// Unique id of the pattern.
-        /// </summary>
-        public DomainId Id { get; set; }
-
         /// <summary>
         /// The name of the suggestion.
         /// </summary>
@@ -33,5 +29,18 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The regex message.
         /// </summary>
         public string? Message { get; set; }
+
+        public static PatternDto FromPattern(Pattern pattern)
+        {
+            return SimpleMapper.Map(pattern, new PatternDto());
+        }
+
+        public Pattern ToPattern()
+        {
+            return new Pattern(Name, Regex)
+            {
+                Message = Message
+            };
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Items =
                     app.Workflows
                         .Select(x => WorkflowDto.FromWorkflow(x.Key, x.Value))
-                        .Select(x => x.WithLinks(resources))
+                        .Select(x => x.CreateLinks(resources))
                         .ToArray()
             };
 
