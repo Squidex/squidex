@@ -110,12 +110,16 @@
                 <ng-container [ngSwitch]="contentTab | async">
                     <ng-container *ngSwitchCase="'references'">
                         <sqx-content-references mode="references"
-                            [content]="content">
+                            [content]="content"
+                            [language]="language"
+                            [languages]="languages">
                         </sqx-content-references>
                     </ng-container>
                     <ng-container *ngSwitchCase="'referencing'">
                         <sqx-content-references mode="referencing"
-                            [content]="content">
+                            [content]="content"
+                            [language]="language"
+                            [languages]="languages">
                         </sqx-content-references>
                     </ng-container>
                     <ng-container *ngSwitchCase="'extension'">

@@ -25,6 +25,9 @@ export class ContentReferencesComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
+    public languages: ReadonlyArray<AppLanguageDto>;
+
+    @Input()
     public mode: 'references' | 'referencing' = 'references';
 
     constructor(
