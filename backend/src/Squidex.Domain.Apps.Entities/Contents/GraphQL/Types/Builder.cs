@@ -70,6 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Query = new AppQueriesGraphType(this, schemaInfos)
             };
 
+            newSchema.RegisterType(SharedTypes.ComponentInterface);
             newSchema.RegisterType(SharedTypes.ContentInterface);
 
             if (schemaInfos.Any())
