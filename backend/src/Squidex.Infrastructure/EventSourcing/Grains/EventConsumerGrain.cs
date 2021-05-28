@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Log;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
@@ -59,6 +60,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             scheduler = TaskScheduler.Current;
 
             eventConsumer = eventConsumerFactory(key);
+
+            return Task.CompletedTask;
+        }
+
+        public override Task OnDeactivateAsync()
+        {
+            CompleteAsync().Forget();
 
             return Task.CompletedTask;
         }
