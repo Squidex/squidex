@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,7 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
                 .Returns(Mocks.App(appId));
 
-            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())), extensions);
+            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())), extensions)
+            {
+                TimeoutScript = TimeSpan.FromSeconds(2),
+                TimeoutExecution = TimeSpan.FromSeconds(10)
+            };
         }
 
         [Fact]

@@ -49,6 +49,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.CreateSerializerSettings()));
 
+            DomainIdSerializer.Register();
+
             SupportsQuerySyntax = false;
             SupportsGeo = true;
         }

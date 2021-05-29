@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             },
             async entry =>
             {
-                var (created, hash) = await schemasHash.GetCurrentHashAsync(app.Id);
+                var (created, hash) = await schemasHash.GetCurrentHashAsync(app);
 
                 return created < entry.Created || string.Equals(hash, entry.Hash, StringComparison.OrdinalIgnoreCase);
             });

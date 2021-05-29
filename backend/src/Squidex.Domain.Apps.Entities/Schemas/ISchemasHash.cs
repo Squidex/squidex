@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public interface ISchemasHash
     {
-        Task<(Instant Create, string Hash)> GetCurrentHashAsync(DomainId appId);
+        Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app);
 
         ValueTask<string> ComputeHashAsync(IAppEntity app, IEnumerable<ISchemaEntity> schemas);
     }
