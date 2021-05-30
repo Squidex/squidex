@@ -25,6 +25,10 @@ Current Version ![GitHub release](https://img.shields.io/github/release/squidex/
 * [MongoDB](https://www.mongodb.com/)
 * [.NET Core SDK](https://www.microsoft.com/net/download/core#/current) (Already part of Visual Studio 2017)
 
+## Quick Deploy
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Squidex/squidex)
+
 ## Contributors
 
 ### Core Team and Founders

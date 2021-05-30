@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: squidex_squidex
+    env: docker
+    repo: https://github.com/kamushadenes/squidex.git
+    dockerfilePath: ./packer/render/squidex/Dockerfile
+    dockerContext: ./packer/render/squidex/
+    disk:
+      name: assets
+      mountPath: /app/Assets
+      sizeGB: 10
+    healthCheckPath: /healthz # hanging
+    envVars:
+      - key: DOMAIN
+        sync: false
+      - key: MONGO
+        fromService:
+          name: squidex_mongo
+          type: pserv
+          property: hostport
+      - key: EVENTSTORE__TYPE
+        value: MongoDB
+      - key: IDENTITY__ADMINEMAIL
+        sync: false
+      - key: IDENTITY__ADMINPASSWORD
+        generateValue: true
+      - key: IDENTITY__GOOGLECLIENT
+        sync: false
+      - key: IDENTITY__GOOGLESECRET
+        sync: false
+      - key: IDENTITY__GITHUBCLIENT
+        sync: false
+      - key: IDENTITY__GITHUBSECRET
+        sync: false
+      - key: IDENTITY__MICROSOFTCLIENT
+        sync: false
+      - key: IDENTITY__MICROSOFTSECRET
+        sync: false
+      - key: ASPNETCORE_URLS
+        value: http://+:5000
+  - type: pserv
+    name: squidex_mongo
+    env: docker
+    repo: https://github.com/kamushadenes/squidex.git
+    dockerfilePath: ./packer/render/mongo/Dockerfile
+    dockerContext: ./packer/render/mongo/
+    disk:
+      name: db
+      mountPath: /data/db
+      sizeGB: 10
