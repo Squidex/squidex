@@ -354,26 +354,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 ["myGeolocation"] = new
                 {
-                    iv = new Dictionary<string, object>
+                    iv = new
                     {
-                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                        ["schemaRef1Field"] = "Component1"
-                    }
-                },
-                ["myComponents"] = new
-                {
-                    iv = new[]
-                    {
-                        new Dictionary<string, object>
-                        {
-                            ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
-                            ["schemaRef1Field"] = "Component1"
-                        },
-                        new Dictionary<string, object>
-                        {
-                            ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
-                            ["schemaRef2Field"] = "Component2"
-                        },
+                        latitude = 10,
+                        longitude = 20
                     }
                 },
                 ["myComponent"] = new
