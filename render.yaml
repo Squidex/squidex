@@ -2,7 +2,7 @@ services:
   - type: web
     name: squidex_squidex
     env: docker
-    repo: https://github.com/kamushadenes/squidex.git
+    repo: https://github.com/Squidex/squidex.git
     dockerfilePath: ./packer/render/squidex/Dockerfile
     dockerContext: ./packer/render/squidex/
     disk:
@@ -41,7 +41,7 @@ services:
   - type: pserv
     name: squidex_mongo
     env: docker
-    repo: https://github.com/kamushadenes/squidex.git
+    repo: https://github.com/Squidex/squidex.git
     dockerfilePath: ./packer/render/mongo/Dockerfile
     dockerContext: ./packer/render/mongo/
     disk:
