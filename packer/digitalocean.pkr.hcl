@@ -3,11 +3,11 @@ variable "squidex_version" {
   default = "5.7.0"
 }
 
-source "digitalocean" "do" {
+source "digitalocean" "squidex" {
   image = "ubuntu-20-04-x64"
   region = "sfo3"
   droplet_name = "squidex-${replace(var.squidex_version, ".", "-")}-build-{{ timestamp }}"
-  snapshot_name = "squidex-${replace(var.squidex_version, ".", "-")}"
+  snapshot_name = "squidex-${replace(var.squidex_version, ".", "-")}-{{ timestamp }}"
   snapshot_regions = [
     "nyc1",
     "sfo1",
@@ -29,7 +29,7 @@ source "digitalocean" "do" {
 
 build {
   sources = [
-    "source.digitalocean.do"
+    "source.digitalocean.squidex"
   ]
 
   provisioner "ansible" {
