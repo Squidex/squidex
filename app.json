@@ -1,0 +1,71 @@
+{
+  "name": "Squidex",
+  "description": "Headless CMS and Content Managment Hub",
+  "website": "https://squidex.io/",
+  "repository": "https://github.com/Squidex/squidex",
+  "logo": "https://avatars.githubusercontent.com/u/25371797?s=200&v=4",
+  "success_url": "/",
+  "env": {
+    "DOMAIN": {
+      "description": "Domain name",
+      "value": "squidex.example.com"
+    },
+    "MONGO_USERNAME": {
+      "description": "Mongo Username, follow https://devcenter.heroku.com/articles/ormongo#open-the-dashboard to create a database named Squidex and then edit the deployment to reflect the credentials you used",
+      "value": "Squidex"
+    },
+    "MONGO_PASSWORD": {
+      "description": "Mongo Password (see MONGO_USERNAME)",
+      "value": "Squidex123"
+    },
+    "EVENTSTORE__TYPE": {
+      "description": "EventStore Type",
+      "value": "MongoDB"
+    },
+    "IDENTITY__ADMINEMAIL": {
+      "description": "Admin Email",
+      "value": "squidex@example.com"
+    },
+    "IDENTITY__ADMINPASSWORD": {
+      "description": "Admin Password",
+      "generator": "secret"
+    },
+    "IDENTITY__GOOGLECLIENT": {
+      "description": "Google Client ID",
+      "required": false
+    },
+    "IDENTITY__GOOGLESECRET": {
+      "description": "Google Secret",
+      "required": false
+    },
+    "IDENTITY__GITHUBCLIENT": {
+      "description": "GitHub Client ID",
+      "required": false
+    },
+    "IDENTITY__GITHUBSECRET": {
+      "description": "GitHub Secret",
+      "required": false
+    },
+    "IDENTITY__MICROSOFTCLIENT": {
+      "description": "Microsoft Client ID",
+      "required": false
+    },
+    "IDENTITY__MICROSOFTSECRET": {
+      "description": "Microsoft Secret",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-1x"
+    }
+  },
+  "addons": [
+    {
+      "plan": "ormongo:2-mmap",
+      "as": "MONGO"
+    }
+  ],
+  "stack": "container"
+}
