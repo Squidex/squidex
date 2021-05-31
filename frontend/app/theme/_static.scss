@@ -36,7 +36,8 @@ noscript {
 .profile {
     &-container {
         margin: 0 auto;
-        max-width: 45rem;
+        max-width: 30rem;
+        min-width: 10rem;
         padding: 1rem 2rem;
     }
 
@@ -134,8 +135,9 @@ noscript {
             display: inline-block;
             font-size: 1.1rem;
             font-weight: normal;
+            margin-bottom: 4px;
+            margin-right: .5rem;
             vertical-align: middle;
-            width: 1.6rem;
         }
     }
 
