@@ -25,6 +25,12 @@ Current Version ![GitHub release](https://img.shields.io/github/release/squidex/
 * [MongoDB](https://www.mongodb.com/)
 * [.NET Core SDK](https://www.microsoft.com/net/download/core#/current) (Already part of Visual Studio 2017)
 
+## Quick Deploy
+
+[![Deploy to Heroku](http://img.shields.io/badge/-Deploy%20to%20Heroku-430098?style=for-the-badge&logo=heroku&logoColor=ffffff)](https://heroku.com/deploy?template=https://github.com/Squidex/squidex)
+[![Deploy to Render](http://img.shields.io/badge/-Deploy%20to%20Render-44E4B4?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADyklEQVR4Xu1aT0gUURh/k5qV2y5pEbpqHiqqy4IIQUGghbNOK53WkwQFdekqRHXNDkHXIKhuXdZTZu6MRkbkJRFJKAKNUnQPEir+IXdr98XbdXbfzrznjLvvObM7s5dld7553/f93u/78/4IwOEfweH+AxcAlwEOR8ANAYcTwE2CfEIAAqEzpjSmQPLobhj2zi9N4fLiotxKet87vvZloKcnqT6jyW2sx2fGz1xb38kGJgCEv0b2h/yBvuu+0/0kZRAAAtX0/wqCkGcPhBAJ6T7SbNQXPSWtqQ9ocsFFpUNpDI5xBeBnYn2+pcrTtJuZpsnSANBCRQNAK8cVgM7F4W6lvmuQZRYxy4De2ajvlSkGvO1QGkPsGXB/aeJF/7G2myxmHR/DGIBMREizsnUhcO/3xMtHdW03WDuPxjMGIKPVshwgLshXZb84lO88OcUVApDtAYAwBUn5XHV2Kbn1tzc2FhptlkYKAcCKd0yXwbnExnxzVQ012z9emb5ztzbw1AonitFpCgBU5yPnwnGaouCCcl5pCn4uxhCr3jUFwLPVbw9v+84+0BkJAXiyMn2rry7w3CoHkN7u2JtDJP0HPv2J4x0jScYUALROaym5lTheebDaSueRbu6dIE2BOBe9PNIivS9vACAQIIApIn00vbtVQOgnKFOambTCV2KDzaP13XOlBUDGWiYAoKVmtEGcJCULbeNiHwYwBkBuECdLiwEMQwAxwO4AFMM8wzLoAuAyYDsECIs+uyRBx4dACkJIimVmZTAvCWJMsAsDuLbCpZAE9xYACADiG6KcAxmQ4b8aBQ4EIJNvHQ+AWnbswgDuZdDuiyHuAOTKYH435BgGuIuhklsO89wP2I4C9LXPjltiWJTyaYWxjGOXHMC3E/wlt8onSm1HiGcIZNsgG7XCKZjeu9aeWzoqBEhn1EwACMNIxcaypyZNqmUAQG0uCUTrcvd0imlGin23a2bYSxrDc7Jrc0AQspepCj4aK9ZAO79vuClqZ+NZ2OYCYISi2R0hdEQ9WB/aNHOAQqvb1Csyaobb/t7TO0Kirg/I5VvcYBUAUjY2e/fHSC49NgRA+kG5KIkrhwAEYwwuSuIM0DpHAqAQBtA2WEzfFE33AXrNTMpgFgCDcwGuIaDxbW9DwOTJkAsAzyRoJQMufn992OOpbsvZ8A8AUJn+id/EDkciFWsXvJdwW5EUktbe2BYX5HZSrtDLDbWrunB5r1/8iHd4tPHiNdVTH460r+5U6dw+wKgPKPfnLgPKfYaN/HMZYIRQuT93GVDuM2zk338nAalfI74e1QAAAABJRU5ErkJggg==&logoColor=ffffff)](https://render.com/deploy?repo=https://github.com/Squidex/squidex)
+
+
 ## Contributors
 
 ### Core Team and Founders
