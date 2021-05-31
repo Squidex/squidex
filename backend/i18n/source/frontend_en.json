@@ -311,7 +311,7 @@
   "common.queryOperators.exists": "exists",
   "common.queryOperators.ge": "is greater than or equals to",
   "common.queryOperators.gt": "is greater than",
-  "common.queryOperators.le": "is less than pr equals to",
+  "common.queryOperators.le": "is less than or equals to",
   "common.queryOperators.lt": "is less than",
   "common.queryOperators.matchs": "matchs",
   "common.queryOperators.ne": "is not equals to",
