@@ -45,11 +45,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var indexBySchemaWithRefs =
                 new CreateIndexModel<MongoContentEntity>(Index
+                    .Descending(x => x.LastModified)
+                    .Ascending(x => x.Id)
                     .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IndexedSchemaId)
                     .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.ReferencedIds)
-                    .Descending(x => x.LastModified));
+                    .Ascending(x => x.ReferencedIds));
 
             await Collection.Indexes.CreateOneAsync(indexBySchemaWithRefs, cancellationToken: ct);
 
@@ -202,13 +203,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         private static bool IsSatisfiedByIndex(ClrQuery query)
         {
-            return query.Sort?.All(x => x.Path.ToString() == "mt" && x.Order == SortOrder.Descending) == true;
+            return query.Sort != null &&
+                query.Sort.Count == 2 &&
+                query.Sort[0].Path.ToString() == "mt" &&
+                query.Sort[0].Order == SortOrder.Descending &&
+                query.Sort[1].Path.ToString() == "id" &&
+                query.Sort[1].Order == SortOrder.Ascending;
         }
 
         private static FilterDefinition<MongoContentEntity> BuildFilter(DomainId appId, DomainId schemaId, FilterNode<ClrValue>? filter)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
+                Filter.Exists(x => x.LastModified),
+                Filter.Exists(x => x.Id),
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IndexedSchemaId, schemaId)
             };
@@ -231,6 +239,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
+                Filter.Exists(x => x.LastModified),
+                Filter.Exists(x => x.Id),
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.In(x => x.IndexedSchemaId, schemaIds),
             };

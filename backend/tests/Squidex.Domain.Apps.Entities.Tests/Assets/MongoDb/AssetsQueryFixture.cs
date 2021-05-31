@@ -87,6 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                                 {
                                     DocumentId = DomainId.NewGuid(),
                                     Tags = new HashSet<string> { tag },
+                                    Id = DomainId.NewGuid(),
                                     FileHash = fileName,
                                     FileName = fileName,
                                     FileSize = 1024,

@@ -46,11 +46,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
+                        .Descending(x => x.LastModified)
+                        .Ascending(x => x.Id)
                         .Ascending(x => x.IndexedAppId)
                         .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.ParentId)
-                        .Ascending(x => x.Tags)
-                        .Descending(x => x.LastModified)),
+                        .Ascending(x => x.Tags)),
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
                         .Ascending(x => x.IndexedAppId)
@@ -99,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         var filter = BuildFilter(appId, q.Ids.ToHashSet());
 
                         var assetEntities =
-                            await Collection.Find(filter).SortByDescending(x => x.LastModified)
+                            await Collection.Find(filter).SortByDescending(x => x.LastModified).ThenBy(x => x.Id)
                                 .QueryLimit(q.Query)
                                 .QuerySkip(q.Query)
                                 .ToListAsync(ct = default);
