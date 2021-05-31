@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public AssetsQueryFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("QueryTests");
+            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
 
             SetupJson();
 

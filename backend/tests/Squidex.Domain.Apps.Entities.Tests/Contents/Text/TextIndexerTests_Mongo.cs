@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             public async Task<ITextIndex> CreateAsync(DomainId schemaId)
             {
-                var database = mongoClient.GetDatabase("FullText");
+                var database = mongoClient.GetDatabase("Squidex_Testing");
 
                 var index = new MongoTextIndex(database, false);
 

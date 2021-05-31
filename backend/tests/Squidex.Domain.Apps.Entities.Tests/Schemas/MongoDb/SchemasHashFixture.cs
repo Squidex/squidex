@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
         {
             InstantSerializer.Register();
 
-            mongoDatabase = mongoClient.GetDatabase("QueryTests");
+            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
 
             var schemasHash = new MongoSchemasHash(mongoDatabase);
 
