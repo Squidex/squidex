@@ -41,26 +41,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.appProvider = appProvider;
         }
 
-        protected override async Task PrepareAsync(CancellationToken ct)
+        public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {
-            var indexBySchemaWithRefs =
-                new CreateIndexModel<MongoContentEntity>(Index
-                    .Descending(x => x.LastModified)
-                    .Ascending(x => x.Id)
-                    .Ascending(x => x.IndexedAppId)
-                    .Ascending(x => x.IndexedSchemaId)
-                    .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.ReferencedIds));
+            yield return new CreateIndexModel<MongoContentEntity>(Index
+                .Descending(x => x.LastModified)
+                .Ascending(x => x.Id)
+                .Ascending(x => x.IndexedAppId)
+                .Ascending(x => x.IndexedSchemaId)
+                .Ascending(x => x.IsDeleted)
+                .Ascending(x => x.ReferencedIds));
 
-            await Collection.Indexes.CreateOneAsync(indexBySchemaWithRefs, cancellationToken: ct);
-
-            var indexBySchema =
-                new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.IndexedSchemaId)
-                    .Ascending(x => x.IsDeleted)
-                    .Descending(x => x.LastModified));
-
-            await Collection.Indexes.CreateOneAsync(indexBySchema, cancellationToken: ct);
+            yield return new CreateIndexModel<MongoContentEntity>(Index
+                .Ascending(x => x.IndexedSchemaId)
+                .Ascending(x => x.IsDeleted)
+                .Descending(x => x.LastModified));
         }
 
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,

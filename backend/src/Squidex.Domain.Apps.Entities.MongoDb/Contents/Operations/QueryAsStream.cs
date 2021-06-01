@@ -17,15 +17,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     public sealed class QueryAsStream : OperationBase
     {
-        protected override async Task PrepareAsync(CancellationToken ct)
+        public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {
-            var indexBySchema =
-                new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.IndexedAppId)
-                    .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.IndexedSchemaId));
-
-            await Collection.Indexes.CreateOneAsync(indexBySchema, cancellationToken: ct);
+            yield return new CreateIndexModel<MongoContentEntity>(Index
+                .Ascending(x => x.IndexedAppId)
+                .Ascending(x => x.IsDeleted)
+                .Ascending(x => x.IndexedSchemaId));
         }
 
         public async IAsyncEnumerable<IContentEntity> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,

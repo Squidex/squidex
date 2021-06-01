@@ -198,6 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var q =
                 Q.Empty
+                    .WithoutTotal()
                     .WithQuery(clrQuery)
                     .WithReference(reference);
 

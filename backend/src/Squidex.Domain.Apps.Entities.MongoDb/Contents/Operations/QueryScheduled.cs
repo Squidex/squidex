@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -18,14 +19,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryScheduled : OperationBase
     {
-        protected override Task PrepareAsync(CancellationToken ct)
+        public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {
-            var index =
-                new CreateIndexModel<MongoContentEntity>(Index
-                   .Ascending(x => x.ScheduledAt)
-                   .Ascending(x => x.IsDeleted));
-
-            return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
+            yield return new CreateIndexModel<MongoContentEntity>(Index
+                .Ascending(x => x.ScheduledAt)
+                .Ascending(x => x.IsDeleted));
         }
 
         public Task QueryAsync(Instant now, Func<IContentEntity, Task> callback,

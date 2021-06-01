@@ -5,8 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using MongoDB.Driver;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
@@ -21,19 +20,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
         public IMongoCollection<MongoContentEntity> Collection { get; private set; }
 
-        public async Task PrepareAsync(IMongoCollection<MongoContentEntity> collection, bool skipIndex, CancellationToken ct = default)
+        public void Setup(IMongoCollection<MongoContentEntity> collection)
         {
             Collection = collection;
-
-            if (!skipIndex)
-            {
-                await PrepareAsync(ct);
-            }
         }
 
-        protected virtual Task PrepareAsync(CancellationToken ct)
+        public virtual IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {
-            return Task.CompletedTask;
+            yield break;
         }
     }
 }

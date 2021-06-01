@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection,
             CancellationToken ct = default)
         {
-            await statisticsCollection.InitializeAsync(ct = default);
+            await statisticsCollection.InitializeAsync(ct);
 
             await collection.Indexes.CreateManyAsync(new[]
             {
@@ -73,12 +73,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId.Value));
             }
 
-            var ruleEventEntities = await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync(ct = default);
+            var ruleEventEntities = await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync(ct);
             var ruleEventTotal = (long)ruleEventEntities.Count;
 
             if (ruleEventTotal >= take || skip > 0)
             {
-                ruleEventTotal = await Collection.Find(filter).CountDocumentsAsync(ct = default);
+                ruleEventTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
             }
 
             return ResultList.Create(ruleEventTotal, ruleEventEntities);
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         {
             var ruleEvent =
                 await Collection.Find(x => x.DocumentId == id)
-                    .FirstOrDefaultAsync(ct = default);
+                    .FirstOrDefaultAsync(ct);
 
             return ruleEvent;
         }
