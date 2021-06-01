@@ -153,7 +153,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                 };
             }
 
-            var assets = await _.AssetRepository.QueryAsync(_.RandomAppId(), parentId, Q.Empty.WithQuery(clrQuery));
+            var q =
+                Q.Empty
+                    .WithoutTotal()
+                    .WithQuery(clrQuery);
+
+            var assets = await _.AssetRepository.QueryAsync(_.RandomAppId(), parentId, q);
 
             return assets;
         }
