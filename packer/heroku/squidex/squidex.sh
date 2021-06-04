@@ -10,4 +10,6 @@ export STORE__MONGODB__CONTENTDATABASE="Squidex"
 
 export ASPNETCORE_URLS="http://+:$PORT"
 
+export IDENTITY__GOOGLECLIENT=""
+
 dotnet Squidex.dll

@@ -3,8 +3,14 @@
 echo "Waiting 60 seconds ..."
 sleep 60
 
+if [ "x$DOMAIN" = "x" ]; then
+    export DOMAIN=$RENDER_EXTERNAL_HOSTNAME
+fi
+
 export URLS__BASEURL="https://${DOMAIN}"
 export EVENTSTORE__MONGODB__CONFIGURATION="mongodb://${MONGO}"
 export STORE__MONGODB__CONFIGURATION="mongodb://${MONGO}"
+
+export IDENTITY__GOOGLECLIENT=""
 
 dotnet Squidex.dll
