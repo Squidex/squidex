@@ -17,42 +17,6 @@
     "MONGO_PASSWORD": {
       "description": "Mongo Password (see MONGO_USERNAME)",
       "value": "Squidex123"
-    },
-    "EVENTSTORE__TYPE": {
-      "description": "EventStore Type",
-      "value": "MongoDB"
-    },
-    "IDENTITY__ADMINEMAIL": {
-      "description": "Admin Email",
-      "value": "squidex@example.com"
-    },
-    "IDENTITY__ADMINPASSWORD": {
-      "description": "Admin Password",
-      "generator": "secret"
-    },
-    "IDENTITY__GOOGLECLIENT": {
-      "description": "Google Client ID",
-      "required": false
-    },
-    "IDENTITY__GOOGLESECRET": {
-      "description": "Google Secret",
-      "required": false
-    },
-    "IDENTITY__GITHUBCLIENT": {
-      "description": "GitHub Client ID",
-      "required": false
-    },
-    "IDENTITY__GITHUBSECRET": {
-      "description": "GitHub Secret",
-      "required": false
-    },
-    "IDENTITY__MICROSOFTCLIENT": {
-      "description": "Microsoft Client ID",
-      "required": false
-    },
-    "IDENTITY__MICROSOFTSECRET": {
-      "description": "Microsoft Secret",
-      "required": false
     }
   },
   "formation": {
