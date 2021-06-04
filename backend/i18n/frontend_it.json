@@ -761,7 +761,7 @@
   "schemas.fieldTypes.assets.sizeMin": "Dimensione Max",
   "schemas.fieldTypes.boolean.description": "Si o no, vero o falso.",
   "schemas.fieldTypes.component.description": "Embed another schema to this content.",
-  "schemas.fieldTypes.components.description": "Embed another schemas to this content as array.",
+  "schemas.fieldTypes.components.description": "Embed other schemas to this content as array.",
   "schemas.fieldTypes.dateTime.defaultMode": "Modalità predefinita",
   "schemas.fieldTypes.dateTime.description": "Data degli eventi, orari di apertura.",
   "schemas.fieldTypes.dateTime.rangeMax": "Valore Max",
