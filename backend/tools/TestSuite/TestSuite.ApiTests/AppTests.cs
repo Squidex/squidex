@@ -270,10 +270,10 @@ namespace TestSuite.ApiTests
             await _.Apps.PostLanguageAsync(appName, new AddLanguageDto { Language = "fr" });
 
             var languages_1 = await _.Apps.GetLanguagesAsync(appName);
-            var languageEN_1 = languages_1.Items.First(x => x.Iso2Code == "en");
+            var language1_EN = languages_1.Items.FirstOrDefault(x => x.Iso2Code == "en");
 
             Assert.Equal(new string[] { "en", "de", "fr", "it" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
-            Assert.True(languageEN_1.IsMaster);
+            Assert.True(language1_EN.IsMaster);
 
 
             // STEP 3: Update German language.
@@ -288,10 +288,10 @@ namespace TestSuite.ApiTests
             };
 
             var languages_2 = await _.Apps.PutLanguageAsync(appName, "de", updateRequest1);
-            var languageDE_2 = languages_2.Items.First(x => x.Iso2Code == "de");
+            var language2_EN = languages_2.Items.FirstOrDefault(x => x.Iso2Code == "de");
 
-            Assert.Equal(new string[] { "fr", "it" }, languageDE_2.Fallback.ToArray());
-            Assert.True(languageDE_2.IsOptional);
+            Assert.Equal(new string[] { "fr", "it" }, language2_EN.Fallback.ToArray());
+            Assert.True(language2_EN.IsOptional);
 
 
             // STEP 4: Update Italian language.
@@ -305,7 +305,7 @@ namespace TestSuite.ApiTests
             };
 
             var languages_3 = await _.Apps.PutLanguageAsync(appName, "it", updateRequest2);
-            var languageDE_3 = languages_3.Items.First(x => x.Iso2Code == "it");
+            var languageDE_3 = languages_3.Items.FirstOrDefault(x => x.Iso2Code == "it");
 
             Assert.Equal(new string[] { "fr", "de" }, languageDE_3.Fallback.ToArray());
 
@@ -314,23 +314,74 @@ namespace TestSuite.ApiTests
             var masterRequest = new UpdateLanguageDto { IsMaster = true };
 
             var languages_4 = await _.Apps.PutLanguageAsync(appName, "it", masterRequest);
+            var language4_IT = languages_4.Items.FirstOrDefault(x => x.Iso2Code == "it");
+            var language4_EN = languages_4.Items.FirstOrDefault(x => x.Iso2Code == "en");
 
-            var languageIT_4 = languages_4.Items.First(x => x.Iso2Code == "it");
-            var languageEN_4 = languages_4.Items.First(x => x.Iso2Code == "en");
-
-            Assert.True(languageIT_4.IsMaster);
-            Assert.False(languageIT_4.IsOptional);
-            Assert.False(languageEN_4.IsMaster);
-            Assert.Empty(languageIT_4.Fallback);
+            Assert.True(language4_IT.IsMaster);
+            Assert.False(language4_IT.IsOptional);
+            Assert.False(language4_EN.IsMaster);
+            Assert.Empty(language4_IT.Fallback);
             Assert.Equal(new string[] { "it", "de", "en", "fr" }, languages_4.Items.Select(x => x.Iso2Code).ToArray());
 
 
             // STEP 6: Remove language.
             var languages_5 = await _.Apps.DeleteLanguageAsync(appName, "fr");
-            var languageDE_5 = languages_5.Items.First(x => x.Iso2Code == "de");
+            var language5_DE = languages_5.Items.FirstOrDefault(x => x.Iso2Code == "de");
 
-            Assert.Equal(new string[] { "it" }, languageDE_5.Fallback.ToArray());
+            Assert.Equal(new string[] { "it" }, language5_DE.Fallback.ToArray());
             Assert.Equal(new string[] { "it", "de", "en" }, languages_5.Items.Select(x => x.Iso2Code).ToArray());
+        }
+
+        [Fact]
+        public async Task Should_manage_workflows()
+        {
+            var workflowName = Guid.NewGuid().ToString();
+
+            // STEP 0: Create workflow.
+            var createRequest = new AddWorkflowDto
+            {
+                Name = workflowName
+            };
+
+            var workflows_1 = await _.Apps.PostWorkflowAsync(_.AppName, createRequest);
+            var workflow_1 = workflows_1.Items.FirstOrDefault(x => x.Name == workflowName);
+
+            Assert.NotNull(workflow_1);
+            Assert.NotNull(workflow_1.Name);
+            Assert.Equal(3, workflow_1.Steps.Count);
+
+
+            // STEP 1: Update workflow.
+            var updateRequest = new UpdateWorkflowDto
+            {
+                Initial = "Draft",
+                Steps = new Dictionary<string, WorkflowStepDto>
+                {
+                    ["Draft"] = new WorkflowStepDto
+                    {
+                        Transitions = new Dictionary<string, WorkflowTransitionDto>
+                        {
+                            ["Published"] = new WorkflowTransitionDto()
+                        }
+                    },
+                    ["Published"] = new WorkflowStepDto(),
+                },
+                Name = workflowName
+            };
+
+            var workflows_2 = await _.Apps.PutWorkflowAsync(_.AppName, workflow_1.Id, updateRequest);
+            var workflow_2 = workflows_2.Items.FirstOrDefault(x => x.Name == workflowName);
+
+            Assert.NotNull(workflow_2);
+            Assert.NotNull(workflow_2.Name);
+            Assert.Equal(2, workflow_2.Steps.Count);
+
+
+            // STEP 2: Delete workflow.
+            var workflows_3 = await _.Apps.DeleteWorkflowAsync(_.AppName, workflow_1.Id);
+            var workflow_3 = workflows_3.Items.FirstOrDefault(x => x.Name == workflowName);
+
+            Assert.Null(workflow_3);
         }
 
         [Fact]
