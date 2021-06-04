@@ -64,9 +64,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 {
                     case AssetCreated e:
                         {
-                            // Set back the deleted flag because the asset might have been recreated to reuse the ID.
-                            IsDeleted = false;
-
                             Id = e.AssetId;
 
                             SimpleMapper.Map(e, this);
