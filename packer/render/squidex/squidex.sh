@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Waiting 60 seconds ..."
+echo "Waiting 60 seconds for MongoDB ..."
 sleep 60
 
 if [ "x$DOMAIN" = "x" ]; then
