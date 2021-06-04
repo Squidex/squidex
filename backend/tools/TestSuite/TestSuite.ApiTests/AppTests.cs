@@ -103,7 +103,7 @@ namespace TestSuite.ApiTests
             var createRequest = new CreateClientDto { Id = clientId };
 
             var clients_1 = await _.Apps.PostClientAsync(_.AppName, createRequest);
-            var client_1 = clients_1.Items.Single(x => x.Id == clientId);
+            var client_1 = clients_1.Items.FirstOrDefault(x => x.Id == clientId);
 
             // Should return client with correct name and id.
             Assert.Equal(clientRole1, client_1.Role);
@@ -114,7 +114,7 @@ namespace TestSuite.ApiTests
             var updateNameRequest = new UpdateClientDto { Name = clientName };
 
             var clients_2 = await _.Apps.PutClientAsync(_.AppName, clientId, updateNameRequest);
-            var client_2 = clients_2.Items.Single(x => x.Id == clientId);
+            var client_2 = clients_2.Items.FirstOrDefault(x => x.Id == clientId);
 
             // Should update client name.
             Assert.Equal(clientName, client_2.Name);
@@ -124,7 +124,7 @@ namespace TestSuite.ApiTests
             var updateRoleRequest = new UpdateClientDto { Role = clientRole2 };
 
             var clients_3 = await _.Apps.PutClientAsync(_.AppName, clientId, updateRoleRequest);
-            var client_3 = clients_3.Items.Single(x => x.Id == clientId);
+            var client_3 = clients_3.Items.FirstOrDefault(x => x.Id == clientId);
 
             // Should update client role.
             Assert.Equal(clientRole2, client_3.Role);
@@ -132,9 +132,10 @@ namespace TestSuite.ApiTests
 
             // STEP 4: Delete client
             var clients_4 = await _.Apps.DeleteClientAsync(_.AppName, clientId);
+            var client_4 = clients_4.Items.FirstOrDefault(x => x.Id == clientId);
 
             // Should not return deleted client.
-            Assert.DoesNotContain(clients_4.Items, x => x.Id == clientId);
+            Assert.Null(client_4);
         }
 
         [Fact]
@@ -176,10 +177,11 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Remove contributor.
-            var contributors3 = await _.Apps.DeleteContributorAsync(_.AppName, contributor_2.ContributorId);
+            var contributors_3 = await _.Apps.DeleteContributorAsync(_.AppName, contributor_2.ContributorId);
+            var contributor_3 = contributors_3.Items.FirstOrDefault(x => x.ContributorId == contributor_1.ContributorId);
 
             // Should not return deleted contributor.
-            Assert.DoesNotContain(contributors3.Items, x => x.ContributorId == contributor_2.ContributorId);
+            Assert.Null(contributor_3);
         }
 
         [Fact]
@@ -194,7 +196,7 @@ namespace TestSuite.ApiTests
             var createRequest = new AddRoleDto { Name = roleName };
 
             var roles_1 = await _.Apps.PostRoleAsync(_.AppName, createRequest);
-            var role_1 = roles_1.Items.Single(x => x.Name == roleName);
+            var role_1 = roles_1.Items.FirstOrDefault(x => x.Name == roleName);
 
             // Should return role with correct name.
             Assert.Empty(role_1.Permissions);
@@ -204,7 +206,7 @@ namespace TestSuite.ApiTests
             var updateRequest = new UpdateRoleDto { Permissions = new List<string> { "a", "b" } };
 
             var roles_2 = await _.Apps.PutRoleAsync(_.AppName, roleName, updateRequest);
-            var role_2 = roles_2.Items.Single(x => x.Name == roleName);
+            var role_2 = roles_2.Items.FirstOrDefault(x => x.Name == roleName);
 
             // Should return role with correct name.
             Assert.Equal(updateRequest.Permissions, role_2.Permissions);
@@ -220,7 +222,7 @@ namespace TestSuite.ApiTests
             await _.Apps.PostContributorAsync(_.AppName, new AssignContributorDto { ContributorId = roleContributor1, Role = roleName, Invite = true });
 
             var roles_3 = await _.Apps.GetRolesAsync(_.AppName);
-            var role_3 = roles_3.Items.Single(x => x.Name == roleName);
+            var role_3 = roles_3.Items.FirstOrDefault(x => x.Name == roleName);
 
             // Should return role with correct number of users and clients.
             Assert.Equal(1, role_3.NumClients);
@@ -248,9 +250,10 @@ namespace TestSuite.ApiTests
             await _.Apps.DeleteRoleAsync(_.AppName, roleName);
 
             var roles_4 = await _.Apps.GetRolesAsync(_.AppName);
+            var role_4 = roles_4.Items.FirstOrDefault(x => x.Name == roleName);
 
             // Should not return deleted role.
-            Assert.DoesNotContain(roles_4.Items, x => x.Name == roleName);
+            Assert.Null(role_4);
         }
 
         [Fact]
@@ -270,10 +273,10 @@ namespace TestSuite.ApiTests
             await _.Apps.PostLanguageAsync(appName, new AddLanguageDto { Language = "fr" });
 
             var languages_1 = await _.Apps.GetLanguagesAsync(appName);
-            var language1_EN = languages_1.Items.FirstOrDefault(x => x.Iso2Code == "en");
+            var language_1_EN = languages_1.Items.FirstOrDefault(x => x.Iso2Code == "en");
 
             Assert.Equal(new string[] { "en", "de", "fr", "it" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
-            Assert.True(language1_EN.IsMaster);
+            Assert.True(language_1_EN.IsMaster);
 
 
             // STEP 3: Update German language.
@@ -288,10 +291,10 @@ namespace TestSuite.ApiTests
             };
 
             var languages_2 = await _.Apps.PutLanguageAsync(appName, "de", updateRequest1);
-            var language2_EN = languages_2.Items.FirstOrDefault(x => x.Iso2Code == "de");
+            var language_2_DE = languages_2.Items.FirstOrDefault(x => x.Iso2Code == "de");
 
-            Assert.Equal(new string[] { "fr", "it" }, language2_EN.Fallback.ToArray());
-            Assert.True(language2_EN.IsOptional);
+            Assert.Equal(new string[] { "fr", "it" }, language_2_DE.Fallback.ToArray());
+            Assert.True(language_2_DE.IsOptional);
 
 
             // STEP 4: Update Italian language.
@@ -305,30 +308,30 @@ namespace TestSuite.ApiTests
             };
 
             var languages_3 = await _.Apps.PutLanguageAsync(appName, "it", updateRequest2);
-            var languageDE_3 = languages_3.Items.FirstOrDefault(x => x.Iso2Code == "it");
+            var language_3_DE = languages_3.Items.FirstOrDefault(x => x.Iso2Code == "it");
 
-            Assert.Equal(new string[] { "fr", "de" }, languageDE_3.Fallback.ToArray());
+            Assert.Equal(new string[] { "fr", "de" }, language_3_DE.Fallback.ToArray());
 
 
             // STEP 5: Change master language.
             var masterRequest = new UpdateLanguageDto { IsMaster = true };
 
             var languages_4 = await _.Apps.PutLanguageAsync(appName, "it", masterRequest);
-            var language4_IT = languages_4.Items.FirstOrDefault(x => x.Iso2Code == "it");
-            var language4_EN = languages_4.Items.FirstOrDefault(x => x.Iso2Code == "en");
+            var language_4_IT = languages_4.Items.FirstOrDefault(x => x.Iso2Code == "it");
+            var language_4_EN = languages_4.Items.FirstOrDefault(x => x.Iso2Code == "en");
 
-            Assert.True(language4_IT.IsMaster);
-            Assert.False(language4_IT.IsOptional);
-            Assert.False(language4_EN.IsMaster);
-            Assert.Empty(language4_IT.Fallback);
+            Assert.True(language_4_IT.IsMaster);
+            Assert.False(language_4_IT.IsOptional);
+            Assert.False(language_4_EN.IsMaster);
+            Assert.Empty(language_4_IT.Fallback);
             Assert.Equal(new string[] { "it", "de", "en", "fr" }, languages_4.Items.Select(x => x.Iso2Code).ToArray());
 
 
             // STEP 6: Remove language.
             var languages_5 = await _.Apps.DeleteLanguageAsync(appName, "fr");
-            var language5_DE = languages_5.Items.FirstOrDefault(x => x.Iso2Code == "de");
+            var language_5_DE = languages_5.Items.FirstOrDefault(x => x.Iso2Code == "de");
 
-            Assert.Equal(new string[] { "it" }, language5_DE.Fallback.ToArray());
+            Assert.Equal(new string[] { "it" }, language_5_DE.Fallback.ToArray());
             Assert.Equal(new string[] { "it", "de", "en" }, languages_5.Items.Select(x => x.Iso2Code).ToArray());
         }
 
@@ -381,6 +384,7 @@ namespace TestSuite.ApiTests
             var workflows_3 = await _.Apps.DeleteWorkflowAsync(_.AppName, workflow_1.Id);
             var workflow_3 = workflows_3.Items.FirstOrDefault(x => x.Name == workflowName);
 
+            // Should not return deleted workflow.
             Assert.Null(workflow_3);
         }
 

@@ -619,7 +619,7 @@ namespace TestSuite.ApiTests
             // STEP 4: Check if we can find it again with a query.
             var contents_4 = await _.Contents.GetAsync(new ContentQuery { Filter = $"id eq '{content_1.Id}'" });
 
-            Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
+            Assert.NotNull(contents_4.Items.FirstOrDefault(x => x.Id == content_1.Id));
         }
 
         [Theory]
@@ -644,7 +644,7 @@ namespace TestSuite.ApiTests
             // STEP 4: Check if we can find it again with a query.
             var contents_4 = await _.Contents.GetAsync(new ContentQuery { Filter = $"id eq '{content_1.Id}'" });
 
-            Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
+            Assert.NotNull(contents_4.Items.FirstOrDefault(x => x.Id == content_1.Id));
         }
     }
 }
