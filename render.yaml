@@ -19,8 +19,6 @@ services:
           name: squidex_mongo
           type: pserv
           property: hostport
-      - key: IDENTITY__ADMINEMAIL
-        sync: false
       - key: ASPNETCORE_URLS
         value: http://+:5000
   - type: pserv

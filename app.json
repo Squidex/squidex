@@ -17,10 +17,6 @@
     "MONGO_PASSWORD": {
       "description": "Mongo Password (see MONGO_USERNAME)",
       "value": "Squidex123"
-    },
-    "IDENTITY__ADMINEMAIL": {
-      "description": "Admin Email",
-      "value": "squidex@example.com"
     }
   },
   "formation": {
