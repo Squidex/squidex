@@ -395,7 +395,6 @@ namespace TestSuite.ApiTests
             var settings_0 = await _.Apps.GetAppSettingsAsync(_.AppName);
 
             Assert.NotEmpty(settings_0.Patterns);
-            Assert.Empty(settings_0.Editors);
 
 
             // STEP 2: Update settings with new state.
