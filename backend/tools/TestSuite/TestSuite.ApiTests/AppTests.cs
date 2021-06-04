@@ -224,7 +224,7 @@ namespace TestSuite.ApiTests
 
             // Should return role with correct number of users and clients.
             Assert.Equal(1, role_3.NumClients);
-            Assert.Equal(2, role_3.NumContributors);
+            Assert.Equal(1, role_3.NumContributors);
 
 
             // STEP 4:  Try to delete role.
