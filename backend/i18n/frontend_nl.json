@@ -761,7 +761,7 @@
   "schemas.fieldTypes.assets.sizeMin": "Max. grootte",
   "schemas.fieldTypes.boolean.description": "Ja of nee, waar of niet waar.",
   "schemas.fieldTypes.component.description": "Embed another schema to this content.",
-  "schemas.fieldTypes.components.description": "Embed another schemas to this content as array.",
+  "schemas.fieldTypes.components.description": "Embed other schemas to this content as array.",
   "schemas.fieldTypes.dateTime.defaultMode": "Standaardmodus",
   "schemas.fieldTypes.dateTime.description": "Datum van evenementen, openingstijden.",
   "schemas.fieldTypes.dateTime.rangeMax": "Max. waarde",

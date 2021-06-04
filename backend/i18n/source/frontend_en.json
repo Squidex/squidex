@@ -761,7 +761,7 @@
   "schemas.fieldTypes.assets.sizeMin": "Max Size",
   "schemas.fieldTypes.boolean.description": "Yes or no, true or false.",
   "schemas.fieldTypes.component.description": "Embed another schema to this content.",
-  "schemas.fieldTypes.components.description": "Embed another schemas to this content as array.",
+  "schemas.fieldTypes.components.description": "Embed other schemas to this content as array.",
   "schemas.fieldTypes.dateTime.defaultMode": "Default Mode",
   "schemas.fieldTypes.dateTime.description": "Events date, opening hours.",
   "schemas.fieldTypes.dateTime.rangeMax": "Max Value",
