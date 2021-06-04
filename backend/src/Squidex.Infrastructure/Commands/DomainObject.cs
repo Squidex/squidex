@@ -304,9 +304,10 @@ namespace Squidex.Infrastructure.Commands
         {
             var newVersion = Version + 1;
 
-            var snapshotNew = Apply(Snapshot, @event);
+            var snapshowOld = IsDeleted() ? new T() : Snapshot;
+            var snapshotNew = Apply(snapshowOld, @event);
 
-            if (!ReferenceEquals(Snapshot, snapshotNew) || isLoading)
+            if (!ReferenceEquals(snapshowOld, snapshotNew) || isLoading)
             {
                 snapshotNew.Version = newVersion;
                 snapshots.Add(snapshotNew, newVersion, true);
