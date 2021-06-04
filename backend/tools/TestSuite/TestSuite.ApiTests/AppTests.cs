@@ -188,8 +188,7 @@ namespace TestSuite.ApiTests
             // Use role name with hash to test previous bug.
             var roleName = $"{Guid.NewGuid()}/1";
             var roleClient = Guid.NewGuid().ToString();
-            var roleContributor1 = "role1@squidex.io";
-            var roleContributor2 = "role2@squidex.io";
+            var roleContributor1 = "hello@squidex.io";
 
             // STEP 1: Add role.
             var createRequest = new AddRoleDto { Name = roleName };
@@ -214,10 +213,11 @@ namespace TestSuite.ApiTests
             // STEP 3: Assign client and contributor.
             await _.Apps.PostClientAsync(_.AppName, new CreateClientDto { Id = roleClient });
 
+            // Add client to role.
             await _.Apps.PutClientAsync(_.AppName, roleClient, new UpdateClientDto { Role = roleName });
 
+            // Add contributor to role.
             await _.Apps.PostContributorAsync(_.AppName, new AssignContributorDto { ContributorId = roleContributor1, Role = roleName, Invite = true });
-            await _.Apps.PostContributorAsync(_.AppName, new AssignContributorDto { ContributorId = roleContributor2, Role = roleName, Invite = true });
 
             var roles_3 = await _.Apps.GetRolesAsync(_.AppName);
             var role_3 = roles_3.Items.Single(x => x.Name == roleName);
@@ -239,10 +239,11 @@ namespace TestSuite.ApiTests
             // STEP 5: Remove after client and contributor removed.
             var fallbackRole = "Developer";
 
+            // Remove client from role.
             await _.Apps.PutClientAsync(_.AppName, roleClient, new UpdateClientDto { Role = fallbackRole });
 
+            // Remove contributor from role.
             await _.Apps.PostContributorAsync(_.AppName, new AssignContributorDto { ContributorId = roleContributor1, Role = fallbackRole });
-            await _.Apps.PostContributorAsync(_.AppName, new AssignContributorDto { ContributorId = roleContributor2, Role = fallbackRole });
 
             await _.Apps.DeleteRoleAsync(_.AppName, roleName);
 
