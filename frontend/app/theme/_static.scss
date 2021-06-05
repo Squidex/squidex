@@ -36,7 +36,8 @@ noscript {
 .profile {
     &-container {
         margin: 0 auto;
-        max-width: 45rem;
+        max-width: 40rem;
+        min-width: 10rem;
         padding: 1rem 2rem;
     }
 
@@ -134,8 +135,9 @@ noscript {
             display: inline-block;
             font-size: 1.1rem;
             font-weight: normal;
+            margin-bottom: 4px;
+            margin-right: .5rem;
             vertical-align: middle;
-            width: 1.6rem;
         }
     }
 
@@ -154,6 +156,12 @@ noscript {
     }
 }
 
+.login-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 20rem;
+}
+
 //
 // Splash text for loader.
 //
@@ -168,6 +176,10 @@ noscript {
         margin-bottom: 2rem;
         max-width: 100%;
     }
+}
+
+.card-consent {
+    border-color: transparent;
 }
 
 //

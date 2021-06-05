@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -110,7 +111,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            return new JintScriptEngine(cache, extensions);
+            return new JintScriptEngine(cache, extensions)
+            {
+                TimeoutScript = TimeSpan.FromSeconds(2),
+                TimeoutExecution = TimeSpan.FromSeconds(10)
+            };
         }
 
         [Theory]

@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public AssetsQueryFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("QueryTests");
+            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
 
             SetupJson();
 
@@ -87,6 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                                 {
                                     DocumentId = DomainId.NewGuid(),
                                     Tags = new HashSet<string> { tag },
+                                    Id = DomainId.NewGuid(),
                                     FileHash = fileName,
                                     FileName = fileName,
                                     FileSize = 1024,

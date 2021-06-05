@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
         public string EventsFilter
         {
-            get => "^(app-|schema-)";
+            get => "^schema-";
         }
 
         public MongoSchemasHash(IMongoDatabase database, bool setup = false)
@@ -63,30 +63,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
                     continue;
                 }
 
-                switch (@event.Payload)
+                if (@event.Payload is SchemaEvent schemaEvent)
                 {
-                    case SchemaEvent schemaEvent:
+                    writes.Add(
+                        new UpdateOneModel<MongoSchemasHashEntity>(
+                            Filter.Eq(x => x.AppId, schemaEvent.AppId.Id.ToString()),
+                            Update
+                                .Set($"s.{schemaEvent.SchemaId.Id}", @event.Headers.EventStreamNumber())
+                                .Set(x => x.Updated, @event.Headers.Timestamp()))
                         {
-                            writes.Add(
-                                new UpdateOneModel<MongoSchemasHashEntity>(
-                                    Filter.Eq(x => x.AppId, schemaEvent.AppId.Id.ToString()),
-                                    Update
-                                        .Set($"s.{schemaEvent.SchemaId.Id}", @event.Headers.EventStreamNumber())
-                                        .Set(x => x.Updated, @event.Headers.Timestamp())));
-                            break;
-                        }
-
-                    case AppEvent appEvent:
-                        writes.Add(
-                            new UpdateOneModel<MongoSchemasHashEntity>(
-                                Filter.Eq(x => x.AppId, appEvent.AppId.Id.ToString()),
-                                Update
-                                    .Set(x => x.AppVersion, @event.Headers.EventStreamNumber())
-                                    .Set(x => x.Updated, @event.Headers.Timestamp()))
-                            {
-                                IsUpsert = true
-                            });
-                        break;
+                            IsUpsert = true
+                        });
                 }
             }
 
@@ -98,9 +85,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return Collection.BulkWriteAsync(writes);
         }
 
-        public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(DomainId appId)
+        public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app)
         {
-            var entity = await Collection.Find(x => x.AppId == appId.ToString()).FirstOrDefaultAsync();
+            Guard.NotNull(app, nameof(app));
+
+            var entity = await Collection.Find(x => x.AppId == app.Id.ToString()).FirstOrDefaultAsync();
 
             if (entity == null)
             {
@@ -109,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
             var ids =
                 entity.SchemaVersions.Select(x => (x.Key, x.Value))
-                    .Union(Enumerable.Repeat((entity.AppId, entity.AppVersion), 1));
+                    .Union(Enumerable.Repeat((app.Id.ToString(), app.Version), 1));
 
             var hash = CreateHash(ids);
 

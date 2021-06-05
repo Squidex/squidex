@@ -34,17 +34,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             TypeConverterStringSerializer<Status>.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, bool useWildcardIndex)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
 
             collectionAll =
-                new MongoContentCollection(
-                    "States_Contents_All3", database, appProvider, useWildcardIndex);
+                new MongoContentCollection("States_Contents_All3", database, appProvider);
 
             collectionPublished =
-                new MongoContentCollection(
-                    "States_Contents_Published3", database, appProvider, useWildcardIndex);
+                new MongoContentCollection("States_Contents_Published3", database, appProvider);
 
             this.appProvider = appProvider;
         }

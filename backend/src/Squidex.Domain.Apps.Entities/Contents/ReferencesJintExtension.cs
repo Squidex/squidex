@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
-                var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids));
+                var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), context.CancellationToken);
 
                 callback(JsValue.FromObject(context.Engine, contents.ToArray()));
             }

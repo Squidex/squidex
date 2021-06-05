@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 var assetFolderEntities =
                     await Collection.Find(filter).SortBy(x => x.FolderName)
-                        .ToListAsync(ct = default);
+                        .ToListAsync(ct);
 
                 return ResultList.Create<IAssetFolderEntity>(assetFolderEntities.Count, assetFolderEntities);
             }
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 var assetFolderEntities =
                     await Collection.Find(filter).Only(x => x.Id)
-                        .ToListAsync(ct = default);
+                        .ToListAsync(ct);
 
                 var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 var assetFolderEntity =
                     await Collection.Find(x => x.DocumentId == documentId && !x.IsDeleted)
-                        .FirstOrDefaultAsync(ct = default);
+                        .FirstOrDefaultAsync(ct);
 
                 return assetFolderEntity;
             }

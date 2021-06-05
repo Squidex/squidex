@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -92,9 +93,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
-            var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())))
+            {
+                TimeoutScript = TimeSpan.FromSeconds(2),
+                TimeoutExecution = TimeSpan.FromSeconds(10)
+            };
 
-            sut = new DynamicContentWorkflow(new JintScriptEngine(memoryCache), appProvider);
+            sut = new DynamicContentWorkflow(scriptEngine, appProvider);
         }
 
         [Fact]

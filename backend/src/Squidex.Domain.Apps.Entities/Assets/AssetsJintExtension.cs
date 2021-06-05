@@ -44,13 +44,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return;
             }
 
-            var action = new GetAssetsDelegate((references, callback) => GetReferences(context, appId, user, references, callback));
+            var action = new GetAssetsDelegate((references, callback) => GetAssets(context, appId, user, references, callback));
 
             context.Engine.SetValue("getAsset", action);
             context.Engine.SetValue("getAssets", action);
         }
 
-        private void GetReferences(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+        private void GetAssets(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
             GetReferencesAsync(context, appId, user, references, callback).Forget();
         }
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
 
-                var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids));
+                var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), context.CancellationToken);
 
                 callback(JsValue.FromObject(context.Engine, assets.ToArray()));
             }
