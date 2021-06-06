@@ -89,6 +89,26 @@ namespace Squidex.Translator
                 new GenerateFrontendResources(folder, service).Run();
             }
 
+            [Command(Name = "clean-backend", Description = "Clean the backend translations.")]
+            public void CleanBackend(TranslateArguments arguments)
+            {
+                var (folder, service) = Setup(arguments, "backend");
+
+                Helper.CleanOtherLocales(service);
+
+                service.Save();
+            }
+
+            [Command(Name = "clean-frontend", Description = "Clean the frontend translations.")]
+            public void CleanFrontend(TranslateArguments arguments)
+            {
+                var (folder, service) = Setup(arguments, "frontend");
+
+                Helper.CleanOtherLocales(service);
+
+                service.Save();
+            }
+
             [Command(Name = "gen-keys", Description = "Generate the keys for translations.")]
             public void GenerateBackendKeys(TranslateArguments arguments)
             {
@@ -124,18 +144,18 @@ namespace Squidex.Translator
                     throw new ArgumentException("Folder does not exist.");
                 }
 
-                var supportedLocaled = new string[] { "en", "nl", "it" };
+                var supportedLocales = new string[] { "en", "nl", "it", "zh" };
 
-                var locales = supportedLocaled;
+                var locales = supportedLocales;
 
                 if (arguments.Locales != null && arguments.Locales.Any())
                 {
-                    locales = supportedLocaled.Intersect(arguments.Locales).ToArray();
+                    locales = supportedLocales.Intersect(arguments.Locales).ToArray();
                 }
 
                 if (locales.Length == 0)
                 {
-                    locales = supportedLocaled;
+                    locales = supportedLocales;
                 }
 
                 var translationsDirectory = new DirectoryInfo(Path.Combine(arguments.Folder, "backend", "i18n"));

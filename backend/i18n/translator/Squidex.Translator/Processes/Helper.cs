@@ -30,9 +30,9 @@ namespace Squidex.Translator.Processes
                 Console.WriteLine("----- CHECKING <{0}> -----", locale);
 
                 var notTranslated = mainTranslations.Keys.Except(texts.Keys).ToList();
-                var notRequired = texts.Keys.Except(mainTranslations.Keys).ToList();
+                var notUsed = texts.Keys.Except(mainTranslations.Keys).ToList();
 
-                if (notTranslated.Count > 0 || notRequired.Count > 0)
+                if (notTranslated.Count > 0 || notUsed.Count > 0)
                 {
                     if (notTranslated.Count > 0)
                     {
@@ -46,17 +46,44 @@ namespace Squidex.Translator.Processes
                         }
                     }
 
-                    if (notRequired.Count > 0)
+                    if (notUsed.Count > 0)
                     {
                         Console.WriteLine();
                         Console.WriteLine("Translations not used:");
 
-                        foreach (var key in notRequired.OrderBy(x => x))
+                        foreach (var key in notUsed.OrderBy(x => x))
                         {
                             Console.Write(" * ");
                             Console.WriteLine(key);
                         }
                     }
+                }
+                else
+                {
+                    Console.WriteLine("> No errors found");
+                }
+            }
+        }
+
+        public static void CleanOtherLocales(TranslationService service)
+        {
+            var mainTranslations = service.MainTranslations;
+
+            foreach (var (locale, texts) in service.Translations.Where(x => x.Key != service.MainLocale))
+            {
+                Console.WriteLine();
+                Console.WriteLine("----- CLEANING <{0}> -----", locale);
+
+                var notUsed = texts.Keys.Except(mainTranslations.Keys).ToList();
+
+                if (notUsed.Count > 0)
+                {
+                    foreach (var unused in notUsed)
+                    {
+                        texts.Remove(unused);
+                    }
+
+                    Console.WriteLine("Cleaned {0} translations.", notUsed.Count);
                 }
                 else
                 {

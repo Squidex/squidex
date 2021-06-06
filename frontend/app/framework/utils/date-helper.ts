@@ -5,12 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { enUS, it, nl } from 'date-fns/locale';
+import { enUS, it, nl, zhCN } from 'date-fns/locale';
 
 export module DateHelper {
     let locale: string | null;
 
-    export const FNSLOCALES = { enUS, it, nl };
+    export const FNSLOCALES = {
+        en: enUS,
+        it,
+        nl,
+        zh: zhCN,
+    };
 
     export function setlocale(code: string | null) {
         locale = code;

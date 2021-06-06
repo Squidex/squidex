@@ -20,6 +20,12 @@ export module Cookies {
         document.cookie = `${name}=${value || ''}${expires}; path=/`;
     }
 
+    export function replace(name: string, value: string, days: number) {
+        remove(name);
+
+        set(name, value, days);
+    }
+
     export function remove(name: string) {
         document.cookie = `${name}=; Max-Age=-99999999;`;
     }
