@@ -1,0 +1,13 @@
+apiVersion: 'kubernetes-client.io/v1'
+kind: ExternalSecret
+metadata:
+  name: squidex-params
+spec:
+  backendType: systemManager
+  data:
+    - key: /squidex/{{ .Values.secretsEnvironment }}/{{ .Values.contentVersion }}/DOMAIN
+      name: DOMAIN
+    - key: /squidex/{{ .Values.secretsEnvironment }}/{{ .Values.contentVersion }}/ADMIN_EMAIL
+      name: ADMIN_EMAIL
+    - key: /squidex/{{ .Values.secretsEnvironment }}/{{ .Values.contentVersion }}/S3_BUCKET
+      name: S3_BUCKET
