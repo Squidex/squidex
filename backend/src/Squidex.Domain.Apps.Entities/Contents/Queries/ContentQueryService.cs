@@ -17,6 +17,7 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
