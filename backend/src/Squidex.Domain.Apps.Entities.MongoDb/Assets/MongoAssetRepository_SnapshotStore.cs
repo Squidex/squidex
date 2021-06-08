@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 await Collection.InsertManyAsync(entities, InsertUnordered);
 
-                await countCollection.UpdateAsync(snapshots.Select(x => x.Value.AppId.Id));
+                await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Value.IsDeleted)));
             }
         }
 

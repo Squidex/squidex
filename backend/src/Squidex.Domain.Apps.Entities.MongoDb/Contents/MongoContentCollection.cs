@@ -226,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             await Collection.InsertManyAsync(entities, InsertUnordered);
 
-            await countCollection.UpdateAsync(snapshots.Select(x => DomainId.Combine(x.IndexedAppId, x.IndexedSchemaId)));
+            await countCollection.UpdateAsync(snapshots.Select(x => (DomainId.Combine(x.IndexedAppId, x.IndexedSchemaId), x.IsDeleted)));
         }
 
         public async Task RebuildCountsAsync(

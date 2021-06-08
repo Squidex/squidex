@@ -51,25 +51,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
 
         public Task UpdateAsync(string key, bool isDeleted = false)
         {
-            var update = Update.Inc(x => x.Count, isDeleted ? -1 : 1);
+            var update = Update.Inc(x => x.Count, Inc(isDeleted));
 
             return Collection.UpdateOneAsync(x => x.Key == key, update, Upsert);
         }
 
-        public Task UpdateAsync(IEnumerable<DomainId> keys, bool isDeleted = false, CancellationToken ct = default)
+        public Task UpdateAsync(IEnumerable<(DomainId Key, bool IsDeleted)> values, CancellationToken ct = default)
         {
-            return UpdateAsync(keys.Select(x => x.ToString()), isDeleted, ct);
+            return UpdateAsync(values.Select(x => (x.Key.ToString(), x.IsDeleted)), ct);
         }
 
-        public Task UpdateAsync(IEnumerable<string> keys, bool isDeleted = false, CancellationToken ct = default)
+        public Task UpdateAsync(IEnumerable<(string Key, bool IsDeleted)> values, CancellationToken ct = default)
         {
-            var writes =
-                keys.GroupBy(x => x).Select(x =>
-                    new UpdateOneModel<MongoCountEntity>(
-                        Filter.Eq(y => y.Key, x.Key), Update.Inc(y => y.Count, isDeleted ? -x.Count() : x.Count()))
-                        {
-                            IsUpsert = true
-                        }).ToList();
+            var writes = values.GroupBy(x => x.Key).Select(CreateUpdate).ToList();
 
             if (writes.Count == 0)
             {
@@ -86,13 +80,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
 
         public Task SetAsync(IEnumerable<(string Key, long Value)> values, CancellationToken ct = default)
         {
-            var writes =
-                values.Select(x =>
-                    new UpdateOneModel<MongoCountEntity>(
-                        Filter.Eq(y => y.Key, x.Key), Update.Set(y => y.Count, x.Value))
-                    {
-                        IsUpsert = true
-                    }).ToList();
+            var writes = values.Select(CreateUpdate).ToList();
 
             if (writes.Count == 0)
             {
@@ -100,6 +88,31 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
             }
 
             return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+        }
+
+        private static UpdateOneModel<MongoCountEntity> CreateUpdate((string Key, long Value) value)
+        {
+            var update = Update.Set(y => y.Count, value.Value);
+
+            return new UpdateOneModel<MongoCountEntity>(Filter.Eq(x => x.Key, value.Key), update)
+            {
+                IsUpsert = true
+            };
+        }
+
+        private static UpdateOneModel<MongoCountEntity> CreateUpdate(IGrouping<string, (string Key, bool IsDeleted)> group)
+        {
+            var update = Update.Inc(y => y.Count, group.Sum(x => Inc(x.IsDeleted)));
+
+            return new UpdateOneModel<MongoCountEntity>(Filter.Eq(x => x.Key, group.Key), update)
+            {
+                IsUpsert = true
+            };
+        }
+
+        private static int Inc(bool isDeleted)
+        {
+            return isDeleted ? -1 : 1;
         }
     }
 }
