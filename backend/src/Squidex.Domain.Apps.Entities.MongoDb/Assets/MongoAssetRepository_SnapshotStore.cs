@@ -85,14 +85,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                var found = await Collection.Find(x => x.DocumentId == key && x.IsDeleted != true).Only(x => x.IndexedAppId).FirstOrDefaultAsync();
+                var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key);
 
-                if (found != null)
+                if (entity != null && !entity.IsDeleted)
                 {
-                    await countCollection.UpdateAsync(found["_ai"].AsString, true);
+                    await countCollection.UpdateAsync(entity.IndexedAppId, true);
                 }
-
-                await Collection.DeleteOneAsync(x => x.DocumentId == key);
             }
         }
 

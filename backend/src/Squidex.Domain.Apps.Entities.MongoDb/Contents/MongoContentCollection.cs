@@ -205,16 +205,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task RemoveAsync(DomainId documentId)
+        public async Task RemoveAsync(DomainId key)
         {
-            var found = await Collection.Find(x => x.DocumentId == documentId && x.IsDeleted != true).Only(x => x.IndexedAppId, x => x.IndexedSchemaId).FirstOrDefaultAsync();
+            var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key);
 
-            if (found != null)
+            if (entity != null && !entity.IsDeleted)
             {
-                await countCollection.UpdateAsync($"{found["_ai"].AsString}--{found["_si"].AsString}", true);
+                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), true);
             }
-
-            await Collection.DeleteOneAsync(x => x.DocumentId == documentId);
         }
 
         public async Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots)
