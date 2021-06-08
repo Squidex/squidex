@@ -14,6 +14,8 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class DomainIdSerializer : SerializerBase<DomainId>, IBsonPolymorphicSerializer, IRepresentationConfigurable<DomainIdSerializer>
     {
+        private static readonly long GuidLength = Guid.Empty.ToByteArray().Length;
+
         public static void Register()
         {
             try
@@ -33,7 +35,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonType Representation { get; }
 
-        public DomainIdSerializer(BsonType representation = BsonType.DateTime)
+        public DomainIdSerializer(BsonType representation = BsonType.String)
         {
             if (representation != BsonType.Binary && representation != BsonType.String)
             {
@@ -56,6 +58,11 @@ namespace Squidex.Infrastructure.MongoDb
                         binary.SubType == BsonBinarySubType.UuidStandard)
                     {
                         return DomainId.Create(binary.ToGuid());
+                    }
+
+                    if (binary.Bytes.Length == GuidLength)
+                    {
+                        return DomainId.Create(new Guid(binary.Bytes));
                     }
 
                     return DomainId.Create(binary.ToString());

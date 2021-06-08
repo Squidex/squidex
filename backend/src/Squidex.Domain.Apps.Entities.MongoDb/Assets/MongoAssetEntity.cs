@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
@@ -23,14 +24,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement("_ai")]
+        [BsonRepresentation(BsonType.Binary)]
         public DomainId IndexedAppId { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("id")]
+        [BsonRepresentation(BsonType.Binary)]
         public DomainId Id { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("pi")]
+        [BsonRepresentation(BsonType.Binary)]
         public DomainId ParentId { get; set; }
 
         [BsonRequired]
@@ -39,10 +43,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement("ct")]
+        [BsonRepresentation(BsonType.Int64)]
         public Instant Created { get; set; }
 
         [BsonRequired]
         [BsonElement("mt")]
+        [BsonRepresentation(BsonType.Int64)]
         public Instant LastModified { get; set; }
 
         [BsonRequired]

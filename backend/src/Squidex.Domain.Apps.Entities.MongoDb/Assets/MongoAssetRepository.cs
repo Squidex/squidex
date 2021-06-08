@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         protected override string CollectionName()
         {
-            return "States_Assets2";
+            return "States_Assets3";
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
@@ -58,15 +58,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
                         .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.Slug)),
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
                         .Ascending(x => x.IndexedAppId)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileHash)
-                        .Ascending(x => x.FileName)
-                        .Ascending(x => x.FileSize)),
+                        .Ascending(x => x.FileHash)),
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
                         .Ascending(x => x.Id)
@@ -181,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntities =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.ParentId == parentId).Only(x => x.Id)
+                    await Collection.Find(BuildFilter(appId, parentId)).Only(x => x.Id)
                         .ToListAsync(ct);
 
                 var field = Field.Of<MongoAssetFolderEntity>(x => nameof(x.Id));
@@ -196,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.FileHash == hash && x.FileName == fileName && x.FileSize == fileSize)
+                    await Collection.Find(x => x.IndexedAppId == appId && x.FileHash == hash && !x.IsDeleted && x.FileSize == fileSize && x.FileName == fileName)
                         .FirstOrDefaultAsync(ct);
 
                 return assetEntity;
@@ -209,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.Slug == slug)
+                    await Collection.Find(x => x.IndexedAppId == appId && x.Slug == slug && !x.IsDeleted)
                         .FirstOrDefaultAsync(ct);
 
                 return assetEntity;
@@ -251,6 +247,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return Filter.And(
                 Filter.In(x => x.DocumentId, documentIds),
                 Filter.Ne(x => x.IsDeleted, true));
+        }
+
+        private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId parentId)
+        {
+            return Filter.And(
+                Filter.Gt(x => x.LastModified, default),
+                Filter.Gt(x => x.Id, default),
+                Filter.Gt(x => x.IndexedAppId, appId),
+                Filter.Ne(x => x.IsDeleted, true),
+                Filter.Ne(x => x.ParentId, parentId));
         }
     }
 }
