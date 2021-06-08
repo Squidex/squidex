@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                var found = await Collection.Find(x => x.DocumentId == key).Only(x => x.IndexedAppId).FirstOrDefaultAsync();
+                var found = await Collection.Find(x => x.DocumentId == key && x.IsDeleted != true).Only(x => x.IndexedAppId).FirstOrDefaultAsync();
 
                 if (found != null)
                 {

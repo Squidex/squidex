@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task RemoveAsync(DomainId documentId)
         {
-            var found = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.IndexedAppId, x => x.IndexedSchemaId).FirstOrDefaultAsync();
+            var found = await Collection.Find(x => x.DocumentId == documentId && x.IsDeleted != true).Only(x => x.IndexedAppId, x => x.IndexedSchemaId).FirstOrDefaultAsync();
 
             if (found != null)
             {
