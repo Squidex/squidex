@@ -15,5 +15,10 @@ namespace Squidex.Infrastructure
         {
             return Instant.FromUnixTimeSeconds(value.ToUnixTimeSeconds());
         }
+
+        public static Instant WithoutNs(this Instant value)
+        {
+            return Instant.FromUnixTimeMilliseconds(value.ToUnixTimeMilliseconds());
+        }
     }
 }

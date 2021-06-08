@@ -5,35 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
+using NodaTime;
 using Xunit;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public class DomainIdSerializerTests
+    public class InstantSerializerTests
     {
-        public DomainIdSerializerTests()
+        public InstantSerializerTests()
         {
-            DomainIdSerializer.Register();
+            InstantSerializer.Register();
         }
 
         [Fact]
         public void Should_serialize_as_default()
         {
-            var source = new Entities.DefaultEntity<DomainId> { Value = DomainId.NewGuid() };
-
-            var result1 = SerializeAndDeserializeBson(source);
-
-            Assert.Equal(source.Value, result1.Value);
-        }
-
-        [Fact]
-        public void Should_serialize_as_binary()
-        {
-            var source = new Entities.BinaryEntity<DomainId> { Value = DomainId.NewGuid() };
+            var source = new Entities.DefaultEntity<Instant> { Value = GetTime() };
 
             var result1 = SerializeAndDeserializeBson(source);
 
@@ -43,7 +33,7 @@ namespace Squidex.Infrastructure.MongoDb
         [Fact]
         public void Should_serialize_as_string()
         {
-            var source = new Entities.StringEntity<DomainId> { Value = DomainId.NewGuid() };
+            var source = new Entities.StringEntity<Instant> { Value = GetTime() };
 
             var result1 = SerializeAndDeserializeBson(source);
 
@@ -51,33 +41,28 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
-        public void Should_deserialize_from_string()
+        public void Should_serialize_as_int64()
         {
-            var source = new Entities.DefaultEntity<string> { Value = Guid.NewGuid().ToString() };
+            var source = new Entities.Int64Entity<Instant> { Value = GetTime() };
 
-            var result = SerializeAndDeserializeBson<Entities.DefaultEntity<string>, Entities.DefaultEntity<DomainId>>(source);
+            var result1 = SerializeAndDeserializeBson(source);
 
-            Assert.Equal(source.Value, result.Value.ToString());
+            Assert.Equal(source.Value, result1.Value);
         }
 
         [Fact]
-        public void Should_deserialize_from_guid_string()
+        public void Should_serialize_as_datetime()
         {
-            var source = new Entities.StringEntity<Guid> { Value = Guid.NewGuid() };
+            var source = new Entities.DateTimeEntity<Instant> { Value = GetTime() };
 
-            var result = SerializeAndDeserializeBson<Entities.StringEntity<Guid>, Entities.DefaultEntity<DomainId>>(source);
+            var result1 = SerializeAndDeserializeBson(source);
 
-            Assert.Equal(source.Value.ToString(), result.Value.ToString());
+            Assert.Equal(source.Value, result1.Value);
         }
 
-        [Fact]
-        public void Should_deserialize_from_guid_bytes()
+        private static Instant GetTime()
         {
-            var source = new Entities.DefaultEntity<Guid> { Value = Guid.NewGuid() };
-
-            var result = SerializeAndDeserializeBson<Entities.DefaultEntity<Guid>, Entities.DefaultEntity<DomainId>>(source);
-
-            Assert.Equal(source.Value.ToString(), result.Value.ToString());
+            return SystemClock.Instance.GetCurrentInstant().WithoutNs();
         }
 
         private static T SerializeAndDeserializeBson<T>(T source)

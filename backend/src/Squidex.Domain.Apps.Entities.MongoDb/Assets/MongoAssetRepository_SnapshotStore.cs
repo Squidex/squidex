@@ -47,6 +47,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 var entity = Map(value);
 
                 await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity);
+
+                if (oldVersion == EtagVersion.Empty || entity.IsDeleted)
+                {
+                    await countCollection.UpdateAsync(entity.IndexedAppId, entity.IsDeleted);
+                }
             }
         }
 
@@ -62,6 +67,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 }
 
                 await Collection.InsertManyAsync(entities, InsertUnordered);
+
+                await countCollection.UpdateAsync(snapshots.Select(x => x.Value.AppId.Id));
             }
         }
 
@@ -78,8 +85,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
+                var found = await Collection.Find(x => x.DocumentId == key).Only(x => x.IndexedAppId).FirstOrDefaultAsync();
+
+                if (found != null)
+                {
+                    await countCollection.UpdateAsync(found["_ai"].AsString, true);
+                }
+
                 await Collection.DeleteOneAsync(x => x.DocumentId == key);
             }
+        }
+
+        public override Task ClearAsync()
+        {
+            return Task.WhenAll(base.ClearAsync(), countCollection.ClearAsync());
         }
 
         private static MongoAssetEntity Map(AssetDomainObject.State value)

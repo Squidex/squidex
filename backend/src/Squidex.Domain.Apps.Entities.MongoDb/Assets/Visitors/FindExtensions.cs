@@ -38,18 +38,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             return query;
         }
 
-        public static FilterDefinition<MongoAssetEntity> BuildFilter(this ClrQuery query, DomainId appId, DomainId? parentId)
+        public static (FilterDefinition<MongoAssetEntity>, bool) BuildFilter(this ClrQuery query, DomainId appId, DomainId? parentId)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
-                Filter.Exists(x => x.LastModified),
-                Filter.Exists(x => x.Id),
+                Filter.Ne(x => x.LastModified, default),
+                Filter.Ne(x => x.Id, default),
                 Filter.Eq(x => x.IndexedAppId, appId)
             };
+
+            var isDefault = false;
 
             if (!query.HasFilterField("IsDeleted"))
             {
                 filters.Add(Filter.Eq(x => x.IsDeleted, false));
+
+                isDefault = true;
             }
 
             if (parentId != null)
@@ -65,12 +69,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 {
                     filters.Add(Filter.Eq(x => x.ParentId, parentId.Value));
                 }
+
+                isDefault = false;
             }
 
             var (filter, last) = query.BuildFilter<MongoAssetEntity>(false);
 
             if (filter != null)
             {
+                isDefault = false;
+
                 if (last)
                 {
                     filters.Add(filter);
@@ -81,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 }
             }
 
-            return Filter.And(filters);
+            return (Filter.And(filters), isDefault);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEntity>
     {
+        private readonly MongoCountCollection countCollection;
         private readonly QueryAsStream queryAsStream;
         private readonly QueryById queryBdId;
         private readonly QueryByIds queryByIds;
@@ -40,10 +41,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             this.name = name;
 
+            countCollection = new MongoCountCollection(database, $"{name}_Count");
+
             queryAsStream = new QueryAsStream();
             queryBdId = new QueryById();
             queryByIds = new QueryByIds();
-            queryByQuery = new QueryByQuery(appProvider);
+            queryByQuery = new QueryByQuery(appProvider, countCollection);
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
@@ -188,24 +191,47 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return result?["vs"].AsInt64 ?? EtagVersion.Empty;
         }
 
-        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity entity)
+        public async Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity value)
         {
-            return Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity);
-        }
+            var entity = value;
 
-        public Task RemoveAsync(DomainId documentId)
-        {
-            return Collection.DeleteOneAsync(x => x.DocumentId == documentId);
-        }
+            await Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity);
 
-        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> entities)
-        {
-            if (entities.Count == 0)
+            if (oldVersion == EtagVersion.Empty || entity.IsDeleted)
             {
-                return Task.CompletedTask;
+                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), entity.IsDeleted);
+            }
+        }
+
+        public async Task RemoveAsync(DomainId documentId)
+        {
+            var found = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.IndexedSchemaId, x => x.IndexedSchemaId).FirstOrDefaultAsync();
+
+            if (found != null)
+            {
+                await countCollection.UpdateAsync($"{found["_ai"].AsString}--{found["_si"].AsString}", true);
             }
 
-            return Collection.InsertManyAsync(entities, InsertUnordered);
+            await Collection.DeleteOneAsync(x => x.DocumentId == documentId);
+        }
+
+        public async Task InsertManyAsync(IReadOnlyList<MongoContentEntity> snapshots)
+        {
+            var entities = snapshots;
+
+            if (entities.Count == 0)
+            {
+                return;
+            }
+
+            await Collection.InsertManyAsync(entities, InsertUnordered);
+
+            await countCollection.UpdateAsync(snapshots.Select(x => DomainId.Combine(x.IndexedAppId, x.IndexedSchemaId)));
+        }
+
+        public override Task ClearAsync()
+        {
+            return Task.WhenAll(base.ClearAsync(), countCollection.ClearAsync());
         }
     }
 }

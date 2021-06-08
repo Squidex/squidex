@@ -28,10 +28,20 @@ namespace Squidex.Infrastructure.MongoDb
 
         public bool IsDiscriminatorCompatibleWithObjectSerializer
         {
-            get => true;
+            get => Representation == BsonType.String;
         }
 
-        public BsonType Representation { get; } = BsonType.String;
+        public BsonType Representation { get; }
+
+        public DomainIdSerializer(BsonType representation = BsonType.DateTime)
+        {
+            if (representation != BsonType.Binary && representation != BsonType.String)
+            {
+                throw new ArgumentException("Unsupported representation.", nameof(representation));
+            }
+
+            Representation = representation;
+        }
 
         public override DomainId Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
@@ -49,24 +59,26 @@ namespace Squidex.Infrastructure.MongoDb
                     }
 
                     return DomainId.Create(binary.ToString());
-                default:
-                    throw new NotSupportedException();
             }
+
+            throw new NotSupportedException();
         }
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, DomainId value)
         {
-            context.Writer.WriteString(value.ToString());
+            if (Representation == BsonType.Binary && Guid.TryParse(value.ToString(), out var guid))
+            {
+                context.Writer.WriteBinaryData(guid.ToByteArray());
+            }
+            else
+            {
+                context.Writer.WriteString(value.ToString());
+            }
         }
 
         public DomainIdSerializer WithRepresentation(BsonType representation)
         {
-            if (representation != BsonType.String)
-            {
-                throw new NotSupportedException();
-            }
-
-            return this;
+            return Representation == representation ? this : new DomainIdSerializer(representation);
         }
 
         IBsonSerializer IRepresentationConfigurable.WithRepresentation(BsonType representation)

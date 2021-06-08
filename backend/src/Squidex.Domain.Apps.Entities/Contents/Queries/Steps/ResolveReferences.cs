@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 .WithoutContentEnrichment(true)
                 .WithoutTotal());
 
-            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids), ct);
+            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids).WithoutTotal(), ct);
 
             return references.ToLookup(x => x.Id);
         }
