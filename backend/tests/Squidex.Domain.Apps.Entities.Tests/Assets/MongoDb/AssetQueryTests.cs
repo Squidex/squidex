@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
     public class AssetQueryTests
     {
         private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
-        private static readonly IBsonSerializer<MongoAssetEntity> Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>();
+        private static readonly IBsonSerializer<MongoAssetEntity> Serializer;
         private readonly DomainId appId = DomainId.NewGuid();
 
         static AssetQueryTests()
@@ -40,6 +40,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             TypeConverterStringSerializer<Status>.Register();
 
             InstantSerializer.Register();
+
+            Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>();
         }
 
         [Fact]

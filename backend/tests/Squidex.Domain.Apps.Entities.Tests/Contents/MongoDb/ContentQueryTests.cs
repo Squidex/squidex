@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
     public class ContentQueryTests
     {
         private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
-        private static readonly IBsonSerializer<MongoContentEntity> Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
+        private static readonly IBsonSerializer<MongoContentEntity> Serializer;
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly Schema schemaDef;
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
@@ -46,6 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             TypeConverterStringSerializer<Status>.Register();
 
             InstantSerializer.Register();
+
+            Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         }
 
         public ContentQueryTests()

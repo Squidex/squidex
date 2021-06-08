@@ -43,12 +43,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement("ct")]
-        [BsonRepresentation(BsonType.Int64)]
         public Instant Created { get; set; }
 
         [BsonRequired]
         [BsonElement("mt")]
-        [BsonRepresentation(BsonType.Int64)]
         public Instant LastModified { get; set; }
 
         [BsonRequired]
