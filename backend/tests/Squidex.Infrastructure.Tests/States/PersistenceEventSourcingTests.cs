@@ -267,7 +267,7 @@ namespace Squidex.Infrastructure.States
         public async Task Should_write_snapshot_to_store_if_not_read_before()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((null!, true, EtagVersion.Empty));
+                .Returns((null!, false, EtagVersion.Empty));
 
             SetupEventStore(3);
 
@@ -277,15 +277,15 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteEventsAsync(new[] { Envelope.Create<IEvent>(new MyEvent()), Envelope.Create<IEvent>(new MyEvent()) }.ToList());
             await persistence.WriteSnapshotAsync("4");
 
             await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
             await persistence.WriteSnapshotAsync("5");
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 3))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "4", 2, 4))
                 .MustHaveHappened();
-            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 3, 4))
+            A.CallTo(() => snapshotStore.WriteAsync(key, "5", 4, 5))
                 .MustHaveHappened();
         }
 

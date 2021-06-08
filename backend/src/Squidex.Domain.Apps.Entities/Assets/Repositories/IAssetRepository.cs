@@ -29,5 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
         Task<IAssetEntity?> FindAssetAsync(DomainId id, CancellationToken ct = default);
 
         Task<IAssetEntity?> FindAssetAsync(DomainId appId, DomainId id, CancellationToken ct = default);
+
+        Task RebuildCountsAsync(CancellationToken ct = default);
     }
 }

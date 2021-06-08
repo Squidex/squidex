@@ -28,6 +28,8 @@ namespace Squidex.Infrastructure.States
         private long versionSnapshot = EtagVersion.Empty;
         private long versionEvents = EtagVersion.Empty;
         private long version = EtagVersion.Empty;
+        private long previousEventVersion;
+        private bool wasSnapshotRead;
 
         public long Version
         {
@@ -124,6 +126,8 @@ namespace Squidex.Infrastructure.States
                 versionEvents = version;
             }
 
+            wasSnapshotRead = valid;
+
             if (applyState != null && version > EtagVersion.Empty && valid)
             {
                 applyState(state, version);
@@ -163,12 +167,12 @@ namespace Squidex.Infrastructure.States
         {
             var oldVersion = versionSnapshot;
 
-            if (oldVersion == EtagVersion.Empty && UseEventSourcing)
+            if (!wasSnapshotRead && UseEventSourcing)
             {
-                oldVersion = versionEvents - 1;
+                oldVersion = previousEventVersion;
             }
 
-            var newVersion = UseEventSourcing ? versionEvents : oldVersion + 1;
+            var newVersion = UseEventSourcing ? versionEvents : (oldVersion + 1);
 
             if (newVersion == versionSnapshot)
             {
@@ -192,6 +196,8 @@ namespace Squidex.Infrastructure.States
             {
                 oldVersion = versionEvents;
             }
+
+            previousEventVersion = oldVersion;
 
             var eventCommitId = Guid.NewGuid();
             var eventData = events.Select(x => eventDataFormatter.ToEventData(x, eventCommitId, true)).ToArray();

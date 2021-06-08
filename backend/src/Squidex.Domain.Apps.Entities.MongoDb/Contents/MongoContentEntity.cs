@@ -25,12 +25,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("_ai")]
-        [BsonRepresentation(BsonType.Binary)]
         public DomainId IndexedAppId { get; set; }
 
         [BsonRequired]
         [BsonElement("_si")]
-        [BsonRepresentation(BsonType.Binary)]
         public DomainId IndexedSchemaId { get; set; }
 
         [BsonRequired]
@@ -47,7 +45,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("id")]
-        [BsonRepresentation(BsonType.Binary)]
         public DomainId Id { get; set; }
 
         [BsonRequired]

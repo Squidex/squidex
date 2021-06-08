@@ -9,7 +9,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb
 {
-    public sealed class MongoCountEntity
+    internal sealed class MongoCountEntity
     {
         [BsonId]
         [BsonRequired]

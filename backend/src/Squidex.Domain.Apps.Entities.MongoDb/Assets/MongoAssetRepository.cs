@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -24,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
+        private static readonly DomainId EmptyId = DomainId.Create(string.Empty);
         private readonly MongoCountCollection countCollection;
 
         public MongoAssetRepository(IMongoDatabase database)
@@ -39,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         protected override string CollectionName()
         {
-            return "States_Assets3";
+            return "States_Assets2";
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
@@ -68,6 +70,32 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .Ascending(x => x.Id)
                         .Ascending(x => x.IsDeleted))
             }, ct);
+        }
+
+        public async Task RebuildCountsAsync(
+            CancellationToken ct)
+        {
+            var results =
+                await Collection.Aggregate()
+                    .Match(
+                        Filter.And(
+                            Filter.Gt(x => x.LastModified, default),
+                            Filter.Gt(x => x.Id, EmptyId),
+                            Filter.Gt(x => x.IndexedAppId, EmptyId),
+                            Filter.Ne(x => x.IsDeleted, true)))
+                    .Group(new BsonDocument
+                    {
+                        ["_id"] = new BsonDocument
+                        {
+                            ["$concat"] = new BsonArray().Add("$_ai")
+                        },
+                        ["t"] = new BsonDocument
+                        {
+                            ["$sum"] = 1
+                        }
+                    }).ToListAsync(ct);
+
+            await countCollection.SetAsync(results.Select(x => (x["_id"].AsString, x["t"].ToLong())), ct);
         }
 
         public async IAsyncEnumerable<IAssetEntity> StreamAll(DomainId appId,
@@ -253,7 +281,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             return Filter.And(
                 Filter.Gt(x => x.LastModified, default),
-                Filter.Gt(x => x.Id, default),
+                Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
                 Filter.Gt(x => x.IndexedAppId, appId),
                 Filter.Ne(x => x.IsDeleted, true),
                 Filter.Ne(x => x.ParentId, parentId));

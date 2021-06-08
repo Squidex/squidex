@@ -15,7 +15,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb
 {
-    public sealed class MongoCountCollection : MongoRepositoryBase<MongoCountEntity>
+    internal sealed class MongoCountCollection : MongoRepositoryBase<MongoCountEntity>
     {
         private readonly string name;
 
@@ -56,19 +56,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
             return Collection.UpdateOneAsync(x => x.Key == key, update, Upsert);
         }
 
-        public Task UpdateAsync(IEnumerable<DomainId> keys, bool isDeleted = false)
+        public Task UpdateAsync(IEnumerable<DomainId> keys, bool isDeleted = false, CancellationToken ct = default)
         {
-            return UpdateAsync(keys.Select(x => x.ToString()), isDeleted);
+            return UpdateAsync(keys.Select(x => x.ToString()), isDeleted, ct);
         }
 
-        public Task UpdateAsync(IEnumerable<string> keys, bool isDeleted = false)
+        public Task UpdateAsync(IEnumerable<string> keys, bool isDeleted = false, CancellationToken ct = default)
         {
-            var update = Update.Inc(x => x.Count, isDeleted ? -1 : 1);
-
             var writes =
                 keys.GroupBy(x => x).Select(x =>
                     new UpdateOneModel<MongoCountEntity>(
-                        Filter.Eq(x => x.Key, x.Key), Update.Inc(x => x.Count, isDeleted ? -x.Count() : x.Count()))
+                        Filter.Eq(y => y.Key, x.Key), Update.Inc(y => y.Count, isDeleted ? -x.Count() : x.Count()))
                         {
                             IsUpsert = true
                         }).ToList();
@@ -78,7 +76,30 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
                 return Task.CompletedTask;
             }
 
-            return Collection.BulkWriteAsync(writes, BulkUnordered);
+            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+        }
+
+        public Task SetAsync(IEnumerable<(DomainId Key, long Value)> values, CancellationToken ct = default)
+        {
+            return SetAsync(values.Select(x => (x.Key.ToString(), x.Value)), ct);
+        }
+
+        public Task SetAsync(IEnumerable<(string Key, long Value)> values, CancellationToken ct = default)
+        {
+            var writes =
+                values.Select(x =>
+                    new UpdateOneModel<MongoCountEntity>(
+                        Filter.Eq(y => y.Key, x.Key), Update.Set(y => y.Count, x.Value))
+                    {
+                        IsUpsert = true
+                    }).ToList();
+
+            if (writes.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -26,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEntity>
     {
+        private static readonly DomainId EmptyId = DomainId.Create(string.Empty);
         private readonly MongoCountCollection countCollection;
         private readonly QueryAsStream queryAsStream;
         private readonly QueryById queryBdId;
@@ -205,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task RemoveAsync(DomainId documentId)
         {
-            var found = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.IndexedSchemaId, x => x.IndexedSchemaId).FirstOrDefaultAsync();
+            var found = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.IndexedAppId, x => x.IndexedSchemaId).FirstOrDefaultAsync();
 
             if (found != null)
             {
@@ -227,6 +229,33 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await Collection.InsertManyAsync(entities, InsertUnordered);
 
             await countCollection.UpdateAsync(snapshots.Select(x => DomainId.Combine(x.IndexedAppId, x.IndexedSchemaId)));
+        }
+
+        public async Task RebuildCountsAsync(
+            CancellationToken ct)
+        {
+            var results =
+                await Collection.Aggregate()
+                    .Match(
+                        Filter.And(
+                            Filter.Gt(x => x.LastModified, default),
+                            Filter.Gt(x => x.Id, EmptyId),
+                            Filter.Gt(x => x.IndexedAppId, EmptyId),
+                            Filter.Gt(x => x.IndexedSchemaId, EmptyId),
+                            Filter.Ne(x => x.IsDeleted, true)))
+                    .Group(new BsonDocument
+                    {
+                        ["_id"] = new BsonDocument
+                        {
+                            ["$concat"] = new BsonArray().Add("$_ai").Add("--").Add("$_si")
+                        },
+                        ["t"] = new BsonDocument
+                        {
+                            ["$sum"] = 1
+                        }
+                    }).ToListAsync(ct);
+
+            await countCollection.SetAsync(results.Select(x => (x["_id"].AsString, x["t"].ToLong())), ct);
         }
 
         public override Task ClearAsync()

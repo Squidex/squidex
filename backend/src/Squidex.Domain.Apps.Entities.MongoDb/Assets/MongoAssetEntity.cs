@@ -24,17 +24,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement("_ai")]
-        [BsonRepresentation(BsonType.Binary)]
         public DomainId IndexedAppId { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("id")]
-        [BsonRepresentation(BsonType.Binary)]
         public DomainId Id { get; set; }
 
         [BsonIgnoreIfDefault]
         [BsonElement("pi")]
-        [BsonRepresentation(BsonType.Binary)]
         public DomainId ParentId { get; set; }
 
         [BsonRequired]

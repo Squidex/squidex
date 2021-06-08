@@ -102,6 +102,21 @@ namespace Squidex.Infrastructure.MongoDb
             return find.Project<T>(Builders<T>.Projection.Exclude(exclude1).Exclude(exclude2));
         }
 
+        public static long ToLong(this BsonValue value)
+        {
+            switch (value.BsonType)
+            {
+                case BsonType.Int32:
+                    return value.AsInt32;
+                case BsonType.Int64:
+                    return value.AsInt64;
+                case BsonType.Double:
+                    return (long)value.AsDouble;
+                default:
+                    throw new InvalidCastException($"Cannot cast from {value.BsonType} to long.");
+            }
+        }
+
         public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater)
             where T : IVersionedEntity<TKey> where TKey : notnull
         {

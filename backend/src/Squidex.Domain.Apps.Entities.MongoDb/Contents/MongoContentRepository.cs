@@ -147,5 +147,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             yield return collectionAll.GetInternalCollection();
             yield return collectionPublished.GetInternalCollection();
         }
+
+        public async Task RebuildCountsAsync(
+            CancellationToken ct = default)
+        {
+            await collectionAll.RebuildCountsAsync(ct);
+            await collectionPublished.RebuildCountsAsync(ct);
+        }
     }
 }
