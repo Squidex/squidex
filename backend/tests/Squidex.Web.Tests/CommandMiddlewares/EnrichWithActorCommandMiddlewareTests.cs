@@ -54,7 +54,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_assign_actor_from_subject()
         {
-            httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "my-user");
+            httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "my-user", "My User");
 
             var context = await HandleAsync(new CreateContent());
 
@@ -64,7 +64,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_assign_actor_from_client()
         {
-            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
+            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client", null);
 
             var context = await HandleAsync(new CreateContent());
 
@@ -74,7 +74,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_not_override_actor()
         {
-            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
+            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client", null);
 
             var customActor = RefToken.User("me");
 
@@ -92,15 +92,18 @@ namespace Squidex.Web.CommandMiddlewares
             return commandContext;
         }
 
-        private static ClaimsPrincipal CreatePrincipal(string claimType, string claimValue)
+        private static ClaimsPrincipal CreatePrincipal(string claimType, string claimValue, string? name)
         {
-            var claimsPrincipal = new ClaimsPrincipal();
-            var claimsIdentity = new ClaimsIdentity();
+            var identity = new ClaimsIdentity();
 
-            claimsIdentity.AddClaim(new Claim(claimType, claimValue));
-            claimsPrincipal.AddIdentity(claimsIdentity);
+            identity.AddClaim(new Claim(claimType, claimValue));
 
-            return claimsPrincipal;
+            if (name != null)
+            {
+                identity.AddClaim(new Claim(OpenIdClaims.Name, name));
+            }
+
+            return new ClaimsPrincipal(identity);
         }
     }
 }
