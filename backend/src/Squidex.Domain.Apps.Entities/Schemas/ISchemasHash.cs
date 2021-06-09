@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
