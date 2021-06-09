@@ -18,7 +18,7 @@ namespace Migrations
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 25;
+        private const int CurrentVersion = 26;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -108,6 +108,12 @@ namespace Migrations
                     {
                         yield return serviceProvider.GetRequiredService<ConvertDocumentIds>().ForAssets();
                     }
+
+                    // Version 26: Introduce asset count collection.
+                    if (version < 26)
+                    {
+                        yield return serviceProvider.GetRequiredService<RebuildAssetsCount>();
+                    }
                 }
 
                 // Version 21: Introduce content drafts V2.
@@ -115,6 +121,12 @@ namespace Migrations
                 if (version < 25)
                 {
                     yield return serviceProvider.GetRequiredService<RebuildContents>();
+                }
+
+                // Version 26: Introduce content count collection.
+                else if (version < 26)
+                {
+                    yield return serviceProvider.GetRequiredService<RebuildContentsCount>();
                 }
 
                 // Version 16: Introduce file name slugs for assets.

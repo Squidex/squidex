@@ -45,15 +45,20 @@ export class PagerComponent implements OnChanges {
 
         const { page, pageSize, count, total } = this.paging;
 
-        const totalPages = Math.ceil(total / pageSize);
-
         if (count > 0) {
             const offset = page * pageSize;
 
             this.itemFirst = offset + 1;
             this.itemLast = offset + count;
 
-            this.canGoNext = page < totalPages - 1;
+            if (total > 0) {
+                const totalPages = Math.ceil(total / pageSize);
+
+                this.canGoNext = page < totalPages - 1;
+            } else {
+                this.canGoNext = count <= pageSize;
+            }
+
             this.canGoPrev = page > 0;
         } else {
             this.canGoNext = false;
