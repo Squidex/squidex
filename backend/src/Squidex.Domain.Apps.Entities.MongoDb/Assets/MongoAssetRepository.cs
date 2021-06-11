@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                                 .ToListAsync(ct);
                         long assetTotal = assetEntities.Count;
 
-                        if (q.NoTotal)
+                        if (q.NoTotal || (q.NoSlowTotal && (q.Query.Filter != null || parentId != null)))
                         {
                             assetTotal = -1;
                         }

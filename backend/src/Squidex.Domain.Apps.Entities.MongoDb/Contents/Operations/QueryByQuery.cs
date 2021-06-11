@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var contentEntities = await FindContentsAsync(query, filter, ct);
                 var contentTotal = (long)contentEntities.Count;
 
-                if (q.NoTotal)
+                if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
                 {
                     contentTotal = -1;
                 }
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 var contentEntities = await FindContentsAsync(query, filter, ct);
                 var contentTotal = (long)contentEntities.Count;
 
-                if (q.NoTotal)
+                if (q.NoTotal || (q.NoSlowTotal && q.Query.Filter != null))
                 {
                     contentTotal = -1;
                 }

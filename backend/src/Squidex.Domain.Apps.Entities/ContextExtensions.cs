@@ -13,6 +13,7 @@ namespace Squidex.Domain.Apps.Entities
     public static class ContextExtensions
     {
         private const string HeaderNoTotal = "X-NoTotal";
+        private const string HeaderNoSlowTotal = "X-NoSlowTotal";
 
         public static bool ShouldSkipTotal(this Context context)
         {
@@ -22,6 +23,16 @@ namespace Squidex.Domain.Apps.Entities
         public static ICloneBuilder WithoutTotal(this ICloneBuilder builder, bool value = true)
         {
             return builder.WithBoolean(HeaderNoTotal, value);
+        }
+
+        public static bool ShouldSkipSlowTotal(this Context context)
+        {
+            return context.Headers.ContainsKey(HeaderNoSlowTotal);
+        }
+
+        public static ICloneBuilder WithoutSlowTotal(this ICloneBuilder builder, bool value = true)
+        {
+            return builder.WithBoolean(HeaderNoSlowTotal, value);
         }
 
         public static ICloneBuilder WithBoolean(this ICloneBuilder builder, string key, bool value)

@@ -122,18 +122,18 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         }, name);
     }
 
-    public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
+    public load(isReload = false, optimizeTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
             this.resetState(update, 'Loading Initial');
         }
 
-        return this.loadInternal(isReload);
+        return this.loadInternal(isReload, optimizeTotal);
     }
 
-    private loadInternal(isReload: boolean): Observable<any> {
+    private loadInternal(isReload: boolean, optimizeTotal: boolean): Observable<any> {
         this.next({ isLoading: true }, 'Loading Started');
 
-        const query = createQuery(this.snapshot);
+        const query = createQuery(this.snapshot, optimizeTotal);
 
         const assets$ =
             this.assetsService.getAssets(this.appName, query);
@@ -333,7 +333,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
     public page(paging: { page: number; pageSize: number }) {
@@ -341,7 +341,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
     public toggleTag(tag: string): Observable<any> {
@@ -389,7 +389,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false);
+        return this.loadInternal(false, true);
     }
 
     public get parentId() {
@@ -437,7 +437,7 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
     return { tagsAvailable, tagsSelected };
 }
 
-function createQuery(snapshot: Snapshot) {
+function createQuery(snapshot: Snapshot, optimizeTotal: boolean) {
     const {
         page,
         pageSize,
@@ -445,7 +445,7 @@ function createQuery(snapshot: Snapshot) {
         tagsSelected,
     } = snapshot;
 
-    const result: any = { take: pageSize, skip: pageSize * page };
+    const result: any = { take: pageSize, skip: pageSize * page, optimizeTotal };
 
     const hasQuery = !!query?.fullText || Object.keys(tagsSelected).length > 0;
 

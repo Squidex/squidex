@@ -44,12 +44,16 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
                 .withSynchronizer(QueryFullTextSynchronizer.INSTANCE)
                 .getInitial();
 
-        this.assetsState.load(false, initial);
+        this.assetsState.load(false, true, initial);
         this.assetsRoute.listen();
     }
 
     public reload() {
         this.assetsState.load(true);
+    }
+
+    public reloadTotal() {
+        this.assetsState.load(true, false);
     }
 
     public search(query: Query) {

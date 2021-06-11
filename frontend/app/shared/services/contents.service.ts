@@ -117,14 +117,20 @@ export type ContentFieldData<T = any> =
 export type ContentData =
     Readonly<{ [fieldName: string ]: ContentFieldData }>;
 
+export type BulkStatusDto =
+    Readonly<{ status?: string; dueTime?: string | null }>;
+
 export type BulkUpdateDto =
     Readonly<{ jobs: ReadonlyArray<BulkUpdateJobDto>; doNotScript?: boolean; checkReferrers?: boolean }>;
 
 export type BulkUpdateJobDto =
-    Readonly<{ id: string; type: BulkUpdateType; status?: string; schema?: string; dueTime?: string | null; expectedVersion?: number }>;
+    Readonly<{ id: string; type: BulkUpdateType; schema?: string; expectedVersion?: number }> & BulkStatusDto;
+
+export type ContentQueryOptions =
+    Readonly<{ maxLength?: number; optimizeTotal?: boolean }>;
 
 export type ContentQueryDto =
-    Readonly<{ ids?: ReadonlyArray<string>; maxLength?: number; query?: Query; skip?: number; take?: number }>;
+    Readonly<{ ids?: ReadonlyArray<string>; query?: Query; skip?: number; take?: number }> & ContentQueryOptions;
 
 @Injectable()
 export class ContentsService {
@@ -140,6 +146,12 @@ export class ContentsService {
 
         const { fullQuery, odataParts: queryOdataParts, queryObj } = buildQuery(q);
 
+        const options = q?.optimizeTotal ? {
+                headers: {
+                    'X-NoSlowTotal': '1',
+                },
+            } : undefined;
+
         if (fullQuery.length > (maxLength || 2000)) {
             const body: any = {};
 
@@ -153,7 +165,7 @@ export class ContentsService {
 
             const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/query`);
 
-            return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body).pipe(
+            return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body, options).pipe(
                 map(({ total, items, statuses, _links }) => {
                     const contents = items.map(parseContent);
 
@@ -163,7 +175,7 @@ export class ContentsService {
         } else {
             const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-            return this.http.get<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url).pipe(
+            return this.http.get<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, options).pipe(
                 map(({ total, items, statuses, _links }) => {
                     const contents = items.map(parseContent);
 

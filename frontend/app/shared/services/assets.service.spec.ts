@@ -55,18 +55,54 @@ describe('AssetsService', () => {
 
     it('should make get request to get assets',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+            const query = { take: 17, skip: 13 };
+
             let assets: AssetsDto;
 
-            assetsService.getAssets('my-app', { take: 17, skip: 13 }).subscribe(result => {
+            assetsService.getAssets('my-app', query).subscribe(result => {
                 assets = result;
             });
-
-            const query = { take: 17, skip: 13 };
 
             const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?q=${encodeQuery(query)}`);
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.headers.get('X-NoSlowTotal')).toBeNull();
+
+            req.flush({
+                total: 10,
+                items: [
+                    assetResponse(12),
+                    assetResponse(13),
+                ],
+                folders: [
+                    assetFolderResponse(22),
+                    assetFolderResponse(23),
+                ],
+            });
+
+            expect(assets!).toEqual(
+                new AssetsDto(10, [
+                    createAsset(12),
+                    createAsset(13),
+                ]));
+        }));
+
+    it('should make get request to get assets with optimized total',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+            const query = { take: 17, skip: 13 };
+
+            let assets: AssetsDto;
+
+            assetsService.getAssets('my-app', { ...query, optimizeTotal: true }).subscribe(result => {
+                assets = result;
+            });
+
+            const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?q=${encodeQuery(query)}`);
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.headers.get('X-NoSlowTotal')).toBe('1');
 
             req.flush({
                 total: 10,
@@ -140,9 +176,9 @@ describe('AssetsService', () => {
 
     it('should make get request to get assets by name',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const query = { fullText: 'my-query' };
+            const query = { take: 17, skip: 13, query: { fullText: 'my-query' } };
 
-            assetsService.getAssets('my-app', { take: 17, skip: 13, query }).subscribe();
+            assetsService.getAssets('my-app', query).subscribe();
 
             const expectedQuery = { filter: { and: [{ path: 'fileName', op: 'contains', value: 'my-query' }] }, take: 17, skip: 13 };
 
@@ -156,9 +192,9 @@ describe('AssetsService', () => {
 
     it('should make post request to get assets by name if request limit reached',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const query = { fullText: 'my-query' };
+            const query = { take: 17, skip: 13, query: { fullText: 'my-query' } };
 
-            assetsService.getAssets('my-app', { take: 17, skip: 13, query, maxLength: 5 }).subscribe();
+            assetsService.getAssets('my-app', { ...query, maxLength: 5 }).subscribe();
 
             const expectedQuery = { filter: { and: [{ path: 'fileName', op: 'contains', value: 'my-query' }] }, take: 17, skip: 13 };
 
@@ -173,7 +209,9 @@ describe('AssetsService', () => {
 
     it('should make get request to get assets by tag',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            assetsService.getAssets('my-app', { take: 17, skip: 13, tags: ['tag1'] }).subscribe();
+            const query = { take: 17, skip: 13, tags: ['tag1'] };
+
+            assetsService.getAssets('my-app', query).subscribe();
 
             const expectedQuery = { filter: { and: [{ path: 'tags', op: 'eq', value: 'tag1' }] }, take: 17, skip: 13 };
 
@@ -187,7 +225,9 @@ describe('AssetsService', () => {
 
     it('should make get request to get assets by tag if request limit reached',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            assetsService.getAssets('my-app', { take: 17, skip: 13, tags: ['tag1'], maxLength: 5 }).subscribe();
+            const query = { take: 17, skip: 13, tags: ['tag1'] };
+
+            assetsService.getAssets('my-app', { ...query, maxLength: 5 }).subscribe();
 
             const expectedQuery = { filter: { and: [{ path: 'tags', op: 'eq', value: 'tag1' }] }, take: 17, skip: 13 };
 

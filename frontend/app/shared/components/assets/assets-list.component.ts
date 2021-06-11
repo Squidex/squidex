@@ -72,6 +72,10 @@ export class AssetsListComponent extends StatefulComponent<State> {
         }
     }
 
+    public reloadTotal() {
+        this.assetsState.load(true, false);
+    }
+
     public selectFolder(asset: AssetDto) {
         this.assetsState.navigate(asset.parentId);
     }

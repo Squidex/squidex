@@ -50,6 +50,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<RebuildContents>()
                 .As<IMigration>();
 
+            services.AddTransientAs<RebuildContentsCount>()
+                .As<IMigration>();
+
             services.AddTransientAs<RebuildSnapshots>()
                 .As<IMigration>();
 
@@ -60,6 +63,9 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildAssetFolders>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildAssetsCount>()
                 .As<IMigration>();
 
             services.AddTransientAs<StartEventConsumers>()

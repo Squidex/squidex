@@ -149,8 +149,11 @@ export type RenameAssetFolderDto =
 export type MoveAssetItemDto =
     Readonly<{ parentId?: string }>;
 
+export type AssetQueryOptions =
+    Readonly<{ maxLength?: number; optimizeTotal?: boolean }>;
+
 export type AssetQueryDto =
-    Readonly<{ ids?: Tags; maxLength?: number; parentId?: string; query?: Query; skip?: number; tags?: Tags; take?: number }>;
+    Readonly<{ ids?: Tags; parentId?: string; query?: Query; skip?: number; tags?: Tags; take?: number }> & AssetQueryOptions;
 
 @Injectable()
 export class AssetsService {
@@ -212,6 +215,12 @@ export class AssetsService {
             }
         }
 
+        const options = q?.optimizeTotal ? {
+                headers: {
+                    'X-NoSlowTotal': '1',
+                },
+            } : undefined;
+
         if (fullQuery.length > (maxLength || 2000)) {
             const body: any = {};
 
@@ -227,7 +236,7 @@ export class AssetsService {
 
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
 
-            return this.http.post<{ total: number; items: any[]; folders: any[] } & Resource>(url, body).pipe(
+            return this.http.post<{ total: number; items: any[]; folders: any[] } & Resource>(url, body, options).pipe(
                 map(({ total, items, _links }) => {
                     const assets = items.map(parseAsset);
 
@@ -237,7 +246,7 @@ export class AssetsService {
         } else {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-            return this.http.get<{ total: number; items: any[]; folders: any[] } & Resource>(url).pipe(
+            return this.http.get<{ total: number; items: any[]; folders: any[] } & Resource>(url, options).pipe(
                 map(({ total, items, _links }) => {
                     const assets = items.map(parseAsset);
 

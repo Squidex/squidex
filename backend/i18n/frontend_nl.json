@@ -296,6 +296,8 @@
   "common.noValue": "- Geen waarde -",
   "common.or": "of",
   "common.pagerInfo": "{itemFirst} - {itemLast} van {numberOfItems}",
+  "common.pagerInfoNoTotal": "{itemFirst}-{itemLast} of total?",
+  "common.pagerReload": "Click to reload view and get total number of items",
   "common.password": "Wachtwoord",
   "common.passwordConfirm": "Bevestig wachtwoord",
   "common.pattern": "Patroon",

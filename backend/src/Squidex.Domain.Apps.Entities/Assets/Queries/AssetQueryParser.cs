@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -65,6 +65,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 if (context.ShouldSkipTotal())
                 {
                     q = q.WithoutTotal();
+                }
+                else if (context.ShouldSkipSlowTotal())
+                {
+                    q = q.WithoutSlowTotal();
                 }
 
                 return q;

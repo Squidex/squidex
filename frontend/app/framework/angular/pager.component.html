@@ -5,7 +5,17 @@
         </select>
 
         <span class="page-info">
-            <span *ngIf="paging.count > 0" class="pagination-text">{{ 'common.pagerInfo' | sqxTranslate: translationInfo }}</span>
+            <ng-container *ngIf="paging.count > 0 && paging.total > 0">
+                <button class="btn deactivated">
+                    {{ 'common.pagerInfo' | sqxTranslate: translationInfo }}
+                </button>
+            </ng-container>
+    
+            <ng-container *ngIf="paging.count > 0 && paging.total <= 0">
+                <button class="btn" title="{{ 'common.pagerReload' | sqxTranslate }}" (click)="loadTotal.emit()">
+                    {{ 'common.pagerInfoNoTotal' | sqxTranslate: translationInfo }}
+                </button>
+            </ng-container>
     
             <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!canGoPrev" (click)="goPrev()">
                 <i class="icon-angle-left"></i>

@@ -81,7 +81,7 @@
                 </ng-container>
     
                 <ng-container footer>
-                    <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
+                    <sqx-pager (loadTotal)="reloadTotal()" [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
                 </ng-container>
             </sqx-list-view>
         </ng-container>
