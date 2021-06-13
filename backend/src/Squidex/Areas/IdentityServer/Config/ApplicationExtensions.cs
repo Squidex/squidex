@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using OpenIddict.Abstractions;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -50,6 +51,11 @@ namespace Squidex.Areas.IdentityServer.Config
                 {
                     foreach (var claimValue in values)
                     {
+                        if (key == SquidexClaimTypes.DisplayName)
+                        {
+                            yield return new Claim(OpenIdClaims.Name, claimValue);
+                        }
+
                         yield return new Claim(key, claimValue);
                     }
                 }
