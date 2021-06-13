@@ -83,10 +83,10 @@
     <value>字段'{0}' 必须介于 {1} 和 {2} 之间。</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>字段 '{name|lower}' 不是。</value>
+    <value>字段 '{name|lower}' 无法通过表达式验证</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>字段 '{0}' 不是。</value>
+    <value>字段 '{0}' 无法通过表达式验证</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
     <value>字段'{name|lower}' 是必需的。</value>
