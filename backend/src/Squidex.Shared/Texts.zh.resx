@@ -71,40 +71,40 @@
     <value>字段 '{0}' 必须与 {1} 相同。</value>
   </data>
   <data name="annotations_EmailAddress" xml:space="preserve">
-    <value>字段 '{name|lower}' 不是有效的电子邮件地址。</value>
+    <value>字段'{name|lower}' 不是有效的电子邮件地址。</value>
   </data>
   <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
-    <value>字段 '{0}' 不是有效的电子邮件地址。</value>
+    <value>字段'{0}' 不是有效的电子邮件地址。</value>
   </data>
   <data name="annotations_Range" xml:space="preserve">
-    <value>字段 '{name|lower}' 必须介于 {min} 和 {max} 之间。</value>
+    <value>字段'{name|lower}' 必须介于 {min} 和 {max} 之间。</value>
   </data>
   <data name="dotnet_annotations_Range" xml:space="preserve">
-    <value>字段 '{0}' 必须介于 {1} 和 {2} 之间。</value>
+    <value>字段'{0}' 必须介于 {1} 和 {2} 之间。</value>
   </data>
   <data name="annotations_RegularExpression" xml:space="preserve">
-    <value>字段 '{name|lower}' 无法通过表达式验证。</value>
+    <value>字段 '{name|lower}' 不是。</value>
   </data>
   <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
-    <value>字段 '{0}' 无法通过表达式验证。</value>
+    <value>字段 '{0}' 不是。</value>
   </data>
   <data name="annotations_Required" xml:space="preserve">
-    <value>字段 '{name|lower}' 是必需的。</value>
+    <value>字段'{name|lower}' 是必需的。</value>
   </data>
   <data name="dotnet_annotations_Required" xml:space="preserve">
-    <value>字段 '{0}' 是必需的。</value>
+    <value>字段'{0}' 是必需的。</value>
   </data>
   <data name="annotations_StringLength" xml:space="preserve">
-    <value>字段 '{name|lower}' 必须是最大长度为 {max} 的字符串。</value>
+    <value>字段'{name|lower}' 必须是最大长度为 {max} 的字符串。</value>
   </data>
   <data name="dotnet_annotations_StringLength" xml:space="preserve">
-    <value>字段 '{0}' 必须是最大长度为 {1} 的字符串。</value>
+    <value>字段'{0}' 必须是最大长度为 {1} 的字符串。</value>
   </data>
   <data name="annotations_StringLengthMinimum" xml:space="preserve">
-    <value>字段 '{name|lower}' 必须是最小长度为 {min} 且最大长度为 {max} 的字符串。</value>
+    <value>字段'{name|lower}' 必须是一个字符串，最小长度为 {min}，最大长度为 {max}。</value>
   </data>
   <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
-    <value>字段 '{0}' 必须是最小长度为 {1} 且最大长度为 {2} 的字符串。</value>
+    <value>字段'{0}' 必须是一个字符串，最小长度为 {1}，最大长度为 {2}。</value>
   </data>
   <data name="apps.clients.idAlreadyExists" xml:space="preserve">
     <value>已存在具有相同 ID 的客户端。</value>
@@ -119,7 +119,7 @@
     <value>无法删除唯一的所有者。</value>
   </data>
   <data name="apps.languages.fallbackNotFound" xml:space="preserve">
-    <value>应用没有后备语言 '{fallback}'。</value>
+    <value>应用没有后备语言'{fallback}'。</value>
   </data>
   <data name="apps.languages.languageAlreadyAdded" xml:space="preserve">
     <value>语言已经添加。</value>
@@ -155,22 +155,22 @@
     <value>已存在同名角色。</value>
   </data>
   <data name="apps.roles.usedRoleByClientsNotRemovable" xml:space="preserve">
-    <value>分配客户端时无法删除角色。</value>
+    <value>分配客户端后无法删除角色。</value>
   </data>
   <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
     <value>当分配了贡献者时无法删除角色。</value>
   </data>
   <data name="assets.folderNotFound" xml:space="preserve">
-    <value>Asset文件夹不存在。</value>
+    <value>资源文件夹不存在。</value>
   </data>
   <data name="assets.folderRecursion" xml:space="preserve">
     <value>无法将文件夹添加到自己的子文件夹中。</value>
   </data>
   <data name="assets.maxSizeReached" xml:space="preserve">
-    <value>您已达到最大Asset大小。</value>
+    <value>您已达到最大资源大小。</value>
   </data>
   <data name="assets.referenced" xml:space="preserve">
-    <value>Asset被内容引用，无法删除。</value>
+    <value>资源被内容引用，无法删除。</value>
   </data>
   <data name="backups.alreadyRunning" xml:space="preserve">
     <value>另一个备份进程已经在运行。</value>
@@ -416,7 +416,7 @@
     <value>保存</value>
   </data>
   <data name="common.schemaId" xml:space="preserve">
-    <value>Schema ID</value>
+    <value>Schemas ID</value>
   </data>
   <data name="common.signup" xml:space="preserve">
     <value>注册</value>
@@ -467,7 +467,7 @@
     <value>无效组件。未找到 'schemaId' 字段。</value>
   </data>
   <data name="contents.invalidComponentUnknownSchema" xml:space="preserve">
-    <value>无效组件。找不到Schema。</value>
+    <value>无效组件。找不到Schemas。</value>
   </data>
   <data name="contents.invalidGeolocation" xml:space="preserve">
     <value>无效的 json 类型，预期的纬度/经度对象。</value>
@@ -491,7 +491,7 @@
     <value>内容被其他内容引用，无法删除或取消发布。</value>
   </data>
   <data name="contents.schemaNotPublished" xml:space="preserve">
-    <value>Schema未发布。</value>
+    <value>Schemas未发布。</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>无法更新单个内容。</value>
@@ -614,7 +614,7 @@
     <value>未找到引用 '{id}'。</value>
   </data>
   <data name="contents.validation.referenceToInvalidSchema" xml:space="preserve">
-    <value>参考 '{id}' 的Schema无效。</value>
+    <value>参考 '{id}' 的Schemas无效。</value>
   </data>
   <data name="contents.validation.regexTooSlow" xml:space="preserve">
     <value>正则表达式太慢了。</value>
@@ -677,10 +677,10 @@
     <value>密码太短。</value>
   </data>
   <data name="dotnet_identity_PwnedError" xml:space="preserve">
-    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前曾在任何地方使用过，请更改它！</value>
+    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前曾在任何地方使用过它，请更改它！</value>
   </data>
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
-    <value>用户被锁定。</value>
+    <value>User is locked out.</value>
   </data>
   <data name="exception.invalidJsonQuery" xml:space="preserve">
     <value>Json 查询无效：{message}</value>
@@ -746,13 +746,13 @@
     <value>更新的 UI 设置</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
-    <value>替换的Asset。</value>
+    <value>替换的资源。</value>
   </data>
   <data name="history.assets.updated" xml:space="preserve">
-    <value>更新的Asset。</value>
+    <value>更新的资源。</value>
   </data>
   <data name="history.assets.uploaded" xml:space="preserve">
-    <value>上传的Asset。</value>
+    <value>上传的资源。</value>
   </data>
   <data name="history.contents.created" xml:space="preserve">
     <value>创建了 {[Schema]} 内容。</value>
@@ -776,52 +776,52 @@
     <value>更新了 {[Schema]} 内容。</value>
   </data>
   <data name="history.schemas.created" xml:space="preserve">
-    <value>创建的Schema {[Name]}。</value>
+    <value>创建的Schemas {[Name]}。</value>
   </data>
   <data name="history.schemas.deleted" xml:space="preserve">
-    <value>已删除Schema {[Name]}。</value>
+    <value>已删除Schemas {[Name]}。</value>
   </data>
   <data name="history.schemas.fieldAdded" xml:space="preserve">
-    <value>将字段 {[Field]} 添加到Schema {[Name]}。</value>
+    <value>将字段 {[Field]} 添加到Schemas {[Name]}。</value>
   </data>
   <data name="history.schemas.fieldDeleted" xml:space="preserve">
-    <value>已从Schema {[Name]} 中删除字段 {[Field]}。</value>
+    <value>已从Schemas {[Name]} 中删除字段 {[Field]}。</value>
   </data>
   <data name="history.schemas.fieldDisabled" xml:space="preserve">
-    <value>Schema{[Name]} 的禁用字段 {[Field]}。</value>
+    <value>Schemas {[Name]} 的禁用字段 {[Field]}。</value>
   </data>
   <data name="history.schemas.fieldHidden" xml:space="preserve">
-    <value>有Schema {[Name]} 的隐藏字段 {[Field]}。</value>
+    <value>有Schemas {[Name]} 的隐藏字段 {[Field]}。</value>
   </data>
   <data name="history.schemas.fieldLocked" xml:space="preserve">
-    <value>已锁定Schema {[Name]} 的字段 {[Field]}。</value>
+    <value>已锁定Schemas {[Name]} 的字段 {[Field]}。</value>
   </data>
   <data name="history.schemas.fieldShown" xml:space="preserve">
-    <value>已显示Schema {[Name]} 的字段 {[Field]}。</value>
+    <value>已显示Schemas {[Name]} 的字段 {[Field]}。</value>
   </data>
   <data name="history.schemas.fieldsReordered" xml:space="preserve">
-    <value>Schema {[Name]} 的重新排序字段。</value>
+    <value>Schemas {[Name]} 的重新排序字段。</value>
   </data>
   <data name="history.schemas.fieldUpdated" xml:space="preserve">
-    <value>已更新Schema {[Name]} 的字段 {[Field]}。</value>
+    <value>已更新Schemas {[Name]} 的字段 {[Field]}。</value>
   </data>
   <data name="history.schemas.published" xml:space="preserve">
-    <value>已发布的Schema {[Name]}。</value>
+    <value>已发布的Schemas {[Name]}。</value>
   </data>
   <data name="history.schemas.scriptsConfigured" xml:space="preserve">
-    <value>Schema {[Name]} 的配置脚本。</value>
+    <value>Schemas {[Name]} 的配置脚本。</value>
   </data>
   <data name="history.schemas.unpublished" xml:space="preserve">
-    <value>未发布的Schema {[Name]}。</value>
+    <value>未发布的Schemas {[Name]}。</value>
   </data>
   <data name="history.schemas.updated" xml:space="preserve">
-    <value>更新的Schema {[Name]}。</value>
+    <value>更新的Schemas {[Name]}。</value>
   </data>
   <data name="history.statusChanged" xml:space="preserve">
     <value>已将 {[Schema]} 内容的状态更改为 {[Status]}。</value>
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
-    <value>您的邮箱在 Github 中设置为私有，请设置为公开以使用 Github 登录。</value>
+    <value>您的邮箱在 Github 中设置为私有。请设置为公开以使用 Github 登录。</value>
   </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>另一个规则已经在运行。</value>
@@ -848,7 +848,7 @@
     <value>字段 ID 未涵盖所有字段。</value>
   </data>
   <data name="schemas.nameAlreadyExists" xml:space="preserve">
-    <value>一个同名的Schema已经存在。</value>
+    <value>一个同名的Schemas已经存在。</value>
   </data>
   <data name="schemas.noPermission" xml:space="preserve">
     <value>You do not have permission for this schema.</value>
@@ -896,10 +896,10 @@
     <value>{name} 内容</value>
   </data>
   <data name="search.schemaResult" xml:space="preserve">
-    <value>{name} Schema</value>
+    <value>{name} Schemas</value>
   </data>
   <data name="security.passwordStolen" xml:space="preserve">
-    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前在任何地方使用过它，请更改它！</value>
+    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前曾在任何地方使用过它，请更改它！</value>
   </data>
   <data name="setup.createUser.button" xml:space="preserve">
     <value>创建用户</value>
@@ -908,7 +908,7 @@
     <value>确认</value>
   </data>
   <data name="setup.createUser.failure" xml:space="preserve">
-    <value>既没有配置密码认证，也没有配置外部认证提供商，如谷歌。请检查您的设置和日志。</value>
+    <value>既未配置密码认证，也未配置 Google 等外部认证提供商。请检查您的设置和日志。</value>
   </data>
   <data name="setup.createUser.headline" xml:space="preserve">
     <value>管理员用户</value>
@@ -917,7 +917,7 @@
     <value>创建管理员用户</value>
   </data>
   <data name="setup.createUser.loginHint" xml:space="preserve">
-    <value>您已经配置了至少一个外部身份验证提供程序，例如 Google。只需转到登录页面并登录即可成为管理员。</value>
+    <value>您至少配置了一个外部身份验证提供程序，例如 Google。只需转到登录页面并登录即可成为管理员。</value>
   </data>
   <data name="setup.createUser.loginLink" xml:space="preserve">
     <value>进入登录页面。</value>
@@ -932,7 +932,7 @@
     <value>您看到此屏幕是因为尚无用户存在。创建用户后，您将无法再次使用此屏幕。</value>
   </data>
   <data name="setup.madeBy" xml:space="preserve">
-    <value>自豪地制作</value>
+    <value>制作</value>
   </data>
   <data name="setup.madeByCopyright" xml:space="preserve">
     <value>Sebastian Stehle 和贡献者，2016-2021</value>
@@ -944,13 +944,13 @@
     <value>通过你的设置，每个用户都可以创建新的应用程序。如果你想改变这个设置 &lt;code&gt;UI__ONLYADMINCANCREATEAPPS=true&lt;/code&gt; 作为环境变量。</value>
   </data>
   <data name="setup.ruleFolder.warning" xml:space="preserve">
-    <value>您正在使用&lt;strong&gt;文件夹Asset存储&lt;/strong&gt;，其中所有Asset都存储在文件系统中。请记住将Asset文件夹包含在您的备份策略中并将其映射到卷, 如果您使用的是 Docker。</value>
+    <value>您正在使用&lt;strong&gt;文件夹资源存储&lt;/strong&gt;，其中所有资源都存储在文件系统中。请记住将资源文件夹包含在您的备份策略中并将其映射到卷, 如果您使用的是 Docker。</value>
   </data>
   <data name="setup.ruleFtp.warning" xml:space="preserve">
-    <value>您正在使用 &lt;strong&gt;FTP Asset存储&lt;/strong&gt;。由于性能不佳，不建议使用这种存储类型。</value>
+    <value>您正在使用 &lt;strong&gt;FTP 资源存储&lt;/strong&gt;。由于性能不佳，不建议使用这种存储类型。</value>
   </data>
   <data name="setup.ruleHttps.failure" xml:space="preserve">
-    <value> 您不是通过 https 访问站点。如果此警告不正确，则 Squidex 无法检测 https Schema，因为您的实例位于反向代理（例如 nginx）之后。确保正确转发 http 标头, 通过 &lt;code&gt;X-Forwarded-*&lt;/code&gt; 标头。</value>
+    <value> 您不是通过 https 访问站点。如果此警告不正确，则 Squidex 无法检测 https 模式，因为您的实例位于反向代理（例如 nginx）之后。确保正确转发 http 标头, 通过 &lt;code&gt;X-Forwarded-*&lt;/code&gt; 标头。</value>
   </data>
   <data name="setup.ruleHttps.success" xml:space="preserve">
     <value>恭喜您，您正在通过安全连接 (https) 访问 Squidex 安装。</value>
@@ -980,7 +980,7 @@
     <value>Cookies &amp; Analytics</value>
   </data>
   <data name="users.consent.cookiesText" xml:space="preserve">
-    <value>&lt;p&gt;我理解并同意 Squidex 使用 cookie 来确保您在我们的平台上获得最佳体验并存储您的登录状态。&lt;/p&gt;&lt;p&gt;我理解并同意 Squidex已集成 Google Analytics（具有匿名器功能）。Google Analytics 是一项网络分析服务，用于收集和分析有关用户行为的数据。&lt;/p&gt;&lt;p&gt; 我接受 &lt;a href="{privacyUrl}" target="_blank" rel="noopener"&gt;隐私政策&lt;/a&gt;.&lt;/p&gt;</value>
+    <value>&lt;p&gt;我理解并同意 Squidex 使用 cookie 来确保您在我们的平台上获得最佳体验并存储您的登录状态。&lt;/p&gt;&lt;p&gt;我理解并同意 Squidex 已集成 Google Analytics（具有匿名器功能）。Google Analytics 是一项网络分析服务，用于收集和分析有关用户行为的数据。&lt;/p&gt;&lt;p&gt; 我接受 &lt;a href="{privacyUrl}" target="_blank" rel="noopener"&gt;隐私政策&lt;/a&gt;.&lt;/p&gt;</value>
   </data>
   <data name="users.consent.emailHeadline" xml:space="preserve">
     <value>自动电子邮件（可选）</value>
@@ -1187,7 +1187,7 @@
     <value>{property|upper} 不是一个有效值。</value>
   </data>
   <data name="workflows.overlap" xml:space="preserve">
-    <value>多个工作流覆盖所有Schema。</value>
+    <value>多个工作流覆盖所有Schemas。</value>
   </data>
   <data name="workflows.publishedIsInitial" xml:space="preserve">
     <value>初始步骤不能发布步骤。</value>
@@ -1199,6 +1199,6 @@
     <value>转换的目标无效。</value>
   </data>
   <data name="workflows.schemaOverlap" xml:space="preserve">
-    <value>Schema'{schema}' 被多个工作流覆盖。</value>
+    <value>Schemas'{schema}' 被多个工作流覆盖。</value>
   </data>
 </root>
