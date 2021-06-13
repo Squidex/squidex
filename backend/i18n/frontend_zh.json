@@ -529,7 +529,7 @@
   "dashboard.schemaNewCardDescription": "Schemas定义了内容元素的结构。",
   "dashboard.schemasCard": "Schemas",
   "dashboard.schemasCardDescription": "深入了解此应用的数据模型。",
-  "dashboard.stackedChart": "堆叠",
+  "dashboard.stackedChart": "折叠",
   "dashboard.supportCard": "反馈与支持",
   "dashboard.supportCardDescription": "提供反馈和请求功能以帮助我们改进 Squidex。",
   "dashboard.trafficChart": "API 流量图表",
