@@ -3,7 +3,7 @@
   "annotations_Compare": "字段 '{name|lower}' 必须与 {other|lower} 相同。",
   "annotations_EmailAddress": "字段'{name|lower}' 不是有效的电子邮件地址。",
   "annotations_Range": "字段'{name|lower}' 必须介于 {min} 和 {max} 之间。",
-  "annotations_RegularExpression": "字段 '{name|lower}' 不是。",
+  "annotations_RegularExpression": "字段 '{name|lower}' 无法通过表达式验证",
   "annotations_Required": "字段'{name|lower}' 是必需的。",
   "annotations_StringLength": "字段'{name|lower}' 必须是最大长度为 {max} 的字符串。",
   "annotations_StringLengthMinimum": "字段'{name|lower}' 必须是一个字符串，最小长度为 {min}，最大长度为 {max}。",
