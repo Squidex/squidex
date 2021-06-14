@@ -17,7 +17,7 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,X-LANG,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,X-Api-Key,X-Device-Id,Access-Control-Allow-Origin"
 spec:
   rules:
-    - host: squidex-staging-v2.learnwithhomer.com
+    - host: {{ .Values.ingressHost }}
       http:
         paths:
         - path: /

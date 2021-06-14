@@ -1,0 +1,3 @@
+contentVersion: v2
+secretsEnvironment: production
+ingressHost: squidex-production-v2.learnwithhomer.com
