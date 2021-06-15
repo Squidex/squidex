@@ -12,13 +12,15 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public sealed class EventConsumerState
     {
-        public bool IsStopped { get; set; }
+        public static readonly EventConsumerState Initial = new EventConsumerState();
 
-        public int Count { get; set; }
+        public bool IsStopped { get; init; }
 
-        public string? Error { get; set; }
+        public string? Error { get; init; }
 
-        public string? Position { get; set; }
+        public string? Position { get; init; }
+
+        public int Count { get; init; }
 
         public bool IsPaused
         {
@@ -41,11 +43,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             Count = count;
         }
 
-        public static EventConsumerState Reset()
-        {
-            return new EventConsumerState();
-        }
-
         public EventConsumerState Handled(string position, int offset = 1)
         {
             return new EventConsumerState(position, Count + offset);
@@ -58,7 +55,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerState Started()
         {
-            return new EventConsumerState(Position, Count) { IsStopped = false };
+            return new EventConsumerState(Position, Count);
         }
 
         public EventConsumerInfo ToInfo(string name)

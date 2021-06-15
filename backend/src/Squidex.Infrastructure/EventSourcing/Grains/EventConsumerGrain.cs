@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 await ClearAsync();
 
-                State = EventConsumerState.Reset();
+                State = EventConsumerState.Initial;
 
                 Subscribe();
             });
