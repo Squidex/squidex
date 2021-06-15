@@ -8,13 +8,6 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
-const ImageTypes: ReadonlyArray<string> = [
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'image/gif',
-];
-
 @Directive({
     selector: '[sqxDropFile]',
 })
@@ -204,7 +197,7 @@ export class FileDropDirective {
     }
 
     private isImage(file: { type: string }) {
-        return !this.onlyImages || ImageTypes.indexOf(file.type) >= 0;
+        return !this.onlyImages || file.type.indexOf('image/') === 0;
     }
 }
 

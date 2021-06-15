@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -76,12 +76,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     foundIds.Add(asset.AssetId);
 
                     ValidateCommon(asset, path, addError);
+                    ValidateIsImage(asset, path, addError);
 
-                    if (asset.Type != AssetType.Image)
-                    {
-                        ValidateNonImage(path, addError);
-                    }
-                    else
+                    if (asset.Type == AssetType.Image)
                     {
                         ValidateImage(asset, path, addError);
                     }
@@ -123,9 +120,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             }
         }
 
-        private void ValidateNonImage(ImmutableQueue<string> path, AddError addError)
+        private void ValidateIsImage(IAssetInfo asset, ImmutableQueue<string> path, AddError addError)
         {
-            if (properties.MustBeImage)
+            if (properties.MustBeImage && asset.Type != AssetType.Image && asset.MimeType != "image/svg+xml")
             {
                 addError(path, T.Get("contents.validation.image"));
             }
