@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
@@ -60,37 +58,6 @@ namespace TestSuite.ApiTests
 
             // Should create default client.
             Assert.Contains(clients.Items, x => x.Id == "default");
-        }
-
-        [Fact]
-        public async Task Should_create_app_with_anonymous_access()
-        {
-            var appName = Guid.NewGuid().ToString();
-
-            // STEP 1: Create app
-            var createRequest = new CreateAppDto { Name = appName };
-
-            var app = await _.Apps.PostAppAsync(createRequest);
-
-            // Should return create app with correct name.
-            Assert.Equal(appName, app.Name);
-
-
-            // STEP 2: Make the client anonymous.
-            var request = new UpdateClientDto
-            {
-                AllowAnonymous = true, Role = "Owner"
-            };
-
-            await _.Apps.PutClientAsync(appName, "default", request);
-
-
-            // STEP 3: Check anonymous permission
-            var url = $"{_.ClientManager.Options.Url}/api/apps/{appName}/contributors";
-
-            var response = await new HttpClient().GetAsync(url);
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
