@@ -196,6 +196,7 @@ namespace Squidex.Web.Pipeline
             Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(isNextCalled);
+            Assert.Contains(user.Claims, x => x.Type == OpenIdClaims.ClientId && x.Value == "client1");
         }
 
         [Fact]
