@@ -106,10 +106,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task Should_enrich_with_asset_urls()
         {
             var img1 = CreateAsset(DomainId.NewGuid(), 1, AssetType.Image, "Image1.png");
-            var img2 = CreateAsset(DomainId.NewGuid(), 2, AssetType.Image, "Image2.png");
+            var img2 = CreateAsset(DomainId.NewGuid(), 2, AssetType.Unknown, "Image2.png", "image/svg+xml");
 
             var doc1 = CreateAsset(DomainId.NewGuid(), 3, AssetType.Unknown, "Document1.png");
-            var doc2 = CreateAsset(DomainId.NewGuid(), 4, AssetType.Unknown, "Document2.png");
+            var doc2 = CreateAsset(DomainId.NewGuid(), 4, AssetType.Unknown, "Document2.png", "image/svg+xml", 20_000);
 
             var contents = new[]
             {
@@ -236,9 +236,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
         }
 
-        private IEnrichedAssetEntity CreateAsset(DomainId id, int version, AssetType type, string fileName)
+        private IEnrichedAssetEntity CreateAsset(DomainId id, int version, AssetType type, string fileName, string? fileType = null, int fileSize = 100)
         {
-            return new AssetEntity { AppId = appId, Id = id, Type = type, Version = version, FileName = fileName };
+            return new AssetEntity
+            {
+                AppId = appId,
+                Id = id,
+                Type = type,
+                FileName = fileName,
+                FileSize = fileSize,
+                MimeType = fileType!,
+                Version = version,
+            };
         }
     }
 }

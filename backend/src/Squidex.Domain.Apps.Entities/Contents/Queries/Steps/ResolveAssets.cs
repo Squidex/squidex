@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                             {
                                 IJsonValue array;
 
-                                if (referencedAsset.Type == AssetType.Image)
+                                if (IsImage(referencedAsset))
                                 {
                                     var url = urlGenerator.AssetContent(
                                         referencedAsset.AppId,
@@ -111,6 +111,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     }
                 }
             }
+        }
+
+        private static bool IsImage(IEnrichedAssetEntity asset)
+        {
+            const int PreviewLimit = 10 * 1024;
+
+            return asset.Type == AssetType.Image || (asset.MimeType == "image/svg+xml" && asset.FileSize < PreviewLimit);
         }
 
         private async Task<ILookup<DomainId, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<DomainId> ids,
