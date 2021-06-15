@@ -777,6 +777,7 @@
   "schemas.fieldTypes.references.countMin": "最小项目",
   "schemas.fieldTypes.references.description": "链接到其他内容项。",
   "schemas.fieldTypes.references.mustBePublished": "必须发布参考文献",
+  "schemas.fieldTypes.references.resolve": "Resolve references",
   "schemas.fieldTypes.references.resolveHint": "当 MaxItems 设置为 1 时，在内容列表中显示引用项的名称。",
   "schemas.fieldTypes.string.characters": "字符",
   "schemas.fieldTypes.string.charactersMax": "最大字符数",

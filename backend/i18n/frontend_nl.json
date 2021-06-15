@@ -777,6 +777,7 @@
   "schemas.fieldTypes.references.countMin": "Min. items",
   "schemas.fieldTypes.references.description": "Links naar andere inhoudsitems.",
   "schemas.fieldTypes.references.mustBePublished": "References must be published",
+  "schemas.fieldTypes.references.resolve": "Resolve references",
   "schemas.fieldTypes.references.resolveHint": "Toon de naam van het item waarnaar wordt verwezen in de inhoudslijst wanneer MaxItems is ingesteld op 1.",
   "schemas.fieldTypes.string.characters": "Karakters",
   "schemas.fieldTypes.string.charactersMax": "Max. karakters",
