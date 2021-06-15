@@ -133,6 +133,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_add_image_tag_if_svg()
+        {
+            var svg = new DelegateAssetFile("MyImage.png", "image/svg+xml", 1024, () => stream);
+
+            var command = new CreateAsset { File = svg };
+
+            await sut.EnhanceAsync(command);
+
+            Assert.Contains("image", command.Tags);
+        }
+
+        [Fact]
         public void Should_format_image()
         {
             var source = new AssetEntity
