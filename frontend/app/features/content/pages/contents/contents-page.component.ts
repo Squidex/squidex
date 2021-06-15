@@ -108,7 +108,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                             .withSynchronizer(QuerySynchronizer.INSTANCE)
                             .getInitial();
 
-                    this.contentsState.load(false, false, initial);
+                    this.contentsState.load(false, true, initial);
                     this.contentsRoute.listen();
                 }));
 
@@ -124,7 +124,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public reloadTotal() {
-        this.contentsState.load(true, true);
+        this.contentsState.load(true, false);
     }
 
     public delete(content: ContentDto) {

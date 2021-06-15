@@ -127,13 +127,13 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public loadReference(contentId: string, update: Partial<Snapshot> = {}) {
         this.resetState({ reference: contentId, referencing: undefined, ...update });
 
-        return this.loadInternal(false, false);
+        return this.loadInternal(false, true);
     }
 
     public loadReferencing(contentId: string, update: Partial<Snapshot> = {}) {
         this.resetState({ referencing: contentId, reference: undefined, ...update });
 
-        return this.loadInternal(false, false);
+        return this.loadInternal(false, true);
     }
 
     public load(isReload = false, optimizeTotal = true, update: Partial<Snapshot> = {}): Observable<any> {
@@ -149,7 +149,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false, false);
+        return this.loadInternal(false, true);
     }
 
     private loadInternal(isReload: boolean, optimizeTotal: boolean) {
@@ -264,7 +264,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 'i18n:contents.unpublishReferrerConfirmTitle',
                 'i18n:contents.unpublishReferrerConfirmText',
                 'unpublishReferencngContent').pipe(
-            switchMap(() => this.loadInternalCore(false, false)), shareSubscribed(this.dialogs));
+            switchMap(() => this.loadInternalCore(false, true)), shareSubscribed(this.dialogs));
     }
 
     public deleteMany(contents: ReadonlyArray<ContentDto>) {
@@ -274,7 +274,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 'i18n:contents.deleteReferrerConfirmTitle',
                 'i18n:contents.deleteReferrerConfirmText',
                 'deleteReferencngContent').pipe(
-            switchMap(() => this.loadInternalCore(false, false)), shareSubscribed(this.dialogs));
+            switchMap(() => this.loadInternalCore(false, true)), shareSubscribed(this.dialogs));
 }
 
     public update(content: ContentDto, request: any): Observable<ContentDto> {
@@ -314,7 +314,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false, false);
+        return this.loadInternal(false, true);
     }
 
     public page(paging: { page: number; pageSize: number }) {
@@ -322,7 +322,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        return this.loadInternal(false, false);
+        return this.loadInternal(false, true);
     }
 
     private replaceContent(content: ContentDto, oldVersion?: Version, updateText?: string) {
