@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return new MongoCollectionSettings
             {
                 ReadPreference = readPreference
-            }
+            };
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection,

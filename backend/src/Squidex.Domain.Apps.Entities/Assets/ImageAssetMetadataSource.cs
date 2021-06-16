@@ -96,7 +96,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 }
             }
 
-            if (command.Type == AssetType.Image && command.Tags != null)
+            if (command.Tags == null)
+            {
+                return;
+            }
+
+            if (command.Type == AssetType.Image)
             {
                 command.Tags.Add("image");
 
