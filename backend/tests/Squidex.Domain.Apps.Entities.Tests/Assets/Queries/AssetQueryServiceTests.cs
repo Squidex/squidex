@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -38,7 +39,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._))
                 .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
-            sut = new AssetQueryService(assetEnricher, assetRepository, assetLoader, assetFolderRepository, queryParser);
+            var options = Options.Create(new AssetOptions());
+
+            sut = new AssetQueryService(
+                assetEnricher,
+                assetRepository,
+                assetLoader,
+                assetFolderRepository,
+                options,
+                queryParser);
         }
 
         [Fact]

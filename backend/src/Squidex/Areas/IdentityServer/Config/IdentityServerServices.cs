@@ -55,6 +55,9 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<ApiPermissionUnifier>()
                 .As<IClaimsTransformation>();
 
+            services.AddSingletonAs<TokenStoreInitializer>()
+                .AsSelf();
+
             services.AddSingletonAs<CreateAdminInitializer>()
                 .AsSelf();
 
