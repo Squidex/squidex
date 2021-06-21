@@ -7,8 +7,8 @@
   "success_url": "/",
   "env": {
     "DOMAIN": {
-      "description": "Domain name",
-      "value": "squidex.example.com"
+      "description": "The domain name under which your instance is available",
+      "value": "https://[YOUR-HEROKU-APPNAME].herokuapp.com"
     },
     "MONGO_USERNAME": {
       "description": "Mongo Username, follow https://devcenter.heroku.com/articles/ormongo#open-the-dashboard to create a database named Squidex and then edit the deployment to reflect the credentials you used",
