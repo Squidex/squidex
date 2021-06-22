@@ -62,32 +62,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_resolve_asset()
         {
-            var assetId1 = DomainId.NewGuid();
-            var asset1 = CreateAsset(assetId1, 1);
-
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("assets",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId1)));
-
-            A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(1, asset1));
-
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            var (vars, asset) = SetupAssetVars();
 
             var script = @"
                 getAsset(data.assets.iv[0], function (assets) {
-                    var result1 = `Text: ${assets[0].fileName}`;
+                    var result1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
 
                     complete(`${result1}`);
                 });";
 
-            var expected = @"
-                Text: file1.jpg
+            var expected = $@"
+                Text: {asset.FileName} {asset.Id}
             ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
@@ -98,36 +83,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_resolve_assets()
         {
-            var assetId1 = DomainId.NewGuid();
-            var asset1 = CreateAsset(assetId1, 1);
-            var assetId2 = DomainId.NewGuid();
-            var asset2 = CreateAsset(assetId1, 2);
-
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("assets",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId1, assetId2)));
-
-            A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, asset1, asset2));
-
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            var (vars, assets) = SetupAssetsVars();
 
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
-                    var result1 = `Text: ${assets[0].fileName}`;
-                    var result2 = `Text: ${assets[1].fileName}`;
+                    var result1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
+                    var result2 = `Text: ${assets[1].fileName} ${assets[1].id}`;
 
                     complete(`${result1}\n${result2}`);
                 });";
 
-            var expected = @"
-                Text: file1.jpg
-                Text: file2.jpg
+            var expected = $@"
+                Text: {assets[0].FileName} {assets[0].Id}
+                Text: {assets[1].FileName} {assets[1].Id}
             ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
@@ -138,30 +106,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_resolve_asset_text()
         {
-            var assetId = DomainId.NewGuid();
-            var asset = CreateAsset(assetId, 1);
+            var (vars, asset) = SetupAssetVars();
 
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("assets",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId)));
-
-            A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, asset));
-
-            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, asset.FileVersion, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
-                .Invokes(x =>
-                {
-                    var stream = x.GetArgument<Stream>(3)!;
-
-                    stream.Write(Encoding.UTF8.GetBytes("Hello Asset"));
-                });
-
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
 
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
@@ -182,24 +129,109 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_resolve_asset_text_with_utf8()
+        {
+            var (vars, asset) = SetupAssetVars();
+
+            SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
+
+            var script = @"
+                getAssets(data.assets.iv, function (assets) {
+                    getAssetText(assets[0], function (text) {
+                        var result = `Text: ${text}`;
+
+                        complete(result);
+                    }, 'utf8');
+                });";
+
+            var expected = @"
+                Text: Hello Asset
+            ";
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_resolve_asset_text_with_unicode()
+        {
+            var (vars, asset) = SetupAssetVars();
+
+            SetupText(asset.Id, Encoding.Unicode.GetBytes("Hello Asset"));
+
+            var script = @"
+                getAssets(data.assets.iv, function (assets) {
+                    getAssetText(assets[0], function (text) {
+                        var result = `Text: ${text}`;
+
+                        complete(result);
+                    }, 'unicode');
+                });";
+
+            var expected = @"
+                Text: Hello Asset
+            ";
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_resolve_asset_text_with_ascii()
+        {
+            var (vars, asset) = SetupAssetVars();
+
+            SetupText(asset.Id, Encoding.ASCII.GetBytes("Hello Asset"));
+
+            var script = @"
+                getAssets(data.assets.iv, function (assets) {
+                    getAssetText(assets[0], function (text) {
+                        var result = `Text: ${text}`;
+
+                        complete(result);
+                    }, 'ascii');
+                });";
+
+            var expected = @"
+                Text: Hello Asset
+            ";
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_resolve_asset_text_with_base64()
+        {
+            var (vars, asset) = SetupAssetVars();
+
+            SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
+
+            var script = @"
+                getAssets(data.assets.iv, function (assets) {
+                    getAssetText(assets[0], function (text) {
+                        var result = `Text: ${text}`;
+
+                        complete(result);
+                    }, 'base64');
+                });";
+
+            var expected = @"
+                Text: SGVsbG8gQXNzZXQ=
+            ";
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
         public async Task Should_not_resolve_asset_text_if_too_big()
         {
-            var assetId = DomainId.NewGuid();
-            var asset = CreateAsset(assetId, 1, 1_000_000);
-
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("assets",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId)));
-
-            A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, asset));
-
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            var (vars, _) = SetupAssetVars(1_000_000);
 
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
@@ -233,13 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 AppId = appId
             };
 
-            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, @event.Id, @event.FileVersion, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
-                .Invokes(x =>
-                {
-                    var stream = x.GetArgument<Stream>(3)!;
-
-                    stream.Write(Encoding.UTF8.GetBytes("Hello Asset"));
-                });
+            SetupText(@event.Id, Encoding.UTF8.GetBytes("Hello Asset"));
 
             var vars = new ScriptVars
             {
@@ -263,7 +289,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_resolve_asset_text_from_event_if_too_big()
+        public async Task Should_not_resolve_asset_text_from_event_if_too_big()
         {
             var @event = new EnrichedAssetEvent
             {
@@ -295,6 +321,63 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
+        }
+
+        private void SetupText(DomainId id, byte[] bytes)
+        {
+            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, id, 0, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
+                .Invokes(x =>
+                {
+                    var stream = x.GetArgument<Stream>(3)!;
+
+                    stream.Write(bytes);
+                });
+        }
+
+        private (ScriptVars, IAssetEntity) SetupAssetVars(int fileSize = 100)
+        {
+            var assetId = DomainId.NewGuid();
+            var asset = CreateAsset(assetId, 1, fileSize);
+
+            var user = new ClaimsPrincipal();
+
+            var data =
+                new ContentData()
+                    .AddField("assets",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(assetId)));
+
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(2, asset));
+
+            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+
+            return (vars, asset);
+        }
+
+        private (ScriptVars, IAssetEntity[]) SetupAssetsVars(int fileSize = 100)
+        {
+            var assetId1 = DomainId.NewGuid();
+            var asset1 = CreateAsset(assetId1, 1, fileSize);
+            var assetId2 = DomainId.NewGuid();
+            var asset2 = CreateAsset(assetId1, 2, fileSize);
+
+            var user = new ClaimsPrincipal();
+
+            var data =
+                new ContentData()
+                    .AddField("assets",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(assetId1, assetId2)));
+
+            A.CallTo(() => assetQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(2, asset1, asset2));
+
+            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+
+            return (vars, new[] { asset1, asset2 });
         }
 
         private IEnrichedAssetEntity CreateAsset(DomainId assetId, int index, int fileSize = 100)

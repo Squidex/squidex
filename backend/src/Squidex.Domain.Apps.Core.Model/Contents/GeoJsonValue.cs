@@ -12,6 +12,7 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.ObjectPool;
 using Squidex.Infrastructure.Validation;
+using System.IO;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -28,9 +29,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             {
                 try
                 {
-                    var stream = DefaultPools.MemoryStream.Get();
-
-                    try
+                    using (var stream = DefaultPools.MemoryStream.GetStream())
                     {
                         serializer.Serialize(value, stream, true);
 
@@ -39,10 +38,6 @@ namespace Squidex.Domain.Apps.Core.Contents
                         geoJSON = serializer.Deserialize<GeoJSONObject>(stream, null, leaveOpen: true);
 
                         return GeoJsonParseResult.Success;
-                    }
-                    finally
-                    {
-                        DefaultPools.MemoryStream.Return(stream);
                     }
                 }
                 catch

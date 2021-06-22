@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -122,24 +121,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         return ErrorTooBig;
                     }
 
-                    var tempStream = DefaultPools.MemoryStream.Get();
-                    try
-                    {
-                        await assetFileStore!.DownloadAsync(appId, id, fileVersion, tempStream);
+                    var encoding = arguments.At(0).ToStringValue()?.ToUpperInvariant();
+                    var encoded = await assetFileStore.GetTextAsync(appId, id, fileVersion, encoding);
 
-                        tempStream.Position = 0;
-
-                        using (var reader = new StreamReader(tempStream, leaveOpen: true))
-                        {
-                            var text = reader.ReadToEnd();
-
-                            return new StringValue(text);
-                        }
-                    }
-                    finally
-                    {
-                        DefaultPools.MemoryStream.Return(tempStream);
-                    }
+                    return new StringValue(encoded);
                 }
 
                 switch (objectValue.ToObjectValue())
