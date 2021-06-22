@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -19,7 +18,6 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.ObjectPool;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -27,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetsJintExtension : IJintExtension
     {
         private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
+        private delegate void GetAssetTextDelegate(JsValue references, Action<JsValue> callback, JsValue encoding);
         private readonly IServiceProvider serviceProvider;
 
         public AssetsJintExtension(IServiceProvider serviceProvider)
@@ -62,17 +61,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void AddAssetText(ExecutionContext context)
         {
-            var action = new GetAssetsDelegate((references, callback) => GetAssetText(context, references, callback));
+            var action = new GetAssetTextDelegate((references, callback, encoding) => GetText(context, references, callback, encoding));
 
             context.Engine.SetValue("getAssetText", action);
         }
 
-        private void GetAssetText(ExecutionContext context, JsValue input, Action<JsValue> callback)
+        private void GetText(ExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
         {
-            GetAssetTextCore(context, input, callback).Forget();
+            GetTextAsync(context, input, callback, encoding).Forget();
         }
 
-        private async Task GetAssetTextCore(ExecutionContext context, JsValue input, Action<JsValue> callback)
+        private async Task GetTextAsync(ExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
         {
             Guard.NotNull(callback, nameof(callback));
 
@@ -96,24 +95,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
 
-                    var tempStream = DefaultPools.MemoryStream.Get();
-                    try
-                    {
-                        await assetFileStore!.DownloadAsync(appId, id, fileVersion, tempStream, default, context.CancellationToken);
+                    var encoded = await assetFileStore.GetTextAsync(appId, id, fileVersion, encoding?.ToString());
 
-                        tempStream.Position = 0;
-
-                        using (var reader = new StreamReader(tempStream, leaveOpen: true))
-                        {
-                            var text = reader.ReadToEnd();
-
-                            callback(JsValue.FromObject(context.Engine, text));
-                        }
-                    }
-                    finally
-                    {
-                        DefaultPools.MemoryStream.Return(tempStream);
-                    }
+                    callback(JsValue.FromObject(context.Engine, encoded));
                 }
                 catch (Exception ex)
                 {
