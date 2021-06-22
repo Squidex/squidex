@@ -43,9 +43,6 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();
 
-            services.AddSingletonAs<PwnedPasswordValidator>()
-                .As<IPasswordValidator<IdentityUser>>();
-
             services.AddScopedAs<DefaultUserService>()
                 .As<IUserService>();
 
