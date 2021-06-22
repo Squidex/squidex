@@ -30,8 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetsJintExtension(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 

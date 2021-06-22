@@ -34,11 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public UsageNotifierGrain(IGrainState<State> state, INotificationSender notificationSender, IUserResolver userResolver, IClock clock)
         {
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(notificationSender, nameof(notificationSender));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(clock, nameof(clock));
-
             this.state = state;
             this.notificationSender = notificationSender;
             this.userResolver = userResolver;

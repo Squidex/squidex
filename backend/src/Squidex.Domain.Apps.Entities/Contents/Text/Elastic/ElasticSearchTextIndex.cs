@@ -27,9 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
         public ElasticSearchTextIndex(string configurationString, string indexName, bool waitForTesting = false)
         {
-            Guard.NotNull(configurationString, nameof(configurationString));
-            Guard.NotNull(indexName, nameof(indexName));
-
             var config = new ConnectionConfiguration(new Uri(configurationString));
 
             client = new ElasticLowLevelClient(config);

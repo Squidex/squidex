@@ -24,9 +24,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public EventEnricher(IMemoryCache userCache, IUserResolver userResolver)
         {
-            Guard.NotNull(userCache, nameof(userCache));
-            Guard.NotNull(userResolver, nameof(userResolver));
-
             this.userCache = userCache;
             this.userResolver = userResolver;
         }

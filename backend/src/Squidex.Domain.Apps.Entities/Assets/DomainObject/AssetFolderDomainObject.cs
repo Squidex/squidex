@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -28,8 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             IAssetQueryService assetQuery)
             : base(factory, log)
         {
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-
             this.assetQuery = assetQuery;
         }
 

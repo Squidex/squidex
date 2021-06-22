@@ -45,11 +45,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentQueryParser(IMemoryCache cache, IJsonSerializer jsonSerializer, ITextIndex textIndex, IOptions<ContentOptions> options)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(textIndex, nameof(textIndex));
-            Guard.NotNull(cache, nameof(cache));
-            Guard.NotNull(options, nameof(options));
-
             this.jsonSerializer = jsonSerializer;
             this.textIndex = textIndex;
             this.cache = cache;

@@ -40,13 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             IOptions<ContentOptions> options,
             ContentQueryParser queryParser)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(contentEnricher, nameof(contentEnricher));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(contentLoader, nameof(contentLoader));
-            Guard.NotNull(options, nameof(options));
-            Guard.NotNull(queryParser, nameof(queryParser));
-
             this.appProvider = appProvider;
             this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;

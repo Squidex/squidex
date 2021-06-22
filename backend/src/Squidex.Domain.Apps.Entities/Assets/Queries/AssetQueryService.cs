@@ -34,13 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             IOptions<AssetOptions> options,
             AssetQueryParser queryParser)
         {
-            Guard.NotNull(assetEnricher, nameof(assetEnricher));
-            Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(assetLoader, nameof(assetLoader));
-            Guard.NotNull(assetFolderRepository, nameof(assetFolderRepository));
-            Guard.NotNull(options, nameof(options));
-            Guard.NotNull(queryParser, nameof(queryParser));
-
             this.assetEnricher = assetEnricher;
             this.assetRepository = assetRepository;
             this.assetLoader = assetLoader;

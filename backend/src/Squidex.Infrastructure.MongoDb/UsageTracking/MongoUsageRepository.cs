@@ -55,6 +55,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public async Task TrackUsagesAsync(params UsageUpdate[] updates)
         {
+            Guard.NotNull(updates, nameof(updates));
+
             if (updates.Length == 1)
             {
                 await TrackUsagesAsync(updates[0]);

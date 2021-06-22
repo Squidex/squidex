@@ -48,8 +48,6 @@ namespace Squidex.Infrastructure.Commands
 
         public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
         {
-            Guard.NotNull(middlewares, nameof(middlewares));
-
             var reverseMiddlewares = middlewares.Reverse().ToList();
 
             IStep next = new NoopStep();

@@ -28,8 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public TagGrain(IGrainState<State> state)
         {
-            Guard.NotNull(state, nameof(state));
-
             this.state = state;
         }
 

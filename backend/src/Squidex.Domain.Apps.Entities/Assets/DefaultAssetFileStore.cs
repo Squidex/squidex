@@ -8,6 +8,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Infrastructure;
 
@@ -16,10 +17,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class DefaultAssetFileStore : IAssetFileStore
     {
         private readonly IAssetStore assetStore;
+        private readonly AssetOptions options;
 
-        public DefaultAssetFileStore(IAssetStore assetStore)
+        public DefaultAssetFileStore(IAssetStore assetStore,
+            IOptions<AssetOptions> options)
         {
             this.assetStore = assetStore;
+
+            this.options = options.Value;
         }
 
         public string? GeneratePublicUrl(DomainId appId, DomainId id, long fileVersion)
@@ -105,9 +110,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return $"{id}_{fileVersion}";
         }
 
-        private static string GetFileName(DomainId appId, DomainId id, long fileVersion)
+        private string GetFileName(DomainId appId, DomainId id, long fileVersion)
         {
-            return $"{appId}_{id}_{fileVersion}";
+            if (options.FolderPerApp)
+            {
+                return $"{appId}/{id}_{fileVersion}";
+            }
+            else
+            {
+                return $"{appId}_{id}_{fileVersion}";
+            }
         }
     }
 }

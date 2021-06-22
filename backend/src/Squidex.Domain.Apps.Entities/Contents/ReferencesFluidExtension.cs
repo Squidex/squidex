@@ -60,8 +60,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ReferencesFluidExtension(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 

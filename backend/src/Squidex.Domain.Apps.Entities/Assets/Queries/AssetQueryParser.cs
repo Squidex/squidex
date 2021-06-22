@@ -36,11 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public AssetQueryParser(IJsonSerializer jsonSerializer, ITagService tagService, IOptions<AssetOptions> options)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(options, nameof(options));
-            Guard.NotNull(tagService, nameof(tagService));
-
             this.jsonSerializer = jsonSerializer;
+
             this.tagService = tagService;
 
             this.options = options.Value;

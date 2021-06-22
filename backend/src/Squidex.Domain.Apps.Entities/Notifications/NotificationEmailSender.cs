@@ -50,14 +50,10 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             IUrlGenerator urlGenerator,
             ISemanticLog log)
         {
-            Guard.NotNull(texts, nameof(texts));
-            Guard.NotNull(emailSender, nameof(emailSender));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-            Guard.NotNull(log, nameof(log));
-
             this.texts = texts.Value;
             this.emailSender = emailSender;
             this.urlGenerator = urlGenerator;
+
             this.log = log;
         }
 

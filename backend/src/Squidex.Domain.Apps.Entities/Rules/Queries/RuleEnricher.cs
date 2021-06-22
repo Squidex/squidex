@@ -23,9 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public RuleEnricher(IRuleEventRepository ruleEventRepository, IRequestCache requestCache)
         {
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(requestCache, nameof(requestCache));
-
             this.ruleEventRepository = ruleEventRepository;
 
             this.requestCache = requestCache;

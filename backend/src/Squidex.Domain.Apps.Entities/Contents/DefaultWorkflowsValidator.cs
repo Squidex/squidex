@@ -20,8 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public DefaultWorkflowsValidator(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-
             this.appProvider = appProvider;
         }
 

@@ -14,7 +14,6 @@ using NSwag.Generation.Processors.Contexts;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
@@ -24,8 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
         public RuleActionProcessor(RuleRegistry ruleRegistry)
         {
-            Guard.NotNull(ruleRegistry, nameof(ruleRegistry));
-
             this.ruleRegistry = ruleRegistry;
         }
 

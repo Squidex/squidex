@@ -30,8 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public ConfigAppPlansProvider(IEnumerable<ConfigAppLimitsPlan> config)
         {
-            Guard.NotNull(config, nameof(config));
-
             foreach (var plan in config.OrderBy(x => x.MaxApiCalls).Select(x => x.Clone()))
             {
                 plansList.Add(plan);
@@ -69,6 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         public IAppLimitsPlan? GetPlanUpgradeForApp(IAppEntity app)
         {
             Guard.NotNull(app, nameof(app));
+
 
             return GetPlanUpgrade(app.Plan?.PlanId);
         }

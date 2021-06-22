@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Migrations.Migrations;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Migrations
@@ -28,11 +27,6 @@ namespace Migrations
             RebuildFiles rebuildFiles,
             PopulateGrainIndexes populateGrainIndexes)
         {
-            Guard.NotNull(rebuildFiles, nameof(rebuildFiles));
-            Guard.NotNull(rebuilder, nameof(rebuilder));
-            Guard.NotNull(rebuildOptions, nameof(rebuildOptions));
-            Guard.NotNull(populateGrainIndexes, nameof(populateGrainIndexes));
-
             this.rebuildFiles = rebuildFiles;
             this.rebuilder = rebuilder;
             this.rebuildOptions = rebuildOptions.Value;

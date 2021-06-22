@@ -9,7 +9,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Assets;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Users
 {
@@ -19,8 +18,6 @@ namespace Squidex.Domain.Users
 
         public DefaultUserPictureStore(IAssetStore assetStore)
         {
-            Guard.NotNull(assetStore, nameof(assetStore));
-
             this.assetStore = assetStore;
         }
 

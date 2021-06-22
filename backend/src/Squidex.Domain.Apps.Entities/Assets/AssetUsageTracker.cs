@@ -24,8 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetUsageTracker(IUsageTracker usageTracker)
         {
-            Guard.NotNull(usageTracker, nameof(usageTracker));
-
             this.usageTracker = usageTracker;
         }
 

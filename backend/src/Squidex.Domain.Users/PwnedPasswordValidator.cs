@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SharpPwned.NET;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 
@@ -22,8 +21,6 @@ namespace Squidex.Domain.Users
 
         public PwnedPasswordValidator(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
-
             this.log = log;
         }
 

@@ -25,8 +25,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal
 
         public Parser(IMemoryCache cache)
         {
-            Guard.NotNull(cache, nameof(cache));
-
             this.cache = cache;
         }
 

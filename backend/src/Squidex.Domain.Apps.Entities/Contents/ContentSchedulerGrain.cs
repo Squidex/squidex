@@ -33,11 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IClock clock,
             ISemanticLog log)
         {
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(log, nameof(log));
-
             this.clock = clock;
 
             this.commandBus = commandBus;

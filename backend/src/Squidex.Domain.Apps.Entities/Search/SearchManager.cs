@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Search
@@ -23,9 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Search
 
         public SearchManager(IEnumerable<ISearchSource> searchSources, ISemanticLog log)
         {
-            Guard.NotNull(searchSources, nameof(searchSources));
-            Guard.NotNull(log, nameof(log));
-
             this.searchSources = searchSources;
 
             this.log = log;
