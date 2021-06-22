@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
-using Squidex.Infrastructure;
 using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
@@ -22,8 +21,6 @@ namespace Squidex.Web.Pipeline
 
         public ApiCostsFilter(UsageGate usageGate)
         {
-            Guard.NotNull(usageGate, nameof(usageGate));
-
             this.usageGate = usageGate;
         }
 

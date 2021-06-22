@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -22,9 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleCommandMiddleware(IGrainFactory grainFactory, IRuleEnricher ruleEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(ruleEnricher, nameof(ruleEnricher));
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
             this.ruleEnricher = ruleEnricher;
 
             this.contextProvider = contextProvider;

@@ -41,8 +41,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public DefaultAppLogStore(IRequestLogStore requestLogStore)
         {
-            Guard.NotNull(requestLogStore, nameof(requestLogStore));
-
             this.requestLogStore = requestLogStore;
         }
 

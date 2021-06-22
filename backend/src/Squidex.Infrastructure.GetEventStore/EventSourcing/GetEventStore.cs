@@ -32,9 +32,6 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public GetEventStore(IEventStoreConnection connection, IJsonSerializer serializer, string prefix, string projectionHost)
         {
-            Guard.NotNull(connection, nameof(connection));
-            Guard.NotNull(serializer, nameof(serializer));
-
             this.connection = connection;
             this.serializer = serializer;
 

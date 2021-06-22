@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
@@ -20,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public EnrichForCaching(IRequestCache requestCache)
         {
-            Guard.NotNull(requestCache, nameof(requestCache));
-
             this.requestCache = requestCache;
         }
 

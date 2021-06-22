@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -29,9 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(factory, log)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));
-
             this.appProvider = appProvider;
             this.ruleEnqueuer = ruleEnqueuer;
         }

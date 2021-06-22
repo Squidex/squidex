@@ -23,8 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
         public TemplateCommandMiddleware(IEnumerable<ITemplate> templates)
         {
-            Guard.NotNull(templates, nameof(templates));
-
             this.templates = templates.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
         }
 

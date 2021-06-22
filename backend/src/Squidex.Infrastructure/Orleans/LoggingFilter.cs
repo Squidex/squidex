@@ -18,8 +18,6 @@ namespace Squidex.Infrastructure.Orleans
 
         public LoggingFilter(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
-
             this.log = log;
         }
 

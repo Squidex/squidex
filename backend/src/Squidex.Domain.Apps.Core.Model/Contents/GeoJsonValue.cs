@@ -12,7 +12,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.ObjectPool;
 using Squidex.Infrastructure.Validation;
-using System.IO;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {

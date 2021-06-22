@@ -16,8 +16,6 @@ namespace Squidex.Infrastructure.Commands
 
         public GrainCommandMiddleware(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 

@@ -23,10 +23,6 @@ namespace Squidex.Infrastructure.Migrations
 
         public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath, ISemanticLog log)
         {
-            Guard.NotNull(migrationStatus, nameof(migrationStatus));
-            Guard.NotNull(migrationPath, nameof(migrationPath));
-            Guard.NotNull(log, nameof(log));
-
             this.migrationStatus = migrationStatus;
             this.migrationPath = migrationPath;
 

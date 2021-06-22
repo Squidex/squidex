@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -22,8 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
         {
-            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
-
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 

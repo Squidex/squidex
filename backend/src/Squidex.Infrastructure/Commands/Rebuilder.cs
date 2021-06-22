@@ -40,10 +40,6 @@ namespace Squidex.Infrastructure.Commands
             IEventStore eventStore,
             IServiceProvider serviceProvider)
         {
-            Guard.NotNull(localCache, nameof(localCache));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(eventStore, nameof(eventStore));
-
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
             this.localCache = localCache;

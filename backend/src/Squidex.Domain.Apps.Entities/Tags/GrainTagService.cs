@@ -19,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public GrainTagService(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 

@@ -47,9 +47,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ContentsBulkUpdateCommandMiddleware(IContentQueryService contentQuery, IContextProvider contextProvider)
         {
-            Guard.NotNull(contentQuery, nameof(contentQuery));
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
             this.contentQuery = contentQuery;
             this.contextProvider = contextProvider;
         }

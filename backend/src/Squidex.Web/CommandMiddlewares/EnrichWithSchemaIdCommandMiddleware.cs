@@ -21,8 +21,6 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithSchemaIdCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-
             this.httpContextAccessor = httpContextAccessor;
         }
 

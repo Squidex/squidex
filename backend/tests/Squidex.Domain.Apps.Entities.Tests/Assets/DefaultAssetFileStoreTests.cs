@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Infrastructure;
 using Xunit;
@@ -23,14 +24,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly long assetFileVersion = 21;
         private readonly string fileNameOld;
         private readonly string fileNameNew;
+        private readonly string fileNameFolder;
+        private readonly AssetOptions options = new AssetOptions();
         private readonly DefaultAssetFileStore sut;
 
         public DefaultAssetFileStoreTests()
         {
             fileNameOld = $"{assetId}_{assetFileVersion}";
             fileNameNew = $"{appId}_{assetId}_{assetFileVersion}";
+            fileNameFolder = $"{appId}/{assetId}_{assetFileVersion}";
 
-            sut = new DefaultAssetFileStore(assetStore);
+            sut = new DefaultAssetFileStore(assetStore, Options.Create(options));
         }
 
         [Fact]
@@ -89,11 +93,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_upload_file_to_store()
         {
+            options.FolderPerApp = false;
+
             var stream = new MemoryStream();
 
             await sut.UploadAsync(appId, assetId, assetFileVersion, stream);
 
             A.CallTo(() => assetStore.UploadAsync(fileNameNew, stream, true, CancellationToken.None))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_upload_file_to_store_with_folder()
+        {
+            options.FolderPerApp = true;
+
+            var stream = new MemoryStream();
+
+            await sut.UploadAsync(appId, assetId, assetFileVersion, stream);
+
+            A.CallTo(() => assetStore.UploadAsync(fileNameFolder, stream, true, CancellationToken.None))
                 .MustHaveHappened();
         }
 

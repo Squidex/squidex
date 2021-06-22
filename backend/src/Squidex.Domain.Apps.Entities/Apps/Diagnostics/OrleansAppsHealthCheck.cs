@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
@@ -21,8 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
 
         public OrleansAppsHealthCheck(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 

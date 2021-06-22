@@ -28,10 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter)
         {
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-
             this.assetFileStore = assetFileStore;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;

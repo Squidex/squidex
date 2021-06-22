@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Comments;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
@@ -31,9 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver)
         {
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(userResolver, nameof(userResolver));
-
             this.scriptEngine = scriptEngine;
 
             this.userResolver = userResolver;

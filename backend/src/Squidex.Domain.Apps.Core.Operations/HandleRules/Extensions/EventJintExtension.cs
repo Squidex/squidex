@@ -8,7 +8,6 @@
 using Jint.Native;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Infrastructure;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
@@ -20,8 +19,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 
         public EventJintExtension(IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.urlGenerator = urlGenerator;
         }
 

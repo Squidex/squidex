@@ -33,10 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public BackupAssets(Rebuilder rebuilder, IAssetFileStore assetFileStore, ITagService tagService)
         {
-            Guard.NotNull(rebuilder, nameof(rebuilder));
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(tagService, nameof(tagService));
-
             this.rebuilder = rebuilder;
             this.assetFileStore = assetFileStore;
             this.tagService = tagService;

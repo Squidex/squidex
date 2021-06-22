@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Slack
 {
@@ -25,8 +24,6 @@ namespace Squidex.Extensions.Actions.Slack
         public SlackActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
             : base(formatter)
         {
-            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
-
             this.httpClientFactory = httpClientFactory;
         }
 

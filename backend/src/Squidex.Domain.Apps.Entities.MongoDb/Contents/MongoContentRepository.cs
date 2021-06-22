@@ -36,8 +36,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-
             collectionAll =
                 new MongoContentCollection("States_Contents_All3", database, appProvider,
                     ReadPreference.Primary);

@@ -46,15 +46,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             ISemanticLog log,
             TypeNameRegistry typeNameRegistry)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(ruleOptions, nameof(ruleOptions));
-            Guard.NotNull(ruleTriggerHandlers, nameof(ruleTriggerHandlers));
-            Guard.NotNull(ruleActionHandlers, nameof(ruleActionHandlers));
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
-            Guard.NotNull(eventEnricher, nameof(eventEnricher));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(log, nameof(log));
-
             this.typeNameRegistry = typeNameRegistry;
 
             this.ruleOptions = ruleOptions.Value;

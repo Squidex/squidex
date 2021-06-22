@@ -19,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public DefaultAppImageStore(IAssetStore assetStore)
         {
-            Guard.NotNull(assetStore, nameof(assetStore));
-
             this.assetStore = assetStore;
         }
 
