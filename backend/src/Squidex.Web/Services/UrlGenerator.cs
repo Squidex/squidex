@@ -61,7 +61,7 @@ namespace Squidex.Web.Services
 
         public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
         {
-            return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion);
+            return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion, null);
         }
 
         public string AssetsUI(NamedId<DomainId> appId, string? query = null)

@@ -68,7 +68,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
         {
             Guard.NotNull(app, nameof(app));
 
-
             return GetPlanUpgrade(app.Plan?.PlanId);
         }
 

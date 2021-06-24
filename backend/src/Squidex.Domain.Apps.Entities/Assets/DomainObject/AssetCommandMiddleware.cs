@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                     try
                     {
-                        await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion);
+                        await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion, null);
                     }
                     catch (AssetAlreadyExistsException) when (context.Command is not UpsertAsset)
                     {

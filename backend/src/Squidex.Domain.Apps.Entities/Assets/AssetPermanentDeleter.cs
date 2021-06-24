@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     try
                     {
-                        await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId, version);
+                        await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId, version, null);
                     }
                     catch (AssetNotFoundException)
                     {

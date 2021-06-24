@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, stream);
+                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream);
                 });
             }
             catch (AssetNotFoundException)
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, stream);
+                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream);
                 });
             }
             catch (FileNotFoundException)

@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             using (var stream = DefaultPools.MemoryStream.GetStream())
             {
-                await assetFileStore.DownloadAsync(appId, id, fileVersion, stream);
+                await assetFileStore.DownloadAsync(appId, id, fileVersion, null, stream);
 
                 stream.Position = 0;
 

@@ -58,13 +58,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             try
             {
-                await assetFileStore.GetFileSizeAsync(appId.Id, id, fileVersion, ct);
+                await assetFileStore.GetFileSizeAsync(appId.Id, id, fileVersion, null, ct);
             }
             catch (AssetNotFoundException)
             {
                 DummyStream.Position = 0;
 
-                await assetFileStore.UploadAsync(appId.Id, id, fileVersion, DummyStream, ct);
+                await assetFileStore.UploadAsync(appId.Id, id, fileVersion, null, DummyStream, ct: ct);
             }
         }
     }

@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Equal(Cleanup(expected), Cleanup(result));
 
-            A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
+            A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -319,16 +319,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Equal(Cleanup(expected), Cleanup(result));
 
-            A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
+            A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         private void SetupText(DomainId id, byte[] bytes)
         {
-            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, id, 0, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
+            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, id, 0, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
                 .Invokes(x =>
                 {
-                    var stream = x.GetArgument<Stream>(3)!;
+                    var stream = x.GetArgument<Stream>(4)!;
 
                     stream.Write(bytes);
                 });
