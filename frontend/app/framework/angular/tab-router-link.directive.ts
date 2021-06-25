@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class TabRouterlinkDirective {
     @Input('sqxTabRouterLink')
-    public commands: any;
+    public commands: any[];
 
     constructor(
         private readonly router: Router,
@@ -23,7 +23,9 @@ export class TabRouterlinkDirective {
 
     @HostListener('click', ['$event'])
     public onClick(event: MouseEvent) {
-        const urlTree = this.router.createUrlTree(this.commands, {
+        const escaped = this.commands.map(x => encodeURIComponent(x));
+
+        const urlTree = this.router.createUrlTree(escaped, {
             relativeTo: this.route,
         });
 
