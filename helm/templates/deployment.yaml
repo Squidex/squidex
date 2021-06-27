@@ -3,59 +3,65 @@ kind: Deployment
 metadata:
   name: {{ include "squidex.fullname" . }}
   labels:
-    {{- include "squidex.labels" . | nindent 4 }}
+    {{- include "squidex.labels" . | indent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: {{ .Values.deployment.replicaCount }}
   selector:
     matchLabels:
-      {{- include "squidex.selectorLabels" . | nindent 6 }}
+      {{- include "squidex.selectors" . | indent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "squidex.selectorLabels" . | nindent 8 }}
+        {{- include "squidex.selectors" . | indent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "squidex.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
+            - name: orleans
+              containerPort: 11111
+              protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /healthz
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /readiness
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+          env:
+          {{- range $key, $val := .Values.env }}
+            {{- if (eq $key "URLS__BASEURL") }}
+            - name: {{ $key | quote }}
+              value: {{ required (printf "The value .Values.env.%s is required" $key) $val | quote }}
+            {{- else }}
+            - name: {{ $key | quote }}
+              value: {{ $val | quote }}
+            {{- end }}
+          {{- end }}
+          
+          {{- $mongoDefaultConnectionString := printf "mongodb://%s" (include "squidex.mongoDefaultHostname" .) }}
+          {{- if (not .Values.env.EVENTSTORE__MONGODB__CONFIGURATION) }}
+            - name: "EVENTSTORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+          {{- if (not .Values.env.STORE__MONGODB__CONFIGURATION) }}
+            - name: "STORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
+        {{- toYaml .Values.affinity | nindent 8 }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
