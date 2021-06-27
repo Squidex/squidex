@@ -37,12 +37,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(cache, nameof(cache));
-            Guard.NotNull(localCache, nameof(localCache));
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(ruleService, nameof(ruleService));
-
             this.appProvider = appProvider;
 
             this.cache = cache;

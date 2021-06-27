@@ -22,9 +22,6 @@ namespace Squidex.Web.Services
 
         public UrlGenerator(IGenericUrlGenerator urlGenerator, IAssetFileStore assetFileStore, bool allowAssetSourceUrl)
         {
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.assetFileStore = assetFileStore;
 
             this.urlGenerator = urlGenerator;
@@ -64,7 +61,7 @@ namespace Squidex.Web.Services
 
         public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
         {
-            return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion);
+            return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion, null);
         }
 
         public string AssetsUI(NamedId<DomainId> appId, string? query = null)

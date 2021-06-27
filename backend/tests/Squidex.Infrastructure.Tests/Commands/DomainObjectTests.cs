@@ -79,6 +79,7 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), result);
             Assert.Equal(0, sut.Version);
+            Assert.Equal(0, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 0);
@@ -116,6 +117,7 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
             Assert.Equal(2, sut.Version);
+            Assert.Equal(2, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 2);
@@ -155,6 +157,7 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
             Assert.Equal(2, sut.Version);
+            Assert.Equal(2, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 2);
@@ -192,6 +195,7 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
             Assert.Equal(1, sut.Version);
+            Assert.Equal(1, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 8, 1);
@@ -213,6 +217,7 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
             Assert.Equal(1, sut.Version);
+            Assert.Equal(1, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 8, 1);
@@ -345,6 +350,7 @@ namespace Squidex.Infrastructure.Commands
 
             Assert.Equal(CommandResult.Empty(id, 0, 0), result);
             Assert.Equal(0, sut.Version);
+            Assert.Equal(0, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 0);

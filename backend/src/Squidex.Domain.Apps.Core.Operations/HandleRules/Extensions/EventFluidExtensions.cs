@@ -20,8 +20,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 
         public EventFluidExtensions(IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.urlGenerator = urlGenerator;
         }
 

@@ -36,9 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
         }

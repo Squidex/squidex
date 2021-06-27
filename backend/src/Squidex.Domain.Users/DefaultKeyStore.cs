@@ -12,7 +12,6 @@ using IdentityModel;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users
@@ -31,8 +30,6 @@ namespace Squidex.Domain.Users
 
         public DefaultKeyStore(ISnapshotStore<State> store)
         {
-            Guard.NotNull(store, nameof(store));
-
             this.store = store;
         }
 

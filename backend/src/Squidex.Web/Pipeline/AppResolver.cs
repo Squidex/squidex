@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Log;
 using Squidex.Shared;
@@ -30,8 +29,6 @@ namespace Squidex.Web.Pipeline
 
         public AppResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-
             this.appProvider = appProvider;
         }
 
@@ -60,16 +57,18 @@ namespace Squidex.Web.Pipeline
                     return;
                 }
 
+                string? clientId = null;
+
                 var (role, permissions) = FindByOpenIdSubject(app, user, isFrontend);
 
                 if (permissions == null)
                 {
-                    (role, permissions) = FindByOpenIdClient(app, user, isFrontend);
+                    (clientId, role, permissions) = FindByOpenIdClient(app, user, isFrontend);
                 }
 
                 if (permissions == null)
                 {
-                    (role, permissions) = FindAnonymousClient(app, isFrontend);
+                    (clientId, role, permissions) = FindAnonymousClient(app, isFrontend);
                 }
 
                 if (permissions != null)
@@ -84,6 +83,11 @@ namespace Squidex.Web.Pipeline
                     foreach (var permission in permissions)
                     {
                         identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission.Id));
+                    }
+
+                    if (user.Token() == null && clientId != null)
+                    {
+                        identity.AddClaim(new Claim(OpenIdClaims.ClientId, clientId));
                     }
                 }
 
@@ -150,45 +154,55 @@ namespace Squidex.Web.Pipeline
             return context.ActionDescriptor.EndpointMetadata.Any(x => x is AllowAnonymousAttribute);
         }
 
-        private static (string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user, bool isFrontend)
+        private static (string?, string?, PermissionSet?) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user, bool isFrontend)
         {
             var (appName, clientId) = user.GetClient();
 
-            if (app.Name != appName)
+            if (app.Name != appName || clientId == null)
             {
-                return (null, null);
+                return default;
             }
 
-            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, isFrontend, out var role))
+            if (app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGet(app.Name, client.Role, isFrontend, out var role))
             {
-                return (client.Role, role.Permissions);
+                return (clientId, client.Role, role.Permissions);
             }
 
-            return (null, null);
+            return default;
         }
 
-        private static (string?, PermissionSet?) FindAnonymousClient(IAppEntity app, bool isFrontend)
+        private static (string?, string?, PermissionSet?) FindAnonymousClient(IAppEntity app, bool isFrontend)
         {
-            var client = app.Clients.Values.FirstOrDefault(x => x.AllowAnonymous);
+            var client = app.Clients.FirstOrDefault(x => x.Value.AllowAnonymous);
 
-            if (client != null && app.Roles.TryGet(app.Name, client.Role, isFrontend, out var role))
+            if (client.Value == null)
             {
-                return (client.Role, role.Permissions);
+                return default;
             }
 
-            return (null, null);
+            if (app.Roles.TryGet(app.Name, client.Value.Role, isFrontend, out var role))
+            {
+                return (client.Key, client.Value.Role, role.Permissions);
+            }
+
+            return default;
         }
 
         private static (string?, PermissionSet?) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user, bool isFrontend)
         {
             var subjectId = user.OpenIdSubject();
 
-            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
+            if (subjectId == null)
+            {
+                return default;
+            }
+
+            if (app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGet(app.Name, roleName, isFrontend, out var role))
             {
                 return (roleName, role.Permissions);
             }
 
-            return (null, null);
+            return default;
         }
     }
 }

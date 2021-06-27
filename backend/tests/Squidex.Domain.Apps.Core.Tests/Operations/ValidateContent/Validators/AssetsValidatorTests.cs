@@ -25,6 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         private readonly IAssetInfo document = TestAssets.Document(DomainId.NewGuid());
         private readonly IAssetInfo image1 = TestAssets.Image(DomainId.NewGuid());
         private readonly IAssetInfo image2 = TestAssets.Image(DomainId.NewGuid());
+        private readonly IAssetInfo imageSvg = TestAssets.Svg(DomainId.NewGuid());
 
         [Fact]
         public async Task Should_not_add_error_if_assets_are_valid()
@@ -62,6 +63,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             var sut = Validator(new AssetsFieldProperties { AllowDuplicates = true });
 
             await sut.ValidateAsync(CreateValue(image1.AssetId, image1.AssetId), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_asset_is_an_image()
+        {
+            var sut = Validator(new AssetsFieldProperties { MustBeImage = true });
+
+            await sut.ValidateAsync(CreateValue(imageSvg.AssetId, image1.AssetId), errors);
 
             Assert.Empty(errors);
         }
@@ -240,7 +251,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             return ids =>
             {
-                var result = new List<IAssetInfo> { document, image1, image2 };
+                var result = new List<IAssetInfo> { document, image1, image2, imageSvg };
 
                 return Task.FromResult<IReadOnlyList<IAssetInfo>>(result);
             };

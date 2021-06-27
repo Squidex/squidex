@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -22,8 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public ImageAssetMetadataSource(IAssetThumbnailGenerator assetThumbnailGenerator)
         {
-            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
-
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
@@ -96,7 +93,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 }
             }
 
-            if (command.Type == AssetType.Image && command.Tags != null)
+            if (command.Tags == null)
+            {
+                return;
+            }
+
+            if (command.Type == AssetType.Image)
             {
                 command.Tags.Add("image");
 
@@ -114,6 +116,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     command.Tags.Add("image/small");
                 }
+            }
+
+            if (command.File.MimeType == "image/svg+xml")
+            {
+                command.Tags.Add("image");
             }
         }
 

@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Validation
 {
@@ -22,9 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
 
         public DependencyValidatorsFactory(IAssetRepository assetRepository, IContentRepository contentRepository)
         {
-            Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
         }

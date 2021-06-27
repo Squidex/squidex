@@ -33,8 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             IServiceProvider serviceProvider)
             : base(persistence, log)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
 
             Capacity = int.MaxValue;

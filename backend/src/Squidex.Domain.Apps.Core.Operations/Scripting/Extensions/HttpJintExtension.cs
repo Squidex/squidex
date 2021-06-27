@@ -12,7 +12,6 @@ using Jint;
 using Jint.Native;
 using Jint.Native.Json;
 using Jint.Runtime;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
@@ -24,8 +23,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public HttpJintExtension(IHttpClientFactory httpClientFactory)
         {
-            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
-
             this.httpClientFactory = httpClientFactory;
         }
 

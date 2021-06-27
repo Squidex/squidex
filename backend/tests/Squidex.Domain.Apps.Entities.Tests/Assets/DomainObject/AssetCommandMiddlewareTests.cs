@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, CancellationToken.None))
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, null, CancellationToken.None))
                 .MustHaveHappened();
             A.CallTo(() => assetFileStore.DeleteAsync(A<string>._))
                 .MustHaveHappened();

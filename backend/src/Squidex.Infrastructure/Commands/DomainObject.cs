@@ -217,6 +217,8 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(handler, nameof(handler));
 
+            var wasDeleted = IsDeleted();
+
             var previousSnapshot = Snapshot;
             var previousVersion = Version;
             try
@@ -233,7 +235,7 @@ namespace Squidex.Infrastructure.Commands
                 {
                     await EnsureLoadedAsync(true);
 
-                    if (IsDeleted())
+                    if (wasDeleted)
                     {
                         if (CanRecreate() && isCreation)
                         {
@@ -304,9 +306,19 @@ namespace Squidex.Infrastructure.Commands
         {
             var newVersion = Version + 1;
 
-            var snapshotNew = Apply(Snapshot, @event);
+            var snapshotOld = Snapshot;
 
-            if (!ReferenceEquals(Snapshot, snapshotNew) || isLoading)
+            if (IsDeleted())
+            {
+                snapshotOld = new T
+                {
+                    Version = Version
+                };
+            }
+
+            var snapshotNew = Apply(snapshotOld, @event);
+
+            if (!ReferenceEquals(snapshotOld, snapshotNew) || isLoading)
             {
                 snapshotNew.Version = newVersion;
                 snapshots.Add(snapshotNew, newVersion, true);

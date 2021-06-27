@@ -41,12 +41,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IEventDataFormatter eventDataFormatter,
             ISemanticLog log)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(eventConsumerFactory, nameof(eventConsumerFactory));
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(log, nameof(log));
-
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.eventConsumerFactory = eventConsumerFactory;
@@ -101,7 +95,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 await DispatchAsync(events);
 
                 State = State.Handled(position, events.Count);
-            });
+            }, State.Position);
         }
 
         public Task OnErrorAsync(object sender, Exception exception)
@@ -116,7 +110,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 Unsubscribe();
 
                 State = State.Stopped(exception);
-            });
+            }, State.Position);
         }
 
         public async Task ActivateAsync()
@@ -128,7 +122,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     Subscribe();
 
                     State = State.Started();
-                });
+                }, State.Position);
             }
             else if (!State.IsStopped)
             {
@@ -148,7 +142,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 Subscribe();
 
                 State = State.Started();
-            });
+            }, State.Position);
 
             return CreateInfo();
         }
@@ -165,7 +159,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 Unsubscribe();
 
                 State = State.Stopped();
-            });
+            }, State.Position);
 
             return CreateInfo();
         }
@@ -178,10 +172,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 await ClearAsync();
 
-                State = EventConsumerState.Reset();
+                State = EventConsumerState.Initial;
 
                 Subscribe();
-            });
+            }, State.Position);
 
             return CreateInfo();
         }
@@ -194,17 +188,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string? caller = null)
+        private Task DoAndUpdateStateAsync(Action action, string? position, [CallerMemberName] string? caller = null)
         {
             return DoAndUpdateStateAsync(() =>
             {
                 action();
 
                 return Task.CompletedTask;
-            }, caller);
+            }, position, caller);
         }
 
-        private async Task DoAndUpdateStateAsync(Func<Task> action, [CallerMemberName] string? caller = null)
+        private async Task DoAndUpdateStateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
         {
             await semaphore.WaitAsync();
             try
@@ -229,6 +223,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     log.LogFatal(ex, w => w
                         .WriteProperty("action", caller)
                         .WriteProperty("status", "Failed")
+                        .WriteProperty("eventPosition", position)
                         .WriteProperty("eventConsumer", eventConsumer!.Name));
 
                     State = previousState.Stopped(ex);

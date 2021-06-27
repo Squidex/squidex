@@ -9,7 +9,6 @@ using System;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Squidex.Infrastructure;
 using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
@@ -21,9 +20,6 @@ namespace Squidex.Web.Pipeline
 
         public ActionContextLogAppender(IActionContextAccessor actionContextAccessor, IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(actionContextAccessor, nameof(actionContextAccessor));
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-
             this.actionContextAccessor = actionContextAccessor;
 
             this.httpContextAccessor = httpContextAccessor;

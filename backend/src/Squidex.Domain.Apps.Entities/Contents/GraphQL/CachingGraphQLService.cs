@@ -40,11 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public CachingGraphQLService(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider, IOptions<GraphQLOptions> options)
         {
-            Guard.NotNull(cache, nameof(cache));
-            Guard.NotNull(schemasHash, nameof(schemasHash));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(options, nameof(options));
-
             this.cache = cache;
             this.schemasHash = schemasHash;
             this.serviceProvider = serviceProvider;

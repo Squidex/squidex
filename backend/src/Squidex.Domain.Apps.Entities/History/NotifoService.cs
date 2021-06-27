@@ -42,17 +42,12 @@ namespace Squidex.Domain.Apps.Entities.History
             ISemanticLog log,
             IClock clock)
         {
-            Guard.NotNull(options, nameof(options));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(log, nameof(log));
-            Guard.NotNull(clock, nameof(clock));
-
             this.options = options.Value;
 
             this.urlGenerator = urlGenerator;
             this.userResolver = userResolver;
             this.clock = clock;
+
             this.log = log;
 
             if (options.Value.IsConfigured())
@@ -72,10 +67,10 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task OnUserCreatedAsync(IUser user)
         {
-                if (!string.IsNullOrWhiteSpace(user.Email))
-                {
-                    await UpsertUserAsync(user);
-                }
+            if (!string.IsNullOrWhiteSpace(user.Email))
+            {
+                await UpsertUserAsync(user);
+            }
         }
 
         public async Task OnUserUpdatedAsync(IUser user, IUser previous)

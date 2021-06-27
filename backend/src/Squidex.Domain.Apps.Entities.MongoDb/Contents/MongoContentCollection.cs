@@ -34,8 +34,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryReferrers queryReferrers;
         private readonly QueryScheduled queryScheduled;
         private readonly string name;
+        private readonly ReadPreference readPreference;
 
-        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider)
+        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, ReadPreference readPreference)
             : base(database)
         {
             this.name = name;
@@ -47,6 +48,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryReferences = new QueryReferences(queryByIds);
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
+
+            this.readPreference = readPreference;
         }
 
         public IMongoCollection<MongoContentEntity> GetInternalCollection()
@@ -57,6 +60,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         protected override string CollectionName()
         {
             return name;
+        }
+
+        protected override MongoCollectionSettings CollectionSettings()
+        {
+            return new MongoCollectionSettings
+            {
+                ReadPreference = readPreference
+            };
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection,

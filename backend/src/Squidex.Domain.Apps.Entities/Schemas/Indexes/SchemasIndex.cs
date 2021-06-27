@@ -30,9 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public SchemasIndex(IGrainFactory grainFactory, IReplicatedCache grainCache)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(grainCache, nameof(grainCache));
-
             this.grainFactory = grainFactory;
             this.grainCache = grainCache;
         }

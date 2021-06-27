@@ -26,8 +26,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public EventJsonSchemaGenerator(JsonSchemaGenerator schemaGenerator)
         {
-            Guard.NotNull(schemaGenerator, nameof(schemaGenerator));
-
             this.schemaGenerator = schemaGenerator;
 
             schemas = new Lazy<Dictionary<string, JsonSchema>>(GenerateSchemas);

@@ -24,9 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.appProvider = appProvider;
 
             this.urlGenerator = urlGenerator;

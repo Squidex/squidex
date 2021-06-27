@@ -19,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentLoader(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 

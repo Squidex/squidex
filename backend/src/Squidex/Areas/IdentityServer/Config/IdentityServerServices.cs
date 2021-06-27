@@ -20,6 +20,8 @@ using Squidex.Hosting;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using static OpenIddict.Server.OpenIddictServerEvents;
+using static OpenIddict.Server.OpenIddictServerHandlers;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -41,9 +43,6 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();
 
-            services.AddSingletonAs<PwnedPasswordValidator>()
-                .As<IPasswordValidator<IdentityUser>>();
-
             services.AddScopedAs<DefaultUserService>()
                 .As<IUserService>();
 
@@ -52,6 +51,9 @@ namespace Squidex.Areas.IdentityServer.Config
 
             services.AddSingletonAs<ApiPermissionUnifier>()
                 .As<IClaimsTransformation>();
+
+            services.AddSingletonAs<TokenStoreInitializer>()
+                .AsSelf();
 
             services.AddSingletonAs<CreateAdminInitializer>()
                 .AsSelf();
@@ -78,6 +80,12 @@ namespace Squidex.Areas.IdentityServer.Config
                 })
                 .AddServer(builder =>
                 {
+                    builder.AddEventHandler<ProcessSignInContext>(builder =>
+                    {
+                        builder.UseSingletonHandler<AlwaysAddTokenHandler>()
+                            .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
+                    });
+
                     builder
                         .SetAuthorizationEndpointUris("/connect/authorize")
                         .SetIntrospectionEndpointUris("/connect/introspect")
@@ -101,7 +109,6 @@ namespace Squidex.Areas.IdentityServer.Config
                     builder.AllowAuthorizationCodeFlow();
 
                     builder.UseAspNetCore()
-                        // Disable it mainly for our tests.
                         .DisableTransportSecurityRequirement()
                         .EnableAuthorizationEndpointPassthrough()
                         .EnableLogoutEndpointPassthrough()

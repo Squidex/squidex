@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope)
         {
             var byGeo =
-                await Collection.Find(
+                await GetCollection(scope).Find(
                     Filter.And(
                         Filter.Eq(x => x.AppId, app.Id),
                         Filter.Eq(x => x.SchemaId, query.SchemaId),
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         private async Task<List<DomainId>> SearchBySchemaAsync(string queryText, IAppEntity app, TextFilter filter, SearchScope scope, int limit)
         {
             var bySchema =
-                await Collection.Find(
+                await GetCollection(scope).Find(
                     Filter.And(
                         Filter.Eq(x => x.AppId, app.Id),
                         Filter.In(x => x.SchemaId, filter.SchemaIds),
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         private async Task<List<DomainId>> SearchByAppAsync(string queryText, IAppEntity app, SearchScope scope, int limit)
         {
             var bySchema =
-                await Collection.Find(
+                await GetCollection(scope).Find(
                     Filter.And(
                         Filter.Eq(x => x.AppId, app.Id),
                         Filter.Exists(x => x.SchemaId),
@@ -166,6 +166,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             else
             {
                 return Filter.Eq(x => x.ServePublished, true);
+            }
+        }
+
+        private IMongoCollection<MongoTextIndexEntity> GetCollection(SearchScope scope)
+        {
+            if (scope == SearchScope.All)
+            {
+                return Collection;
+            }
+            else
+            {
+                return Collection.WithReadPreference(ReadPreference.Secondary);
             }
         }
     }

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
@@ -22,9 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(contentEnricher, nameof(contentEnricher));
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
             this.contentEnricher = contentEnricher;
             this.contextProvider = contextProvider;
         }

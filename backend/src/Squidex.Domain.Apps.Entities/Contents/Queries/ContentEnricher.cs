@@ -29,9 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public ContentEnricher(IEnumerable<IContentEnricherStep> steps, Lazy<IContentQueryService> contentQuery)
         {
-            Guard.NotNull(steps, nameof(steps));
-            Guard.NotNull(contentQuery, nameof(contentQuery));
-
             this.steps = steps;
 
             this.contentQuery = contentQuery;

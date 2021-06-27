@@ -70,7 +70,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerGrainTests()
         {
-            grainState.Value.Position = initialPosition;
+            grainState.Value = new EventConsumerState
+            {
+                Position = initialPosition
+            };
 
             consumerName = eventConsumer.GetType().Name;
 
