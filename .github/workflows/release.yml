@@ -148,7 +148,7 @@ jobs:
         run: |
           mkdir /build 2> /dev/null
           docker create --name squidex-container squidex-tmp
-          docker cp squidex-container:/app/. /build
+          docker cp squidex-container:/app/. /build/
 
       - name: ZIP Binaries
         run: |

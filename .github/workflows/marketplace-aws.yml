@@ -17,8 +17,7 @@ jobs:
         with:
           command: validate
           arguments: -syntax-only
-          target: aws.pkr.hcl
-        working-directory: packer/
+          target: packer/aws.pkr.hcl
 
   publish:
     needs: validate
@@ -34,20 +33,18 @@ jobs:
         uses: hashicorp/packer-github-actions@master
         with:
           command: init
-          target: vultr.pkr.hcl
+          target: packer/aws.pkr.hcl
         env:
           PACKER_LOG: 1
-        working-directory: packer/
 
       - name: Build
         uses: hashicorp/packer-github-actions@master
         with:
           command: build
           arguments: "-color=false -on-error=abort"
-          target: aws.pkr.hcl
+          target: packer/aws.pkr.hcl
         env:
           PACKER_LOG: 1
           PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
           AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
           AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-        working-directory: packer/
