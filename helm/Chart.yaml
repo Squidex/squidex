@@ -11,6 +11,11 @@ home: https://squidex.io/
 
 keywords:
   - cms
+  - headless-cms
+  - mongodb
+  - csharp
+  - asp-net-core
+  - asp-net
 
 sources:
   - https://github.com/Squidex/squidex
