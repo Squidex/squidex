@@ -3,7 +3,7 @@
 #
 FROM mcr.microsoft.com/dotnet/sdk:5.0 as backend
 
-ARG SQUIDEX__VERSION=4.0.0
+ARG SQUIDEX__VERSION=5.0.0
 
 WORKDIR /src
 
