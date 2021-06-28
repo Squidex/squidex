@@ -88,7 +88,7 @@ namespace Squidex.Domain.Users
                 return result;
             }
 
-            var userItems = QueryUsers(query).Take(take).Skip(skip).ToList();
+            var userItems = QueryUsers(query).Skip(skip).Take(take).ToList();
             var userTotal = QueryUsers(query).LongCount();
 
             var resolved = await ResolveAsync(userItems);
