@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "squidex.fullname" . }}
+  labels:
+    {{- include "squidex.labels" . | indent 4 }}  
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "squidex.selectors" . | indent 4 }}
