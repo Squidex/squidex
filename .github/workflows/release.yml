@@ -160,16 +160,16 @@ jobs:
         run: docker load < squidex-tmp.tar.gz
 
       - name: Make directories
-        run: mkdir /build /release
+        run: sudo mkdir /build /release
 
       - name: Create container
         run: docker create --name squidex-container squidex-tmp:latest
 
       - name: Get binaries
-        run: docker cp squidex-container:/app/. /build
+        run: sudo docker cp squidex-container:/app/. /build
 
       - name: ZIP Binaries
-        run: zip -r /release/binaries.zip .
+        run: sudo zip -r /release/binaries.zip .
         working-directory: /build
 
       - name: Get Changelog Entry
