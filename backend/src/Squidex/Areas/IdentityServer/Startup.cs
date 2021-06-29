@@ -21,7 +21,7 @@ namespace Squidex.Areas.IdentityServer
 
             app.Map(Constants.PrefixIdentityServer, identityApp =>
             {
-                if (environment.IsDevelopment())
+                if (!environment.IsDevelopment())
                 {
                     identityApp.UseDeveloperExceptionPage();
                 }
