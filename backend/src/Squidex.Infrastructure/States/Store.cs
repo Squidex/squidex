@@ -24,11 +24,6 @@ namespace Squidex.Infrastructure.States
             IEventDataFormatter eventDataFormatter,
             IStreamNameResolver streamNameResolver)
         {
-            Guard.NotNull(snapshotStore, nameof(snapshotStore));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
-
             this.snapshotStore = snapshotStore;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;

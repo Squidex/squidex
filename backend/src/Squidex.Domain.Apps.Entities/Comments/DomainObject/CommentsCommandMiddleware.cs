@@ -12,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
@@ -27,9 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsCommandMiddleware(IGrainFactory grainFactory, IUserResolver userResolver)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(userResolver, nameof(userResolver));
-
             this.grainFactory = grainFactory;
 
             this.userResolver = userResolver;

@@ -27,8 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ReferencesJintExtension(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 

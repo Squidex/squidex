@@ -21,8 +21,6 @@ namespace Squidex.Infrastructure.Translations
 
         public ResourcesLocalizer(ResourceManager resourceManager)
         {
-            Guard.NotNull(resourceManager, nameof(resourceManager));
-
             this.resourceManager = resourceManager;
         }
 

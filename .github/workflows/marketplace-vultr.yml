@@ -17,8 +17,7 @@ jobs:
         with:
           command: validate
           arguments: -syntax-only
-          target: vultr.pkr.hcl
-        working-directory: packer/
+          target: packer/vultr.pkr.hcl
 
   publish:
     needs: validate
@@ -34,19 +33,17 @@ jobs:
         uses: hashicorp/packer-github-actions@master
         with:
           command: init
-          target: vultr.pkr.hcl
+          target: packer/vultr.pkr.hcl
         env:
           PACKER_LOG: 1
-        working-directory: packer/
 
       - name: Build
         uses: hashicorp/packer-github-actions@master
         with:
           command: build
           arguments: "-color=false -on-error=abort"
-          target: vultr.pkr.hcl
+          target: packer/vultr.pkr.hcl
         env:
           PACKER_LOG: 1
           PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
           VULTR_API_KEY: "${{ secrets.VULTR_API_KEY }}"
-        working-directory: packer/

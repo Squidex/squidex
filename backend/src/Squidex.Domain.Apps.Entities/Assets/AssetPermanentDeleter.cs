@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -31,8 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetPermanentDeleter(IAssetFileStore assetFileStore, TypeNameRegistry typeNameRegistry)
         {
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-
             this.assetFileStore = assetFileStore;
 
             deletedType = typeNameRegistry?.GetName<AssetDeleted>();
@@ -56,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     try
                     {
-                        await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId, version);
+                        await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId, version, null);
                     }
                     catch (AssetNotFoundException)
                     {

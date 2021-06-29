@@ -1,0 +1,60 @@
+labels:
+service:
+  type: ClusterIP
+  port: 80
+deployment:
+  replicaCount: 1
+selectors:
+  component: squidex
+  partOf: ""
+  version: ""
+image:
+  repository: squidex/squidex
+  tag: ""
+  pullPolicy: IfNotPresent
+
+resources: { }
+nodeSelector: { }
+tolerations: [ ]
+affinity: { }
+
+clusterSuffix: cluster.local
+
+ingress:
+  annotations: { }
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hostName: squidex.local
+
+  tls: [ ]
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+env:
+  URLS__BASEURL: null
+  URLS__ENFORCEHTTPS: false
+  EVENTSTORE__CONSUME: true
+  EVENTSTORE__TYPE: MongoDb
+  IDENTITY__ADMINEMAIL: null
+  IDENTITY__ADMINPASSWORD: null
+  IDENTITY__SHOWPII: true
+  LETSENCRYPT_HOST: null
+  LETSENCRYPT_EMAIL: null
+  LOGGING__HUMAN: "false"
+  EVENTSTORE__MONGODB__DATABASE: "Squidex"
+  STORE__MONGODB__DATABASE: "Squidex"
+  STORE__MONGODB__CONTENTDATABASE: "SquidexContent"
+  IDENTITY__GOOGLECLIENT: null
+  IDENTITY__GOOGLESECRET: null
+  IDENTITY__MICROSOFTCLIENT: null
+  IDENTITY__MICROSOFTSECRET: null
+  IDENTITY__GITHUBCLIENT: null
+  IDENTITY__GITHUBSECRET: null
+  IDENTITY__ALLOWPASSWORDAUTH: "true"
+  IDENTITY__LOCKAUTOMATICALLY: "false"
+  ORLEANS__CLUSTERING: MongoDB
+
+mongodb-replicaset:
+  enabled: true
+  replicas: 3

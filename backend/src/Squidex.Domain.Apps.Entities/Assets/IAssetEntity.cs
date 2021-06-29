@@ -22,8 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         DomainId ParentId { get; }
 
-        string MimeType { get; }
-
         bool IsProtected { get; }
 
         long FileVersion { get; }

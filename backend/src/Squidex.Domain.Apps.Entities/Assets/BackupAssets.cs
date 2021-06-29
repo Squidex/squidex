@@ -33,10 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public BackupAssets(Rebuilder rebuilder, IAssetFileStore assetFileStore, ITagService tagService)
         {
-            Guard.NotNull(rebuilder, nameof(rebuilder));
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(tagService, nameof(tagService));
-
             this.rebuilder = rebuilder;
             this.assetFileStore = assetFileStore;
             this.tagService = tagService;
@@ -131,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, stream);
+                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream);
                 });
             }
             catch (AssetNotFoundException)
@@ -146,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, stream);
+                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream);
                 });
             }
             catch (FileNotFoundException)

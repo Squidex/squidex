@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.8.0] - 2021-06-28
+
+### Fixed
+
+* **API**: Fixes for anonymous write access.
+* **API**: Fixes for client access when creating apps.
+* **Schemas**: Correct sync of field rules, especially for CLI.
+* **UserManagement**: Fix pagination
+* **UI**: Encode IDs to allow custom content IDs with slash.
+* **UI**: Fixes typos for italian translation.
+* **UI**: Allow scrolling when content is disabled.
+* **UI**: Fixes references/referencing view for localized content.
+* **UI**: Fix confirm click.
+
+### Added
+
+* **API**: Better timeout and cancellation handling.
+* **API**: Default timeouts for most important MongoDB calls.
+* **API**: Better API tests to improve stability.
+* **Assets**: Additional configuration flag to allow one folder per asset.
+* **Contents**: Read published contents from secondary MongodB instances for better load distribution.
+* **Contents**: Better indexes for improved performance.
+* **Rules**: New liquid and javascript extensions to read the asset as text in rules.
+* **Rules**: Simpler syntax to resolve assets and contents in liquid templates.
+* **Contents**: Array builder when building custom code extension.
+* **UI**: Show SVG as images when in contnet overview.
+* **UI**: Chinese translation.
+
 ## [5.7.1] - 2021-05-21
 
 ### Fixed

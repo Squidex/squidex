@@ -43,9 +43,6 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();
 
-            services.AddSingletonAs<PwnedPasswordValidator>()
-                .As<IPasswordValidator<IdentityUser>>();
-
             services.AddScopedAs<DefaultUserService>()
                 .As<IUserService>();
 
@@ -54,6 +51,9 @@ namespace Squidex.Areas.IdentityServer.Config
 
             services.AddSingletonAs<ApiPermissionUnifier>()
                 .As<IClaimsTransformation>();
+
+            services.AddSingletonAs<TokenStoreInitializer>()
+                .AsSelf();
 
             services.AddSingletonAs<CreateAdminInitializer>()
                 .AsSelf();

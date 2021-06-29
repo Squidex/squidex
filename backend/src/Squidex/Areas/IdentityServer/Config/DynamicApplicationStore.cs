@@ -33,8 +33,6 @@ namespace Squidex.Areas.IdentityServer.Config
         public DynamicApplicationStore(IServiceProvider serviceProvider)
             : base(CreateStaticClients(serviceProvider))
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 

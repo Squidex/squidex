@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.On(Envelope.Create(@event).SetRestored());
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<long>._))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<long>._, null))
                 .MustNotHaveHappened();
         }
 
@@ -72,10 +72,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.On(Envelope.Create(@event).SetEventStreamNumber(2));
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0, null))
                 .MustHaveHappened();
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1, null))
                 .MustHaveHappened();
         }
 
@@ -84,12 +84,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0, null))
                 .Throws(new AssetNotFoundException("fileName"));
 
             await sut.On(Envelope.Create(@event).SetEventStreamNumber(2));
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1, null))
                 .MustHaveHappened();
         }
 
@@ -98,12 +98,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0, null))
                 .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.On(Envelope.Create(@event).SetEventStreamNumber(2)));
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1, null))
                 .MustNotHaveHappened();
         }
     }

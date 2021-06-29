@@ -12,7 +12,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Jint.Native;
 using Jint.Runtime;
+using Jint.Runtime.Interop;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
@@ -23,16 +25,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetsJintExtension : IJintExtension
     {
         private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
+        private delegate void GetAssetTextDelegate(JsValue references, Action<JsValue> callback, JsValue encoding);
         private readonly IServiceProvider serviceProvider;
 
         public AssetsJintExtension(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 
         public void ExtendAsync(ExecutionContext context)
+        {
+            AddAssetText(context);
+            AddAsset(context);
+        }
+
+        private void AddAsset(ExecutionContext context)
         {
             if (!context.TryGetValue<DomainId>(nameof(ScriptVars.AppId), out var appId))
             {
@@ -48,6 +55,66 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             context.Engine.SetValue("getAsset", action);
             context.Engine.SetValue("getAssets", action);
+        }
+
+        private void AddAssetText(ExecutionContext context)
+        {
+            var action = new GetAssetTextDelegate((references, callback, encoding) => GetText(context, references, callback, encoding));
+
+            context.Engine.SetValue("getAssetText", action);
+        }
+
+        private void GetText(ExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
+        {
+            GetTextAsync(context, input, callback, encoding).Forget();
+        }
+
+        private async Task GetTextAsync(ExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
+        {
+            Guard.NotNull(callback, nameof(callback));
+
+            if (input is not ObjectWrapper objectWrapper)
+            {
+                callback(JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                return;
+            }
+
+            async Task ResolveAssetText(DomainId appId, DomainId id, long fileSize, long fileVersion)
+            {
+                if (fileSize > 256_000)
+                {
+                    callback(JsValue.FromObject(context.Engine, "ErrorTooBig"));
+                    return;
+                }
+
+                context.MarkAsync();
+
+                try
+                {
+                    var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
+
+                    var encoded = await assetFileStore.GetTextAsync(appId, id, fileVersion, encoding?.ToString());
+
+                    callback(JsValue.FromObject(context.Engine, encoded));
+                }
+                catch (Exception ex)
+                {
+                    context.Fail(ex);
+                }
+            }
+
+            switch (objectWrapper.Target)
+            {
+                case IAssetEntity asset:
+                    await ResolveAssetText(asset.AppId.Id, asset.Id, asset.FileSize, asset.FileVersion);
+                    return;
+
+                case EnrichedAssetEvent @event:
+                    await ResolveAssetText(@event.AppId.Id, @event.Id, @event.FileSize, @event.FileVersion);
+                    return;
+            }
+
+            callback(JsValue.FromObject(context.Engine, "ErrorNoAsset"));
         }
 
         private void GetAssets(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)

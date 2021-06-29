@@ -36,13 +36,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-
             collectionAll =
-                new MongoContentCollection("States_Contents_All3", database, appProvider);
+                new MongoContentCollection("States_Contents_All3", database, appProvider,
+                    ReadPreference.Primary);
 
             collectionPublished =
-                new MongoContentCollection("States_Contents_Published3", database, appProvider);
+                new MongoContentCollection("States_Contents_Published3", database, appProvider,
+                    ReadPreference.Secondary);
 
             this.appProvider = appProvider;
         }

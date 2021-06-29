@@ -32,10 +32,6 @@ namespace Squidex.Infrastructure.Log
         public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
             IRequestLogRepository logRepository, ISemanticLog log)
         {
-            Guard.NotNull(options, nameof(options));
-            Guard.NotNull(logRepository, nameof(logRepository));
-            Guard.NotNull(log, nameof(log));
-
             this.options = options.Value;
 
             this.logRepository = logRepository;

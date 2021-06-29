@@ -27,9 +27,6 @@ namespace Squidex.Extensions.Actions.Notification
         public NotificationActionHandler(RuleEventFormatter formatter, ICommandBus commandBus, IUserResolver userResolver)
             : base(formatter)
         {
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(userResolver, nameof(userResolver));
-
             this.commandBus = commandBus;
 
             this.userResolver = userResolver;

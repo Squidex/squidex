@@ -1,0 +1,27 @@
+apiVersion: v2
+type: application
+
+name: squidex
+description: Squidex CMS
+
+version: 1.0.0
+appVersion: "5.7.0"
+
+home: https://squidex.io/
+
+keywords:
+  - cms
+  - headless-cms
+  - mongodb
+  - csharp
+  - asp-net-core
+  - asp-net
+
+sources:
+  - https://github.com/Squidex/squidex
+
+dependencies:
+  - name: mongodb-replicaset
+    version: 3.9.6
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    condition: mongodb-replicaset.enabled

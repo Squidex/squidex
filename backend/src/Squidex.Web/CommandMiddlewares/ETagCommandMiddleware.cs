@@ -22,8 +22,6 @@ namespace Squidex.Web.CommandMiddlewares
 
         public ETagCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-
             this.httpContextAccessor = httpContextAccessor;
         }
 

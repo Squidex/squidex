@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Log;
@@ -22,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly IAssetRepository assetRepository;
         private readonly IAssetLoader assetLoader;
         private readonly IAssetFolderRepository assetFolderRepository;
+        private readonly AssetOptions options;
         private readonly AssetQueryParser queryParser;
 
         public AssetQueryService(
@@ -29,18 +31,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             IAssetRepository assetRepository,
             IAssetLoader assetLoader,
             IAssetFolderRepository assetFolderRepository,
+            IOptions<AssetOptions> options,
             AssetQueryParser queryParser)
         {
-            Guard.NotNull(assetEnricher, nameof(assetEnricher));
-            Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(assetLoader, nameof(assetLoader));
-            Guard.NotNull(assetFolderRepository, nameof(assetFolderRepository));
-            Guard.NotNull(queryParser, nameof(queryParser));
-
             this.assetEnricher = assetEnricher;
             this.assetRepository = assetRepository;
             this.assetLoader = assetLoader;
             this.assetFolderRepository = assetFolderRepository;
+            this.options = options.Value;
             this.queryParser = queryParser;
         }
 
@@ -53,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 while (id != DomainId.Empty)
                 {
-                    var folder = await assetFolderRepository.FindAssetFolderAsync(appId, id, ct);
+                    var folder = await FindFolderCoreAsync(appId, id, ct);
 
                     if (folder == null || result.Any(x => x.Id == folder.Id))
                     {
@@ -75,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var assetFolders = await assetFolderRepository.QueryAsync(appId, parentId, ct);
+                var assetFolders = await QueryFoldersCoreAsync(appId, parentId, ct);
 
                 return assetFolders;
             }
@@ -86,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var assetFolders = await assetFolderRepository.QueryAsync(context.App.Id, parentId, ct);
+                var assetFolders = await QueryFoldersCoreAsync(context, parentId, ct);
 
                 return assetFolders;
             }
@@ -99,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var asset = await assetRepository.FindAssetByHashAsync(context.App.Id, hash, fileName, fileSize, ct);
+                var asset = await FindByHashCoreAsync(context, hash, fileName, fileSize, ct);
 
                 if (asset == null)
                 {
@@ -117,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var asset = await assetRepository.FindAssetBySlugAsync(context.App.Id, slug, ct);
+                var asset = await FindBySlugCoreAsync(context, slug, ct);
 
                 if (asset == null)
                 {
@@ -135,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             using (Profiler.TraceMethod<AssetQueryService>())
             {
-                var asset = await assetRepository.FindAssetAsync(id, ct);
+                var asset = await FindCoreAsync(id, ct);
 
                 if (asset == null)
                 {
@@ -161,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 }
                 else
                 {
-                    asset = await assetRepository.FindAssetAsync(context.App.Id, id, ct);
+                    asset = await FindCoreAsync(context, id, ct);
                 }
 
                 if (asset == null)
@@ -187,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 q = await queryParser.ParseAsync(context, q);
 
-                var assets = await assetRepository.QueryAsync(context.App.Id, parentId, q, ct);
+                var assets = await QueryCoreAsync(context, parentId, q, ct);
 
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
@@ -220,6 +218,101 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             using (Profiler.TraceMethod<AssetQueryService>())
             {
                 return await assetEnricher.EnrichAsync(assets, context, ct);
+            }
+        }
+
+        private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(Context context, DomainId parentId,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetFolderRepository.QueryAsync(context.App.Id, parentId, combined.Token);
+                }
+            }
+        }
+
+        private async Task<IResultList<IAssetFolderEntity>> QueryFoldersCoreAsync(DomainId appId, DomainId parentId,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetFolderRepository.QueryAsync(appId, parentId, combined.Token);
+                }
+            }
+        }
+
+        private async Task<IResultList<IAssetEntity>> QueryCoreAsync(Context context, DomainId? parentId, Q q,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetRepository.QueryAsync(context.App.Id, parentId, q, combined.Token);
+                }
+            }
+        }
+
+        private async Task<IAssetFolderEntity?> FindFolderCoreAsync(DomainId appId, DomainId id, CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetFolderRepository.FindAssetFolderAsync(appId, id, combined.Token);
+                }
+            }
+        }
+
+        private async Task<IAssetEntity?> FindByHashCoreAsync(Context context, string hash, string fileName, long fileSize,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetRepository.FindAssetByHashAsync(context.App.Id, hash, fileName, fileSize, combined.Token);
+                }
+            }
+        }
+
+        private async Task<IAssetEntity?> FindBySlugCoreAsync(Context context, string slug,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetRepository.FindAssetBySlugAsync(context.App.Id, slug, combined.Token);
+                }
+            }
+        }
+
+        private async Task<IAssetEntity?> FindCoreAsync(DomainId id,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetRepository.FindAssetAsync(id, combined.Token);
+                }
+            }
+        }
+
+        private async Task<IAssetEntity?> FindCoreAsync(Context context, DomainId id,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await assetRepository.FindAssetAsync(context.App.Id, id, combined.Token);
+                }
             }
         }
     }

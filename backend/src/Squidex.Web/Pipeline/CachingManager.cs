@@ -172,9 +172,6 @@ namespace Squidex.Web.Pipeline
 
         public CachingManager(IHttpContextAccessor httpContextAccessor, IOptions<CachingOptions> cachingOptions)
         {
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-            Guard.NotNull(cachingOptions, nameof(cachingOptions));
-
             this.httpContextAccessor = httpContextAccessor;
 
             this.cachingOptions = cachingOptions.Value;

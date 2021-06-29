@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Search;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Squidex.Shared;
 
@@ -23,9 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetsSearchSource(IAssetQueryService assetQuery, IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.assetQuery = assetQuery;
 
             this.urlGenerator = urlGenerator;

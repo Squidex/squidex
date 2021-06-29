@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.BackupEventAsync(AppEvent(@event), context);
 
-            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, assetStream, default, default))
+            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, null, assetStream, default, default))
                 .MustHaveHappened();
         }
 
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => context.Writer.WriteBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
 
-            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, assetStream, default, default))
+            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, null, assetStream, default, default))
                 .Throws(new AssetNotFoundException(assetId.ToString()));
 
             await sut.BackupEventAsync(AppEvent(@event), context);
@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreEventAsync(AppEvent(@event), context);
 
-            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, assetStream, default))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, null, assetStream, true, default))
                 .MustHaveHappened();
         }
 
@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RestoreEventAsync(AppEvent(@event), context);
 
-            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, assetStream, default))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, assetId, version, null, assetStream, true, default))
                 .MustNotHaveHappened();
         }
 

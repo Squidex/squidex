@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Queries
 {
@@ -20,9 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public RuleQueryService(IRulesIndex rulesIndex, IRuleEnricher ruleEnricher)
         {
-            Guard.NotNull(rulesIndex, nameof(rulesIndex));
-            Guard.NotNull(ruleEnricher, nameof(ruleEnricher));
-
             this.rulesIndex = rulesIndex;
             this.ruleEnricher = ruleEnricher;
         }

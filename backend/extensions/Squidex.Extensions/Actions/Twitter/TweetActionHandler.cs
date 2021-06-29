@@ -12,7 +12,6 @@ using CoreTweet;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Twitter
 {
@@ -25,8 +24,6 @@ namespace Squidex.Extensions.Actions.Twitter
         public TweetActionHandler(RuleEventFormatter formatter, IOptions<TwitterOptions> twitterOptions)
             : base(formatter)
         {
-            Guard.NotNull(twitterOptions, nameof(twitterOptions));
-
             this.twitterOptions = twitterOptions.Value;
         }
 

@@ -10,7 +10,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -20,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ScriptContent(IScriptEngine scriptEngine)
         {
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-
             this.scriptEngine = scriptEngine;
         }
 

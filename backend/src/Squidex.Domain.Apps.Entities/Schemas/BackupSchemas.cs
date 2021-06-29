@@ -24,8 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public BackupSchemas(ISchemasIndex indexSchemas)
         {
-            Guard.NotNull(indexSchemas, nameof(indexSchemas));
-
             this.indexSchemas = indexSchemas;
         }
 
