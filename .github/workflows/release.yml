@@ -176,7 +176,6 @@ jobs:
         id: changelog_reader
         uses: mindsers/changelog-reader-action@v2
         with:
-          validation_depth: 10
           version: ${{ env.GITHUB_REF_SLUG }}
           path: ./CHANGELOG.md
 
@@ -185,10 +184,10 @@ jobs:
         with:
           allowUpdates: true
           artifactErrorsFailBuild: true
-          artifact: "/release/binaries.zip"
+          artifacts: "/release/binaries.zip"
           body: ${{ steps.changelog_reader.outputs.changes }}
           name: ${{ env.GITHUB_REF_SLUG }}
-          replaceArtifacts: true
+          replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup Binaries
