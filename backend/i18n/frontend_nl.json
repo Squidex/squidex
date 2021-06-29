@@ -942,6 +942,7 @@
   "validation.min": "{field|upper} moet groter zijn dan of gelijk zijn aan '{min}'.",
   "validation.minlength": "{field|upper} moet minimaal {requiredlength} item (s) bevatten.",
   "validation.minlengthstring": "{field|upper} moet minimaal {requiredlength} teken (s) bevatten.",
+  "validation.notAnValidSvg": "The SVG is malicious and contains script tags.",
   "validation.pattern": "{field|upper} komt niet overeen met het patroon.",
   "validation.patternmessage": "{message}",
   "validation.required": "{field|upper} is vereist.",

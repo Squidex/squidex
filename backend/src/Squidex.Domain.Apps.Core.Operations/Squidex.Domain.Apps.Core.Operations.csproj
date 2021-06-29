@@ -17,9 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fluid.Core.Squidex" Version="1.0.0-beta" />
-	<PackageReference Include="GeoJSON.Net" Version="1.2.19" />
-	<PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
-    <PackageReference Include="Markdig" Version="0.25.0" />
+	  <PackageReference Include="GeoJSON.Net" Version="1.2.19" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.9.0" />
     <PackageReference Include="NJsonSchema" Version="10.4.4" />

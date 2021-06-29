@@ -11,6 +11,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -203,10 +204,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 switch (properties.ContentType)
                 {
                     case StringContentType.Markdown:
-                        transform = TextHelpers.Markdown2Text;
+                        transform = MarkdownExtensions.Markdown2Text;
                         break;
                     case StringContentType.Html:
-                        transform = TextHelpers.Html2Text;
+                        transform = HtmlExtensions.Html2Text;
                         break;
                 }
 

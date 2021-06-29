@@ -942,6 +942,7 @@
   "validation.min": "{field|upper} 必须大于或等于 '{min}'。",
   "validation.minlength": "{field|upper} 必须至少有 {requiredlength} 项。",
   "validation.minlengthstring": "{field|upper} 必须至少有 {requiredlength} 个字符。",
+  "validation.notAnValidSvg": "The SVG is malicious and contains script tags.",
   "validation.pattern": "{field|upper} 与模式不匹配。",
   "validation.patternmessage": "{message}",
   "validation.required": "{field|upper} 是必需的。",

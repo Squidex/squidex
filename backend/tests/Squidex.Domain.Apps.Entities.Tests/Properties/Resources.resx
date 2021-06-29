@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SvgInvalid" xml:space="preserve">
+    <value>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" onload="alert(localStorage.getItem('oidc.user:https://cloud.squidex.io/identity-server/:squidex-frontend'))"&gt;
+  &lt;path d="M30,1h40l29,29v40l-29,29h-40l-29-29v-40z" stroke="#000" fill="none"/&gt; 
+  &lt;path d="M31,3h38l28,28v38l-28,28h-38l-28-28v-38z" fill="#a23"/&gt; 
+  &lt;text x="50" y="68" font-size="48" fill="#FFF" text-anchor="middle"&gt;&lt;![CDATA[410]]&gt;&lt;/text&gt;
+&lt;/svg&gt;</value>
+  </data>
+  <data name="SvgValid" xml:space="preserve">
+    <value>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  --&gt;
+
+&lt;svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="110"
+   height="110"
+   viewBox="0 0 110 110"
+   enable-background="new 0 0 494 111"
+   xml:space="preserve"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="logo-squared.svg"
+   inkscape:export-filename="C:\Users\mail2\Downloads\logo-squared.png"
+   inkscape:export-xdpi="490.91"
+   inkscape:export-ydpi="490.91"&gt;&lt;metadata
+     id="metadata45"&gt;&lt;rdf:RDF&gt;&lt;cc:Work
+         rdf:about=""&gt;&lt;dc:format&gt;image/svg+xml&lt;/dc:format&gt;&lt;dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /&gt;&lt;dc:title&gt;&lt;/dc:title&gt;&lt;/cc:Work&gt;&lt;/rdf:RDF&gt;&lt;/metadata&gt;&lt;defs
+     id="defs43" /&gt;&lt;sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview41"
+     showgrid="false"
+     inkscape:zoom="2.3319838"
+     inkscape:cx="-70.482725"
+     inkscape:cy="106.27906"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" /&gt;&lt;g
+     id="g19"
+     transform="matrix(1.0069983,0,0,1.0058932,11.091568,0.44387448)"&gt;&lt;g
+       id="g21"&gt;&lt;path
+         d="m 21.267,80.827 c -0.473,0 -0.971,-0.031 -1.494,-0.096 -3.67,-0.459 -6.484,-2.862 -7.531,-6.428 -1.109,-3.789 0.053,-8.048 2.826,-10.359 1.144,-0.955 2.844,-0.799 3.797,0.345 0.953,1.145 0.798,2.844 -0.346,3.797 -1.138,0.948 -1.611,2.968 -1.104,4.7 0.309,1.051 1.083,2.353 3.025,2.596 1.399,0.175 2.459,-0.063 3.246,-0.724 1.435,-1.209 1.869,-3.684 1.922,-4.596 l 0,-16.985 c 0,-1.489 1.207,-2.695 2.695,-2.695 1.488,0 2.697,1.206 2.697,2.695 l 0,17.051 c 0,0.033 0,0.065 -0.001,0.098 -0.02,0.558 -0.297,5.538 -3.803,8.525 -1.165,0.991 -3.089,2.076 -5.929,2.076 z"
+         id="path23"
+         inkscape:connector-curvature="0"
+         style="fill:#3389ff" /&gt;&lt;/g&gt;&lt;g
+       id="g25"&gt;&lt;path
+         d="m 31.435,99.967 c -0.473,0 -0.971,-0.031 -1.494,-0.096 -3.67,-0.46 -6.486,-2.862 -7.531,-6.428 -1.109,-3.789 0.051,-8.048 2.826,-10.358 1.144,-0.955 2.845,-0.8 3.797,0.342 0.953,1.146 0.798,2.845 -0.346,3.799 -1.138,0.947 -1.612,2.968 -1.104,4.701 0.308,1.049 1.082,2.351 3.025,2.594 1.404,0.177 2.473,-0.065 3.259,-0.735 1.638,-1.394 1.887,-4.275 1.909,-4.586 l 0,-36.962 c 0,-1.489 1.207,-2.696 2.695,-2.696 1.488,0 2.695,1.207 2.695,2.696 l 0,37.031 c 0,0.032 0,0.062 -0.002,0.097 -0.019,0.558 -0.296,5.538 -3.803,8.525 -1.162,0.991 -3.086,2.076 -5.926,2.076 z"
+         id="path27"
+         inkscape:connector-curvature="0"
+         style="fill:#3389ff" /&gt;&lt;/g&gt;&lt;g
+       id="g29"&gt;&lt;path
+         d="m 65.941,80.827 c -2.84,0 -4.764,-1.085 -5.928,-2.076 -3.507,-2.987 -3.784,-7.968 -3.803,-8.525 -0.002,-0.032 -0.002,-0.064 -0.002,-0.098 l 0,-17.051 c 0,-1.489 1.206,-2.695 2.695,-2.695 1.488,0 2.695,1.207 2.695,2.695 l 0,16.991 c 0.05,0.889 0.482,3.377 1.923,4.591 0.786,0.66 1.849,0.899 3.245,0.723 1.942,-0.242 2.718,-1.544 3.025,-2.595 0.509,-1.732 0.034,-3.752 -1.104,-4.7 -1.144,-0.953 -1.299,-2.652 -0.345,-3.797 0.951,-1.144 2.65,-1.299 3.796,-0.345 2.774,2.312 3.936,6.57 2.826,10.359 -1.045,3.565 -3.861,5.969 -7.53,6.428 -0.522,0.064 -1.02,0.095 -1.493,0.095 z"
+         id="path31"
+         inkscape:connector-curvature="0"
+         style="fill:#3389ff" /&gt;&lt;/g&gt;&lt;g
+       id="g33"&gt;&lt;path
+         d="m 55.773,99.967 c -2.84,0 -4.764,-1.085 -5.928,-2.076 C 46.338,94.904 46.062,89.923 46.042,89.366 46.04,89.332 46.04,89.302 46.04,89.269 l 0,-37.031 c 0,-1.489 1.207,-2.696 2.696,-2.696 1.488,0 2.694,1.207 2.694,2.696 l 0,36.967 c 0.051,0.891 0.482,3.379 1.923,4.592 0.786,0.661 1.847,0.9 3.245,0.724 1.942,-0.243 2.718,-1.545 3.025,-2.594 0.509,-1.733 0.034,-3.754 -1.104,-4.701 -1.144,-0.954 -1.298,-2.652 -0.345,-3.799 0.952,-1.141 2.651,-1.297 3.797,-0.342 2.774,2.311 3.935,6.569 2.825,10.358 -1.045,3.565 -3.861,5.968 -7.53,6.428 -0.522,0.065 -1.019,0.096 -1.493,0.096 z"
+         id="path35"
+         inkscape:connector-curvature="0"
+         style="fill:#3389ff" /&gt;&lt;/g&gt;&lt;g
+       id="g37"&gt;&lt;path
+         d="M 64.793,38.868 C 64.615,36.921 68.58,37.699 68.104,35.928 63.147,17.484 43.646,8.512 43.632,8.506 43.617,8.512 24.116,17.484 19.16,35.928 c -0.478,1.771 3.487,0.993 3.31,2.94 -0.217,2.364 -4.765,3.333 -4.172,10.121 0.641,7.341 7.182,14.765 7.418,18.873 l 5.295,0 0,-0.153 c 0,-1.319 1.069,-2.388 2.389,-2.388 1.32,0 2.388,1.068 2.388,2.388 l 0,0.153 5.39,-2.695 0,-0.107 c 0,-1.345 1.09,-2.435 2.436,-2.435 1.344,0 2.434,1.09 2.434,2.435 l 0,0.107 5.375,2.695 0,-0.153 c 0,-1.319 1.069,-2.388 2.389,-2.388 1.32,0 2.389,1.068 2.389,2.388 l 0,0.153 5.391,0 c 0.542,-5.791 6.735,-11.532 7.376,-18.873 0.59,-6.788 -3.959,-7.757 -4.175,-10.121 z"
+         id="path39"
+         inkscape:connector-curvature="0"
+         style="fill:#3389ff" /&gt;&lt;/g&gt;&lt;/g&gt;&lt;/svg&gt;</value>
+  </data>
+</root>
