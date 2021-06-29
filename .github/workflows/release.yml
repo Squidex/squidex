@@ -159,16 +159,17 @@ jobs:
       - name: Load Image
         run: docker load < squidex-tmp.tar.gz
 
-      - name: Get Binaries
-        run: |
-          mkdir /build 2> /dev/null
-          docker create --name squidex-container squidex-tmp
-          docker cp squidex-container:/app/. /build
+      - name: Make directories
+        run: mkdir /build /release
+
+      - name: Create container
+        run: docker create --name squidex-container squidex-tmp:latest
+
+      - name: Get binaries
+        run: docker cp squidex-container:/app/. /build
 
       - name: ZIP Binaries
-        run: |
-          mkdir /release 2> /dev/null
-          zip -r /release/binaries.zip .
+        run: zip -r /release/binaries.zip .
         working-directory: /build
 
       - name: Get Changelog Entry
