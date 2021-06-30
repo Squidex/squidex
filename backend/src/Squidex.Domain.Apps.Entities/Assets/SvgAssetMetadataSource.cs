@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public IEnumerable<string> Format(IAssetEntity asset)
         {
-            throw new NotImplementedException();
+            yield break;
         }
     }
 }
