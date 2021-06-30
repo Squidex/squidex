@@ -26,10 +26,6 @@ namespace Squidex.Infrastructure
 
         public RedisPubSub(IConnectionMultiplexer redis, IJsonSerializer serializer, ISemanticLog log)
         {
-            Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(redis, nameof(redis));
-            Guard.NotNull(log, nameof(log));
-
             this.log = log;
             this.redis = redis;
             this.serializer = serializer;

@@ -79,7 +79,53 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {% reference 'ref', id %}
                     Text: {{ ref.data.field1.iv }} {{ ref.data.field2.iv }} {{ ref.id }}
                 {% endfor %}
-                ";
+            ";
+
+            var expected = $@"
+                Text: Hello 1 World 1 {referenceId1}
+                Text: Hello 2 World 2 {referenceId2}
+            ";
+
+            var result = await sut.RenderAsync(template, vars);
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_resolve_references_in_loop_with_filter()
+        {
+            var referenceId1 = DomainId.NewGuid();
+            var reference1 = CreateReference(referenceId1, 1);
+            var referenceId2 = DomainId.NewGuid();
+            var reference2 = CreateReference(referenceId2, 2);
+
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new ContentData()
+                        .AddField("references",
+                            new ContentFieldData()
+                                .AddInvariant(JsonValue.Array(referenceId1, referenceId2))),
+                AppId = appId
+            };
+
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, reference1));
+
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId2), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, reference2));
+
+            var vars = new TemplateVars
+            {
+                ["event"] = @event
+            };
+
+            var template = @"
+                {% for id in event.data.references.iv %}
+                    {% assign ref = id | reference %}
+                    Text: {{ ref.data.field1.iv }} {{ ref.data.field2.iv }} {{ ref.id }}
+                {% endfor %}
+            ";
 
             var expected = $@"
                 Text: Hello 1 World 1 {referenceId1}

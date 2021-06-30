@@ -1,9 +1,9 @@
-<div class="references-container" [class.disabled]="snapshot.isDisabled"
+<div class="references-container"
     (sqxResizeCondition)="setCompact($event)"
     [sqxResizeMinWidth]="600"
     [sqxResizeMaxWidth]="0">
     <ng-container>
-        <div class="drop-area-container">
+        <div class="drop-area-container" [class.disabled]="snapshot.isDisabled">
             <div class="drop-area">
                 <a (click)="createContent()">{{ 'contents.referencesCreateNew' | sqxTranslate }}</a>
 

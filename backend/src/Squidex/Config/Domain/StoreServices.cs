@@ -59,20 +59,23 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs(c => GetDatabase(c, mongoDatabaseName))
                         .As<IMongoDatabase>();
 
-                    services.AddTransientAs(c => new DeleteContentCollections(GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IMigration>();
-
-                    services.AddTransientAs(c => new RestructureContentCollection(GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IMigration>();
-
                     services.AddSingletonAs<MongoMigrationStatus>()
                         .As<IMigrationStatus>();
 
                     services.AddTransientAs<ConvertOldSnapshotStores>()
                         .As<IMigration>();
 
+                    services.AddTransientAs(c => new DeleteContentCollections(GetDatabase(c, mongoContentDatabaseName)))
+                        .As<IMigration>();
+
+                    services.AddTransientAs(c => new RestructureContentCollection(GetDatabase(c, mongoContentDatabaseName)))
+                        .As<IMigration>();
+
                     services.AddTransientAs(c => new ConvertDocumentIds(GetDatabase(c, mongoDatabaseName), GetDatabase(c, mongoContentDatabaseName)))
                         .As<IMigration>();
+
+                    services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
+                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>();
 
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();
@@ -112,9 +115,6 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
                         .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>();
-
-                    services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName), false))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>();
 
                     services.AddSingletonAs<MongoSchemasHash>()
                         .AsOptional<ISchemasHash>().As<IEventConsumer>();

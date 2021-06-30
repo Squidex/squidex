@@ -31,11 +31,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             IEventDataFormatter eventDataFormatter,
             IRuleService ruleService)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(ruleService, nameof(ruleService));
-
             this.grainFactory = grainFactory;
             this.eventDataFormatter = eventDataFormatter;
             this.eventStore = eventStore;

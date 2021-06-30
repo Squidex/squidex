@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -58,11 +59,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<ISchemaEntity?>._))
                 .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
+            var options = Options.Create(new ContentOptions());
+
             sut = new ContentQueryService(
                 appProvider,
                 contentEnricher,
                 contentRepository,
                 contentVersionLoader,
+                options,
                 queryParser);
         }
 

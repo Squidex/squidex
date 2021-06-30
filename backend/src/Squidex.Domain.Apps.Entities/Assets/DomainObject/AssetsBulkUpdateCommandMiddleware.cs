@@ -41,8 +41,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider)
         {
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
             this.contextProvider = contextProvider;
         }
 

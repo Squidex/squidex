@@ -5,7 +5,7 @@
         </a>
     </li>
     <li class="nav-item nav-icon dropdown" #button>
-        <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
+        <span class="nav-link dropdown-toggle" (click)="toggleProfile()">
             <span class="user">
                 <img class="user-picture" [src]="snapshot.profileId | sqxUserIdPicture">
             </span>
@@ -13,9 +13,9 @@
     </li>
 </ul>
 
-<ng-container *sqxModal="modalMenu;onRoot:false">
+<ng-container *sqxModal="modalMenu;onRoot:false;closeAlways:true">
     <div class="dropdown-menu" [sqxAnchoredTo]="button" [offset]="10" @fade>
-        <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl" (click)="modalMenu.hide()">
+        <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
             <div>{{ 'profile.userEmail' | sqxTranslate }}</div>
     
             <strong>{{snapshot.profileEmail}}</strong>
@@ -27,12 +27,12 @@
             {{ 'common.administration' | sqxTranslate }}
         </a>
 
-        <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl" (click)="modalMenu.hide()">
+        <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
             {{ 'profile.title' | sqxTranslate }}
         </a>
 
         <div class="dropdown-submenu">
-            <a class="dropdown-item dropdown-toggle" (click)="toggle()">
+            <a class="dropdown-item dropdown-toggle" (click)="toggleSubmenu()" sqxStopClick>
                 {{ 'common.language' | sqxTranslate }}
             </a>
 

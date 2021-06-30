@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -36,10 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             IContentRepository contentRepository)
             : base(factory, log)
         {
-            Guard.NotNull(assetTags, nameof(assetTags));
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-
             this.assetTags = assetTags;
             this.assetQuery = assetQuery;
             this.contentRepository = contentRepository;

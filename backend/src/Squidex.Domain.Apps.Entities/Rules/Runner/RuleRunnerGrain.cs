@@ -60,15 +60,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             IRuleService ruleService,
             ISemanticLog log)
         {
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(localCache, nameof(localCache));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(ruleService, nameof(ruleService));
-            Guard.NotNull(log, nameof(log));
-
             this.state = state;
             this.appProvider = appProvider;
             this.localCache = localCache;

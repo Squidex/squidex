@@ -30,10 +30,6 @@ namespace Squidex.Extensions.Actions.CreateContent
         public CreateContentActionHandler(RuleEventFormatter formatter, IAppProvider appProvider, ICommandBus commandBus, IJsonSerializer jsonSerializer)
             : base(formatter)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-
             this.appProvider = appProvider;
             this.commandBus = commandBus;
             this.jsonSerializer = jsonSerializer;

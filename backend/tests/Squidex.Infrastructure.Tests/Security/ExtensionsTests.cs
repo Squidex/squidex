@@ -38,12 +38,6 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_retrieve_nickname()
-        {
-            TestClaimExtension(OpenIdClaims.NickName, x => x.OpenIdNickName());
-        }
-
-        [Fact]
         public void Should_retrieve_email()
         {
             TestClaimExtension(OpenIdClaims.Email, x => x.OpenIdEmail());

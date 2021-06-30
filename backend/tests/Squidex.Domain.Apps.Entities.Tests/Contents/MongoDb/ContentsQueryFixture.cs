@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             ContentRepository =
                 new MongoContentRepository(
                     mongoDatabase,
-                    appProvider, false);
+                    appProvider);
 
             Task.Run(async () =>
             {

@@ -17,21 +17,21 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="26.1.0" />
-    <PackageReference Include="Elasticsearch.Net" Version="7.12.0" />
+    <PackageReference Include="CsvHelper" Version="27.1.1" />
+    <PackageReference Include="Elasticsearch.Net" Version="7.13.1" />
     <PackageReference Include="Equals.Fody" Version="4.0.1" PrivateAssets="all" />
     <PackageReference Include="Fody" Version="6.5.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="GraphQL" Version="4.2.0" />
-    <PackageReference Include="GraphQL.DataLoader" Version="4.2.0" />
+    <PackageReference Include="GraphQL" Version="4.5.0" />
+    <PackageReference Include="GraphQL.DataLoader" Version="4.5.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.4.2">
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.4.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Orleans.Core" Version="3.4.2" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.4.3" />
     <PackageReference Include="Notifo.SDK" Version="1.0.0-beta2" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />

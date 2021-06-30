@@ -85,6 +85,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ImageAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
+
+            services.AddSingletonAs<SvgAssetMetadataSource>()
+                .As<IAssetMetadataSource>();
         }
 
         public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)

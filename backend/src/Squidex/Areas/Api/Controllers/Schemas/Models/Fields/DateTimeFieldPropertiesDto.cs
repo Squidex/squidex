@@ -34,6 +34,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public Instant? MinValue { get; set; }
 
         /// <summary>
+        /// The format pattern when displayed in the UI.
+        /// </summary>
+        public string? Format { get; set; }
+
+        /// <summary>
         /// The editor that is used to manage this field.
         /// </summary>
         public DateTimeFieldEditor Editor { get; set; }

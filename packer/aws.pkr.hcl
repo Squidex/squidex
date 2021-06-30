@@ -3,7 +3,7 @@ variable "squidex_version" {
   default = "5.7.0"
 }
 
-source "amazon-ebs" "aws" {
+source "amazon-ebs" "squidex" {
   ami_groups = [
     "all"]
   ami_virtualization_type = "hvm"
@@ -44,7 +44,7 @@ source "amazon-ebs" "aws" {
 
 build {
   sources = [
-    "source.amazon-ebs.aws"
+    "source.amazon-ebs.squidex"
   ]
 
   provisioner "ansible" {

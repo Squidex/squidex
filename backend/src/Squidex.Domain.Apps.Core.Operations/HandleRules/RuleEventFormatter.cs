@@ -16,7 +16,6 @@ using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Templates;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Text;
 using ValueTaskSupplement;
@@ -72,11 +71,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public RuleEventFormatter(IJsonSerializer jsonSerializer, IEnumerable<IRuleEventFormatter> formatters, ITemplateEngine templateEngine, IScriptEngine scriptEngine)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(templateEngine, nameof(templateEngine));
-            Guard.NotNull(formatters, nameof(formatters));
-
             this.jsonSerializer = jsonSerializer;
             this.formatters = formatters;
             this.templateEngine = templateEngine;

@@ -26,10 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources, IRequestCache requestCache)
         {
-            Guard.NotNull(tagService, nameof(tagService));
-            Guard.NotNull(assetMetadataSources, nameof(assetMetadataSources));
-            Guard.NotNull(requestCache, nameof(requestCache));
-
             this.tagService = tagService;
             this.assetMetadataSources = assetMetadataSources;
             this.requestCache = requestCache;

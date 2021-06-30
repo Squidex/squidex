@@ -30,11 +30,6 @@ namespace Squidex.Domain.Users
         public DefaultUserService(UserManager<IdentityUser> userManager, IUserFactory userFactory,
             IEnumerable<IUserEvents> userEvents, ISemanticLog log)
         {
-            Guard.NotNull(userManager, nameof(userManager));
-            Guard.NotNull(userFactory, nameof(userFactory));
-            Guard.NotNull(userEvents, nameof(userEvents));
-            Guard.NotNull(log, nameof(log));
-
             this.userManager = userManager;
             this.userFactory = userFactory;
             this.userEvents = userEvents;
@@ -93,7 +88,7 @@ namespace Squidex.Domain.Users
                 return result;
             }
 
-            var userItems = QueryUsers(query).Take(take).Skip(skip).ToList();
+            var userItems = QueryUsers(query).Skip(skip).Take(take).ToList();
             var userTotal = QueryUsers(query).LongCount();
 
             var resolved = await ResolveAsync(userItems);

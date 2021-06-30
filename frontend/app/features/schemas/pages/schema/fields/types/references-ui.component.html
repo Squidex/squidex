@@ -16,9 +16,9 @@
     <div class="form-group row" *ngIf="field.properties.isContentField">
         <div class="col-9 offset-3">
             <div class="custom-control custom-checkbox">
-                <input class="custom-control-input" type="checkbox" id="{{field.fieldId}}_fieldResolveReferences" formControlName="resolveReference">
-                <label class="custom-control-label" for="{{field.fieldId}}_fieldResolveReferences">
-                    Resolve reference
+                <input class="custom-control-input" type="checkbox" id="{{field.fieldId}}_fieldResolveReference" formControlName="resolveReference">
+                <label class="custom-control-label" for="{{field.fieldId}}_fieldResolveReference">
+                    {{ 'schemas.fieldTypes.references.resolve' | sqxTranslate }}
                 </label>
             </div>
 

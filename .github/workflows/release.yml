@@ -22,6 +22,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: BUILD
         uses: docker/build-push-action@v2
         with:
@@ -29,6 +37,8 @@ jobs:
           load: true
           tags: squidex-tmp
           build-args: "SQUIDEX__VERSION=${{ env.GITHUB_REF_SLUG }}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       - name: Export Image
         run: docker save squidex-tmp | gzip > squidex-tmp.tar.gz
@@ -38,6 +48,11 @@ jobs:
         with:
           path: squidex-tmp.tar.gz
           key: squidex-release-image-${{ github.sha }}
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   test:
     needs: build
@@ -144,23 +159,23 @@ jobs:
       - name: Load Image
         run: docker load < squidex-tmp.tar.gz
 
-      - name: Get Binaries
-        run: |
-          mkdir /build 2> /dev/null
-          docker create --name squidex-container squidex-tmp
-          docker cp squidex-container:/app/. /build
+      - name: Make directories
+        run: sudo mkdir /build /release
+
+      - name: Create container
+        run: docker create --name squidex-container squidex-tmp:latest
+
+      - name: Get binaries
+        run: sudo docker cp squidex-container:/app/. /build
 
       - name: ZIP Binaries
-        run: |
-          mkdir /release 2> /dev/null
-          zip -r /release/binaries.zip .
+        run: sudo zip -r /release/binaries.zip .
         working-directory: /build
 
       - name: Get Changelog Entry
         id: changelog_reader
         uses: mindsers/changelog-reader-action@v2
         with:
-          validation_depth: 10
           version: ${{ env.GITHUB_REF_SLUG }}
           path: ./CHANGELOG.md
 
@@ -169,10 +184,10 @@ jobs:
         with:
           allowUpdates: true
           artifactErrorsFailBuild: true
-          artifact: "/release/binaries.zip"
+          artifacts: "/release/binaries.zip"
           body: ${{ steps.changelog_reader.outputs.changes }}
           name: ${{ env.GITHUB_REF_SLUG }}
-          replaceArtifacts: true
+          replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup Binaries

@@ -73,8 +73,6 @@ namespace Squidex.Web
 
         protected ApiController(ICommandBus commandBus)
         {
-            Guard.NotNull(commandBus, nameof(commandBus));
-
             CommandBus = commandBus;
 
             resources = new Lazy<Resources>(() => new Resources(this));

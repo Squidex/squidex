@@ -28,10 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IGrainFactory grainFactory)
         {
-            Guard.NotNull(apiUsageTracker, nameof(apiUsageTracker));
-            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
             this.grainFactory = grainFactory;

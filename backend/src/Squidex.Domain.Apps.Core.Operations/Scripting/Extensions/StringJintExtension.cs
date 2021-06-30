@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.Html2Text(text);
+                return text.Html2Text();
             }
             catch
             {
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.Markdown2Text(text);
+                return text.Markdown2Text();
             }
             catch
             {

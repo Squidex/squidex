@@ -300,6 +300,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['calculatedDefaultValue'] = undefined;
         this.config['defaultValue'] = undefined;
         this.config['defaultValues'] = undefined;
+        this.config['format'] = undefined;
         this.config['maxValue'] = [undefined, ValidatorsEx.validDateTime()];
         this.config['minValue'] = [undefined, ValidatorsEx.validDateTime()];
     }
@@ -316,15 +317,13 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
 
     public visitReferences() {
         this.config['allowDuplicates'] = undefined;
-        this.config['maxItems'] = undefined;
-        this.config['minItems'] = undefined;
-        this.config['schemaIds'] = undefined;
         this.config['defaultValue'] = undefined;
         this.config['defaultValues'] = undefined;
-        this.config['mustBePublished'] = undefined;
-        this.config['defaultValues'] = undefined;
-        this.config['defaultValues'] = undefined;
-        this.config['defaultValues'] = undefined;
+        this.config['maxItems'] = undefined;
+        this.config['minItems'] = undefined;
+        this.config['mustBePublished'] = false;
+        this.config['resolveReference'] = false;
+        this.config['schemaIds'] = undefined;
     }
 
     public visitString() {

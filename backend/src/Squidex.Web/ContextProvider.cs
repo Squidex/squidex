@@ -8,7 +8,6 @@
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Infrastructure;
 
 namespace Squidex.Web
 {
@@ -37,8 +36,6 @@ namespace Squidex.Web
 
         public ContextProvider(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-
             this.httpContextAccessor = httpContextAccessor;
         }
     }

@@ -152,9 +152,12 @@ export class SchemaDto {
         };
 
         const result: any = {
+            previewUrls: this.previewUrls,
             properties: cleanup(this.properties),
             category: this.category,
             scripts: this.scripts,
+            isPublished: this.isPublished,
+            fieldRules: this.fieldRules,
             fieldsInLists: this.fieldsInLists,
             fieldsInReferences: this.fieldsInReferences,
             fields: this.fields.map(field => {

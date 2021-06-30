@@ -46,6 +46,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
 
         /// <summary>
+        /// The optional field Rules.
+        /// </summary>
+        public List<FieldRuleDto>? FieldRules { get; set; }
+
+        /// <summary>
         /// The category.
         /// </summary>
         public string? Category { get; set; }
@@ -111,6 +116,18 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 }
 
                 command.Fields = fields.ToArray();
+            }
+
+            if (dto.FieldRules?.Count > 0)
+            {
+                var fieldRuleCommands = new List<FieldRuleCommand>();
+
+                foreach (var fieldRule in dto.FieldRules)
+                {
+                    fieldRuleCommands.Add(fieldRule.ToCommand());
+                }
+
+                command.FieldRules = fieldRuleCommands.ToArray();
             }
 
             return command;

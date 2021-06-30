@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -29,10 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-            Guard.NotNull(appImageStore, nameof(appImageStore));
-            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
-
             this.appImageStore = appImageStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.contextProvider = contextProvider;

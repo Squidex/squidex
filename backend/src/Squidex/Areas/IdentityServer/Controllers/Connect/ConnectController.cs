@@ -184,19 +184,11 @@ namespace Notifo.Areas.Account.Controllers
 
             var principal = new ClaimsPrincipal(identity);
 
-            var clientId = request.ClientId;
-            var clientName = await applicationManager.GetDisplayNameAsync(application);
-
-            if (clientId != null)
+            if (request.ClientId != null)
             {
-                identity.AddClaim(Claims.Subject, clientId,
-                    Destinations.AccessToken, Destinations.IdentityToken);
-            }
-
-            if (clientName != null)
-            {
-                identity.AddClaim(Claims.Name, clientName,
-                    Destinations.AccessToken, Destinations.IdentityToken);
+                identity.AddClaim(Claims.Subject, request.ClientId,
+                    Destinations.AccessToken,
+                    Destinations.IdentityToken);
             }
 
             var properties = await applicationManager.GetPropertiesAsync(application);
@@ -228,7 +220,7 @@ namespace Notifo.Areas.Account.Controllers
         {
             switch (claim.Type)
             {
-                case SquidexClaimTypes.DisplayName when principal.HasScope(Scopes.Profile):
+                case SquidexClaimTypes.DisplayName:
                     yield return Destinations.IdentityToken;
                     yield break;
 
@@ -273,13 +265,6 @@ namespace Notifo.Areas.Account.Controllers
                         yield return Destinations.IdentityToken;
                     }
 
-                    yield break;
-
-                case "AspNet.Identity.SecurityStamp":
-                    yield break;
-
-                default:
-                    yield return Destinations.AccessToken;
                     yield break;
             }
         }

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -33,9 +34,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly QueryReferrers queryReferrers;
         private readonly QueryScheduled queryScheduled;
         private readonly string name;
-        private readonly bool useWildcardIndex;
+        private readonly ReadPreference readPreference;
 
-        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, bool useWildcardIndex)
+        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, ReadPreference readPreference)
             : base(database)
         {
             this.name = name;
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             queryReferrers = new QueryReferrers();
             queryScheduled = new QueryScheduled();
 
-            this.useWildcardIndex = useWildcardIndex;
+            this.readPreference = readPreference;
         }
 
         public IMongoCollection<MongoContentEntity> GetInternalCollection()
@@ -61,26 +62,34 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return name;
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection,
+        protected override MongoCollectionSettings CollectionSettings()
+        {
+            return new MongoCollectionSettings
+            {
+                ReadPreference = readPreference
+            };
+        }
+
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection,
             CancellationToken ct)
         {
-            if (useWildcardIndex)
+            var operations = new OperationBase[]
             {
-                await collection.Indexes.CreateOneAsync(
-                    new CreateIndexModel<MongoContentEntity>(
-                        Index.Wildcard()
-                    ), null, ct);
+                queryAsStream,
+                queryBdId,
+                queryByIds,
+                queryByQuery,
+                queryReferences,
+                queryReferrers,
+                queryScheduled
+            };
+
+            foreach (var operation in operations)
+            {
+                operation.Setup(collection);
             }
 
-            var skipIndex = useWildcardIndex;
-
-            await queryAsStream.PrepareAsync(collection, skipIndex, ct);
-            await queryBdId.PrepareAsync(collection, skipIndex, ct);
-            await queryByIds.PrepareAsync(collection, skipIndex, ct);
-            await queryByQuery.PrepareAsync(collection, skipIndex, ct);
-            await queryReferences.PrepareAsync(collection, skipIndex, ct);
-            await queryReferrers.PrepareAsync(collection, skipIndex, ct);
-            await queryScheduled.PrepareAsync(collection, skipIndex, ct);
+            return collection.Indexes.CreateManyAsync(operations.SelectMany(x => x.CreateIndexes()), ct);
         }
 
         public Task ResetScheduledAsync(DomainId documentId,

@@ -28,10 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter)
         {
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-
             this.assetFileStore = assetFileStore;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
@@ -62,13 +58,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             try
             {
-                await assetFileStore.GetFileSizeAsync(appId.Id, id, fileVersion, ct);
+                await assetFileStore.GetFileSizeAsync(appId.Id, id, fileVersion, null, ct);
             }
             catch (AssetNotFoundException)
             {
                 DummyStream.Position = 0;
 
-                await assetFileStore.UploadAsync(appId.Id, id, fileVersion, DummyStream, ct);
+                await assetFileStore.UploadAsync(appId.Id, id, fileVersion, null, DummyStream, ct: ct);
             }
         }
     }

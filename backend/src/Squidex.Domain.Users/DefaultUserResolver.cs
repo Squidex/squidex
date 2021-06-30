@@ -24,8 +24,6 @@ namespace Squidex.Domain.Users
 
         public DefaultUserResolver(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 

@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     .ToArray()
             };
 
-            return result;
+            return result.CreateLinks(resources);
         }
 
         private ClientsDto CreateLinks(Resources resources)

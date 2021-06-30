@@ -73,14 +73,22 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     }
 
     public changeLanguage(code: string) {
-        Cookies.remove('.AspNetCore.Culture');
-        Cookies.set('.AspNetCore.Culture', `c=${code}|uic=${code}`, 365);
+        Cookies.replace('.AspNetCore.Culture', `c=${code}|uic=${code}`, 365);
 
         // eslint-disable-next-line no-restricted-globals
         location.reload();
     }
 
-    public toggle() {
+    public toggleProfile() {
+        this.modalMenu.toggle();
+
+        this.next(s => ({
+            ...s,
+            showSubmenu: false,
+        }));
+    }
+
+    public toggleSubmenu() {
         this.next(s => ({
             ...s,
             showSubmenu: !s.showSubmenu,

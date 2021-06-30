@@ -57,8 +57,6 @@ namespace Squidex.Domain.Apps.Core.Templates
 
         public FluidTemplateEngine(IEnumerable<IFluidExtension> extensions)
         {
-            Guard.NotNull(extensions, nameof(extensions));
-
             this.extensions = extensions;
 
             SquidexTemplate.Setup(extensions);

@@ -53,7 +53,7 @@ module.exports = function calculateConfig(env) {
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 
     // eslint-disable-next-line no-console
-    console.log(`Use ${configFile}`);
+    console.log(`Use ${configFile}, Production: ${isProduction}`);
 
     const config = {
         mode: isProduction ? 'production' : 'development',
@@ -268,9 +268,9 @@ module.exports = function calculateConfig(env) {
                     { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
                     { from: './node_modules/ace-builds/src-min/ext-language_tools.js', to: 'dependencies/ace/ext/language_tools.js' },
                     { from: './node_modules/ace-builds/src-min/ext-modelist.js', to: 'dependencies/ace/ext/modelist.js' },
-                    { from: './node_modules/ace-builds/src-min/mode-*.js', to: 'dependencies/ace/[name].[ext]' },
+                    { from: './node_modules/ace-builds/src-min/mode-*.js', to: 'dependencies/ace/[name][ext]' },
                     { from: './node_modules/ace-builds/src-min/snippets', to: 'dependencies/ace/snippets' },
-                    { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace/[name].[ext]' },
+                    { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace/[name][ext]' },
 
                     { from: './node_modules/video.js/dist/video.min.js', to: 'dependencies/videojs' },
                     { from: './node_modules/video.js/dist/video-js.min.css', to: 'dependencies/videojs' },

@@ -495,7 +495,7 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
     constructor(globals: FormGlobals, path: string, field: TField, isOptional: boolean,
         private readonly partition: string,
     ) {
-        super(globals, path, field, ObjectForm.buildControl(field, isOptional, true), isOptional);
+        super(globals, path, field, ObjectForm.buildControl(field, isOptional, false), isOptional);
     }
 
     public get(field: string | { name: string }): FieldItemForm | undefined {

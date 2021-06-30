@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Log;
 using Squidex.Shared.Users;
@@ -35,10 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver, ISemanticLog log)
         {
-            Guard.NotNull(emailSender, nameof(emailSender));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(log, nameof(log));
-
             this.emailSender = emailSender;
             this.userResolver = userResolver;
 

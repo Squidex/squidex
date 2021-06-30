@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -43,11 +42,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             TypeNameRegistry typeNameRegistry,
             ISemanticLog log)
         {
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(assetFolderRepository, nameof(assetFolderRepository));
-            Guard.NotNull(log, nameof(log));
-
             this.commandBus = commandBus;
             this.assetRepository = assetRepository;
             this.assetFolderRepository = assetFolderRepository;
