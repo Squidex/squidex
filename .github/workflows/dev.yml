@@ -47,7 +47,7 @@ jobs:
           push: false
           load: true
           tags: squidex-tmp
-          build-args: "SQUIDEX__VERSION=4.0.0-dev-${{ env.BUILD_NUMBER }}"
+          build-args: "SQUIDEX__VERSION=5.0.0-dev-${{ env.BUILD_NUMBER }}"
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
