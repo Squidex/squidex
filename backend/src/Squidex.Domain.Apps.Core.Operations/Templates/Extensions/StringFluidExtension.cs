@@ -39,12 +39,12 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         private static readonly FilterDelegate Markdown2Text = (input, arguments, context) =>
         {
-            return FluidValue.Create(TextHelpers.Markdown2Text(input.ToStringValue()));
+            return FluidValue.Create(input.ToStringValue().Markdown2Text());
         };
 
         private static readonly FilterDelegate Html2Text = (input, arguments, context) =>
         {
-            return FluidValue.Create(TextHelpers.Html2Text(input.ToStringValue()));
+            return FluidValue.Create(input.ToStringValue().Html2Text());
         };
 
         private static readonly FilterDelegate Trim = (input, arguments, context) =>

@@ -117,11 +117,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     command.Tags.Add("image/small");
                 }
             }
-
-            if (command.File.MimeType == "image/svg+xml")
-            {
-                command.Tags.Add("image");
-            }
         }
 
         public IEnumerable<string> Format(IAssetEntity asset)
