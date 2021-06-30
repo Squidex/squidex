@@ -764,6 +764,8 @@
   "schemas.fieldTypes.components.description": "将其他Schemas作为数组嵌入到此内容中。",
   "schemas.fieldTypes.dateTime.defaultMode": "默认模式",
   "schemas.fieldTypes.dateTime.description": "活动日期，开放时间。",
+  "schemas.fieldTypes.dateTime.format": "Pattern",
+  "schemas.fieldTypes.dateTime.formatHint": "The pattern when shown in the UI, see: https://date-fns.org/v2.22.1/docs/format",
   "schemas.fieldTypes.dateTime.rangeMax": "最大值",
   "schemas.fieldTypes.dateTime.rangeMin": "最小值",
   "schemas.fieldTypes.geolocation.description": "坐标：纬度和经度。",

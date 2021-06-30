@@ -10,7 +10,9 @@
                 </button>
             </div>
             <div class="input-group">
-                <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}" [class.form-date-only]="!isDateTimeMode" [class.form-date-time-only]="isDateTimeMode && shouldShowDateTimeModeButton" 
+                <input type="text" class="form-control form-date" [formControl]="dateControl" placeholder="{{ 'common.date' | sqxTranslate }}" 
+                    [class.form-date-only]="!isDateTimeMode" 
+                    [class.form-date-time-only]="!isCompact && isDateTimeMode && shouldShowDateTimeModeButton" 
                     (blur)="callTouched()" maxlength="10" #dateInput>
 
                 <input type="text" class="form-control form-time" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" (blur)="callTouched()" *ngIf="isDateTimeMode">

@@ -300,6 +300,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['calculatedDefaultValue'] = undefined;
         this.config['defaultValue'] = undefined;
         this.config['defaultValues'] = undefined;
+        this.config['format'] = undefined;
         this.config['maxValue'] = [undefined, ValidatorsEx.validDateTime()];
         this.config['minValue'] = [undefined, ValidatorsEx.validDateTime()];
     }
