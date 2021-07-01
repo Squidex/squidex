@@ -21,6 +21,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             schemaId = schemaInfo.Schema.Id;
 
+            IsTypeOf = CheckType;
+        }
+
+        private bool CheckType(object value)
+        {
+            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
+        }
+
+        public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> allSchemas)
+        {
+
             Name = schemaInfo.ContentType;
 
             AddField(ContentFields.Id);
@@ -33,20 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(ContentFields.LastModifiedByUser);
             AddField(ContentFields.Status);
             AddField(ContentFields.StatusColor);
-            AddResolvedInterface(builder.SharedTypes.ContentInterface);
 
-            Description = $"The structure of a {schemaInfo.DisplayName} content type.";
-
-            IsTypeOf = CheckType;
-        }
-
-        private bool CheckType(object value)
-        {
-            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
-        }
-
-        public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> allSchemas)
-        {
             AddField(new FieldType
             {
                 Name = "url",
@@ -85,6 +83,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 AddReferencingQueries(builder, other);
             }
+            AddResolvedInterface(builder.SharedTypes.ContentInterface);
+
+            Description = $"The structure of a {schemaInfo.DisplayName} content type.";
         }
 
         private void AddReferencingQueries(Builder builder, SchemaInfo referencingSchemaInfo)

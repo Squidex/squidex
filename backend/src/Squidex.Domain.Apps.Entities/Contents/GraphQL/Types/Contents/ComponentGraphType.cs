@@ -21,14 +21,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             Description = $"The structure of the {schemaInfo.DisplayName} component schema.";
 
-            AddField(ContentFields.SchemaId);
-            AddResolvedInterface(builder.SharedTypes.ComponentInterface);
-
             IsTypeOf = CheckType(schemaInfo.Schema.Id.ToString());
         }
 
         public void Initialize(Builder builder, SchemaInfo schemaInfo)
         {
+            AddField(ContentFields.SchemaId);
+
             foreach (var fieldInfo in schemaInfo.Fields)
             {
                 if (fieldInfo.Field.IsComponentLike())
@@ -57,6 +56,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     }).WithSourceName(fieldInfo);
                 }
             }
+
+            AddResolvedInterface(builder.SharedTypes.ComponentInterface);
         }
 
         private static Func<object, bool> CheckType(string schemaId)
