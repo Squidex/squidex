@@ -65,6 +65,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 contentResultTypes[schemaInfo] = new ContentResultGraphType(contentType, schemaInfo);
             }
 
+            foreach (var schemaInfo in allSchemas)
+            {
+                var componentType = new ComponentGraphType(this, schemaInfo);
+
+                componentTypes[schemaInfo] = componentType;
+            }
+
             var newSchema = new GraphQLSchema
             {
                 Query = new AppQueriesGraphType(this, schemaInfos)
@@ -142,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 return null;
             }
 
-            return componentTypes.GetOrAdd(schema, x => new ComponentGraphType(this, schema));
+            return componentTypes.GetOrDefault(schema);
         }
 
         public IEnumerable<KeyValuePair<SchemaInfo, ContentGraphType>> GetAllContentTypes()
