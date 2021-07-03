@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IJsonSerializer JsonSerializer { get; }
 
+        public ResolvedComponents Components { get; }
+
         public DomainId ContentId { get; }
 
         public bool IsOptional { get; private set; }
@@ -28,11 +30,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             NamedId<DomainId> appId,
             NamedId<DomainId> schemaId,
             Schema schema,
+            ResolvedComponents components,
             DomainId contentId)
             : base(appId, schemaId, schema)
         {
             JsonSerializer = jsonSerializer;
 
+            Components = components;
             ContentId = contentId;
         }
 

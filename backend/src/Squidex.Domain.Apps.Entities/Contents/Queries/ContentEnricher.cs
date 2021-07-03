@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -20,18 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public sealed class ContentEnricher : IContentEnricher
     {
         private readonly IEnumerable<IContentEnricherStep> steps;
-        private readonly Lazy<IContentQueryService> contentQuery;
+        private readonly IAppProvider appProvider;
 
-        private IContentQueryService ContentQuery
-        {
-            get => contentQuery.Value;
-        }
-
-        public ContentEnricher(IEnumerable<IContentEnricherStep> steps, Lazy<IContentQueryService> contentQuery)
+        public ContentEnricher(IEnumerable<IContentEnricherStep> steps, IAppProvider appProvider)
         {
             this.steps = steps;
 
-            this.contentQuery = contentQuery;
+            this.appProvider = appProvider;
         }
 
         public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context,
@@ -84,11 +79,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                     if (context.App != null)
                     {
-                        var schemaCache = new Dictionary<DomainId, Task<ISchemaEntity>>();
+                        var schemaCache = new Dictionary<DomainId, Task<(ISchemaEntity, ResolvedComponents)>>();
 
-                        Task<ISchemaEntity> GetSchema(DomainId id)
+                        Task<(ISchemaEntity, ResolvedComponents)> GetSchema(DomainId id)
                         {
-                            return schemaCache.GetOrAdd(id, x => ContentQuery.GetSchemaOrThrowAsync(context, x.ToString()));
+                            return schemaCache.GetOrAdd(id, async x =>
+                            {
+                                var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false);
+
+                                if (schema == null)
+                                {
+                                    throw new DomainObjectNotFoundException(x.ToString());
+                                }
+
+                                var components = await appProvider.GetComponentsAsync(schema);
+
+                                return (schema, components);
+                            });
                         }
 
                         foreach (var step in steps)

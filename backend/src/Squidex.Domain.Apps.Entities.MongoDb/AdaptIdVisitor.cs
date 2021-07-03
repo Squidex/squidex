@@ -12,21 +12,15 @@ using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Entities.MongoDb
 {
     internal sealed class AdaptIdVisitor : TransformVisitor<ClrValue, AdaptIdVisitor.Args>
     {
         private static readonly AdaptIdVisitor Instance = new AdaptIdVisitor();
 
-        public readonly struct Args
-        {
-            public readonly DomainId AppId;
-
-            public Args(DomainId appId)
-            {
-                AppId = appId;
-            }
-        }
+        public sealed record Args(DomainId AppId);
 
         private AdaptIdVisitor()
         {

@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var schemaInfo in schemaInfos)
             {
-                var contentType = new ContentGraphType(this, schemaInfo);
+                var contentType = new ContentGraphType(schemaInfo);
 
                 contentTypes[schemaInfo] = contentType;
                 contentResultTypes[schemaInfo] = new ContentResultGraphType(contentType, schemaInfo);
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var schemaInfo in allSchemas)
             {
-                var componentType = new ComponentGraphType(this, schemaInfo);
+                var componentType = new ComponentGraphType(schemaInfo);
 
                 componentTypes[schemaInfo] = componentType;
             }

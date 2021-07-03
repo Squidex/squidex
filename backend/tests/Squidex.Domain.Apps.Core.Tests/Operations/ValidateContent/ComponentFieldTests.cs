@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public void Should_instantiate_field()
         {
-            var (_, sut) = Field(new ComponentFieldProperties());
+            var (_, sut, _) = Field(new ComponentFieldProperties());
 
             Assert.Equal("my-component", sut.Name);
         }
@@ -32,9 +32,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_component_is_null_and_valid()
         {
-            var (_, sut) = Field(new ComponentFieldProperties());
+            var (_, sut, components) = Field(new ComponentFieldProperties());
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(null, errors, components: components);
 
             Assert.Empty(errors);
         }
@@ -42,9 +42,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_component_is_valid()
         {
-            var (id, sut) = Field(new ComponentFieldProperties());
+            var (id, sut, components) = Field(new ComponentFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(id.ToString(), "component-field", 1), errors);
+            await sut.ValidateAsync(CreateValue(id.ToString(), "component-field", 1), errors, components: components);
 
             Assert.Empty(errors);
         }
@@ -52,9 +52,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_component_is_required()
         {
-            var (_, sut) = Field(new ComponentFieldProperties { IsRequired = true });
+            var (_, sut, components) = Field(new ComponentFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(null, errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
@@ -63,9 +63,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_component_value_is_required()
         {
-            var (id, sut) = Field(new ComponentFieldProperties { IsRequired = true }, true);
+            var (id, sut, components) = Field(new ComponentFieldProperties { IsRequired = true }, true);
 
-            await sut.ValidateAsync(CreateValue(id.ToString(), "component-field", null), errors);
+            await sut.ValidateAsync(CreateValue(id.ToString(), "component-field", null), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "component-field: Field is required." });
@@ -74,9 +74,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_is_not_valid()
         {
-            var (_, sut) = Field(new ComponentFieldProperties());
+            var (_, sut, components) = Field(new ComponentFieldProperties());
 
-            await sut.ValidateAsync(JsonValue.Create("Invalid"), errors);
+            await sut.ValidateAsync(JsonValue.Create("Invalid"), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid json object, expected object with 'schemaId' field." });
@@ -85,9 +85,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_no_discriminator()
         {
-            var (_, sut) = Field(new ComponentFieldProperties());
+            var (_, sut, components) = Field(new ComponentFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(null, "field", 1), errors);
+            await sut.ValidateAsync(CreateValue(null, "field", 1), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid component. No 'schemaId' field found." });
@@ -96,9 +96,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_invalid_discriminator()
         {
-            var (_, sut) = Field(new ComponentFieldProperties());
+            var (_, sut, components) = Field(new ComponentFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("invalid", "field", 1), errors);
+            await sut.ValidateAsync(CreateValue("invalid", "field", 1), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid component. Cannot find schema." });
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return obj;
         }
 
-        private static (DomainId, RootField<ComponentFieldProperties>) Field(ComponentFieldProperties properties, bool isRequired = false)
+        private static (DomainId, RootField<ComponentFieldProperties>, ResolvedComponents) Field(ComponentFieldProperties properties, bool isRequired = false)
         {
             var schema =
                 new Schema("my-component")
@@ -127,11 +127,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             var id = DomainId.NewGuid();
 
-            var field =
-                Fields.Component(1, "my-component", Partitioning.Invariant, properties)
-                    .SetResolvedSchema(id, schema);
+            var field = Fields.Component(1, "my-component", Partitioning.Invariant, properties);
 
-            return (id, field);
+            var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
+            {
+                [id] = schema
+            });
+
+            return (id, field, components);
         }
     }
 }

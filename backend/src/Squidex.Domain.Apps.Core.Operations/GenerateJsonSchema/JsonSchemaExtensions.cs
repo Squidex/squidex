@@ -14,7 +14,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class JsonSchemaExtensions
     {
-        public static JsonSchema BuildFlatJsonSchema(this Schema schema, SchemaResolver schemaResolver)
+        public static JsonSchema BuildFlatJsonSchema(this Schema schema, SchemaResolver schemaResolver,
+            ResolvedComponents components)
         {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
 
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             foreach (var field in schema.Fields.ForApi())
             {
-                var property = JsonTypeVisitor.BuildProperty(field);
+                var property = JsonTypeVisitor.BuildProperty(field, components);
 
                 if (property != null)
                 {
@@ -37,7 +38,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return jsonSchema;
         }
 
-        public static JsonSchema BuildDynamicJsonSchema(this Schema schema, SchemaResolver schemaResolver, bool withHidden = false)
+        public static JsonSchema BuildDynamicJsonSchema(this Schema schema, SchemaResolver schemaResolver,
+            ResolvedComponents components, bool withHidden = false)
         {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
 
@@ -45,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
-                var propertyItem = JsonTypeVisitor.BuildProperty(field, schemaResolver, withHidden);
+                var propertyItem = JsonTypeVisitor.BuildProperty(field, components, schemaResolver, withHidden);
 
                 if (propertyItem != null)
                 {
@@ -61,7 +63,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return jsonSchema;
         }
 
-        public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, bool withHidden = false)
+        public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver,
+            ResolvedComponents components, bool withHidden = false)
         {
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
@@ -75,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    var propertyItem = JsonTypeVisitor.BuildProperty(field, withHiddenFields: withHidden);
+                    var propertyItem = JsonTypeVisitor.BuildProperty(field, components, withHiddenFields: withHidden);
 
                     if (propertyItem != null)
                     {

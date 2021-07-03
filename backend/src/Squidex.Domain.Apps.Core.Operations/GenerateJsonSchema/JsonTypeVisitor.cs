@@ -15,6 +15,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public delegate JsonSchema SchemaResolver(string name, Func<JsonSchema> schema);
@@ -24,36 +26,15 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         private const int MaxDepth = 5;
         private static readonly JsonTypeVisitor Instance = new JsonTypeVisitor();
 
-        public readonly struct Args
-        {
-            public readonly SchemaResolver? SchemaResolver;
-
-            public readonly bool WithHiddenFields;
-
-            public readonly int Level;
-
-            public Args(SchemaResolver? schemaResolver, bool withHiddenFields, int level)
-            {
-                SchemaResolver = schemaResolver;
-
-                WithHiddenFields = withHiddenFields;
-
-                Level = level;
-            }
-
-            public Args Increment()
-            {
-                return new Args(SchemaResolver, WithHiddenFields, Level + 1);
-            }
-        }
+        public sealed record Args(ResolvedComponents Components, SchemaResolver? SchemaResolver, bool WithHiddenFields, int Level = 0);
 
         private JsonTypeVisitor()
         {
         }
 
-        public static JsonSchemaProperty? BuildProperty(IField field, SchemaResolver? schemaResolver = null, bool withHiddenFields = false)
+        public static JsonSchemaProperty? BuildProperty(IField field, ResolvedComponents components, SchemaResolver? schemaResolver = null, bool withHiddenFields = false)
         {
-            var args = new Args(schemaResolver, withHiddenFields, 0);
+            var args = new Args(components, schemaResolver, withHiddenFields, 0);
 
             return field.Accept(Instance, args);
         }
@@ -67,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             var itemSchema = SchemaBuilder.Object();
 
-            var nestedArgs = args.Increment();
+            var nestedArgs = args with { Level = args.Level + 1 };
 
             foreach (var nestedField in field.Fields.ForApi(args.WithHiddenFields))
             {
@@ -104,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             var property = SchemaBuilder.ObjectProperty();
 
-            BuildComponent(property, field, field.Properties.SchemaIds, args);
+            BuildComponent(property, field.Properties.SchemaIds, args);
 
             return property;
         }
@@ -118,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             var itemSchema = SchemaBuilder.Object();
 
-            BuildComponent(itemSchema, field, field.Properties.SchemaIds, args);
+            BuildComponent(itemSchema, field.Properties.SchemaIds, args);
 
             return SchemaBuilder.ArrayProperty(itemSchema);
         }
@@ -196,13 +177,13 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return null;
         }
 
-        private void BuildComponent(JsonSchema jsonSchema, IField field, ImmutableList<DomainId>? schemaIds, Args args)
+        private void BuildComponent(JsonSchema jsonSchema, ImmutableList<DomainId>? schemaIds, Args args)
         {
             jsonSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
 
             if (args.SchemaResolver != null)
             {
-                var schemas = schemaIds?.Select(x => field.GetResolvedSchema(x)).NotNull() ?? Enumerable.Empty<Schema>();
+                var schemas = schemaIds?.Select(x => args.Components.Get(x)).NotNull() ?? Enumerable.Empty<Schema>();
 
                 var discriminator = new OpenApiDiscriminator
                 {
@@ -215,7 +196,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                     var componentSchema = args.SchemaResolver(schemaName, () =>
                     {
-                        var nestedArgs = args.Increment();
+                        var nestedArgs = args with { Level = args.Level + 1 };
 
                         var componentSchema = SchemaBuilder.Object();
 

@@ -31,9 +31,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
-            ValidationAction action = ValidationAction.Upsert)
+            ValidationAction action = ValidationAction.Upsert,
+            ResolvedComponents? components = null,
+            DomainId? contentId = null)
         {
-            var context = CreateContext(schema, mode, updater, action);
+            var context = CreateContext(schema, mode, updater, action, components, contentId);
 
             return validator.ValidateAsync(value, context, CreateFormatter(errors));
         }
@@ -43,9 +45,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
             IValidatorsFactory? factory = null,
-            ValidationAction action = ValidationAction.Upsert)
+            ValidationAction action = ValidationAction.Upsert,
+            ResolvedComponents? components = null,
+            DomainId? contentId = null)
         {
-            var context = CreateContext(schema, mode, updater, action);
+            var context = CreateContext(schema, mode, updater, action, components, contentId);
 
             var validator = new ValidatorBuilder(factory, context).ValueValidator(field);
 
@@ -57,9 +61,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
             IValidatorsFactory? factory = null,
-            ValidationAction action = ValidationAction.Upsert)
+            ValidationAction action = ValidationAction.Upsert,
+            ResolvedComponents? components = null,
+            DomainId? contentId = null)
         {
-            var context = CreateContext(schema, mode, updater, action);
+            var context = CreateContext(schema, mode, updater, action, components, contentId);
 
             var validator = new ValidatorBuilder(factory, context).ContentValidator(partitionResolver);
 
@@ -76,9 +82,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
             IValidatorsFactory? factory = null,
-            ValidationAction action = ValidationAction.Upsert)
+            ValidationAction action = ValidationAction.Upsert,
+            ResolvedComponents? components = null,
+            DomainId? contentId = null)
         {
-            var context = CreateContext(schema, mode, updater, action);
+            var context = CreateContext(schema, mode, updater, action, components, contentId);
 
             var validator = new ValidatorBuilder(factory, context).ContentValidator(partitionResolver);
 
@@ -109,14 +117,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
-            ValidationAction action = ValidationAction.Upsert)
+            ValidationAction action = ValidationAction.Upsert,
+            ResolvedComponents? components = null,
+            DomainId? contentId = null)
         {
             var context = new ValidationContext(
                 TestUtils.DefaultSerializer,
                 AppId,
                 SchemaId,
                 schema ?? new Schema(SchemaId.Name),
-                DomainId.NewGuid());
+                components ?? ResolvedComponents.Empty,
+                contentId ?? DomainId.NewGuid());
 
             context = context.WithMode(mode).WithAction(action);
 

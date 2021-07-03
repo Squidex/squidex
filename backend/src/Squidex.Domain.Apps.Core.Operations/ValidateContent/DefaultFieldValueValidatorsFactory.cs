@@ -13,25 +13,15 @@ using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Text;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>, DefaultFieldValueValidatorsFactory.Args>
     {
         private static readonly DefaultFieldValueValidatorsFactory Instance = new DefaultFieldValueValidatorsFactory();
 
-        public readonly struct Args
-        {
-            public readonly ValidatorContext Context;
-
-            public readonly ValidatorFactory Factory;
-
-            public Args(ValidatorContext context, ValidatorFactory factory)
-            {
-                Context = context;
-
-                Factory = factory;
-            }
-        }
+        public sealed record Args(ValidatorContext Context, ValidatorFactory Factory);
 
         private DefaultFieldValueValidatorsFactory()
         {

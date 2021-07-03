@@ -11,25 +11,15 @@ using NJsonSchema;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.Queries.Json
 {
     public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, IJsonValue, JsonFilterVisitor.Args>
     {
         private static readonly JsonFilterVisitor Instance = new JsonFilterVisitor();
 
-        public struct Args
-        {
-            public readonly List<string> Errors;
-
-            public JsonSchema Schema;
-
-            public Args(JsonSchema schema, List<string> errors)
-            {
-                Schema = schema;
-
-                Errors = errors;
-            }
-        }
+        public sealed record Args(JsonSchema Schema, List<string> Errors);
 
         private JsonFilterVisitor()
         {

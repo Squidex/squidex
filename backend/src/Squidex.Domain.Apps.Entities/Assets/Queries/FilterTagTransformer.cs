@@ -11,25 +11,15 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     internal sealed class FilterTagTransformer : AsyncTransformVisitor<ClrValue, FilterTagTransformer.Args>
     {
         private static readonly FilterTagTransformer Instance = new FilterTagTransformer();
 
-        public readonly struct Args
-        {
-            public readonly DomainId AppId;
-
-            public readonly ITagService TagService;
-
-            public Args(DomainId appId, ITagService tagService)
-            {
-                AppId = appId;
-
-                TagService = tagService;
-            }
-        }
+        public sealed record Args(DomainId AppId, ITagService TagService);
 
         private FilterTagTransformer()
         {

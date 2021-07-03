@@ -12,25 +12,15 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.DefaultValues
 {
     public sealed class DefaultValueFactory : IFieldPropertiesVisitor<IJsonValue, DefaultValueFactory.Args>
     {
         private static readonly DefaultValueFactory Instance = new DefaultValueFactory();
 
-        public readonly struct Args
-        {
-            public readonly Instant Now;
-
-            public readonly string Partition;
-
-            public Args(Instant now, string partition)
-            {
-                Now = now;
-
-                Partition = partition;
-            }
-        }
+        public sealed record Args(Instant Now, string Partition);
 
         private DefaultValueFactory()
         {

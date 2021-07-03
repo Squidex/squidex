@@ -48,24 +48,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    var schema = await schemas(group.Key);
+                    var (schema, components) = await schemas(group.Key);
 
-                    AddReferenceIds(ids, schema, group);
+                    AddReferenceIds(ids, schema, components, group);
                 }
 
                 var references = await GetReferencesAsync(context, ids, ct);
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    var schema = await schemas(group.Key);
+                    var (schema, components) = await schemas(group.Key);
 
-                    await ResolveReferencesAsync(context, schema, group, references, schemas);
+                    await ResolveReferencesAsync(context, schema, components, group, references, schemas);
                 }
             }
         }
 
-        private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references,
-            ProvideSchema schemas)
+        private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, ResolvedComponents components,
+            IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references, ProvideSchema schemas)
         {
             var formatted = new Dictionary<IContentEntity, JsonObject>();
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                             foreach (var (partition, partitionValue) in fieldData)
                             {
                                 var referencedContents =
-                                    field.GetReferencedIds(partitionValue)
+                                    field.GetReferencedIds(partitionValue, components)
                                         .Select(x => references[x])
                                         .SelectMany(x => x)
                                         .ToList();
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                                 {
                                     var reference = referencedContents[0];
 
-                                    var referencedSchema = await schemas(reference.SchemaId.Id);
+                                    var (referencedSchema, _) = await schemas(reference.SchemaId.Id);
 
                                     requestCache.AddDependency(referencedSchema.UniqueId, referencedSchema.Version);
                                     requestCache.AddDependency(reference.UniqueId, reference.Version);
@@ -138,11 +138,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return value;
         }
 
-        private static void AddReferenceIds(HashSet<DomainId> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
+        private static void AddReferenceIds(HashSet<DomainId> ids, ISchemaEntity schema, ResolvedComponents components, IEnumerable<ContentEntity> contents)
         {
             foreach (var content in contents)
             {
-                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids);
+                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids, components);
             }
         }
 

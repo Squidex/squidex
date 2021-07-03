@@ -601,8 +601,6 @@ export class ComponentForm extends ObjectForm {
 
         if (schemaId) {
             this.selectSchema(schemaId);
-        } else if (this.properties.schemaIds?.length === 1) {
-            this.selectSchema(this.properties.schemaIds[0]);
         }
     }
 

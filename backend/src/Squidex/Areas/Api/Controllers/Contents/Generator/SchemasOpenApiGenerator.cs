@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using NSwag.Generation.Processors.Contexts;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Hosting;
@@ -25,24 +27,27 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasOpenApiGenerator
     {
+        private readonly IAppProvider appProvider;
         private readonly IUrlGenerator urlGenerator;
         private readonly OpenApiDocumentGeneratorSettings schemaSettings;
         private readonly OpenApiSchemaGenerator schemaGenerator;
         private readonly IRequestCache requestCache;
 
         public SchemasOpenApiGenerator(
+            IAppProvider appProvider,
             IUrlGenerator urlGenerator,
             OpenApiDocumentGeneratorSettings schemaSettings,
             OpenApiSchemaGenerator schemaGenerator,
             IRequestCache requestCache)
         {
+            this.appProvider = appProvider;
             this.urlGenerator = urlGenerator;
             this.schemaSettings = schemaSettings;
             this.schemaGenerator = schemaGenerator;
             this.requestCache = requestCache;
         }
 
-        public OpenApiDocument Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat = false)
+        public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat = false)
         {
             var document = CreateApiDocument(httpContext, app);
 
@@ -68,7 +73,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             foreach (var schema in validSchemas)
             {
-                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, flat));
+                var components = await appProvider.GetComponentsAsync(schema);
+
+                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, components, flat));
             }
 
             GenerateSharedOperations(builder.Shared());

@@ -162,7 +162,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             if (schema != null)
             {
-                entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef);
+                var components = await appProvider.GetComponentsAsync(schema);
+
+                entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef, components);
             }
             else
             {

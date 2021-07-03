@@ -10,6 +10,8 @@ using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Text;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 {
     internal sealed class EdmTypeVisitor : IFieldVisitor<IEdmTypeReference?, EdmTypeVisitor.Args>
@@ -18,32 +20,15 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
         private static readonly EdmComplexType JsonType = new EdmComplexType("Squidex", "Json", null, false, true);
         private static readonly EdmTypeVisitor Instance = new EdmTypeVisitor();
 
-        public readonly struct Args
-        {
-            public readonly EdmTypeFactory Factory;
-
-            public readonly int Level;
-
-            public Args(EdmTypeFactory factory, int level)
-            {
-                Factory = factory;
-
-                Level = level;
-            }
-
-            public Args Increment()
-            {
-                return new Args(Factory, Level + 1);
-            }
-        }
+        public sealed record Args(EdmTypeFactory Factory, ResolvedComponents Components, int Level = 0);
 
         private EdmTypeVisitor()
         {
         }
 
-        public static IEdmTypeReference? BuildType(IField field, EdmTypeFactory factory)
+        public static IEdmTypeReference? BuildType(IField field, EdmTypeFactory factory, ResolvedComponents components)
         {
-            var args = new Args(factory, 0);
+            var args = new Args(factory, components);
 
             return field.Accept(Instance, args);
         }
@@ -65,12 +50,12 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
         public IEdmTypeReference? Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            return CreateNestedType(field, field.GetSharedFields(field.Properties.SchemaIds, true), args);
+            return CreateNestedType(field, args.Components.GetSharedFields(field.Properties.SchemaIds, true), args);
         }
 
         public IEdmTypeReference? Visit(IField<ComponentsFieldProperties> field, Args args)
         {
-            return CreateNestedType(field, field.GetSharedFields(field.Properties.SchemaIds, true), args);
+            return CreateNestedType(field, args.Components.GetSharedFields(field.Properties.SchemaIds, true), args);
         }
 
         public IEdmTypeReference? Visit(IField<DateTimeFieldProperties> field, Args args)
@@ -139,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
             if (created)
             {
-                var nestedArgs = args.Increment();
+                var nestedArgs = args with { Level = args.Level + 1 };
 
                 foreach (var sharedField in nested)
                 {

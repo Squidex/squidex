@@ -15,17 +15,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
     {
-        public ComponentGraphType(Builder builder, SchemaInfo schemaInfo)
+        public ComponentGraphType(SchemaInfo schemaInfo)
         {
             Name = schemaInfo.ComponentType;
-
-            Description = $"The structure of the {schemaInfo.DisplayName} component schema.";
 
             IsTypeOf = CheckType(schemaInfo.Schema.Id.ToString());
         }
 
         public void Initialize(Builder builder, SchemaInfo schemaInfo)
         {
+            Description = $"The structure of the {schemaInfo.DisplayName} component schema.";
+
             AddField(ContentFields.SchemaId);
 
             foreach (var fieldInfo in schemaInfo.Fields)

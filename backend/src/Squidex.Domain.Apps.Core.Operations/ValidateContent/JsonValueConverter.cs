@@ -14,35 +14,27 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class JsonValueConverter : IFieldVisitor<(object? Result, JsonError? Error), JsonValueConverter.Args>
     {
         private static readonly JsonValueConverter Instance = new JsonValueConverter();
 
-        public readonly struct Args
-        {
-            public readonly IJsonValue Value;
-            public readonly IJsonSerializer JsonSerializer;
-
-            public Args(IJsonValue value, IJsonSerializer jsonSerializer)
-            {
-                Value = value;
-
-                JsonSerializer = jsonSerializer;
-            }
-        }
+        public sealed record Args(IJsonValue Value, IJsonSerializer JsonSerializer, ResolvedComponents Components);
 
         private JsonValueConverter()
         {
         }
 
-        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue value, IJsonSerializer jsonSerializer)
+        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue value, IJsonSerializer jsonSerializer,
+            ResolvedComponents components)
         {
             Guard.NotNull(field, nameof(field));
             Guard.NotNull(value, nameof(value));
 
-            var args = new Args(value, jsonSerializer);
+            var args = new Args(value, jsonSerializer, components);
 
             return field.Accept(Instance, args);
         }
@@ -59,12 +51,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            return ConvertToComponent(field, args.Value);
+            return ConvertToComponent(args.Value, args.Components);
         }
 
         public (object? Result, JsonError? Error) Visit(IField<ComponentsFieldProperties> field, Args args)
         {
-            return ConvertToComponentList(field, args.Value);
+            return ConvertToComponentList(args.Value, args.Components);
         }
 
         public (object? Result, JsonError? Error) Visit(IField<ReferencesFieldProperties> field, Args args)
@@ -199,7 +191,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
         }
 
-        private static (object? Result, JsonError? Error) ConvertToComponentList(IField<ComponentsFieldProperties> field, IJsonValue value)
+        private static (object? Result, JsonError? Error) ConvertToComponentList(IJsonValue value,
+            ResolvedComponents components)
         {
             if (value is JsonArray array)
             {
@@ -207,7 +200,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                 for (var i = 0; i < array.Count; i++)
                 {
-                    var (item, error) = ConvertToComponent(field, array[i]);
+                    var (item, error) = ConvertToComponent(array[i], components);
 
                     if (error != null)
                     {
@@ -250,7 +243,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfObjects")));
         }
 
-        private static (object? Result, JsonError? Error) ConvertToComponent(IField field, IJsonValue value)
+        private static (object? Result, JsonError? Error) ConvertToComponent(IJsonValue value,
+            ResolvedComponents components)
         {
             if (value is not JsonObject obj)
             {
@@ -262,7 +256,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return (null, new JsonError(T.Get("contents.invalidComponentNoType")));
             }
 
-            if (!field.TryGetResolvedSchema(type, out var schema))
+            var id = DomainId.Create(type.Value);
+
+            if (!components.TryGetValue(id, out var schema))
             {
                 return (null, new JsonError(T.Get("contents.invalidComponentUnknownSchema")));
             }

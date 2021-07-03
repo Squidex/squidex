@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddAssets(31, "nested"));
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
-            schemaProvider = x => Task.FromResult(schema);
+            schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
             sut = new ConvertData(urlGenerator, TestUtils.DefaultSerializer, assetRepository, contentRepository);
         }

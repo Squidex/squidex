@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             {
                 ct.ThrowIfCancellationRequested();
 
-                var schema = await schemas(group.Key);
+                var (schema, _) = await schemas(group.Key);
 
                 foreach (var content in group)
                 {

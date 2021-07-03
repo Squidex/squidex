@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -17,6 +18,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class ContentConversionTests
     {
         private readonly Schema schema;
+        private readonly ResolvedComponents components;
 
         public ContentConversionTests()
         {
@@ -30,8 +32,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddArray(6, "array", Partitioning.Invariant, a => a
                         .AddAssets(31, "nested"));
 
-            schema.FieldsById[1].SetResolvedSchema(DomainId.Empty, schema);
-            schema.FieldsById[2].SetResolvedSchema(DomainId.Empty, schema);
+            components = new ResolvedComponents(new Dictionary<DomainId, Schema>
+            {
+                [DomainId.Empty] = schema
+            });
         }
 
         [Fact]
@@ -113,9 +117,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                                                 JsonValue.Object()))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
+            var converter = new ValueConverter((data, field, parent) => field.Name != "assets1" ? null : data);
+
             var actual =
                 source.Convert(schema,
-                    FieldConverters.ForValues((data, field, parent) => field.Name != "assets1" ? null : data));
+                    FieldConverters.ForValues(components, converter));
 
             Assert.Equal(expected, actual);
         }

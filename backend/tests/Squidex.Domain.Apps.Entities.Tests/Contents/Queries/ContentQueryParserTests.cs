@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryParserTests
     {
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly ITextIndex textIndex = A.Fake<ITextIndex>();
         private readonly ISchemaEntity schema;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
-            sut = new ContentQueryParser(cache, TestUtils.DefaultSerializer, textIndex, options);
+            sut = new ContentQueryParser(appProvider, textIndex, options, cache, TestUtils.DefaultSerializer);
         }
 
         [Fact]
