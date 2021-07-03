@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public DomainId ContentId { get; init; }
 
+        public ResolvedComponents Components { get; init; }
+
         public Func<IContentEntity> ContentProvider { get; init; }
 
         public IContentEntity Content
@@ -69,10 +71,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 throw new DomainObjectNotFoundException(command.SchemaId.Id.ToString());
             }
 
+            var components = await appProvider.GetComponentsAsync(schema);
+
             return new OperationContext(services)
             {
                 App = app,
                 Actor = command.Actor,
+                Components = components,
                 ContentProvider = snapshot,
                 ContentId = command.ContentId,
                 Schema = schema,

@@ -18,7 +18,6 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 {
     public class JsonSchemaTests
     {
-        private const int MaxDepth = 5;
         private readonly Schema schema = TestUtils.MixedSchema();
 
         [Fact]
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver());
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }
@@ -36,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var schemaResolver = new SchemaResolver((name, action) => action());
 
-            var jsonSchema = schema.BuildDynamicJsonSchema(schemaResolver);
+            var jsonSchema = schema.BuildDynamicJsonSchema(schemaResolver, ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }
@@ -51,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
                 return action();
             });
 
-            var jsonSchema = schema.BuildFlatJsonSchema(schemaResolver);
+            var jsonSchema = schema.BuildFlatJsonSchema(schemaResolver, ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }

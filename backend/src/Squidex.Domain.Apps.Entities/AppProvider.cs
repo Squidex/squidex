@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Caching;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Rules;
@@ -17,7 +16,6 @@ using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities
@@ -109,8 +107,6 @@ namespace Squidex.Domain.Apps.Entities
 
             if (schema != null)
             {
-                await ResolveSchemaAsync(appId, schema.SchemaDef);
-
                 localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
             }
@@ -131,8 +127,6 @@ namespace Squidex.Domain.Apps.Entities
 
             if (schema != null)
             {
-                await ResolveSchemaAsync(appId, schema.SchemaDef);
-
                 localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
             }
@@ -163,11 +157,6 @@ namespace Squidex.Domain.Apps.Entities
                 localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
             }
 
-            foreach (var schema in schemas)
-            {
-                await ResolveSchemaAsync(appId, schema.SchemaDef);
-            }
-
             return schemas;
         }
 
@@ -186,59 +175,6 @@ namespace Squidex.Domain.Apps.Entities
             var rules = await GetRulesAsync(appId);
 
             return rules.Find(x => x.Id == id);
-        }
-
-        private async Task ResolveSchemaAsync(DomainId appId, Schema schema)
-        {
-            async Task ResolveWithIdsAsync(IField field, ImmutableList<DomainId>? schemaIds)
-            {
-                if (schemaIds != null)
-                {
-                    foreach (var schemaId in schemaIds)
-                    {
-                        if (!field.TryGetResolvedSchema(schemaId, out _))
-                        {
-                            var resolvedEntity = await GetSchemaAsync(appId, schemaId, true);
-
-                            if (resolvedEntity != null)
-                            {
-                                field.SetResolvedSchema(schemaId, resolvedEntity.SchemaDef);
-                            }
-                        }
-                    }
-                }
-            }
-
-            async Task ResolveArrayAsync(IArrayField arrayField)
-            {
-                foreach (var nestedField in arrayField.Fields)
-                {
-                    await ResolveAsync(nestedField);
-                }
-            }
-
-            async Task ResolveAsync(IField field)
-            {
-                switch (field)
-                {
-                    case IField<ComponentFieldProperties> component:
-                        await ResolveWithIdsAsync(field, component.Properties.SchemaIds);
-                        break;
-
-                    case IField<ComponentsFieldProperties> components:
-                        await ResolveWithIdsAsync(field, components.Properties.SchemaIds);
-                        break;
-
-                    case IArrayField arrayField:
-                        await ResolveArrayAsync(arrayField);
-                        break;
-                }
-            }
-
-            foreach (var field in schema.Fields)
-            {
-                await ResolveAsync(field);
-            }
         }
 
         private static string AppCacheKey(DomainId appId)

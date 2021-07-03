@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public void Should_instantiate_field()
         {
-            var (_, sut) = Field(new ComponentsFieldProperties());
+            var (_, sut, _) = Field(new ComponentsFieldProperties());
 
             Assert.Equal("my-components", sut.Name);
         }
@@ -32,9 +32,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_components_are_null_and_valid()
         {
-            var (_, sut) = Field(new ComponentsFieldProperties());
+            var (_, sut, components) = Field(new ComponentsFieldProperties());
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(null, errors, components: components);
 
             Assert.Empty(errors);
         }
@@ -42,9 +42,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_components_is_valid()
         {
-            var (id, sut) = Field(new ComponentsFieldProperties());
+            var (id, sut, components) = Field(new ComponentsFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(1, id.ToString(), "component-field", 1), errors);
+            await sut.ValidateAsync(CreateValue(1, id.ToString(), "component-field", 1), errors, components: components);
 
             Assert.Empty(errors);
         }
@@ -52,9 +52,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_number_of_components_is_equal_to_min_and_max_components()
         {
-            var (id, sut) = Field(new ComponentsFieldProperties { MinItems = 2, MaxItems = 2 });
+            var (id, sut, components) = Field(new ComponentsFieldProperties { MinItems = 2, MaxItems = 2 });
 
-            await sut.ValidateAsync(CreateValue(2, id.ToString(), "component-field", 1), errors);
+            await sut.ValidateAsync(CreateValue(2, id.ToString(), "component-field", 1), errors, components: components);
 
             Assert.Empty(errors);
         }
@@ -62,9 +62,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_components_are_required()
         {
-            var (_, sut) = Field(new ComponentsFieldProperties { IsRequired = true });
+            var (_, sut, components) = Field(new ComponentsFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(null, errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
@@ -73,9 +73,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_components_value_is_required()
         {
-            var (id, sut) = Field(new ComponentsFieldProperties { IsRequired = true }, true);
+            var (id, sut, components) = Field(new ComponentsFieldProperties { IsRequired = true }, true);
 
-            await sut.ValidateAsync(CreateValue(1, id.ToString(), "component-field", null), errors);
+            await sut.ValidateAsync(CreateValue(1, id.ToString(), "component-field", null), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[1].component-field: Field is required." });
@@ -84,9 +84,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_is_not_valid()
         {
-            var (_, sut) = Field(new ComponentsFieldProperties());
+            var (_, sut, components) = Field(new ComponentsFieldProperties());
 
-            await sut.ValidateAsync(JsonValue.Create("Invalid"), errors);
+            await sut.ValidateAsync(JsonValue.Create("Invalid"), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid json type, expected array of objects." });
@@ -95,9 +95,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_component_is_not_valid()
         {
-            var (_, sut) = Field(new ComponentsFieldProperties());
+            var (_, sut, components) = Field(new ComponentsFieldProperties());
 
-            await sut.ValidateAsync(JsonValue.Array(JsonValue.Create("Invalid")), errors);
+            await sut.ValidateAsync(JsonValue.Array(JsonValue.Create("Invalid")), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid json object, expected object with 'schemaId' field." });
@@ -106,9 +106,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_component_has_no_discriminator()
         {
-            var (_, sut) = Field(new ComponentsFieldProperties());
+            var (_, sut, components) = Field(new ComponentsFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(1, null, "field", 1), errors);
+            await sut.ValidateAsync(CreateValue(1, null, "field", 1), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid component. No 'schemaId' field found." });
@@ -117,9 +117,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_invalid_discriminator()
         {
-            var (_, sut) = Field(new ComponentsFieldProperties());
+            var (_, sut, components) = Field(new ComponentsFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(1, "invalid", "field", 1), errors);
+            await sut.ValidateAsync(CreateValue(1, "invalid", "field", 1), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid component. Cannot find schema." });
@@ -128,9 +128,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_not_enough_components()
         {
-            var (id, sut) = Field(new ComponentsFieldProperties { MinItems = 3 });
+            var (id, sut, components) = Field(new ComponentsFieldProperties { MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(2, id.ToString(), "component-field", 1), errors);
+            await sut.ValidateAsync(CreateValue(2, id.ToString(), "component-field", 1), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
@@ -139,9 +139,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_too_much_components()
         {
-            var (id, sut) = Field(new ComponentsFieldProperties { MaxItems = 1 });
+            var (id, sut, components) = Field(new ComponentsFieldProperties { MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(2, id.ToString(), "component-field", 1), errors);
+            await sut.ValidateAsync(CreateValue(2, id.ToString(), "component-field", 1), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must not have more than 1 item(s)." });
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return result;
         }
 
-        private static (DomainId, RootField<ComponentsFieldProperties>) Field(ComponentsFieldProperties properties, bool isRequired = false)
+        private static (DomainId, RootField<ComponentsFieldProperties>, ResolvedComponents) Field(ComponentsFieldProperties properties, bool isRequired = false)
         {
             var schema =
                 new Schema("my-component")
@@ -177,11 +177,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             var id = DomainId.NewGuid();
 
-            var field =
-                Fields.Components(1, "my-components", Partitioning.Invariant, properties)
-                    .SetResolvedSchema(id, schema);
+            var field = Fields.Components(1, "my-components", Partitioning.Invariant, properties);
 
-            return (id, field);
+            var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
+            {
+                [id] = schema
+            });
+
+            return (id, field, components);
         }
     }
 }

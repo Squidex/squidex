@@ -109,6 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     context.App.NamedId(),
                     context.Schema.NamedId(),
                     context.SchemaDef,
+                    context.Components,
                     context.ContentId)
                 .Optimized(optimize).AsPublishing(published);
 

@@ -42,11 +42,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (x == schemaId.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, schemaId, schemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, schemaId, schemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == schemaWithScriptId.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, schemaWithScriptId, schemaDefWithScript));
+                    return Task.FromResult((Mocks.Schema(appId, schemaWithScriptId, schemaDefWithScript), ResolvedComponents.Empty));
                 }
                 else
                 {

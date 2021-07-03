@@ -11,27 +11,15 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Queries;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQueryTransformer.Args>
     {
         public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
 
-        public readonly struct Args
-        {
-            public readonly ITextIndex TextIndex;
-
-            public readonly ISchemaEntity Schema;
-
-            public readonly Context Context;
-
-            public Args(Context context, ISchemaEntity schema, ITextIndex textIndex)
-            {
-                Context = context;
-                Schema = schema;
-                TextIndex = textIndex;
-            }
-        }
+        public sealed record Args(Context Context, ISchemaEntity Schema, ITextIndex TextIndex);
 
         private GeoQueryTransformer()
         {

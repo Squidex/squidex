@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             {
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    var schema = await schemas(group.Key);
+                    var (schema, _) = await schemas(group.Key);
 
                     var script = schema.SchemaDef.Scripts.Query;
 

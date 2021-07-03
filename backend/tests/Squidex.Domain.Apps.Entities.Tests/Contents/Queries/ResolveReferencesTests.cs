@@ -69,15 +69,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (x == schemaId.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, schemaId, schemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, schemaId, schemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == refSchemaId1.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, refSchemaId1, refSchemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, refSchemaId1, refSchemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == refSchemaId2.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, refSchemaId2, refSchemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, refSchemaId2, refSchemaDef), ResolvedComponents.Empty));
                 }
                 else
                 {

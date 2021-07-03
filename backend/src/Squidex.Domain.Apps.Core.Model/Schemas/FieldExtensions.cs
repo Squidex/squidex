@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return fields.Where(x => IsForApi(x, withHidden));
         }
 
-        public static IEnumerable<IRootField> GetSharedFields(this IField field, ImmutableList<DomainId>? schemaIds, bool withHidden)
+        public static IEnumerable<IRootField> GetSharedFields(this ResolvedComponents components, ImmutableList<DomainId>? schemaIds, bool withHidden)
         {
             if (schemaIds == null || schemaIds.Count == 0)
             {
@@ -35,37 +34,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             var allFields =
                 schemaIds
-                    .Select(x => field.GetResolvedSchema(x)).NotNull()
+                    .Select(x => components.Get(x)).NotNull()
                     .SelectMany(x => x.Fields.ForApi(withHidden))
                     .GroupBy(x => new { x.Name, Type = x.RawProperties.GetType() }).Where(x => x.Count() == 1)
                     .Select(x => x.First());
 
             return allFields;
-        }
-
-        public static T SetResolvedSchema<T>(this T metadataProvider, DomainId id, Schema schema) where T : IMetadataProvider
-        {
-            var key = $"ResolvedSchema_{id}";
-
-            metadataProvider.Metadata[key] = schema;
-
-            return metadataProvider;
-        }
-
-        public static Schema? GetResolvedSchema<T>(this T metadataProvider, object id) where T : IMetadataProvider
-        {
-            var key = $"ResolvedSchema_{id}";
-
-            return metadataProvider.GetMetadata<Schema>(key);
-        }
-
-        public static bool TryGetResolvedSchema<T>(this T metadataProvider, object id, [MaybeNullWhen(false)] out Schema schema) where T : IMetadataProvider
-        {
-            var key = $"ResolvedSchema_{id}";
-
-            schema = metadataProvider.GetMetadata<Schema>(key);
-
-            return schema != null;
         }
 
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField

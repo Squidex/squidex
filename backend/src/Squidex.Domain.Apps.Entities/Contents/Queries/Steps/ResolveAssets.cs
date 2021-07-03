@@ -46,23 +46,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    var schema = await schemas(group.Key);
+                    var (schema, components) = await schemas(group.Key);
 
-                    AddAssetIds(ids, schema, group);
+                    AddAssetIds(ids, schema, components, group);
                 }
 
                 var assets = await GetAssetsAsync(context, ids, ct);
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    var schema = await schemas(group.Key);
+                    var (schema, components) = await schemas(group.Key);
 
-                    ResolveAssetsUrls(schema, group, assets);
+                    ResolveAssetsUrls(schema, components, group, assets);
                 }
             }
         }
 
-        private void ResolveAssetsUrls(ISchemaEntity schema, IGrouping<DomainId, ContentEntity> contents, ILookup<DomainId, IEnrichedAssetEntity> assets)
+        private void ResolveAssetsUrls(ISchemaEntity schema, ResolvedComponents components,
+            IGrouping<DomainId, ContentEntity> contents, ILookup<DomainId, IEnrichedAssetEntity> assets)
         {
             foreach (var field in schema.SchemaDef.ResolvingAssets())
             {
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                         foreach (var (partitionKey, partitionValue) in fieldData)
                         {
                             var referencedAsset =
-                                field.GetReferencedIds(partitionValue)
+                                field.GetReferencedIds(partitionValue, components)
                                     .Select(x => assets[x])
                                     .SelectMany(x => x)
                                     .FirstOrDefault();
@@ -133,11 +134,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return assets.ToLookup(x => x.Id);
         }
 
-        private static void AddAssetIds(HashSet<DomainId> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
+        private static void AddAssetIds(HashSet<DomainId> ids, ISchemaEntity schema, ResolvedComponents components, IEnumerable<ContentEntity> contents)
         {
             foreach (var content in contents)
             {
-                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids, 1);
+                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids, components, 1);
             }
         }
 

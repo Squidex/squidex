@@ -12,24 +12,15 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class JsonValueValidator : IFieldVisitor<bool, JsonValueValidator.Args>
     {
         private static readonly JsonValueValidator Instance = new JsonValueValidator();
 
-        public readonly struct Args
-        {
-            public readonly IJsonValue Value;
-            public readonly IJsonSerializer JsonSerializer;
-
-            public Args(IJsonValue value, IJsonSerializer jsonSerializer)
-            {
-                Value = value;
-
-                JsonSerializer = jsonSerializer;
-            }
-        }
+        public sealed record Args(IJsonValue Value, IJsonSerializer JsonSerializer);
 
         private JsonValueValidator()
         {
