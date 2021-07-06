@@ -22,7 +22,7 @@ $drag-margin: -8px;
     .drop-indicator {
         @include absolute($drag-margin, $drag-margin, $drag-margin, $drag-margin);
         background: none;
-        border: 2px dashed $color-dark-black;
+        border: 2px dashed $color-black;
         display: none;
         pointer-events: none;
     }
@@ -37,10 +37,10 @@ $drag-margin: -8px;
 }
 
 .cdk-drag-preview {
-    background: $color-dark2-background !important;
+    background: $color-white !important;
 
     a {
-        color: $color-dark1-foreground !important;
+        color: $color-black !important;
     }
 }
 

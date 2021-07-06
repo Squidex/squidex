@@ -17,31 +17,31 @@
                         <span title="i18n:schemas.field.visibleMarker">{{field.displayName}}</span>
                     </ng-template>
 
-                    <span class="field-partitioning ml-2" *ngIf="field['isLocalizable']">{{ 'schemas.field.localizableMarker' | sqxTranslate }}</span>
+                    <span class="field-partitioning ms-2" *ngIf="field['isLocalizable']">{{ 'schemas.field.localizableMarker' | sqxTranslate }}</span>
                 </span>
             </div>
             <div class="col col-tags flex-nowrap">
-                <div class="float-right">
-                    <span class="ml-1 badge badge-pill badge-danger"  *ngIf="field.isLocked">
+                <div class="float-end">
+                    <span class="ms-1 badge rounded-pill badge-danger"  *ngIf="field.isLocked">
                         {{ 'schemas.field.lockedMarker' | sqxTranslate }}
                     </span>
 
-                    <span class="ml-1 badge badge-pill badge-success" *ngIf="!field.isDisabled">
+                    <span class="ms-1 badge rounded-pill badge-success" *ngIf="!field.isDisabled">
                         {{ 'schemas.field.enabledMarker' | sqxTranslate }}
                     </span>
 
-                    <span class="ml-1 badge badge-pill badge-danger"  *ngIf="field.isDisabled">
+                    <span class="ms-1 badge rounded-pill badge-danger"  *ngIf="field.isDisabled">
                         {{ 'schemas.field.disabledMarker' | sqxTranslate }}
                     </span>
                 </div>
             </div>
             <div class="col col-options flex-nowrap">
-                <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
+                <div class="float-end">
+                    <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" #buttonOptions>
+                    <button type="button" class="btn btn-text-secondary ms-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
 

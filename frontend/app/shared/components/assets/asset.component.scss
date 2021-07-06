@@ -10,21 +10,21 @@ $list-height: 2.25rem;
 
 @mixin overlay {
     @include absolute(0, 0, 0, 0);
-    color: $color-dark-foreground;
+    color: $color-white;
     display: flex;
     opacity: 0;
     transition: opacity .4s ease;
 
     &-background {
         @include absolute(0, 0, 0, 0);
-        background: $color-dark-black;
+        background: $color-black;
         opacity: .7;
     }
 }
 
 @mixin asset-type {
     @include text-smallest;
-    color: $color-dark-foreground;
+    color: $color-white;
     cursor: none;
     padding: .1rem .25rem;
     text-transform: uppercase;
@@ -90,7 +90,7 @@ $list-height: 2.25rem;
         @include absolute(1rem, auto, auto, 1rem);
         @include asset-type;
         @include border-radius(3px);
-        background: $color-dark-black;
+        background: $color-black;
         transition: opacity .4s ease;
     }
 
@@ -135,13 +135,13 @@ $list-height: 2.25rem;
         @include absolute(1rem, 1rem, auto, auto);
 
         a {
-            color: darken($color-dark-foreground, 10%);
+            color: darken($color-white, 10%);
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: normal;
 
             &:hover {
-                color: $color-dark-foreground;
+                color: $color-white;
             }
 
             &:focus,

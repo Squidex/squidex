@@ -1,6 +1,6 @@
 <div class="table-items-row table-items-row-expandable workflow"> 
     <div class="table-items-row-summary">        
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col col-name">
                 <span class="workflow-name">{{workflow.displayName}}</span>
             </div>
@@ -12,8 +12,8 @@
                 </sqx-tag-editor>
             </div>
             <div class="col-options">
-                <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()">
+                <div class="float-end">
+                    <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
 
@@ -44,12 +44,12 @@
                 </li>
             </ul>
 
-            <div class="float-right">
+            <div class="float-end">
                 <button type="reset" class="btn btn-text-secondary" (click)="toggleEditing()">
                     {{ 'common.cancel' | sqxTranslate }}
                 </button>
 
-                <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable" (click)="save()">
+                <button type="submit" class="btn btn-primary ms-1" *ngIf="isEditable" (click)="save()">
                     {{ 'common.save' | sqxTranslate }}
                 </button>
             </div>

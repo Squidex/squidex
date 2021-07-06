@@ -2,18 +2,18 @@
     <h5>{{ 'clients.add.title' | sqxTranslate }}</h5>
 
     <form [formGroup]="addClientForm.form" (ngSubmit)="addClient()">
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col">
                 <sqx-control-errors for="name"></sqx-control-errors>
 
                 <input type="text" class="form-control" formControlName="id" maxlength="40" placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}" autocomplete="off" sqxTransformInput="LowerCase">
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto ps-1">
                 <button type="submit" class="btn btn-success" [disabled]="addClientForm.hasNoId | async">
                     {{ 'clients.add' | sqxTranslate }}
                 </button>
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto ps-1">
                 <button type="reset" class="btn btn-text-secondary" (click)="cancel()">
                     {{ 'common.cancel' | sqxTranslate }}
                 </button>

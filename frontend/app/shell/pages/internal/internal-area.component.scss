@@ -1,5 +1,5 @@
 .navbar {
-    @include box-shadow-outer(0, 3px, 5px, .13);
+    @include box-shadow-outer(0, 2px, 3px, .13);
     padding-left: $size-sidebar-width + 2rem;
 }
 

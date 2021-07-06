@@ -47,10 +47,10 @@ $icon-size: 4.5rem;
             @include box-shadow-outer(0, 0, 10px, .5);
             background: $color-theme-blue;
             border-color: $color-theme-blue;
-            color: $color-dark-foreground;
+            color: $color-white;
 
             &:hover {
-                color: $color-dark-foreground;
+                color: $color-white;
             }
         }
 

@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-end">
             <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
 
-            <button type="button" class="btn btn-text-secondary mr-2" (click)="reload()" title="i18n:contributors.refreshTooltip">
+            <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:contributors.refreshTooltip">
                 <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
             </button>
 
@@ -44,7 +44,7 @@
                         </ng-container>
     
                         <ng-template #noContributors>
-                            <div class="table-items-row table-items-row-empty">
+                            <div class="table-items-row  table-items-row-summary table-items-row-empty">
                                 {{ 'contributors.empty' | sqxTranslate }}
                             </div>
                         </ng-template>

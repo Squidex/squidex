@@ -18,7 +18,7 @@ h3 {
     }
 
     &-header {
-        background: $color-table-footer;
+        background: $color-white;
         border: 0;
         margin: -.75rem -1.25rem;
         margin-bottom: 1rem;
@@ -26,7 +26,7 @@ h3 {
         position: relative;
 
         &::before {
-            @include caret-top($color-table-footer);
+            @include caret-top($color-white);
             @include absolute(-1.1rem, 1.8rem, auto, auto);
         }
 

@@ -5,14 +5,14 @@
                 <span class="role-name">{{role.name}}</span>
             </div>
             <div class="col text-decent">
-                {{ 'common.clients' | sqxTranslate }}: <span class="badge badge-light badge-pill" [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
+                {{ 'common.clients' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
             </div>
             <div class="col text-decent">
-                {{ 'common.users' | sqxTranslate }}: <span class="badge badge-light badge-pill" [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
+                {{ 'common.users' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
             </div>
             <div class="col-auto">
-                <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()">
+                <div class="float-end">
+                    <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
 
@@ -31,12 +31,12 @@
     <div class="table-items-row-details" *ngIf="isEditing">
         <form (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
-                <div class="float-right">
+                <div class="float-end">
                     <button type="reset" class="btn btn-text-secondary" (click)="toggleEditing()">
                         {{ 'common.cancel' | sqxTranslate }}
                     </button>
                     
-                    <button type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">
+                    <button type="submit" class="btn btn-primary ms-1" *ngIf="isEditable">
                         {{ 'common.save' | sqxTranslate }}
                     </button>
                 </div>
@@ -50,13 +50,13 @@
                 </sqx-form-hint>
 
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
-                    <div class="row no-gutters mb-1" *ngFor="let control of editForm.controls; let i = index">
+                    <div class="row g-0 mb-1" *ngFor="let control of editForm.controls; let i = index">
                         <div class="col">
                             <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
 
                             <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                         </div>
-                        <div class="col-auto pl-1" *ngIf="isEditable">
+                        <div class="col-auto ps-1" *ngIf="isEditable">
                             <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
                                 <i class="icon-bin2"></i>
                             </button>
@@ -78,13 +78,13 @@
                     </table>
                 </ng-template>
 
-                <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
+                <form class="form-group row g-0" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
                         <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput
                             placeholder="{{ 'roles.permissionsPlaceholder' | sqxTranslate }}">
                         </sqx-autocomplete>
                     </div>
-                    <div class="col-auto pl-1">
+                    <div class="col-auto ps-1">
                         <button type="submit" class="btn btn-success col-action">
                             <i class="icon-plus"></i>
                         </button>
@@ -99,13 +99,13 @@
                     </sqx-form-hint>
 
                     <div class="row rule-section">
-                        <div class="custom-control custom-checkbox col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
-                            <input class="custom-control-input" type="checkbox" id="{{role.name}}_{{property.key}}"
+                        <div class="form-check col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
+                            <input class="form-check-input" type="checkbox" id="{{role.name}}_{{property.key}}"
                                 [disabled]="!isEditable"
                                 [ngModel]="getProperty(property.key)"
                                 (ngModelChange)="setProperty(property.key, $event)"
                                 [ngModelOptions]="{ standalone: true }">
-                            <label class="custom-control-label" for="{{role.name}}_{{property.key}}">
+                            <label class="form-check-label" for="{{role.name}}_{{property.key}}">
                                 {{ property.name | sqxTranslate }}
                             </label>
                         </div>
@@ -116,13 +116,13 @@
 
                         <div class="row rule-section">
                             <div class="col-6">
-                                <div class="custom-control custom-checkbox" *ngFor="let schema of schemas | slice:0:halfSchemas; trackBy: trackBySchema">
-                                    <input class="custom-control-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
+                                <div class="form-check" *ngFor="let schema of schemas | slice:0:halfSchemas; trackBy: trackBySchema">
+                                    <input class="form-check-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
                                         [disabled]="!isEditable"
                                         [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                         (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
                                         [ngModelOptions]="{ standalone: true }">
-                                    <label class="custom-control-label" for="{{role.name}}_schema_{{schema.name}}">
+                                    <label class="form-check-label" for="{{role.name}}_schema_{{schema.name}}">
                                         <span class="truncate">
                                             {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
                                         </span>
@@ -131,13 +131,13 @@
                             </div>
 
                             <div class="col-6">
-                                <div class="custom-control custom-checkbox" *ngFor="let schema of schemas | slice:halfSchemas; trackBy: trackBySchema">
-                                    <input class="custom-control-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
+                                <div class="form-check" *ngFor="let schema of schemas | slice:halfSchemas; trackBy: trackBySchema">
+                                    <input class="form-check-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"
                                         [disabled]="!isEditable"
                                         [ngModel]="getProperty(propertiesList.HIDE_CONTENTS(schema.name))"
                                         (ngModelChange)="setProperty(propertiesList.HIDE_CONTENTS(schema.name), $event)"
                                         [ngModelOptions]="{ standalone: true }">
-                                    <label class="custom-control-label" for="{{role.name}}_schema_{{schema.name}}">
+                                    <label class="form-check-label" for="{{role.name}}_schema_{{schema.name}}">
                                         <span class="truncate">
                                             {{ 'roles.properties.hideContents' | sqxTranslate: { schema: schema.displayName } }}
                                         </span>

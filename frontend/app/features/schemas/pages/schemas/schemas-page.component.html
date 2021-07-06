@@ -2,11 +2,11 @@
 
 <sqx-layout layout="left" width="18rem" [white]="true" [padding]="true" [overflow]="true">    
     <ng-container menu>
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col-auto" *ngIf="schemasState.canCreate | async">
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
     
-                <button type="button" class="btn btn-success mr-2" (click)="createSchema()" title="i18n:schemas.createSchemaTooltip" titlePosition="top-left">
+                <button type="button" class="btn btn-success me-2" (click)="createSchema()" title="i18n:schemas.createSchemaTooltip" titlePosition="top-left">
                     <i class="icon-plus"></i>          
                 </button>
             </div>

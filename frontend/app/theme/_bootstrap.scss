@@ -1,19 +1,19 @@
 @import '_mixins';
 @import '_vars';
 
-// Import bootstrap files
 @import './../../node_modules/bootstrap/scss/mixins/_buttons';
 
-/* stylelint-disable no-descending-specificity */
+/* stylelint-disable */
 
 //
 // Bade colors
 //
 .badge {
-    @include text-small;
-    font-style: normal;
-    font-weight: normal;
-    padding: .25rem .6rem;
+    & {
+        font-size: .9rem;
+        font-weight: normal;
+        padding: .25rem .6rem;
+    }
 
     &-primary {
         background: $color-badge-primary-background;
@@ -46,49 +46,32 @@
     }
 }
 
-//
-// Alert overrides.
-//
-.alert-success,
-.alert-warning,
-.alert-info,
-.alert-danger {
-    border: 0;
-
-    .alert-link {
-        color: $color-dark-foreground !important;
-        font-size: inherit;
-        font-weight: normal;
-        text-decoration: underline;
+.input-group {
+    & {
+        // Fix drop shadow with custom border radius.
+        border: 0;
+        border-radius: $border-radius;
+        box-shadow: $color-input-shadow;
     }
 
-    .close {
-        font-size: 1.6rem;
-        font-weight: 400;
-        padding-top: .25rem;
-
-        &:hover,
-        &:focus {
-            color: inherit;
-        }
+    .form-control {
+        box-shadow: none;
     }
 }
 
-.alert-info {
-    background: $color-theme-blue;
-    border: 0;
+.alert {
+    .alert-link {
+        color: inherit;
+    }
 }
 
 .alert-hint {
-    @include text-small;
     background: lighten($color-theme-blue, 35%);
-    border: 1px solid $color-border;
-    border-radius: 0;
+    border: 1px solid $color-theme-blue;
+    border-radius: $border-radius;
     color: $color-text;
-
-    .alert-link {
-        color: $color-text !important;
-    }
+    font-size: 90%;
+    font-weight: normal;
 
     i {
         color: $color-theme-blue;
@@ -116,7 +99,9 @@ a {
     }
 
     &.force {
-        color: $color-theme-blue !important;
+        & {
+            color: $color-theme-blue !important;
+        }
 
         &:hover {
             color: inherit;
@@ -126,23 +111,22 @@ a {
     }
 }
 
-.nav-item {
-    max-width: 100%;
-}
-
 .navbar-nav {
     .nav-link {
         cursor: pointer;
     }
 
     .nav-icon {
-        line-height: 2rem;
-        margin-left: .5rem;
-        margin-right: 0;
-        position: relative;
-        vertical-align: middle;
+        & {
+            line-height: 2rem;
+            margin-left: .5rem;
+            margin-right: 0;
+            position: relative;
+            vertical-align: middle;
+        }
 
         .nav-link {
+            color: $color-text;
             padding-bottom: 0;
             padding-top: 0;
 
@@ -155,8 +139,9 @@ a {
 
         .badge {
             @include absolute(-.25rem, auto, auto, -.375rem);
-            @include text-smallest;
             background: $color-theme-error;
+            font-size: .75rem;
+            font-weight: normal;
             padding: .25rem .5rem;
         }
     }
@@ -167,34 +152,42 @@ a {
 //
 .dropdown-menu {
     // White dropdown menu without border and shadow.
-    @include box-shadow-outer(0, 3px, 16px, .2);
-    background: $panel-light-background;
-    border: 0;
-    z-index: 1200;
+    & {
+        z-index: 1200;
+    }
+
+    .dropdown-header {
+        font-size: 80%;
+        text-transform: uppercase;
+    }
+
+    .dropdown-divider {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
 
     a {
         // Special style for menu item to delete something.
         &.dropdown-item-delete {
-            color: $color-theme-error;
+            & {
+                color: $color-theme-error;
+            }
 
             &:hover {
-                color: $color-theme-error-dark;
+                background: $color-theme-error-dark;
+                // Make the color white on active.
+                color: $color-white;
             }
 
             &:active {
                 background: $color-theme-error-dark;
+                // Make the color white on active.
+                color: $color-white;
             }
 
             &:disabled,
             &.disabled {
                 color: lighten($color-theme-error, 20%);
-            }
-        }
-
-        &.dropdown-item {
-            // Make the color white on active.
-            &:active {
-                color: $color-dark-foreground;
             }
         }
     }
@@ -204,45 +197,25 @@ a {
 // Breadcrump
 //
 .breadcrumb {
-    border: 1px solid $color-border;
-
-    &-item {
-        i {
-            display: none;
-        }
-
-        &::before {
-            color: darken($color-border, 10%);
-        }
-
-        &.done {
-            color: $color-theme-green;
-
-            a {
-                color: $color-theme-green !important;
-            }
-
-            i {
-                display: inline-block;
-            }
-        }
-    }
-
     &.steps {
-        border: 1px solid $color-border;
-        border-radius: 2px;
-        padding: 0;
+        & {
+            border: 1px solid $color-border;
+            border-radius: $border-radius;
+            padding: 0;
+        }
 
         .breadcrumb-item {
-            background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
-            background-position-x: right;
-            background-repeat: no-repeat;
-            background-size: contain;
-            color: $color-text-decent;
-            padding: .75rem 2rem .75rem 1rem;
+            & {
+                background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
+                background-position-x: right;
+                background-repeat: no-repeat;
+                background-size: contain;
+                color: $color-text-decent;
+                padding: .75rem 2rem .75rem 1rem;
 
-            a {
-                color: $color-text-decent !important;
+                a {
+                    color: $color-text-decent !important;
+                }
             }
 
             &.active {
@@ -270,19 +243,27 @@ a {
             }
         }
     }
-}
 
-.dropdown-divider {
-    &:first-child {
-        display: none;
-    }
+    &-item {
+        i {
+            display: none;
+        }
 
-    &:last-child {
-        display: none;
-    }
+        &::before {
+            color: darken($color-border, 10%);
+        }
 
-    & + .dropdown-divider {
-        display: none;
+        &.done {
+            color: $color-theme-green;
+
+            a {
+                color: $color-theme-green !important;
+            }
+
+            i {
+                display: inline-block;
+            }
+        }
     }
 }
 
@@ -290,15 +271,16 @@ a {
 // Tab control navigation.
 //
 .nav-tabs2 {
-    @include absolute(auto, auto, 0, 1.25rem);
-
     & .nav-link {
-        border-bottom: .25rem solid transparent;
-        color: $color-text;
-        cursor: pointer;
-        margin: 0 1rem;
-        padding: 1rem 0;
-        text-align: center;
+        & {
+            border-bottom: 2px solid transparent;
+            color: $color-text;
+            cursor: pointer;
+            margin-left: 1rem;
+            margin-right: 1rem;
+            padding: 1rem 0;
+            text-align: center;
+        }
 
         &.active {
             font-weight: bold;
@@ -311,101 +293,78 @@ a {
     }
 }
 
-//
-// Corresponding icon colors for external login buttons.
-//
-.icon {
-    &-github {
-        color: $color-extern-github-icon;
-    }
-
-    &-google {
-        color: $color-extern-google-icon;
-    }
-
-    &-microsoft {
-        color: $color-extern-microsoft-icon;
-    }
-
-    &-twitter {
-        color: $color-extern-twitter-icon;
-    }
+.icon-sm {
+    font-size: 70%;
 }
 
-.icon-sm {
-    @include text-smallest;
+.icon-decent {
+    opacity: .5;
 }
 
 //
 // Button improvements
 //
 .btn {
+    &-outline-secondary {
+        color: $color-text;
+
+        &:hover {
+            color: $color-text;
+
+        }
+    }
+
     // Buttons for external logins.
     &-github {
         @include button-variant($color-extern-github, $color-extern-github);
-
-        &:hover,
-        &:focus {
-            .icon-github {
-                color: darken($color-extern-github-icon, 5%);
-            }
-        }
     }
 
     &-google {
         @include button-variant($color-extern-google, $color-extern-google);
-
-        &:hover,
-        &:focus {
-            .icon-google {
-                color: darken($color-extern-google-icon, 5%);
-            }
-        }
     }
 
     &-microsoft {
         @include button-variant($color-extern-microsoft, $color-extern-microsoft);
-
-        &:hover,
-        &:focus {
-            .icon-microsoft {
-                color: darken($color-extern-microsoft-icon, 5%);
-            }
-        }
     }
 
     &-twitter {
         @include button-variant($color-extern-twitter, $color-extern-twitter);
-        color: $color-dark-foreground;
+    }
 
-        &:hover,
-        &:focus {
-            .icon-twitter {
-                color: darken($color-extern-twitter-icon, 5%);
-            }
-        }
+    &-tooltip {
+        background-color: $color-input-shortcut;
+        border: 0;
+        border-radius: $border-radius;
+        display: inline-block;
+        margin-left: .25rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        text-transform: uppercase;
     }
 
     // Special radio button.
     &-radio {
-        @include border-radius;
-        background: transparent;
-        border: 1px solid $color-border;
-        color: $color-text-decent;
-        cursor: pointer;
-        font-size: 1.5rem;
-        font-weight: normal;
-        margin-right: .5rem;
-        text-align: center;
-        width: 4.5rem;
+        & {
+            @include border-radius;
+            background: transparent;
+            border: 1px solid $color-border;
+            color: $color-text-decent;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: normal;
+            margin-right: .5rem;
+            text-align: center;
+            width: 4.5rem;
+        }
 
         i {
             color: $color-border-dark;
         }
 
         .radio-label {
-            @include text-smallest;
             display: block;
+            font-size: .7rem;
+            font-weight: bold;
             line-height: 1.5rem;
             margin-left: -.5rem;
             margin-right: -.5rem;
@@ -416,9 +375,11 @@ a {
         }
 
         &.active {
-            background: none;
-            border-color: $color-theme-blue;
-            color: $color-theme-blue;
+            & {
+                background: none;
+                border-color: $color-theme-blue;
+                color: $color-theme-blue;
+            }
 
             i {
                 color: $color-theme-blue;
@@ -445,8 +406,10 @@ a {
     // Special button groups
     &-group {
         .btn-toggle {
-            background: $color-dark-foreground;
-            border: 1px solid $color-input;
+            & {
+                background: $color-white;
+                border: 1px solid $color-theme-secondary;
+            }
 
             &.btn-primary {
                 @include build-toggle-button($color-theme-blue, $color-badge-primary-background);
@@ -502,7 +465,7 @@ a {
         }
 
         &-secondary2 {
-            @include build-text-button($color-text-decent);
+            @include build-text-button($color-text);
         }
     }
 }
@@ -513,7 +476,9 @@ $icon-size: 4.5rem;
 // Type icons, for example for apps or schemas
 //
 .type {
-    margin-bottom: .5rem;
+    & {
+        margin-bottom: .5rem;
+    }
 
     &-title {
         font-weight: bold;
@@ -522,14 +487,16 @@ $icon-size: 4.5rem;
     }
 
     &-text {
-        @include text-small;
+        font-size: .9rem;
     }
 
     .btn-radio {
-        font-size: 1.75rem;
-        font-weight: normal;
-        height: $icon-size;
-        line-height: $icon-size;
+        & {
+            font-size: 1.75rem;
+            font-weight: normal;
+            height: $icon-size;
+            line-height: $icon-size;
+        }
 
         i {
             color: $color-theme-blue;
@@ -549,15 +516,31 @@ $icon-size: 4.5rem;
 // Restyle modal dialogs.
 //
 .modal {
+    &-header,
+    &-tabs,
+    &-footer {
+        flex-shrink: 0;
+    }
+
+    &-body {
+        overflow-y: auto;
+    }
+
+    &-header {
+        padding-bottom: 0;
+
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 2.25rem;
+        }
+    }
+
     &-content {
         @include box-shadow-outer(0, 8px, 16px, .3);
         border: 0;
-        border-radius: .4rem .35rem .35rem .4rem;
+        border-radius: $border-radius;
         max-height: 100%;
-    }
-
-    .btn-close {
-        color: $color-text-decent;
     }
 
     &-fh {
@@ -573,18 +556,28 @@ $icon-size: 4.5rem;
     }
 
     &-dialog {
-        @include absolute(0, 0, 0, 0);
-        z-index: 1100;
+        & {
+            @include absolute(0, 0, 0, 0);
+            z-index: 1100;
+        }
     }
 
     &-tabs {
-        background: $color-theme-secondary;
-        padding: .75rem 1.25rem;
-        position: relative;
+        background-color: $color-white;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        padding-bottom: 0;
+        padding-left: .75rem;
+        padding-top: 0;
     }
 
     &-footer {
-        padding: $modal-header-padding;
+        padding-bottom: 1.25rem;
+        padding-top: 1.25rem;
+
+        .clearfix {
+            width: 100%;
+        }
     }
 }
 
@@ -596,13 +589,9 @@ $icon-size: 4.5rem;
     border-top-width: 0;
 }
 
-//
+// 
 // Table Helpers
-//
-th {
-    font-weight: normal;
-}
-
+// 
 .table {
     // Use fixed width for columns.
     &-fixed {

@@ -2,8 +2,8 @@
 
 <sqx-layout layout="main" titleText="common.contents" titleIcon="contents">
     <ng-container menu>
-        <div class="row flex-nowrap no-gutters pl-1">
-            <div class="col-auto ml-8">
+        <div class="row flex-nowrap g-0 ps-1">
+            <div class="col-auto ms-8">
                 <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
 
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
@@ -12,7 +12,7 @@
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
-            <div class="col pl-1">
+            <div class="col ps-1">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     (queryChange)="search($event)"
                     [query]="contentsState.query | async"
@@ -23,10 +23,10 @@
                     [enableShortcut]="true">
                 </sqx-search-form>
             </div>
-            <div class="col-auto pl-1" *ngIf="languages.length > 1">
+            <div class="col-auto ps-1" *ngIf="languages.length > 1">
                 <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto ps-1">
                 <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
                     <i class="icon-plus"></i> {{ 'contents.create' | sqxTranslate }}
                 </button>
@@ -43,7 +43,7 @@
                     <div class="selection" *ngIf="selectionCount > 0">
                         {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
             
-                        <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of selectionStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
+                        <button type="button" class="btn btn-outline-secondary btn-status me-1" *ngFor="let status of selectionStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
                             <sqx-content-status layout="text"
                                 [status]="status"
                                 [statusColor]="selectionStatuses[status]">
@@ -80,12 +80,12 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input" type="checkbox" id="all_selected"
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="all_selected"
                                             [ngModel]="selectedAll" 
                                             (ngModelChange)="selectAll($event)">
 
-                                        <label class="custom-control-label" for="all_selected"></label>
+                                        <label class="form-check-label" for="all_selected"></label>
                                     </div>
                                 </th>
                                 <th class="cell-actions cell-actions-left">

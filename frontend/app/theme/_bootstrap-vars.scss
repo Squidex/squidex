@@ -1,7 +1,11 @@
 @import '_mixins.scss';
 @import '_vars.scss';
 
-$font-size-base:            .95rem;
+$enable-shadows:            false;
+$enable-rounded:            true;
+
+// Typography
+$font-size-base:            1rem; // .875rem;
 
 $h1-font-size:              $font-size-base * 1.4;
 $h2-font-size:              $font-size-base * 1.3;
@@ -12,52 +16,77 @@ $h6-font-size:              $font-size-base;
 
 $small-font-size:           90%;
 
+$text-muted:                $color-text-decent;
+
+// General colors, reduce ratio to enforce white buttons for all colors.
+$min-contrast-ratio:        1.5;
+
+// Danger color (red)
+$danger:                    $color-theme-error;
+// Pimary color (blue)
+$primary:                   $color-theme-blue;
+// Secondary color (gray)
+$secondary:                 $color-theme-secondary;
+// Success color (green)
+$success:                   $color-theme-green;
+// warning color (orange)
+$warning:                   $color-theme-orange;
+
 $body-bg:                   $color-background;
 
 $border-color:              $color-border;
 
-$danger:                    $color-theme-error;
-$primary:                   $color-theme-blue;
-$secondary:                 $color-theme-secondary;
-$success:                   $color-theme-green;
-$warning:                   $color-theme-orange;
+// Buttons
+$btn-border-width:          1px;
+$btn-white-space:           nowrap;
 
-$text-muted:                $color-text-decent;
+// Alerts
+$alert-bg-scale:            0%;
+$alert-color-scale:         0;
+$alert-link-font-weight:    normal;
 
-$alert-bg-level:            0;
-$alert-color-level:         -12.5;
-
+// Labels
 $label-margin-bottom:       .25rem;
 
+// Imputs
 $input-border-color:        $color-input;
+$input-box-shadow:          $color-input-shadow;
 $input-disabled-bg:         $color-input-disabled;
+$input-group-addon-bg:      $color-white;
 $input-placeholder-color:   $color-input-placeholder;
+
+// Select
+$form-select-box-shadow:    $color-input-shadow;
 
 $badge-bg-level: 2;
 
-$dropdown-border-color:     $color-border;
+// Dropdown
+$dropdown-border-color:     0;
+$dropdown-box-shadow:       0 3px 16px rgba(0, 0, 0, .2);
+$dropdown-divider-bg:       $color-border-dark;
+$dropdown-link-hover-bg:    $color-theme-blue-lightest;
 
+// Horizontal separator
+$hr-opacity:                1;
+
+// cards
 $card-border-color:         $color-border;
 $card-border-radius:        0;
-$card-cap-bg:               $panel-light-background;
+$card-cap-bg:               $color-white;
 
-// Breadcrump
-$breadcrumb-bg:             $color-white;
-$breadcrumb-divider:        quote(">");
-
+// Paragraphs
 $paragraph-margin-bottom:   .5rem;
 
-$modal-backdrop-opacity:    .5;
+// Modal
+$modal-footer-border-color: $color-border;
 $modal-footer-border-width: 1px;
-$modal-header-border-width: 1px;
-$modal-header-padding:      1rem 1.75rem;
+$modal-header-border-width: 0;
+$modal-header-padding-x:    1.75rem;
+$modal-header-padding-y:    .75rem;
 $modal-inner-padding:       1.75rem;
-$modal-md:                  560px;
-$modal-title-line-height:   1.8rem;
 
-$navbar-dark-color:         $color-dark-foreground;
+// Navbar
+$navbar-dark-color:         $color-white;
 
-$close-font-size:           1rem;
-$close-font-weight:         normal;
-$close-text-shadow:         none;
-$color-color:               $color-text-decent;
+// Close button
+$btn-close-width:           .5rem;

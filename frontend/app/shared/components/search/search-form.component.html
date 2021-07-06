@@ -56,7 +56,7 @@
                     </a>
                 </ng-template>
                 
-                <div class="btn-group ml-2">
+                <div class="btn-group ms-2">
                     <button type="button" class="btn btn-sm btn-secondary btn-toggle" [class.btn-primary]="!showQueries" [disabled]="!showQueries" (click)="changeView(false)">
                         {{ 'common.designer' | sqxTranslate }}
                     </button>
@@ -114,9 +114,9 @@
                     <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxFocusOnInit>
                 </div>
 
-                <div class="custom-control custom-checkbox">
-                    <input class="custom-control-input" type="checkbox" formControlName="user" id="user">
-                    <label class="custom-control-label" for="user">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" formControlName="user" id="user">
+                    <label class="form-check-label" for="user">
                         {{ 'search.saveQueryMyself' | sqxTranslate }}
                     </label>
                 </div>

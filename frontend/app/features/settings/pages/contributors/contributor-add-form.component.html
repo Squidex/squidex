@@ -2,7 +2,7 @@
     <h5>{{ 'contributors.add.title' | sqxTranslate }}</h5>
 
     <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col">
                 <sqx-autocomplete [source]="usersDataSource" formControlName="user" inputName="contributor" placeholder="{{ 'contributors.emailPlaceholder' | sqxTranslate }}" displayProperty="displayName">
                     <ng-template let-user="$implicit">
@@ -14,12 +14,12 @@
                     </ng-template>
                 </sqx-autocomplete>
             </div>
-            <div class="col-3 pl-1">
-                <select class="custom-select" formControlName="role">
+            <div class="col-3 ps-1">
+                <select class="form-select" formControlName="role">
                     <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
                 </select>
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto ps-1">
                 <button type="submit" class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async">
                     {{ 'contributors.add' | sqxTranslate }}
                 </button>

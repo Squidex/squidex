@@ -9,10 +9,10 @@
         <ng-container content>
             <span [innerHTML]="request.text | sqxTranslate | sqxMarkdown"></span>
 
-            <div class="custom-control custom-checkbox mt-4" *ngIf="request.canRemember">
-                <input class="custom-control-input" type="checkbox" id="remember" [(ngModel)]="request.remember">
+            <div class="form-check mt-4" *ngIf="request.canRemember">
+                <input class="form-check-input" type="checkbox" id="remember" [(ngModel)]="request.remember">
 
-                <label class="custom-control-label" for="remember">
+                <label class="form-check-label" for="remember">
                     {{ 'common.remember' | sqxTranslate}}
                 </label>
             </div>

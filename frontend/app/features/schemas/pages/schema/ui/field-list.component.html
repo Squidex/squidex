@@ -9,7 +9,7 @@
         <sqx-form-hint>{{emptyText}}</sqx-form-hint>
     </div>
 
-    <div *ngFor="let field of fieldsAdded" class="table-items-row" cdkDrag>
+    <div *ngFor="let field of fieldsAdded" class="table-items-row table-items-row-summary" cdkDrag>
         <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
     </div>
 </div>
@@ -22,7 +22,7 @@
     (cdkDropListDropped)="drop($event)">
     <label>{{ 'schemas.ui.unassignedFields' | sqxTranslate }}</label>
     
-    <div *ngFor="let field of fieldsNotAdded" class="table-items-row" cdkDrag>
+    <div *ngFor="let field of fieldsNotAdded" class="table-items-row table-items-row-summary" cdkDrag>
         <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
     </div>
 </div>

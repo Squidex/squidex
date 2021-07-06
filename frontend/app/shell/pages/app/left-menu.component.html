@@ -1,6 +1,6 @@
 <ul class="nav flex-column">
     <li class="nav-item">
-        <a class="nav-link" routerLink="./">
+        <a class="nav-link" routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <i class="nav-icon icon-dashboard"></i> <div class="nav-text">{{ 'common.dashboard' | sqxTranslate }}</div>
         </a>
     </li>

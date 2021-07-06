@@ -16,9 +16,11 @@ noscript {
 // Profile element
 //
 .profile {
-    margin: 0 auto;
-    max-width: 20rem;
-    padding: 1rem 2rem;
+    & {
+        margin: 0 auto;
+        max-width: 20rem;
+        padding: 1rem 2rem;
+    }
 
     // Lightweight, table like headline.
     &-headline {
@@ -40,7 +42,7 @@ noscript {
     }
 
     &-section {
-        margin-top: 3rem;
+        margin-top: 2rem;
     }
 
     &-section-sm {
@@ -64,7 +66,8 @@ noscript {
     }
 
     &-footer {
-        @include text-smallest;
+        font-size: .8rem;
+        font-weight: normal;
         margin-top: 2rem;
     }
 
@@ -72,13 +75,15 @@ noscript {
     // Separator element to split two sections.
     //
     &-separator {
-        border-bottom: 1px solid $color-border;
-        margin-bottom: 2.5rem;
-        margin-top: 1.5rem;
-        text-align: center;
+        & {
+            border-bottom: 1px solid $color-border;
+            margin-bottom: 2.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
 
         &-text {
-            background: $color-dark-foreground;
+            background: $color-white;
             border: 0;
             bottom: -.75rem;
             color: darken($color-border, 15%);
@@ -128,7 +133,9 @@ noscript {
     }
 
     p {
-        margin-bottom: .5rem;
+        & {
+            margin-bottom: .5rem;
+        }
 
         &:last-child {
             margin-bottom: 0;
@@ -156,9 +163,11 @@ noscript {
 // Loader element.
 //
 .loading {
-    margin-bottom: 20px;
-    margin-top: 200px;
-    text-align: center;
+    & {
+        margin-bottom: 20px;
+        margin-top: 200px;
+        text-align: center;
+    }
 
     div {
         font-size: 30px;

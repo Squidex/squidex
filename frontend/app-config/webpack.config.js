@@ -28,11 +28,11 @@ const plugins = {
     // https://www.npmjs.com/package/@ngtools/webpack
     NgToolsWebpack: require('@ngtools/webpack'),
     // https://github.com/NMFR/optimize-css-assets-webpack-plugin
-    OptimizeCSSAssetsPlugin: require("optimize-css-assets-webpack-plugin"),
-    // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('tslint-webpack-plugin'),
+    OptimizeCSSAssetsPlugin: require('optimize-css-assets-webpack-plugin'),
+    // https://webpack.js.org/plugins/eslint-webpack-plugin/
+    ESLintPlugin: require('eslint-webpack-plugin'),
     // https://github.com/webpack-contrib/stylelint-webpack-plugin
-    StylelintPlugin : require('stylelint-webpack-plugin'),
+    StylelintPlugin: require('stylelint-webpack-plugin'),
     // https://www.npmjs.com/package/webpack-bundle-analyzer
     BundleAnalyzerPlugin: require('webpack-bundle-analyzer').BundleAnalyzerPlugin,
     // https://www.npmjs.com/package/@angular-devkit/build-optimizer
@@ -234,7 +234,7 @@ module.exports = function calculateConfig(env) {
             }),
 
             new plugins.StylelintPlugin({
-                files: '**/*.scss'
+                files: '**/*.scss',
             }),
 
             /*

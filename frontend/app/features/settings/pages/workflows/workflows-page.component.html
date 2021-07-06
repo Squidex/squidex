@@ -26,7 +26,7 @@
 
             <ng-container>
                 <ng-container *ngIf="schemasSource && workflowsState.workflows | async; let workflows">
-                    <div class="table-items-row table-items-row-empty" *ngIf="workflows.length === 0">
+                    <div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="workflows.length === 0">
                         {{ 'workflows.empty' | sqxTranslate }}
                     </div>
 

@@ -5,16 +5,16 @@
         </ng-container>
     
         <ng-container content>
-            <div class="custom-control custom-radio">
-                <input class="custom-control-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately" name="dueTimeMode">
-                <label class="custom-control-label" for="immediately">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately" name="dueTimeMode">
+                <label class="form-check-label" for="immediately">
                     {{ 'contents.changeStatusToImmediately' | sqxTranslate: { action: dueTimeAction } }}
                 </label>
             </div>
     
-            <div class="custom-control custom-radio">
-                <input class="custom-control-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled" name="dueTimeMode">
-                <label class="custom-control-label" for="scheduled">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled" name="dueTimeMode">
+                <label class="form-check-label" for="scheduled">
                     {{ 'contents.changeStatusToLater' | sqxTranslate: { action: dueTimeAction } }}
                 </label>
             </div>

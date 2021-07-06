@@ -4,7 +4,7 @@
 
     .reference-menu {
         @include absolute(0, -.25rem, auto, auto);
-        background: $color-table-background;
+        background: $color-white;
         border: 0;
         border-left: 1px solid $color-border;
         padding-left: 1rem;

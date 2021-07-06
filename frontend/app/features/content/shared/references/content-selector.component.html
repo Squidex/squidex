@@ -2,7 +2,7 @@
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="custom-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+                <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
                     <option *ngFor="let schema of schemas" [ngValue]="schema">
                         {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
@@ -12,14 +12,14 @@
     </ng-container>
 
     <ng-container tabs>
-        <div class="row no-gutters">
+        <div class="row g-0">
             <ng-container *ngIf="schema">
                 <div class="col-auto">
                     <button type="button" class="btn btn-text-secondary" (click)="reload()">
                         <i class="icon-reset"></i>
                     </button>
                 </div>
-                <div class="col pl-1">
+                <div class="col ps-1">
                     <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}" 
                         [query]="contentsState.query | async"
                         [queryModel]="queryModel"
@@ -27,7 +27,7 @@
                     </sqx-search-form>
                 </div>
                     
-                <div class="col-auto pl-1" *ngIf="languages.length > 1">
+                <div class="col-auto ps-1" *ngIf="languages.length > 1">
                     <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
                 </div>
             </ng-container>
@@ -42,7 +42,7 @@
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <input type="checkbox" class="custom-control custom-checkbox" 
+                                    <input type="checkbox" class="form-check" 
                                         [ngModel]="selectedAll" 
                                         (ngModelChange)="selectAll($event)">
                                 </th>

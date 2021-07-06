@@ -1,18 +1,18 @@
 @import '_mixins';
 @import '_vars';
 
-/* stylelint-disable no-descending-specificity */
+/* stylelint-disable */
 
 //
 // Custom list that can either be used with a table or divs.
 //
 .table-items {
-    margin-bottom: -.25rem;
-
     th,
     td {
         // Unified padding for all table cells.
-        padding: .75rem;
+        & {
+            padding: .75rem;
+        }
 
         // Additional padding for the first column.
         &:first-child {
@@ -32,10 +32,13 @@
     thead {
         // Small font size for the table header, content is more important!
         th {
-            @include text-smallest;
             border: 0;
-            color: $color-table-header;
+            color: $color-text-decent;
+            font-size: .8rem;
+            font-weight: normal;
             padding-top: 0;
+            text-decoration: none;
+            text-transform: uppercase;
             vertical-align: middle;
 
             // Auto truncate all header elements.
@@ -57,10 +60,12 @@
 
         tr {
             // Each row is white and a has a border.
-            background: $color-table-background;
-            border: 1px solid $color-table-border;
-            border-bottom: 2px solid $color-table-border;
-            margin-bottom: .5rem;
+            & {
+                @include box-shadow-outer(0, 0, 2px, .1);
+                background: $color-white;
+                border: 1px solid $color-border;
+                border-radius: 2px;
+            }
 
             &:focus {
                 outline: none;
@@ -68,17 +73,7 @@
 
             // Blue background and white text when active.
             &.active {
-                background: $color-theme-blue;
                 border-color: $color-theme-blue;
-                color: $color-dark-foreground;
-
-                .btn-text {
-                    &,
-                    &:hover {
-                        // Enforce white color for links.
-                        color: $color-dark-foreground;
-                    }
-                }
             }
         }
     }
@@ -87,36 +82,53 @@
     // Use the list style with divs.
     //
     &-row {
-        background: $color-table-background;
-        border: 1px solid $color-border;
-        border-bottom-width: 2px;
-        border-top: 0;
-        margin-bottom: .25rem;
-        padding: .75rem 1.25rem;
+        & {
+            background: $color-white;
+            border: 1px solid $color-border;
+            border-bottom-width: 2px;
+            border-top: 0;
+            margin-bottom: .25rem;
+        }
 
         // Summary row for expandable rows.
         &-summary {
             line-height: 2.5rem;
+            list-style: none;
             padding: .75rem 1.25rem;
             position: relative;
-        }
-
-        &-expandable {
-            padding: 0;
         }
 
         &-empty {
             color: $color-text-decent;
         }
 
-        // Detail row for expandable rows.
-        &-details {
+        .btn-expand {
             position: relative;
 
-            // Caret that is placed next to the expand button.
-            &::before {
-                @include caret-top($color-theme-secondary);
-                @include absolute(-1.1rem, 0, auto, auto);
+            &.expanded {
+                background-color: $color-theme-blue-lightest;
+                border-color: $color-theme-blue-lightest;
+                color: $color-theme-blue;
+                font-size: inherit;
+                font-weight: 500;
+
+                // Caret that is placed next to the expand button.
+                &::before {
+                    @include caret-top($color-border-light, 10px);
+                    @include absolute(null, null, -1.1rem, 50%);
+                    margin-left: -10px;
+                }
+            }
+        }
+
+        // Detail row for expandable rows.
+        &-details {
+            & {
+                position: relative;
+            }
+
+            .nav-tabs2 {
+                @include absolute(auto, auto, -2px, 1.25rem);
             }
 
             &-tab {
@@ -124,51 +136,27 @@
             }
 
             &-tabs {
-                background: $color-table-footer;
-                height: 70px;
-                padding: 1rem 1.25rem;
+                background: $color-border-light;
+                border: 0;
+                border-bottom: 2px solid $color-border;
+                height: 3.75rem;
+                padding: .75rem 1.25rem;
                 position: relative;
             }
         }
     }
 
-    // Footer that typically contains an add-item-form.
-    &-footer {
-        background: $color-table-footer;
-        border: 1px solid $color-input;
-        border-bottom-width: 2px;
-        margin-top: .75rem;
-        padding: .75rem 1.25rem;
-    }
-
     &-header {
-        background: $color-table-footer;
+        background: $color-theme-secondary;
         border-bottom: 1px solid $color-border-darker;
         margin-bottom: .75rem;
         padding: .75rem 1.25rem;
     }
 
-    // Edit or expand button.
-    &-edit-button {
-        color: $color-theme-blue;
-        padding-left: 0;
-        padding-right: 0;
-        width: 2.2rem;
-
-        &:hover {
-            color: $color-theme-blue-dark !important;
-        }
-
-        &.active {
-            background: $color-theme-blue !important;
-            border-color: $color-theme-blue !important;
-            color: $color-dark-foreground !important;
-        }
-    }
-
     // Spacer item between two normal items, because table rows cannot have margins.
     .spacer {
         border: 0;
+        box-shadow: none;
         height: .25rem;
     }
 }
@@ -244,17 +232,21 @@
 // Lightweight pagination controls.
 //
 .pagination {
-    margin-top: 1rem;
+    & {
+        margin-top: 1rem;
+    }
 
     &-text {
         line-height: 2.2rem;
     }
 
     &-button {
-        color: $color-text;
-        font-size: 1.1rem;
-        font-weight: bold;
-        margin-left: .4rem;
+        & {
+            color: $color-text;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-left: .4rem;
+        }
 
         &:hover,
         &.active {

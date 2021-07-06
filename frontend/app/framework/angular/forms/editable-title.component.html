@@ -1,19 +1,19 @@
 <div class="title">
     <form *ngIf="renaming; else noRenaming" [formGroup]="renameForm" (ngSubmit)="rename()">
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col">
-                <div class="form-group mr-2">
+                <div class="form-group me-2">
                     <sqx-control-errors for="name"></sqx-control-errors>
                     
                     <input type="text" class="form-control" formControlName="name" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event)" spellcheck="false">
                 </div>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary mr-1" [disabled]="!renameForm.valid || !renameForm.dirty">
+                <button type="submit" class="btn btn-primary me-1" [disabled]="!renameForm.valid || !renameForm.dirty">
                     {{ 'common.save' | sqxTranslate }}
                 </button>
         
-                <button type="button" class="btn btn-text-secondary btn-cancel mr-4" (click)="toggleRename()">
+                <button type="button" class="btn btn-text-secondary btn-cancel me-4" (click)="toggleRename()">
                     <i class="icon-close"></i>
                 </button>
             </div>

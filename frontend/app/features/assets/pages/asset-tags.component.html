@@ -6,8 +6,8 @@
     </div>
 
     <div class="nav-item" *ngFor="let tag of tags; trackBy: trackByTag">
-        <a class="nav-link row no-gutters" (click)="toggle.emit(tag.name)" [class.active]="isSelected(tag)">
-            <div class="row no-gutters">
+        <a class="nav-link row g-0" (click)="toggle.emit(tag.name)" [class.active]="isSelected(tag)">
+            <div class="row g-0">
                 <div class="col">
                     <span class="truncate">{{tag.name}}</span>
                 </div>

@@ -10,10 +10,3 @@
 .col-name {
     @include force-width(14rem);
 }
-
-.preview {
-    background-color: $color-input;
-    border: 0;
-    border-radius: 4px;
-    opacity: .4;
-}

@@ -31,9 +31,7 @@ h3 {
 }
 
 .breadcrumb {
-    border: 0;
-    border-radius: 0;
-    padding: 0;
+    margin: 0;
 
     &-item {
         &.active {
@@ -42,6 +40,8 @@ h3 {
 
         a {
             color: inherit !important;
+            text-align: left;
+            text-decoration: none;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 <sqx-layout layout="main" titleText="common.rules" titleIcon="rules" width="54rem">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="i18n:rules.refreshTooltip">
+        <button type="button" class="btn btn-text-secondary me-1" (click)="reload()" title="i18n:rules.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
@@ -20,7 +20,7 @@
     <ng-container>
         <sqx-list-view innerWidth="54rem" [isLoading]="rulesState.isLoading | async">
             <div class="alert alert-danger mb-4" *ngIf="rulesState.runningRule | async; let runningRule">
-                <div class="float-right">
+                <div class="float-end">
                     <a class="force" (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>
                 </div>
 
@@ -28,10 +28,10 @@
             </div>
 
             <ng-container *ngIf="supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
-                <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
+                <div class="table-items-row table-items-row-summary table-items-row-empty" *ngIf="rules.length === 0">
                     {{ 'rules.empty' | sqxTranslate }}
     
-                    <button type="button" class="btn btn-success btn-sm ml-2" routerLink="new" *ngIf="rulesState.canCreate | async">
+                    <button type="button" class="btn btn-success btn-sm ms-2" routerLink="new" *ngIf="rulesState.canCreate | async">
                         <i class="icon icon-plus"></i> {{ 'rules.emptyAddRule' | sqxTranslate }}
                     </button>
                 </div>

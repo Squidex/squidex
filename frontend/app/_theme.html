@@ -72,7 +72,7 @@
                     <nav class="navbar navbar-expand navbar-dark bg-primary">
                         <a class="navbar-brand" href="#">Navbar</a>
         
-                        <ul class="navbar-nav ml-auto">
+                        <ul class="navbar-nav ms-auto">
                             <li class="nav-item active">
                                 <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                             </li>
@@ -88,7 +88,7 @@
                         </ul>
         
                         <form class="form-inline">
-                            <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                            <input class="form-control me-sm-2" type="text" placeholder="Search">
         
                             <button type="button" class="btn btn-secondary my-2 my-sm-0">Search</button>
                         </form>
@@ -101,7 +101,7 @@
                     <nav class="navbar navbar-expand navbar-light bg-light">
                         <a class="navbar-brand" href="#">Navbar</a>
         
-                        <ul class="navbar-nav ml-auto">
+                        <ul class="navbar-nav ms-auto">
                             <li class="nav-item active">
                                 <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                             </li>
@@ -117,7 +117,7 @@
                         </ul>
         
                         <form class="form-inline">
-                            <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                            <input class="form-control me-sm-2" type="text" placeholder="Search">
 
                             <button type="button" class="btn btn-secondary my-2 my-sm-0">Search</button>
                         </form>
@@ -587,7 +587,7 @@
                                 <div class="form-group">
                                     <label>Example custom select</label>
 
-                                    <select class="custom-select">
+                                    <select class="form-select">
                                         <option>1</option>
                                         <option>2</option>
                                         <option>3</option>
@@ -599,7 +599,7 @@
                                 <div class="form-group">
                                     <label>Example custom multiple select</label>
 
-                                    <select multiple class="custom-select">
+                                    <select multiple class="form-select">
                                         <option>1</option>
                                         <option>2</option>
                                         <option>3</option>
@@ -633,38 +633,38 @@
                                 <div class="form-group">
                                     <h2>Custom Radio buttons</h2>
 
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
-                                        <label class="custom-control-label" for="customRadio1">Option 1</label>
+                                    <div class="form-check">
+                                        <input type="radio" id="customRadio1" name="customRadio" class="form-check-input">
+                                        <label class="form-check-label" for="customRadio1">Option 1</label>
                                     </div>
 
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
-                                        <label class="custom-control-label" for="customRadio2">Option 2</label>
+                                    <div class="form-check">
+                                        <input type="radio" id="customRadio2" name="customRadio" class="form-check-input">
+                                        <label class="form-check-label" for="customRadio2">Option 2</label>
                                     </div>
                                     
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" id="customRadio3" name="customRadio" class="custom-control-input" disabled>
-                                        <label class="custom-control-label" for="customRadio3">Option 3 (disabled)</label>
+                                    <div class="form-check">
+                                        <input type="radio" id="customRadio3" name="customRadio" class="form-check-input" disabled>
+                                        <label class="form-check-label" for="customRadio3">Option 3 (disabled)</label>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group">
                                     <h2>Custom Checkboxes</h2>
 
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="customCheckbox1" name="customRadio" class="custom-control-input">
-                                        <label class="custom-control-label" for="customCheckbox1">Option 1</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" id="customCheckbox1" name="customRadio" class="form-check-input">
+                                        <label class="form-check-label" for="customCheckbox1">Option 1</label>
                                     </div>
 
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="customCheckbox2" name="customRadio" class="custom-control-input">
-                                        <label class="custom-control-label" for="customCheckbox2">Option 2</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" id="customCheckbox2" name="customRadio" class="form-check-input">
+                                        <label class="form-check-label" for="customCheckbox2">Option 2</label>
                                     </div>
                                     
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="customCheckbox3" name="customRadio" class="custom-control-input" disabled>
-                                        <label class="custom-control-label" for="customCheckbox3">Option 3 (disabled)</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" id="customCheckbox3" name="customRadio" class="form-check-input" disabled>
+                                        <label class="form-check-label" for="customCheckbox3">Option 3 (disabled)</label>
                                     </div>
                                 </div>
 
@@ -1064,14 +1064,14 @@
                 </div>
 
                 <div class="bs-component">
-                    <span class="badge badge-pill badge-primary">Primary</span>
-                    <span class="badge badge-pill badge-secondary">Secondary</span>
-                    <span class="badge badge-pill badge-success">Success</span>
-                    <span class="badge badge-pill badge-danger">Danger</span>
-                    <span class="badge badge-pill badge-warning">Warning</span>
-                    <span class="badge badge-pill badge-info">Info</span>
-                    <span class="badge badge-pill badge-light">Light</span>
-                    <span class="badge badge-pill badge-dark">Dark</span>
+                    <span class="badge rounded-pill badge-primary">Primary</span>
+                    <span class="badge rounded-pill badge-secondary">Secondary</span>
+                    <span class="badge rounded-pill badge-success">Success</span>
+                    <span class="badge rounded-pill badge-danger">Danger</span>
+                    <span class="badge rounded-pill badge-warning">Warning</span>
+                    <span class="badge rounded-pill badge-info">Info</span>
+                    <span class="badge rounded-pill badge-light">Light</span>
+                    <span class="badge rounded-pill badge-dark">Dark</span>
                 </div>
             </div>
         </div>
@@ -1413,9 +1413,9 @@
 
                                     <div class="modal-footer">
                                         <div class="clearfix">
-                                            <button type="button" class="float-right btn btn-primary">Save changes</button>
+                                            <button type="button" class="float-end btn btn-primary">Save changes</button>
 
-                                            <button type="button" class="float-left btn btn-text-secondary">Close</button>
+                                            <button type="button" class="float-start btn btn-text-secondary">Close</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1440,12 +1440,12 @@
                     <div class="bs-component">
                         <div class="table-items-row table-items-row-expandable">
                             <div class="table-items-row-summary">
-                                <div class="row no-gutters">
+                                <div class="row g-0">
                                     <div class="col">
                                         My Item 1
                                     </div>
                                     <div class="col col-auto">
-                                        <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                        <button type="button" class="btn btn-secondary table-items-edit-button me-1">
                                             <i class="icon-settings"></i>
                                         </button>
                                         <button type="button" class="btn btn-text-danger"">
@@ -1468,9 +1468,9 @@
                                         </li>
                                     </ul>
                                             
-                                    <div class="float-right">
+                                    <div class="float-end">
                                         <button type="reset" class="btn btn-text-secondary">Cancel</button>
-                                        <button type="submit" class="btn btn-primary ml-1">Save</button>
+                                        <button type="submit" class="btn btn-primary ms-1">Save</button>
                                     </div>
                                 </div>
                                 <div class="table-items-row-details-tab">
@@ -1481,12 +1481,12 @@
 
                         <div class="table-items-row table-items-row-expandable">
                             <div class="table-items-row-summary">
-                                <div class="row no-gutters">
+                                <div class="row g-0">
                                     <div class="col">
                                         My Item 2
                                     </div>
                                     <div class="col col-auto">
-                                        <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                        <button type="button" class="btn btn-secondary table-items-edit-button me-1">
                                             <i class="icon-settings"></i>
                                         </button>
                                         <button type="button" class="btn btn-text-danger"">
@@ -1499,12 +1499,12 @@
 
                         <div class="table-items-row table-items-row-expandable">
                             <div class="table-items-row-summary">
-                                <div class="row no-gutters">
+                                <div class="row g-0">
                                     <div class="col col-name">
                                         My Item 3
                                     </div>
                                     <div class="col col-auto">
-                                        <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                        <button type="button" class="btn btn-secondary table-items-edit-button me-1">
                                             <i class="icon-settings"></i>
                                         </button>
                                         <button type="button" class="btn btn-text-danger"">
@@ -1516,12 +1516,12 @@
                         </div>
 
                         <div class="table-items-row">
-                            <div class="row no-gutters">
+                            <div class="row g-0">
                                 <div class="col col-name">
                                     My Item 4
                                 </div>
                                 <div class="col col-auto">
-                                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1">
+                                    <button type="button" class="btn btn-secondary table-items-edit-button me-1">
                                         <i class="icon-settings"></i>
                                     </button>
                                     <button type="button" class="btn btn-text-danger"">
@@ -1533,14 +1533,14 @@
                        
                         <div class="table-items-footer">
                             <form>
-                                <div class="row no-gutters">
+                                <div class="row g-0">
                                     <div class="col">
                                         <input class="form-control" placeholder="Enter workflow name">
                                     </div>
-                                    <div class="col-auto pl-1">
+                                    <div class="col-auto ps-1">
                                         <button ype="submit" class="btn btn-success">Add Workflow</button>
                                     </div>
-                                    <div class="col-auto pl-1">
+                                    <div class="col-auto ps-1">
                                         <button type="reset" class="btn btn-text-secondary">
                                             Cancel
                                         </button>
@@ -1570,7 +1570,7 @@
                         <div class="panel panel-light">
                             <div class="panel-header">
                                 <div class="panel-title-row">
-                                    <div class="float-right">
+                                    <div class="float-end">
                                         <button type="button" class="btn btn-success">New</button>
                                     </div>
 
@@ -1610,7 +1610,7 @@
                         <div class="panel panel-light">
                             <div class="panel-header">
                                 <div class="panel-title-row">
-                                    <div class="float-right">
+                                    <div class="float-end">
                                         <button type="button" class="btn btn-success">New</button>
                                     </div>
 
@@ -1640,7 +1640,7 @@
                         <div class="panel panel-dark">
                             <div class="panel-header large">
                                 <div class="panel-title-row">
-                                    <div class="float-right">
+                                    <div class="float-end">
                                         <button type="button" class="btn btn-success">New</button>
                                     </div>
 

@@ -32,7 +32,7 @@
     </ng-container>
 
     <ng-container menu>
-        <div class="btn-group mr-1" #buttonPublish>
+        <div class="btn-group me-1" #buttonPublish>
             <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="!schema.canPublish" (click)="publish()">
                 {{ 'schemas.published' | sqxTranslate }}
             </button>
@@ -41,7 +41,7 @@
             </button>
         </div>
 
-        <button type="button" class="btn btn-text-secondary ml-1" (click)="editOptionsDropdown.toggle()" #buttonOptions>
+        <button type="button" class="btn btn-text-secondary ms-1" (click)="editOptionsDropdown.toggle()" #buttonOptions>
             <i class="icon-dots"></i>
         </button>
 

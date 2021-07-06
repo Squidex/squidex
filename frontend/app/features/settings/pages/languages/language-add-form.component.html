@@ -2,13 +2,13 @@
     <h5>{{ 'languages.add.title' | sqxTranslate }}</h5>
 
     <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col">
-                <select class="custom-select" formControlName="language">
+                <select class="form-select" formControlName="language">
                     <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>
                 </select>
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto ps-1">
                 <button type="submit" class="btn btn-success">
                     {{ 'languages.add' | sqxTranslate }}
                 </button>

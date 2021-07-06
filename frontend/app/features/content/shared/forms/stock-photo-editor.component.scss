@@ -29,7 +29,7 @@ $height: 300px;
     background: $color-background;
     border: 0;
     border-radius: .25rem;
-    color: $color-dark-foreground;
+    color: $color-white;
     display: flex;
     justify-content: center;
     margin: 0;
@@ -91,7 +91,7 @@ sqx-list-view {
     &-user-link {
         @include text-small;
         @include truncate;
-        color: $color-dark-foreground;
+        color: $color-white;
     }
 
     img {

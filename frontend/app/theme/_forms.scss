@@ -1,14 +1,18 @@
 @import '_mixins';
 @import '_vars';
 
+/* stylelint-disable */
+
 //
 // Support for Angular validation states.
-//
+// 
 .form-control {
     &.ng-invalid {
         &.ng-touched,
         &.ng-dirty {
-            border-color: $color-theme-error;
+            & {
+                border-color: $color-theme-error;
+            }
 
             &:hover,
             &:focus {
@@ -35,13 +39,15 @@
     }
 
     // The tooltip rectangle itself.
-    @include absolute(null, null, .4rem, 0);
-    @include border-radius(2px);
-    @include text-small;
-    background: $color-theme-error;
-    color: $color-dark-foreground;
-    cursor: default;
-    padding: .25rem .5rem;
+    & {
+        @include absolute(null, null, .4rem, 0);
+        @include border-radius(2px);
+        background: $color-theme-error;
+        color: $color-white;
+        font-size: .9rem;
+        font-weight: normal;
+        padding: .25rem .5rem;
+    }
 }
 
 //
@@ -56,13 +62,16 @@
 // Form alerts.
 //
 .form-alert {
-    @include border-radius(4px);
-    @include text-small;
-    color: $color-dark-foreground;
-    margin-bottom: .75rem;
-    margin-top: .25rem;
-    padding: .5rem;
-    padding-right: 1.5rem;
+    & {
+        @include border-radius(4px);
+        color: $color-white;
+        font-size: .9rem;
+        font-weight: normal;
+        margin-bottom: .75rem;
+        margin-top: .25rem;
+        padding: .5rem;
+        padding-right: 1.5rem;
+    }
 
     &-close {
         @include absolute(0, 0, auto, auto);
@@ -98,11 +107,13 @@
 }
 
 .form-bubble {
-    position: relative;
+    & {
+        position: relative;
+    }
 
     .form-alert {
         @include absolute(.25rem, 0, auto, auto);
-        font-size: 1rem;
+        font-size: .9rem;
         font-weight: normal;
         line-height: 1.75;
         max-width: 600px;
@@ -119,22 +130,35 @@
     }
 }
 
+
+.preview {
+    background-color: $color-input;
+    border: 0;
+    border-radius: $border-radius;
+    opacity: .4;
+    pointer-events: none;
+}
+
 //
 // Control Dropdown item
 //
 .control-dropdown {
-    @include absolute(2px, auto, auto, 0);
-    @include border-radius(.25em);
-    @include box-shadow-outer;
-    background: $color-dark-foreground;
-    border: 1px solid $color-input;
-    max-height: 15rem;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: .25rem 0;
+    & {
+        @include absolute(2px, auto, auto, 0);
+        @include border-radius(.25em);
+        @include box-shadow-outer;
+        background: $color-white;
+        border: 1px solid $color-input;
+        max-height: 15rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: .25rem 0;
+    }
 
     &-item {
-        padding: .5rem .75rem;
+        & {
+            padding: .5rem .75rem;
+        }
 
         &.separated {
             border-bottom: 1px solid lighten($color-input, 5%);
@@ -144,20 +168,18 @@
             }
         }
 
-        %focused {
-            color: $color-dark-foreground;
+        &.active,
+        &:active,
+        &:hover {
+            color: $color-white;
 
             .text-muted {
-                color: $color-dark-foreground !important;
+                color: $color-white !important;
             }
         }
 
+        &:active,
         &.active {
-            @extend %focused;
-        }
-
-        &.active {
-            @extend %focused;
             background: $color-theme-blue;
 
             &.separated {
@@ -166,7 +188,6 @@
         }
 
         &:hover {
-            @extend %focused;
             background: $color-theme-blue;
 
             &.separated {
@@ -175,60 +196,58 @@
         }
 
         &-selectable {
-            cursor: pointer;
+            & {
+                cursor: pointer;
+            }
         }
     }
 }
 
-/* stylelint-disable */
+.btn-block {
+    width: 100%;
+}
+
 //
 // Form group error.
 //
 .form-group {
+    margin-bottom: 1rem;
+
     // Remove the margin after the last form group.
     &:last-child {
         margin-bottom: 0;
     }
 
     // Remove the margin if the next element is hidden.
-    &~.hidden {
+    & ~ .hidden {
         margin-bottom: 0;
-    }
-}
-/* stylelint-enable */
-
-.form-text {
-    a {
-        white-space: nowrap;
     }
 }
 
 .col-form-label {
-    @include text-small;
+    font-size: 90%;
 }
 
 label {
-    @include text-small-bold;
-    color: $color-title;
+    & {
+        font-size: 90%;
+        font-weight: 500;
+    }
 
-    %normal-size {
+    &.form-check-label {
         font-size: 100%;
         font-weight: normal;
     }
 
-    &.form-check-label {
-        @extend %normal-size;
-    }
-
     &.custom-control-label {
-        @extend %normal-size;
+        font-size: 100%;
+        font-weight: normal;
     }
 
     .hint {
         color: $color-text-decent;
     }
 
-    /* stylelint-disable-next-line no-descending-specificity */
     .text-muted {
         font-weight: normal;
     }
@@ -238,8 +257,10 @@ label {
 // Custom search form.
 //
 .search-form {
-    flex-grow: 1;
-    position: relative;
+    & {
+        flex-grow: 1;
+        position: relative;
+    }
 
     // Keep some additional space for the search icon.
     .form-control {
@@ -252,5 +273,11 @@ label {
         color: $color-input;
         font-size: 1.1rem;
         font-weight: lighter;
+    }
+}
+
+input {
+    &.form-empty {
+        border: 0;
     }
 }

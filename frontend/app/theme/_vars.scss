@@ -1,135 +1,81 @@
-$color-background:                      #eef1f4;
+$color-background:          #eef1f4;
 
-$color-default:                         #212529;
-$color-border:                          #e4e7e9;
-$color-border-dark:                     #b3bbbf;
-$color-border-darker:                   darken($color-border, 3%);
-$color-border-grey:                     #dedfe3;
+$color-border:              #dedfe3;
+$color-border-light:        #f5f6f9;
+$color-border-dark:         #e7e8ea;
+$color-border-darker:       darken($color-border, 3%);
 
-$color-title:                           #000;
-$color-text:                            #6e7387;
-$color-text-decent:                     #8091a5;
-$color-tooltip:                         #1a2129;
+$color-title:               #000;
+$color-text:                #373a3c;
+$color-text-decent:         #9ea2b7;
+$color-tooltip:             #1a2129;
 
-$color-code-background:                 #f5f7f9;
-$color-code-text:                       #708090;
+$color-code-background:     #f5f7f9;
+$color-code-text:           #708090;
 
-$color-extern-google:                   #d34836;
-$color-extern-google-icon:              #b02c1b;
-$color-extern-microsoft:                #004185;
-$color-extern-microsoft-icon:           #1b67b7;
-$color-extern-github:                   #353535;
-$color-extern-github-icon:              #616161;
-$color-extern-twitter:                  #1da1f2;
-$color-extern-twitter-icon:             #1681bf;
+$color-extern-google:           #d34836;
+$color-extern-microsoft:        #004185;
+$color-extern-github:           #353535;
+$color-extern-twitter:          #1da1f2;
 
-$color-theme-blue:                      #3389ff;
-$color-theme-blue-dark:                 #297ff6;
-$color-theme-blue-darker:               #206fd6;
-$color-theme-blue-lighter:              #65a6ff;
-$color-theme-blue-light:                #9ebeea;
-$color-theme-blue-lightest:             #d9e8fc;
-$color-theme-secondary:                 #ecf2f6;
+$color-theme-blue:          #3389ff;
+$color-theme-blue-dark:     #206fd6;
+$color-theme-blue-darker:   #206fd6;
+$color-theme-blue-lighter:  #65a6ff;
+$color-theme-blue-light:    #9ebeea;
+$color-theme-blue-lightest: #d9e8fc;
+$color-theme-secondary:     #e0e1e5;
 
-$color-theme-green:                     #4bb958;
-$color-theme-green-dark:                #47b353;
-$color-theme-orange:                    #ffb136;
-$color-theme-orange-dark:               #a65b00;
+$color-theme-green:         #3ab480;
+$color-theme-green-dark:    #47b353;
+$color-theme-orange:        #ffb136;
+$color-theme-orange-dark:   #a65b00;
 
-$color-theme-error:                     #eb3142;
-$color-theme-error-dark:                #c00;
+$color-theme-error:         #eb3142;
+$color-theme-error-dark:    #c00;
 
-$color-black:                           #000;
-$color-white:                           #fff;
-$color-grey:                            #dedfe3;
-$color-grey-dark:                       #9da1b6;
-$color-white-lighten:                   #fff;
-$color-green-lighter:                   #d6eadd;
+$color-black:   #000;
+$color-white:   #fff;
 
-$color-theme-info:                      #5bc0de;
+$color-theme-info:          #5bc0de;
 
-$color-asset-bg:                        #f7f8fa;
+$color-asset-bg:            #f7f8fa;
 
-$color-input:                           #dbe4eb;
-$color-input-background:                #fff;
-$color-input-disabled:                  $color-theme-secondary;
-$color-input-placeholder:               lighten($color-text-decent, 20%);
+$color-input:               #e0e1e5;
+$color-input-shadow:          0 1px 1px rgba(0, 0, 0, .1);
+$color-input-background:    #fff;
+$color-input-disabled:      #eff1f4;
+$color-input-placeholder:   lighten($color-text-decent, 20%);
+$color-input-shortcut:      rgba(255, 255, 255, .2);
 
-$color-dark1-background:                #2e3842;
-$color-dark1-foreground:                #6a7681;
-$color-dark1-border1:                   #37424c;
-$color-dark1-border2:                   #222a32;
-$color-dark1-focus-foreground:          #fff;
-$color-dark1-active-background:         #273039;
+$color-badge-success-background:    #e4f6e6;
+$color-badge-success-foreground:    #4cc159;
 
-$color-dark2-background:                #273039;
-$color-dark2-foreground:                #6a7681;
-$color-dark2-border1:                   #37424c;
-$color-dark2-border2:                   #222a32;
-$color-dark2-focus-foreground:          #fff;
-$color-dark2-active-background:         #222931;
-$color-dark2-control:                   #2e3842;
-$color-dark2-separator:                 #2e3842;
-$color-dark2-placeholder:               #757e8d;
+$color-badge-warning-background:    #ffe8cc;
+$color-badge-warning-foreground:    #efa243;
 
-$color-dark-onboarding:                 #273039;
+$color-badge-danger-background:     #fce0e3;
+$color-badge-danger-foreground:     #f56a76;
 
-$color-badge-success-background:        #e4f6e6;
-$color-badge-success-foreground:        #4cc159;
+$color-badge-info-background:       #d0f2fb;
+$color-badge-info-foreground:       #43ccef;
 
-$color-badge-warning-background:        #ffe8cc;
-$color-badge-warning-foreground:        #efa243;
+$color-badge-primary-background:    #cce1ff;
+$color-badge-primary-foreground:    #438cef;
 
-$color-badge-danger-background:         #fce0e3;
-$color-badge-danger-foreground:         #f56a76;
+$color-badge-secondary-background:  #e6e6e6;
+$color-badge-secondary-foreground:  #999;
 
-$color-badge-info-background:           #d0f2fb;
-$color-badge-info-foreground:           #43ccef;
+$border-radius:             .375rem;
 
-$color-badge-primary-background:        #cce1ff;
-$color-badge-primary-foreground:        #438cef;
+$size-navbar-height:        3.25rem;
+$size-sidebar-width:        5rem;
 
-$color-badge-secondary-background:      #e6e6e6;
-$color-badge-secondary-foreground:      #999;
+$color-dark-onboarding:   #273039;
 
-$color-table-background:                #fff;
-$color-table-footer:                    $color-theme-secondary;
-
-$color-table-border:                    $color-border;
-$color-table-header:                    $color-text-decent;
-
-$color-modal-header-background:         #2e3842;
-$color-modal-header-foreground:         #9eafbc;
-
-$color-dark-black:                      #000;
-$color-dark-foreground:                 #fff;
-
-$size-navbar-height:                    3.25rem;
-$size-sidebar-width:                    5rem;
-
-$panel-padding:                         1.5rem;
+$panel-padding:                       1.5rem;
 $panel-header:                          5.4rem;
 $panel-sidebar:                         3.75rem;
-$panel-light-background:                #fff;
-
-$asset-checked-after:                   url('../images/icons/circle-white.svg');
-$asset-checked-before:                  url('../images/icons/circle-grey.svg');
-
-$asset-icon-bell:                       url('../images/icons/bell.svg');
-$asset-icon-filter:                     url('../images/icons/filter.svg');
-$asset-icon-clone:                      url('../images/icons/clone.svg');
-$asset-icon-delete:                     url('../images/icons/delete.svg');
-$asset-icon-folder-plus:                url('../images/icons/folder-plus.svg');
-$asset-icon-refresh:                    url('../images/icons/reset.svg');
-$asset-icon-globe:                      url('../images/icons/globe.svg');
-
-$breadcrumb-divider:                    quote('>');
-$breadcrumb-margin-bottom:              0 !important;
-$breadcrumb-active-color:               $color-border-dark !default;
-$breadcrumb-link-color:                 $color-border-darker;
-
-$text-small:                .9rem;
-$text-smallest:             .8rem;
 
 $asset-width:               14.5rem;
 $asset-folder-height:       4rem;

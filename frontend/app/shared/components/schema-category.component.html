@@ -5,7 +5,7 @@
     (cdkDropListDropped)="changeCategory($event)">
 
     <div class="header clearfix">
-        <div class="row no-gutters align-items-center mb-1">
+        <div class="row g-0 align-items-center mb-1">
             <div class="col-auto">
                 <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
                     <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
@@ -18,10 +18,10 @@
             </div>
             <div class="col-auto">
                 <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
-                    <span class="badge badge-pill badge-light">{{filteredSchemas.length}}</span>
+                    <span class="badge rounded-pill badge-secondary">{{filteredSchemas.length}}</span>
                 </ng-container>
                 <ng-template #noSchemas>
-                    <button type="button" class="btn btn-sm btn-text-danger btn-remove" (click)="remove.emit()">
+                    <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()" *ngIf="schemaCategory.name">
                         <i class="icon-bin2"></i> 
                     </button>
                 </ng-template>
@@ -40,7 +40,7 @@
                 <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
                     <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 
-                    <span class="item-published mr-1" [class.unpublished]="!schema.isPublished"></span> {{schema.displayName}}
+                    <span class="item-published me-1" [class.unpublished]="!schema.isPublished"></span> {{schema.displayName}}
                 </a>
             </div>
         </ng-container>

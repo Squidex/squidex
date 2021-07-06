@@ -1,6 +1,6 @@
 <tr (click)="toggle()">
     <td class="cell-select" sqxStopClick>
-        <input type="checkbox" class="custom-control custom-checkbox"
+        <input type="checkbox" class="form-check"
             [disabled]="!selectable"
             [ngModel]="selected || !selectable"
             (ngModelChange)="select($event)"

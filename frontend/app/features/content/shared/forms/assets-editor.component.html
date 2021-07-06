@@ -1,12 +1,12 @@
 <div class="assets-container" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled" tabindex="1000">
     <div class="header list">
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col" [class.disabled]="snapshot.isDisabled">
                 <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled">
                     {{ 'contents.assetsUpload' | sqxTranslate }}
                 </div>
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto ps-1">
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
                         <i class="icon-list"></i>
@@ -21,7 +21,7 @@
 
     <div class="body" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="600" [sqxResizeMaxWidth]="0">
         <ng-container *ngIf="!snapshot.isListView; else listTemplate">
-            <div class="row no-gutters">
+            <div class="row g-0">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles"
                     [assetFile]="file"
                     [isDisabled]="snapshot.isDisabled"

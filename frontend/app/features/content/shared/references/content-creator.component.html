@@ -2,7 +2,7 @@
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="custom-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+                <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
                     <option *ngFor="let schema of schemas" [ngValue]="schema.id">
                         {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
@@ -12,19 +12,19 @@
     </ng-container>
 
     <ng-container tabs>
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col-auto">          
                 <div *ngIf="schema && languages.length > 1">
                     <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language!" [languages]="languages"></sqx-language-selector>
                 </div>
             </div>
 
-            <div class="col text-right">
+            <div class="col text-end">
                 <button type="button" class="btn btn-outline-success" (click)="save()">
                     {{ 'common.create' | sqxTranslate }}
                 </button>
 
-                <button type="button" class="btn btn-success ml-1" (click)="saveAndPublish()" *ngIf="schema?.canContentsCreateAndPublish">
+                <button type="button" class="btn btn-success ms-1" (click)="saveAndPublish()" *ngIf="schema?.canContentsCreateAndPublish">
                     {{ 'contents.referencesCreatePublish' | sqxTranslate }}
                 </button>
 

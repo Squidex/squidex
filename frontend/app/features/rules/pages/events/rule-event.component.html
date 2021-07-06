@@ -1,6 +1,6 @@
 <tr [class.expanded]="expanded">
     <td class="cell-label">
-        <span class="badge badge-pill badge-{{jobResultClass}}">{{event.jobResult}}</span>
+        <span class="badge rounded-pill badge-{{jobResultClass}}">{{event.jobResult}}</span>
     </td>
     <td class="cell-40">
         <span class="truncate">{{event.eventName}}</span>
@@ -12,7 +12,7 @@
         <small class="item-modified">{{event.created | sqxFromNow}}</small>
     </td>
     <td class="cell-actions">
-        <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="expanded" (click)="expandedChange.emit()">
+        <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()">
             <i class="icon-settings"></i>
         </button>
     </td>
@@ -23,9 +23,9 @@
             <h4>{{ 'rules.ruleEvents.lastInvokedLabel' | sqxTranslate }}</h4>
         </div>
         
-        <div class="row no-gutters event-stats align-items-center">
+        <div class="row g-0 event-stats align-items-center">
             <div class="col-3">
-                <span class="badge badge-pill badge-{{resultClass}}">{{event.result}}</span>
+                <span class="badge rounded-pill badge-{{resultClass}}">{{event.result}}</span>
             </div>
             <div class="col-2">
                 {{ 'rules.ruleEvents.numAttemptsLabel' | sqxTranslate }}: {{event.numCalls}}
@@ -33,8 +33,8 @@
             <div class="col-4">
                 {{ 'rules.ruleEvents.nextAttemptLabel' | sqxTranslate }}: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
             </div>
-            <div class="col-3 text-right">
-                <button type="button" class="btn btn-text-danger btn-sm mr-1" (click)="cancel.emit()" [class.hidden]="!event.nextAttempt">
+            <div class="col-3 text-end">
+                <button type="button" class="btn btn-text-danger btn-sm me-1" (click)="cancel.emit()" [class.hidden]="!event.nextAttempt">
                     {{ 'common.cancel' | sqxTranslate }}
                 </button>
 

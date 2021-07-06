@@ -24,8 +24,8 @@
                             {{status.email}}
                         </div>
 
-                        <div class="col-5 pl-1">
-                            <select class="custom-select" [(ngModel)]="status.role" [ngModelOptions]="{ standalone: true }">
+                        <div class="col-5 ps-1">
+                            <select class="form-select" [(ngModel)]="status.role" [ngModelOptions]="{ standalone: true }">
                                 <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
                             </select>
                         </div>

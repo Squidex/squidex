@@ -4,8 +4,8 @@
     <sqx-list-view innerWidth="70rem">
         <div class="card section" *ngIf="restoreJob | async; let job">
             <div class="card-header">
-                <div class="row no-gutters">
-                    <div class="col-auto pr-2">
+                <div class="row g-0">
+                    <div class="col-auto pe-2">
                         <div *ngIf="job.status === 'Started'" class="restore-status restore-status-pending spin">
                             <i class="icon-hour-glass"></i>
                         </div>
@@ -21,7 +21,7 @@
                         <h3>{{ 'backups.restoreLastStatus' | sqxTranslate }}</h3>
                     </div>
 
-                    <div class="col text-right restore-url">
+                    <div class="col text-end restore-url">
                         {{job.url}}
                     </div>
                 </div>
@@ -36,23 +36,23 @@
                     <div class="col">
                         {{ 'backups.restoreStartedLabel' | sqxTranslate }}: {{job.started | sqxISODate}}
                     </div>
-                    <div class="col text-right" *ngIf="job.stopped">
+                    <div class="col text-end" *ngIf="job.stopped">
                         {{ 'backups.restoreStoppedLabel' | sqxTranslate }}: {{job.stopped | sqxISODate}}
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="table-items-row">
+        <div class="table-items-row table-items-row-summary">
             <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
-                <div class="row no-gutters">
+                <div class="row g-0">
                     <div class="col">
                         <input class="form-control" formControlName="url" placeholder="{{ 'backups.restoreLastUrl' | sqxTranslate }}">
                     </div>
-                    <div class="col pl-1">
+                    <div class="col ps-1">
                         <input class="form-control" formControlName="name" placeholder="{{ 'backups.restoreNewAppName' | sqxTranslate }}">
                     </div>
-                    <div class="col-auto pl-1">
+                    <div class="col-auto ps-1">
                         <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">
                             {{ 'backups.restore' | sqxTranslate }}
                         </button>

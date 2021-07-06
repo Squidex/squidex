@@ -6,7 +6,7 @@
         <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:search"></span>
     </td>
     <td class="cell-time">
-        <select class="custom-select" [ngModel]="contributor.role" (ngModelChange)="changeRole($event)" [disabled]="!contributor.canUpdate">
+        <select class="form-select" [ngModel]="contributor.role" (ngModelChange)="changeRole($event)" [disabled]="!contributor.canUpdate">
             <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
         </select>
     </td>
