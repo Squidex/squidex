@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { EventEmitter } from '@angular/core';
 import { AbstractControl, AbstractControlOptions, AsyncValidatorFn, FormArray, ValidatorFn } from '@angular/forms';
 import { Types } from '@app/framework/internal';
@@ -23,7 +21,7 @@ export class UndefinableFormArray extends FormArray {
             if (this.isUndefined) {
                 return undefined;
             } else {
-                return reduce();
+                return reduce.apply(this);
             }
         };
     }
@@ -48,7 +46,7 @@ export class UndefinableFormArray extends FormArray {
         super.insert(index, control);
     }
 
-    public setValue(value: any[] | undefined, options?: { onlySelf?: boolean; emitEvent?: boolean; }) {
+    public setValue(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {
         this.isUndefined = Types.isUndefined(value);
 
         if (this.isUndefined) {
@@ -58,7 +56,7 @@ export class UndefinableFormArray extends FormArray {
         }
     }
 
-    public patchValue(value: any[] | undefined, options?: { onlySelf?: boolean; emitEvent?: boolean; }) {
+    public patchValue(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {
         this.isUndefined = Types.isUndefined(value);
 
         if (this.isUndefined) {
@@ -68,13 +66,13 @@ export class UndefinableFormArray extends FormArray {
         }
     }
 
-    public reset(value: any[] | undefined, options?: { onlySelf?: boolean; emitEvent?: boolean; }) {
+    public reset(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {
         this.isUndefined = Types.isUndefined(value);
 
         super.reset(value || [], options);
     }
 
-    public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean; } = {}) {
+    public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean } = {}) {
         super.updateValueAndValidity({ emitEvent: false, onlySelf: true });
 
         if (this.isUndefined) {

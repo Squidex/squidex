@@ -36,13 +36,13 @@ namespace Migrations.OldEvents
         {
             var newSettings = new AppSettings
             {
-                Patterns = new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
+                Patterns = ImmutableList.ToImmutableList(new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
                 {
                     new Pattern(Name, Pattern)
                     {
                         Message = Message
                     }
-                }.ToReadOnlyCollection(),
+                }),
                 Editors = state.Settings.Editors
             };
 

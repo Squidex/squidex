@@ -5,24 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class AppSettings
+    public sealed record AppSettings
     {
         public static readonly AppSettings Empty = new AppSettings();
 
-        public ReadOnlyCollection<Pattern> Patterns { get; init; } = ReadOnlyCollection.Empty<Pattern>();
+        public ImmutableList<Pattern> Patterns { get; init; } = ImmutableList.Empty<Pattern>();
 
-        public ReadOnlyCollection<Editor> Editors { get; init; } = ReadOnlyCollection.Empty<Editor>();
+        public ImmutableList<Editor> Editors { get; init; } = ImmutableList.Empty<Editor>();
 
         public bool HideScheduler { get; init; }
 
         public bool HideDateTimeModeButton { get; init; }
-
-        public bool HideDateTimeQuickButtons { get; init; }
     }
 }

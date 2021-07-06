@@ -4,7 +4,7 @@
 <form (ngSubmit)="save()">
     <sqx-layout titleText="common.rule" layout="main" width="54rem">    
         <ng-container menu>
-            <div class="btn btn-outline-secondary2 btn-enabled" *ngIf="rule">
+            <div class="btn btn-outline-secondary btn-enabled" *ngIf="rule">
                 <span class="mr-1" *ngIf="isEnabled">
                     {{ 'common.enabled' | sqxTranslate }}
                 </span>

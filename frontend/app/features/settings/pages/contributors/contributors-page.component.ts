@@ -13,14 +13,14 @@ import { ContributorDto, ContributorsState, RolesState, Router2State } from '@ap
     styleUrls: ['./contributors-page.component.scss'],
     templateUrl: './contributors-page.component.html',
     providers: [
-        Router2State
-    ]
+        Router2State,
+    ],
 })
 export class ContributorsPageComponent implements OnInit {
     constructor(
         public readonly contributorsRoute: Router2State,
         public readonly contributorsState: ContributorsState,
-        public readonly rolesState: RolesState
+        public readonly rolesState: RolesState,
     ) {
     }
 

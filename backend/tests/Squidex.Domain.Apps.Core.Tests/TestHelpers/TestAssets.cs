@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
 
             public string FileHash { get; set; }
 
+            public string MimeType { get; set; }
+
             public string Slug { get; set; }
 
             public long FileSize { get; set; }
@@ -59,6 +61,18 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new AssetMetadata()
                         .SetPixelWidth(800)
                         .SetPixelHeight(600)
+            };
+        }
+
+        public static AssetInfo Svg(DomainId id)
+        {
+            return new AssetInfo
+            {
+                AssetId = id,
+                FileName = "MyImage.png",
+                FileSize = 1024 * 8,
+                Type = AssetType.Unknown,
+                MimeType = "image/svg+xml"
             };
         }
     }

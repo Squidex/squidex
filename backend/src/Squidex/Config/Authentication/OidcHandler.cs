@@ -46,6 +46,7 @@ namespace Squidex.Config.Authentication
             if (!string.IsNullOrEmpty(options.OidcOnSignoutRedirectUrl))
             {
                 var logoutUri = options.OidcOnSignoutRedirectUrl;
+
                 context.Response.Redirect(logoutUri);
                 context.HandleResponse();
 

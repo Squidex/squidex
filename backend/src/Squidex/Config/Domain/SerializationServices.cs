@@ -46,8 +46,6 @@ namespace Squidex.Config.Domain
                 new ExecutionResultJsonConverter(new ErrorInfoProvider()),
                 new JsonValueConverter(),
                 new StringEnumConverter(),
-                new SurrogateConverter<AppClients, AppClientsSurrogate>(),
-                new SurrogateConverter<AppContributors, AppContributorsSurrogate>(),
                 new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
                 new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                 new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
@@ -55,7 +53,6 @@ namespace Squidex.Config.Domain
                 new SurrogateConverter<Roles, RolesSurrogate>(),
                 new SurrogateConverter<Rule, RuleSorrgate>(),
                 new SurrogateConverter<Schema, SchemaSurrogate>(),
-                new SurrogateConverter<Workflows, WorkflowsSurrogate>(),
                 new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
                 new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
                 new WriteonlyGeoJsonConverter());

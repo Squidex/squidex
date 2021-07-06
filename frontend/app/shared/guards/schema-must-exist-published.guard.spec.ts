@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
+import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SchemaMustExistPublishedGuard } from './schema-must-exist-published.guard';
@@ -14,8 +14,8 @@ import { SchemaMustExistPublishedGuard } from './schema-must-exist-published.gua
 describe('SchemaMustExistPublishedGuard', () => {
     const route: any = {
         params: {
-            schemaName: '123'
-        }
+            schemaName: '123',
+        },
     };
 
     let schemasState: IMock<SchemasState>;
@@ -28,9 +28,9 @@ describe('SchemaMustExistPublishedGuard', () => {
         schemaGuard = new SchemaMustExistPublishedGuard(schemasState.object, router.object);
     });
 
-    it('should load schema and return true if found', () => {
+    it('should load schema and return true if published', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => of(<SchemaDetailsDto>{ isPublished: true }));
+            .returns(() => of(<SchemaDto>{ isPublished: true }));
 
         let result: boolean;
 
@@ -43,9 +43,39 @@ describe('SchemaMustExistPublishedGuard', () => {
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
+    it('should load schema and return false if component', () => {
+        schemasState.setup(x => x.select('123'))
+            .returns(() => of(<SchemaDto>{ isPublished: true, type: 'Component' }));
+
+        let result: boolean;
+
+        schemaGuard.canActivate(route).subscribe(x => {
+            result = x;
+        }).unsubscribe();
+
+        expect(result!).toBeFalsy();
+
+        router.verify(x => x.navigate(['/404']), Times.once());
+    });
+
     it('should load schema and return false if not found', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => of(<SchemaDetailsDto>{ isPublished: false }));
+            .returns(() => of(null));
+
+        let result: boolean;
+
+        schemaGuard.canActivate(route).subscribe(x => {
+            result = x;
+        }).unsubscribe();
+
+        expect(result!).toBeFalsy();
+
+        router.verify(x => x.navigate(['/404']), Times.once());
+    });
+
+    it('should load schema and return false if not published', () => {
+        schemasState.setup(x => x.select('123'))
+            .returns(() => of(<SchemaDto>{ isPublished: false, type: 'Default' }));
 
         let result: boolean;
 

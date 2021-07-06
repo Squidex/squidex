@@ -17,7 +17,7 @@ interface State {
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Output()
@@ -75,10 +75,10 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly assetUploader: AssetUploaderState,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super(changeDetector, {
-            progress: 0
+            progress: 0,
         });
     }
 

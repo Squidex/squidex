@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Tags for automation processes.
         /// </summary>
-        public ReadOnlyCollection<string>? Tags { get; set; }
+        public ImmutableList<string>? Tags { get; set; }
 
         public UpdateSchema ToCommand()
         {

@@ -12,19 +12,19 @@ import { map } from 'rxjs/operators';
 @Component({
     selector: 'sqx-contents-filters-page',
     styleUrls: ['./contents-filters-page.component.scss'],
-    templateUrl: './contents-filters-page.component.html'
+    templateUrl: './contents-filters-page.component.html',
 })
 export class ContentsFiltersPageComponent {
     public schemaQueries =
         this.schemasState.selectedSchema.pipe(
             defined(),
-            map(schema => new Queries(this.uiState, `schemas.${schema.name}`)
+            map(schema => new Queries(this.uiState, `schemas.${schema.name}`),
         ));
 
     constructor(
         public readonly contentsState: ContentsState,
         private readonly schemasState: SchemasState,
-        private readonly uiState: UIState
+        private readonly uiState: UIState,
     ) {
     }
 

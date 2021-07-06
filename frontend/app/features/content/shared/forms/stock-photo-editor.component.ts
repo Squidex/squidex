@@ -12,7 +12,7 @@ import { of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
 
 export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,
 };
 
 interface State {
@@ -28,9 +28,9 @@ interface State {
     styleUrls: ['./stock-photo-editor.component.scss'],
     templateUrl: './stock-photo-editor.component.html',
     providers: [
-        SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
     @Input()
@@ -63,7 +63,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
             }));
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly stockPhotoService: StockPhotoService
+        private readonly stockPhotoService: StockPhotoService,
     ) {
         super(changeDetector, {});
     }

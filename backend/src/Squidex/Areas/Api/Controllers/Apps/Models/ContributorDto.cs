@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public ContributorDto WithUser(IDictionary<string, IUser> users)
+        public ContributorDto CreateUser(IDictionary<string, IUser> users)
         {
             if (users.TryGetValue(ContributorId, out var user))
             {
@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return this;
         }
 
-        public ContributorDto WithLinks(Resources resources)
+        public ContributorDto CreateLinks(Resources resources)
         {
             if (!resources.IsUser(ContributorId))
             {

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -21,17 +22,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public EnrichWithWorkflows(IContentWorkflow contentWorkflow)
         {
-            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
-
             this.contentWorkflow = contentWorkflow;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             var cache = new Dictionary<(DomainId, Status), StatusInfo>();
 
             foreach (var content in contents)
             {
+                ct.ThrowIfCancellationRequested();
+
                 await EnrichColorAsync(content, content, cache);
 
                 if (ShouldEnrichWithStatuses(context))

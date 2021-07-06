@@ -11,12 +11,12 @@ import { AuthService } from '@app/shared';
 
 @Component({
     selector: 'sqx-logout',
-    template: ''
+    template: '',
 })
 export class LogoutPageComponent implements OnInit {
     constructor(
         private readonly authService: AuthService,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 
@@ -28,7 +28,7 @@ export class LogoutPageComponent implements OnInit {
                 },
                 () => {
                     this.router.navigate(['/'], { replaceUrl: true });
-                }
+                },
             );
     }
 }

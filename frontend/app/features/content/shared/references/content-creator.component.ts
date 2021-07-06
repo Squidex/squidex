@@ -5,20 +5,26 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDetailsDto, SchemaDto, SchemasState, Types } from '@app/shared';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
     providers: [
-        ComponentContentsState
-    ]
+        ComponentContentsState,
+    ],
 })
 export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     @Output()
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
+
+    @Input()
+    public initialData: any;
+
+    @Input()
+    public schemaName?: string | null;
 
     @Input()
     public schemaIds: ReadonlyArray<string>;
@@ -32,7 +38,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     @Input()
     public formContext: any;
 
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
 
     public contentForm: EditContentForm;
@@ -40,7 +46,6 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     constructor(
         private readonly contentsState: ComponentContentsState,
         private readonly schemasState: SchemasState,
-        private readonly changeDetector: ChangeDetectorRef
     ) {
         super();
     }
@@ -52,25 +57,24 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
             this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
         }
 
-        this.selectSchema(this.schemas[0]);
+        const selectedSchema = this.schemas.find(x => x.name === this.schemaName) || this.schemas[0];
+
+        this.selectSchema(selectedSchema);
     }
 
-    public selectSchema(selected: string | SchemaDto) {
-        if (Types.is(selected, SchemaDto)) {
-            selected = selected.id;
+    public selectSchema(schema: SchemaDto) {
+        this.schema = schema;
+
+        if (schema) {
+            this.contentsState.schema = schema;
+            this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, { user: this.formContext.user });
+
+            if (this.initialData) {
+                this.contentForm.load(this.initialData, true);
+
+                this.initialData = null;
+            }
         }
-
-        this.schemasState.loadSchema(selected, true)
-            .subscribe(schema => {
-                if (schema) {
-                    this.schema = schema;
-
-                    this.contentsState.schema = schema;
-                    this.contentForm = new EditContentForm(this.languages, this.schema, { user: this.formContext.user });
-
-                    this.changeDetector.markForCheck();
-                }
-            });
     }
 
     public saveAndPublish() {

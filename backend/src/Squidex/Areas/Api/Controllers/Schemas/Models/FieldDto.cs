@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
-using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
@@ -108,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             if (allowUpdate)
             {
-                var values = new { app = resources.App, name = schema, id = FieldId };
+                var values = new { app = resources.App, schema, id = FieldId };
 
                 AddPutLink("update", resources.Url<SchemaFieldsController>(x => nameof(x.PutField), values));
 
@@ -130,13 +129,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                     AddPutLink("disable", resources.Url<SchemaFieldsController>(x => nameof(x.DisableField), values));
                 }
 
-                if (Properties is ArrayFieldPropertiesDto)
+                if (Nested != null)
                 {
-                    var parentValues = new { values.app, values.name, parentId = FieldId };
+                    var parentValues = new { values.app, values.schema, parentId = FieldId };
 
                     AddPostLink("fields/add", resources.Url<SchemaFieldsController>(x => nameof(x.PostNestedField), parentValues));
 
-                    AddPutLink("fields/order", resources.Url<SchemaFieldsController>(x => nameof(x.PutNestedFieldOrdering), parentValues));
+                    if (Nested.Count > 0)
+                    {
+                        AddPutLink("fields/order", resources.Url<SchemaFieldsController>(x => nameof(x.PutNestedFieldOrdering), parentValues));
+                    }
                 }
 
                 if (!IsLocked)

@@ -5,122 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { DateHelper } from '@app/framework';
-import { createProperties, DateTime, FieldDefaultValue, FieldFormatter, FieldsValidators, HtmlValue, MetaFields, SchemaPropertiesDto } from '@app/shared/internal';
+import { createProperties, DateTime, FieldDefaultValue, FieldFormatter, FieldsValidators, HtmlValue } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 const {
     createField,
-    createSchema
 } = TestValues;
 
 const now = DateTime.parseISO('2017-10-12T16:30:10Z');
-
-describe('SchemaDetailsDto', () => {
-    const field1 = createField({ properties: createProperties('Array'), id: 1 });
-    const field2 = createField({ properties: createProperties('Array'), id: 2 });
-    const field3 = createField({ properties: createProperties('Array'), id: 3 });
-
-    it('should return label as display name', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto('Label') });
-
-        expect(schema.displayName).toBe('Label');
-    });
-
-    it('should return name as display name if label is undefined', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(undefined) });
-
-        expect(schema.displayName).toBe('schema1');
-    });
-
-    it('should return name as display name label is empty', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto('') });
-
-        expect(schema.displayName).toBe('schema1');
-    });
-
-    it('should return configured fields as list fields if fields are declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInLists: ['field1', 'field3'] });
-
-        expect(schema.defaultListFields).toEqual([field1, field3]);
-    });
-
-    it('should return first fields as list fields if no field is declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
-
-        expect(schema.defaultListFields).toEqual([MetaFields.lastModifiedByAvatar, field1, MetaFields.statusColor, MetaFields.lastModified]);
-    });
-
-    it('should return preset with empty content field as list fields if fields is empty', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto() });
-
-        expect(schema.defaultListFields).toEqual([MetaFields.lastModifiedByAvatar, '', MetaFields.statusColor, MetaFields.lastModified]);
-    });
-
-    it('should return configured fields as references fields if fields are declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3], fieldsInReferences: ['field1', 'field3'] });
-
-        expect(schema.defaultReferenceFields).toEqual([field1, field3]);
-    });
-
-    it('should return first field as reference fields if no field is declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
-
-        expect(schema.defaultReferenceFields).toEqual([field1]);
-    });
-
-    it('should return noop field as reference field if list is empty', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto() });
-
-        expect(schema.defaultReferenceFields).toEqual(['']);
-    });
-});
-
-describe('FieldDto', () => {
-    it('should return label as display name', () => {
-        const field = createField({ properties: createProperties('Array', { label: 'Label' }) });
-
-        expect(field.displayName).toBe('Label');
-    });
-
-    it('should return name as display name if label is null', () => {
-        const field = createField({ properties: createProperties('Assets') });
-
-        expect(field.displayName).toBe('field1');
-    });
-
-    it('should return name as display name label is empty', () => {
-        const field = createField({ properties: createProperties('Assets', { label: '' }) });
-
-        expect(field.displayName).toBe('field1');
-    });
-
-    it('should return placeholder as display placeholder', () => {
-        const field = createField({ properties: createProperties('Assets', { placeholder: 'Placeholder' }) });
-
-        expect(field.displayPlaceholder).toBe('Placeholder');
-    });
-
-    it('should return empty as display placeholder if placeholder is null', () => {
-        const field = createField({ properties: createProperties('Assets') });
-
-        expect(field.displayPlaceholder).toBe('');
-    });
-
-    it('should return localizable if partitioning is language', () => {
-        const field = createField({ properties: createProperties('Assets'), partitioning: 'language' });
-
-        expect(field.isLocalizable).toBeTruthy();
-    });
-
-    it('should not return localizable if partitioning is invariant', () => {
-        const field = createField({ properties: createProperties('Assets'), partitioning: 'invariant' });
-
-        expect(field.isLocalizable).toBeFalsy();
-    });
-});
 
 describe('ArrayField', () => {
     const field = createField({ properties: createProperties('Array', { isRequired: true, minItems: 1, maxItems: 5 }) });
@@ -180,14 +73,34 @@ describe('AssetsField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'], defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
 
-describe('TagsField', () => {
-    const field = createField({ properties: createProperties('Tags', { isRequired: true, minItems: 1, maxItems: 5 }) });
+describe('ComponentField', () => {
+    const field = createField({ properties: createProperties('Component', { isRequired: true }) });
+
+    it('should create validators', () => {
+        expect(FieldsValidators.create(field, false).length).toBe(1);
+    });
+
+    it('should format to empty string if null', () => {
+        expect(FieldFormatter.format(field, null)).toBe('');
+    });
+
+    it('should format to constant', () => {
+        expect(FieldFormatter.format(field, {})).toBe('{ Component }');
+    });
+
+    it('should return default value as null', () => {
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
+    });
+});
+
+describe('ComponentsField', () => {
+    const field = createField({ properties: createProperties('Components', { isRequired: true, minItems: 1, maxItems: 5 }) });
 
     it('should create validators', () => {
         expect(FieldsValidators.create(field, false).length).toBe(2);
@@ -197,24 +110,20 @@ describe('TagsField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to asset count', () => {
-        expect(FieldFormatter.format(field, ['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
+    it('should format to plural count for many items', () => {
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Components');
+    });
+
+    it('should format to plural count for single item', () => {
+        expect(FieldFormatter.format(field, [1])).toBe('1 Component');
     });
 
     it('should return zero formatting if other type', () => {
-        expect(FieldFormatter.format(field, 1)).toBe('');
+        expect(FieldFormatter.format(field, 1)).toBe('0 Components');
     });
 
-    it('should return default value from properties', () => {
-        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'] }) });
-
-        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(['1', '2']);
-    });
-
-    it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
-
-        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
+    it('should return default value as null', () => {
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
     });
 });
 
@@ -244,7 +153,7 @@ describe('BooleanField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Boolean', { defaultValue: true, defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('Boolean', { defaultValue: true, defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -287,12 +196,6 @@ describe('DateTimeField', () => {
         expect(FieldFormatter.format(dateField, '2017-12-12T00:00:00Z')).toBe('12/12/2017');
     });
 
-    it('should format to date time', () => {
-        const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime' }) });
-
-        expect(FieldFormatter.format(field2, '2017-12-12T16:00:00Z')).toBe('12/12/2017, 4:00:00 PM');
-    });
-
     it('should return default from properties value', () => {
         const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime', defaultValue: '2017-10-12T16:00:00Z' }) });
 
@@ -300,7 +203,7 @@ describe('DateTimeField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('DateTime', { defaultValue: '2017-10-12T16:00:00Z', defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('DateTime', { defaultValue: '2017-10-12T16:00:00Z', defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -316,6 +219,14 @@ describe('DateTimeField', () => {
 
         expect(FieldDefaultValue.get(field2, 'iv', now)).toEqual('2017-10-12T16:30:10Z');
     });
+
+    if (isUtc()) {
+        it('should format to date time', () => {
+            const field2 = createField({ properties: createProperties('DateTime', { editor: 'DateTime' }) });
+
+            expect(FieldFormatter.format(field2, '2017-12-12T16:00:00Z')).toBe('12/12/2017, 4:00:00 PM');
+        });
+    }
 });
 
 describe('GeolocationField', () => {
@@ -410,7 +321,7 @@ describe('NumberField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('Number', { defaultValue: 13, defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('Number', { defaultValue: 13, defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -446,7 +357,7 @@ describe('ReferencesField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('References', { defaultValue: ['1', '2'], defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('References', { defaultValue: ['1', '2'], defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
@@ -492,8 +403,44 @@ describe('StringField', () => {
     });
 
     it('should override default value from localizable properties', () => {
-        const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault', defaultValues: { 'iv': null } }) });
+        const field2 = createField({ properties: createProperties('String', { defaultValue: 'MyDefault', defaultValues: { iv: null } }) });
 
         expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
     });
 });
+
+describe('TagsField', () => {
+    const field = createField({ properties: createProperties('Tags', { isRequired: true, minItems: 1, maxItems: 5 }) });
+
+    it('should create validators', () => {
+        expect(FieldsValidators.create(field, false).length).toBe(2);
+    });
+
+    it('should format to empty string if null', () => {
+        expect(FieldFormatter.format(field, null)).toBe('');
+    });
+
+    it('should format to asset count', () => {
+        expect(FieldFormatter.format(field, ['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
+    });
+
+    it('should return zero formatting if other type', () => {
+        expect(FieldFormatter.format(field, 1)).toBe('');
+    });
+
+    it('should return default value from properties', () => {
+        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'] }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toEqual(['1', '2']);
+    });
+
+    it('should override default value from localizable properties', () => {
+        const field2 = createField({ properties: createProperties('Tags', { defaultValue: ['1', '2'], defaultValues: { iv: null } }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv')).toBeNull();
+    });
+});
+
+function isUtc() {
+    return new Date().getTimezoneOffset() === 0;
+}

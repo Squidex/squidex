@@ -18,7 +18,7 @@ describe('RulesState', () => {
     const {
         app,
         appsState,
-        newVersion
+        newVersion,
     } = TestValues;
 
     const rule1 = createRule(1);
@@ -66,7 +66,7 @@ describe('RulesState', () => {
 
         it('should reset loading state if loading failed', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             rulesState.load().pipe(onErrorResumeNext()).subscribe();
 
@@ -197,7 +197,7 @@ describe('RulesState', () => {
         it('should update selected rule if reloaded', () => {
             const newRules = [
                 createRule(1, '_new'),
-                createRule(2, '_new')
+                createRule(2, '_new'),
             ];
 
             rulesService.setup(x => x.getRules(app))

@@ -74,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return app.Clients.Count(x => role.Equals(x.Value.Role));
         }
 
-        public RoleDto WithLinks(Resources resources)
+        public RoleDto CreateLinks(Resources resources)
         {
             var values = new { app = resources.App, roleName = Name };
 

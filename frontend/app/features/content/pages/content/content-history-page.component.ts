@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: triple-equals
-
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppsState, ContentDto, ContentsState, defined, fadeAnimation, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemasState, switchSafe } from '@app/shared';
 import { Observable, timer } from 'rxjs';
@@ -19,8 +17,8 @@ import { ContentPageComponent } from './content-page.component';
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class ContentHistoryPageComponent extends ResourceOwner implements OnInit {
     @ViewChild('dueTimeSelector', { static: false })
@@ -41,7 +39,7 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
         private readonly contentPage: ContentPageComponent,
         private readonly contentsState: ContentsState,
         private readonly historyService: HistoryService,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
         super();
     }

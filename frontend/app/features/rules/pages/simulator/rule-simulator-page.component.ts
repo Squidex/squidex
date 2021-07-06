@@ -12,14 +12,14 @@ import { ResourceOwner, RuleSimulatorState, SimulatedRuleEventDto } from '@app/s
 @Component({
     selector: 'sqx-simulator-events-page',
     styleUrls: ['./rule-simulator-page.component.scss'],
-    templateUrl: './rule-simulator-page.component.html'
+    templateUrl: './rule-simulator-page.component.html',
 })
 export class RuleSimulatorPageComponent extends ResourceOwner implements OnInit {
     public selectedRuleEvent?: SimulatedRuleEventDto | null;
 
     constructor(
         private route: ActivatedRoute,
-        public readonly ruleSimulatorState: RuleSimulatorState
+        public readonly ruleSimulatorState: RuleSimulatorState,
     ) {
         super();
     }

@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable no-inner-declarations */
+
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { ErrorDto, Types, Version, Versioned } from '@app/framework/internal';
 import { Observable, throwError } from 'rxjs';
@@ -82,7 +84,7 @@ export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
     source.pipe(catchError((response: HttpErrorResponse) => {
         const error = parseError(response, message);
 
-        return throwError(error);
+        return throwError(() => error);
     }));
 
 export function parseError(response: HttpErrorResponse, fallback: string) {

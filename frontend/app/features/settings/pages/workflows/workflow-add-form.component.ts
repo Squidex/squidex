@@ -13,14 +13,14 @@ import { AddWorkflowForm, WorkflowsState } from '@app/shared';
     selector: 'sqx-workflow-add-form',
     styleUrls: ['./workflow-add-form.component.scss'],
     templateUrl: './workflow-add-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkflowAddFormComponent {
     public addWorkflowForm = new AddWorkflowForm(this.formBuilder);
 
     constructor(
         private readonly workflowsState: WorkflowsState,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

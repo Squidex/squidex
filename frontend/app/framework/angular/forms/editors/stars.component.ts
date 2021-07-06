@@ -10,7 +10,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true,
 };
 
 interface State {
@@ -29,9 +29,9 @@ interface State {
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
     providers: [
-        SQX_STARS_CONTROL_VALUE_ACCESSOR
+        SQX_STARS_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StarsComponent extends StatefulControlComponent<State, number | null> {
     private maximumStarsValue = 5;
@@ -66,7 +66,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         super(changeDetector, {
             stars: -1,
             starsArray: [1, 2, 3, 4, 5],
-            value: 1
+            value: 1,
         });
     }
 

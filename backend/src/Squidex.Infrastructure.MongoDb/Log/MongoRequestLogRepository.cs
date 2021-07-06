@@ -34,7 +34,8 @@ namespace Squidex.Infrastructure.Log
             return "RequestLog";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection,
+            CancellationToken ct = default)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {

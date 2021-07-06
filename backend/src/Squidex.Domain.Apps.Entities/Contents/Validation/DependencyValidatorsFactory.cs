@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Validation
 {
@@ -22,9 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
 
         public DependencyValidatorsFactory(IAssetRepository assetRepository, IContentRepository contentRepository)
         {
-            Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
         }
@@ -42,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             {
                 var checkAssets = new CheckAssets(async ids =>
                 {
-                    return await assetRepository.QueryAsync(context.AppId.Id, null, Q.Empty.WithIds(ids));
+                    return await assetRepository.QueryAsync(context.AppId.Id, null, Q.Empty.WithIds(ids), default);
                 });
 
                 yield return new AssetsValidator(isRequired, assetsField.Properties, checkAssets);
@@ -52,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             {
                 var checkReferences = new CheckContentsByIds(async ids =>
                 {
-                    return await contentRepository.QueryIdsAsync(context.AppId.Id, ids, SearchScope.All);
+                    return await contentRepository.QueryIdsAsync(context.AppId.Id, ids, SearchScope.All, default);
                 });
 
                 yield return new ReferencesValidator(isRequired, referencesField.Properties, checkReferences);
@@ -62,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             {
                 var checkUniqueness = new CheckUniqueness(async filter =>
                 {
-                    return await contentRepository.QueryIdsAsync(context.AppId.Id, context.SchemaId.Id, filter);
+                    return await contentRepository.QueryIdsAsync(context.AppId.Id, context.SchemaId.Id, filter, default);
                 });
 
                 yield return new UniqueValidator(checkUniqueness);
@@ -72,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Validation
             {
                 var checkUniqueness = new CheckUniqueness(async filter =>
                 {
-                    return await contentRepository.QueryIdsAsync(context.AppId.Id, context.SchemaId.Id, filter);
+                    return await contentRepository.QueryIdsAsync(context.AppId.Id, context.SchemaId.Id, filter, default);
                 });
 
                 yield return new UniqueValidator(checkUniqueness);

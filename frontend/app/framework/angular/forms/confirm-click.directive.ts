@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { DialogService } from '@app/framework/internal';
+import { DialogService, Types } from '@app/framework/internal';
 import { Subscriber } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 @Directive({
-    selector: '[sqxConfirmClick]'
+    selector: '[sqxConfirmClick]',
 })
 export class ConfirmClickDirective {
     @Input()
@@ -35,7 +33,7 @@ export class ConfirmClickDirective {
     public clickConfirmed = new EventEmitter();
 
     constructor(
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
     }
 
@@ -46,19 +44,16 @@ export class ConfirmClickDirective {
             this.confirmTitle.length > 0 &&
             this.confirmText &&
             this.confirmText.length > 0) {
-
-            const observers = [...this.clickConfirmed.observers];
+            const destinations = this.clickConfirmed.observers?.map(x => (x as Subscriber<any>)['destination']) || [];
 
             this.beforeClick.emit();
 
             this.dialogs.confirm(this.confirmTitle, this.confirmText, this.confirmRememberKey).pipe(take(1))
                 .subscribe(confirmed => {
                     if (confirmed) {
-                        for (const observer of observers) {
-                            const subscriber = observer as Subscriber<any>;
-
-                            if (subscriber['destination'] && subscriber['destination'].next) {
-                                subscriber['destination'].next(true);
+                        for (const destination of destinations) {
+                            if (Types.isFunction(destination?.next)) {
+                                destination.next(true);
                             }
                         }
                     }

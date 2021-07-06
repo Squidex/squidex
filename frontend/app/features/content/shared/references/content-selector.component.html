@@ -2,8 +2,8 @@
     <ng-container title>
         <div class="row">
             <div class="col-selector">
-                <select class="custom-select" [ngModel]="schema?.id" (ngModelChange)="selectSchema($event)">
-                    <option *ngFor="let schema of schemas" [ngValue]="schema.id">
+                <select class="custom-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
+                    <option *ngFor="let schema of schemas" [ngValue]="schema">
                         {{ 'contents.referencesSelectSchema' | sqxTranslate: { schema: schema.displayName } }}
                     </option>
                 </select>
@@ -88,7 +88,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn text-secondary2" (click)="emitComplete()">
+        <button type="button" class="btn text-secondary" (click)="emitComplete()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 

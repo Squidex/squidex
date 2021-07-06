@@ -1,0 +1,195 @@
+name: Release
+concurrency: release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: BUILD
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          load: true
+          tags: squidex-tmp
+          build-args: "SQUIDEX__VERSION=${{ env.GITHUB_REF_SLUG }}"
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - name: Export Image
+        run: docker save squidex-tmp | gzip > squidex-tmp.tar.gz
+
+      - name: Save Image to Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image-${{ github.sha }}
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Get Image From Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image-${{ github.sha }}
+
+      - name: Load Image
+        run: docker load < squidex-tmp.tar.gz
+
+      - name: Replace Image Name
+        uses: mikefarah/yq@v4.9.1
+        with:
+          cmd: yq e '.services.squidex.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
+
+      - name: Start Test
+        run: docker-compose up -d
+        working-directory: backend/tests
+
+      - name: RUN TEST
+        uses: kohlerdominik/docker-run-action@v1.0.0
+        with:
+          image: mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim
+          environment: |
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8080
+          default_network: host
+          options: --name test
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+
+      - name: Cleanup Test
+        if: always()
+        run: docker-compose down
+        working-directory: backend/tests
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Get Major Version
+        id: version
+        uses: rishabhgupta/split-by@v1
+        with:
+          string: '${{ env.GITHUB_REF_SLUG }}'
+          split-by: '.'
+
+      - name: Get Image From Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image-${{ github.sha }}
+
+      - name: Load Image
+        run: docker load < squidex-tmp.tar.gz
+
+      - name: Rename Tags
+        run: |
+          docker tag squidex-tmp squidex/squidex:latest
+          docker tag squidex-tmp squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker tag squidex-tmp squidex/squidex:${{ steps.version.outputs._0 }}
+
+      - name: Push Tags
+        run: |
+          docker push squidex/squidex:latest
+          docker push squidex/squidex:${{ env.GITHUB_REF_SLUG }}
+          docker push squidex/squidex:${{ steps.version.outputs._0 }}
+
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Get Image From Cache
+        uses: actions/cache@v2
+        with:
+          path: squidex-tmp.tar.gz
+          key: squidex-release-image-${{ github.sha }}
+
+      - name: Load Image
+        run: docker load < squidex-tmp.tar.gz
+
+      - name: Make directories
+        run: sudo mkdir /build /release
+
+      - name: Create container
+        run: docker create --name squidex-container squidex-tmp:latest
+
+      - name: Get binaries
+        run: sudo docker cp squidex-container:/app/. /build
+
+      - name: ZIP Binaries
+        run: sudo zip -r /release/binaries.zip .
+        working-directory: /build
+
+      - name: Get Changelog Entry
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          version: ${{ env.GITHUB_REF_SLUG }}
+          path: ./CHANGELOG.md
+
+      - name: Publish Binaries
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: "/release/binaries.zip"
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          name: ${{ env.GITHUB_REF_SLUG }}
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup Binaries
+        if: always()
+        run: docker rm squidex-container

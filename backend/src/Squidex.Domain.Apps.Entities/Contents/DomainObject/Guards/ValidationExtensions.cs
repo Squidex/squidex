@@ -94,11 +94,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var contentRepository = context.Resolve<IContentRepository>();
 
-            var hasReferrer = await contentRepository.HasReferrersAsync(context.App.Id, context.ContentId, SearchScope.All);
+            var hasReferrer = await contentRepository.HasReferrersAsync(context.App.Id, context.ContentId, SearchScope.All, default);
 
             if (hasReferrer)
             {
-                throw new DomainException(T.Get("contents.referenced", "OBJECT_REFERENCED"));
+                throw new DomainException(T.Get("contents.referenced"), "OBJECT_REFERENCED");
             }
         }
 
@@ -109,6 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     context.App.NamedId(),
                     context.Schema.NamedId(),
                     context.SchemaDef,
+                    context.Components,
                     context.ContentId)
                 .Optimized(optimize).AsPublishing(published);
 

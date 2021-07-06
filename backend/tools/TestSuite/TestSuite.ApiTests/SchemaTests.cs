@@ -53,7 +53,12 @@ namespace TestSuite.ApiTests
             var schemaName = $"schema-{Guid.NewGuid()}";
 
             // STEP 1: Create schema
-            var createRequest = new CreateSchemaDto { Name = schemaName, IsSingleton = true };
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName,
+                IsSingleton = true,
+                IsPublished = true
+            };
 
             var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
 

@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
     selector: 'sqx-status-icon',
     styleUrls: ['./status-icon.component.scss'],
     templateUrl: './status-icon.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatusIconComponent {
     @Input()

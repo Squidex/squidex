@@ -54,7 +54,7 @@ export class RolesState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
-        private readonly rolesService: RolesService
+        private readonly rolesService: RolesService,
     ) {
         super({ roles: [], version: Version.EMPTY }, 'Roles');
     }
@@ -116,7 +116,7 @@ export class RolesState extends State<Snapshot> {
             isLoaded: true,
             isLoading: false,
             roles,
-            version
+            version,
         }, 'Loading Success / Updated');
     }
 

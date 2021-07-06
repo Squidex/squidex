@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("xyz", ctx);
+            var result = await sut.SearchAsync("xyz", ctx, default);
 
             Assert.Empty(result);
         }
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.DashboardUI(appId))
                 .Returns("dashboard-url");
 
-            var result = await sut.SearchAsync("dashboard", ctx);
+            var result = await sut.SearchAsync("dashboard", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx);
+            var result = await sut.SearchAsync("assets", ctx, default);
 
             Assert.Empty(result);
         }
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.LanguagesUI(appId))
                 .Returns("languages-url");
 
-            var result = await sut.SearchAsync("languages", ctx);
+            var result = await sut.SearchAsync("languages", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx);
+            var result = await sut.SearchAsync("assets", ctx, default);
 
             Assert.Empty(result);
         }
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("patterns", ctx);
+            var result = await sut.SearchAsync("patterns", ctx, default);
 
             Assert.Empty(result);
         }
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.SchemasUI(appId))
                 .Returns("schemas-url");
 
-            var result = await sut.SearchAsync("schemas", ctx);
+            var result = await sut.SearchAsync("schemas", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("schemas", ctx);
+            var result = await sut.SearchAsync("schemas", ctx, default);
 
             Assert.Empty(result);
         }
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.AssetsUI(appId, A<string?>._))
                 .Returns("assets-url");
 
-            var result = await sut.SearchAsync("assets", ctx);
+            var result = await sut.SearchAsync("assets", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx);
+            var result = await sut.SearchAsync("assets", ctx, default);
 
             Assert.Empty(result);
         }
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.BackupsUI(appId))
                 .Returns("backups-url");
 
-            var result = await sut.SearchAsync("backups", ctx);
+            var result = await sut.SearchAsync("backups", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("backups", ctx);
+            var result = await sut.SearchAsync("backups", ctx, default);
 
             Assert.Empty(result);
         }
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.ClientsUI(appId))
                 .Returns("clients-url");
 
-            var result = await sut.SearchAsync("clients", ctx);
+            var result = await sut.SearchAsync("clients", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("clients", ctx);
+            var result = await sut.SearchAsync("clients", ctx, default);
 
             Assert.Empty(result);
         }
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.ContributorsUI(appId))
                 .Returns("contributors-url");
 
-            var result = await sut.SearchAsync("contributors", ctx);
+            var result = await sut.SearchAsync("contributors", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -234,7 +234,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("contributors", ctx);
+            var result = await sut.SearchAsync("contributors", ctx, default);
 
             Assert.Empty(result);
         }
@@ -249,7 +249,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.PlansUI(appId))
                 .Returns("subscription-url");
 
-            var result = await sut.SearchAsync("subscription", ctx);
+            var result = await sut.SearchAsync("subscription", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("subscription", ctx);
+            var result = await sut.SearchAsync("subscription", ctx, default);
 
             Assert.Empty(result);
         }
@@ -276,7 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.RolesUI(appId))
                 .Returns("roles-url");
 
-            var result = await sut.SearchAsync("roles", ctx);
+            var result = await sut.SearchAsync("roles", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -288,7 +288,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("roles", ctx);
+            var result = await sut.SearchAsync("roles", ctx, default);
 
             Assert.Empty(result);
         }
@@ -303,7 +303,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.RulesUI(appId))
                 .Returns("rules-url");
 
-            var result = await sut.SearchAsync("rules", ctx);
+            var result = await sut.SearchAsync("rules", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -315,7 +315,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("assets", ctx);
+            var result = await sut.SearchAsync("assets", ctx, default);
 
             Assert.Empty(result);
         }
@@ -330,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => urlGenerator.WorkflowsUI(appId))
                 .Returns("workflows-url");
 
-            var result = await sut.SearchAsync("workflows", ctx);
+            var result = await sut.SearchAsync("workflows", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
@@ -342,7 +342,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("workflows", ctx);
+            var result = await sut.SearchAsync("workflows", ctx, default);
 
             Assert.Empty(result);
         }

@@ -11,7 +11,7 @@ export const Settings = {
         HIDE_ASSETS: 'ui.assets.hide',
         HIDE_CONTENTS: (schema: any) => `ui.contents.${schema}.hide`,
         HIDE_SCHEMAS: 'ui.schemas.hide',
-        HIDE_SETTINGS: 'ui.settings.hide'
+        HIDE_SETTINGS: 'ui.settings.hide',
     },
     Local: {
         ASSETS_MODE: 'squidex.assets.list-view',
@@ -23,6 +23,6 @@ export const Settings = {
         NEWS_VERSION: 'squidex.news.version',
         SCHEMA_CATEGORY_COLLAPSED: (category: any) => `squidex.schema.category.${category}.collapsed`,
         SCHEMA_PREVIEW: (schema: any) => `squidex.schemas.${schema}.preview-button`,
-        SCHEMAS_COLLAPSED: 'content.schemas.collapsed'
-    }
+        SCHEMAS_COLLAPSED: 'content.schemas.collapsed',
+    },
 };

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -21,7 +22,7 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(CancellationToken ct)
         {
             var collection = database.GetCollection<BsonDocument>("States_Assets");
 
@@ -29,39 +30,39 @@ namespace Migrations.Migrations.MongoDb
                 Builders<BsonDocument>.Update
                     .Set("md", new BsonDocument());
 
-            await collection.UpdateManyAsync(new BsonDocument(), createMetadata);
+            await collection.UpdateManyAsync(new BsonDocument(), createMetadata, cancellationToken: ct);
 
             var removeNullPixelInfos =
                 Builders<BsonDocument>.Update
                     .Unset("ph")
                     .Unset("pw");
 
-            await collection.UpdateManyAsync(new BsonDocument("ph", BsonValue.Create(null)), removeNullPixelInfos);
+            await collection.UpdateManyAsync(new BsonDocument("ph", BsonValue.Create(null)), removeNullPixelInfos, cancellationToken: ct);
 
             var setPixelDimensions =
                 Builders<BsonDocument>.Update
                     .Rename("ph", "md.pixelHeight")
                     .Rename("pw", "md.pixelWidth");
 
-            await collection.UpdateManyAsync(new BsonDocument(), setPixelDimensions);
+            await collection.UpdateManyAsync(new BsonDocument(), setPixelDimensions, cancellationToken: ct);
 
             var setTypeToImage =
                 Builders<BsonDocument>.Update
                     .Set("at", "Image");
 
-            await collection.UpdateManyAsync(new BsonDocument("im", true), setTypeToImage);
+            await collection.UpdateManyAsync(new BsonDocument("im", true), setTypeToImage, cancellationToken: ct);
 
             var setTypeToUnknown =
                 Builders<BsonDocument>.Update
                     .Set("at", "Unknown");
 
-            await collection.UpdateManyAsync(new BsonDocument("im", false), setTypeToUnknown);
+            await collection.UpdateManyAsync(new BsonDocument("im", false), setTypeToUnknown, cancellationToken: ct);
 
             var removeIsImage =
                 Builders<BsonDocument>.Update
                     .Unset("im");
 
-            await collection.UpdateManyAsync(new BsonDocument(), removeIsImage);
+            await collection.UpdateManyAsync(new BsonDocument(), removeIsImage, cancellationToken: ct);
         }
     }
 }

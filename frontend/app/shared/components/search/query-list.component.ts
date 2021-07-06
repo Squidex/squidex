@@ -12,7 +12,7 @@ import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
     selector: 'sqx-query-list',
     styleUrls: ['./query-list.component.scss'],
     templateUrl: './query-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QueryListComponent {
     @Output()

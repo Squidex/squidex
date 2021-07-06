@@ -6,7 +6,7 @@
  */
 
 import { Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
-import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
+import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SchemaMustNotBeSingletonGuard } from './schema-must-not-be-singleton.guard';
@@ -14,13 +14,13 @@ import { SchemaMustNotBeSingletonGuard } from './schema-must-not-be-singleton.gu
 describe('SchemaMustNotBeSingletonGuard', () => {
     const route: any = {
         params: {
-            schemaName: '123'
+            schemaName: '123',
         },
         url: [
             new UrlSegment('schemas', {}),
             new UrlSegment('name', {}),
-            new UrlSegment('new', {})
-        ]
+            new UrlSegment('new', {}),
+        ],
     };
 
     let schemasState: IMock<SchemasState>;
@@ -33,11 +33,11 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         schemaGuard = new SchemaMustNotBeSingletonGuard(schemasState.object, router.object);
     });
 
-    it('should subscribe to schema and return true if not singleton', () => {
+    it('should subscribe to schema and return true if default', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDetailsDto>{ id: '123', isSingleton: false }));
+            .returns(() => of(<SchemaDto>{ id: '123', type: 'Default' }));
 
         let result: boolean;
 
@@ -54,7 +54,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDetailsDto>{ id: '123', isSingleton: true }));
+            .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
         let result: boolean;
 
@@ -71,7 +71,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/new/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(<SchemaDetailsDto>{ id: '123', isSingleton: true }));
+            .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
         let result: boolean;
 

@@ -36,18 +36,20 @@ export class AppDto {
 
     constructor(links: ResourceLinks,
         public readonly id: string,
+        public readonly created: DateTime,
+        public readonly createdBy: string,
+        public readonly lastModified: DateTime,
+        public readonly lastModifiedBy: string,
+        public readonly version: Version,
         public readonly name: string,
         public readonly label: string | undefined,
         public readonly description: string | undefined,
         public readonly permissions: ReadonlyArray<string>,
-        public readonly created: DateTime,
-        public readonly lastModified: DateTime,
         public readonly canAccessApi: boolean,
         public readonly canAccessContent: boolean,
         public readonly planName: string | undefined,
         public readonly planUpgrade: string | undefined,
         public readonly roleProperties: {},
-        public readonly version: Version
     ) {
         this._links = links;
 
@@ -83,7 +85,7 @@ export class AppSettingsDto {
         public readonly hideScheduler: boolean,
         public readonly patterns: ReadonlyArray<PatternDto>,
         public readonly editors: ReadonlyArray<EditorDto>,
-        public readonly version: Version
+        public readonly version: Version,
     ) {
         this._links = links;
 
@@ -95,7 +97,7 @@ export class PatternDto {
     constructor(
         public readonly name: string,
         public readonly regex: string,
-        public readonly message?: string
+        public readonly message?: string,
     ) {
     }
 }
@@ -103,32 +105,26 @@ export class PatternDto {
 export class EditorDto {
     constructor(
         public readonly name: string,
-        public readonly url: string
+        public readonly url: string,
     ) {
     }
 }
 
-export type UpdatePatternDto =
-    Readonly<{ name: string, regex: string, message?: string }>;
-
-export type UpdateEditorDto =
-    Readonly<{ name: string, regex: string, message?: string }>;
-
 export type UpdateAppSettingsDto =
-    Readonly<{ patterns: readonly UpdatePatternDto[], editors: readonly UpdateEditorDto[], hideScheduler?: boolean }>;
+    Readonly<{ patterns: ReadonlyArray<PatternDto>; editors: ReadonlyArray<EditorDto>; hideScheduler?: boolean }>;
 
 export type CreateAppDto =
-    Readonly<{ name: string; template?: string; }>;
+    Readonly<{ name: string; template?: string }>;
 
 export type UpdateAppDto =
-    Readonly<{ label?: string, description?: string }>;
+    Readonly<{ label?: string; description?: string }>;
 
 @Injectable()
 export class AppsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -228,14 +224,14 @@ export class AppsService {
                 } else if (Types.is(event, HttpResponse)) {
                     return parseApp(event.body);
                 } else {
-                    throw 'Invalid';
+                    throw new Error('Invalid');
                 }
             }),
             catchError(error => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
+                    return throwError(() => new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(value => {
@@ -289,18 +285,18 @@ export class AppsService {
 function parseApp(response: any) {
     return new AppDto(response._links,
         response.id,
+        DateTime.parseISO(response.created), response.createdBy,
+        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
+        new Version(response.version.toString()),
         response.name,
         response.label,
         response.description,
         response.permissions,
-        DateTime.parseISO(response.created),
-        DateTime.parseISO(response.lastModified),
         response.canAccessApi,
         response.canAccessContent,
         response.planName,
         response.planUpgrade,
-        response.roleProperties,
-        new Version(response.version.toString()));
+        response.roleProperties);
 }
 
 function parseAppSettings(response: any) {

@@ -13,11 +13,11 @@ describe('HelpService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
-                HelpService
-            ]
+                HelpService,
+            ],
         });
     });
 
@@ -27,39 +27,37 @@ describe('HelpService', () => {
 
     it('should make get request to get help sections',
         inject([HelpService, HttpTestingController], (helpService: HelpService, httpMock: HttpTestingController) => {
+            let helpSections: string;
 
-        let helpSections: string;
+            helpService.getHelp('01-chapter/02-article').subscribe(result => {
+                helpSections = result;
+            });
 
-        helpService.getHelp('01-chapter/02-article').subscribe(result => {
-            helpSections = result;
-        });
+            const req = httpMock.expectOne('https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md');
 
-        const req = httpMock.expectOne('https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush('Markdown');
 
-        req.flush('Markdown');
-
-        expect(helpSections!).toEqual('Markdown');
-    }));
+            expect(helpSections!).toEqual('Markdown');
+        }));
 
     it('should return empty sections if get request fails',
         inject([HelpService, HttpTestingController], (helpService: HelpService, httpMock: HttpTestingController) => {
+            let helpSections: string;
 
-        let helpSections: string;
+            helpService.getHelp('01-chapter/02-article').subscribe(result => {
+                helpSections = result;
+            });
 
-        helpService.getHelp('01-chapter/02-article').subscribe(result => {
-            helpSections = result;
-        });
+            const req = httpMock.expectOne('https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md');
 
-        const req = httpMock.expectOne('https://raw.githubusercontent.com/squidex/squidex-docs2/master/01-chapter/02-article.md');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.error(<any>{});
 
-        req.error(<any>{});
-
-        expect(helpSections!).toEqual('');
-    }));
+            expect(helpSections!).toEqual('');
+        }));
 });

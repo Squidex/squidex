@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -30,8 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemaChangedTriggerHandler(IScriptEngine scriptEngine)
         {
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-
             this.scriptEngine = scriptEngine;
         }
 

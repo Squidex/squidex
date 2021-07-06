@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string DisplayName { get; }
 
+        public string ComponentType { get; }
+
         public string ContentType { get; }
 
         public string DataType { get; }
@@ -38,6 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         private SchemaInfo(ISchemaEntity schema, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
         {
             Schema = schema;
+            ComponentType = names[$"{typeName}Component"];
             ContentType = names[typeName];
             DataFlatType = names[$"{typeName}FlatDataDto"];
             DataInputType = names[$"{typeName}DataInputDto"];
@@ -57,25 +60,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             var names = new Names();
 
-            foreach (var schema in schemas.Where(x => x.SchemaDef.IsPublished && x.SchemaDef.Fields.Count > 0).OrderBy(x => x.Created))
+            foreach (var schema in schemas.OrderBy(x => x.Created))
             {
                 var typeName = schema.TypeName();
 
-                var fields = FieldInfo.EmptyFields;
+                var fieldInfos = new List<FieldInfo>(schema.SchemaDef.Fields.Count);
+                var fieldNames = new Names();
 
-                if (schema.SchemaDef.Fields.Count > 0)
+                foreach (var field in schema.SchemaDef.Fields.ForApi())
                 {
-                    var fieldNames = new Names();
-
-                    fields = new List<FieldInfo>(schema.SchemaDef.Fields.Count);
-
-                    foreach (var field in schema.SchemaDef.Fields)
-                    {
-                        fields.Add(FieldInfo.Build(field, fieldNames[field], names[$"{typeName}Data{field.TypeName()}"], names));
-                    }
+                    fieldInfos.Add(FieldInfo.Build(
+                        field,
+                        names[$"{typeName}Data{field.TypeName()}"],
+                        names,
+                        fieldNames));
                 }
 
-                yield return new SchemaInfo(schema, typeName, fields, names);
+                yield return new SchemaInfo(schema, typeName, fieldInfos, names);
             }
         }
     }
@@ -88,6 +89,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string FieldName { get; }
 
+        public string FieldNameDynamic { get; }
+
         public string DisplayName { get; }
 
         public string LocalizedType { get; }
@@ -98,21 +101,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string NestedInputType { get; }
 
-        public string UnionType { get; }
+        public string ComponentType { get; }
+
+        public string ReferenceType { get; }
 
         public IReadOnlyList<FieldInfo> Fields { get; }
 
-        private FieldInfo(IField field, string fieldName, string typeName, IReadOnlyList<FieldInfo> fields, Names names)
+        private FieldInfo(IField field, string typeName, Names names, Names parentNames, IReadOnlyList<FieldInfo> fields)
         {
+            var fieldName = parentNames[field.Name.ToCamelCase(), false];
+
+            ComponentType = names[$"{typeName}ComponentUnionDto"];
             DisplayName = field.DisplayName();
             Field = field;
             Fields = fields;
             FieldName = fieldName;
+            FieldNameDynamic = names[$"{fieldName}__Dynamic"];
             LocalizedType = names[$"{typeName}Dto"];
             LocalizedInputType = names[$"{typeName}InputDto"];
             NestedInputType = names[$"{typeName}ChildInputDto"];
             NestedType = names[$"{typeName}ChildDto"];
-            UnionType = names[$"{typeName}UnionDto"];
+            ReferenceType = names[$"{typeName}UnionDto"];
         }
 
         public override string ToString()
@@ -120,23 +129,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return FieldName;
         }
 
-        internal static FieldInfo Build(IRootField rootField, string fieldName, string typeName, Names names)
+        internal static FieldInfo Build(IRootField rootField, string typeName, Names names, Names parentNames)
         {
-            var fields = EmptyFields;
+            var fieldInfos = EmptyFields;
 
-            if (rootField is IArrayField arrayField && arrayField.Fields.Count > 0)
+            if (rootField is IArrayField arrayField)
             {
                 var fieldNames = new Names();
 
-                fields = new List<FieldInfo>(arrayField.Fields.Count);
+                fieldInfos = new List<FieldInfo>(arrayField.Fields.Count);
 
-                foreach (var field in arrayField.Fields)
+                foreach (var nestedField in arrayField.Fields.ForApi())
                 {
-                    fields.Add(new FieldInfo(field, fieldNames[field], $"{typeName}{field.TypeName()}", EmptyFields, names));
+                    fieldInfos.Add(new FieldInfo(
+                        nestedField,
+                        names[$"{typeName}{nestedField.TypeName()}"],
+                        names,
+                        fieldNames,
+                        EmptyFields));
                 }
             }
 
-            return new FieldInfo(rootField, fieldName, typeName, fields, names);
+            return new FieldInfo(rootField, typeName, names, parentNames, fieldInfos);
         }
     }
 
@@ -145,9 +159,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         // Reserver names that are used for other GraphQL types.
         private static readonly HashSet<string> ReservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "Content",
             "Asset",
             "AssetResultDto",
+            "Content",
+            "Component",
+            "EntityCreatedResultDto",
             "EntitySavedResultDto",
             "JsonScalar",
             "JsonPrimitive",
@@ -155,14 +171,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         };
         private readonly Dictionary<string, int> takenNames = new Dictionary<string, int>();
 
-        public string this[IField field]
+        public string this[string name, bool isEntity = true]
         {
-            get => GetName(field.Name.ToCamelCase(), false);
-        }
-
-        public string this[string name]
-        {
-            get => GetName(name, true);
+            get => GetName(name, isEntity);
         }
 
         private string GetName(string name, bool isEntity)
@@ -173,7 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 name = "gql_" + name;
             }
-            else if (ReservedNames.Contains(name) && isEntity)
+            else if (isEntity && ReservedNames.Contains(name))
             {
                 name = $"{name}Entity";
             }
@@ -187,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             takenNames[name] = ++offset;
 
-            // Add + 1 to all offset for backwars compatibility.
+            // Add + 1 to all offsets for backwards-compatibility.
             return $"{name}{offset + 1}";
         }
     }

@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RuleEnqueuer sut;
 
-        public sealed class TestAction : RuleAction
+        public sealed record TestAction : RuleAction
         {
             public Uri Url { get; set; }
         }

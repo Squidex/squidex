@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
@@ -23,7 +24,7 @@ namespace Migrations.Migrations
             this.stateForAssets = stateForAssets;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(CancellationToken ct)
         {
             return stateForAssets.ReadAllAsync(async (state, version) =>
             {
@@ -32,7 +33,7 @@ namespace Migrations.Migrations
                 var key = DomainId.Combine(state.AppId.Id, state.Id);
 
                 await stateForAssets.WriteAsync(key, state, version, version);
-            });
+            }, ct);
         }
     }
 }

@@ -7,6 +7,7 @@
 
 import { DialogService, RulesService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SimulatedRuleEventsDto } from '../services/rules.service';
 import { createSimulatedRuleEvent } from './../services/rules.service.spec';
@@ -16,12 +17,12 @@ import { TestValues } from './_test-helpers';
 describe('RuleSimulatorState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     const oldSimulatedRuleEvents = [
-         createSimulatedRuleEvent(1),
-         createSimulatedRuleEvent(2)
+        createSimulatedRuleEvent(1),
+        createSimulatedRuleEvent(2),
     ];
 
     let dialogs: IMock<DialogService>;
@@ -53,16 +54,18 @@ describe('RuleSimulatorState', () => {
 
     it('should reset loading state if loading failed', () => {
         rulesService.setup(x => x.getSimulatedEvents(app, '12'))
-            .returns(() => throwError('error'));
+            .returns(() => throwError(() => 'Service Error'));
 
         ruleSimulatorState.selectRule('12');
-        ruleSimulatorState.load().subscribe();
+        ruleSimulatorState.load().pipe(onErrorResumeNext()).subscribe();
 
         expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
     });
 
     it('should not load simulated rule events if no rule selected', () => {
         ruleSimulatorState.load().subscribe();
+
+        expect().nothing();
 
         rulesService.verify(x => x.getSimulatedEvents(app, It.isAnyString()), Times.never());
     });

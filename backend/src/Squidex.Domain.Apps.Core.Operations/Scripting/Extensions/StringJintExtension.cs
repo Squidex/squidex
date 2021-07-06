@@ -8,6 +8,7 @@
 using System;
 using Jint;
 using Jint.Native;
+using Squidex.Infrastructure;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
@@ -15,6 +16,30 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
     public sealed class StringJintExtension : IJintExtension
     {
         private delegate JsValue StringSlugifyDelegate(string text, bool single = false);
+
+        private readonly Func<string, JsValue> sha256 = (text) =>
+        {
+            try
+            {
+                return text.ToSha256();
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
+        };
+
+        private readonly Func<string, JsValue> md5 = (text) =>
+        {
+            try
+            {
+                return text.ToMD5();
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
+        };
 
         private readonly StringSlugifyDelegate slugify = (text, single) =>
         {
@@ -56,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.Html2Text(text);
+                return text.Html2Text();
             }
             catch
             {
@@ -68,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             try
             {
-                return TextHelpers.Markdown2Text(text);
+                return text.Markdown2Text();
             }
             catch
             {
@@ -81,6 +106,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         public void Extend(Engine engine)
         {
             engine.SetValue("slugify", slugify);
+
+            engine.SetValue("sha256", sha256);
+            engine.SetValue("md5", md5);
 
             engine.SetValue("toCamelCase", toCamelCase);
             engine.SetValue("toPascalCase", toPascalCase);

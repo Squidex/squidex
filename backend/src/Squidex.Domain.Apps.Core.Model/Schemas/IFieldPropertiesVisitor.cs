@@ -15,6 +15,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         T Visit(BooleanFieldProperties properties, TArgs args);
 
+        T Visit(ComponentFieldProperties properties, TArgs args);
+
+        T Visit(ComponentsFieldProperties properties, TArgs args);
+
         T Visit(DateTimeFieldProperties properties, TArgs args);
 
         T Visit(GeolocationFieldProperties properties, TArgs args);

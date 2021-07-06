@@ -233,7 +233,7 @@ describe('ValidatorsEx.match', () => {
 
         const form = new FormGroup({
             password: new FormControl('1'),
-            passwordConfirm: new FormControl('2', validator)
+            passwordConfirm: new FormControl('2', validator),
         });
 
         form.controls['passwordConfirm'].setValue('1');
@@ -251,10 +251,10 @@ describe('ValidatorsEx.match', () => {
 
         const form = new FormGroup({
             password: new FormControl('1'),
-            passwordConfirm: new FormControl('2', validator)
+            passwordConfirm: new FormControl('2', validator),
         });
 
-        expect(validator(form.controls['passwordConfirm'])).toEqual({ match: { message: 'Passwords are not the same.' }});
+        expect(validator(form.controls['passwordConfirm'])).toEqual({ match: { message: 'Passwords are not the same.' } });
     });
 
     it('should return empty object if values are the same', () => {
@@ -262,7 +262,7 @@ describe('ValidatorsEx.match', () => {
 
         const form = new FormGroup({
             password: new FormControl('1'),
-            passwordConfirm: new FormControl('1', validator)
+            passwordConfirm: new FormControl('1', validator),
         });
 
         expect(validator(form.controls['passwordConfirm'])).toBeNull();
@@ -272,7 +272,7 @@ describe('ValidatorsEx.match', () => {
         const validator = ValidatorsEx.match('password', 'Passwords are not the same.');
 
         const form = new FormGroup({
-            passwordConfirm: new FormControl('2', validator)
+            passwordConfirm: new FormControl('2', validator),
         });
 
         expect(() => validator(form.controls['passwordConfirm'])).toThrow();
@@ -324,8 +324,8 @@ describe('ValidatorsEx.pattern', () => {
         const error = <any>ValidatorsEx.pattern('[0-9]{1,4}', 'My-Message')(input);
         const expected: any = {
             patternmessage: {
-                requiredPattern: '^[0-9]{1,4}$', actualValue: 'abc', message: 'My-Message'
-            }
+                requiredPattern: '^[0-9]{1,4}$', actualValue: 'abc', message: 'My-Message',
+            },
         };
 
         expect(error).toEqual(expected);
@@ -337,8 +337,8 @@ describe('ValidatorsEx.pattern', () => {
         const error = <any>ValidatorsEx.pattern(/^[0-9]{1,4}$/, 'My-Message')(input);
         const expected: any = {
             patternmessage: {
-                requiredPattern: '/^[0-9]{1,4}$/', actualValue: 'abc', message: 'My-Message'
-            }
+                requiredPattern: '/^[0-9]{1,4}$/', actualValue: 'abc', message: 'My-Message',
+            },
         };
 
         expect(error).toEqual(expected);
@@ -350,8 +350,8 @@ describe('ValidatorsEx.pattern', () => {
         const error = <any>ValidatorsEx.pattern('[0-9]{1,4}')(input);
         const expected: any = {
             pattern: {
-                requiredPattern: '^[0-9]{1,4}$', actualValue: 'abc'
-            }
+                requiredPattern: '^[0-9]{1,4}$', actualValue: 'abc',
+            },
         };
 
         expect(error).toEqual(expected);
@@ -363,8 +363,8 @@ describe('ValidatorsEx.pattern', () => {
         const error = <any>ValidatorsEx.pattern(/^[0-9]{1,4}$/)(input);
         const expected: any = {
             pattern: {
-                requiredPattern: '/^[0-9]{1,4}$/', actualValue: 'abc'
-            }
+                requiredPattern: '/^[0-9]{1,4}$/', actualValue: 'abc',
+            },
         };
 
         expect(error).toEqual(expected);

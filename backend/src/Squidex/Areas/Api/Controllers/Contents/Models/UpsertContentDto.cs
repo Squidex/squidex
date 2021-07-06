@@ -12,8 +12,6 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using StatusType = Squidex.Domain.Apps.Core.Contents.Status;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
     public class UpsertContentDto
@@ -34,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// True to automatically publish the content.
         /// </summary>
         [FromQuery]
-        [Obsolete("Use status query string.")]
+        [Obsolete("Use 'status' query string now.")]
         public bool Publish { get; set; }
 
         public UpsertContent ToCommand(DomainId id)
@@ -45,10 +43,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             {
                 command.Status = Status;
             }
+#pragma warning disable CS0618 // Type or member is obsolete
             else if (Publish)
             {
                 command.Status = StatusType.Published;
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return command;
         }

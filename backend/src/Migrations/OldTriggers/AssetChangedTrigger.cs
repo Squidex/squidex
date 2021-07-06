@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Migrations.OldTriggers
 {
     [TypeName(nameof(AssetChangedTrigger))]
-    public sealed class AssetChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
+    public sealed record AssetChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
     {
         public bool SendCreate { get; set; }
 

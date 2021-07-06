@@ -335,10 +335,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             ITextIndex textIndex,
             ITextIndexerState textIndexerState)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(textIndex, nameof(textIndex));
-            Guard.NotNull(textIndexerState, nameof(textIndexerState));
-
             this.jsonSerializer = jsonSerializer;
             this.textIndex = textIndex;
             this.textIndexerState = textIndexerState;

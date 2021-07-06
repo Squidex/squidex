@@ -8,33 +8,27 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class ArrayField : RootField<ArrayFieldProperties>, IArrayField
     {
-        private FieldCollection<NestedField> fields = FieldCollection<NestedField>.Empty;
-
         public IReadOnlyList<NestedField> Fields
         {
-            get => fields.Ordered;
+            get => FieldCollection.Ordered;
         }
 
         public IReadOnlyDictionary<long, NestedField> FieldsById
         {
-            get => fields.ById;
+            get => FieldCollection.ById;
         }
 
         public IReadOnlyDictionary<string, NestedField> FieldsByName
         {
-            get => fields.ByName;
+            get => FieldCollection.ByName;
         }
 
-        public FieldCollection<NestedField> FieldCollection
-        {
-            get => fields;
-        }
+        public FieldCollection<NestedField> FieldCollection { get; private set;  } = FieldCollection<NestedField>.Empty;
 
         public ArrayField(long id, string name, Partitioning partitioning, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
             : base(id, name, partitioning, properties, settings)
@@ -44,9 +38,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public ArrayField(long id, string name, Partitioning partitioning, NestedField[] fields, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
             : this(id, name, partitioning, properties, settings)
         {
-            Guard.NotNull(fields, nameof(fields));
-
-            this.fields = new FieldCollection<NestedField>(fields);
+            FieldCollection = new FieldCollection<NestedField>(fields);
         }
 
         [Pure]
@@ -75,16 +67,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         private ArrayField Updatefields(Func<FieldCollection<NestedField>, FieldCollection<NestedField>> updater)
         {
-            var newFields = updater(fields);
+            var newFields = updater(FieldCollection);
 
-            if (ReferenceEquals(newFields, fields))
+            if (ReferenceEquals(newFields, FieldCollection))
             {
                 return this;
             }
 
-            return Clone<ArrayField>(clone =>
+            return (ArrayField)Clone(clone =>
             {
-                clone.fields = newFields;
+                ((ArrayField)clone).FieldCollection = newFields;
             });
         }
     }

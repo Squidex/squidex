@@ -7,10 +7,9 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class GeolocationFieldProperties : FieldProperties
+    public sealed record GeolocationFieldProperties : FieldProperties
     {
-        public GeolocationFieldEditor Editor { get; set; }
+        public GeolocationFieldEditor Editor { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

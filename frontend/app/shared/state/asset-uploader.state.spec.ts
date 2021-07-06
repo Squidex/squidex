@@ -15,7 +15,7 @@ import { TestValues } from './_test-helpers';
 describe('AssetUploaderState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     let assetsService: IMock<AssetsService>;
@@ -83,7 +83,7 @@ describe('AssetUploaderState', () => {
         const file: File = <any>{ name: 'my-file' };
 
         assetsService.setup(x => x.postAssetFile(app, file, undefined))
-            .returns(() => throwError('Error')).verifiable();
+            .returns(() => throwError(() => 'Service Error')).verifiable();
 
         assetUploader.uploadFile(file).pipe(onErrorResumeNext()).subscribe();
 
@@ -148,7 +148,7 @@ describe('AssetUploaderState', () => {
         const file: File = <any>{ name: 'my-file' };
 
         assetsService.setup(x => x.putAssetFile(app, asset, file, asset.version))
-            .returns(() => throwError('Error')).verifiable();
+            .returns(() => throwError(() => 'Service Error')).verifiable();
 
         assetUploader.uploadAsset(asset, file).pipe(onErrorResumeNext()).subscribe();
 

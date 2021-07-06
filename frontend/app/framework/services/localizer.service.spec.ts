@@ -13,7 +13,7 @@ describe('LocalizerService', () => {
         withLowerVar: 'Var: {var|lower}.',
         withUpperVar: 'Var: {var|upper}.',
         withMultiple: 'Text1: {text1}, Text2: {Text2}.',
-        withVar: 'Var: {var}.'
+        withVar: 'Var: {var}.',
     };
 
     it('should instantiate', () => {

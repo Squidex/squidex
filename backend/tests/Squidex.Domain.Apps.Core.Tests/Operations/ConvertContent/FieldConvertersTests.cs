@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddInvariant(JsonValue.Object());
 
-            var result = FieldConverters.ForValues((value, field, parent) => null)(source, field);
+            var result = FieldConverters.ForValues(ResolvedComponents.Empty, (value, field, parent) => null)(source, field);
 
             var expected = new ContentFieldData();
 

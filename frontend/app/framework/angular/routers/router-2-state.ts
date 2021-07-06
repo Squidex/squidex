@@ -5,9 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: forin
-// tslint:disable: readonly-array
-
 import { Injectable, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { LocalStoreService, Types } from '@app/framework/internal';
@@ -30,7 +27,7 @@ export class PagingSynchronizer implements RouteSynchronizer {
     constructor(
         private readonly localStore: LocalStoreService,
         private readonly storeName: string,
-        private readonly defaultSize: number
+        private readonly defaultSize: number,
     ) {
     }
 
@@ -43,17 +40,17 @@ export class PagingSynchronizer implements RouteSynchronizer {
             pageSize = parseInt(pageSizeValue, 10);
         }
 
-        if (pageSize <= 0 || pageSize > 100 || isNaN(pageSize)) {
+        if (pageSize <= 0 || pageSize > 100 || !Types.isNumber(pageSize) || Number.isNaN(pageSize)) {
             pageSize = this.localStore.getInt(`${this.storeName}.pageSize`, this.defaultSize);
         }
 
-        if (pageSize <= 0 || pageSize > 100 || isNaN(pageSize)) {
+        if (pageSize <= 0 || pageSize > 100 || !Types.isNumber(pageSize) || Number.isNaN(pageSize)) {
             pageSize = this.defaultSize;
         }
 
         let page = parseInt(query['page'], 10);
 
-        if (page <= 0 || isNaN(page)) {
+        if (page <= 0 || !Types.isNumber(page) || Number.isNaN(page)) {
             page = 0;
         }
 
@@ -61,7 +58,7 @@ export class PagingSynchronizer implements RouteSynchronizer {
     }
 
     public parseFromState(state: any) {
-        let page = undefined;
+        let page;
 
         const pageSize: number = state.pageSize;
 
@@ -82,7 +79,7 @@ export class StringSynchronizer implements RouteSynchronizer {
 
     constructor(
         private readonly key: string,
-        private readonly fallback?: string
+        private readonly fallback?: string,
     ) {
     }
 
@@ -102,6 +99,8 @@ export class StringSynchronizer implements RouteSynchronizer {
         if (Types.isString(value)) {
             return { [this.key]: value };
         }
+
+        return undefined;
     }
 }
 
@@ -111,7 +110,7 @@ export class StringKeysSynchronizer implements RouteSynchronizer {
     }
 
     constructor(
-        private readonly key: string
+        private readonly key: string,
     ) {
     }
 
@@ -141,6 +140,8 @@ export class StringKeysSynchronizer implements RouteSynchronizer {
                 return { [this.key]: items };
             }
         }
+
+        return undefined;
     }
 }
 
@@ -167,7 +168,7 @@ export class Router2State implements OnDestroy, StateSynchronizer {
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
     }
 
@@ -204,7 +205,7 @@ export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
         private readonly state: State<T>,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
     }
 
@@ -238,7 +239,7 @@ export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
         this.router.navigate([], {
             queryParams: query,
             queryParamsHandling: 'merge',
-            replaceUrl: true
+            replaceUrl: true,
         });
     }
 

@@ -11,7 +11,7 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Dia
 @Component({
     selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
-    templateUrl: './client-connect-form.component.html'
+    templateUrl: './client-connect-form.component.html',
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()
@@ -40,7 +40,7 @@ export class ClientConnectFormComponent implements OnInit {
         public readonly apiUrl: ApiUrlConfig,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly clientsService: ClientsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
     }
 
@@ -65,7 +65,7 @@ export class ClientConnectFormComponent implements OnInit {
     }
 }
 
-function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
+function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string; secret: string }) {
     const url = apiUrl.buildUrl('identity-server/connect/token');
 
     return `$ curl
@@ -77,7 +77,7 @@ function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string
         scope=squidex-api'`;
 }
 
-function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
+function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string; secret: string }) {
     const url = apiUrl.value;
 
     return `var clientManager = new SquidexClientManager(

@@ -7,16 +7,16 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { SchemaDetailsDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
+import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-export-form',
     styleUrls: ['./schema-export-form.component.scss'],
-    templateUrl: './schema-export-form.component.html'
+    templateUrl: './schema-export-form.component.html',
 })
 export class SchemaExportFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public synchronizeForm = new SynchronizeSchemaForm(this.formBuilder);
 
@@ -24,7 +24,7 @@ export class SchemaExportFormComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 

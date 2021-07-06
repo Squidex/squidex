@@ -10,10 +10,10 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 import marked from 'marked';
 
-declare var SimpleMDE: any;
+declare const SimpleMDE: any;
 
 export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true,
 };
 
 interface State {
@@ -26,9 +26,9 @@ interface State {
     styleUrls: ['./markdown-editor.component.scss'],
     templateUrl: './markdown-editor.component.html',
     providers: [
-        SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MarkdownEditorComponent extends StatefulControlComponent<State, string> implements AfterViewInit {
     private simplemde: any;
@@ -57,10 +57,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly renderer: Renderer2,
-        private readonly resourceLoader: ResourceLoaderService
+        private readonly resourceLoader: ResourceLoaderService,
     ) {
         super(changeDetector, {
-            isFullscreen: false
+            isFullscreen: false,
         });
     }
 
@@ -84,13 +84,13 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         }
 
         this.assetsDialog.show();
-    }
+    };
 
     public ngAfterViewInit() {
         Promise.all([
             this.resourceLoader.loadLocalStyle('dependencies/simplemde/simplemde.min.css'),
             this.resourceLoader.loadLocalStyle('dependencies/font-awesome/css/font-awesome.min.css'),
-            this.resourceLoader.loadLocalScript('dependencies/simplemde/simplemde.min.js')
+            this.resourceLoader.loadLocalScript('dependencies/simplemde/simplemde.min.js'),
         ]).then(() => {
             this.simplemde = new SimpleMDE({
                 previewRender: (text: string) => {
@@ -104,78 +104,78 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                         name: 'bold',
                         action: SimpleMDE.toggleBold,
                         className: 'fa fa-bold',
-                        title: 'Bold'
+                        title: 'Bold',
                     }, {
                         name: 'italic',
                         action: SimpleMDE.toggleItalic,
                         className: 'fa fa-italic',
-                        title: 'Italic'
+                        title: 'Italic',
                     }, {
                         name: 'heading',
                         action: SimpleMDE.toggleHeadingSmaller,
                         className: 'fa fa-header',
-                        title: 'Heading'
+                        title: 'Heading',
                     }, {
                         name: 'quote',
                         action: SimpleMDE.toggleBlockquote,
                         className: 'fa fa-quote-left',
-                        title: 'Quote'
+                        title: 'Quote',
                     }, {
                         name: 'unordered-list',
                         action: SimpleMDE.toggleUnorderedList,
                         className: 'fa fa-list-ul',
-                        title: 'Generic List'
+                        title: 'Generic List',
                     }, {
                         name: 'ordered-list',
                         action: SimpleMDE.toggleOrderedList,
                         className: 'fa fa-list-ol',
-                        title: 'Numbered List'
+                        title: 'Numbered List',
                     },
                     '|',
                     {
                         name: 'link',
                         action: SimpleMDE.drawLink,
                         className: 'fa fa-link',
-                        title: 'Create Link'
+                        title: 'Create Link',
                     }, {
                         name: 'image',
                         action: SimpleMDE.drawImage,
                         className: 'fa fa-picture-o',
-                        title: 'Insert Image'
+                        title: 'Insert Image',
                     },
                     '|',
                     {
                         name: 'preview',
                         action: SimpleMDE.togglePreview,
                         className: 'fa fa-eye no-disable',
-                        title: 'Toggle Preview'
+                        title: 'Toggle Preview',
                     }, {
                         name: 'fullscreen',
                         action: SimpleMDE.toggleFullScreen,
                         className: 'fa fa-arrows-alt no-disable no-mobile',
-                        title: 'Toggle Fullscreen'
+                        title: 'Toggle Fullscreen',
                     }, {
                         name: 'side-by-side',
                         action: SimpleMDE.toggleSideBySide,
                         className: 'fa fa-columns no-disable no-mobile',
-                        title: 'Toggle Side by Side'
+                        title: 'Toggle Side by Side',
                     },
                     '|',
                     {
                         name: 'guide',
                         action: 'https://simplemde.com/markdown-guide',
                         className: 'fa fa-question-circle',
-                        title: 'Markdown Guide'
+                        title: 'Markdown Guide',
                     },
                     '|',
                     {
                         name: 'assets',
                         action: this.showSelector,
                         className: 'icon-assets icon-bold',
-                        title: 'Insert Assets'
-                    }
+                        title: 'Insert Assets',
+                    },
                 ],
-                element: this.editor.nativeElement
+                element: this.editor.nativeElement,
             });
 
             this.simplemde.value(this.value || '');

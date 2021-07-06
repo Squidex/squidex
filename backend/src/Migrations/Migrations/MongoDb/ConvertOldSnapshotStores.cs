@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -22,7 +23,7 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(CancellationToken ct)
         {
             var collections = new[]
             {

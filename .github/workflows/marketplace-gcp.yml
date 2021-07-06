@@ -1,0 +1,52 @@
+name: Marketplace - GCP
+concurrency: marketplace-gcp
+
+on:
+  release:
+    types: [ released ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Validate Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: packer/gcp.pkr.hcl
+
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Extract service account
+        run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" | base64 -d > /tmp/squidex.json
+
+      - name: Init
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: init
+          target: packer/gcp.pkr.hcl
+        env:
+          PACKER_LOG: 1
+
+      - name: Build
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort"
+          target: packer/gcp.pkr.hcl
+        env:
+          PACKER_LOG: 1
+          PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
+          GOOGLE_APPLICATION_CREDENTIALS: "/tmp/squidex.json"

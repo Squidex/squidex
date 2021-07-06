@@ -16,7 +16,7 @@ export class CommentsDto extends Model<CommentsDto> {
         public readonly createdComments: ReadonlyArray<CommentDto>,
         public readonly updatedComments: ReadonlyArray<CommentDto>,
         public readonly deletedComments: ReadonlyArray<string>,
-        public readonly version: Version
+        public readonly version: Version,
     ) {
         super();
     }
@@ -28,20 +28,20 @@ export class CommentDto extends Model<CommentDto> {
         public readonly time: DateTime,
         public readonly text: string,
         public readonly url: string | undefined,
-        public readonly user: string
+        public readonly user: string,
     ) {
         super();
     }
 }
 
 export type UpsertCommentDto =
-    Readonly<{ text: string, url?: string }>;
+    Readonly<{ text: string; url?: string }>;
 
 @Injectable()
 export class CommentsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 
@@ -50,8 +50,8 @@ export class CommentsService {
 
         const options = {
             headers: new HttpHeaders({
-                'X-Silent': '1'
-            })
+                'X-Silent': '1',
+            }),
         };
 
         return this.http.get<any>(url, options).pipe(
@@ -74,7 +74,7 @@ export class CommentsService {
                             item.user);
                     }),
                     body.deletedComments,
-                    new Version(body.version)
+                    new Version(body.version),
                 );
 
                 return comments;

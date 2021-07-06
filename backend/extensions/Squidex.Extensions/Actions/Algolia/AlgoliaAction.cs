@@ -19,7 +19,7 @@ namespace Squidex.Extensions.Actions.Algolia
         Display = "Populate Algolia index",
         Description = "Populate a full text search index in Algolia.",
         ReadMore = "https://www.algolia.com/")]
-    public sealed class AlgoliaAction : RuleAction
+    public sealed record AlgoliaAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Application Id", Description = "The application ID.")]

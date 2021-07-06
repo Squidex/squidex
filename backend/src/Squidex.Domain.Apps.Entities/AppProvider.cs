@@ -29,11 +29,6 @@ namespace Squidex.Domain.Apps.Entities
 
         public AppProvider(ILocalCache localCache, IAppsIndex indexForApps, IRulesIndex indexRules, ISchemasIndex indexSchemas)
         {
-            Guard.NotNull(indexForApps, nameof(indexForApps));
-            Guard.NotNull(indexRules, nameof(indexRules));
-            Guard.NotNull(indexSchemas, nameof(indexSchemas));
-            Guard.NotNull(localCache, nameof(localCache));
-
             this.localCache = localCache;
             this.indexForApps = indexForApps;
             this.indexRules = indexRules;
@@ -155,6 +150,12 @@ namespace Squidex.Domain.Apps.Entities
             {
                 return indexSchemas.GetSchemasAsync(appId);
             });
+
+            foreach (var schema in schemas)
+            {
+                localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
+                localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+            }
 
             return schemas;
         }

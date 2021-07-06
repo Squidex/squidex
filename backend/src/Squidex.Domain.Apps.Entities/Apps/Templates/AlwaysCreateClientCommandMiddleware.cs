@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -22,9 +23,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
-                var command = new AttachClient { Id = "default", AppId = appId };
+                var publish = new Func<IAppCommand, Task>(command =>
+                {
+                    command.AppId = appId;
 
-                await context.CommandBus.PublishAsync(command);
+                    return context.CommandBus.PublishAsync(command);
+                });
+
+                await publish(new AttachClient { Id = "default" });
             }
         }
     }

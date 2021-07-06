@@ -8,7 +8,7 @@
 import { Directive, HostListener, Input } from '@angular/core';
 
 @Directive({
-    selector: '[sqxStopClick]'
+    selector: '[sqxStopClick]',
 })
 export class StopClickDirective {
     @Input('sqxStopClick')

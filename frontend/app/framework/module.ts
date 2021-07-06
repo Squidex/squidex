@@ -1,11 +1,9 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
-// tslint:disable: max-line-length
 
 import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -19,7 +17,7 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         ColorPickerModule,
         CommonModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
     ],
     declarations: [
         AutocompleteComponent,
@@ -96,7 +94,7 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,
-        VideoPlayerComponent
+        VideoPlayerComponent,
     ],
     exports: [
         AutocompleteComponent,
@@ -176,8 +174,8 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,
-        VideoPlayerComponent
-    ]
+        VideoPlayerComponent,
+    ],
 })
 export class SqxFrameworkModule {
     public static forRoot(): ModuleWithProviders<SqxFrameworkModule> {
@@ -200,14 +198,14 @@ export class SqxFrameworkModule {
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: LoadingInterceptor,
-                    multi: true
+                    multi: true,
                 },
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: CachingInterceptor,
-                    multi: true
-                }
-            ]
+                    multi: true,
+                },
+            ],
         };
     }
- }
+}

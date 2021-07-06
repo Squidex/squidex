@@ -29,7 +29,8 @@ namespace Squidex.Infrastructure.UsageTracking
             return "UsagesV2";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection,
+            CancellationToken ct = default)
         {
             return collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<MongoUsage>(
@@ -37,7 +38,7 @@ namespace Squidex.Infrastructure.UsageTracking
                         .Ascending(x => x.Key)
                         .Ascending(x => x.Category)
                         .Ascending(x => x.Date)),
-                cancellationToken: ct);
+                cancellationToken: ct = default);
         }
 
         public async Task TrackUsagesAsync(UsageUpdate update)
@@ -54,6 +55,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public async Task TrackUsagesAsync(params UsageUpdate[] updates)
         {
+            Guard.NotNull(updates, nameof(updates));
+
             if (updates.Length == 1)
             {
                 await TrackUsagesAsync(updates[0]);

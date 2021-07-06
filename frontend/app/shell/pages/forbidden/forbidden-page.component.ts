@@ -11,11 +11,11 @@ import { Component } from '@angular/core';
 @Component({
     selector: 'sqx-forbidden-page',
     styleUrls: ['./forbidden-page.component.scss'],
-    templateUrl: './forbidden-page.component.html'
+    templateUrl: './forbidden-page.component.html',
 })
 export class ForbiddenPageComponent {
     constructor(
-        private readonly location: Location
+        private readonly location: Location,
     ) {
     }
 

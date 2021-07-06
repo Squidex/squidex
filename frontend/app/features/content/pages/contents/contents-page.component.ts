@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
+/* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, fadeAnimation, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDetailsDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, fadeAnimation, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
@@ -19,24 +19,24 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
     providers: [
-        Router2State
+        Router2State,
     ],
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public tableView: TableFields;
     public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
 
-    public selectedItems:  { [id: string]: boolean; } = {};
+    public selectedItems: { [id: string]: boolean } = {};
     public selectedAll = false;
     public selectionCount = 0;
     public selectionCanDelete = false;
@@ -53,7 +53,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         combineLatest([
             this.schemasState.selectedSchema.pipe(defined()),
             this.languagesState.isoLanguages,
-            this.contentsState.statuses
+            this.contentsState.statuses,
         ]).pipe(
             map(values => queryModelFromSchema(values[0], values[1], values[2])));
 
@@ -71,7 +71,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly router: Router,
         private readonly schemasState: SchemasState,
         private readonly tempService: TempService,
-        private readonly uiState: UIState
+        private readonly uiState: UIState,
     ) {
         super();
     }

@@ -5,10 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable no-useless-escape */
+
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
-import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDetailsDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
+import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
 import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };
@@ -16,7 +18,7 @@ type CreateCategoryFormType = { name: string };
 export class CreateCategoryForm extends Form<FormGroup, CreateCategoryFormType> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            name: ['']
+            name: [''],
         }));
     }
 }
@@ -28,25 +30,29 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage')
-                ]
+                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:schemas.schemaNameValidationMessage'),
+                ],
+            ],
+            type: ['Default',
+                [
+                    Validators.required,
+                ],
             ],
             initialCategory: undefined,
-            isSingleton: false,
-            importing: {}
+            importing: {},
         }));
     }
 
     public transformLoad(value: CreateSchemaDto) {
-        const { name, isSingleton, category, ...importing } = value;
+        const { name, type, category, ...importing } = value;
 
-        return { name, isSingleton, importing, initialCategory: category };
+        return { name, type, importing, initialCategory: category };
     }
 
     public transformSubmit(value: any): CreateSchemaDto {
-        const { name, isSingleton, importing, initialCategory } = value;
+        const { name, type, importing, initialCategory } = value;
 
-        return { name, isSingleton, category: initialCategory, ...importing };
+        return { name, type, category: initialCategory, ...importing };
     }
 }
 
@@ -55,11 +61,11 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
         super(formBuilder.group({
             json: {},
             fieldsDelete: false,
-            fieldsRecreate: false
+            fieldsRecreate: false,
         }));
     }
 
-    public loadSchema(schema: SchemaDetailsDto) {
+    public loadSchema(schema: SchemaDto) {
         this.form.get('json')!.setValue(schema.export());
     }
 
@@ -67,18 +73,18 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
         return {
             ...value.json,
             noFieldDeletion: !value.fieldsDelete,
-            noFieldRecreation: !value.fieldsRecreate
+            noFieldRecreation: !value.fieldsRecreate,
         };
     }
 }
 
-export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDetailsDto> {
+export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDto> {
     public get rulesControls(): ReadonlyArray<FormGroup> {
         return this.form.controls as any;
     }
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
         super(formBuilder.array([]));
     }
@@ -88,19 +94,19 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
             this.formBuilder.group({
                 action: ['Disable',
                     [
-                        Validators.required
-                    ]
+                        Validators.required,
+                    ],
                 ],
                 field: [fieldNames[0],
                     [
-                        Validators.required
-                    ]
+                        Validators.required,
+                    ],
                 ],
                 condition: ['',
                     [
-                        Validators.required
-                    ]
-                ]
+                        Validators.required,
+                    ],
+                ],
             }));
     }
 
@@ -108,7 +114,7 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
         this.form.removeAt(index);
     }
 
-    public transformLoad(value: Partial<SchemaDetailsDto>) {
+    public transformLoad(value: Partial<SchemaDto>) {
         const result = value.fieldRules || [];
 
         while (this.form.controls.length < result.length) {
@@ -125,13 +131,13 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
 
 type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
-export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType, SchemaDetailsDto> {
+export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType, SchemaDto> {
     public get previewControls(): ReadonlyArray<FormGroup> {
         return this.form.controls as any;
     }
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
         super(formBuilder.array([]));
     }
@@ -141,14 +147,14 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
             this.formBuilder.group({
                 name: ['',
                     [
-                        Validators.required
-                    ]
+                        Validators.required,
+                    ],
                 ],
                 url: ['',
                     [
-                        Validators.required
-                    ]
-                ]
+                        Validators.required,
+                    ],
+                ],
             }));
     }
 
@@ -156,7 +162,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         this.form.removeAt(index);
     }
 
-    public transformLoad(value: Partial<SchemaDetailsDto>) {
+    public transformLoad(value: Partial<SchemaDto>) {
         const result = [];
 
         const previewUrls = value.previewUrls || {};
@@ -191,14 +197,14 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
     }
 }
 
-export class EditScriptsForm extends Form<FormGroup, {}, SchemaDetailsDto> {
+export class EditScriptsForm extends Form<FormGroup, {}, SchemaDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             query: '',
             create: '',
             change: '',
             delete: '',
-            update: ''
+            update: '',
         }));
     }
 }
@@ -212,25 +218,25 @@ export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
         const config = {
             label: ['',
                 [
-                    Validators.maxLength(100)
-                ]
+                    Validators.maxLength(100),
+                ],
             ],
             hints: ['',
                 [
-                    Validators.maxLength(1000)
-                ]
+                    Validators.maxLength(1000),
+                ],
             ],
             placeholder: ['',
                 [
-                    Validators.maxLength(1000)
-                ]
+                    Validators.maxLength(1000),
+                ],
             ],
             editor: undefined,
             editorUrl: undefined,
             isRequired: false,
             isRequiredOnPublish: false,
             isHalfWidth: false,
-            tags: []
+            tags: [],
         };
 
         const visitor = new EditFieldFormVisitor(config);
@@ -243,7 +249,7 @@ export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
 
 export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     constructor(
-        private readonly config:  { [key: string]: any; }
+        private readonly config: { [key: string]: any },
     ) {
     }
 
@@ -280,10 +286,21 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['defaultValue'] = undefined;
     }
 
+    public visitComponent() {
+        this.config['schemaIds'] = undefined;
+    }
+
+    public visitComponents() {
+        this.config['schemaIds'] = undefined;
+        this.config['maxItems'] = undefined;
+        this.config['minItems'] = undefined;
+    }
+
     public visitDateTime() {
         this.config['calculatedDefaultValue'] = undefined;
         this.config['defaultValue'] = undefined;
         this.config['defaultValues'] = undefined;
+        this.config['format'] = undefined;
         this.config['maxValue'] = [undefined, ValidatorsEx.validDateTime()];
         this.config['minValue'] = [undefined, ValidatorsEx.validDateTime()];
     }
@@ -300,15 +317,13 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
 
     public visitReferences() {
         this.config['allowDuplicates'] = undefined;
-        this.config['maxItems'] = undefined;
-        this.config['minItems'] = undefined;
-        this.config['schemaIds'] = undefined;
         this.config['defaultValue'] = undefined;
         this.config['defaultValues'] = undefined;
-        this.config['mustBePublished'] = undefined;
-        this.config['defaultValues'] = undefined;
-        this.config['defaultValues'] = undefined;
-        this.config['defaultValues'] = undefined;
+        this.config['maxItems'] = undefined;
+        this.config['minItems'] = undefined;
+        this.config['mustBePublished'] = false;
+        this.config['resolveReference'] = false;
+        this.config['schemaIds'] = undefined;
     }
 
     public visitString() {
@@ -338,15 +353,15 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 
     public visitGeolocation() {
-        return;
+        return undefined;
     }
 
     public visitJson() {
-        return;
+        return undefined;
     }
 
     public visitUI() {
-        return;
+        return undefined;
     }
 }
 
@@ -355,19 +370,19 @@ export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto, SchemaPrope
         super(formBuilder.group({
             label: ['',
                 [
-                    Validators.maxLength(100)
-                ]
+                    Validators.maxLength(100),
+                ],
             ],
             hints: ['',
                 [
-                    Validators.maxLength(1000)
-                ]
+                    Validators.maxLength(1000),
+                ],
             ],
             contentsSidebarUrl: '',
             contentSidebarUrl: '',
             contentEditorUrl: '',
             validateOnPublish: false,
-            tags: []
+            tags: [],
         }));
     }
 }
@@ -379,17 +394,17 @@ export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
         super(formBuilder.group({
             type: ['String',
                 [
-                    Validators.required
-                ]
+                    Validators.required,
+                ],
             ],
             name: ['',
                 [
                     Validators.required,
                     Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'i18n:schemas.field.nameValidationMessage')
-                ]
+                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'i18n:schemas.field.nameValidationMessage'),
+                ],
             ],
-            isLocalizable: false
+            isLocalizable: false,
         }));
     }
 

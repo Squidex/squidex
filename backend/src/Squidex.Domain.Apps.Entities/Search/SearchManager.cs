@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Search
@@ -22,33 +22,32 @@ namespace Squidex.Domain.Apps.Entities.Search
 
         public SearchManager(IEnumerable<ISearchSource> searchSources, ISemanticLog log)
         {
-            Guard.NotNull(searchSources, nameof(searchSources));
-            Guard.NotNull(log, nameof(log));
-
             this.searchSources = searchSources;
 
             this.log = log;
         }
 
-        public async Task<SearchResults> SearchAsync(string? query, Context context)
+        public async Task<SearchResults> SearchAsync(string? query, Context context,
+            CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
             {
                 return new SearchResults();
             }
 
-            var tasks = searchSources.Select(x => SearchAsync(x, query, context));
+            var tasks = searchSources.Select(x => SearchAsync(x, query, context, ct));
 
             var results = await Task.WhenAll(tasks);
 
             return new SearchResults(results.SelectMany(x => x));
         }
 
-        private async Task<SearchResults> SearchAsync(ISearchSource source, string query, Context context)
+        private async Task<SearchResults> SearchAsync(ISearchSource source, string query, Context context,
+            CancellationToken ct)
         {
             try
             {
-                return await source.SearchAsync(query, context);
+                return await source.SearchAsync(query, context, ct);
             }
             catch (Exception ex)
             {

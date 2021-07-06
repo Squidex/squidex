@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import './array-extensions';
 
 describe('ArrayExtensions', () => {
@@ -117,5 +119,15 @@ describe('ArrayExtensions', () => {
 
         expect(array_1).toBe(array_0);
         expect(array_1).toEqual([{ id: 'A' }, { id: 'b' }, { id: 'C' }]);
+    });
+
+    it('should convert to map', () => {
+        const array_0 = [{ id: 'A', value: 1 }, { id: 'B', value: 2 }, { id: 'B', value: 3 }];
+        const map = array_0.toMap(x => x.id);
+
+        expect(map).toEqual({
+            A: { id: 'A', value: 1 },
+            B: { id: 'B', value: 3 },
+        });
     });
 });

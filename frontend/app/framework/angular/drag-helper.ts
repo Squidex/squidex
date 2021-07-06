@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: prefer-for-of
-
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Types } from './../utils/types';
 

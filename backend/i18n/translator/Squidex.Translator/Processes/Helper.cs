@@ -27,7 +27,7 @@ namespace Squidex.Translator.Processes
             foreach (var (locale, texts) in service.Translations.Where(x => x.Key != service.MainLocale))
             {
                 Console.WriteLine();
-                Console.WriteLine("Checking {0}", locale);
+                Console.WriteLine("----- CHECKING <{0}> -----", locale);
 
                 var notTranslated = mainTranslations.Keys.Except(texts.Keys).ToList();
                 var notUsed = texts.Keys.Except(mainTranslations.Keys).ToList();
@@ -57,6 +57,33 @@ namespace Squidex.Translator.Processes
                             Console.WriteLine(key);
                         }
                     }
+                }
+                else
+                {
+                    Console.WriteLine("> No errors found");
+                }
+            }
+        }
+
+        public static void CleanOtherLocales(TranslationService service)
+        {
+            var mainTranslations = service.MainTranslations;
+
+            foreach (var (locale, texts) in service.Translations.Where(x => x.Key != service.MainLocale))
+            {
+                Console.WriteLine();
+                Console.WriteLine("----- CLEANING <{0}> -----", locale);
+
+                var notUsed = texts.Keys.Except(mainTranslations.Keys).ToList();
+
+                if (notUsed.Count > 0)
+                {
+                    foreach (var unused in notUsed)
+                    {
+                        texts.Remove(unused);
+                    }
+
+                    Console.WriteLine("Cleaned {0} translations.", notUsed.Count);
                 }
                 else
                 {

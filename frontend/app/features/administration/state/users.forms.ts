@@ -11,33 +11,33 @@ import { UpdateUserDto, UserDto } from './../services/users.service';
 
 export class UserForm extends Form<FormGroup, UpdateUserDto, UserDto> {
     constructor(
-        formBuilder: FormBuilder
+        formBuilder: FormBuilder,
     ) {
         super(formBuilder.group({
             email: ['',
                 [
                     Validators.email,
                     Validators.required,
-                    Validators.maxLength(100)
-                ]
+                    Validators.maxLength(100),
+                ],
             ],
             displayName: ['',
                 [
                     Validators.required,
-                    Validators.maxLength(100)
-                ]
+                    Validators.maxLength(100),
+                ],
             ],
             password: ['',
                 [
-                    Validators.required
-                ]
+                    Validators.required,
+                ],
             ],
             passwordConfirm: ['',
                 [
-                    ValidatorsEx.match('password', 'i18n:users.passwordConfirmValidationMessage')
-                ]
+                    ValidatorsEx.match('password', 'i18n:users.passwordConfirmValidationMessage'),
+                ],
             ],
-            permissions: ['']
+            permissions: [''],
         }));
     }
 

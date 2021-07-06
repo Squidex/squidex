@@ -1,0 +1,44 @@
+name: Marketplace - Kubernetes
+concurrency: marketplace-kubernetes
+
+on:
+  release:
+    types: [ released ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Validate Template
+        if: false
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: kubernetes.pkr.hcl
+        working-directory: packer/
+
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Build
+        if: false
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort"
+          target: kubernetes.pkr.hcl
+        env:
+          PACKER_LOG: 1
+          PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
+        working-directory: packer/

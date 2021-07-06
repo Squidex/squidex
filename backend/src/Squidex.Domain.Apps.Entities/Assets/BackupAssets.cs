@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class BackupAssets : IBackupHandler
     {
+        private const int BatchSize = 100;
         private const string TagsFile = "AssetTags.json";
         private readonly HashSet<DomainId> assetIds = new HashSet<DomainId>();
         private readonly HashSet<DomainId> assetFolderIds = new HashSet<DomainId>();
@@ -32,10 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public BackupAssets(Rebuilder rebuilder, IAssetFileStore assetFileStore, ITagService tagService)
         {
-            Guard.NotNull(rebuilder, nameof(rebuilder));
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(tagService, nameof(tagService));
-
             this.rebuilder = rebuilder;
             this.assetFileStore = assetFileStore;
             this.tagService = tagService;
@@ -101,12 +98,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (assetIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds);
+                await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize);
             }
 
             if (assetFolderIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds);
+                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds, BatchSize);
             }
         }
 
@@ -130,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, stream);
+                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream);
                 });
             }
             catch (AssetNotFoundException)
@@ -145,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, stream);
+                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream);
                 });
             }
             catch (FileNotFoundException)

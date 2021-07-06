@@ -13,7 +13,7 @@ import { TestValues } from './_test-helpers';
 describe('UIState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     const common = {
@@ -21,29 +21,29 @@ describe('UIState', () => {
         map: {
             type: 'GSM',
             sizeX: 800,
-            sizeY: 600
+            sizeY: 600,
         },
-        canCreateApps: true
+        canCreateApps: true,
     };
 
     const shared = {
         map: {
-            type: 'GM', key: 'xyz'
+            type: 'GM', key: 'xyz',
         },
-        canCreateApps: true
+        canCreateApps: true,
     };
 
     const user = {
         map: {
-            sizeX: 1000
+            sizeX: 1000,
         },
-        canCustomize: true
+        canCustomize: true,
     };
 
     const resources: ResourceLinks = {
-        ['admin/events']: { method: 'GET', href: '/api/events' },
-        ['admin/restore']: { method: 'GET', href: '/api/restore' },
-        ['admin/users']: { method: 'GET', href: '/api/users' }
+        'admin/events': { method: 'GET', href: '/api/events' },
+        'admin/restore': { method: 'GET', href: '/api/restore' },
+        'admin/users': { method: 'GET', href: '/api/users' },
     };
 
     let usersService: IMock<UsersService>;
@@ -77,10 +77,10 @@ describe('UIState', () => {
                 type: 'GM',
                 sizeX: 1000,
                 sizeY: 600,
-                key: 'xyz'
+                key: 'xyz',
             },
             canCreateApps: true,
-            canCustomize: true
+            canCustomize: true,
         });
 
         expect(uiState.snapshot.canReadEvents).toBeTruthy();
@@ -100,13 +100,13 @@ describe('UIState', () => {
                 type: 'GM',
                 sizeX: 1000,
                 sizeY: 600,
-                key: 'xyz'
+                key: 'xyz',
             },
             canCreateApps: true,
             canCustomize: true,
             root: {
-                nested: 123
-            }
+                nested: 123,
+            },
         });
 
         uiState.get('root', {}).subscribe(x => {
@@ -136,13 +136,13 @@ describe('UIState', () => {
                 type: 'GM',
                 sizeX: 1000,
                 sizeY: 600,
-                key: 'xyz'
+                key: 'xyz',
             },
             canCreateApps: true,
             canCustomize: true,
             root: {
-                nested: 123
-            }
+                nested: 123,
+            },
         });
 
         uiState.get('root', {}).subscribe(x => {
@@ -171,10 +171,10 @@ describe('UIState', () => {
             map: {
                 type: 'GM',
                 sizeX: 1000,
-                sizeY: 600
+                sizeY: 600,
             },
             canCreateApps: true,
-            canCustomize: true
+            canCustomize: true,
         });
 
         uiService.verifyAll();
@@ -192,10 +192,10 @@ describe('UIState', () => {
                 type: 'GM',
                 sizeX: 800,
                 sizeY: 600,
-                key: 'xyz'
+                key: 'xyz',
             },
             canCreateApps: true,
-            canCustomize: true
+            canCustomize: true,
         });
 
         uiService.verifyAll();

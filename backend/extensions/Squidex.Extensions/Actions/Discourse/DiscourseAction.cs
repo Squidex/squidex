@@ -20,7 +20,7 @@ namespace Squidex.Extensions.Actions.Discourse
         Display = "Post to discourse",
         Description = "Create a post or topic at discourse.",
         ReadMore = "https://www.discourse.org/")]
-    public sealed class DiscourseAction : RuleAction
+    public sealed record DiscourseAction : RuleAction
     {
         [AbsoluteUrl]
         [LocalizedRequired]

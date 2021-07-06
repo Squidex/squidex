@@ -1,0 +1,1204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="annotations_AbsoluteUrl" xml:space="preserve">
+    <value>字段 '{name|lower}' 必须是绝对 URL。</value>
+  </data>
+  <data name="dotnet_annotations_AbsoluteUrl" xml:space="preserve">
+    <value>字段 '{0}' 必须是绝对 URL。</value>
+  </data>
+  <data name="annotations_Compare" xml:space="preserve">
+    <value>字段 '{name|lower}' 必须与 {other|lower} 相同。</value>
+  </data>
+  <data name="dotnet_annotations_Compare" xml:space="preserve">
+    <value>字段 '{0}' 必须与 {1} 相同。</value>
+  </data>
+  <data name="annotations_EmailAddress" xml:space="preserve">
+    <value>字段'{name|lower}' 不是有效的电子邮件地址。</value>
+  </data>
+  <data name="dotnet_annotations_EmailAddress" xml:space="preserve">
+    <value>字段'{0}' 不是有效的电子邮件地址。</value>
+  </data>
+  <data name="annotations_Range" xml:space="preserve">
+    <value>字段'{name|lower}' 必须介于 {min} 和 {max} 之间。</value>
+  </data>
+  <data name="dotnet_annotations_Range" xml:space="preserve">
+    <value>字段'{0}' 必须介于 {1} 和 {2} 之间。</value>
+  </data>
+  <data name="annotations_RegularExpression" xml:space="preserve">
+    <value>字段 '{name|lower}' 无法通过表达式验证</value>
+  </data>
+  <data name="dotnet_annotations_RegularExpression" xml:space="preserve">
+    <value>字段 '{0}' 无法通过表达式验证</value>
+  </data>
+  <data name="annotations_Required" xml:space="preserve">
+    <value>字段'{name|lower}' 是必需的。</value>
+  </data>
+  <data name="dotnet_annotations_Required" xml:space="preserve">
+    <value>字段'{0}' 是必需的。</value>
+  </data>
+  <data name="annotations_StringLength" xml:space="preserve">
+    <value>字段'{name|lower}' 必须是最大长度为 {max} 的字符串。</value>
+  </data>
+  <data name="dotnet_annotations_StringLength" xml:space="preserve">
+    <value>字段'{0}' 必须是最大长度为 {1} 的字符串。</value>
+  </data>
+  <data name="annotations_StringLengthMinimum" xml:space="preserve">
+    <value>字段'{name|lower}' 必须是一个字符串，最小长度为 {min}，最大长度为 {max}。</value>
+  </data>
+  <data name="dotnet_annotations_StringLengthMinimum" xml:space="preserve">
+    <value>字段'{0}' 必须是一个字符串，最小长度为 {1}，最大长度为 {2}。</value>
+  </data>
+  <data name="apps.clients.idAlreadyExists" xml:space="preserve">
+    <value>已存在具有相同 ID 的客户端。</value>
+  </data>
+  <data name="apps.contributors.cannotChangeYourself" xml:space="preserve">
+    <value>你不能改变你自己的角色。</value>
+  </data>
+  <data name="apps.contributors.maxReached" xml:space="preserve">
+    <value>您已达到计划的最大贡献者数量。</value>
+  </data>
+  <data name="apps.contributors.onlyOneOwner" xml:space="preserve">
+    <value>无法删除唯一的所有者。</value>
+  </data>
+  <data name="apps.languages.fallbackNotFound" xml:space="preserve">
+    <value>应用没有后备语言'{fallback}'。</value>
+  </data>
+  <data name="apps.languages.languageAlreadyAdded" xml:space="preserve">
+    <value>语言已经添加。</value>
+  </data>
+  <data name="apps.languages.masterLanguageNoFallbacks" xml:space="preserve">
+    <value>主语言不能有后备语言。</value>
+  </data>
+  <data name="apps.languages.masterLanguageNotOptional" xml:space="preserve">
+    <value>主语言不能是可选的。</value>
+  </data>
+  <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
+    <value>无法删除主语言。</value>
+  </data>
+  <data name="apps.nameAlreadyExists" xml:space="preserve">
+    <value>同名应用已经存在。</value>
+  </data>
+  <data name="apps.notImage" xml:space="preserve">
+    <value>文件不是图像</value>
+  </data>
+  <data name="apps.plans.notFound" xml:space="preserve">
+    <value>不存在具有此 ID 的计划。</value>
+  </data>
+  <data name="apps.plans.notPlanOwner" xml:space="preserve">
+    <value>计划只能由最初配置计划的用户更改。</value>
+  </data>
+  <data name="apps.roles.defaultRoleNotRemovable" xml:space="preserve">
+    <value>无法删除默认角色。</value>
+  </data>
+  <data name="apps.roles.defaultRoleNotUpdateable" xml:space="preserve">
+    <value>无法更新默认角色。</value>
+  </data>
+  <data name="apps.roles.nameAlreadyExists" xml:space="preserve">
+    <value>已存在同名角色。</value>
+  </data>
+  <data name="apps.roles.usedRoleByClientsNotRemovable" xml:space="preserve">
+    <value>分配客户端后无法删除角色。</value>
+  </data>
+  <data name="apps.roles.usedRoleByContributorsNotRemovable" xml:space="preserve">
+    <value>当分配了贡献者时无法删除角色。</value>
+  </data>
+  <data name="assets.folderNotFound" xml:space="preserve">
+    <value>资源文件夹不存在。</value>
+  </data>
+  <data name="assets.folderRecursion" xml:space="preserve">
+    <value>无法将文件夹添加到自己的子文件夹中。</value>
+  </data>
+  <data name="assets.maxSizeReached" xml:space="preserve">
+    <value>您已达到最大资源大小。</value>
+  </data>
+  <data name="assets.referenced" xml:space="preserve">
+    <value>资源被内容引用，无法删除。</value>
+  </data>
+  <data name="backups.alreadyRunning" xml:space="preserve">
+    <value>另一个备份进程已经在运行。</value>
+  </data>
+  <data name="backups.maxReached" xml:space="preserve">
+    <value>您不能拥有超过 {max} 个备份。</value>
+  </data>
+  <data name="backups.restoreRunning" xml:space="preserve">
+    <value>还原操作已经在运行。</value>
+  </data>
+  <data name="comments.noPermissions" xml:space="preserve">
+    <value>您只能访问您的通知。</value>
+  </data>
+  <data name="comments.notUserComment" xml:space="preserve">
+    <value>评论是由另一个用户创建的。</value>
+  </data>
+  <data name="common.action" xml:space="preserve">
+    <value>动作</value>
+  </data>
+  <data name="common.aspectHeight" xml:space="preserve">
+    <value>纵横高度</value>
+  </data>
+  <data name="common.aspectWidth" xml:space="preserve">
+    <value>纵横宽</value>
+  </data>
+  <data name="common.calculatedDefaultValue" xml:space="preserve">
+    <value>计算的默认值</value>
+  </data>
+  <data name="common.clientd" xml:space="preserve">
+    <value>客户端 ID</value>
+  </data>
+  <data name="common.clientId" xml:space="preserve">
+    <value>客户端 ID</value>
+  </data>
+  <data name="common.clientSecret" xml:space="preserve">
+    <value>客户端密码</value>
+  </data>
+  <data name="common.contentType" xml:space="preserve">
+    <value>内容类型</value>
+  </data>
+  <data name="common.contributorId" xml:space="preserve">
+    <value>贡献者 ID 或电子邮件</value>
+  </data>
+  <data name="common.critical" xml:space="preserve">
+    <value>关键</value>
+  </data>
+  <data name="common.data" xml:space="preserve">
+    <value>数据</value>
+  </data>
+  <data name="common.defaultValue" xml:space="preserve">
+    <value>默认值</value>
+  </data>
+  <data name="common.displayName" xml:space="preserve">
+    <value>显示名称</value>
+  </data>
+  <data name="common.editor" xml:space="preserve">
+    <value>编辑器</value>
+  </data>
+  <data name="common.email" xml:space="preserve">
+    <value>电子邮件</value>
+  </data>
+  <data name="common.errorNoPermission" xml:space="preserve">
+    <value>您没有必要的权限。</value>
+  </data>
+  <data name="common.field" xml:space="preserve">
+    <value>字段</value>
+  </data>
+  <data name="common.fieldIds" xml:space="preserve">
+    <value>字段 ID</value>
+  </data>
+  <data name="common.fieldName" xml:space="preserve">
+    <value>字段名</value>
+  </data>
+  <data name="common.file" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="common.folderName" xml:space="preserve">
+    <value>文件夹名称</value>
+  </data>
+  <data name="common.fullTextNotSupported" xml:space="preserve">
+    <value>不支持查询搜索子句。</value>
+  </data>
+  <data name="common.httpContentTypeNotDefined" xml:space="preserve">
+    <value>文件内容类型未定义。</value>
+  </data>
+  <data name="common.httpFileNameNotDefined" xml:space="preserve">
+    <value>文件名未定义。</value>
+  </data>
+  <data name="common.httpInvalidRequest" xml:space="preserve">
+    <value>模型无效。</value>
+  </data>
+  <data name="common.httpInvalidRequestFormat" xml:space="preserve">
+    <value>请求正文的格式无效。</value>
+  </data>
+  <data name="common.httpOnlyAsUser" xml:space="preserve">
+    <value>客户端不允许。</value>
+  </data>
+  <data name="common.httpValidationError" xml:space="preserve">
+    <value>验证错误</value>
+  </data>
+  <data name="common.initialStep" xml:space="preserve">
+    <value>初始步骤</value>
+  </data>
+  <data name="common.jsError" xml:space="preserve">
+    <value>执行脚本失败，Javascript 错误：{message}</value>
+  </data>
+  <data name="common.jsNotAllowed" xml:space="preserve">
+    <value>脚本禁止操作。</value>
+  </data>
+  <data name="common.jsParseError" xml:space="preserve">
+    <value>无法执行脚本，Javascript 语法错误：{message}</value>
+  </data>
+  <data name="common.jsRejected" xml:space="preserve">
+    <value>脚本拒绝了操作。</value>
+  </data>
+  <data name="common.language" xml:space="preserve">
+    <value>语言代码</value>
+  </data>
+  <data name="common.login" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="common.logout" xml:space="preserve">
+    <value>注销</value>
+  </data>
+  <data name="common.maxCharacters" xml:space="preserve">
+    <value>最大字符数</value>
+  </data>
+  <data name="common.maxHeight" xml:space="preserve">
+    <value>最大高度</value>
+  </data>
+  <data name="common.maxItems" xml:space="preserve">
+    <value>最大项目数</value>
+  </data>
+  <data name="common.maxLength" xml:space="preserve">
+    <value>最大长度</value>
+  </data>
+  <data name="common.maxSize" xml:space="preserve">
+    <value>最大尺寸</value>
+  </data>
+  <data name="common.maxValue" xml:space="preserve">
+    <value>最大值</value>
+  </data>
+  <data name="common.maxWidth" xml:space="preserve">
+    <value>最大宽度</value>
+  </data>
+  <data name="common.maxWords" xml:space="preserve">
+    <value>最大字数</value>
+  </data>
+  <data name="common.minCharacters" xml:space="preserve">
+    <value>最小字符数</value>
+  </data>
+  <data name="common.minHeight" xml:space="preserve">
+    <value>最小高度</value>
+  </data>
+  <data name="common.minItems" xml:space="preserve">
+    <value>最小项目</value>
+  </data>
+  <data name="common.minLength" xml:space="preserve">
+    <value>最小长度</value>
+  </data>
+  <data name="common.minSize" xml:space="preserve">
+    <value>最小尺寸</value>
+  </data>
+  <data name="common.minValue" xml:space="preserve">
+    <value>最小值</value>
+  </data>
+  <data name="common.minWidth" xml:space="preserve">
+    <value>最小宽度</value>
+  </data>
+  <data name="common.minWords" xml:space="preserve">
+    <value>最小词</value>
+  </data>
+  <data name="common.name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="common.notFoundValue" xml:space="preserve">
+    <value>- 未找到 -</value>
+  </data>
+  <data name="common.numDays" xml:space="preserve">
+    <value>天数</value>
+  </data>
+  <data name="common.odataFailure" xml:space="preserve">
+    <value>无法解析查询：{message}，查询：{odata}</value>
+  </data>
+  <data name="common.odataFilterNotValid" xml:space="preserve">
+    <value>OData $filter 子句无效：{message}</value>
+  </data>
+  <data name="common.odataNotSupported" xml:space="preserve">
+    <value>查询不支持 OData 操作：{odata}</value>
+  </data>
+  <data name="common.odataSearchNotValid" xml:space="preserve">
+    <value>OData $search 子句无效：{message}</value>
+  </data>
+  <data name="common.oldPassword" xml:space="preserve">
+    <value>旧密码</value>
+  </data>
+  <data name="common.other" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="common.partitioning" xml:space="preserve">
+    <value>分区</value>
+  </data>
+  <data name="common.password" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="common.passwordConfirm" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="common.pattern" xml:space="preserve">
+    <value>模式</value>
+  </data>
+  <data name="common.permissions" xml:space="preserve">
+    <value>权限</value>
+  </data>
+  <data name="common.planId" xml:space="preserve">
+    <value>计划 ID</value>
+  </data>
+  <data name="common.previewUrls" xml:space="preserve">
+    <value>预览网址</value>
+  </data>
+  <data name="common.product" xml:space="preserve">
+    <value>Squidex Headless CMS</value>
+  </data>
+  <data name="common.properties" xml:space="preserve">
+    <value>属性</value>
+  </data>
+  <data name="common.property" xml:space="preserve">
+    <value>属性</value>
+  </data>
+  <data name="common.readonlyMode" xml:space="preserve">
+    <value>应用程序目前处于只读模式。</value>
+  </data>
+  <data name="common.remove" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="common.resultTooLarge" xml:space="preserve">
+    <value>结果集太大无法检索。使用 $take 参数减少项目数。</value>
+  </data>
+  <data name="common.role" xml:space="preserve">
+    <value>角色</value>
+  </data>
+  <data name="common.save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="common.schemaId" xml:space="preserve">
+    <value>Schemas ID</value>
+  </data>
+  <data name="common.signup" xml:space="preserve">
+    <value>注册</value>
+  </data>
+  <data name="common.success" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="common.text" xml:space="preserve">
+    <value>文本</value>
+  </data>
+  <data name="common.trigger" xml:space="preserve">
+    <value>触发器</value>
+  </data>
+  <data name="common.warning" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="common.workflow" xml:space="preserve">
+    <value>工作流程</value>
+  </data>
+  <data name="common.workflowStep" xml:space="preserve">
+    <value>步骤</value>
+  </data>
+  <data name="common.workflowTransition" xml:space="preserve">
+    <value>过渡</value>
+  </data>
+  <data name="contents.bulkInsertQueryNotUnique" xml:space="preserve">
+    <value>多个内容与查询匹配。</value>
+  </data>
+  <data name="contents.draftNotCreateForUnpublished" xml:space="preserve">
+    <value>您只能在内容发布后创建新版本。</value>
+  </data>
+  <data name="contents.draftToDeleteNotFound" xml:space="preserve">
+    <value>没有要删除的内容。</value>
+  </data>
+  <data name="contents.invalidArrayOfObjects" xml:space="preserve">
+    <value>无效的 json 类型，预期的对象数组。</value>
+  </data>
+  <data name="contents.invalidArrayOfStrings" xml:space="preserve">
+    <value>无效的 json 类型，需要字符串数组。</value>
+  </data>
+  <data name="contents.invalidBoolean" xml:space="preserve">
+    <value>无效的 json 类型，应为布尔值。</value>
+  </data>
+  <data name="contents.invalidComponentNoObject" xml:space="preserve">
+    <value>无效的 json 对象，带有 'schemaId' 字段的预期对象。</value>
+  </data>
+  <data name="contents.invalidComponentNoType" xml:space="preserve">
+    <value>无效组件。未找到 'schemaId' 字段。</value>
+  </data>
+  <data name="contents.invalidComponentUnknownSchema" xml:space="preserve">
+    <value>无效组件。找不到Schemas。</value>
+  </data>
+  <data name="contents.invalidGeolocation" xml:space="preserve">
+    <value>无效的 json 类型，预期的纬度/经度对象。</value>
+  </data>
+  <data name="contents.invalidGeolocationLatitude" xml:space="preserve">
+    <value>纬度必须在 -90 到 90 之间。</value>
+  </data>
+  <data name="contents.invalidGeolocationLongitude" xml:space="preserve">
+    <value>经度必须在 -180 到 180 之间。</value>
+  </data>
+  <data name="contents.invalidNumber" xml:space="preserve">
+    <value>无效的 json 类型，需要的数字。</value>
+  </data>
+  <data name="contents.invalidString" xml:space="preserve">
+    <value>无效的 json 类型，需要的字符串。</value>
+  </data>
+  <data name="contents.listReferences" xml:space="preserve">
+    <value>{count} 个引用</value>
+  </data>
+  <data name="contents.referenced" xml:space="preserve">
+    <value>内容被其他内容引用，无法删除或取消发布。</value>
+  </data>
+  <data name="contents.schemaNotPublished" xml:space="preserve">
+    <value>Schemas未发布。</value>
+  </data>
+  <data name="contents.singletonNotChangeable" xml:space="preserve">
+    <value>无法更新单个内容。</value>
+  </data>
+  <data name="contents.singletonNotCreatable" xml:space="preserve">
+    <value>无法创建单个内容。</value>
+  </data>
+  <data name="contents.singletonNotDeletable" xml:space="preserve">
+    <value>无法删除单个内容。</value>
+  </data>
+  <data name="contents.statusNotValid" xml:space="preserve">
+    <value>工作流中未定义状态。</value>
+  </data>
+  <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
+    <value>无法将状态从 {oldStatus} 更改为 {newStatus}。</value>
+  </data>
+  <data name="contents.validation.aspectRatio" xml:space="preserve">
+    <value>必须有纵横比 {width}:{height}。</value>
+  </data>
+  <data name="contents.validation.assetNotFound" xml:space="preserve">
+    <value>未找到 ID {id}。</value>
+  </data>
+  <data name="contents.validation.between" xml:space="preserve">
+    <value>必须介于 {min} 和 {max} 之间。</value>
+  </data>
+  <data name="contents.validation.characterCount" xml:space="preserve">
+    <value>必须正好有 {count} 个字符。</value>
+  </data>
+  <data name="contents.validation.charactersBetween" xml:space="preserve">
+    <value>必须在 {min} 到 {max} 个字符之间。</value>
+  </data>
+  <data name="contents.validation.duplicates" xml:space="preserve">
+    <value>不得包含重复值。</value>
+  </data>
+  <data name="contents.validation.error" xml:space="preserve">
+    <value>验证失败，内部错误。</value>
+  </data>
+  <data name="contents.validation.exactValue" xml:space="preserve">
+    <value>必须正好是 {value}。</value>
+  </data>
+  <data name="contents.validation.extension" xml:space="preserve">
+    <value>必须是允许的扩展名。</value>
+  </data>
+  <data name="contents.validation.image" xml:space="preserve">
+    <value>不是图片。</value>
+  </data>
+  <data name="contents.validation.invalid" xml:space="preserve">
+    <value>无效值。</value>
+  </data>
+  <data name="contents.validation.itemCount" xml:space="preserve">
+    <value>必须正好有 {count} 个项目。</value>
+  </data>
+  <data name="contents.validation.itemCountBetween" xml:space="preserve">
+    <value>必须介于 {min} 和 {max} 项之间。</value>
+  </data>
+  <data name="contents.validation.max" xml:space="preserve">
+    <value>必须小于或等于 {max}。</value>
+  </data>
+  <data name="contents.validation.maxCharacters" xml:space="preserve">
+    <value>不得超过 {max} 个文本字符。</value>
+  </data>
+  <data name="contents.validation.maximumHeight" xml:space="preserve">
+    <value>高度 {height}px 必须小于 {max}px。</value>
+  </data>
+  <data name="contents.validation.maximumSize" xml:space="preserve">
+    <value>{size} 的大小必须小于 {max}。</value>
+  </data>
+  <data name="contents.validation.maximumWidth" xml:space="preserve">
+    <value>宽度 {width}px 必须小于 {max}px。</value>
+  </data>
+  <data name="contents.validation.maxItems" xml:space="preserve">
+    <value>不得超过 {max} 个项目。</value>
+  </data>
+  <data name="contents.validation.maxLength" xml:space="preserve">
+    <value>不得超过 {max} 个字符。</value>
+  </data>
+  <data name="contents.validation.maxWords" xml:space="preserve">
+    <value>不得超过 {max} 个单词。</value>
+  </data>
+  <data name="contents.validation.min" xml:space="preserve">
+    <value>必须大于或等于 {min}。</value>
+  </data>
+  <data name="contents.validation.minimumHeight" xml:space="preserve">
+    <value>高度 {height}px 必须大于 {min}px。</value>
+  </data>
+  <data name="contents.validation.minimumSize" xml:space="preserve">
+    <value>{size} 的大小必须大于 {min}。</value>
+  </data>
+  <data name="contents.validation.minimumWidth" xml:space="preserve">
+    <value>宽度 {width}px 必须大于 {min}px。</value>
+  </data>
+  <data name="contents.validation.minItems" xml:space="preserve">
+    <value>必须至少有 {min} 个项目。</value>
+  </data>
+  <data name="contents.validation.minLength" xml:space="preserve">
+    <value>必须至少有 {min} 个字符。</value>
+  </data>
+  <data name="contents.validation.minNormalCharacters" xml:space="preserve">
+    <value>必须至少有 {min} 个文本字符。</value>
+  </data>
+  <data name="contents.validation.minWords" xml:space="preserve">
+    <value>必须至少有 {min} 个单词。</value>
+  </data>
+  <data name="contents.validation.mustBeEmpty" xml:space="preserve">
+    <value>不得定义值。</value>
+  </data>
+  <data name="contents.validation.normalCharacterCount" xml:space="preserve">
+    <value>必须正好有 {count} 个文本字符。</value>
+  </data>
+  <data name="contents.validation.normalCharactersBetween" xml:space="preserve">
+    <value>必须在 {min} 和 {max} 个文本字符之间。</value>
+  </data>
+  <data name="contents.validation.notAllowed" xml:space="preserve">
+    <value>不允许的值。</value>
+  </data>
+  <data name="contents.validation.pattern" xml:space="preserve">
+    <value>必须遵循模式。</value>
+  </data>
+  <data name="contents.validation.referenceNotFound" xml:space="preserve">
+    <value>未找到引用 '{id}'。</value>
+  </data>
+  <data name="contents.validation.referenceToInvalidSchema" xml:space="preserve">
+    <value>参考 '{id}' 的Schemas无效。</value>
+  </data>
+  <data name="contents.validation.regexTooSlow" xml:space="preserve">
+    <value>正则表达式太慢了。</value>
+  </data>
+  <data name="contents.validation.required" xml:space="preserve">
+    <value>必填字段。</value>
+  </data>
+  <data name="contents.validation.unique" xml:space="preserve">
+    <value>存在另一个具有相同值的内容。</value>
+  </data>
+  <data name="contents.validation.unknownField" xml:space="preserve">
+    <value>不是已知的 {fieldType}。</value>
+  </data>
+  <data name="contents.validation.wordCount" xml:space="preserve">
+    <value>必须正好有 {count} 个单词。</value>
+  </data>
+  <data name="contents.validation.wordsBetween" xml:space="preserve">
+    <value>必须在 {min} 到 {max} 个单词之间。</value>
+  </data>
+  <data name="contents.workflowErrorUpdate" xml:space="preserve">
+    <value>工作流不允许更新状态为 {status}</value>
+  </data>
+  <data name="dotnet_identity_DefaultEror" xml:space="preserve">
+    <value>发生未知故障。</value>
+  </data>
+  <data name="dotnet_identity_DuplicateEmail" xml:space="preserve">
+    <value>电子邮件已被占用。</value>
+  </data>
+  <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
+    <value>用户名已被占用。</value>
+  </data>
+  <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
+    <value>电子邮件无效。</value>
+  </data>
+  <data name="dotnet_identity_InvalidUserName" xml:space="preserve">
+    <value>用户名“{0}”无效，只能包含字母或数字。</value>
+  </data>
+  <data name="dotnet_identity_LoginAlreadyAssociated" xml:space="preserve">
+    <value>已存在使用此登录名的用户。</value>
+  </data>
+  <data name="dotnet_identity_PasswordMismatch" xml:space="preserve">
+    <value>密码不正确。</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresDigit" xml:space="preserve">
+    <value>密码必须至少有一位 ('0'-'9')。</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresLower" xml:space="preserve">
+    <value>密码必须至少有一个小写字母 ('a'-'z')。</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>密码必须至少有一个非字母数字字符。</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>密码必须至少使用 {0} 个不同的字符。</value>
+  </data>
+  <data name="dotnet_identity_PasswordRequiresUpper" xml:space="preserve">
+    <value>密码必须至少有一个大写字母 ('A'-'Z')。</value>
+  </data>
+  <data name="dotnet_identity_PasswordTooShort" xml:space="preserve">
+    <value>密码太短。</value>
+  </data>
+  <data name="dotnet_identity_PwnedError" xml:space="preserve">
+    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前曾在任何地方使用过它，请更改它！</value>
+  </data>
+  <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
+    <value>User is locked out.</value>
+  </data>
+  <data name="exception.invalidJsonQuery" xml:space="preserve">
+    <value>Json 查询无效：{message}</value>
+  </data>
+  <data name="exception.invalidJsonQueryJson" xml:space="preserve">
+    <value>Json 查询无效 json: {message}</value>
+  </data>
+  <data name="exceptions.domainObjectConflict" xml:space="preserve">
+    <value>实体 ({id}) 已经存在。</value>
+  </data>
+  <data name="exceptions.domainObjectDeleted" xml:space="preserve">
+    <value>实体 ({id}) 已被删除。</value>
+  </data>
+  <data name="exceptions.domainObjectNotFound" xml:space="preserve">
+    <value>实体 ({id}) 不存在。</value>
+  </data>
+  <data name="exceptions.domainObjectVersion" xml:space="preserve">
+    <value>实体 ({id}) 请求版本 {expectedVersion}，但找到 {currentVersion}。</value>
+  </data>
+  <data name="history.apps.clientAdded" xml:space="preserve">
+    <value>将客户端 {[Id]} 添加到应用程序</value>
+  </data>
+  <data name="history.apps.clientRevoked" xml:space="preserve">
+    <value>已撤销客户端 {[Id]}</value>
+  </data>
+  <data name="history.apps.clientUpdated" xml:space="preserve">
+    <value>更新的客户端 {[Id]}</value>
+  </data>
+  <data name="history.apps.contributoreAssigned" xml:space="preserve">
+    <value>已分配 {user:[Contributor]} 作为 {[Role]}</value>
+  </data>
+  <data name="history.apps.contributoreRemoved" xml:space="preserve">
+    <value>从应用中删除了 {user:[Contributor]}</value>
+  </data>
+  <data name="history.apps.languagedAdded" xml:space="preserve">
+    <value>添加语言 {[Language]}</value>
+  </data>
+  <data name="history.apps.languagedRemoved" xml:space="preserve">
+    <value>已删除语言 {[Language]}</value>
+  </data>
+  <data name="history.apps.languagedSetToMaster" xml:space="preserve">
+    <value>将主语言更改为 {[Language]}</value>
+  </data>
+  <data name="history.apps.languagedUpdated" xml:space="preserve">
+    <value>更新的语言 {[Language]}</value>
+  </data>
+  <data name="history.apps.planChanged" xml:space="preserve">
+    <value>已将计划更改为 {[Plan]}</value>
+  </data>
+  <data name="history.apps.planReset" xml:space="preserve">
+    <value>重置计划</value>
+  </data>
+  <data name="history.apps.roleAdded" xml:space="preserve">
+    <value>添加角色 {[Name]}</value>
+  </data>
+  <data name="history.apps.roleDeleted" xml:space="preserve">
+    <value>已删除角色 {[Name]}</value>
+  </data>
+  <data name="history.apps.roleUpdated" xml:space="preserve">
+    <value>更新角色 {[Name]}</value>
+  </data>
+  <data name="history.apps.settingsUpdated" xml:space="preserve">
+    <value>更新的 UI 设置</value>
+  </data>
+  <data name="history.assets.replaced" xml:space="preserve">
+    <value>替换的资源。</value>
+  </data>
+  <data name="history.assets.updated" xml:space="preserve">
+    <value>更新的资源。</value>
+  </data>
+  <data name="history.assets.uploaded" xml:space="preserve">
+    <value>上传的资源。</value>
+  </data>
+  <data name="history.contents.created" xml:space="preserve">
+    <value>创建了 {[Schema]} 内容。</value>
+  </data>
+  <data name="history.contents.deleted" xml:space="preserve">
+    <value>删除了 {[Schema]} 内容。</value>
+  </data>
+  <data name="history.contents.draftCreated" xml:space="preserve">
+    <value>创建了新草稿。</value>
+  </data>
+  <data name="history.contents.draftDeleted" xml:space="preserve">
+    <value>已删除的草稿。</value>
+  </data>
+  <data name="history.contents.scheduleCompleted" xml:space="preserve">
+    <value>已安排将 {[Schema]} 内容的状态更改为 {[Status]}。</value>
+  </data>
+  <data name="history.contents.scheduleFailed" xml:space="preserve">
+    <value>无法安排 {[Schema]} 内容的状态更改。</value>
+  </data>
+  <data name="history.contents.updated" xml:space="preserve">
+    <value>更新了 {[Schema]} 内容。</value>
+  </data>
+  <data name="history.schemas.created" xml:space="preserve">
+    <value>创建的Schemas {[Name]}。</value>
+  </data>
+  <data name="history.schemas.deleted" xml:space="preserve">
+    <value>已删除Schemas {[Name]}。</value>
+  </data>
+  <data name="history.schemas.fieldAdded" xml:space="preserve">
+    <value>将字段 {[Field]} 添加到Schemas {[Name]}。</value>
+  </data>
+  <data name="history.schemas.fieldDeleted" xml:space="preserve">
+    <value>已从Schemas {[Name]} 中删除字段 {[Field]}。</value>
+  </data>
+  <data name="history.schemas.fieldDisabled" xml:space="preserve">
+    <value>Schemas {[Name]} 的禁用字段 {[Field]}。</value>
+  </data>
+  <data name="history.schemas.fieldHidden" xml:space="preserve">
+    <value>有Schemas {[Name]} 的隐藏字段 {[Field]}。</value>
+  </data>
+  <data name="history.schemas.fieldLocked" xml:space="preserve">
+    <value>已锁定Schemas {[Name]} 的字段 {[Field]}。</value>
+  </data>
+  <data name="history.schemas.fieldShown" xml:space="preserve">
+    <value>已显示Schemas {[Name]} 的字段 {[Field]}。</value>
+  </data>
+  <data name="history.schemas.fieldsReordered" xml:space="preserve">
+    <value>Schemas {[Name]} 的重新排序字段。</value>
+  </data>
+  <data name="history.schemas.fieldUpdated" xml:space="preserve">
+    <value>已更新Schemas {[Name]} 的字段 {[Field]}。</value>
+  </data>
+  <data name="history.schemas.published" xml:space="preserve">
+    <value>已发布的Schemas {[Name]}。</value>
+  </data>
+  <data name="history.schemas.scriptsConfigured" xml:space="preserve">
+    <value>Schemas {[Name]} 的配置脚本。</value>
+  </data>
+  <data name="history.schemas.unpublished" xml:space="preserve">
+    <value>未发布的Schemas {[Name]}。</value>
+  </data>
+  <data name="history.schemas.updated" xml:space="preserve">
+    <value>更新的Schemas {[Name]}。</value>
+  </data>
+  <data name="history.statusChanged" xml:space="preserve">
+    <value>已将 {[Schema]} 内容的状态更改为 {[Status]}。</value>
+  </data>
+  <data name="login.githubPrivateEmail" xml:space="preserve">
+    <value>您的邮箱在 Github 中设置为私有。请设置为公开以使用 Github 登录。</value>
+  </data>
+  <data name="rules.ruleAlreadyRunning" xml:space="preserve">
+    <value>另一个规则已经在运行。</value>
+  </data>
+  <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
+    <value>计算出的默认值和默认值不能一起使用。</value>
+  </data>
+  <data name="schemas.duplicateFieldName" xml:space="preserve">
+    <value>字段 '{field}' 已添加两次。</value>
+  </data>
+  <data name="schemas.fieldCannotBeUIField" xml:space="preserve">
+    <value>字段不能是 UI 字段。</value>
+  </data>
+  <data name="schemas.fieldIsLocked" xml:space="preserve">
+    <value>Schema field is locked.</value>
+  </data>
+  <data name="schemas.fieldNameAlreadyExists" xml:space="preserve">
+    <value>已存在同名字段。</value>
+  </data>
+  <data name="schemas.fieldNotInSchema" xml:space="preserve">
+    <value>Field is not part of the schema.</value>
+  </data>
+  <data name="schemas.fieldsNotCovered" xml:space="preserve">
+    <value>字段 ID 未涵盖所有字段。</value>
+  </data>
+  <data name="schemas.nameAlreadyExists" xml:space="preserve">
+    <value>一个同名的Schemas已经存在。</value>
+  </data>
+  <data name="schemas.noPermission" xml:space="preserve">
+    <value>You do not have permission for this schema.</value>
+  </data>
+  <data name="schemas.notFoundId" xml:space="preserve">
+    <value>Schema {id} does not exist.</value>
+  </data>
+  <data name="schemas.number.inlineEditorError" xml:space="preserve">
+    <value>无线电编辑器不允许内联编辑。</value>
+  </data>
+  <data name="schemas.onlyArraysHaveNested" xml:space="preserve">
+    <value>只有数组字段可以有嵌套字段。</value>
+  </data>
+  <data name="schemas.onylArraysInRoot" xml:space="preserve">
+    <value>嵌套字段不能是数组字段。</value>
+  </data>
+  <data name="schemas.references.resolveError" xml:space="preserve">
+    <value>只有在 MaxItems 为 1 时才能解析引用。</value>
+  </data>
+  <data name="schemas.string.inlineEditorError" xml:space="preserve">
+    <value>内联编辑只允许用于下拉菜单、slug 和输入字段。</value>
+  </data>
+  <data name="schemas.stringEditorsNeedAllowedValuesError" xml:space="preserve">
+    <value>单选按钮或下拉列表需要允许的值。</value>
+  </data>
+  <data name="schemas.tags.editorNeedsAllowedValues" xml:space="preserve">
+    <value>复选框或下拉列表需要允许的值。</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeDisabled" xml:space="preserve">
+    <value>UI 字段不能被禁用。</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeEnabled" xml:space="preserve">
+    <value>UI 字段无法启用。</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeHidden" xml:space="preserve">
+    <value>UI 字段不能隐藏。</value>
+  </data>
+  <data name="schemas.uiFieldCannotBeShown" xml:space="preserve">
+    <value>UI 字段无法显示。</value>
+  </data>
+  <data name="search.contentResult" xml:space="preserve">
+    <value>{name} 内容</value>
+  </data>
+  <data name="search.contentsResult" xml:space="preserve">
+    <value>{name} 内容</value>
+  </data>
+  <data name="search.schemaResult" xml:space="preserve">
+    <value>{name} Schemas</value>
+  </data>
+  <data name="security.passwordStolen" xml:space="preserve">
+    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前曾在任何地方使用过它，请更改它！</value>
+  </data>
+  <data name="setup.createUser.button" xml:space="preserve">
+    <value>创建用户</value>
+  </data>
+  <data name="setup.createUser.confirmPassword" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="setup.createUser.failure" xml:space="preserve">
+    <value>既未配置密码认证，也未配置 Google 等外部认证提供商。请检查您的设置和日志。</value>
+  </data>
+  <data name="setup.createUser.headline" xml:space="preserve">
+    <value>管理员用户</value>
+  </data>
+  <data name="setup.createUser.headlineCreate" xml:space="preserve">
+    <value>创建管理员用户</value>
+  </data>
+  <data name="setup.createUser.loginHint" xml:space="preserve">
+    <value>您至少配置了一个外部身份验证提供程序，例如 Google。只需转到登录页面并登录即可成为管理员。</value>
+  </data>
+  <data name="setup.createUser.loginLink" xml:space="preserve">
+    <value>进入登录页面。</value>
+  </data>
+  <data name="setup.createUser.separator" xml:space="preserve">
+    <value>OR</value>
+  </data>
+  <data name="setup.headline" xml:space="preserve">
+    <value>安装</value>
+  </data>
+  <data name="setup.hint" xml:space="preserve">
+    <value>您看到此屏幕是因为尚无用户存在。创建用户后，您将无法再次使用此屏幕。</value>
+  </data>
+  <data name="setup.madeBy" xml:space="preserve">
+    <value>制作</value>
+  </data>
+  <data name="setup.madeByCopyright" xml:space="preserve">
+    <value>Sebastian Stehle 和贡献者，2016-2021</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAdmins" xml:space="preserve">
+    <value>通过你的设置，只有管理员可以创建新的应用程序。如果你想改变这个设置 &lt;code&gt;UI__ONLYADMINCANCREATEAPPS=false&lt;/code&gt; 作为环境变量。</value>
+  </data>
+  <data name="setup.ruleAppCreation.warningAll" xml:space="preserve">
+    <value>通过你的设置，每个用户都可以创建新的应用程序。如果你想改变这个设置 &lt;code&gt;UI__ONLYADMINCANCREATEAPPS=true&lt;/code&gt; 作为环境变量。</value>
+  </data>
+  <data name="setup.ruleFolder.warning" xml:space="preserve">
+    <value>您正在使用&lt;strong&gt;文件夹资源存储&lt;/strong&gt;，其中所有资源都存储在文件系统中。请记住将资源文件夹包含在您的备份策略中并将其映射到卷, 如果您使用的是 Docker。</value>
+  </data>
+  <data name="setup.ruleFtp.warning" xml:space="preserve">
+    <value>您正在使用 &lt;strong&gt;FTP 资源存储&lt;/strong&gt;。由于性能不佳，不建议使用这种存储类型。</value>
+  </data>
+  <data name="setup.ruleHttps.failure" xml:space="preserve">
+    <value> 您不是通过 https 访问站点。如果此警告不正确，则 Squidex 无法检测 https 模式，因为您的实例位于反向代理（例如 nginx）之后。确保正确转发 http 标头, 通过 &lt;code&gt;X-Forwarded-*&lt;/code&gt; 标头。</value>
+  </data>
+  <data name="setup.ruleHttps.success" xml:space="preserve">
+    <value>恭喜您，您正在通过安全连接 (https) 访问 Squidex 安装。</value>
+  </data>
+  <data name="setup.rules.headline" xml:space="preserve">
+    <value>系统清单</value>
+  </data>
+  <data name="setup.ruleUrl.failure" xml:space="preserve">
+    <value>您应该仅通过一个规范 URL 访问 Squidex，并通过 &lt;code&gt;URLS__BASEURL&lt;/code&gt; 环境变量配置此 URL。当前的基本 URL &lt;code&gt;{actual}&lt;/code&gt;与基本 url &lt;code&gt;{configured}&lt;/code&gt; 不匹配。</value>
+  </data>
+  <data name="setup.ruleUrl.success" xml:space="preserve">
+    <value>恭喜 &lt;code&gt;URLS__BASEURL&lt;/code&gt; 环境变量配置正确。</value>
+  </data>
+  <data name="setup.title" xml:space="preserve">
+    <value>安装</value>
+  </data>
+  <data name="users.accessDenied.text" xml:space="preserve">
+    <value>不允许此操作，您的帐户可能被锁定。</value>
+  </data>
+  <data name="users.accessDenied.title" xml:space="preserve">
+    <value>拒绝访问</value>
+  </data>
+  <data name="users.consent.agree" xml:space="preserve">
+    <value>我同意！</value>
+  </data>
+  <data name="users.consent.cookiesHeadline" xml:space="preserve">
+    <value>Cookies &amp; Analytics</value>
+  </data>
+  <data name="users.consent.cookiesText" xml:space="preserve">
+    <value>&lt;p&gt;我理解并同意 Squidex 使用 cookie 来确保您在我们的平台上获得最佳体验并存储您的登录状态。&lt;/p&gt;&lt;p&gt;我理解并同意 Squidex 已集成 Google Analytics（具有匿名器功能）。Google Analytics 是一项网络分析服务，用于收集和分析有关用户行为的数据。&lt;/p&gt;&lt;p&gt; 我接受 &lt;a href="{privacyUrl}" target="_blank" rel="noopener"&gt;隐私政策&lt;/a&gt;.&lt;/p&gt;</value>
+  </data>
+  <data name="users.consent.emailHeadline" xml:space="preserve">
+    <value>自动电子邮件（可选）</value>
+  </data>
+  <data name="users.consent.emailText" xml:space="preserve">
+    <value>我理解并同意 Squidex 发送电子邮件来通知我有关新功能、重大更改和停机时间的信息。</value>
+  </data>
+  <data name="users.consent.headline" xml:space="preserve">
+    <value>我们需要您的同意</value>
+  </data>
+  <data name="users.consent.needed" xml:space="preserve">
+    <value>你必须同意。</value>
+  </data>
+  <data name="users.consent.piiHeadline" xml:space="preserve">
+    <value>个人信息</value>
+  </data>
+  <data name="users.consent.piiText" xml:space="preserve">
+    <value>我理解并同意 Squidex 收集从外部身份验证提供商（例如 Google、Microsoft 或 Github）检索到的以下私人信息。&lt;ul class="personal-information"&gt; &lt;li&gt;向所有其他用户提供基本的个人信息（名字、姓氏和照片），以便他们可以将您添加到他们的工作空间。&lt;/li&gt;&lt;li&gt;您可以随时选择更改这些信息以使您的帐户匿名. &lt;/li&gt;&lt;li&gt;您的用户帐户具有唯一标识符，对于我们跟踪的所有更改，您进行了这些更改并将此信息提供给其他用户。&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="users.consent.title" xml:space="preserve">
+    <value>同意</value>
+  </data>
+  <data name="users.deleteYourselfError" xml:space="preserve">
+    <value>你不能删除自己。</value>
+  </data>
+  <data name="users.error.headline" xml:space="preserve">
+    <value>操作失败</value>
+  </data>
+  <data name="users.error.text" xml:space="preserve">
+    <value>我们真的很抱歉出现问题。</value>
+  </data>
+  <data name="users.error.title" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="users.errorHappened" xml:space="preserve">
+    <value>发生意外异常。</value>
+  </data>
+  <data name="users.lockedOutText" xml:space="preserve">
+    <value>您的账户已被锁定，请联系管理员。</value>
+  </data>
+  <data name="users.lockedOutTitle" xml:space="preserve">
+    <value>帐户已锁定</value>
+  </data>
+  <data name="users.lockYourselfError" xml:space="preserve">
+    <value>你不能锁定自己。</value>
+  </data>
+  <data name="users.login.askAdmin" xml:space="preserve">
+    <value />
+  </data>
+  <data name="users.login.emailPlaceholder" xml:space="preserve">
+    <value>输入邮箱</value>
+  </data>
+  <data name="users.login.error" xml:space="preserve">
+    <value>电子邮件或密码不正确</value>
+  </data>
+  <data name="users.login.loginWith" xml:space="preserve">
+    <value>{action} with &lt;strong&gt;{provider}&lt;/strong&gt;</value>
+  </data>
+  <data name="users.login.noAccountLoginAction" xml:space="preserve">
+    <value>点击此处登录</value>
+  </data>
+  <data name="users.login.noAccountLoginQuestion" xml:space="preserve">
+    <value>已经注册？</value>
+  </data>
+  <data name="users.login.noAccountSignupAction" xml:space="preserve">
+    <value>点击此处注册</value>
+  </data>
+  <data name="users.login.noAccountSignupQuestion" xml:space="preserve">
+    <value>还没有账号？</value>
+  </data>
+  <data name="users.login.passwordPlaceholder" xml:space="preserve">
+    <value>输入密码</value>
+  </data>
+  <data name="users.login.separator" xml:space="preserve">
+    <value>或</value>
+  </data>
+  <data name="users.logout.headline" xml:space="preserve">
+    <value>登出！</value>
+  </data>
+  <data name="users.logout.text" xml:space="preserve">
+    <value>！请关闭这个弹窗。</value>
+  </data>
+  <data name="users.logout.title" xml:space="preserve">
+    <value>注销</value>
+  </data>
+  <data name="users.profile.addLoginDone" xml:space="preserve">
+    <value>登录添加成功。</value>
+  </data>
+  <data name="users.profile.changePassword" xml:space="preserve">
+    <value>更改密码</value>
+  </data>
+  <data name="users.profile.changePasswordDone" xml:space="preserve">
+    <value>密码更改成功。</value>
+  </data>
+  <data name="users.profile.clientHint" xml:space="preserve">
+    <value>使用客户端凭据通过您的个人资料信息和权限访问 API</value>
+  </data>
+  <data name="users.profile.clientTitle" xml:space="preserve">
+    <value>客户端</value>
+  </data>
+  <data name="users.profile.confirmPassword" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="users.profile.generateClient" xml:space="preserve">
+    <value>生成</value>
+  </data>
+  <data name="users.profile.generateClientDone" xml:space="preserve">
+    <value>客户端密码生成成功。</value>
+  </data>
+  <data name="users.profile.headline" xml:space="preserve">
+    <value>编辑个人资料</value>
+  </data>
+  <data name="users.profile.hideProfile" xml:space="preserve">
+    <value>不要向其他用户显示我的个人资料</value>
+  </data>
+  <data name="users.profile.loginsTitle" xml:space="preserve">
+    <value>登录</value>
+  </data>
+  <data name="users.profile.passwordTitle" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="users.profile.pii" xml:space="preserve">
+    <value>个人信息</value>
+  </data>
+  <data name="users.profile.propertiesHint" xml:space="preserve">
+    <value>为规则和脚本使用自定义属性。</value>
+  </data>
+  <data name="users.profile.propertiesTitle" xml:space="preserve">
+    <value>属性</value>
+  </data>
+  <data name="users.profile.propertyAdd" xml:space="preserve">
+    <value>添加属性</value>
+  </data>
+  <data name="users.profile.removeLoginDone" xml:space="preserve">
+    <value>登录提供程序删除成功。</value>
+  </data>
+  <data name="users.profile.setPassword" xml:space="preserve">
+    <value>设置密码</value>
+  </data>
+  <data name="users.profile.setPasswordDone" xml:space="preserve">
+    <value>密码设置成功。</value>
+  </data>
+  <data name="users.profile.title" xml:space="preserve">
+    <value>个人资料</value>
+  </data>
+  <data name="users.profile.updateProfileDone" xml:space="preserve">
+    <value>账户更新成功。</value>
+  </data>
+  <data name="users.profile.updatePropertiesDone" xml:space="preserve">
+    <value>账户更新成功。</value>
+  </data>
+  <data name="users.profile.uploadPicture" xml:space="preserve">
+    <value>上传图片</value>
+  </data>
+  <data name="users.profile.uploadPictureDone" xml:space="preserve">
+    <value>图片上传成功。</value>
+  </data>
+  <data name="users.unlockYourselfError" xml:space="preserve">
+    <value>您无法解锁自己。</value>
+  </data>
+  <data name="users.userLocked" xml:space="preserve">
+    <value>不允许用户登录。</value>
+  </data>
+  <data name="users.userNotFound" xml:space="preserve">
+    <value>找不到用户。</value>
+  </data>
+  <data name="validation.between" xml:space="preserve">
+    <value>{property|upper} 必须介于 {min} 和 {max} 之间。</value>
+  </data>
+  <data name="validation.greaterEqualsThan" xml:space="preserve">
+    <value>{property|upper} 必须大于或等于 {other|lower}。</value>
+  </data>
+  <data name="validation.greaterThan" xml:space="preserve">
+    <value>{property|upper} 必须大于 {other|lower}。</value>
+  </data>
+  <data name="validation.javascriptProperty" xml:space="preserve">
+    <value>{property|upper} 不是 Javascript 属性名称。</value>
+  </data>
+  <data name="validation.lessEqualsThan" xml:space="preserve">
+    <value>{property|upper} 必须小于或等于 {other|lower}。</value>
+  </data>
+  <data name="validation.lessThan" xml:space="preserve">
+    <value>{property|upper} 必须小于 {other|lower}。</value>
+  </data>
+  <data name="validation.notAnImage" xml:space="preserve">
+    <value>图片不是有效图片。</value>
+  </data>
+  <data name="validation.onlyOneFile" xml:space="preserve">
+    <value>只能上传一个文件。</value>
+  </data>
+  <data name="validation.required" xml:space="preserve">
+    <value>{property|upper} 是必需的。</value>
+  </data>
+  <data name="validation.requiredBoth" xml:space="preserve">
+    <value>如果使用 {property1|lower} 或 {property2|lower}，则必须定义两者。</value>
+  </data>
+  <data name="validation.requiredValue" xml:space="preserve">
+    <value>必须定义值。</value>
+  </data>
+  <data name="validation.slug" xml:space="preserve">
+    <value>{property|upper} 不是有效的 slug。</value>
+  </data>
+  <data name="validation.valid" xml:space="preserve">
+    <value>{property|upper} 不是一个有效值。</value>
+  </data>
+  <data name="workflows.overlap" xml:space="preserve">
+    <value>多个工作流覆盖所有Schemas。</value>
+  </data>
+  <data name="workflows.publishedIsInitial" xml:space="preserve">
+    <value>初始步骤不能发布步骤。</value>
+  </data>
+  <data name="workflows.publishedNotDefined" xml:space="preserve">
+    <value>工作流必须有一个已发布的步骤。</value>
+  </data>
+  <data name="workflows.publishedStepNotFound" xml:space="preserve">
+    <value>转换的目标无效。</value>
+  </data>
+  <data name="workflows.schemaOverlap" xml:space="preserve">
+    <value>Schemas'{schema}' 被多个工作流覆盖。</value>
+  </data>
+</root>

@@ -18,9 +18,9 @@ interface State {
     styleUrls: ['./list-view.component.scss'],
     templateUrl: './list-view.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {
     private timer: any;
@@ -67,10 +67,10 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     }
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
         super(changeDetector, {
-            isLoading: false
+            isLoading: false,
         });
     }
 

@@ -9,14 +9,14 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
-declare var L: any;
-declare var google: any;
+declare const L: any;
+declare const google: any;
 
 export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => GeolocationEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => GeolocationEditorComponent), multi: true,
 };
 
-type Geolocation = { latitude: number; longitude: number; };
+type Geolocation = { latitude: number; longitude: number };
 
 interface State {
     // True when the map should be hidden.
@@ -33,9 +33,9 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
     providers: [
-        SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
     private marker: any;
@@ -58,15 +58,15 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             latitude: [
                 '',
                 [
-                    ValidatorsEx.between(-90, 90)
-                ]
+                    ValidatorsEx.between(-90, 90),
+                ],
             ],
             longitude: [
                 '',
                 [
-                    ValidatorsEx.between(-180, 180)
-                ]
-            ]
+                    ValidatorsEx.between(-180, 180),
+                ],
+            ],
         });
 
     @ViewChild('editor', { static: false })
@@ -79,10 +79,10 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         private readonly localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly uiOptions: UIOptions
+        private readonly uiOptions: UIOptions,
     ) {
         super(changeDetector, {
-            isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP)
+            isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP),
         });
 
         this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
@@ -179,50 +179,50 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         Promise.all([
             this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.css'),
             this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css'),
-            this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js')
+            this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js'),
         ]).then(() => {
-                this.map = L.map(this.editor.nativeElement).fitWorld();
+            this.map = L.map(this.editor.nativeElement).fitWorld();
 
-                L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png',
-                    {
-                        attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(this.map);
+            L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png',
+                {
+                    attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+                }).addTo(this.map);
 
-                this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.js')
-                    .then(() => {
-                        L.Control.geocoder({
-                            defaultMarkGeocode: false
-                        })
-                        .on('markgeocode', (event: any) => {
-                            const center = event.geocode.center;
+            this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.js')
+                .then(() => {
+                    L.Control.geocoder({
+                        defaultMarkGeocode: false,
+                    })
+                    .on('markgeocode', (event: any) => {
+                        const center = event.geocode.center;
 
-                            if (!this.snapshot.isDisabled) {
-                                this.updateValue(center.lat, center.lng);
-                                this.updateMarker({ reset: true, fire: true });
-                            }
-                          })
-                          .addTo(this.map);
-                    });
-
-                this.map.on('click', (event: any) => {
-                    if (!this.snapshot.isDisabled) {
-                        const latlng = event.latlng.wrap();
-
-                        this.updateValue(latlng.lat, latlng.lng);
-                        this.updateMarker({ fire: true });
-                    }
+                        if (!this.snapshot.isDisabled) {
+                            this.updateValue(center.lat, center.lng);
+                            this.updateMarker({ reset: true, fire: true });
+                        }
+                    })
+                    .addTo(this.map);
                 });
 
-                this.updateMarker({ reset: true });
+            this.map.on('click', (event: any) => {
+                if (!this.snapshot.isDisabled) {
+                    const latlng = event.latlng.wrap();
 
-                if (this.snapshot.isDisabled) {
-                    this.map.zoomControl.disable();
-
-                    this.map._handlers.forEach((handler: any) => {
-                        handler.disable();
-                    });
+                    this.updateValue(latlng.lat, latlng.lng);
+                    this.updateMarker({ fire: true });
                 }
             });
+
+            this.updateMarker({ reset: true });
+
+            if (this.snapshot.isDisabled) {
+                this.map.zoomControl.disable();
+
+                this.map._handlers.forEach((handler: any) => {
+                    handler.disable();
+                });
+            }
+        });
     }
 
     private ngAfterViewInitGoogle(apiKey: string) {
@@ -235,7 +235,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
                         mapTypeControl: false,
                         mapTypeControlOptions: {},
                         streetViewControl: false,
-                        center: { lat: 0, lng: 0 }
+                        center: { lat: 0, lng: 0 },
                     });
 
                 const searchBox = new google.maps.places.SearchBox(this.searchBoxInput.nativeElement);
@@ -338,24 +338,22 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             }
 
             this.marker.setLatLng(latLng);
-        } else {
-            if (this.marker) {
-                this.marker.removeFrom(this.map);
-                this.marker = null;
-            }
+        } else if (this.marker) {
+            this.marker.removeFrom(this.map);
+            this.marker = null;
         }
     }
 
     private updateMarkerGoogle(opts?: UpdateOptions) {
         if (this.value) {
             if (!this.marker) {
-                this.marker =  new google.maps.Marker({
+                this.marker = new google.maps.Marker({
                     map: this.map,
                     position: {
                         lat: 0,
-                        lng: 0
+                        lng: 0,
                     },
-                    draggable: true
+                    draggable: true,
                 });
 
                 this.marker.addListener('dragend', (event: any) => {
@@ -378,11 +376,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             }
 
             this.marker.setPosition(latLng);
-        } else {
-            if (this.marker) {
-                this.marker.setMap(null);
-                this.marker = null;
-            }
+        } else if (this.marker) {
+            this.marker.setMap(null);
+            this.marker = null;
         }
     }
 

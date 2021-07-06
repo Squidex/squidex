@@ -15,7 +15,7 @@ import { TestValues } from './_test-helpers';
 describe('BackupsState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     const backup1 = createBackup(12);
@@ -52,7 +52,7 @@ describe('BackupsState', () => {
 
         it('should reset loading state if loading failed', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             backupsState.load().pipe(onErrorResumeNext()).subscribe();
 
@@ -72,7 +72,7 @@ describe('BackupsState', () => {
 
         it('should show notification on load error if silent is false', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => throwError({}));
+                .returns(() => throwError(() => 'Service Error'));
 
             backupsState.load(true, false).pipe(onErrorResumeNext()).subscribe();
 
@@ -83,7 +83,7 @@ describe('BackupsState', () => {
 
         it('should not show notification on load error if silent is true', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => throwError({}));
+                .returns(() => throwError(() => 'Service Error'));
 
             backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
 

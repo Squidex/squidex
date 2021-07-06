@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -31,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetFolderDomainObjectTests()
         {
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             sut = new AssetFolderDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), assetQuery);

@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.DefaultValues;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -94,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.Assets(1, "1", Partitioning.Invariant,
-                    new AssetsFieldProperties { DefaultValue = new[] { "1", "2" } });
+                    new AssetsFieldProperties { DefaultValue = ImmutableList.Create("1", "2" ) });
 
             Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
@@ -106,11 +108,11 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.Assets(1, "1", Partitioning.Invariant,
                     new AssetsFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string[]?>
+                        DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
                         {
                             [language.Iso2Code] = null
-                        },
-                        DefaultValue = new[] { "1", "2" }
+                        }),
+                        DefaultValue = ImmutableList.Create("1", "2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -133,10 +135,10 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.Boolean(1, "1", Partitioning.Invariant,
                     new BooleanFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<bool?>
+                        DefaultValues = new LocalizedValue<bool?>(new Dictionary<string, bool?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = true
                     });
 
@@ -180,10 +182,10 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.DateTime(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<Instant?>
+                        DefaultValues = new LocalizedValue<Instant?>(new Dictionary<string, Instant?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = FutureDays(15)
                     });
 
@@ -227,10 +229,10 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.Number(1, "1", Partitioning.Invariant,
                     new NumberFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<double?>
+                        DefaultValues = new LocalizedValue<double?>(new Dictionary<string, double?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = 12
                     });
 
@@ -252,7 +254,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.References(1, "1", Partitioning.Invariant,
-                    new ReferencesFieldProperties { DefaultValue = new[] { "1", "2" } });
+                    new ReferencesFieldProperties { DefaultValue = ImmutableList.Create("1", "2") });
 
             Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
@@ -264,11 +266,11 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.References(1, "1", Partitioning.Invariant,
                     new ReferencesFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string[]?>
+                        DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
                         {
                             [language.Iso2Code] = null
-                        },
-                        DefaultValue = new[] { "1", "2" }
+                        }),
+                        DefaultValue = ImmutableList.Create("1", "2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -291,10 +293,10 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.String(1, "1", Partitioning.Invariant,
                     new StringFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string?>
+                        DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = "default"
                     });
 
@@ -306,7 +308,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.Tags(1, "1", Partitioning.Invariant,
-                    new TagsFieldProperties { DefaultValue = new[] { "tag1", "tag2" } });
+                    new TagsFieldProperties { DefaultValue = ImmutableList.Create("tag1", "tag2") });
 
             Assert.Equal(JsonValue.Array("tag1", "tag2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
@@ -318,11 +320,11 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.Tags(1, "1", Partitioning.Invariant,
                     new TagsFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string[]?>
+                        DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
                         {
                             [language.Iso2Code] = null
-                        },
-                        DefaultValue = new[] { "tag1", "tag2" }
+                        }),
+                        DefaultValue = ImmutableList.Create("tag1", "tag2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));

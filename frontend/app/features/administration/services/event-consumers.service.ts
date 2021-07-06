@@ -15,7 +15,7 @@ export class EventConsumersDto {
     public readonly _links: ResourceLinks;
 
     constructor(
-        public readonly items: ReadonlyArray<EventConsumerDto>, links?: ResourceLinks
+        public readonly items: ReadonlyArray<EventConsumerDto>, links?: ResourceLinks,
     ) {
         this._links = links || {};
     }
@@ -34,7 +34,7 @@ export class EventConsumerDto {
         public readonly isStopped?: boolean,
         public readonly isResetting?: boolean,
         public readonly error?: string,
-        public readonly position?: string
+        public readonly position?: string,
     ) {
         this._links = links;
 
@@ -48,7 +48,7 @@ export class EventConsumerDto {
 export class EventConsumersService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 

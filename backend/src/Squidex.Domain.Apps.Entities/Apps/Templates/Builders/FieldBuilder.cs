@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -13,69 +14,76 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public abstract class FieldBuilder
     {
-        private readonly UpsertSchemaField field;
-        private readonly CreateSchema schema;
+        protected UpsertSchemaFieldBase Field { get; init; }
+        protected CreateSchema Schema { get; init; }
+    }
 
-        protected T Properties<T>() where T : FieldProperties
+    public abstract class FieldBuilder<T> : FieldBuilder
+        where T : FieldBuilder
+    {
+        protected FieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
         {
-            return (T)field.Properties;
+            Field = field;
+            Schema = schema;
         }
 
-        protected FieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public T Label(string? label)
         {
-            this.field = field;
-            this.schema = schema;
+            Field.Properties = Field.Properties with { Label = label };
+
+            return (T)(object)this;
         }
 
-        public FieldBuilder Label(string? label)
+        public T Hints(string? hints)
         {
-            field.Properties.Label = label;
+            Field.Properties = Field.Properties with { Hints = hints };
 
-            return this;
+            return (T)(object)this;
         }
 
-        public FieldBuilder Hints(string? hints)
+        public T Localizable()
         {
-            field.Properties.Hints = hints;
+            if (Field is UpsertSchemaField localizableField)
+            {
+                localizableField.Partitioning = Partitioning.Language.Key;
+            }
 
-            return this;
+            return (T)(object)this;
         }
 
-        public FieldBuilder Localizable()
+        public T Disabled()
         {
-            field.Partitioning = Partitioning.Language.Key;
+            Field.IsDisabled = true;
 
-            return this;
+            return (T)(object)this;
         }
 
-        public FieldBuilder Disabled()
+        public T Required()
         {
-            field.IsDisabled = true;
+            Field.Properties = Field.Properties with { IsRequired = true };
 
-            return this;
+            return (T)(object)this;
         }
 
-        public FieldBuilder Required()
+        protected void Properties<TProperties>(Func<TProperties, TProperties> updater) where TProperties : FieldProperties
         {
-            field.Properties.IsRequired = true;
-
-            return this;
+            Field.Properties = updater((TProperties)Field.Properties);
         }
 
-        public FieldBuilder ShowInList()
+        public T ShowInList()
         {
-            schema.FieldsInLists ??= new FieldNames();
-            schema.FieldsInLists.Add(field.Name);
+            Schema.FieldsInLists ??= new FieldNames();
+            Schema.FieldsInLists.Add(Field.Name);
 
-            return this;
+            return (T)(object)this;
         }
 
-        public FieldBuilder ShowInReferences()
+        public T ShowInReferences()
         {
-            schema.FieldsInReferences ??= new FieldNames();
-            schema.FieldsInReferences.Add(field.Name);
+            Schema.FieldsInReferences ??= new FieldNames();
+            Schema.FieldsInReferences.Add(Field.Name);
 
-            return this;
+            return (T)(object)this;
         }
     }
 }

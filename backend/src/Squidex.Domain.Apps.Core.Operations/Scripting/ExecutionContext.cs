@@ -40,7 +40,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
             completion?.Invoke(exception);
         }
 
-        public ExecutionContext ExtendAsync(IEnumerable<IJintExtension> extensions, Func<Exception, bool> completion, CancellationToken ct)
+        public ExecutionContext ExtendAsync(IEnumerable<IJintExtension> extensions, Func<Exception, bool> completion,
+            CancellationToken ct)
         {
             CancellationToken = ct;
 

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
- // tslint:disable: readonly-array
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
@@ -25,8 +23,10 @@ export const MetaFields = {
     status: 'meta.status',
     statusColor: 'meta.status.color',
     statusNext: 'meta.status.next',
-    version: 'meta.version'
+    version: 'meta.version',
 };
+
+export type SchemaType = 'Default' | 'Singleton' | 'Component';
 
 export class SchemaDto {
     public readonly _links: ResourceLinks;
@@ -50,18 +50,29 @@ export class SchemaDto {
 
     public readonly displayName: string;
 
+    public readonly contentFields: ReadonlyArray<RootFieldDto>;
+
+    public readonly defaultListFields: ReadonlyArray<TableField>;
+    public readonly defaultReferenceFields: ReadonlyArray<TableField>;
+
     constructor(links: ResourceLinks,
         public readonly id: string,
-        public readonly name: string,
-        public readonly category: string,
-        public readonly properties: SchemaPropertiesDto,
-        public readonly isSingleton: boolean,
-        public readonly isPublished: boolean,
         public readonly created: DateTime,
         public readonly createdBy: string,
         public readonly lastModified: DateTime,
         public readonly lastModifiedBy: string,
-        public readonly version: Version
+        public readonly version: Version,
+        public readonly name: string,
+        public readonly category: string,
+        public readonly type: SchemaType,
+        public readonly isPublished: boolean,
+        public readonly properties: SchemaPropertiesDto,
+        public readonly fields: ReadonlyArray<RootFieldDto> = [],
+        public readonly fieldsInLists: Tags = [],
+        public readonly fieldsInReferences: Tags = [],
+        public readonly fieldRules: ReadonlyArray<FieldRule> = [],
+        public readonly previewUrls = {},
+        public readonly scripts = {},
     ) {
         this._links = links;
 
@@ -83,32 +94,6 @@ export class SchemaDto {
         this.canUpdateRules = hasAnyLink(links, 'update/rules');
 
         this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
-    }
-}
-
-export class SchemaDetailsDto extends SchemaDto {
-    public readonly contentFields: ReadonlyArray<RootFieldDto>;
-
-    public readonly defaultListFields: ReadonlyArray<TableField>;
-    public readonly defaultReferenceFields: ReadonlyArray<TableField>;
-
-    constructor(links: ResourceLinks, id: string, name: string, category: string,
-        properties: SchemaPropertiesDto,
-        isSingleton: boolean,
-        isPublished: boolean,
-        created: DateTime,
-        createdBy: string,
-        lastModified: DateTime,
-        lastModifiedBy: string,
-        version: Version,
-        public readonly fields: ReadonlyArray<RootFieldDto> = [],
-        public readonly fieldsInLists: Tags = [],
-        public readonly fieldsInReferences: Tags = [],
-        public readonly fieldRules: ReadonlyArray<FieldRule> = [],
-        public readonly scripts = {},
-        public readonly previewUrls = {}
-    ) {
-        super(links, id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
 
         if (fields) {
             this.contentFields = fields.filter(x => x.properties.isContentField);
@@ -147,7 +132,7 @@ export class SchemaDetailsDto extends SchemaDto {
             'fieldId',
             'parentId',
             'parentFieldId',
-            '_links'
+            '_links',
         ];
 
         const cleanup = (source: any, ...exclude: string[]): any => {
@@ -167,9 +152,12 @@ export class SchemaDetailsDto extends SchemaDto {
         };
 
         const result: any = {
+            previewUrls: this.previewUrls,
             properties: cleanup(this.properties),
             category: this.category,
             scripts: this.scripts,
+            isPublished: this.isPublished,
+            fieldRules: this.fieldRules,
             fieldsInLists: this.fieldsInLists,
             fieldsInReferences: this.fieldsInReferences,
             fields: this.fields.map(field => {
@@ -193,7 +181,7 @@ export class SchemaDetailsDto extends SchemaDto {
 
                 return copy;
             }),
-            isPublished: this.isPublished
+            type: this.type,
         };
 
         return result;
@@ -253,7 +241,7 @@ export class FieldDto {
         public readonly properties: FieldPropertiesDto,
         public readonly isLocked: boolean = false,
         public readonly isHidden: boolean = false,
-        public readonly isDisabled: boolean = false
+        public readonly isDisabled: boolean = false,
     ) {
         this._links = links;
 
@@ -274,16 +262,12 @@ export class RootFieldDto extends FieldDto {
         return this.partitioning === 'language';
     }
 
-    public get isArray() {
-        return this.properties.fieldType === 'Array';
-    }
-
     constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly partitioning: string,
         isLocked: boolean = false,
         isHidden: boolean = false,
         isDisabled: boolean = false,
-        public readonly nested: ReadonlyArray<NestedFieldDto> = []
+        public readonly nested: ReadonlyArray<NestedFieldDto> = [],
     ) {
         super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
@@ -294,7 +278,7 @@ export class NestedFieldDto extends FieldDto {
         public readonly parentId: number,
         isLocked: boolean = false,
         isHidden: boolean = false,
-        isDisabled: boolean = false
+        isDisabled: boolean = false,
     ) {
         super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
@@ -308,7 +292,7 @@ export class SchemaPropertiesDto {
         public readonly contentSidebarUrl?: string,
         public readonly contentEditorUrl?: string,
         public readonly validateOnPublish?: boolean,
-        public readonly tags?: ReadonlyArray<string>
+        public readonly tags?: ReadonlyArray<string>,
     ) {
     }
 }
@@ -316,7 +300,7 @@ export class SchemaPropertiesDto {
 export const FIELD_RULE_ACTIONS: ReadonlyArray<FieldRuleAction> = [
     'Disable',
     'Hide',
-    'Require'
+    'Require',
 ];
 
 type Tags = readonly string[];
@@ -324,39 +308,39 @@ type Tags = readonly string[];
 export type TableField = RootFieldDto | string;
 
 export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
-export type FieldRule = { field: string, action: FieldRuleAction, condition: string };
-export type SchemaCompletions = ReadonlyArray<{ name: string, description: string }>;
+export type FieldRule = { field: string; action: FieldRuleAction; condition: string };
+export type SchemaCompletions = ReadonlyArray<{ name: string; description: string }>;
 
 export type SchemasDto =
-    Readonly<{ items: readonly SchemaDto[]; canCreate: boolean } & Resource>;
+    Readonly<{ items: ReadonlyArray<SchemaDto>; canCreate: boolean } & Resource>;
 
 export type AddFieldDto =
-    Readonly<{ name: string;  partitioning?: string; properties: FieldPropertiesDto }>;
+    Readonly<{ name: string; partitioning?: string; properties: FieldPropertiesDto }>;
 
 export type UpdateUIFields =
-    Readonly<{ fieldsInLists?: Tags; fieldsInReferences?: Tags; }>;
+    Readonly<{ fieldsInLists?: Tags; fieldsInReferences?: Tags }>;
 
 export type CreateSchemaDto =
-    Readonly<{ name: string; fields?: ReadonlyArray<RootFieldDto>; category?: string; isSingleton?: boolean; isPublished?: boolean; properties?: SchemaPropertiesDto; }>;
+    Readonly<{ name: string; fields?: ReadonlyArray<RootFieldDto>; category?: string; type?: string; isPublished?: boolean; properties?: SchemaPropertiesDto }>;
 
 export type UpdateSchemaCategoryDto =
-    Readonly<{ name?: string; }>;
+    Readonly<{ name?: string }>;
 
 export type UpdateFieldDto =
-    Readonly<{ properties: FieldPropertiesDto; }>;
+    Readonly<{ properties: FieldPropertiesDto }>;
 
 export type SynchronizeSchemaDto =
-    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; [key: string]: any; }>;
+    Readonly<{ noFieldDeletiong?: boolean; noFieldRecreation?: boolean; [key: string]: any }>;
 
 export type UpdateSchemaDto =
-    Readonly<{ label?: string; hints?: string; contentsSidebarUrl?: string; contentSidebarUrl?: string; contentEditorUrl?: string; validateOnPublish?: boolean; tags?: Tags; }>;
+    Readonly<{ label?: string; hints?: string; contentsSidebarUrl?: string; contentSidebarUrl?: string; contentEditorUrl?: string; validateOnPublish?: boolean; tags?: Tags }>;
 
 @Injectable()
 export class SchemasService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -370,22 +354,22 @@ export class SchemasService {
             pretifyError('i18n:schemas.loadFailed'));
     }
 
-    public getSchema(appName: string, name: string): Observable<SchemaDetailsDto> {
+    public getSchema(appName: string, name: string): Observable<SchemaDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${name}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             pretifyError('i18n:schemas.loadSchemaFailed'));
     }
 
-    public postSchema(appName: string, dto: CreateSchemaDto): Observable<SchemaDetailsDto> {
+    public postSchema(appName: string, dto: CreateSchemaDto): Observable<SchemaDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.postVersioned(this.http, url, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
@@ -393,14 +377,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.createFailed'));
     }
 
-    public putScripts(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
+    public putScripts(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDto> {
         const link = resource._links['update/scripts'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
@@ -408,14 +392,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateScriptsFailed'));
     }
 
-    public putFieldRules(appName: string, resource: Resource, dto: ReadonlyArray<FieldRule>, version: Version): Observable<SchemaDetailsDto> {
+    public putFieldRules(appName: string, resource: Resource, dto: ReadonlyArray<FieldRule>, version: Version): Observable<SchemaDto> {
         const link = resource._links['update/rules'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, { fieldRules: dto }).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'RulesConfigured', appName);
@@ -423,14 +407,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateRulesFailed'));
     }
 
-    public putSchemaSync(appName: string, resource: Resource, dto: SynchronizeSchemaDto, version: Version): Observable<SchemaDetailsDto> {
+    public putSchemaSync(appName: string, resource: Resource, dto: SynchronizeSchemaDto, version: Version): Observable<SchemaDto> {
         const link = resource._links['update/sync'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Updated', appName);
@@ -438,14 +422,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.synchronizeFailed'));
     }
 
-    public putSchema(appName: string, resource: Resource, dto: UpdateSchemaDto, version: Version): Observable<SchemaDetailsDto> {
+    public putSchema(appName: string, resource: Resource, dto: UpdateSchemaDto, version: Version): Observable<SchemaDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Updated', appName);
@@ -453,14 +437,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateFailed'));
     }
 
-    public putCategory(appName: string, resource: Resource, dto: UpdateSchemaCategoryDto, version: Version): Observable<SchemaDetailsDto> {
+    public putCategory(appName: string, resource: Resource, dto: UpdateSchemaCategoryDto, version: Version): Observable<SchemaDto> {
         const link = resource._links['update/category'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'CategoryChanged', appName);
@@ -468,14 +452,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.changeCategoryFailed'));
     }
 
-    public putPreviewUrls(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
+    public putPreviewUrls(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDto> {
         const link = resource._links['update/urls'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'PreviewUrlsConfigured', appName);
@@ -483,14 +467,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.updatePreviewUrlsFailed'));
     }
 
-    public publishSchema(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public publishSchema(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['publish'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Published', appName);
@@ -498,14 +482,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.publishFailed'));
     }
 
-    public unpublishSchema(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public unpublishSchema(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['unpublish'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Unpublished', appName);
@@ -513,14 +497,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.unpublishFailed'));
     }
 
-    public postField(appName: string, resource: Resource, dto: AddFieldDto, version: Version): Observable<SchemaDetailsDto> {
+    public postField(appName: string, resource: Resource, dto: AddFieldDto, version: Version): Observable<SchemaDto> {
         const link = resource._links['fields/add'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldCreated', appName);
@@ -528,14 +512,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.addFieldFailed'));
     }
 
-    public putUIFields(appName: string, resource: Resource, dto: UpdateUIFields, version: Version): Observable<SchemaDetailsDto> {
+    public putUIFields(appName: string, resource: Resource, dto: UpdateUIFields, version: Version): Observable<SchemaDto> {
         const link = resource._links['fields/ui'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'UIFieldsConfigured', appName);
@@ -543,14 +527,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateUIFieldsFailed'));
     }
 
-    public putFieldOrdering(appName: string, resource: Resource, dto: ReadonlyArray<number>, version: Version): Observable<SchemaDetailsDto> {
+    public putFieldOrdering(appName: string, resource: Resource, dto: ReadonlyArray<number>, version: Version): Observable<SchemaDto> {
         const link = resource._links['fields/order'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, { fieldIds: dto }).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
@@ -558,14 +542,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.reorderFieldsFailed'));
     }
 
-    public putField(appName: string, resource: Resource, dto: UpdateFieldDto, version: Version): Observable<SchemaDetailsDto> {
+    public putField(appName: string, resource: Resource, dto: UpdateFieldDto, version: Version): Observable<SchemaDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
@@ -573,14 +557,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateFieldFailed'));
     }
 
-    public lockField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public lockField(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['lock'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldLocked', appName);
@@ -588,14 +572,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.lockFieldFailed'));
     }
 
-    public enableField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public enableField(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['enable'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
@@ -603,14 +587,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.enableFieldFailed'));
     }
 
-    public disableField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public disableField(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['disable'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
@@ -618,14 +602,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.disableFieldFailed'));
     }
 
-    public showField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public showField(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['show'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldShown', appName);
@@ -633,14 +617,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.showFieldFailed'));
     }
 
-    public hideField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public hideField(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['hide'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldHidden', appName);
@@ -648,14 +632,14 @@ export class SchemasService {
             pretifyError('i18n:schemas.hideFieldFailed'));
     }
 
-    public deleteField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+    public deleteField(appName: string, resource: Resource, version: Version): Observable<SchemaDto> {
         const link = resource._links['delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
             map(({ payload }) => {
-                return parseSchemaWithDetails(payload.body);
+                return parseSchema(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
@@ -685,42 +669,32 @@ export class SchemasService {
 function parseSchemas(response: any) {
     const raw: any[] = response.items;
 
-    const items = raw.map(item =>
-        new SchemaDto(item._links,
-            item.id,
-            item.name,
-            item.category,
-            parseProperties(item.properties),
-            item.isSingleton,
-            item.isPublished,
-            DateTime.parseISO(item.created), item.createdBy,
-            DateTime.parseISO(item.lastModified), item.lastModifiedBy,
-            new Version(item.version.toString())));
+    const items = raw.map(parseSchema);
 
     const _links = response._links;
 
     return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }
 
-function parseSchemaWithDetails(response: any) {
+function parseSchema(response: any) {
     const fields = response.fields.map(parseField);
 
-    return new SchemaDetailsDto(response._links,
+    return new SchemaDto(response._links,
         response.id,
-        response.name,
-        response.category,
-        parseProperties(response.properties),
-        response.isSingleton,
-        response.isPublished,
         DateTime.parseISO(response.created), response.createdBy,
         DateTime.parseISO(response.lastModified), response.lastModifiedBy,
         new Version(response.version.toString()),
+        response.name,
+        response.category,
+        response.type,
+        response.isPublished,
+        parseProperties(response.properties),
         fields,
         response.fieldsInLists,
         response.fieldsInReferences,
         response.fieldRules,
-        response.scripts || {},
-        response.previewUrls || {});
+        response.previewUrls || {},
+        response.scripts || {});
 }
 
 function parseProperties(response: any) {

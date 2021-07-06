@@ -16,7 +16,7 @@ import { RulesState } from './../state/rules.state';
 export class RuleMustExistGuard implements CanActivate {
     constructor(
         private readonly rulesState: RulesState,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 

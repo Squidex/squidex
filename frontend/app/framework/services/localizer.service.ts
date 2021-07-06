@@ -13,7 +13,7 @@ export class LocalizerService {
     private shouldLog = false;
 
     constructor(
-        private readonly translations: Object
+        private readonly translations: Object,
     ) {
     }
 
@@ -23,11 +23,11 @@ export class LocalizerService {
         return this;
     }
 
-    public getOrKey(key: string | undefined, args?: any): string  {
+    public getOrKey(key: string | undefined, args?: any): string {
         return this.get(key, args) || key || '';
     }
 
-    public get(key: string | undefined, args?: any): string | null  {
+    public get(key: string | undefined, args?: any): string | null {
         if (!key) {
             return null;
         }
@@ -40,6 +40,7 @@ export class LocalizerService {
 
         if (!text) {
             if (this.shouldLog && !key.indexOf(' ')) {
+                // eslint-disable-next-line no-console
                 console.warn(`Missing i18n key: ${key}`);
             }
 

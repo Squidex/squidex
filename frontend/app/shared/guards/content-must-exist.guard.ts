@@ -16,7 +16,7 @@ import { ContentsState } from './../state/contents.state';
 export class ContentMustExistGuard implements CanActivate {
     constructor(
         private readonly contentsState: ContentsState,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
     }
 
@@ -27,8 +27,10 @@ export class ContentMustExistGuard implements CanActivate {
             return this.contentsState.select(null).pipe(map(u => u === null));
         }
 
+        const decoded = decodeURIComponent(contentId);
+
         const result =
-            this.contentsState.select(contentId).pipe(
+            this.contentsState.select(decoded).pipe(
                 tap(content => {
                     if (!content) {
                         this.router.navigate(['/404']);

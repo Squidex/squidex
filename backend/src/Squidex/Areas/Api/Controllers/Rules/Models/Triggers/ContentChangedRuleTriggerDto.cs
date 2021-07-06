@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 
         public override RuleTrigger ToTrigger()
         {
-            var schemas = Schemas?.Select(x => x.ToTrigger()).ToReadOnlyCollection();
+            var schemas = Schemas?.Select(x => x.ToTrigger()).ToImmutableList();
 
             return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
         }

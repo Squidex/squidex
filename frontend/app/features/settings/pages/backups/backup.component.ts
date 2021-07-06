@@ -12,7 +12,7 @@ import { ApiUrlConfig, BackupDto, BackupsState, Duration } from '@app/shared';
     selector: 'sqx-backup',
     styleUrls: ['./backup.component.scss'],
     templateUrl: './backup.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackupComponent {
     @Input()
@@ -23,7 +23,7 @@ export class BackupComponent {
     }
 
     constructor(
-        public readonly apiUrl: ApiUrlConfig, private readonly backupsState: BackupsState
+        public readonly apiUrl: ApiUrlConfig, private readonly backupsState: BackupsState,
     ) {
     }
 

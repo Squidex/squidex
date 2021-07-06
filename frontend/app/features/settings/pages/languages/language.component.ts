@@ -13,7 +13,7 @@ import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted }
 @Component({
     selector: 'sqx-language',
     styleUrls: ['./language.component.scss'],
-    templateUrl: './language.component.html'
+    templateUrl: './language.component.html',
 })
 export class LanguageComponent implements OnChanges {
     @Input()
@@ -34,7 +34,7 @@ export class LanguageComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly languagesState: LanguagesState
+        private readonly languagesState: LanguagesState,
     ) {
     }
 

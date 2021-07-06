@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web.Pipeline
@@ -23,10 +22,6 @@ namespace Squidex.Web.Pipeline
 
         public CachingKeysMiddleware(CachingManager cachingManager, IOptions<CachingOptions> cachingOptions, RequestDelegate next)
         {
-            Guard.NotNull(cachingManager, nameof(cachingManager));
-            Guard.NotNull(cachingOptions, nameof(cachingOptions));
-            Guard.NotNull(next, nameof(next));
-
             this.cachingOptions = cachingOptions.Value;
             this.cachingManager = cachingManager;
 

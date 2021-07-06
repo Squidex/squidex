@@ -20,17 +20,17 @@ describe('Queries', () => {
         uiState = Mock.ofType<UIState>();
 
         const shared$ = new BehaviorSubject({
-            key1: '{ "fullText": "shared1" }'
+            key1: '{ "fullText": "shared1" }',
         });
 
         const user$ = new BehaviorSubject({
-            key1: '{ "fullText": "user1" }'
+            key1: '{ "fullText": "user1" }',
         });
 
         const merged$ = new BehaviorSubject({
             key1: '{ "fullText": "merged1" }',
             key2: 'merged2',
-            key3: undefined
+            key3: undefined,
         });
 
         uiState.setup(x => x.get('schemas.my-schema.queries', {}))
@@ -54,12 +54,12 @@ describe('Queries', () => {
 
         expect(converted!).toEqual([
             {
-                name: 'key1', query: { fullText: 'merged1' }
+                name: 'key1', query: { fullText: 'merged1' },
             }, {
-                name: 'key2', query: { fullText: 'merged2' }
+                name: 'key2', query: { fullText: 'merged2' },
             }, {
-                name: 'key3', query: undefined
-            }
+                name: 'key3', query: undefined,
+            },
         ]);
     });
 
@@ -72,8 +72,8 @@ describe('Queries', () => {
 
         expect(converted!).toEqual([
             {
-                name: 'key1', query: { fullText: 'shared1' }
-            }
+                name: 'key1', query: { fullText: 'shared1' },
+            },
         ]);
     });
 
@@ -86,8 +86,8 @@ describe('Queries', () => {
 
         expect(converted!).toEqual([
             {
-                name: 'key1', query: { fullText: 'user1' }
-            }
+                name: 'key1', query: { fullText: 'user1' },
+            },
         ]);
     });
 

@@ -21,15 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             created
             createdBy
             createdByUser {
-              id,
-              email,
+              id
+              email
               displayName
             }
             lastModified
             lastModifiedBy
             lastModifiedByUser {
-              id,
-              email,
+              id
+              email
               displayName
             }
             url
@@ -52,14 +52,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             metadata
             slug";
 
-        public static IEnrichedAssetEntity Create(NamedId<DomainId> appId, DomainId id)
+        public static IEnrichedAssetEntity Create(DomainId id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
             var asset = new AssetEntity
             {
                 Id = id,
-                AppId = appId,
+                AppId = TestApp.DefaultId,
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),

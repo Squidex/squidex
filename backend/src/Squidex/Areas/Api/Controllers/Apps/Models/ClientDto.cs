@@ -59,9 +59,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public ClientDto WithLinks(Resources resources, string app)
+        public ClientDto CreateLinks(Resources resources)
         {
-            var values = new { app, id = Id };
+            var values = new { app = resources.App, id = Id };
 
             if (resources.CanUpdateClient)
             {

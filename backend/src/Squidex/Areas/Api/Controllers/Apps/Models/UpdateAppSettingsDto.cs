@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
@@ -20,18 +19,23 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The configured app patterns.
         /// </summary>
         [Required]
-        public List<PatternDto> Patterns { get; set; }
+        public PatternDto[] Patterns { get; set; }
 
         /// <summary>
         /// The configured UI editors.
         /// </summary>
         [Required]
-        public List<EditorDto> Editors { get; set; }
+        public EditorDto[] Editors { get; set; }
 
         /// <summary>
         /// Hide the scheduler for content items.
         /// </summary>
         public bool HideScheduler { get; set; }
+
+        /// <summary>
+        /// Hide the datetime mode button.
+        /// </summary>
+        public bool HideDateTimeModeButton { get; set; }
 
         public UpdateAppSettings ToCommand()
         {
@@ -39,14 +43,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Settings = new AppSettings
                 {
+                    Editors = Editors?.Select(x => x.ToEditor()).ToImmutableList()!,
                     HideScheduler = HideScheduler,
-                    Patterns =
-                        Patterns?.Select(x => new Pattern(x.Name, x.Regex)
-                        {
-                            Message = x.Message
-                        }).ToReadOnlyCollection()!,
-                    Editors =
-                        Editors?.Select(x => new Editor(x.Name, x.Url)).ToReadOnlyCollection()!
+                    HideDateTimeModeButton = HideDateTimeModeButton,
+                    Patterns = Patterns?.Select(x => x.ToPattern()).ToImmutableList()!,
                 }
             };
         }

@@ -18,9 +18,9 @@ const ITEM_HEIGHT = 3.125;
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchemaCategoryComponent implements OnChanges {
     @Output()
@@ -42,7 +42,7 @@ export class SchemaCategoryComponent implements OnChanges {
     constructor(
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 
@@ -58,7 +58,7 @@ export class SchemaCategoryComponent implements OnChanges {
         if (this.forContent) {
             const app = this.appsState.snapshot.selectedApp!;
 
-            this.filteredSchemas = this.filteredSchemas.filter(x => x.canReadContents && x.isPublished);
+            this.filteredSchemas = this.filteredSchemas.filter(x => x.canReadContents && x.isPublished && x.type !== 'Component');
             this.filteredSchemas = this.filteredSchemas.filter(x => !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(x.name)]);
         }
 
@@ -72,7 +72,7 @@ export class SchemaCategoryComponent implements OnChanges {
     }
 
     public schemaRoute(schema: SchemaDto) {
-        if (schema.isSingleton && this.forContent) {
+        if (schema.type === 'Singleton' && this.forContent) {
             return [schema.name, schema.id, 'history'];
         } else {
             return [schema.name];

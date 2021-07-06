@@ -12,7 +12,7 @@ import { BooleanFieldPropertiesDto, BOOLEAN_FIELD_EDITORS, FieldDto } from '@app
 @Component({
     selector: 'sqx-boolean-ui',
     styleUrls: ['boolean-ui.component.scss'],
-    templateUrl: 'boolean-ui.component.html'
+    templateUrl: 'boolean-ui.component.html',
 })
 export class BooleanUIComponent {
     @Input()

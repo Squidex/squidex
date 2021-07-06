@@ -103,6 +103,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
         {
             settings.AllowReferencesWithProperties = true;
 
+            settings.ReflectionService = new ReflectionServices();
+
             settings.TypeMappers = new List<ITypeMapper>
             {
                 CreateStringMap<DomainId>(),
@@ -119,6 +121,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateObjectMap<JsonObject>(),
                 CreateObjectMap<AssetMetadata>()
             };
+
+            settings.SchemaType = SchemaType.OpenApi3;
 
             settings.FlattenInheritanceHierarchy = flatten;
         }

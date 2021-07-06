@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                     else
                     {
-                        var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue, context.JsonSerializer);
+                        var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue, context.JsonSerializer, context.Components);
 
                         if (error != null)
                         {

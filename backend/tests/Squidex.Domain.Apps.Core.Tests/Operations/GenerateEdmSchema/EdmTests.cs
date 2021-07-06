@@ -8,6 +8,7 @@
 using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
@@ -38,7 +39,9 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateEdmSchema
                 return (new EdmComplexType("Squidex", string.Join(".", names)), true);
             });
 
-            var edmModel = TestUtils.MixedSchema().BuildEdmType(true, languagesConfig.ToResolver(), typeFactory);
+            var edmModel =
+                TestUtils.MixedSchema()
+                    .BuildEdmType(true, languagesConfig.ToResolver(), typeFactory, ResolvedComponents.Empty);
 
             Assert.NotNull(edmModel);
         }

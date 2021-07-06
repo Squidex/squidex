@@ -12,10 +12,10 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { FocusComponent } from './../forms-helper';
 
-declare var ace: any;
+declare const ace: any;
 
 export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CodeEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CodeEditorComponent), multi: true,
 };
 
 @Component({
@@ -23,16 +23,16 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',
     providers: [
-        SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, FocusComponent, OnChanges {
     private aceEditor: any;
     private valueChanged = new Subject();
     private value = '';
     private modelist: any;
-    private completions: ReadonlyArray<{ name: string, value: string }> = [];
+    private completions: ReadonlyArray<{ name: string; value: string }> = [];
 
     @ViewChild('editor', { static: false })
     public editor: ElementRef;
@@ -61,7 +61,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     @Input()
-    public set completion(value: ReadonlyArray<{ name: string, description: string }> | undefined | null) {
+    public set completion(value: ReadonlyArray<{ name: string; description: string }> | undefined | null) {
         if (value) {
             this.completions = value.map(({ name, description }) => ({ value: name, name, meta: 'context', description }));
         } else {
@@ -70,7 +70,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly resourceLoader: ResourceLoaderService
+        private readonly resourceLoader: ResourceLoaderService,
     ) {
         super(changeDetector, {});
     }
@@ -132,7 +132,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
         Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/ace/ace.js'),
             this.resourceLoader.loadLocalScript('dependencies/ace/ext/modelist.js'),
-            this.resourceLoader.loadLocalScript('dependencies/ace/ext/language_tools.js')
+            this.resourceLoader.loadLocalScript('dependencies/ace/ext/language_tools.js'),
         ]).then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
@@ -154,7 +154,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
                 this.aceEditor.setOptions({
                     enableBasicAutocompletion: true,
                     enableSnippets: true,
-                    enableLiveAutocompletion: true
+                    enableLiveAutocompletion: true,
                 });
 
                 const previous = this.aceEditor.completers;
@@ -165,12 +165,13 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
                             callback(null, this.completions);
                         },
                         getDocTooltip: (item: any) => {
-                            if (item.meta  === 'context' && item.description) {
+                            if (item.meta === 'context' && item.description) {
                                 item.docHTML = `<b>${item.value}</b><hr></hr>${item.description}`;
                             }
                         },
-                        identifierRegexps: [/[a-zA-Z_0-9\$\-\.\u00A2-\u2000\u2070-\uFFFF]/]
-                    }
+                        // eslint-disable-next-line no-useless-escape
+                        identifierRegexps: [/[a-zA-Z_0-9\$\-\.\u00A2-\u2000\u2070-\uFFFF]/],
+                    },
                 ];
             }
 
@@ -181,7 +182,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             });
 
             this.aceEditor.on('change', () => {
-                this.valueChanged.next();
+                this.valueChanged.next(true);
             });
 
             this.detach();
@@ -240,13 +241,13 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
 
                 this.aceEditor.setOptions({
                     minLines: lines,
-                    maxLines: lines
+                    maxLines: lines,
                 });
             } else if (this.height === 'auto') {
                 this.aceEditor.setOptions({
                     minLines: 3,
-                    maxLines: 500
-                 });
+                    maxLines: 500,
+                });
             }
         }
     }

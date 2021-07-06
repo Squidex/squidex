@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
@@ -55,22 +56,22 @@ namespace Migrations.Migrations.MongoDb
             return this;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(CancellationToken ct)
         {
             switch (scope)
             {
                 case Scope.Assets:
-                    await RebuildAsync(database, ConvertParentId, "States_Assets");
-                    await RebuildAsync(database, ConvertParentId, "States_AssetFolders");
+                    await RebuildAsync(database, ConvertParentId, "States_Assets", ct);
+                    await RebuildAsync(database, ConvertParentId, "States_AssetFolders", ct);
                     break;
                 case Scope.Contents:
-                    await RebuildAsync(databaseContent, null, "State_Contents_All");
-                    await RebuildAsync(databaseContent, null, "State_Contents_Published");
+                    await RebuildAsync(databaseContent, null, "State_Contents_All", ct);
+                    await RebuildAsync(databaseContent, null, "State_Contents_Published", ct);
                     break;
             }
         }
 
-        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameOld)
+        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameOld, CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 10;
@@ -88,7 +89,7 @@ namespace Migrations.Migrations.MongoDb
                 return;
             }
 
-            await collectionNew.DeleteManyAsync(new BsonDocument());
+            await collectionNew.DeleteManyAsync(new BsonDocument(), ct);
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
@@ -156,7 +157,7 @@ namespace Migrations.Migrations.MongoDb
                 PropagateCompletion = true
             });
 
-            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync);
+            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync, ct);
 
             batchBlock.Complete();
 

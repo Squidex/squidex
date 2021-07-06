@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
@@ -28,8 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public RolePermissionsProvider(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-
             this.appProvider = appProvider;
 
             foreach (var field in typeof(Permissions).GetFields(BindingFlags.Public | BindingFlags.Static))
@@ -40,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                     if (value?.StartsWith(Permissions.App, StringComparison.OrdinalIgnoreCase) == true)
                     {
-                        if (value.IndexOf("{name}", Permissions.App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (value.IndexOf("{schema}", Permissions.App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             forAppSchemas.Add(value);
                         }
@@ -78,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 foreach (var schema in schemaNames)
                 {
-                    var replaced = trimmed.Replace("{name}", schema);
+                    var replaced = trimmed.Replace("{schema}", schema);
 
                     result.Add(replaced);
                 }

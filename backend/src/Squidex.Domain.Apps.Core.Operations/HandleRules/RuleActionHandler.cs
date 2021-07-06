@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Infrastructure;
 
 #pragma warning disable RECS0083 // Shows NotImplementedException throws in the quick task bar
 
@@ -32,8 +31,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected RuleActionHandler(RuleEventFormatter formatter)
         {
-            Guard.NotNull(formatter, nameof(formatter));
-
             this.formatter = formatter;
         }
 

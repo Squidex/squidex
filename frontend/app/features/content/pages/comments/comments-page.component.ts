@@ -12,13 +12,13 @@ import { map } from 'rxjs/operators';
 @Component({
     selector: 'sqx-comments-page',
     styleUrls: ['./comments-page.component.scss'],
-    templateUrl: './comments-page.component.html'
+    templateUrl: './comments-page.component.html',
 })
 export class CommentsPageComponent {
     public commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));
 
     constructor(
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
     ) {
     }
 }

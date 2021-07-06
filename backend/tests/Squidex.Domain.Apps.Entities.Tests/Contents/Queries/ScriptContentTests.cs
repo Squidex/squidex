@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -41,11 +42,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (x == schemaId.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, schemaId, schemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, schemaId, schemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == schemaWithScriptId.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, schemaWithScriptId, schemaDefWithScript));
+                    return Task.FromResult((Mocks.Schema(appId, schemaWithScriptId, schemaDefWithScript), ResolvedComponents.Empty));
                 }
                 else
                 {
@@ -63,9 +64,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { SchemaId = schemaId };
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
+            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -76,9 +77,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { SchemaId = schemaWithScriptId };
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
+            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -91,10 +92,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { SchemaId = schemaWithScriptId, Data = oldData };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions()))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
                 .Returns(new ContentData());
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider);
+            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
 
             Assert.NotSame(oldData, content.Data);
 
@@ -104,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         ReferenceEquals(x.Data, oldData) &&
                         x.ContentId == content.Id),
                     "my-query",
-                    ScriptOptions()))
+                    ScriptOptions(), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

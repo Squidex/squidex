@@ -17,11 +17,21 @@
         @await RenderSectionAsync("header")
     }
 </head>
-<body class="@ViewBag.ThemeColor">
-    <div class="profile @ViewBag.ThemeSize">
+<body class="profile">
+    <div class="profile-container">
         <img class="profile-logo" alt="@T.Get("common.product")S" title="@T.Get("common.product")" src="@Url.RootContentUrl("~/images/logo.svg")" />
 
-        @RenderBody()
+        <div class="profile-card card">
+            <div class="profile-card-body card-body">
+                @RenderBody()
+            </div>
+        </div>
+
+        <div class="profile-footer text-center mt-4 mb-2">
+            <small class="text-muted">
+                @T.Get("setup.madeBy")<br />@T.Get("setup.madeByCopyright")
+            </small>
+        </div>
     </div>
 
     <environment names="Development">

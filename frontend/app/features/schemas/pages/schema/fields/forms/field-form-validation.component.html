@@ -39,15 +39,6 @@
             [properties]="field.rawProperties">
         </sqx-assets-validation>
     </ng-container>
-    <ng-container *ngSwitchCase="'DateTime'">
-        <sqx-date-time-validation
-            [languages]="languages"
-            [isLocalizable]="isLocalizable"
-            [fieldForm]="fieldForm"
-            [field]="field"
-            [properties]="field.rawProperties">
-        </sqx-date-time-validation>
-    </ng-container>
     <ng-container *ngSwitchCase="'Boolean'">
         <sqx-boolean-validation
             [languages]="languages"
@@ -56,6 +47,29 @@
             [field]="field"
             [properties]="field.rawProperties">
         </sqx-boolean-validation>
+    </ng-container>
+    <ng-container *ngSwitchCase="'Component'">
+        <sqx-component-validation
+            [fieldForm]="fieldForm"
+            [field]="field"
+            [properties]="field.rawProperties">
+        </sqx-component-validation>
+    </ng-container>
+    <ng-container *ngSwitchCase="'Components'">
+        <sqx-components-validation
+            [fieldForm]="fieldForm"
+            [field]="field"
+            [properties]="field.rawProperties">
+        </sqx-components-validation>
+    </ng-container>
+    <ng-container *ngSwitchCase="'DateTime'">
+        <sqx-date-time-validation
+            [languages]="languages"
+            [isLocalizable]="isLocalizable"
+            [fieldForm]="fieldForm"
+            [field]="field"
+            [properties]="field.rawProperties">
+        </sqx-date-time-validation>
     </ng-container>
     <ng-container *ngSwitchCase="'Geolocation'">
         <sqx-geolocation-validation

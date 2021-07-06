@@ -27,9 +27,6 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
         {
-            Guard.NotNull(usageRepository, nameof(usageRepository));
-            Guard.NotNull(log, nameof(log));
-
             this.usageRepository = usageRepository;
 
             this.log = log;

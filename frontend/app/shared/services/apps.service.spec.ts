@@ -16,13 +16,13 @@ describe('AppsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 AppsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() }
-            ]
+                { provide: AnalyticsService, useValue: new AnalyticsService() },
+            ],
         });
     });
 
@@ -32,272 +32,263 @@ describe('AppsService', () => {
 
     it('should make get request to get apps',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            let apps: ReadonlyArray<AppDto>;
 
-        let apps: ReadonlyArray<AppDto>;
+            appsService.getApps().subscribe(result => {
+                apps = result;
+            });
 
-        appsService.getApps().subscribe(result => {
-            apps = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps');
 
-        const req = httpMock.expectOne('http://service/p/api/apps');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush([
+                appResponse(12),
+                appResponse(13),
+            ]);
 
-        req.flush([
-            appResponse(12),
-            appResponse(13)
-        ]);
-
-        expect(apps!).toEqual([createApp(12), createApp(13)]);
-    }));
+            expect(apps!).toEqual([createApp(12), createApp(13)]);
+        }));
 
     it('should make get request to get app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            let app: AppDto;
 
-        let app: AppDto;
+            appsService.getApp('my-app').subscribe(result => {
+                app = result;
+            });
 
-        appsService.getApp('my-app').subscribe(result => {
-            app = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(appResponse(12));
 
-        req.flush(appResponse(12));
-
-        expect(app!).toEqual(createApp(12));
-    }));
+            expect(app!).toEqual(createApp(12));
+        }));
 
     it('should make get request to get app settings',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            let app: AppSettingsDto;
 
-        let app: AppSettingsDto;
+            appsService.getSettings('my-app').subscribe(result => {
+                app = result;
+            });
 
-        appsService.getSettings('my-app').subscribe(result => {
-            app = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(appSettingsResponse(12));
 
-        req.flush(appSettingsResponse(12));
-
-        expect(app!).toEqual(createAppSettings(12));
-    }));
+            expect(app!).toEqual(createAppSettings(12));
+        }));
 
     it('should make put request to update app settings',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    update: { method: 'PUT', href: '/api/apps/my-app/settings' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                update: { method: 'PUT', href: '/api/apps/my-app/settings' }
-            }
-        };
+            let app: AppSettingsDto;
 
-        let app: AppSettingsDto;
+            appsService.putSettings(resource, {} as any, version).subscribe(result => {
+                app = result;
+            });
 
-        appsService.putSettings(resource, {} as any, version).subscribe(result => {
-            app = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+            req.flush(appSettingsResponse(12));
 
-        req.flush(appSettingsResponse(12));
-
-        expect(app!).toEqual(createAppSettings(12));
-    }));
+            expect(app!).toEqual(createAppSettings(12));
+        }));
 
     it('should make post request to create app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = { name: 'new-app' };
 
-        const dto = { name: 'new-app' };
+            let app: AppDto;
 
-        let app: AppDto;
+            appsService.postApp(dto).subscribe(result => {
+                app = result;
+            });
 
-        appsService.postApp(dto).subscribe(result => {
-            app = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps');
 
-        const req = httpMock.expectOne('http://service/p/api/apps');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(appResponse(12));
 
-        req.flush(appResponse(12));
-
-        expect(app!).toEqual(createApp(12));
-    }));
+            expect(app!).toEqual(createApp(12));
+        }));
 
     it('should make put request to update app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    update: { method: 'PUT', href: '/api/apps/my-app' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                update: { method: 'PUT', href: '/api/apps/my-app' }
-            }
-        };
+            let app: AppDto;
 
-        let app: AppDto;
+            appsService.putApp(resource, { }, version).subscribe(result => {
+                app = result;
+            });
 
-        appsService.putApp(resource, { }, version).subscribe(result => {
-            app = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app');
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+            req.flush(appResponse(12));
 
-        req.flush(appResponse(12));
-
-        expect(app!).toEqual(createApp(12));
-    }));
+            expect(app!).toEqual(createApp(12));
+        }));
 
     it('should make post request to upload app image',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    'image/upload': { method: 'POST', href: '/api/apps/my-app/image' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                ['image/upload']: { method: 'POST', href: '/api/apps/my-app/image' }
-            }
-        };
+            let app: AppDto;
 
-        let app: AppDto;
+            appsService.postAppImage(resource, null!, version).subscribe(result => {
+                app = <AppDto>result;
+            });
 
-        appsService.postAppImage(resource, null!, version).subscribe(result => {
-            app = <AppDto>result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+            req.flush(appResponse(12));
 
-        req.flush(appResponse(12));
-
-        expect(app!).toEqual(createApp(12));
-    }));
+            expect(app!).toEqual(createApp(12));
+        }));
 
     it('should return proper error if uploading app image failed with 413',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    'image/upload': { method: 'POST', href: '/api/apps/my-app/image' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                ['image/upload']: { method: 'POST', href: '/api/apps/my-app/image' }
-            }
-        };
+            let app: AppDto;
+            let error: ErrorDto;
 
-        let app: AppDto;
-        let error: ErrorDto;
+            appsService.postAppImage(resource, null!, version).subscribe(result => {
+                app = <AppDto>result;
+            }, e => {
+                error = e;
+            });
 
-        appsService.postAppImage(resource, null!, version).subscribe(result => {
-            app = <AppDto>result;
-        }, e => {
-            error = e;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            req.flush({}, { status: 413, statusText: 'Payload too large' });
 
-        req.flush({}, { status: 413, statusText: 'Payload too large' });
-
-        expect(app!).toBeUndefined();
-        expect(error!).toEqual(new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
-    }));
+            expect(app!).toBeUndefined();
+            expect(error!).toEqual(new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
+        }));
 
     it('should make delete request to remove app image',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    'image/delete': { method: 'DELETE', href: '/api/apps/my-app/image' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                ['image/delete']: { method: 'DELETE', href: '/api/apps/my-app/image' }
-            }
-        };
+            let app: AppDto;
 
-        let app: AppDto;
+            appsService.deleteAppImage(resource, version).subscribe(result => {
+                app = result;
+            });
 
-        appsService.deleteAppImage(resource, version).subscribe(result => {
-            app = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
+            req.flush(appResponse(12));
 
-        req.flush(appResponse(12));
-
-        expect(app!).toEqual(createApp(12));
-    }));
+            expect(app!).toEqual(createApp(12));
+        }));
 
     it('should make delete request to leave app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    delete: { method: 'DELETE', href: '/api/apps/my-app/contributors/me' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: '/api/apps/my-app/contributors/me' }
-            }
-        };
+            appsService.deleteApp(resource).subscribe();
 
-        appsService.deleteApp(resource).subscribe();
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/me');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/me');
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({});
-    }));
+            req.flush({});
+        }));
 
     it('should make delete request to archive app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    delete: { method: 'DELETE', href: '/api/apps/my-app' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: '/api/apps/my-app' }
-            }
-        };
+            appsService.deleteApp(resource).subscribe();
 
-        appsService.deleteApp(resource).subscribe();
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app');
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({});
-    }));
+            req.flush({});
+        }));
 
     function appResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 
         return {
             id: `id${id}`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            createdBy: `creator${id}`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
+            lastModifiedBy: `modifier${id}`,
+            version: key,
             name: `app-name${key}`,
             label: `app-label${key}`,
             description: `app-description${key}`,
             permissions: ['Owner'],
-            created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10:00Z`,
             canAccessApi: id % 2 === 0,
             canAccessContent: id % 2 === 0,
             planName: 'Free',
             planUpgrade: 'Basic',
             roleProperties: createProperties(id),
-            version: key,
             _links: {
-                update: { method: 'PUT', href: `apps/${id}` }
-            }
+                update: { method: 'PUT', href: `apps/${id}` },
+            },
         };
     }
 
@@ -318,37 +309,37 @@ describe('AppsService', () => {
             }),
             version: key,
             _links: {
-                update: { method: 'PUT', href: `apps/${id}/settings` }
-            }
+                update: { method: 'PUT', href: `apps/${id}/settings` },
+            },
         };
     }
 });
 
 export function createApp(id: number, suffix = '') {
     const links: ResourceLinks = {
-        update: { method: 'PUT', href: `apps/${id}` }
+        update: { method: 'PUT', href: `apps/${id}` },
     };
 
     const key = `${id}${suffix}`;
 
     return new AppDto(links,
         `id${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`), `creator${id}`,
+        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
+        new Version(key),
         `app-name${key}`,
         `app-label${key}`,
         `app-description${key}`,
         ['Owner'],
-        DateTime.parseISO(`${id % 1000 + 2000}-12-12T10:10:00Z`),
-        DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`),
         id % 2 === 0,
         id % 2 === 0,
         'Free', 'Basic',
-        createProperties(id),
-        new Version(key));
+        createProperties(id));
 }
 
 export function createAppSettings(id: number, suffix = '') {
     const links: ResourceLinks = {
-        update: { method: 'PUT', href: `apps/${id}/settings` }
+        update: { method: 'PUT', href: `apps/${id}/settings` },
     };
 
     const key = `${id}${suffix}`;

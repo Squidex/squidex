@@ -28,32 +28,49 @@ namespace Squidex.Web.Pipeline
 
         public async Task InvokeAsync(HttpContext context, ISemanticLog log)
         {
-            var watch = ValueStopwatch.StartNew();
+            var shouldStartSession = requestLogOptions.LogRequests || Profiler.HasListener;
 
-            using (Profiler.StartSession())
+            if (requestLogOptions.LogRequests || shouldStartSession)
             {
-                try
-                {
-                    await next(context);
-                }
-                finally
-                {
-                    var elapsedMs = watch.Stop();
+                var session =
+                    shouldStartSession ?
+                    Profiler.StartSession() :
+                    default;
 
-                    if (requestLogOptions.LogRequests)
+                var watch =
+                    requestLogOptions.LogRequests ?
+                    ValueStopwatch.StartNew() :
+                    default;
+
+                using (session)
+                {
+                    try
                     {
-                        log.LogInformation((elapsedMs, context), (ctx, w) =>
+                        await next(context);
+                    }
+                    finally
+                    {
+                        if (requestLogOptions.LogRequests)
                         {
-                            if (requestLogOptions.LogProfiler)
-                            {
-                                Profiler.Session?.Write(w);
-                            }
+                            var elapsedMs = watch.Stop();
 
-                            w.WriteObject("filters", ctx.context, LogFilters);
-                            w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
-                        });
+                            log.LogInformation((elapsedMs, context), (ctx, w) =>
+                            {
+                                if (requestLogOptions.LogProfiler)
+                                {
+                                    Profiler.Session?.Write(w);
+                                }
+
+                                w.WriteObject("filters", ctx.context, LogFilters);
+                                w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
+                            });
+                        }
                     }
                 }
+            }
+            else
+            {
+                await next(context);
             }
         }
 

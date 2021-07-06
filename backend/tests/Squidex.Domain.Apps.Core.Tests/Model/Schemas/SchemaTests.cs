@@ -11,6 +11,7 @@ using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -437,11 +438,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var urls1 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            };
+            }.ToImmutableDictionary();
             var urls2 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            };
+            }.ToImmutableDictionary();
 
             var schema_1 = schema_0.SetPreviewUrls(urls1);
             var schema_2 = schema_1.SetPreviewUrls(urls2);
@@ -457,23 +458,42 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_serialize_and_deserialize_schema()
         {
             var schemaSource =
-                TestUtils.MixedSchema(true)
+                TestUtils.MixedSchema(SchemaType.Singleton)
                     .ChangeCategory("Category")
                     .SetFieldRules(FieldRule.Hide("2"))
                     .SetFieldsInLists("field2")
                     .SetFieldsInReferences("field1")
-                    .SetPreviewUrls(new Dictionary<string, string>
-                    {
-                        ["web"] = "Url"
-                    })
                     .SetScripts(new SchemaScripts
                     {
                         Create = "<create-script>"
-                    });
+                    })
+                    .SetPreviewUrls(new Dictionary<string, string>
+                    {
+                        ["web"] = "Url"
+                    }.ToImmutableDictionary());
 
             var schemaTarget = schemaSource.SerializeAndDeserialize();
 
             schemaTarget.Should().BeEquivalentTo(schemaSource);
+        }
+
+        [Fact]
+        public void Should_deserialize_obsolete_isSingleton_property()
+        {
+            var schemaSource = new
+            {
+                name = "my-schema",
+                isPublished = true,
+                isSingleton = true
+            };
+
+            var expected =
+                new Schema("my-schema", type: SchemaType.Singleton)
+                    .Publish();
+
+            var schemaTarget = schemaSource.SerializeAndDeserialize<Schema>();
+
+            schemaTarget.Should().BeEquivalentTo(expected);
         }
 
         private static RootField<NumberFieldProperties> CreateField(int id)

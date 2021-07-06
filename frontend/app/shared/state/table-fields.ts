@@ -5,11 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { MetaFields, SchemaDetailsDto, TableField } from './../services/schemas.service';
+import { MetaFields, SchemaDto, TableField } from './../services/schemas.service';
 import { UIState } from './ui.state';
 
 const META_FIELD_NAMES = Object.values(MetaFields);
@@ -31,7 +29,7 @@ export class TableFields {
 
     constructor(
         private readonly uiState: UIState,
-        private readonly schema: SchemaDetailsDto
+        private readonly schema: SchemaDto,
     ) {
         this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
 
@@ -52,10 +50,8 @@ export class TableFields {
             if (save) {
                 this.uiState.removeUser(this.settingsKey);
             }
-        } else {
-            if (save) {
-                this.uiState.set(this.settingsKey, fieldNames, true);
-            }
+        } else if (save) {
+            this.uiState.set(this.settingsKey, fieldNames, true);
         }
 
         const fields: ReadonlyArray<TableField> = fieldNames.map(n => this.schema.fields.find(f => f.name === n) || n);

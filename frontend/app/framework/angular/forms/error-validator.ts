@@ -61,13 +61,13 @@ export class ErrorValidator {
 
             return {
                 custom: {
-                    errors
-                }
+                    errors,
+                },
             };
         }
 
         return null;
-    }
+    };
 
     public setError(error: ErrorDto | undefined | null) {
         this.values = {};

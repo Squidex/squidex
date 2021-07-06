@@ -11,7 +11,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, sorted, StatefulControlComponent, Types } from '@app/shared';
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true,
 };
 
 interface State {
@@ -27,9 +27,9 @@ interface State {
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
     providers: [
-        SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     @Input()
@@ -52,12 +52,14 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
         this.setDisabledState(value === true);
     }
 
+    public clonedContent?: ContentDto;
+
     public contentCreatorDialog = new DialogModel();
     public contentSelectorDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService
+        private readonly contentsService: ContentsService,
     ) {
         super(changeDetector, { contentItems: [] });
     }
@@ -112,6 +114,12 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
 
             this.updateValue();
         }
+    }
+
+    public createContent(clone?: ContentDto) {
+        this.clonedContent = clone;
+
+        this.contentCreatorDialog.show();
     }
 
     private updateValue() {

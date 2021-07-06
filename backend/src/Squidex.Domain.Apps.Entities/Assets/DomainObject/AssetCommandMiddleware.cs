@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Orleans;
@@ -33,15 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             IEnumerable<IAssetMetadataSource> assetMetadataSources)
             : base(grainFactory)
         {
-            Guard.NotNull(assetEnricher, nameof(assetEnricher));
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(assetMetadataSources, nameof(assetMetadataSources));
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
             this.assetEnricher = assetEnricher;
             this.assetFileStore = assetFileStore;
-            this.assetMetadataSources = assetMetadataSources;
+            this.assetMetadataSources = assetMetadataSources.OrderBy(x => x.Order).ToList();
             this.assetQuery = assetQuery;
             this.contextProvider = contextProvider;
         }
@@ -147,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                     try
                     {
-                        await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion);
+                        await assetFileStore.CopyAsync(tempFile, asset.AppId.Id, asset.AssetId, asset.FileVersion, null);
                     }
                     catch (AssetAlreadyExistsException) when (context.Command is not UpsertAsset)
                     {
@@ -157,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                 if (payload is not IEnrichedAssetEntity)
                 {
-                    payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context);
+                    payload = await assetEnricher.EnrichAsync(asset, contextProvider.Context, default);
                 }
             }
 
@@ -181,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             var steamHash = hashStream.GetHashStringAndReset();
 
-            return $"{steamHash}{file.FileName}{file.FileSize}".Sha256Base64();
+            return $"{steamHash}{file.FileName}{file.FileSize}".ToSha256Base64();
         }
 
         private async Task EnrichWithMetadataAsync(UploadAssetCommand command)

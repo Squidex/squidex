@@ -1,11 +1,9 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
-// tslint:disable: max-line-length
 
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -14,7 +12,7 @@ import { RouterModule } from '@angular/router';
 import { SqxFrameworkModule } from '@app/framework';
 import { MentionModule } from 'angular-mentions';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
-import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentMustExistGuard, ContentsService, ContentsState, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, GeolocationEditorComponent, GraphQlService, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, ReferencesCheckboxesComponent, ReferencesDropdownComponent, ReferencesTagsComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, TableHeaderComponent, TranslationsService, UIService, UIState, UnsetAppGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WorkflowsService, WorkflowsState } from './declarations';
+import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentMustExistGuard, ContentsService, ContentsState, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, GeolocationEditorComponent, GraphQlService, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, LoadSchemasGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, ReferencesCheckboxesComponent, ReferencesDropdownComponent, ReferencesTagsComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, TableHeaderComponent, TranslationsService, UIService, UIState, UnsetAppGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WorkflowsService, WorkflowsState } from './declarations';
 
 @NgModule({
     imports: [
@@ -22,7 +20,7 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         MentionModule,
         NgxDocViewerModule,
         RouterModule,
-        SqxFrameworkModule
+        SqxFrameworkModule,
     ],
     declarations: [
         AppFormComponent,
@@ -73,7 +71,7 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
     ],
     exports: [
         AppFormComponent,
@@ -116,8 +114,8 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
-    ]
+        UserPictureRefPipe,
+    ],
 })
 export class SqxSharedModule {
     public static forRoot(): ModuleWithProviders<SqxSharedModule> {
@@ -150,6 +148,7 @@ export class SqxSharedModule {
                 LanguagesState,
                 LoadAppsGuard,
                 LoadLanguagesGuard,
+                LoadSchemasGuard,
                 MustBeAuthenticatedGuard,
                 MustBeNotAuthenticatedGuard,
                 NewsService,
@@ -182,9 +181,9 @@ export class SqxSharedModule {
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: AuthInterceptor,
-                    multi: true
-                }
-            ]
+                    multi: true,
+                },
+            ],
         };
     }
 }

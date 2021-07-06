@@ -23,8 +23,6 @@ namespace Squidex.Extensions.Actions.Webhook
         public WebhookActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
             : base(formatter)
         {
-            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
-
             this.httpClientFactory = httpClientFactory;
         }
 
@@ -45,7 +43,7 @@ namespace Squidex.Extensions.Actions.Webhook
                     requestBody = ToEnvelopeJson(@event);
                 }
 
-                requestSignature = $"{requestBody}{action.SharedSecret}".Sha256Base64();
+                requestSignature = $"{requestBody}{action.SharedSecret}".ToSha256Base64();
             }
 
             var ruleDescription = $"Send event to webhook '{requestUrl}'";

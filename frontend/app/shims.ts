@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -9,6 +9,7 @@ import 'core-js/es/date';
 import 'core-js/es/math';
 import 'core-js/es/number';
 import 'core-js/es/regexp';
+
 // ES2015 array capabilities
 import 'core-js/modules/es.array.copy-within';
 import 'core-js/modules/es.array.every';
@@ -30,11 +31,13 @@ import 'core-js/modules/es.array.reduce-right';
 import 'core-js/modules/es.array.slice';
 import 'core-js/modules/es.array.some';
 import 'core-js/modules/es.array.sort';
+
 // ES2015 function capabilities
 import 'core-js/modules/es.function.bind';
 import 'core-js/modules/es.function.has-instance';
 import 'core-js/modules/es.function.name';
 import 'core-js/modules/es.map';
+
 // ES2015 object capabilities
 import 'core-js/modules/es.object.assign';
 import 'core-js/modules/es.object.create';
@@ -57,6 +60,7 @@ import 'core-js/modules/es.parse-float';
 import 'core-js/modules/es.parse-int';
 import 'core-js/modules/es.promise';
 import 'core-js/modules/es.set';
+
 // ES2015 string capabilities
 import 'core-js/modules/es.string.anchor';
 import 'core-js/modules/es.string.big';
@@ -80,9 +84,12 @@ import 'core-js/modules/es.string.strike';
 import 'core-js/modules/es.string.sub';
 import 'core-js/modules/es.string.sup';
 import 'core-js/modules/es.string.trim';
+
 // ES2015 symbol capabilities
 import 'core-js/modules/es.symbol';
 import 'core-js/modules/es.weak-map';
 import 'core-js/modules/web.dom-collections.iterator';
+
 import 'reflect-metadata';
+
 import 'zone.js/dist/zone';

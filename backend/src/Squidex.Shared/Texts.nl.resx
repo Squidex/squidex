@@ -460,6 +460,15 @@
   <data name="contents.invalidBoolean" xml:space="preserve">
     <value>Ongeldig json-type, verwachte boolean.</value>
   </data>
+  <data name="contents.invalidComponentNoObject" xml:space="preserve">
+    <value>Invalid json object, expected object with 'schemaId' field.</value>
+  </data>
+  <data name="contents.invalidComponentNoType" xml:space="preserve">
+    <value>Invalid component. No 'schemaId' field found.</value>
+  </data>
+  <data name="contents.invalidComponentUnknownSchema" xml:space="preserve">
+    <value>Invalid component. Cannot find schema.</value>
+  </data>
   <data name="contents.invalidGeolocation" xml:space="preserve">
     <value>Ongeldig json-type, verwacht object voor lengte- / breedtegraad.</value>
   </data>
@@ -480,6 +489,9 @@
   </data>
   <data name="contents.referenced" xml:space="preserve">
     <value>Er wordt naar de inhoud verwezen door een andere item en kan niet worden verwijderd.</value>
+  </data>
+  <data name="contents.schemaNotPublished" xml:space="preserve">
+    <value>Schema not published.</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Singleton-inhoud kan niet worden bijgewerkt.</value>

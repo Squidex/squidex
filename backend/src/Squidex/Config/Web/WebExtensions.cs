@@ -39,7 +39,7 @@ namespace Squidex.Config.Web
 
         public static IApplicationBuilder UseSquidexLocalization(this IApplicationBuilder app)
         {
-            var supportedCultures = new[] { "en", "nl", "it" };
+            var supportedCultures = new[] { "en", "nl", "it", "zh" };
 
             var localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[0])

@@ -11,7 +11,7 @@ import { ResourceOwner, RolesState, SchemaTagSource, WorkflowDto, WorkflowsState
 @Component({
     selector: 'sqx-workflows-page',
     styleUrls: ['./workflows-page.component.scss'],
-    templateUrl: './workflows-page.component.html'
+    templateUrl: './workflows-page.component.html',
 })
 export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
     public roles: ReadonlyArray<string> = [];
@@ -19,7 +19,7 @@ export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
     constructor(
         public readonly rolesState: RolesState,
         public readonly schemasSource: SchemaTagSource,
-        public readonly workflowsState: WorkflowsState
+        public readonly workflowsState: WorkflowsState,
     ) {
         super();
     }

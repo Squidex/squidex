@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
+/* eslint-disable */
 
 interface ReadonlyArray<T> {
     replacedBy(field: keyof T, value: T): ReadonlyArray<T>;
@@ -17,6 +17,8 @@ interface ReadonlyArray<T> {
     sorted(): ReadonlyArray<T>;
 
     sortedByString(selector: (value: T) => string): ReadonlyArray<T>;
+
+    toMap(selector: (value: T) => string): { [key: string]: T };
 }
 
 interface Array<T> {
@@ -37,6 +39,8 @@ interface Array<T> {
     sortedByString(selector: (value: T) => string): ReadonlyArray<T>;
 
     sortByString(selector: (value: T) => string): Array<T>;
+
+    toMap(selector: (value: T) => string): { [key: string]: T };
 }
 
 Array.prototype.replaceBy = function<T>(field: keyof T, value: T) {
@@ -159,4 +163,14 @@ Array.prototype.sortByString = function<T>(selector: (value: T) => string) {
     self.sort((a, b) => selector(a).localeCompare(selector(b), undefined, { sensitivity: 'base' }));
 
     return self;
+};
+
+Array.prototype.toMap = function<T>(selector: (value: T) => string) {
+    const result: { [key: string]: T } = {};
+
+    for (const item of this) {
+        result[selector(item)] = item;
+    }
+
+    return result;
 };

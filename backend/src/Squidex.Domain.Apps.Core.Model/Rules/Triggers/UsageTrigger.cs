@@ -10,11 +10,11 @@ using Squidex.Infrastructure.Reflection;
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
     [TypeName(nameof(UsageTrigger))]
-    public sealed class UsageTrigger : RuleTrigger
+    public sealed record UsageTrigger : RuleTrigger
     {
-        public int Limit { get; set; }
+        public int Limit { get; init; }
 
-        public int? NumDays { get; set; }
+        public int? NumDays { get; init; }
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {

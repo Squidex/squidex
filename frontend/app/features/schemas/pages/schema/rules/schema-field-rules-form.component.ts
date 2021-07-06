@@ -7,16 +7,16 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDetailsDto, SchemasState } from '@app/shared';
+import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',
     styleUrls: ['./schema-field-rules-form.component.scss'],
-    templateUrl: './schema-field-rules-form.component.html'
+    templateUrl: './schema-field-rules-form.component.html',
 })
 export class SchemaFieldRulesFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public editForm = new ConfigureFieldRulesForm(this.formBuilder);
 
@@ -27,7 +27,7 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
     }
 

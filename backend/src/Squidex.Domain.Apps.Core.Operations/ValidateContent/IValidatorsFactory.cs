@@ -14,17 +14,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
     public interface IValidatorsFactory
     {
-        IEnumerable<IValidator> CreateFieldValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
+        IEnumerable<IValidator> CreateFieldValidators(ValidatorContext context, IField field, ValidatorFactory factory)
         {
             yield break;
         }
 
-        IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, ValidatorFactory createFieldValidator)
+        IEnumerable<IValidator> CreateValueValidators(ValidatorContext context, IField field, ValidatorFactory factory)
         {
             yield break;
         }
 
-        IEnumerable<IValidator> CreateContentValidators(ValidatorContext context, ValidatorFactory createFieldValidator)
+        IEnumerable<IValidator> CreateContentValidators(ValidatorContext context, ValidatorFactory factory)
         {
             yield break;
         }

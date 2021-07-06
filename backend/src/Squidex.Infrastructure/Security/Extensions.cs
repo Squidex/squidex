@@ -16,13 +16,14 @@ namespace Squidex.Infrastructure.Security
         public static RefToken? Token(this ClaimsPrincipal principal)
         {
             var subjectId = principal.OpenIdSubject();
+            var subjectName = principal.OpenIdName();
 
-            if (!string.IsNullOrWhiteSpace(subjectId))
+            var clientId = principal.OpenIdClientId();
+
+            if (!string.IsNullOrWhiteSpace(subjectId) && !string.IsNullOrWhiteSpace(subjectName))
             {
                 return RefToken.User(subjectId);
             }
-
-            var clientId = principal.OpenIdClientId();
 
             if (!string.IsNullOrWhiteSpace(clientId))
             {
@@ -55,11 +56,6 @@ namespace Squidex.Infrastructure.Security
         public static string? OpenIdName(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Name)?.Value;
-        }
-
-        public static string? OpenIdNickName(this ClaimsPrincipal principal)
-        {
-            return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.NickName)?.Value;
         }
 
         public static string? OpenIdEmail(this ClaimsPrincipal principal)

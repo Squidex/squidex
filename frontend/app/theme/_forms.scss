@@ -197,6 +197,12 @@
 }
 /* stylelint-enable */
 
+.form-text {
+    a {
+        white-space: nowrap;
+    }
+}
+
 .col-form-label {
     @include text-small;
 }

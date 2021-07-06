@@ -11,7 +11,7 @@ import { RuleElementDto } from '../services/rules.service';
 
 export class ActionForm extends Form<any, FormGroup> {
     constructor(public readonly definition: RuleElementDto,
-        private readonly actionType: string
+        private readonly actionType: string,
     ) {
         super(ActionForm.builForm(definition));
     }
@@ -40,7 +40,7 @@ export class ActionForm extends Form<any, FormGroup> {
 
 export class TriggerForm extends Form<any, FormGroup> {
     constructor(formBuilder: FormBuilder,
-        private readonly triggerType: string
+        private readonly triggerType: string,
     ) {
         super(TriggerForm.builForm(formBuilder, triggerType));
     }
@@ -54,14 +54,14 @@ export class TriggerForm extends Form<any, FormGroup> {
                 return formBuilder.group({
                     limit: [20000,
                         [
-                            Validators.required
-                        ]
+                            Validators.required,
+                        ],
                     ],
                     numDays: [3,
                         [
-                            ValidatorsEx.between(1, 30)
-                        ]
-                    ]
+                            ValidatorsEx.between(1, 30),
+                        ],
+                    ],
                 });
             }
             default: {

@@ -8,13 +8,13 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, Renderer2, ViewChild } from '@angular/core';
 import { ResourceLoaderService } from '@app/framework/internal';
 
-declare var videojs: any;
+declare const videojs: any;
 
 @Component({
     selector: 'sqx-video-player',
     styleUrls: ['./video-player.component.scss'],
     templateUrl: './video-player.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges {
     private player: any;
@@ -30,7 +30,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
 
     constructor(
         private readonly resourceLoader: ResourceLoaderService,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 
@@ -51,12 +51,12 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
     public ngAfterViewInit(): void {
         Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
-            this.resourceLoader.loadLocalStyle('dependencies/videojs/video-js.min.css')
+            this.resourceLoader.loadLocalStyle('dependencies/videojs/video-js.min.css'),
         ]).then(() => {
             this.renderer.removeClass(this.video.nativeElement, 'hidden');
 
             this.player = videojs(this.video.nativeElement, {
-                fluid: true
+                fluid: true,
             });
 
             this.ngOnChanges();

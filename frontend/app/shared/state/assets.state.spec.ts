@@ -17,7 +17,7 @@ describe('AssetsState', () => {
     const {
         app,
         appsState,
-        newVersion
+        newVersion,
     } = TestValues;
 
     const asset1 = createAsset(1, ['tag1', 'shared']);
@@ -279,7 +279,7 @@ describe('AssetsState', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, asset1, It.isValue(request), asset1.version))
-                .returns(() => throwError('error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             assetsState.moveAsset(asset1, request.parentId).pipe(onErrorResumeNext()).subscribe();
 
@@ -318,7 +318,7 @@ describe('AssetsState', () => {
             const request = { parentId: 'newParent' };
 
             assetsService.setup(x => x.putAssetItemParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
-                .returns(() => throwError('error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNext()).subscribe();
 
@@ -338,7 +338,7 @@ describe('AssetsState', () => {
 
         it('should remove asset from snapshot if when referenced and not confirmed', () => {
             assetsService.setup(x => x.deleteAssetItem(app, asset1, false, asset1.version))
-                .returns(() => throwError(new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
+                .returns(() => throwError(() => new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
 
             assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
                 .returns(() => of(versioned(newVersion)));
@@ -355,7 +355,7 @@ describe('AssetsState', () => {
 
         it('should not remove asset if referenced and not confirmed', () => {
             assetsService.setup(x => x.deleteAssetItem(app, asset1, true, asset1.version))
-                .returns(() => throwError(new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
+                .returns(() => throwError(() => new ErrorDto(404, 'Referenced', 'OBJECT_REFERENCED')));
 
             dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAnyString()))
                 .returns(() => of(false));

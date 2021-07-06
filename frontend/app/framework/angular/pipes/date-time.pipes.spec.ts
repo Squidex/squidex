@@ -26,7 +26,7 @@ describe('DurationPipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new DurationPipe().transform(x, '-');
 
@@ -49,7 +49,7 @@ describe('DatePipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new DatePipe().transform(x, '-');
 
@@ -72,7 +72,7 @@ describe('DayPipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new DayPipe().transform(x, '-');
 
@@ -95,7 +95,7 @@ describe('DayOfWeekPipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new DayOfWeekPipe().transform(x, '-');
 
@@ -118,7 +118,7 @@ describe('FromNowPipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new FromNowPipe().transform(x, '-');
 
@@ -141,7 +141,7 @@ describe('FullDateTimePipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new FullDateTimePipe().transform(x, '-');
 
@@ -164,7 +164,7 @@ describe('MonthPipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new MonthPipe().transform(x, '-');
 
@@ -187,7 +187,7 @@ describe('ShortDatePipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new ShortDatePipe().transform(x, '-');
 
@@ -210,7 +210,7 @@ describe('ShortTimePipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new ShortTimePipe().transform(x, '-');
 
@@ -233,7 +233,7 @@ describe('ISODatePipe', () => {
         expect(actual).toBe(expected);
     });
 
-    [null, undefined].map(x => {
+    [null, undefined].forEach(x => {
         it('should use fallback for non value', () => {
             const actual = new ISODatePipe().transform(x, '-');
 

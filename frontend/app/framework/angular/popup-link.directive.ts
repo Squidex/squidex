@@ -8,7 +8,7 @@
 import { Directive, HostListener, Input } from '@angular/core';
 
 @Directive({
-    selector: '[sqxPopupLink]'
+    selector: '[sqxPopupLink]',
 })
 export class PopupLinkDirective {
     @Input('sqxPopupLink')

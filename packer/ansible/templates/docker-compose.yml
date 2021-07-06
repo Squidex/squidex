@@ -1,0 +1,57 @@
+version: '2.3'
+services:
+  squidex_mongo:
+    image: mongo
+    volumes:
+      - /etc/squidex/mongo/db:/data/db
+    networks:
+      - internal
+    restart: unless-stopped
+
+  squidex_squidex:
+    image: "squidex/squidex:{{ squidex_version }}"
+    environment:
+      - URLS__BASEURL=https://${SQUIDEX_DOMAIN}
+      - EVENTSTORE__TYPE=MongoDB
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://squidex_mongo
+      - STORE__MONGODB__CONFIGURATION=mongodb://squidex_mongo
+      - IDENTITY__ADMINEMAIL=${SQUIDEX_ADMINEMAIL}
+      - IDENTITY__ADMINPASSWORD=${SQUIDEX_ADMINPASSWORD}
+      - IDENTITY__GOOGLECLIENT=${SQUIDEX_GOOGLECLIENT}
+      - IDENTITY__GOOGLESECRET=${SQUIDEX_GOOGLESECRET}
+      - IDENTITY__GITHUBCLIENT=${SQUIDEX_GITHUBCLIENT}
+      - IDENTITY__GITHUBSECRET=${SQUIDEX_GITHUBSECRET}
+      - IDENTITY__MICROSOFTCLIENT=${SQUIDEX_MICROSOFTCLIENT}
+      - IDENTITY__MICROSOFTSECRET=${SQUIDEX_MICROSOFTSECRET}
+      - ASPNETCORE_URLS=http://+:5000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/healthz"]
+      start_period: 60s
+    depends_on:
+      - squidex_mongo
+    volumes:
+      - /etc/squidex/assets:/app/Assets
+    networks:
+      - internal
+    restart: unless-stopped
+
+  squidex_proxy:
+    image: squidex/caddy-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - SITE_ADDRESS=${SQUIDEX_DOMAIN}
+      - SITE_SERVER="squidex_squidex:5000"
+    volumes:
+      - /etc/squidex/caddy/data:/data
+      - /etc/squidex/caddy/config:/config
+    depends_on:
+      - squidex_squidex
+    networks:
+      - internal
+    restart: unless-stopped
+    
+networks:
+  internal:
+    driver: bridge

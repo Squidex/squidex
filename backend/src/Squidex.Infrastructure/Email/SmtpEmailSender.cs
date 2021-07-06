@@ -24,8 +24,6 @@ namespace Squidex.Infrastructure.Email
 
         public SmtpEmailSender(IOptions<SmtpOptions> options)
         {
-            Guard.NotNull(options, nameof(options));
-
             this.options = options.Value;
 
             clientPool = new DefaultObjectPoolProvider().Create(new DefaultPooledObjectPolicy<SmtpClient>());

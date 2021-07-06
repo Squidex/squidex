@@ -29,11 +29,11 @@
                 <div class="row">
                     <div class="col-6 type">
                         <label>
-                            <input type="radio" class="radio-input" name="isSingleton" formControlName="isSingleton" [value]="false">
+                            <input type="radio" class="radio-input" name="type" formControlName="type" [value]="'Default'">
                         
                             <div class="row no-gutters">
                                 <div class="col-auto">
-                                    <div class="btn-radio" [class.active]="createForm.form.controls['isSingleton'].value !== true">
+                                    <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Default'">
                                         <i class="icon-multiple-content"></i>
                                     </div>
                                 </div>
@@ -47,17 +47,34 @@
                     </div>
                     <div class="col-6 type">
                         <label>
-                            <input type="radio" class="radio-input" name="isSingleton" formControlName="isSingleton" [value]="true">
+                            <input type="radio" class="radio-input" name="type" formControlName="type" [value]="'Singleton'">
                         
                             <div class="row no-gutters">
                                 <div class="col-auto">
-                                    <div class="btn-radio" [class.active]="createForm.form.controls['isSingleton'].value === true">
+                                    <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Singleton'">
                                         <i class="icon-single-content"></i>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="type-title">{{ 'schemas.modeSingle' | sqxTranslate }}</div>
                                     <div class="type-text text-muted">{{ 'schemas.modeSingleDescription' | sqxTranslate }}</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="col-6 type">
+                        <label>
+                            <input type="radio" class="radio-input" name="type" formControlName="type" [value]="'Component'">
+                        
+                            <div class="row no-gutters">
+                                <div class="col-auto">
+                                    <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Component'">
+                                        <i class="icon-component"></i>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="type-title">{{ 'schemas.modeComponent' | sqxTranslate }}</div>
+                                    <div class="type-text text-muted">{{ 'schemas.modeComponentDescription' | sqxTranslate }}</div>
                                 </div>
                             </div>
                         </label>
@@ -69,13 +86,13 @@
                 {{ 'schemas.nameWarning' | sqxTranslate }}
             </sqx-form-alert>
 
-            <ng-container *ngIf="schemasState.categories | async; let categories">
-                <div class="form-group" *ngIf="categories.length > 1">
+            <ng-container *ngIf="schemasState.categoryNames | async; let categories">
+                <div class="form-group" *ngIf="categories.size > 0">
                     <label for="category">{{ 'common.category' | sqxTranslate }}</label>
             
                     <select class="custom-select" id="category" formControlName="initialCategory">
                         <option></option>
-                        <option *ngFor="let category of categories | slice:1" [ngValue]="category.name">{{category.name}}</option>
+                        <option *ngFor="let category of categories" [ngValue]="category">{{category}}</option>
                     </select>
                 </div>
             </ng-container>
@@ -93,7 +110,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="button" class="btn btn-text-secondary2" (click)="cancel.emit()">
+            <button type="button" class="btn btn-text-secondary" (click)="cancel.emit()">
                 {{ 'common.cancel' | sqxTranslate }}
             </button>
 

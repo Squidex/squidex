@@ -13,7 +13,7 @@ export class TagValue<T = any> {
     constructor(
         public readonly id: any,
         public readonly name: string,
-        public readonly value: T
+        public readonly value: T,
     ) {
         this.lowerCaseName = name.toLowerCase();
     }
@@ -34,7 +34,9 @@ export class IntConverter implements TagConverter {
 
     public static readonly INSTANCE: TagConverter = new IntConverter();
 
-    private constructor() {}
+    private constructor() {
+        /* NOOP */
+    }
 
     public convertInput(input: string) {
         if (input === '0') {
@@ -64,7 +66,9 @@ export class FloatConverter implements TagConverter {
 
     public static readonly INSTANCE: TagConverter = new FloatConverter();
 
-    private constructor() {}
+    private constructor() {
+        /* NOOP */
+    }
 
     public convertInput(input: string) {
         if (input === '0') {
@@ -92,7 +96,9 @@ export class FloatConverter implements TagConverter {
 export class StringConverter implements TagConverter {
     public static readonly INSTANCE: TagConverter = new StringConverter();
 
-    private constructor() {}
+    private constructor() {
+        /* NOOP */
+    }
 
     public convertInput(input: string) {
         if (input) {

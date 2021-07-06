@@ -9,11 +9,11 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import { FilterComparison, LanguageDto, QueryFieldModel, QueryModel } from '@app/shared/internal';
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
- @Component({
+@Component({
     selector: 'sqx-filter-comparison',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterComparisonComponent implements OnChanges {
     @Output()
@@ -36,7 +36,7 @@ export class FilterComparisonComponent implements OnChanges {
     public noValue = false;
 
     constructor(
-        public readonly contributorsState: ContributorsState
+        public readonly contributorsState: ContributorsState,
     ) {
     }
 

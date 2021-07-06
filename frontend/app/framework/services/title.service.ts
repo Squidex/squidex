@@ -1,11 +1,9 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
-
-// tslint:disable: readonly-array
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -15,7 +13,7 @@ export class TitlesConfig {
     constructor(
         public readonly prefix?: string,
         public readonly suffix?: string,
-        public readonly separator?: string
+        public readonly separator?: string,
     ) {
     }
 }
@@ -32,12 +30,12 @@ export class TitleService {
 
     constructor(
         private readonly titles: TitlesConfig,
-        private readonly localizer: LocalizerService
+        private readonly localizer: LocalizerService,
     ) {
         this.titles = new TitlesConfig(
             this.localizer.getOrKey(titles.prefix),
             this.localizer.getOrKey(titles.suffix),
-            this.titles.separator
+            this.titles.separator,
         );
 
         this.path$.subscribe(value => {

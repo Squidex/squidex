@@ -12,7 +12,7 @@ import { HistoryEventDto } from '@app/shared/internal';
     selector: 'sqx-history-list',
     styleUrls: ['./history-list.component.scss'],
     templateUrl: './history-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoryListComponent {
     @Input()

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -16,6 +17,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -38,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Draft] = WorkflowTransition.Always
-                        },
+                        }.ToImmutableDictionary(),
                         StatusColors.Archived, NoUpdate.Always),
                 [Status.Draft] =
                     new WorkflowStep(
@@ -46,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Published] = WorkflowTransition.When("data.field.iv === 2", "Editor")
-                        },
+                        }.ToImmutableDictionary(),
                         StatusColors.Draft),
                 [Status.Published] =
                     new WorkflowStep(
@@ -54,9 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Draft] = WorkflowTransition.Always
-                        },
+                        }.ToImmutableDictionary(),
                         StatusColors.Published, NoUpdate.When("data.field.iv === 2", "Owner", "Editor"))
-            });
+            }.ToImmutableDictionary());
 
         public DynamicContentWorkflowTests()
         {
@@ -71,17 +73,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Published] = WorkflowTransition.Always
-                            },
+                            }.ToImmutableDictionary(),
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Draft] = WorkflowTransition.Always
-                            },
+                            }.ToImmutableDictionary(),
                             StatusColors.Published)
-                },
-                new List<DomainId> { simpleSchemaId.Id });
+                }.ToImmutableDictionary(),
+                ImmutableList.Create(simpleSchemaId.Id));
 
             var workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow);
 
@@ -91,9 +93,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
-            var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())))
+            {
+                TimeoutScript = TimeSpan.FromSeconds(2),
+                TimeoutExecution = TimeSpan.FromSeconds(10)
+            };
 
-            sut = new DynamicContentWorkflow(new JintScriptEngine(memoryCache), appProvider);
+            sut = new DynamicContentWorkflow(scriptEngine, appProvider);
         }
 
         [Fact]

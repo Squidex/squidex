@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
         }
 
-        public WorkflowTransition ToTransition()
+        public WorkflowTransition ToWorkflowTransition()
         {
             return WorkflowTransition.When(Expression, Roles);
         }

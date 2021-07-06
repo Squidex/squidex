@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'sqx-boolean-validation',
     styleUrls: ['boolean-validation.component.scss'],
-    templateUrl: 'boolean-validation.component.html'
+    templateUrl: 'boolean-validation.component.html',
 })
 export class BooleanValidationComponent implements OnChanges {
     @Input()

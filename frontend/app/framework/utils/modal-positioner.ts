@@ -18,7 +18,7 @@ const POSITION_RIGHT_CENTER = 'right';
 const POSITION_RIGHT_TOP = 'right-top';
 const POSITION_RIGHT_BOTTOM = 'right-bottom';
 
-export function positionModal(targetRect: ClientRect, modalRect: ClientRect, relativePosition: string, offset: number, fix: boolean, viewportWidth: number, viewportHeight: number): { x: number, y: number } {
+export function positionModal(targetRect: ClientRect, modalRect: ClientRect, relativePosition: string, offset: number, fix: boolean, viewportWidth: number, viewportHeight: number): { x: number; y: number } {
     let y = 0;
     let x = 0;
 

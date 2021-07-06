@@ -14,11 +14,14 @@ import { AppLanguageDto, ContentDto, getContentValue } from '@app/shared';
     selector: '[sqxReferenceItem]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferenceItemComponent implements OnChanges {
     @Output()
     public delete = new EventEmitter();
+
+    @Output()
+    public clone = new EventEmitter();
 
     @Input()
     public language: AppLanguageDto;

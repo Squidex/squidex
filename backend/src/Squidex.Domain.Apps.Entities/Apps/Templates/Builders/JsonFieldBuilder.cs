@@ -9,9 +9,9 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class JsonFieldBuilder : FieldBuilder
+    public class JsonFieldBuilder : FieldBuilder<JsonFieldBuilder>
     {
-        public JsonFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public JsonFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }

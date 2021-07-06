@@ -12,7 +12,7 @@ import { FieldDto, ReferencesFieldPropertiesDto, REFERENCES_FIELD_EDITORS } from
 @Component({
     selector: 'sqx-references-ui',
     styleUrls: ['references-ui.component.scss'],
-    templateUrl: 'references-ui.component.html'
+    templateUrl: 'references-ui.component.html',
 })
 export class ReferencesUIComponent {
     @Input()

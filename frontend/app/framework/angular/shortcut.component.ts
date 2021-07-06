@@ -10,7 +10,7 @@ import { ShortcutService, StatefulComponent } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-shortcut',
-    template: ''
+    template: '',
 })
 export class ShortcutComponent extends StatefulComponent implements OnDestroy, OnInit {
     private lastKeys: string;
@@ -27,7 +27,7 @@ export class ShortcutComponent extends StatefulComponent implements OnDestroy, O
     constructor(
         changeDetector: ChangeDetectorRef,
         private readonly shortcutService: ShortcutService,
-        private readonly zone: NgZone
+        private readonly zone: NgZone,
     ) {
         super(changeDetector, {});
 
@@ -47,7 +47,7 @@ export class ShortcutComponent extends StatefulComponent implements OnDestroy, O
             this.shortcutService.on(this.lastKeys, () => {
                 if (!this.disabled) {
                     this.zone.run(() => {
-                        this.trigger.next();
+                        this.trigger.next(true);
                     });
                 }
 

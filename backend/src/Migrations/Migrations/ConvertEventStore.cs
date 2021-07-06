@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -23,7 +24,7 @@ namespace Migrations.Migrations
             this.eventStore = eventStore;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(CancellationToken ct)
         {
             if (eventStore is MongoEventStore mongoEventStore)
             {
@@ -42,7 +43,7 @@ namespace Migrations.Migrations
 
                     if (writes.Count == 1000 || (force && writes.Count > 0))
                     {
-                        await collection.BulkWriteAsync(writes);
+                        await collection.BulkWriteAsync(writes, cancellationToken: ct);
 
                         writes.Clear();
                     }
@@ -59,7 +60,7 @@ namespace Migrations.Migrations
                     }
 
                     await WriteAsync(new ReplaceOneModel<BsonDocument>(filter.Eq("_id", commit["_id"].AsString), commit), false);
-                });
+                }, ct);
 
                 await WriteAsync(null, true);
             }

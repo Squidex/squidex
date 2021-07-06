@@ -78,7 +78,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 return permissionsProvider.GetPermissionsAsync(App);
             });
 
-            Response.Headers[HeaderNames.ETag] = string.Concat(response).Sha256Base64();
+            Response.Headers[HeaderNames.ETag] = string.Concat(response).ToSha256Base64();
 
             return Ok(response);
         }

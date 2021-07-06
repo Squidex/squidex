@@ -17,7 +17,7 @@ describe('ClientsState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const oldClients = createClients(1, 2);
@@ -54,7 +54,7 @@ describe('ClientsState', () => {
 
         it('should reset loading state if loading failed', () => {
             clientsService.setup(x => x.getClients(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             clientsState.load().pipe(onErrorResumeNext()).subscribe();
 
@@ -134,7 +134,6 @@ describe('ClientsState', () => {
         function expectNewClients(updated: ClientsPayload) {
             expect(clientsState.snapshot.clients).toEqual(updated.items);
             expect(clientsState.snapshot.version).toEqual(newVersion);
-
         }
     });
 });

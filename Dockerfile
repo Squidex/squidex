@@ -3,7 +3,7 @@
 #
 FROM mcr.microsoft.com/dotnet/sdk:5.0 as backend
 
-ARG SQUIDEX__VERSION=4.0.0
+ARG SQUIDEX__VERSION=5.0.0
 
 WORKDIR /src
 
@@ -40,11 +40,16 @@ FROM buildkite/puppeteer:5.2.1 as frontend
 
 WORKDIR /src
 
+ENV CONTINUOUS_INTEGRATION=1
+
 # Copy Node project files.
 COPY frontend/package*.json /tmp/
 
+# Copy patches for broken npm packages
+COPY frontend/patches /tmp/patches
+
 # Install Node packages 
-RUN cd /tmp && npm install --loglevel=error
+RUN cd /tmp && npm set unsafe-perm true && npm install --loglevel=error
 
 COPY frontend .
 
@@ -68,8 +73,10 @@ RUN apt-get update \
 # Default AspNetCore directory
 WORKDIR /app
 
-# Copy from build stages
+# Copy from backend build stages
 COPY --from=backend /build/ .
+
+# Copy from backend build stages to webserver folder
 COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80

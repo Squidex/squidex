@@ -35,43 +35,43 @@ export const ALL_TRIGGERS: TriggersDto = {
         display: 'Asset changed',
         iconColor: '#3389ff',
         iconCode: 'assets',
-        title: 'Asset changed'
+        title: 'Asset changed',
     },
     Comment: {
         description: 'When a user is mentioned in any comment...',
         display: 'User mentioned',
         iconColor: '#3389ff',
         iconCode: 'comments',
-        title: 'User mentioned'
+        title: 'User mentioned',
     },
     ContentChanged: {
         description: 'For content changes like created, updated, published, unpublished...',
         display: 'Content changed',
         iconColor: '#3389ff',
         iconCode: 'contents',
-        title: 'Content changed'
+        title: 'Content changed',
     },
     Manual: {
         description: 'To invoke processes manually, for example to update your static site...',
         display: 'Manually triggered',
         iconColor: '#3389ff',
         iconCode: 'play-line',
-        title: 'Manually triggered'
+        title: 'Manually triggered',
     },
     SchemaChanged: {
         description: 'When a schema definition has been created, updated, published or deleted...',
         display: 'Schema changed',
         iconColor: '#3389ff',
         iconCode: 'schemas',
-        title: 'Schema changed'
+        title: 'Schema changed',
     },
     Usage: {
         description: 'When monthly API calls exceed a specified limit for one time a month...',
         display: 'Usage exceeded',
         iconColor: '#3389ff',
         iconCode: 'dashboard',
-        title: 'Usage'
-    }
+        title: 'Usage',
+    },
 };
 
 export class RuleElementDto {
@@ -83,7 +83,7 @@ export class RuleElementDto {
         public readonly iconImage: string,
         public readonly iconCode: string | null,
         public readonly readMore: string,
-        public readonly properties: ReadonlyArray<RuleElementPropertyDto>
+        public readonly properties: ReadonlyArray<RuleElementPropertyDto>,
     ) {
     }
 }
@@ -96,7 +96,7 @@ export class RuleElementPropertyDto {
         public readonly description: string,
         public readonly isFormattable: boolean,
         public readonly isRequired: boolean,
-        public readonly options?: ReadonlyArray<string>
+        public readonly options?: ReadonlyArray<string>,
     ) {
     }
 }
@@ -115,7 +115,7 @@ export class RulesDto extends ResultSet<RuleDto> {
     }
 
     constructor(items: ReadonlyArray<RuleDto>, links?: {},
-        public readonly runningRuleId?: string
+        public readonly runningRuleId?: string,
     ) {
         super(items.length, items, links);
     }
@@ -148,7 +148,7 @@ export class RuleDto {
         public readonly name: string,
         public readonly numSucceeded: number,
         public readonly numFailed: number,
-        public readonly lastExecuted?: DateTime
+        public readonly lastExecuted?: DateTime,
     ) {
         this._links = links;
 
@@ -180,7 +180,7 @@ export class RuleEventDto extends Model<RuleEventDto> {
         public readonly lastDump: string,
         public readonly result: string,
         public readonly jobResult: string,
-        public readonly numCalls: number
+        public readonly numCalls: number,
     ) {
         super();
 
@@ -202,7 +202,7 @@ export class SimulatedRuleEventDto {
         public readonly actionName: string | undefined,
         public readonly actionData: string | undefined,
         public readonly error: string | undefined,
-        public readonly skipReason: string
+        public readonly skipReason: string,
     ) {
         this._links = links;
     }
@@ -212,20 +212,20 @@ export type ActionsDto =
     Readonly<{ [name: string]: RuleElementDto }>;
 
 export type UpsertRuleDto =
-    Readonly<{ trigger?: RuleTrigger; action?: RuleAction; name?: string; isEnabled?: boolean; }>;
+    Readonly<{ trigger?: RuleTrigger; action?: RuleAction; name?: string; isEnabled?: boolean }>;
 
 export type RuleAction =
-    Readonly<{ actionType: string; [key: string]: any; }>;
+    Readonly<{ actionType: string; [key: string]: any }>;
 
 export type RuleTrigger =
-    Readonly<{ triggerType: string; [key: string]: any; }>;
+    Readonly<{ triggerType: string; [key: string]: any }>;
 
 @Injectable()
 export class RulesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -342,7 +342,7 @@ export class RulesService {
     public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}&ruleId=${ruleId || ''}`);
 
-        return this.http.get<{ items: any[], total: number } & Resource>(url).pipe(
+        return this.http.get<{ items: any[]; total: number } & Resource>(url).pipe(
             map(({ items, total, _links }) => {
                 const ruleEvents = items.map(parseRuleEvent);
 
@@ -354,7 +354,7 @@ export class RulesService {
     public getSimulatedEvents(appName: string, ruleId: string): Observable<SimulatedRuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${ruleId}/simulate`);
 
-        return this.http.get<{ items: any[], total: number } & Resource>(url).pipe(
+        return this.http.get<{ items: any[]; total: number } & Resource>(url).pipe(
             map(({ items, total, _links }) => {
                 const simulatedRuleEvents = items.map(parseSimulatedRuleEvent);
 
@@ -402,7 +402,7 @@ function parseActions(response: any) {
                 property.description,
                 property.isFormattable,
                 property.isRequired,
-                property.options
+                property.options,
             ));
 
         actions[key] = new RuleElementDto(

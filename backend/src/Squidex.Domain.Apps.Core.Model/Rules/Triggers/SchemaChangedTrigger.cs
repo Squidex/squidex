@@ -10,9 +10,9 @@ using Squidex.Infrastructure.Reflection;
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
     [TypeName(nameof(SchemaChangedTrigger))]
-    public sealed class SchemaChangedTrigger : RuleTrigger
+    public sealed record SchemaChangedTrigger : RuleTrigger
     {
-        public string Condition { get; set; }
+        public string Condition { get; init; }
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {

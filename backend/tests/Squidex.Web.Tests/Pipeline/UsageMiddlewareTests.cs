@@ -12,11 +12,10 @@ using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 using Xunit;
-
-#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
 
 namespace Squidex.Web.Pipeline
 {
@@ -63,7 +62,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_not_track_if_call_blocked()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -81,7 +80,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_track_if_calls_left()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             await sut.InvokeAsync(httpContext, next);
@@ -97,7 +96,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_track_request_bytes()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
             httpContext.Request.ContentLength = 1024;
 
@@ -114,7 +113,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_track_response_bytes_with_writer()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             await sut.InvokeAsync(httpContext, async x =>
@@ -135,7 +134,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_track_response_bytes_with_stream()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             await sut.InvokeAsync(httpContext, async x =>
@@ -156,7 +155,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_track_response_bytes_with_file()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(13));
 
             var tempFileName = Path.GetTempFileName();
@@ -187,7 +186,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_not_track_if_costs_are_zero()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
             await sut.InvokeAsync(httpContext, next);
@@ -203,7 +202,7 @@ namespace Squidex.Web.Pipeline
         [Fact]
         public async Task Should_log_request_even_if_costs_are_zero()
         {
-            httpContext.Features.Set<IAppFeature>(new AppFeature(appId));
+            httpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
             httpContext.Features.Set<IApiCostsFeature>(new ApiCostsAttribute(0));
 
             httpContext.Request.Method = "GET";

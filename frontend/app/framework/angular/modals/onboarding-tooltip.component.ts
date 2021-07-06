@@ -14,9 +14,9 @@ import { timer } from 'rxjs';
     styleUrls: ['./onboarding-tooltip.component.scss'],
     templateUrl: './onboarding-tooltip.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OnboardingTooltipComponent extends StatefulComponent implements OnDestroy, OnInit {
     @Input()
@@ -35,10 +35,9 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly onboardingService: OnboardingService,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
         super(changeDetector, {});
-
     }
 
     public ngOnDestroy() {
@@ -55,7 +54,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
                         const forRect = this.for.getBoundingClientRect();
 
                         const x = forRect.left + 0.5 * forRect.width;
-                        const y = forRect.top  + 0.5 * forRect.height;
+                        const y = forRect.top + 0.5 * forRect.height;
 
                         const fromPoint = document.elementFromPoint(x, y);
 

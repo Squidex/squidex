@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -23,6 +22,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -152,13 +152,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
-                {
+                Schemas = ImmutableList.Create(
                     new ContentChangedTriggerSchemaV2
                     {
                         SchemaId = schemaMatch.Id
-                    }
-                })
+                    })
             };
 
             var ctx = Context(trigger);
@@ -361,13 +359,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (schemaId != null)
             {
-                trigger.Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
+                trigger = trigger with
                 {
-                    new ContentChangedTriggerSchemaV2
-                    {
-                        SchemaId = schemaId.Id, Condition = condition
-                    }
-                });
+                    Schemas = ImmutableList.Create(
+                        new ContentChangedTriggerSchemaV2
+                        {
+                            SchemaId = schemaId.Id, Condition = condition
+                        })
+                };
             }
 
             action(Context(trigger));

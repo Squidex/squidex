@@ -17,7 +17,7 @@ describe('CanDeactivateGuard', () => {
                 called = true;
 
                 return of(true);
-            }
+            },
         };
 
         const result = new CanDeactivateGuard().canDeactivate(component);

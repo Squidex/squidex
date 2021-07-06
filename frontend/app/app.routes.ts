@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -14,7 +14,7 @@ const routes: Routes = [
     {
         path: '',
         component: HomePageComponent,
-        canActivate: [MustBeNotAuthenticatedGuard]
+        canActivate: [MustBeNotAuthenticatedGuard],
     },
     {
         path: 'app',
@@ -24,12 +24,12 @@ const routes: Routes = [
             {
                 path: '',
                 loadChildren: () => import('./features/apps/module').then(m => m.SqxFeatureAppsModule),
-                canActivate: [UnsetAppGuard]
+                canActivate: [UnsetAppGuard],
             },
             {
                 path: 'administration',
                 loadChildren: () => import('./features/administration/module').then(m => m.SqxFeatureAdministrationModule),
-                canActivate: [UnsetAppGuard]
+                canActivate: [UnsetAppGuard],
             },
             {
                 path: ':appName',
@@ -38,52 +38,52 @@ const routes: Routes = [
                 children: [
                     {
                         path: '',
-                        loadChildren: () => import('./features/dashboard/module').then(m => m.SqxFeatureDashboardModule)
+                        loadChildren: () => import('./features/dashboard/module').then(m => m.SqxFeatureDashboardModule),
                     },
                     {
                         path: 'content',
-                        loadChildren: () => import('./features/content/module').then(m => m.SqxFeatureContentModule)
+                        loadChildren: () => import('./features/content/module').then(m => m.SqxFeatureContentModule),
                     },
                     {
                         path: 'schemas',
-                        loadChildren: () => import('./features/schemas/module').then(m => m.SqxFeatureSchemasModule)
+                        loadChildren: () => import('./features/schemas/module').then(m => m.SqxFeatureSchemasModule),
                     },
                     {
                         path: 'assets',
-                        loadChildren: () => import('./features/assets/module').then(m => m.SqxFeatureAssetsModule)
+                        loadChildren: () => import('./features/assets/module').then(m => m.SqxFeatureAssetsModule),
                     },
                     {
                         path: 'rules',
-                        loadChildren: () => import('./features/rules/module').then(m => m.SqxFeatureRulesModule)
+                        loadChildren: () => import('./features/rules/module').then(m => m.SqxFeatureRulesModule),
                     },
                     {
                         path: 'settings',
-                        loadChildren: () => import('./features/settings/module').then(m => m.SqxFeatureSettingsModule)
+                        loadChildren: () => import('./features/settings/module').then(m => m.SqxFeatureSettingsModule),
                     },
                     {
                         path: 'api',
-                        loadChildren: () => import('./features/api/module').then(m => m.SqxFeatureApiModule)
-                    }
-                ]
-            }
-        ]
+                        loadChildren: () => import('./features/api/module').then(m => m.SqxFeatureApiModule),
+                    },
+                ],
+            },
+        ],
     },
     {
         path: 'logout',
-        component: LogoutPageComponent
+        component: LogoutPageComponent,
     },
     {
         path: 'login',
-        component: LoginPageComponent
+        component: LoginPageComponent,
     },
     {
         path: 'forbidden',
-        component: ForbiddenPageComponent
+        component: ForbiddenPageComponent,
     },
     {
         path: '**',
-        component: NotFoundPageComponent
-    }
+        component: NotFoundPageComponent,
+    },
 ];
 
 export const routing: ModuleWithProviders<RouterModule> = RouterModule.forRoot(routes, { useHash: false });

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -68,90 +68,98 @@ namespace Squidex.Domain.Apps.Core.Scripting
             this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
         }
 
-        public async Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default)
+        public async Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
+            CancellationToken ct = default)
         {
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
             {
-                var tcs = new TaskCompletionSource<IJsonValue>();
-
-                using (cts.Token.Register(() => tcs.TrySetCanceled()))
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
-                    var context =
-                        CreateEngine(options)
-                            .Extend(vars, options)
-                            .Extend(extensions)
-                            .ExtendAsync(extensions, tcs.TrySetException, cts.Token);
+                    var tcs = new TaskCompletionSource<IJsonValue>();
 
-                    context.Engine.SetValue("complete", new Action<JsValue?>(value =>
+                    using (combined.Token.Register(() => tcs.TrySetCanceled()))
                     {
-                        tcs.TrySetResult(JsonMapper.Map(value));
-                    }));
+                        var context =
+                            CreateEngine(options)
+                                .Extend(vars, options)
+                                .Extend(extensions)
+                                .ExtendAsync(extensions, tcs.TrySetException, combined.Token);
 
-                    Execute(context.Engine, script);
+                        context.Engine.SetValue("complete", new Action<JsValue?>(value =>
+                        {
+                            tcs.TrySetResult(JsonMapper.Map(value));
+                        }));
 
-                    if (!context.IsAsync)
-                    {
-                        tcs.TrySetResult(JsonMapper.Map(context.Engine.GetCompletionValue()));
+                        Execute(context.Engine, script);
+
+                        if (!context.IsAsync)
+                        {
+                            tcs.TrySetResult(JsonMapper.Map(context.Engine.GetCompletionValue()));
+                        }
+
+                        return await tcs.Task;
                     }
-
-                    return await tcs.Task;
                 }
             }
         }
 
-        public async Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default)
+        public async Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default,
+            CancellationToken ct = default)
         {
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
             using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
             {
-                var tcs = new TaskCompletionSource<ContentData>();
-
-                using (cts.Token.Register(() => tcs.TrySetCanceled()))
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
-                    var context =
-                        CreateEngine(options)
-                            .Extend(vars, options)
-                            .Extend(extensions)
-                            .ExtendAsync(extensions, tcs.TrySetException, cts.Token);
+                    var tcs = new TaskCompletionSource<ContentData>();
 
-                    context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
+                    using (combined.Token.Register(() => tcs.TrySetCanceled()))
                     {
-                        tcs.TrySetResult(vars.Data!);
-                    }));
+                        var context =
+                            CreateEngine(options)
+                                .Extend(vars, options)
+                                .Extend(extensions)
+                                .ExtendAsync(extensions, tcs.TrySetException, combined.Token);
 
-                    context.Engine.SetValue("replace", new Action(() =>
-                    {
-                        var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
-
-                        if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
+                        context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
                         {
-                            if (!tcs.Task.IsCompleted)
+                            tcs.TrySetResult(vars.Data!);
+                        }));
+
+                        context.Engine.SetValue("replace", new Action(() =>
+                        {
+                            var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
+
+                            if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
                             {
-                                if (data.TryUpdate(out var modified))
+                                if (!tcs.Task.IsCompleted)
                                 {
-                                    tcs.TrySetResult(modified);
-                                }
-                                else
-                                {
-                                    tcs.TrySetResult(vars.Data!);
+                                    if (data.TryUpdate(out var modified))
+                                    {
+                                        tcs.TrySetResult(modified);
+                                    }
+                                    else
+                                    {
+                                        tcs.TrySetResult(vars.Data!);
+                                    }
                                 }
                             }
+                        }));
+
+                        Execute(context.Engine, script);
+
+                        if (!context.IsAsync)
+                        {
+                            tcs.TrySetResult(vars.Data!);
                         }
-                    }));
 
-                    Execute(context.Engine, script);
-
-                    if (!context.IsAsync)
-                    {
-                        tcs.TrySetResult(vars.Data!);
+                        return await tcs.Task;
                     }
-
-                    return await tcs.Task;
                 }
             }
         }

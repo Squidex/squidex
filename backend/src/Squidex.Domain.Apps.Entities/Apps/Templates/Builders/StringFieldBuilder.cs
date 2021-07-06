@@ -11,54 +11,75 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class StringFieldBuilder : FieldBuilder
+    public class StringFieldBuilder : FieldBuilder<StringFieldBuilder>
     {
-        public StringFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public StringFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }
 
         public StringFieldBuilder AsTextArea()
         {
-            Properties<StringFieldProperties>().Editor = StringFieldEditor.TextArea;
+            Properties<StringFieldProperties>(p => p with
+            {
+                EditorUrl = null,
+                Editor = StringFieldEditor.TextArea
+            });
 
             return this;
         }
 
         public StringFieldBuilder AsRichText()
         {
-            Properties<StringFieldProperties>().Editor = StringFieldEditor.RichText;
+            Properties<StringFieldProperties>(p => p with
+            {
+                EditorUrl = null,
+                Editor = StringFieldEditor.RichText
+            });
 
             return this;
         }
 
         public StringFieldBuilder AsDropDown(params string[] values)
         {
-            Properties<StringFieldProperties>().AllowedValues = ReadOnlyCollection.Create(values);
-            Properties<StringFieldProperties>().Editor = StringFieldEditor.Dropdown;
+            Properties<StringFieldProperties>(p => p with
+            {
+                AllowedValues = ImmutableList.Create(values),
+                EditorUrl = null,
+                Editor = StringFieldEditor.Dropdown
+            });
 
             return this;
         }
 
         public StringFieldBuilder Unique()
         {
-            Properties<StringFieldProperties>().IsUnique = true;
+            Properties<StringFieldProperties>(p => p with
+            {
+                IsUnique = true
+            });
 
             return this;
         }
 
         public StringFieldBuilder Pattern(string pattern, string? message = null)
         {
-            Properties<StringFieldProperties>().Pattern = pattern;
-            Properties<StringFieldProperties>().PatternMessage = message;
+            Properties<StringFieldProperties>(p => p with
+            {
+                Pattern = pattern,
+                PatternMessage = message
+            });
 
             return this;
         }
 
         public StringFieldBuilder Length(int maxLength, int minLength = 0)
         {
-            Properties<StringFieldProperties>().MaxLength = maxLength;
-            Properties<StringFieldProperties>().MinLength = minLength;
+            Properties<StringFieldProperties>(p => p with
+            {
+                MaxLength = maxLength,
+                MinLength = minLength
+            });
 
             return this;
         }

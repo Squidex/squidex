@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
- // tslint:disable: readonly-array
-
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FilterLogical, FilterNode, LanguageDto, QueryModel } from '@app/shared/internal';
 
@@ -14,7 +12,7 @@ import { FilterLogical, FilterNode, LanguageDto, QueryModel } from '@app/shared/
     selector: 'sqx-filter-logical',
     styleUrls: ['./filter-logical.component.scss'],
     templateUrl: './filter-logical.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterLogicalComponent {
     private filterValue: FilterLogical;

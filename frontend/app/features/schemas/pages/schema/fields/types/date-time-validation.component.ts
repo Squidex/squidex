@@ -15,7 +15,7 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 @Component({
     selector: 'sqx-date-time-validation',
     styleUrls: ['date-time-validation.component.scss'],
-    templateUrl: 'date-time-validation.component.html'
+    templateUrl: 'date-time-validation.component.html',
 })
 export class DateTimeValidationComponent implements OnChanges {
     @Input()

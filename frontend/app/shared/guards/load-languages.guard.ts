@@ -14,7 +14,7 @@ import { LanguagesState } from './../state/languages.state';
 @Injectable()
 export class LoadLanguagesGuard implements CanActivate {
     constructor(
-        private readonly languagesState: LanguagesState
+        private readonly languagesState: LanguagesState,
     ) {
     }
 

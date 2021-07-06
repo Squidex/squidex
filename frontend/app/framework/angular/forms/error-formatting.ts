@@ -7,7 +7,7 @@
 
 import { LocalizerService, StringHelper, Types } from '@app/framework/internal';
 
-export function formatError(localizer: LocalizerService, field: string, type: string, properties: any, value: any, errors?: any): string | readonly string[]  {
+export function formatError(localizer: LocalizerService, field: string, type: string, properties: any, value: any, errors?: any): string | readonly string[] {
     type = type.toLowerCase();
 
     if (type === 'custom' && Types.isArrayOfString(properties.errors)) {

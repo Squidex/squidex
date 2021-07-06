@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -21,13 +22,13 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(CancellationToken ct)
         {
             var collection = database.GetCollection<BsonDocument>("States_Assets");
 
             var update = Builders<BsonDocument>.Update.Rename("FileNameSlug", "Slug");
 
-            return collection.UpdateManyAsync(new BsonDocument(), update);
+            return collection.UpdateManyAsync(new BsonDocument(), update, cancellationToken: ct);
         }
     }
 }

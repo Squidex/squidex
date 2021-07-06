@@ -18,9 +18,9 @@ import { map } from 'rxjs/operators';
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppsMenuComponent {
     public addAppDialog = new DialogModel();
@@ -31,7 +31,7 @@ export class AppsMenuComponent {
     constructor(titleService: TitleService,
         public readonly appsState: AppsState,
         public readonly route: ActivatedRoute,
-        public readonly uiState: UIState
+        public readonly uiState: UIState,
     ) {
         this.appPath = titleService.pathChanges.pipe(map(x => x.slice(1)));
     }

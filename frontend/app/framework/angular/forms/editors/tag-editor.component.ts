@@ -5,15 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: template-use-track-by-function
-
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { fadeAnimation, getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
 };
 
 let CACHED_FONT: string;
@@ -37,12 +35,12 @@ interface State {
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
     providers: [
-        SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR
+        SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnChanges, OnInit {
     private latestValue: any;
@@ -109,7 +107,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
             hasFocus: false,
             suggestedItems: [],
             suggestedIndex: 0,
-            items: []
+            items: [],
         });
     }
 
@@ -154,7 +152,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                 .subscribe(items => {
                     this.next({
                         suggestedIndex: -1,
-                        suggestedItems: items || []
+                        suggestedItems: items || [],
                     });
                 }));
     }
@@ -271,7 +269,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         if (Keys.isComma(event)) {
             return !this.selectValue(this.addInput.value);
         } else if (Keys.isDelete(event)) {
-            const value = <string>this.addInput.value;
+            const value = this.addInput.value as string;
 
             if (!value || value.length === 0) {
                 this.updateItems(this.snapshot.items.slice(0, this.snapshot.items.length - 1), false);
@@ -281,7 +279,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         } else if (Keys.isEscape(event) && this.suggestionsModal.isOpen) {
             this.suggestionsModal.hide();
             return false;
-        }  else if (Keys.isUp(event)) {
+        } else if (Keys.isUp(event)) {
             this.selectPrevIndex();
             return false;
         } else if (Keys.isDown(event)) {
@@ -373,7 +371,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     }
 
     public callTouched() {
-        this.blur.next();
+        this.blur.next(true);
 
         super.callTouched();
     }

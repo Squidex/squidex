@@ -15,12 +15,12 @@ import { TestValues } from './_test-helpers';
 describe('RuleEventsState', () => {
     const {
         app,
-        appsState
+        appsState,
     } = TestValues;
 
     const oldRuleEvents = [
-         createRuleEvent(1),
-         createRuleEvent(2)
+        createRuleEvent(1),
+        createRuleEvent(2),
     ];
 
     let dialogs: IMock<DialogService>;
@@ -49,7 +49,7 @@ describe('RuleEventsState', () => {
 
     it('should reset loading state if loading failed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, undefined))
-            .returns(() => throwError('error'));
+            .returns(() => throwError(() => 'Service Error'));
 
         ruleEventsState.load().pipe(onErrorResumeNext()).subscribe();
 

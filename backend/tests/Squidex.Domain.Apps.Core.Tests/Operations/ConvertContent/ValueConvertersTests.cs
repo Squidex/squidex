@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create(123);
 
-            var result = ValueConverters.ExcludeHidden(source, stringField.Hide());
+            var result = ValueConverters.ExcludeHidden(source, stringField.Hide(), null);
 
             Assert.Null(result);
         }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create("invalid");
 
-            var result = ValueConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, numberField);
+            var result = ValueConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, numberField, null);
 
             Assert.Null(result);
         }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = JsonValue.Array($"url/to/{id1}", $"url/to/{id2}");
 
-            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field, null);
 
             Assert.Equal(expected, result);
         }
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = source;
 
-            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field, null);
 
             Assert.Equal(expected, result);
         }

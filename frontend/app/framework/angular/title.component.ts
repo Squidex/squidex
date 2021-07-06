@@ -14,7 +14,7 @@ import { TitleService } from '@app/framework/internal';
 @Component({
     selector: 'sqx-title',
     template: '',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TitleComponent implements OnDestroy, OnChanges {
     private previous: any;
@@ -28,7 +28,7 @@ export class TitleComponent implements OnDestroy, OnChanges {
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly titleService: TitleService
+        private readonly titleService: TitleService,
     ) {
     }
 

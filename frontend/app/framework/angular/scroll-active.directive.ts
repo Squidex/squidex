@@ -8,7 +8,7 @@
 import { AfterViewInit, Directive, ElementRef, Input, OnChanges, Renderer2 } from '@angular/core';
 
 @Directive({
-    selector: '[sqxScrollActive]'
+    selector: '[sqxScrollActive]',
 })
 export class ScrollActiveDirective implements AfterViewInit, OnChanges {
     @Input('sqxScrollActive')
@@ -19,7 +19,7 @@ export class ScrollActiveDirective implements AfterViewInit, OnChanges {
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

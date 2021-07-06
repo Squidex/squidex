@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Squidex.Areas.IdentityServer.Config;
 using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer
@@ -20,7 +19,7 @@ namespace Squidex.Areas.IdentityServer
         {
             var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
-            app.Map(Constants.IdentityServerPrefix, identityApp =>
+            app.Map(Constants.PrefixIdentityServer, identityApp =>
             {
                 if (environment.IsDevelopment())
                 {
@@ -31,12 +30,18 @@ namespace Squidex.Areas.IdentityServer
                     identityApp.UseExceptionHandler("/error");
                 }
 
+                identityApp.Use((context, next) =>
+                {
+                    // OpenId dict core only works with https, which sucks in our tests.
+                    context.Request.IsHttps = true;
+
+                    return next();
+                });
+
                 identityApp.UseRouting();
 
                 identityApp.UseAuthentication();
                 identityApp.UseAuthorization();
-
-                identityApp.UseSquidexIdentityServer();
 
                 identityApp.UseEndpoints(endpoints =>
                 {

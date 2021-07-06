@@ -9,7 +9,7 @@ import { Directive, ElementRef, EventEmitter, Input, NgZone, OnChanges, OnDestro
 import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
-    selector: '[sqxResized], [sqxResizeCondition]'
+    selector: '[sqxResized], [sqxResizeCondition]',
 })
 export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChanges, ResizeListener {
     private condition: ((rect: ClientRect) => boolean) | undefined;
@@ -28,7 +28,7 @@ export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChan
     public resize = new EventEmitter<ClientRect>();
 
     constructor(resizeService: ResizeService, element: ElementRef,
-        private readonly zone: NgZone
+        private readonly zone: NgZone,
     ) {
         super();
 
@@ -36,12 +36,12 @@ export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChan
     }
 
     public ngOnChanges() {
-        const minWidth = parseInt(<any>this.minWidth, 10);
-        const maxWidth = parseInt(<any>this.maxWidth, 10);
+        const minWidth = parseInt(this.minWidth as any, 10);
+        const maxWidth = parseInt(this.maxWidth as any, 10);
 
-        if (minWidth > 0 &&  maxWidth > 0) {
+        if (minWidth > 0 && maxWidth > 0) {
             this.condition = rect => rect.width < minWidth! || rect.width > maxWidth!;
-        } else if ( maxWidth > 0) {
+        } else if (maxWidth > 0) {
             this.condition = rect => rect.width > maxWidth!;
         } else if (minWidth > 0) {
             this.condition = rect => rect.width < minWidth!;

@@ -59,6 +59,7 @@ export class AssetDto {
         public readonly createdBy: string,
         public readonly lastModified: DateTime,
         public readonly lastModifiedBy: string,
+        public readonly version: Version,
         public readonly fileName: string,
         public readonly fileHash: string,
         public readonly fileType: string,
@@ -72,7 +73,6 @@ export class AssetDto {
         public readonly metadata: any,
         public readonly slug: string,
         public readonly tags: ReadonlyArray<string>,
-        public readonly version: Version
     ) {
         this.canPreview =
             (this.mimeType !== MIME_TIFF && this.type === 'Image') ||
@@ -102,7 +102,7 @@ export class AssetDto {
 export class AssetFoldersDto extends ResultSet<AssetFolderDto> {
     constructor(total: number, items: ReadonlyArray<AssetFolderDto>,
         public readonly path: ReadonlyArray<AssetFolderDto>,
-        links?: ResourceLinks
+        links?: ResourceLinks,
     ) {
         super(total, items, links);
     }
@@ -123,7 +123,7 @@ export class AssetFolderDto {
         public readonly id: string,
         public readonly folderName: string,
         public readonly parentId: string,
-        public readonly version: Version
+        public readonly version: Version,
     ) {
         this._links = links;
 
@@ -150,14 +150,14 @@ export type MoveAssetItemDto =
     Readonly<{ parentId?: string }>;
 
 export type AssetQueryDto =
-    Readonly<{ ids?: Tags; maxLength?: number; parentId?: string; query?: Query; skip?: number; tags?: Tags; take?: number; }>;
+    Readonly<{ ids?: Tags; maxLength?: number; parentId?: string; query?: Query; skip?: number; tags?: Tags; take?: number }>;
 
 @Injectable()
 export class AssetsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -172,7 +172,7 @@ export class AssetsService {
 
         let fullQuery: string;
 
-        let queryObj: Query | undefined = undefined;
+        let queryObj: Query | undefined;
 
         if (ids && ids.length > 0) {
             fullQuery = `ids=${ids.join(',')}`;
@@ -227,7 +227,7 @@ export class AssetsService {
 
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
 
-            return this.http.post<{ total: number, items: any[], folders: any[] } & Resource>(url, body).pipe(
+            return this.http.post<{ total: number; items: any[]; folders: any[] } & Resource>(url, body).pipe(
                 map(({ total, items, _links }) => {
                     const assets = items.map(parseAsset);
 
@@ -237,7 +237,7 @@ export class AssetsService {
         } else {
             const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-            return this.http.get<{ total: number, items: any[], folders: any[] } & Resource>(url).pipe(
+            return this.http.get<{ total: number; items: any[]; folders: any[] } & Resource>(url).pipe(
                 map(({ total, items, _links }) => {
                     const assets = items.map(parseAsset);
 
@@ -250,7 +250,7 @@ export class AssetsService {
     public getAssetFolders(appName: string, parentId: string): Observable<AssetFoldersDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}`);
 
-        return this.http.get<{ total: number, items: any[], folders: any[], path: any[] } & Resource>(url).pipe(
+        return this.http.get<{ total: number; items: any[]; folders: any[]; path: any[] } & Resource>(url).pipe(
             map(({ total, items, path, _links }) => {
                 const assetFolders = items.map(parseAssetFolder);
                 const assetPath = path.map(parseAssetFolder);
@@ -291,14 +291,14 @@ export class AssetsService {
                 } else if (Types.is(event, HttpResponse)) {
                     return parseAsset(event.body);
                 } else {
-                    throw 'Invalid';
+                    throw new Error('Invalid');
                 }
             }),
             catchError((error: any) => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'i18n:assets.fileTooBig'));
+                    return throwError(() => new ErrorDto(413, 'i18n:assets.fileTooBig'));
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(value => {
@@ -326,14 +326,14 @@ export class AssetsService {
                 } else if (Types.is(event, HttpResponse)) {
                     return parseAsset(event.body);
                 } else {
-                    throw 'Invalid';
+                    throw new Error('Invalid');
                 }
             }),
             catchError(error => {
                 if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                    return throwError(new ErrorDto(413, 'i18n:assets.fileTooBig'));
+                    return throwError(() => new ErrorDto(413, 'i18n:assets.fileTooBig'));
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(value => {
@@ -417,6 +417,7 @@ function parseAsset(response: any) {
         response.id,
         DateTime.parseISO(response.created), response.createdBy,
         DateTime.parseISO(response.lastModified), response.lastModifiedBy,
+        new Version(response.version.toString()),
         response.fileName,
         response.fileHash,
         response.fileType,
@@ -429,8 +430,7 @@ function parseAsset(response: any) {
         response.metadataText,
         response.metadata,
         response.slug,
-        response.tags || [],
-        new Version(response.version.toString()));
+        response.tags || []);
 }
 
 function parseAssetFolder(response: any) {

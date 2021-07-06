@@ -45,10 +45,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IContentLoader contentLoader,
             IContentRepository contentRepository)
         {
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(contentLoader, nameof(contentLoader));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-
             this.scriptEngine = scriptEngine;
             this.contentLoader = contentLoader;
             this.contentRepository = contentRepository;

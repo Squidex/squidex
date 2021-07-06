@@ -19,7 +19,7 @@ namespace Squidex.Extensions.Actions.Email
         Display = "Send an email",
         Description = "Send an email with a custom SMTP server.",
         ReadMore = "https://en.wikipedia.org/wiki/Email")]
-    public sealed class EmailAction : RuleAction
+    public sealed record EmailAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Server Host", Description = "The IP address or host to the SMTP server.")]

@@ -1,0 +1,50 @@
+name: Marketplace - AWS
+concurrency: marketplace-aws
+
+on:
+  release:
+    types: [ released ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Validate Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: packer/aws.pkr.hcl
+
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Init
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: init
+          target: packer/aws.pkr.hcl
+        env:
+          PACKER_LOG: 1
+
+      - name: Build
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort"
+          target: packer/aws.pkr.hcl
+        env:
+          PACKER_LOG: 1
+          PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
+          AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"

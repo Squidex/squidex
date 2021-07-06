@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
         private void CreateLinks(Resources resources, string schema)
         {
-            var values = new { app = resources.App, name = schema };
+            var values = new { app = resources.App, schema };
 
             AddSelfLink(resources.Url<ContentsController>(x => nameof(x.GetContents), values));
 
@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             {
                 AddPostLink("create", resources.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-                var publishValues = new { values.app, values.name, publish = true };
+                var publishValues = new { values.app, values.schema, publish = true };
 
                 AddPostLink("create/publish", resources.Url<ContentsController>(x => nameof(x.PostContent), publishValues));
             }

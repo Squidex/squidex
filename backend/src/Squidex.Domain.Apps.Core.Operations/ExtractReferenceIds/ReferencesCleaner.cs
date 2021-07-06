@@ -10,25 +10,15 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     internal sealed class ReferencesCleaner : IFieldVisitor<IJsonValue, ReferencesCleaner.Args>
     {
         private static readonly ReferencesCleaner Instance = new ReferencesCleaner();
 
-        public readonly struct Args
-        {
-            public readonly IJsonValue Value;
-
-            public readonly HashSet<DomainId> ValidIds;
-
-            public Args(IJsonValue value, HashSet<DomainId> validIds)
-            {
-                Value = value;
-
-                ValidIds = validIds;
-            }
-        }
+        public sealed record Args(IJsonValue Value, ISet<DomainId> ValidIds);
 
         private ReferencesCleaner()
         {
@@ -52,6 +42,16 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         }
 
         public IJsonValue Visit(IField<BooleanFieldProperties> field, Args args)
+        {
+            return args.Value;
+        }
+
+        public IJsonValue Visit(IField<ComponentFieldProperties> field, Args args)
+        {
+            return args.Value;
+        }
+
+        public IJsonValue Visit(IField<ComponentsFieldProperties> field, Args args)
         {
             return args.Value;
         }

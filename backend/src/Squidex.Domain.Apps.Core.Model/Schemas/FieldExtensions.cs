@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using NamedIdStatic = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -24,9 +25,31 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return fields.Where(x => IsForApi(x, withHidden));
         }
 
+        public static IEnumerable<IRootField> GetSharedFields(this ResolvedComponents components, ImmutableList<DomainId>? schemaIds, bool withHidden)
+        {
+            if (schemaIds == null || schemaIds.Count == 0)
+            {
+                return Enumerable.Empty<IRootField>();
+            }
+
+            var allFields =
+                schemaIds
+                    .Select(x => components.Get(x)).NotNull()
+                    .SelectMany(x => x.Fields.ForApi(withHidden))
+                    .GroupBy(x => new { x.Name, Type = x.RawProperties.GetType() }).Where(x => x.Count() == 1)
+                    .Select(x => x.First());
+
+            return allFields;
+        }
+
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField
         {
             return (withHidden || !field.IsHidden) && !field.RawProperties.IsUIProperty();
+        }
+
+        public static bool IsComponentLike<T>(this T field) where T : IField
+        {
+            return field.RawProperties is ComponentFieldProperties || field.RawProperties is ComponentsFieldProperties;
         }
 
         public static bool IsUI<T>(this T field) where T : IField

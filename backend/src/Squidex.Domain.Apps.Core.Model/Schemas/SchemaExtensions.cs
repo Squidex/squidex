@@ -60,11 +60,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return schema.Properties.Label.Or(schema.Name);
         }
 
-        public static DomainId SingleId(this ReferencesFieldProperties properties)
-        {
-            return properties.SchemaIds?.Count == 1 ? properties.SchemaIds[0] : default;
-        }
-
         public static IEnumerable<RootField> ReferenceFields(this Schema schema)
         {
             return schema.RootFields(schema.FieldsInReferences);

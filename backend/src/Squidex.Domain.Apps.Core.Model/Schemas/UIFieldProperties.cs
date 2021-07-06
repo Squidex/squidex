@@ -7,10 +7,9 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class UIFieldProperties : FieldProperties
+    public sealed record UIFieldProperties : FieldProperties
     {
-        public UIFieldEditor Editor { get; set; }
+        public UIFieldEditor Editor { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

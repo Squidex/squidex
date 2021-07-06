@@ -13,9 +13,9 @@ import { AppDto, CallsUsageDto, fadeAnimation } from '@app/shared';
     styleUrls: ['./api-calls-summary-card.component.scss'],
     templateUrl: './api-calls-summary-card.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiCallsSummaryCardComponent implements OnChanges {
     @Input()

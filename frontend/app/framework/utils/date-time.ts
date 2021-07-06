@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -7,6 +7,7 @@
 
 import { addDays, addHours, addMilliseconds, addMinutes, addMonths, addSeconds, addYears, format, formatDistanceToNow, formatISO, parse, parseISO, startOfDay, startOfMonth, startOfTomorrow, startOfWeek, startOfYesterday } from 'date-fns';
 import { DateHelper } from './date-helper';
+import { Types } from './types';
 
 const DATE_FORMAT = 'yyyy-MM-dd';
 
@@ -98,7 +99,9 @@ export class DateTime {
             date = parseISO(value);
         }
 
-        if (isNaN(date.getTime())) {
+        const time = date.getTime();
+
+        if (Number.isNaN(time) || !Types.isNumber(time)) {
             return null;
         }
 
@@ -202,5 +205,4 @@ export class DateTime {
 
         return result;
     }
-
 }

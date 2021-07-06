@@ -26,7 +26,8 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             return field.Replace("_", "-");
         }
 
-        public static EdmComplexType BuildEdmType(this Schema schema, bool withHidden, PartitionResolver partitionResolver, EdmTypeFactory typeFactory)
+        public static EdmComplexType BuildEdmType(this Schema schema, bool withHidden, PartitionResolver partitionResolver, EdmTypeFactory typeFactory,
+            ResolvedComponents components)
         {
             Guard.NotNull(typeFactory, nameof(typeFactory));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
@@ -40,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
                     continue;
                 }
 
-                var fieldEdmType = EdmTypeVisitor.BuildType(field, typeFactory);
+                var fieldEdmType = EdmTypeVisitor.BuildType(field, typeFactory, components);
 
                 if (fieldEdmType == null)
                 {

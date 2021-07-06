@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing
         protected MongoEventStoreFixture(string connectionString)
         {
             mongoClient = new MongoClient(connectionString);
-            mongoDatabase = mongoClient.GetDatabase($"EventStoreTest");
+            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
 
             BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.DefaultSettings()));
 

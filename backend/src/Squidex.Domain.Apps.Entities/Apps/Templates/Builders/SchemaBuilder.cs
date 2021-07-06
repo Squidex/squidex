@@ -34,8 +34,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public SchemaBuilder WithLabel(string? label)
         {
-            command.Properties ??= new SchemaProperties();
-            command.Properties.Label = label;
+            if (command.Properties == null)
+            {
+                command.Properties = new SchemaProperties { Label = label };
+            }
+            else
+            {
+                command.Properties = command.Properties with { Label = label };
+            }
 
             return this;
         }
@@ -56,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public SchemaBuilder Singleton()
         {
-            command.IsSingleton = true;
+            command.Type = SchemaType.Singleton;
 
             return this;
         }
@@ -129,6 +135,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             var field = AddField<TagsFieldProperties>(name);
 
             configure(new TagsFieldBuilder(field, command));
+
+            return this;
+        }
+
+        public SchemaBuilder AddArray(string name, Action<ArrayFieldBuilder> configure)
+        {
+            var field = AddField<ArrayFieldProperties>(name);
+
+            configure(new ArrayFieldBuilder(field, command));
 
             return this;
         }

@@ -24,9 +24,9 @@ interface State {
     styleUrls: ['./assets-selector.component.scss'],
     templateUrl: './assets-selector.component.html',
     providers: [
-        ComponentAssetsState
+        ComponentAssetsState,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetsSelectorComponent extends StatefulComponent<State> implements OnInit {
     @Output()
@@ -34,12 +34,12 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
 
     constructor(changeDector: ChangeDetectorRef,
         public readonly assetsState: ComponentAssetsState,
-        public readonly localStore: LocalStoreService
+        public readonly localStore: LocalStoreService,
     ) {
         super(changeDector, {
             selectedAssets: {},
             selectionCount: 0,
-            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE)
+            isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
         });
     }
 

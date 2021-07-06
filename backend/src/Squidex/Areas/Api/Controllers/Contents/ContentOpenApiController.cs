@@ -64,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var openApiDocument = schemasOpenApiGenerator.Generate(HttpContext, App, schemas);
+            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas);
 
             return Content(openApiDocument.ToJson(), "application/json");
         }
@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var openApiDocument = schemasOpenApiGenerator.Generate(HttpContext, App, schemas, true);
+            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, true);
 
             return Content(openApiDocument.ToJson(), "application/json");
         }

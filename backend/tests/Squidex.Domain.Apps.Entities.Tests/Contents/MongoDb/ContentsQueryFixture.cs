@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public ContentsQueryFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("QueryTests");
+            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
 
             SetupJson();
 
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             ContentRepository =
                 new MongoContentRepository(
                     mongoDatabase,
-                    appProvider, false);
+                    appProvider);
 
             Task.Run(async () =>
             {

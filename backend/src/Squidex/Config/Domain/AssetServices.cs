@@ -53,7 +53,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
 
-            services.AddSingletonAs<RepairFiles>()
+            services.AddSingletonAs<RebuildFiles>()
                 .AsSelf();
 
             services.AddTransientAs<AssetHistoryEventsCreator>()
@@ -84,6 +84,9 @@ namespace Squidex.Config.Domain
                 .As<IAssetMetadataSource>();
 
             services.AddSingletonAs<ImageAssetMetadataSource>()
+                .As<IAssetMetadataSource>();
+
+            services.AddSingletonAs<SvgAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
         }
 

@@ -7,7 +7,7 @@
 
 import { of } from 'rxjs';
 import { Mock } from 'typemoq';
-import { AppsState, AuthService, DateTime, FieldPropertiesDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemaPropertiesDto, Version } from './../';
+import { AppsState, AuthService, DateTime, FieldPropertiesDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemaPropertiesDto, Version } from './../';
 
 const app = 'my-app';
 const creation = DateTime.today().addDays(-2);
@@ -42,16 +42,18 @@ type SchemaValues = {
 function createSchema({ properties, id, fields, fieldsInLists, fieldsInReferences, fieldRules }: SchemaValues = {}) {
     id = id || 1;
 
-    return new SchemaDetailsDto({},
-        `schema${1}`,
-        `schema${1}`,
-        'category',
-        properties || new SchemaPropertiesDto(), false, true,
+    return new SchemaDto({},
+        `schema${id}`,
         creation,
         creator,
         modified,
         modifier,
         new Version('1'),
+        `schema-name${id}`,
+        `schema-category${id}`,
+        'Default',
+        true,
+        properties || new SchemaPropertiesDto(),
         fields,
         fieldsInLists || [],
         fieldsInReferences || [],
@@ -61,10 +63,10 @@ function createSchema({ properties, id, fields, fieldsInLists, fieldsInReference
 type FieldValues = {
     id?: number;
     properties: FieldPropertiesDto;
-    isDisabled?: boolean,
-    isHidden?: boolean,
+    isDisabled?: boolean;
+    isHidden?: boolean;
     partitioning?: string;
-    nested?: ReadonlyArray<NestedFieldDto>
+    nested?: ReadonlyArray<NestedFieldDto>;
 };
 
 function createField({ properties, id, partitioning, isDisabled, nested }: FieldValues) {
@@ -91,5 +93,5 @@ export const TestValues = {
     modified,
     modifier,
     newVersion,
-    version
+    version,
 };

@@ -11,6 +11,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     selector: 'sqx-code',
     styleUrls: ['./code.component.scss'],
     templateUrl: './code.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeComponent {}

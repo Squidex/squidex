@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -80,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var childFolderId1 = DomainId.NewGuid();
             var childFolderId2 = DomainId.NewGuid();
 
-            A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
+            A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
                 .Returns(new List<DomainId> { childFolderId1, childFolderId2 });
 
             await sut.On(Envelope.Create(@event));
@@ -100,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var childId1 = DomainId.NewGuid();
             var childId2 = DomainId.NewGuid();
 
-            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
+            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
                 .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));
@@ -123,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1)))
                 .Throws(new InvalidOperationException());
 
-            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
+            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
                 .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));

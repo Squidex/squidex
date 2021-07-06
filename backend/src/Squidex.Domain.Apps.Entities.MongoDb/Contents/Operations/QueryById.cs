@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -15,7 +16,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryById : OperationBase
     {
-        public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id)
+        public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id,
+            CancellationToken ct)
         {
             Guard.NotNull(schema, nameof(schema));
 
@@ -23,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var find = Collection.Find(x => x.DocumentId == documentId);
 
-            var contentEntity = await find.FirstOrDefaultAsync();
+            var contentEntity = await find.FirstOrDefaultAsync(ct);
 
             if (contentEntity != null)
             {

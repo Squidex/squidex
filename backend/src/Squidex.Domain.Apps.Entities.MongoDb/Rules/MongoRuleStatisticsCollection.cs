@@ -39,7 +39,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return "RuleStatistics";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<RuleStatistics> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<RuleStatistics> collection,
+            CancellationToken ct)
         {
             return collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<RuleStatistics>(
@@ -49,9 +50,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 cancellationToken: ct);
         }
 
-        public async Task<IReadOnlyList<RuleStatistics>> QueryByAppAsync(DomainId appId)
+        public async Task<IReadOnlyList<RuleStatistics>> QueryByAppAsync(DomainId appId,
+            CancellationToken ct)
         {
-            var statistics = await Collection.Find(x => x.AppId == appId).ToListAsync();
+            var statistics = await Collection.Find(x => x.AppId == appId).ToListAsync(ct);
 
             return statistics;
         }

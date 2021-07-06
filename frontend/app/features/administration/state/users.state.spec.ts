@@ -53,7 +53,7 @@ describe('UsersState', () => {
 
         it('should reset loading state if loading failed', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => throwError('error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             usersState.load().pipe(onErrorResumeNext()).subscribe();
 
@@ -136,11 +136,11 @@ describe('UsersState', () => {
 
         it('should return null on select if user is not found', () => {
             usersService.setup(x => x.getUser('unknown'))
-                .returns(() => throwError({})).verifiable();
+                .returns(() => throwError(() => 'Service Error')).verifiable();
 
             let userSelected: UserDto;
 
-            usersState.select('unknown').subscribe(x => {
+            usersState.select('unknown').pipe(onErrorResumeNext()).subscribe(x => {
                 userSelected = x!;
             }).unsubscribe();
 
@@ -234,7 +234,7 @@ describe('UsersState', () => {
         it('should update selected user if reloaded', () => {
             const newUsers = [
                 createUser(1, '_new'),
-                createUser(2, '_new')
+                createUser(2, '_new'),
             ];
 
             usersService.setup(x => x.getUsers(10, 0, undefined))

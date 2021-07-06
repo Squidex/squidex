@@ -5,9 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-// tslint:disable: directive-class-suffix
-
 import { ChangeDetectorRef, Directive, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
@@ -59,7 +56,7 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
 
     protected constructor(
         private readonly changeDetector: ChangeDetectorRef,
-        state: T
+        state: T,
     ) {
         super(state);
 
@@ -124,8 +121,8 @@ export abstract class StatefulControlComponent<T extends {}, TValue> extends Sta
         this.onDisabled(this.snapshot.isDisabled);
     }
 
-    public onDisabled(isDisabled: boolean) {
-        return;
+    public onDisabled(_isDisabled: boolean) {
+        /* NOOP */
     }
 
     public abstract writeValue(obj: any): void;

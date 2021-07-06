@@ -19,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
         public CounterJintExtension(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 

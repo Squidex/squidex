@@ -1,10 +1,16 @@
-const webpack = require('webpack'), path = require('path');
+/* eslint-disable no-useless-escape */
+/* eslint-disable global-require */
+
+const webpack = require('webpack');
+const path = require('path');
 
 const appRoot = path.resolve(__dirname, '..');
 
 function root() {
-    var newArgs = Array.prototype.slice.call(arguments, 0);
+    // eslint-disable-next-line prefer-rest-params
+    const newArgs = Array.prototype.slice.call(arguments, 0);
 
+    // eslint-disable-next-line prefer-spread
     return path.join.apply(path, [appRoot].concat(newArgs));
 }
 
@@ -32,36 +38,40 @@ const plugins = {
     // https://www.npmjs.com/package/@angular-devkit/build-optimizer
     BuildOptimizerWebpackPlugin: require('@angular-devkit/build-optimizer').BuildOptimizerWebpackPlugin,
     // https://webpack.js.org/plugins/copy-webpack-plugin/
-    CopyPlugin: require('copy-webpack-plugin')
+    CopyPlugin: require('copy-webpack-plugin'),
+    // https://www.npmjs.com/package/webpack-filter-warnings-plugin
+    FilterWarningsPlugin: require('webpack-filter-warnings-plugin'),
 };
 
-module.exports = function (env) {
-    const isDevServer = path.basename(require.main.filename) === 'webpack-dev-server.js';
+module.exports = function calculateConfig(env) {
     const isProduction = env && env.production;
-    const isTests = env && env.target === 'tests';
-    const isTestCoverage = env && env.coverage;
     const isAnalyzing = isProduction && env.analyze;
-    const isAot = !isDevServer && !isTests && !isTestCoverage;
+    const isDevServer = env.WEBPACK_SERVE;
+    const isTestCoverage = env && env.coverage;
+    const isTests = env && env.target === 'tests';
 
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
+
+    // eslint-disable-next-line no-console
+    console.log(`Use ${configFile}, Production: ${isProduction}`);
 
     const config = {
         mode: isProduction ? 'production' : 'development',
 
-        /**
+        /*
          * Source map for Karma from the help of karma-sourcemap-loader & karma-webpack.
          *
          * See: https://webpack.js.org/configuration/devtool/
          */
         devtool: isProduction ? false : 'inline-source-map',
 
-        /**
+        /*
          * Options affecting the resolving of modules.
          *
          * See: https://webpack.js.org/configuration/resolve/
          */
         resolve: {
-            /**
+            /*
              * An array of extensions that should be used to resolve modules.
              *
              * See: https://webpack.js.org/configuration/resolve/#resolve-extensions
@@ -70,88 +80,93 @@ module.exports = function (env) {
             modules: [
                 root('app'),
                 root('app', 'theme'),
-                root('node_modules')
+                root('node_modules'),
             ],
 
             plugins: [
                 new plugins.TsconfigPathsPlugin({
-                    configFile
-                })
-            ]
+                    configFile,
+                }),
+            ],
         },
 
-        /**
+        /*
          * Options affecting the normal modules.
          *
          * See: https://webpack.js.org/configuration/module/
          */
         module: {
-            /**
+            /*
              * An array of Rules which are matched to requests when modules are created.
              *
              * See: https://webpack.js.org/configuration/module/#module-rules
              */
             rules: [{
                 test: /\.mjs$/,
-                type: "javascript/auto",
-                include: [/node_modules/]
+                type: 'javascript/auto',
+                include: [/node_modules/],
             }, {
+                // Mark files inside `@angular/core` as using SystemJS style dynamic imports.
                 test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
                 parser: { system: true },
-                include: [/node_modules/]
+                include: [/node_modules/],
             }, {
                 test: /\.js\.flow$/,
                 use: [{
-                    loader: 'ignore-loader'
+                    loader: 'ignore-loader',
                 }],
-                include: [/node_modules/]
+                include: [/node_modules/],
             }, {
                 test: /\.map$/,
                 use: [{
-                    loader: 'ignore-loader'
+                    loader: 'ignore-loader',
                 }],
-                include: [/node_modules/]
+                include: [/node_modules/],
             }, {
                 test: /\.d\.ts$/,
                 use: [{
-                    loader: 'ignore-loader'
+                    loader: 'ignore-loader',
                 }],
-                include: [/node_modules/]
+                include: [/node_modules/],
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader',
                     options: {
+                        name: '[name].[hash].[ext]',
+
+                        // Store the assets in custom path because of fonts need relative urls.
                         outputPath: 'assets',
-                        /*
-                        * Use custom public path as ./ is not supported by fonts.
-                        */
-                        publicPath: isDevServer ? undefined : 'assets'
-                    }
-                }]
+
+                        // Use custom public path as ./ is not supported by fonts.
+                        publicPath: isDevServer ? undefined : 'assets',
+                    },
+                }],
             }, {
                 test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
                 use: [{
-                    loader: 'file-loader?name=[name].[hash].[ext]',
+                    loader: 'file-loader',
                     options: {
-                        outputPath: 'assets'
-                    }
-                }]
+                        name: '[name].[hash].[ext]',
+                        // Store the assets in custom path because of fonts need relative urls.
+                        outputPath: 'assets',
+                    },
+                }],
             }, {
                 test: /\.css$/,
                 use: [
                     plugins.MiniCssExtractPlugin.loader,
                     {
-                        loader: 'css-loader'
+                        loader: 'css-loader',
                     }, {
-                        loader: 'postcss-loader'
-                    }]
+                        loader: 'postcss-loader',
+                    }],
             }, {
                 test: /\.scss$/,
                 use: [{
-                    loader: 'raw-loader'
+                    loader: 'raw-loader',
                 }, {
-                    loader: 'postcss-loader'
+                    loader: 'postcss-loader',
                 }, {
                     loader: 'sass-loader',
                     options: {
@@ -160,54 +175,82 @@ module.exports = function (env) {
                             @import '_mixins';
                         `,
                         sassOptions: {
-                            includePaths: [root('app', 'theme')]
-                        }
-                    }
+                            includePaths: [root('app', 'theme')],
+                        },
+                    },
                 }],
-                exclude: root('app', 'theme')
-            }]
+                exclude: root('app', 'theme'),
+            }],
+        },
+
+        performance: {
+            hints: false,
         },
 
         plugins: [
-            new webpack.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)fesm5/, root('./app'), {}),
+            new plugins.FilterWarningsPlugin({
+                exclude: /System.import/,
+            }),
 
-            /**
+            /*
+             * Always replace the context for the System.import in angular/core to prevent warnings.
+             */
+            new webpack.ContextReplacementPlugin(
+                /\@angular(\\|\/)core(\\|\/)/,
+                root('./app', '$_lazy_route_resources'),
+                {},
+            ),
+
+            new plugins.NgToolsWebpack.AngularWebpackPlugin({
+                tsconfig: configFile,
+                // Load directly from file system and skip webpack.
+                directTemplateLoading: true,
+
+                // Only run in aot compiler in production.
+                jitMode: !isProduction,
+            }),
+
+            /*
              * Puts each bundle into a file and appends the hash of the file to the path.
-             * 
+             *
              * See: https://github.com/webpack-contrib/mini-css-extract-plugin
              */
             new plugins.MiniCssExtractPlugin({
-                filename: '[name].css'
+                filename: '[name].css',
             }),
 
             new webpack.LoaderOptionsPlugin({
                 options: {
                     htmlLoader: {
-                        /**
+                        /*
                          * Define the root for images, so that we can use absolute urls.
-                         * 
+                         *
                          * See: https://github.com/webpack/html-loader#Advanced_Options
                          */
-                        root: root('app', 'images')
+                        root: root('app', 'images'),
                     },
-                    context: '/'
-                }
+                    context: '/',
+                },
             }),
 
             new plugins.StylelintPlugin({
                 files: '**/*.scss'
             }),
 
-            /**
+            /*
              * Detect circular dependencies in app.
-             * 
+             *
              * See: https://github.com/aackerman/circular-dependency-plugin
              */
             new plugins.CircularDependencyPlugin({
                 exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
                 // Add errors to webpack instead of warnings
-                failOnError: true
+                failOnError: true,
             }),
+
+            /*
+             * Copy lazy loaded libraries to output.
+             */
             new plugins.CopyPlugin({
                 patterns: [
                     { from: './node_modules/simplemde/dist', to: 'dependencies/simplemde' },
@@ -225,11 +268,11 @@ module.exports = function (env) {
                     { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce' },
 
                     { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
-                    { from: './node_modules/ace-builds/src-min/mode-*.js', to: 'dependencies/ace/[name].[ext]' },
-                    { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace/[name].[ext]' },
-                    { from: './node_modules/ace-builds/src-min/snippets', to: 'dependencies/ace/snippets' },
-                    { from: './node_modules/ace-builds/src-min/ext-modelist.js', to: 'dependencies/ace/ext/modelist.js' },
                     { from: './node_modules/ace-builds/src-min/ext-language_tools.js', to: 'dependencies/ace/ext/language_tools.js' },
+                    { from: './node_modules/ace-builds/src-min/ext-modelist.js', to: 'dependencies/ace/ext/modelist.js' },
+                    { from: './node_modules/ace-builds/src-min/mode-*.js', to: 'dependencies/ace/[name][ext]' },
+                    { from: './node_modules/ace-builds/src-min/snippets', to: 'dependencies/ace/snippets' },
+                    { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace/[name][ext]' },
 
                     { from: './node_modules/video.js/dist/video.min.js', to: 'dependencies/videojs' },
                     { from: './node_modules/video.js/dist/video-js.min.css', to: 'dependencies/videojs' },
@@ -244,27 +287,27 @@ module.exports = function (env) {
 
         devServer: {
             headers: {
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
             },
             historyApiFallback: true,
-        }
+        },
     };
 
     if (!isTests) {
-        /**
+        /*
          * The entry point for the bundle. Our Angular app.
          *
          * See: https://webpack.js.org/configuration/entry-context/
          */
         config.entry = {
-            'shims': './app/shims.ts',
-            'style': './app/style.js',
-              'app': './app/app.ts'
+            shims: './app/shims.ts',
+            style: './app/style.js',
+              app: './app/app.ts',
         };
 
         if (isProduction) {
             config.output = {
-                /**
+                /*
                  * The output directory as absolute path (required).
                  *
                  * See: https://webpack.js.org/configuration/output/#output-path
@@ -273,38 +316,39 @@ module.exports = function (env) {
 
                 publicPath: './build/',
 
-                /**
+                /*
                  * Specifies the name of each output file on disk.
                  *
                  * See: https://webpack.js.org/configuration/output/#output-filename
                  */
                 filename: '[name].js',
 
-                /**
+                /*
                  * The filename of non-entry chunks as relative path inside the output.path directory.
                  *
                  * See: https://webpack.js.org/configuration/output/#output-chunkfilename
                  */
-                chunkFilename: '[id].[hash].chunk.js'
+                chunkFilename: '[id].[fullhash].chunk.js',
             };
         } else {
             config.output = {
                 filename: '[name].js',
 
-                /**
+                /*
                  * Set the public path, because we are running the website from another port (5000).
                  */
-                publicPath: 'https://localhost:3000/'
+                publicPath: 'https://localhost:3000/',
             };
         }
 
         config.plugins.push(
             new plugins.HtmlWebpackPlugin({
+                filename: 'index.html',
                 hash: true,
                 chunks: ['shims', 'app'],
                 chunksSortMode: 'manual',
-                template: 'app/index.html'
-            })
+                template: root('app', 'index.html'),
+            }),
         );
 
         config.plugins.push(
@@ -313,35 +357,19 @@ module.exports = function (env) {
                 hash: true,
                 chunks: ['style'],
                 chunksSortMode: 'none',
-                template: 'app/_theme.html'
-            })
+                template: root('app', '_theme.html'),
+            }),
         );
 
-        config.plugins.push(
-            new plugins.TsLintPlugin({
-                files: ['./app/**/*.ts'],
-                /**
-                 * Path to a configuration file.
-                 */
-                config: root('tslint.json'),
-                /**
-                 * Wait for linting and fail the build when linting error occur.
-                 */
-                waitForLinting: isProduction
-            })
-        );
-    }
-
-    if (!isTestCoverage) {
-        config.plugins.push(
-            new plugins.NgToolsWebpack.AngularCompilerPlugin({
-                directTemplateLoading: true,
-                entryModule: 'app/app.module#AppModule',
-                skipCodeGeneration: !isAot,
-                sourceMap: !isProduction,
-                tsConfigPath: configFile
-            })
-        );
+        if (isProduction) {
+            config.plugins.push(
+                new plugins.ESLintPlugin({
+                    files: [
+                        './app/**/*.ts',
+                    ],
+                }),
+            );
+        }
     }
 
     if (isProduction) {
@@ -353,19 +381,15 @@ module.exports = function (env) {
                         ecma: 5,
                         mangle: true,
                         output: {
-                            comments: false
+                            comments: false,
                         },
-                        safari10: true
+                        safari10: true,
                     },
-                    extractComments: true
+                    extractComments: true,
                 }),
 
-                new plugins.OptimizeCSSAssetsPlugin({})
-            ]
-        };
-
-        config.performance = {
-            hints: false
+                new plugins.OptimizeCSSAssetsPlugin({}),
+            ],
         };
 
         config.plugins.push(new plugins.BuildOptimizerWebpackPlugin());
@@ -375,39 +399,42 @@ module.exports = function (env) {
             use: [{
                 loader: '@angular-devkit/build-optimizer/webpack-loader',
                 options: {
-                    sourceMap: false
-                }
-            }]
+                    sourceMap: false,
+                },
+            }],
         });
     }
 
     if (isTestCoverage) {
         // Do not instrument tests.
         config.module.rules.push({
-            test: /\.ts$/,
+            test: /\.[jt]sx?$/,
             use: [{
-                loader: 'ts-loader'
+                loader: '@ngtools/webpack',
             }],
             include: [/\.(e2e|spec)\.ts$/],
         });
 
         // Use instrument loader for all normal files.
         config.module.rules.push({
-            test: /\.ts$/,
+            test: /\.[jt]sx?$/,
             use: [{
-                loader: 'istanbul-instrumenter-loader?esModules=true'
+                loader: 'istanbul-instrumenter-loader',
+                options: {
+                    esModules: true,
+                },
             }, {
-                loader: 'ts-loader'
+                loader: '@ngtools/webpack',
             }],
-            exclude: [/\.(e2e|spec)\.ts$/]
+            exclude: [/\.(e2e|spec)\.ts$/],
         });
     } else {
         config.module.rules.push({
-            test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+            test: /\.[jt]sx?$/,
             use: [{
-                loader: plugins.NgToolsWebpack.NgToolsLoader
-            }]
-        })
+                loader: '@ngtools/webpack',
+            }],
+        });
     }
 
     if (isProduction) {
@@ -415,17 +442,17 @@ module.exports = function (env) {
             test: /\.scss$/,
             /*
              * Extract the content from a bundle to a file.
-             * 
+             *
              * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
              */
             use: [
                 plugins.MiniCssExtractPlugin.loader,
                 {
-                    loader: 'css-loader'
+                    loader: 'css-loader',
                 }, {
-                    loader: 'postcss-loader'
+                    loader: 'postcss-loader',
                 }, {
-                    loader: 'sass-loader'
+                    loader: 'sass-loader',
                 }],
             /*
              * Do not include component styles.
@@ -436,21 +463,19 @@ module.exports = function (env) {
         config.module.rules.push({
             test: /\.scss$/,
             use: [{
-                loader: 'style-loader'
+                loader: 'style-loader',
             }, {
-                loader: 'css-loader'
+                loader: 'css-loader',
             }, {
-                loader: 'postcss-loader'
+                loader: 'postcss-loader',
             }, {
                 loader: 'sass-loader',
                 options: {
-                    sourceMap: true
-                }
+                    sourceMap: true,
+                },
             }],
-            /*
-             * Do not include component styles.
-             */
-            include: root('app', 'theme')
+            // Do not include component styles.
+            include: root('app', 'theme'),
         });
     }
 

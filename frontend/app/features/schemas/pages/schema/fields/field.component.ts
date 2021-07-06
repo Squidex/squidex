@@ -8,22 +8,22 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDetailsDto, SchemasState, sorted } from '@app/shared';
+import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-field',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
     animations: [
-        fadeAnimation
-    ]
+        fadeAnimation,
+    ],
 })
 export class FieldComponent implements OnChanges {
     @Input()
     public field: NestedFieldDto | RootFieldDto;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     @Input()
     public parent: RootFieldDto;
@@ -51,7 +51,7 @@ export class FieldComponent implements OnChanges {
 
     constructor(
         private readonly formBuilder: FormBuilder,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
         this.trackByFieldFn = this.trackByField.bind(this);
     }
@@ -94,7 +94,7 @@ export class FieldComponent implements OnChanges {
     }
 
     public sortFields(event: CdkDragDrop<ReadonlyArray<NestedFieldDto>>) {
-        this.schemasState.orderFields(this.schema, sorted(event), <any>this.field).subscribe();
+        this.schemasState.orderFields(this.schema, sorted(event), this.field as any).subscribe();
     }
 
     public lockField() {

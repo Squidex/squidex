@@ -14,8 +14,8 @@ import { Settings } from '@app/shared/state/settings';
     styleUrls: ['./assets-page.component.scss'],
     templateUrl: './assets-page.component.html',
     providers: [
-        Router2State
-    ]
+        Router2State,
+    ],
 })
 export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public queries = new Queries(this.uiState, 'assets');
@@ -28,7 +28,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         public readonly assetsRoute: Router2State,
         public readonly assetsState: AssetsState,
         private readonly localStore: LocalStoreService,
-        private readonly uiState: UIState
+        private readonly uiState: UIState,
     ) {
         super();
 

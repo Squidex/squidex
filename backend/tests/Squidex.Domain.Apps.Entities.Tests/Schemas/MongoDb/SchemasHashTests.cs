@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -59,11 +58,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
 
             await _.SchemasHash.On(new[]
             {
-                Envelope.Create<IEvent>(new AppCreated
-                {
-                    AppId = NamedId.Of(app.Id, "my-app")
-                }).SetEventStreamNumber(app.Version).SetTimestamp(timestamp),
-
                 Envelope.Create<IEvent>(new SchemaCreated
                 {
                     AppId = NamedId.Of(app.Id, "my-app"),
@@ -77,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
                 }).SetEventStreamNumber(schema2.Version).SetTimestamp(timestamp)
             });
 
-            var (dbTime, dbHash) = await _.SchemasHash.GetCurrentHashAsync(app.Id);
+            var (dbTime, dbHash) = await _.SchemasHash.GetCurrentHashAsync(app);
 
             Assert.Equal(dbHash, computedHash);
             Assert.Equal(dbTime, timestamp);

@@ -60,13 +60,13 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new[]
+            var commit = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
             };
 
-            await Assert.ThrowsAsync<WrongEventVersionException>(() => Sut.AppendAsync(Guid.NewGuid(), streamName, 0, events));
+            await Assert.ThrowsAsync<WrongEventVersionException>(() => Sut.AppendAsync(Guid.NewGuid(), streamName, 0, commit));
         }
 
         [Fact]
@@ -74,15 +74,15 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new[]
+            var commit = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
             };
 
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit);
 
-            await Assert.ThrowsAsync<WrongEventVersionException>(() => Sut.AppendAsync(Guid.NewGuid(), streamName, 0, events));
+            await Assert.ThrowsAsync<WrongEventVersionException>(() => Sut.AppendAsync(Guid.NewGuid(), streamName, 0, commit));
         }
 
         [Fact]
@@ -90,21 +90,30 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new[]
+            var commit1 = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
             };
 
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+            var commit2 = new[]
+            {
+                CreateEventData(1),
+                CreateEventData(2)
+            };
+
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit1);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit2);
 
             var readEvents1 = await QueryAsync(streamName);
             var readEvents2 = await QueryAllAsync(streamName);
 
             var expected = new[]
             {
-                new StoredEvent(streamName, "Position", 0, events[0]),
-                new StoredEvent(streamName, "Position", 1, events[1])
+                new StoredEvent(streamName, "Position", 0, commit1[0]),
+                new StoredEvent(streamName, "Position", 1, commit1[1]),
+                new StoredEvent(streamName, "Position", 2, commit2[0]),
+                new StoredEvent(streamName, "Position", 3, commit2[1])
             };
 
             ShouldBeEquivalentTo(readEvents1, expected);
@@ -116,7 +125,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new[]
+            var commit1 = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
@@ -124,7 +133,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await Sut.AppendUnsafeAsync(new List<EventCommit>
             {
-                new EventCommit(Guid.NewGuid(), streamName, -1, events)
+                new EventCommit(Guid.NewGuid(), streamName, -1, commit1)
             });
 
             var readEvents1 = await QueryAsync(streamName);
@@ -132,8 +141,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var expected = new[]
             {
-                new StoredEvent(streamName, "Position", 0, events[0]),
-                new StoredEvent(streamName, "Position", 1, events[1])
+                new StoredEvent(streamName, "Position", 0, commit1[0]),
+                new StoredEvent(streamName, "Position", 1, commit1[1])
             };
 
             ShouldBeEquivalentTo(readEvents1, expected);
@@ -145,7 +154,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new[]
+            var commit1 = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
@@ -153,13 +162,13 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var readEvents = await QueryWithSubscriptionAsync(streamName, async () =>
             {
-                await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+                await Sut.AppendAsync(Guid.NewGuid(), streamName, commit1);
             });
 
             var expected = new[]
             {
-                new StoredEvent(streamName, "Position", 0, events[0]),
-                new StoredEvent(streamName, "Position", 1, events[1])
+                new StoredEvent(streamName, "Position", 0, commit1[0]),
+                new StoredEvent(streamName, "Position", 1, commit1[1])
             };
 
             ShouldBeEquivalentTo(readEvents, expected);
@@ -170,7 +179,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events1 = new[]
+            var commit1 = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
@@ -179,10 +188,10 @@ namespace Squidex.Infrastructure.EventSourcing
             // Append and read in parallel.
             await QueryWithSubscriptionAsync(streamName, async () =>
             {
-                await Sut.AppendAsync(Guid.NewGuid(), streamName, events1);
+                await Sut.AppendAsync(Guid.NewGuid(), streamName, commit1);
             });
 
-            var events2 = new[]
+            var commit2 = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
@@ -191,23 +200,23 @@ namespace Squidex.Infrastructure.EventSourcing
             // Append and read in parallel.
             var readEventsFromPosition = await QueryWithSubscriptionAsync(streamName, async () =>
             {
-                await Sut.AppendAsync(Guid.NewGuid(), streamName, events2);
+                await Sut.AppendAsync(Guid.NewGuid(), streamName, commit2);
             });
 
             var expectedFromPosition = new[]
             {
-                new StoredEvent(streamName, "Position", 2, events2[0]),
-                new StoredEvent(streamName, "Position", 3, events2[1])
+                new StoredEvent(streamName, "Position", 2, commit2[0]),
+                new StoredEvent(streamName, "Position", 3, commit2[1])
             };
 
             var readEventsFromBeginning = await QueryWithSubscriptionAsync(streamName, fromBeginning: true);
 
             var expectedFromBeginning = new[]
             {
-                new StoredEvent(streamName, "Position", 0, events1[0]),
-                new StoredEvent(streamName, "Position", 1, events1[1]),
-                new StoredEvent(streamName, "Position", 2, events2[0]),
-                new StoredEvent(streamName, "Position", 3, events2[1])
+                new StoredEvent(streamName, "Position", 0, commit1[0]),
+                new StoredEvent(streamName, "Position", 1, commit1[1]),
+                new StoredEvent(streamName, "Position", 2, commit2[0]),
+                new StoredEvent(streamName, "Position", 3, commit2[1])
             };
 
             ShouldBeEquivalentTo(readEventsFromPosition?.TakeLast(2), expectedFromPosition);
@@ -219,13 +228,13 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new[]
+            var commit = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
             };
 
-            await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, commit);
 
             var firstRead = await QueryAsync(streamName);
 
@@ -234,7 +243,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var expected = new[]
             {
-                new StoredEvent(streamName, "Position", 1, events[1])
+                new StoredEvent(streamName, "Position", 1, commit[1])
             };
 
             ShouldBeEquivalentTo(readEvents1, expected);
@@ -247,33 +256,33 @@ namespace Squidex.Infrastructure.EventSourcing
             var streamName1 = $"test-{Guid.NewGuid()}";
             var streamName2 = $"test-{Guid.NewGuid()}";
 
-            var events1 = new[]
+            var stream1Commit = new[]
             {
                 CreateEventData(1),
                 CreateEventData(2)
             };
 
-            var events2 = new[]
+            var stream2Commit = new[]
             {
                 CreateEventData(3),
                 CreateEventData(4)
             };
 
-            await Sut.AppendAsync(Guid.NewGuid(), streamName1, events1);
-            await Sut.AppendAsync(Guid.NewGuid(), streamName2, events2);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName1, stream1Commit);
+            await Sut.AppendAsync(Guid.NewGuid(), streamName2, stream2Commit);
 
             var readEvents = await Sut.QueryManyAsync(new[] { streamName1, streamName2 });
 
             var expected1 = new[]
             {
-                new StoredEvent(streamName1, "Position", 0, events1[0]),
-                new StoredEvent(streamName1, "Position", 1, events1[1])
+                new StoredEvent(streamName1, "Position", 0, stream1Commit[0]),
+                new StoredEvent(streamName1, "Position", 1, stream1Commit[1])
             };
 
             var expected2 = new[]
             {
-                new StoredEvent(streamName2, "Position", 0, events2[0]),
-                new StoredEvent(streamName2, "Position", 1, events2[1])
+                new StoredEvent(streamName2, "Position", 0, stream2Commit[0]),
+                new StoredEvent(streamName2, "Position", 1, stream2Commit[1])
             };
 
             ShouldBeEquivalentTo(readEvents[streamName1], expected1);

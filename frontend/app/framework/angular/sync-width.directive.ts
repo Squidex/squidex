@@ -9,7 +9,7 @@ import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular
 import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
-    selector: '[sqxSyncWidth]'
+    selector: '[sqxSyncWidth]',
 })
 export class SyncWidthDirective extends ResourceOwner implements AfterViewInit, ResizeListener {
     @Input('sqxSyncWidth')
@@ -18,7 +18,7 @@ export class SyncWidthDirective extends ResourceOwner implements AfterViewInit, 
     constructor(
         private readonly element: ElementRef<HTMLElement>,
         private readonly renderer: Renderer2,
-        private readonly resizeService: ResizeService
+        private readonly resizeService: ResizeService,
     ) {
         super();
 

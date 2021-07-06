@@ -24,8 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public BackupRules(IRulesIndex indexForRules)
         {
-            Guard.NotNull(indexForRules, nameof(indexForRules));
-
             this.indexForRules = indexForRules;
         }
 

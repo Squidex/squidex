@@ -9,22 +9,24 @@ import { Directive, HostListener, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Directive({
-    selector: '[sqxTabRouterLink]'
+    selector: '[sqxTabRouterLink]',
 })
 export class TabRouterlinkDirective {
     @Input('sqxTabRouterLink')
-    public commands: any;
+    public commands: any[];
 
     constructor(
         private readonly router: Router,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
     ) {
     }
 
     @HostListener('click', ['$event'])
     public onClick(event: MouseEvent) {
-        const urlTree = this.router.createUrlTree(this.commands, {
-            relativeTo: this.route
+        const escaped = this.commands.map(x => encodeURIComponent(x));
+
+        const urlTree = this.router.createUrlTree(escaped, {
+            relativeTo: this.route,
         });
 
         if (event.ctrlKey) {

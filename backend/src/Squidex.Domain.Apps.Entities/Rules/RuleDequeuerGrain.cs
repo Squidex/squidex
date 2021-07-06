@@ -35,11 +35,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             IRuleEventRepository ruleEventRepository,
             ISemanticLog log, IClock clock)
         {
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(ruleService, nameof(ruleService));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(log, nameof(log));
-
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
 

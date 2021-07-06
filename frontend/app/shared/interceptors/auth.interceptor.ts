@@ -19,7 +19,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     constructor(apiUrlConfig: ApiUrlConfig,
         private readonly authService: AuthService,
-        private readonly router: Router
+        private readonly router: Router,
     ) {
         this.baseUrl = apiUrlConfig.buildUrl('');
     }
@@ -42,7 +42,7 @@ export class AuthInterceptor implements HttpInterceptor {
         req = req.clone({
             headers: req.headers
                 .set('Authorization', token)
-                .set('Pragma', 'no-cache')
+                .set('Pragma', 'no-cache'),
         });
 
         return next.handle(req).pipe(
@@ -65,11 +65,11 @@ export class AuthInterceptor implements HttpInterceptor {
 
                         return EMPTY;
                     } else {
-                        return throwError(new ErrorDto(403, 'i18n:common.errorNoPermission'));
+                        return throwError(() => new ErrorDto(403, 'i18n:common.errorNoPermission'));
                     }
                 }
 
-                return throwError(error);
+                return throwError(() => error);
             }));
     }
 }

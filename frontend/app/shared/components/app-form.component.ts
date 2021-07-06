@@ -13,7 +13,7 @@ import { ApiUrlConfig, AppsState, CreateAppForm } from '@app/shared/internal';
     selector: 'sqx-app-form',
     styleUrls: ['./app-form.component.scss'],
     templateUrl: './app-form.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppFormComponent {
     @Output()
@@ -27,7 +27,7 @@ export class AppFormComponent {
     constructor(
         public readonly apiUrl: ApiUrlConfig,
         private readonly appsStore: AppsState,
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
     ) {
     }
 

@@ -16,7 +16,7 @@ export interface AutocompleteSource {
 }
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true,
 };
 
 interface State {
@@ -40,12 +40,12 @@ const NO_EMIT = { emitEvent: false };
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
     providers: [
-        SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR
+        SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR,
     ],
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
     private timer: any;
@@ -93,7 +93,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
             suggestedItems: [],
-            suggestedIndex: -1
+            suggestedIndex: -1,
         });
     }
 
@@ -126,7 +126,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                                 finalize(() => {
                                     this.setLoading(false);
                                 }),
-                                catchError(() => of([]))
+                                catchError(() => of([])),
                             );
                         }
                     }))
@@ -134,7 +134,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                     this.next({
                         suggestedIndex: -1,
                         suggestedItems: items || [],
-                        isSearching: false
+                        isSearching: false,
                     });
                 }));
     }
@@ -159,12 +159,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public writeValue(obj: any) {
         if (!obj) {
             this.resetForm();
+        } else if (this.displayProperty && this.displayProperty.length > 0) {
+            this.queryInput.setValue(obj[this.displayProperty], NO_EMIT);
         } else {
-            if (this.displayProperty && this.displayProperty.length > 0) {
-                this.queryInput.setValue(obj[this.displayProperty], NO_EMIT);
-            } else {
-                this.queryInput.setValue(obj.toString(), NO_EMIT);
-            }
+            this.queryInput.setValue(obj.toString(), NO_EMIT);
         }
 
         this.resetState();

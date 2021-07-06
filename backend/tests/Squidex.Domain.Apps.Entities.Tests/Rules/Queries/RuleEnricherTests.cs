@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -64,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
                 LastExecuted = SystemClock.Instance.GetCurrentInstant()
             };
 
-            A.CallTo(() => ruleEventRepository.QueryStatisticsByAppAsync(appId.Id))
+            A.CallTo(() => ruleEventRepository.QueryStatisticsByAppAsync(appId.Id, A<CancellationToken>._))
                 .Returns(new List<RuleStatistics> { stats });
 
             await sut.EnrichAsync(source, requestContext);

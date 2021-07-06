@@ -9,6 +9,8 @@ export type FieldType =
     'Array' |
     'Assets' |
     'Boolean' |
+    'Component' |
+    'Components' |
     'DateTime' |
     'Json' |
     'Geolocation' |
@@ -18,41 +20,47 @@ export type FieldType =
     'Tags' |
     'UI';
 
-export const fieldTypes: ReadonlyArray<{ type: FieldType, description: string }> = [
+export const fieldTypes: ReadonlyArray<{ type: FieldType; description: string }> = [
     {
         type: 'String',
-        description: 'i18n:schemas.fieldTypes.string.description'
+        description: 'i18n:schemas.fieldTypes.string.description',
     }, {
         type: 'Assets',
-        description: 'i18n:schemas.fieldTypes.assets.description'
+        description: 'i18n:schemas.fieldTypes.assets.description',
     }, {
         type: 'Boolean',
-        description: 'i18n:schemas.fieldTypes.boolean.description'
+        description: 'i18n:schemas.fieldTypes.boolean.description',
+    }, {
+        type: 'Component',
+        description: 'i18n:schemas.fieldTypes.component.description',
+    }, {
+        type: 'Components',
+        description: 'i18n:schemas.fieldTypes.components.description',
     }, {
         type: 'DateTime',
-        description: 'i18n:schemas.fieldTypes.dateTime.description'
+        description: 'i18n:schemas.fieldTypes.dateTime.description',
     }, {
         type: 'Geolocation',
-        description: 'i18n:schemas.fieldTypes.geolocation.description'
+        description: 'i18n:schemas.fieldTypes.geolocation.description',
     }, {
         type: 'Json',
-        description: 'i18n:schemas.fieldTypes.json.description'
+        description: 'i18n:schemas.fieldTypes.json.description',
     }, {
         type: 'Number',
-        description: 'i18n:schemas.fieldTypes.number.description'
+        description: 'i18n:schemas.fieldTypes.number.description',
     }, {
         type: 'References',
-        description: 'i18n:schemas.fieldTypes.references.description'
+        description: 'i18n:schemas.fieldTypes.references.description',
     }, {
         type: 'Tags',
-        description: 'i18n:schemas.fieldTypes.tags.description'
+        description: 'i18n:schemas.fieldTypes.tags.description',
     }, {
         type: 'Array',
-        description: 'i18n:schemas.fieldTypes.array.description'
+        description: 'i18n:schemas.fieldTypes.array.description',
     }, {
         type: 'UI',
-        description: 'i18n:schemas.fieldTypes.ui.description'
-    }
+        description: 'i18n:schemas.fieldTypes.ui.description',
+    },
 ];
 
 export const fieldInvariant = 'iv';
@@ -69,6 +77,12 @@ export function createProperties(fieldType: FieldType, values?: any): FieldPrope
             break;
         case 'Boolean':
             properties = new BooleanFieldPropertiesDto();
+            break;
+        case 'Component':
+            properties = new ComponentFieldPropertiesDto();
+            break;
+        case 'Components':
+            properties = new ComponentsFieldPropertiesDto();
             break;
         case 'DateTime':
             properties = new DateTimeFieldPropertiesDto();
@@ -95,7 +109,7 @@ export function createProperties(fieldType: FieldType, values?: any): FieldPrope
             properties = new UIFieldPropertiesDto();
             break;
         default:
-            throw 'Invalid properties type';
+            throw new Error(`Unknown field type ${fieldType}.`);
     }
 
     if (values) {
@@ -111,6 +125,10 @@ export interface FieldPropertiesVisitor<T> {
     visitAssets(properties: AssetsFieldPropertiesDto): T;
 
     visitBoolean(properties: BooleanFieldPropertiesDto): T;
+
+    visitComponent(properties: ComponentFieldPropertiesDto): T;
+
+    visitComponents(properties: ComponentsFieldPropertiesDto): T;
 
     visitDateTime(properties: DateTimeFieldPropertiesDto): T;
 
@@ -174,7 +192,7 @@ export type AssetPreviewMode = 'ImageAndFileName' | 'Image' | 'FileName';
 export const ASSET_PREVIEW_MODES: ReadonlyArray<AssetPreviewMode> = [
     'ImageAndFileName',
     'Image',
-    'FileName'
+    'FileName',
 ];
 
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
@@ -212,7 +230,7 @@ export type BooleanFieldEditor = 'Checkbox' | 'Toggle';
 
 export const BOOLEAN_FIELD_EDITORS: ReadonlyArray<BooleanFieldEditor> = [
     'Checkbox',
-    'Toggle'
+    'Toggle',
 ];
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
@@ -232,11 +250,41 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
+export class ComponentFieldPropertiesDto extends FieldPropertiesDto {
+    public readonly fieldType = 'Component';
+
+    public readonly schemaIds?: ReadonlyArray<string>;
+
+    public get isComplexUI() {
+        return true;
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitComponent(this);
+    }
+}
+
+export class ComponentsFieldPropertiesDto extends FieldPropertiesDto {
+    public readonly fieldType = 'Components';
+
+    public readonly schemaIds?: ReadonlyArray<string>;
+    public readonly maxItems?: number;
+    public readonly minItems?: number;
+
+    public get isComplexUI() {
+        return true;
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitComponents(this);
+    }
+}
+
 export type DateTimeFieldEditor = 'DateTime' | 'Date';
 
 export const DATETIME_FIELD_EDITORS: ReadonlyArray<DateTimeFieldEditor> = [
     'DateTime',
-    'Date'
+    'Date',
 ];
 
 export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
@@ -245,6 +293,7 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
     public readonly calculatedDefaultValue?: string;
     public readonly defaultValue?: string;
     public readonly defaultValues?: DefaultValue<string>;
+    public readonly format?: string;
     public readonly editor: DateTimeFieldEditor = 'DateTime';
     public readonly maxValue?: string;
     public readonly minValue?: string;
@@ -292,7 +341,7 @@ export const NUMBER_FIELD_EDITORS: ReadonlyArray<NumberFieldEditor> = [
     'Input',
     'Radio',
     'Dropdown',
-    'Stars'
+    'Stars',
 ];
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
@@ -322,7 +371,7 @@ export const REFERENCES_FIELD_EDITORS: ReadonlyArray<ReferencesFieldEditor> = [
     'List',
     'Dropdown',
     'Checkboxes',
-    'Tags'
+    'Tags',
 ];
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
@@ -364,13 +413,13 @@ export const STRING_FIELD_EDITORS: ReadonlyArray<StringFieldEditor> = [
     'Radio',
     'Html',
     'StockPhoto',
-    'Color'
+    'Color',
 ];
 
 export const STRING_CONTENT_TYPES: ReadonlyArray<StringContentType> = [
     'Unspecified',
     'Markdown',
-    'Html'
+    'Html',
 ];
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
@@ -407,7 +456,7 @@ export type TagsFieldEditor = 'Tags' | 'Checkboxes' | 'Dropdown';
 export const TAGS_FIELD_EDITORS: ReadonlyArray<TagsFieldEditor> = [
     'Tags',
     'Checkboxes',
-    'Dropdown'
+    'Dropdown',
 ];
 
 export class TagsFieldPropertiesDto extends FieldPropertiesDto {

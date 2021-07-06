@@ -47,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Search
         [ApiCosts(0)]
         public async Task<IActionResult> GetSearchResults(string app, [FromQuery] string? query = null)
         {
-            var result = await searchManager.SearchAsync(query, Context);
+            var result = await searchManager.SearchAsync(query, Context, HttpContext.RequestAborted);
 
             var response = result.Select(SearchResultDto.FromSearchResult).ToArray();
 

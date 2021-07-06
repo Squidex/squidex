@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return builder;
         }
 
-        public OperationsBuilder Schema(Schema schema, bool flat)
+        public OperationsBuilder Schema(Schema schema, ResolvedComponents components, bool flat)
         {
             var typeName = schema.TypeName();
 
@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             var dataSchema = ResolveSchema($"{typeName}DataDto", () =>
             {
-                return schema.BuildDynamicJsonSchema(ResolveSchema);
+                return schema.BuildDynamicJsonSchema(ResolveSchema, components);
             });
 
             var contentSchema = ResolveSchema($"{typeName}ContentDto", () =>
@@ -98,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 {
                     contentDataSchema = ResolveSchema($"{typeName}FlatDataDto", () =>
                     {
-                        return schema.BuildFlatJsonSchema(ResolveSchema);
+                        return schema.BuildFlatJsonSchema(ResolveSchema, components);
                     });
                 }
 

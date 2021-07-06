@@ -11,7 +11,7 @@ import { WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, Work
 @Component({
     selector: 'sqx-workflow-step',
     styleUrls: ['./workflow-step.component.scss'],
-    templateUrl: './workflow-step.component.html'
+    templateUrl: './workflow-step.component.html',
 })
 export class WorkflowStepComponent implements OnChanges {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
@@ -26,7 +26,7 @@ export class WorkflowStepComponent implements OnChanges {
     public transitionRemove = new EventEmitter<WorkflowTransition>();
 
     @Output()
-    public transitionUpdate = new EventEmitter<{ transition: WorkflowTransition, values: WorkflowTransitionValues }>();
+    public transitionUpdate = new EventEmitter<{ transition: WorkflowTransition; values: WorkflowTransitionValues }>();
 
     @Output()
     public update = new EventEmitter<WorkflowStepValues>();

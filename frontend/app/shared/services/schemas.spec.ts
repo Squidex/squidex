@@ -1,20 +1,19 @@
- /*
+/*
  * Squidex Headless CMS
  *
  * @license
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
-
 import { createProperties, MetaFields, SchemaPropertiesDto } from '@app/shared/internal';
 import { TestValues } from './../state/_test-helpers';
 
 const {
     createField,
-    createSchema} = TestValues;
+    createSchema,
+} = TestValues;
 
-describe('SchemaDetailsDto', () => {
+describe('SchemaDto', () => {
     const field1 = createField({ properties: createProperties('Array'), id: 1 });
     const field2 = createField({ properties: createProperties('Array'), id: 2 });
     const field3 = createField({ properties: createProperties('Array'), id: 3 });
@@ -28,13 +27,13 @@ describe('SchemaDetailsDto', () => {
     it('should return name as display name if label is undefined', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto(undefined) });
 
-        expect(schema.displayName).toBe('schema1');
+        expect(schema.displayName).toBe('schema-name1');
     });
 
     it('should return name as display name label is empty', () => {
         const schema = createSchema({ properties: new SchemaPropertiesDto('') });
 
-        expect(schema.displayName).toBe('schema1');
+        expect(schema.displayName).toBe('schema-name1');
     });
 
     it('should return configured fields as list fields if fields are declared', () => {

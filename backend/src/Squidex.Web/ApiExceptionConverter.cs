@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -84,31 +84,31 @@ namespace Squidex.Web
             switch (exception)
             {
                 case ValidationException ex:
-                    return (CreateError(400, T.Get("common.httpValidationError"), ToErrors(ex.Errors).ToArray()), true);
+                    return (CreateError(400, T.Get("common.httpValidationError"), null, ToErrors(ex.Errors)), true);
 
                 case DomainObjectNotFoundException ex:
-                    return (CreateError(404, errorCode: ex.ErrorCode), true);
+                    return (CreateError(404, ex.ErrorCode), true);
 
                 case DomainObjectVersionException ex:
-                    return (CreateError(412, exception.Message, errorCode: ex.ErrorCode), true);
+                    return (CreateError(412, ex.Message, ex.ErrorCode), true);
 
                 case DomainObjectDeletedException ex:
-                    return (CreateError(410, exception.Message, errorCode: ex.ErrorCode), true);
+                    return (CreateError(410, ex.Message, ex.ErrorCode), true);
 
                 case DomainObjectConflictException ex:
-                    return (CreateError(409, exception.Message, errorCode: ex.ErrorCode), true);
+                    return (CreateError(409, ex.Message, ex.ErrorCode), true);
 
                 case DomainForbiddenException ex:
-                    return (CreateError(403, exception.Message, errorCode: ex.ErrorCode), true);
+                    return (CreateError(403, ex.Message, ex.ErrorCode), true);
 
                 case DomainException ex:
-                    return (CreateError(400, exception.Message, errorCode: ex.ErrorCode), true);
+                    return (CreateError(400, ex.Message, ex.ErrorCode), true);
 
                 case SecurityException:
                     return (CreateError(403), false);
 
-                case DecoderFallbackException:
-                    return (CreateError(400, exception.Message), true);
+                case DecoderFallbackException ex:
+                    return (CreateError(400, ex.Message), true);
 
                 case BadHttpRequestException ex:
                     return (CreateError(ex.StatusCode, ex.Message), true);
@@ -118,9 +118,16 @@ namespace Squidex.Web
             }
         }
 
-        private static ErrorDto CreateError(int status, string? message = null, string[]? details = null, string? errorCode = null)
+        private static ErrorDto CreateError(int status, string? message = null, string? errorCode = null, IEnumerable<string>? details = null)
         {
-            var error = new ErrorDto { StatusCode = status, Message = message, Details = details, ErrorCode = errorCode };
+            var error = new ErrorDto { StatusCode = status, Message = message };
+
+            if (!string.IsNullOrWhiteSpace(errorCode))
+            {
+                error.ErrorCode = errorCode;
+            }
+
+            error.Details = details?.ToArray();
 
             return error;
         }

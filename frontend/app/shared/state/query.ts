@@ -5,12 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { QueryParams, RouteSynchronizer, Types } from '@app/framework';
-import { StatusInfo } from './../services/contents.service';
 import { LanguageDto } from './../services/languages.service';
-import { MetaFields, SchemaDetailsDto } from './../services/schemas.service';
+import { MetaFields, SchemaDto } from './../services/schemas.service';
 
 export type QueryValueType =
     'boolean' |
@@ -22,6 +19,9 @@ export type QueryValueType =
     'string' |
     'tags' |
     'user';
+
+export type StatusInfo =
+    Readonly<{ status: string; color: string }>;
 
 export interface FilterOperator {
     // The optional display value.
@@ -89,7 +89,7 @@ export interface QuerySorting {
 
 export const SORT_MODES: ReadonlyArray<SortMode> = [
     'ascending',
-    'descending'
+    'descending',
 ];
 
 export type SortMode = 'ascending' | 'descending';
@@ -113,9 +113,9 @@ export interface Query {
 
 const DEFAULT_QUERY = {
     filter: {
-        and: []
+        and: [],
     },
-    sort: []
+    sort: [],
 };
 
 export class QueryFullTextSynchronizer implements RouteSynchronizer {
@@ -129,6 +129,8 @@ export class QueryFullTextSynchronizer implements RouteSynchronizer {
         if (Types.isString(query)) {
             return { query: { fullText: query } };
         }
+
+        return undefined;
     }
 
     public parseFromState(state: any) {
@@ -137,6 +139,8 @@ export class QueryFullTextSynchronizer implements RouteSynchronizer {
         if (Types.isObject(value) && Types.isString(value.fullText) && value.fullText.length > 0) {
             return { query: value.fullText };
         }
+
+        return undefined;
     }
 }
 
@@ -151,6 +155,8 @@ export class QuerySynchronizer implements RouteSynchronizer {
         if (Types.isString(query)) {
             return { query: deserializeQuery(query) };
         }
+
+        return undefined;
     }
 
     public parseFromState(state: any) {
@@ -159,6 +165,8 @@ export class QuerySynchronizer implements RouteSynchronizer {
         if (Types.isObject(value)) {
             return { query: serializeQuery(value) };
         }
+
+        return undefined;
     }
 }
 
@@ -191,7 +199,7 @@ export function encodeQuery(query?: Query | null) {
 }
 
 export function deserializeQuery(raw?: string): Query | undefined {
-    let query: Query | undefined = undefined;
+    let query: Query | undefined;
 
     try {
         if (Types.isString(raw)) {
@@ -214,116 +222,116 @@ export function hasFilter(query?: Query | null) {
 
 const EqualOperators: ReadonlyArray<FilterOperator> = [
     { name: 'i18n:common.queryOperators.eq', value: 'eq' },
-    { name: 'i18n:common.queryOperators.ne', value: 'ne' }
+    { name: 'i18n:common.queryOperators.ne', value: 'ne' },
 ];
 
 const CompareOperator: ReadonlyArray<FilterOperator> = [
     { name: 'i18n:common.queryOperators.lt', value: 'lt' },
     { name: 'i18n:common.queryOperators.le', value: 'le' },
     { name: 'i18n:common.queryOperators.gt', value: 'gt' },
-    { name: 'i18n:common.queryOperators.ge', value: 'ge' }
+    { name: 'i18n:common.queryOperators.ge', value: 'ge' },
 ];
 
 const StringOperators: ReadonlyArray<FilterOperator> = [
     { name: 'i18n:common.queryOperators.matchs', value: 'matchs' },
     { name: 'i18n:common.queryOperators.startsWith', value: 'startsWith' },
     { name: 'i18n:common.queryOperators.endsWith', value: 'endsWith' },
-    { name: 'i18n:common.queryOperators.contains', value: 'contains' }
+    { name: 'i18n:common.queryOperators.contains', value: 'contains' },
 ];
 
 const ArrayOperators: ReadonlyArray<FilterOperator> = [
     { name: 'i18n:common.queryOperators.empty', value: 'empty', noValue: true },
-    { name: 'i18n:common.queryOperators.exists', value: 'exists', noValue: true }
+    { name: 'i18n:common.queryOperators.exists', value: 'exists', noValue: true },
 ];
 
 const TypeBoolean: QueryFieldModel = {
     type: 'boolean',
-    operators: EqualOperators
+    operators: EqualOperators,
 };
 
 const TypeDateTime: QueryFieldModel = {
     type: 'datetime',
-    operators: [...EqualOperators, ...CompareOperator]
+    operators: [...EqualOperators, ...CompareOperator],
 };
 
 const TypeNumber: QueryFieldModel = {
     type: 'number',
-    operators: [...EqualOperators, ...CompareOperator]
+    operators: [...EqualOperators, ...CompareOperator],
 };
 
 const TypeReference: QueryFieldModel = {
     type: 'reference',
-    operators: [...EqualOperators, ...ArrayOperators]
+    operators: [...EqualOperators, ...ArrayOperators],
 };
 
 const TypeStatus: QueryFieldModel = {
     type: 'status',
-    operators: EqualOperators
+    operators: EqualOperators,
 };
 
 const TypeUser: QueryFieldModel = {
     type: 'user',
-    operators: EqualOperators
+    operators: EqualOperators,
 };
 
 const TypeString: QueryFieldModel = {
     type: 'string',
-    operators: [...EqualOperators, ...CompareOperator, ...StringOperators, ...ArrayOperators]
+    operators: [...EqualOperators, ...CompareOperator, ...StringOperators, ...ArrayOperators],
 };
 
 const TypeTags: QueryFieldModel = {
     type: 'string',
-    operators: EqualOperators
+    operators: EqualOperators,
 };
 
 const DEFAULT_FIELDS: QueryModelFields = {
     created: {
         ...TypeDateTime,
         displayName: MetaFields.created,
-        description: 'i18n:contents.createFieldDescription'
+        description: 'i18n:contents.createFieldDescription',
     },
     createdBy: {
         ...TypeUser,
         displayName: 'meta.createdBy',
-        description: 'i18n:contents.createdByFieldDescription'
+        description: 'i18n:contents.createdByFieldDescription',
     },
     lastModified: {
         ...TypeDateTime,
         displayName: MetaFields.lastModified,
-        description: 'i18n:contents.lastModifiedFieldDescription'
+        description: 'i18n:contents.lastModifiedFieldDescription',
     },
     lastModifiedBy: {
         ...TypeUser,
         displayName: 'meta.lastModifiedBy',
-        description: 'i18n:contents.lastModifiedByFieldDescription'
+        description: 'i18n:contents.lastModifiedByFieldDescription',
     },
     version: {
         ...TypeNumber,
         displayName: MetaFields.version,
-        description: 'i18n:contents.versionFieldDescription'
-    }
+        description: 'i18n:contents.versionFieldDescription',
+    },
 };
 
-export function queryModelFromSchema(schema: SchemaDetailsDto, languages: ReadonlyArray<LanguageDto>, statuses: ReadonlyArray<StatusInfo> | undefined) {
+export function queryModelFromSchema(schema: SchemaDto, languages: ReadonlyArray<LanguageDto>, statuses: ReadonlyArray<StatusInfo> | undefined) {
     const languagesCodes = languages.map(x => x.iso2Code);
 
     const model: QueryModel = {
-        fields: { ...DEFAULT_FIELDS }
+        fields: { ...DEFAULT_FIELDS },
     };
 
     if (statuses) {
         model.fields['status'] = {
-             ...TypeStatus,
-             displayName: MetaFields.status,
-             description: 'i18n:contents.statusFieldDescription',
-             extra: statuses
+            ...TypeStatus,
+            displayName: MetaFields.status,
+            description: 'i18n:contents.statusFieldDescription',
+            extra: statuses,
         };
 
         model.fields['newStatus'] = {
-             ...TypeStatus,
-             displayName: MetaFields.statusNext,
-             description: 'i18n:contents.newStatusFieldDescription',
-             extra: statuses
+            ...TypeStatus,
+            displayName: MetaFields.statusNext,
+            description: 'i18n:contents.newStatusFieldDescription',
+            extra: statuses,
         };
     }
 
@@ -352,7 +360,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
                     const infos = {
                         displayName: `${field.name} (${code})`,
                         description: 'i18n:contents.localizedFieldDescription',
-                        fieldName: field.displayName
+                        fieldName: field.displayName,
                     };
 
                     model.fields[`data.${field.name}.${code}`] = { ...type, ...infos };
@@ -361,7 +369,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Readon
                 const infos = {
                     displayName: field.name,
                     description: 'i18n:contents.invariantFieldDescription',
-                    fieldName: field.displayName
+                    fieldName: field.displayName,
                 };
 
                 model.fields[`data.${field.name}.iv`] = { ...type, ...infos };

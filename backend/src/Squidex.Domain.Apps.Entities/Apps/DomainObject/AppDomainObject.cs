@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -38,11 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             IUserResolver userResolver)
             : base(persistence, log)
         {
-            Guard.NotNull(initialPatterns, nameof(initialPatterns));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
-            Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
-
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
@@ -310,8 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var events = new List<AppEvent>
             {
-                CreateInitalEvent(command.Name),
-                CreateInitialLanguage()
+                CreateInitalEvent(command.Name)
             };
 
             if (command.Actor.IsUser)
@@ -448,11 +442,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private static AppCreated CreateInitalEvent(string name)
         {
             return new AppCreated { Name = name };
-        }
-
-        private static AppLanguageAdded CreateInitialLanguage()
-        {
-            return new AppLanguageAdded { Language = Language.EN };
         }
 
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)

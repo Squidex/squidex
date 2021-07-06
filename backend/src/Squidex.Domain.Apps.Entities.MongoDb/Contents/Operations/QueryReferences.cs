@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -36,7 +37,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             this.queryByIds = queryByIds;
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q)
+        public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q,
+            CancellationToken ct)
         {
             var documentId = DomainId.Combine(appId, q.Referencing);
 
@@ -45,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .Find(x => x.DocumentId == documentId)
                     .Project<ReferencedIdsOnly>(Projection.Include(x => x.ReferencedIds));
 
-            var contentEntity = await find.FirstOrDefaultAsync();
+            var contentEntity = await find.FirstOrDefaultAsync(ct);
 
             if (contentEntity == null)
             {
@@ -59,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             q = q.WithReferencing(default).WithIds(contentEntity.ReferencedIds!);
 
-            return await queryByIds.QueryAsync(appId, schemas, q);
+            return await queryByIds.QueryAsync(appId, schemas, q, ct);
         }
     }
 }

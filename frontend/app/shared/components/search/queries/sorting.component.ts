@@ -12,7 +12,7 @@ import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
      selector: 'sqx-sorting',
      styleUrls: ['./sorting.component.scss'],
      templateUrl: './sorting.component.html',
-     changeDetection: ChangeDetectionStrategy.OnPush
+     changeDetection: ChangeDetectionStrategy.OnPush,
  })
 export class SortingComponent {
     @Output()

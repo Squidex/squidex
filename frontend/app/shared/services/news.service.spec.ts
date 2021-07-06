@@ -13,12 +13,12 @@ describe('NewsService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 NewsService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -28,33 +28,32 @@ describe('NewsService', () => {
 
     it('should make get request to get features',
         inject([NewsService, HttpTestingController], (newsService: NewsService, httpMock: HttpTestingController) => {
+            let features: FeaturesDto;
 
-        let features: FeaturesDto;
+            newsService.getFeatures(13).subscribe(result => {
+                features = result;
+            });
 
-        newsService.getFeatures(13).subscribe(result => {
-            features = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/news/features?version=13');
 
-        const req = httpMock.expectOne('http://service/p/api/news/features?version=13');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({
+                version: 13,
+                features: [{
+                    name: 'Feature1',
+                    text: 'Feature Text1',
+                }, {
+                    name: 'Feature2',
+                    text: 'Feature Text2',
+                }],
+            });
 
-        req.flush({
-            version: 13,
-            features: [{
-                name: 'Feature1',
-                text: 'Feature Text1'
-            }, {
-                name: 'Feature2',
-                text: 'Feature Text2'
-            }]
-        });
-
-        expect(features!).toEqual(
-            new FeaturesDto([
-                new FeatureDto('Feature1', 'Feature Text1'),
-                new FeatureDto('Feature2', 'Feature Text2')
-            ], 13));
-    }));
+            expect(features!).toEqual(
+                new FeaturesDto([
+                    new FeatureDto('Feature1', 'Feature Text1'),
+                    new FeatureDto('Feature2', 'Feature Text2'),
+                ], 13));
+        }));
 });

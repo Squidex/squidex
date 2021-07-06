@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -29,7 +26,6 @@ using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
-using Xunit;
 
 namespace Squidex.Domain.Apps.Core.TestHelpers
 {
@@ -57,8 +53,6 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new EnvelopeHeadersConverter(),
                     new JsonValueConverter(),
                     new StringEnumConverter(),
-                    new SurrogateConverter<AppClients, AppClientsSurrogate>(),
-                    new SurrogateConverter<AppContributors, AppContributorsSurrogate>(),
                     new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
                     new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                     new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
@@ -66,7 +60,6 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new SurrogateConverter<Roles, RolesSurrogate>(),
                     new SurrogateConverter<Rule, RuleSorrgate>(),
                     new SurrogateConverter<Schema, SchemaSurrogate>(),
-                    new SurrogateConverter<Workflows, WorkflowsSurrogate>(),
                     new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
                     new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
                     new WriteonlyGeoJsonConverter()),
@@ -89,9 +82,11 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
-        public static Schema MixedSchema(bool isSingleton = false)
+        public static Schema MixedSchema(SchemaType type = SchemaType.Default)
         {
-            var schema = new Schema("user", isSingleton: isSingleton)
+            var componentId = DomainId.NewGuid();
+
+            var schema = new Schema("user", type: type)
                 .Publish()
                 .AddArray(101, "root-array", Partitioning.Language, f => f
                     .AddAssets(201, "nested-assets")
@@ -122,13 +117,17 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 .AddReferences(109, "root-references", Partitioning.Invariant,
                     new ReferencesFieldProperties())
                 .AddString(110, "root-string1", Partitioning.Invariant,
-                    new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ReadOnlyCollection.Create("a", "b") })
+                    new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") })
                 .AddString(111, "root-string2", Partitioning.Invariant,
                     new StringFieldProperties { Hints = "My String1" })
                 .AddTags(112, "root-tags", Partitioning.Language,
                     new TagsFieldProperties())
                 .AddUI(113, "root-ui", Partitioning.Language,
                     new UIFieldProperties())
+                .AddComponent(114, "root-component", Partitioning.Language,
+                    new ComponentFieldProperties { SchemaId = componentId })
+                .AddComponents(115, "root-components", Partitioning.Language,
+                    new ComponentsFieldProperties { SchemaId = componentId })
                 .Update(new SchemaProperties { Hints = "The User" })
                 .HideField(104)
                 .HideField(211, 101)
@@ -151,48 +150,6 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             var json = DefaultSerializer.Serialize(value);
 
             return DefaultSerializer.Deserialize<T>(json);
-        }
-
-        public static void TestFreeze(IFreezable sut)
-        {
-            var properties =
-                sut.GetType().GetRuntimeProperties()
-                    .Where(x =>
-                        x.CanWrite &&
-                        x.CanRead &&
-                        x.Name != "IsFrozen");
-
-            foreach (var property in properties)
-            {
-                var value =
-                    property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null;
-
-                property.SetValue(sut, value);
-
-                var result = property.GetValue(sut);
-
-                Assert.Equal(value, result);
-            }
-
-            sut.Freeze();
-
-            foreach (var property in properties)
-            {
-                var value =
-                    property.PropertyType.IsValueType ? Activator.CreateInstance(property.PropertyType) : null;
-
-                Assert.Throws<InvalidOperationException>(() =>
-                {
-                    try
-                    {
-                        property.SetValue(sut, value);
-                    }
-                    catch (Exception ex) when (ex.InnerException != null)
-                    {
-                        throw ex.InnerException;
-                    }
-                });
-            }
         }
     }
 }

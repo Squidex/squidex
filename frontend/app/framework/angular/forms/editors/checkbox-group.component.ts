@@ -5,14 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
-
 import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { getTagValues, MathHelper, StatefulControlComponent, TagValue, Types } from '@app/framework/internal';
 
 export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true,
 };
 
 let CACHED_FONT: string;
@@ -30,9 +28,9 @@ interface State {
     styleUrls: ['./checkbox-group.component.scss'],
     templateUrl: './checkbox-group.component.html',
     providers: [
-        SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR
+        SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked, OnChanges {
     private childrenWidth = 0;
@@ -61,7 +59,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            checkedValues: []
+            checkedValues: [],
         });
     }
 

@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
 export class GraphQlService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
     ) {
     }
 

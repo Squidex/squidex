@@ -12,7 +12,6 @@ import { IMock, Mock, Times } from 'typemoq';
 import { UserMustExistGuard } from './user-must-exist.guard';
 
 describe('UserMustExistGuard', () => {
-
     let usersState: IMock<UsersState>;
     let router: IMock<Router>;
     let userGuard: UserMustExistGuard;
@@ -31,8 +30,8 @@ describe('UserMustExistGuard', () => {
 
         const route: any = {
             params: {
-                userId: '123'
-            }
+                userId: '123',
+            },
         };
 
         userGuard.canActivate(route).subscribe(x => {
@@ -52,8 +51,8 @@ describe('UserMustExistGuard', () => {
 
         const route: any = {
             params: {
-                userId: '123'
-            }
+                userId: '123',
+            },
         };
 
         userGuard.canActivate(route).subscribe(x => {
@@ -73,8 +72,8 @@ describe('UserMustExistGuard', () => {
 
         const route: any = {
             params: {
-                userId: undefined
-            }
+                userId: undefined,
+            },
         };
 
         userGuard.canActivate(route).subscribe(x => {
@@ -94,8 +93,8 @@ describe('UserMustExistGuard', () => {
 
         const route: any = {
             params: {
-                userId: 'new'
-            }
+                userId: 'new',
+            },
         };
 
         userGuard.canActivate(route).subscribe(x => {

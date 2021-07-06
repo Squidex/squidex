@@ -11,7 +11,7 @@
                 </sqx-editable-title>
             </div>
             <div class="col-auto" *ngIf="rule.canDelete || rule.canRun">
-                <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
+                <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" #buttonOptions>
                     <i class="icon-dots"></i>
                 </button>
         

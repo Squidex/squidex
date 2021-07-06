@@ -13,12 +13,12 @@ describe('UsersService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 UsersService,
-                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') }
-            ]
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
         });
     });
 
@@ -28,111 +28,107 @@ describe('UsersService', () => {
 
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
+            let users: ReadonlyArray<UserDto>;
 
-        let users: ReadonlyArray<UserDto>;
+            usersService.getUsers().subscribe(result => {
+                users = result;
+            });
 
-        usersService.getUsers().subscribe(result => {
-            users = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/users?query=');
 
-        const req = httpMock.expectOne('http://service/p/api/users?query=');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush([
-            {
-                id: '123',
-                displayName: 'User1'
-            },
-            {
-                id: '456',
-                displayName: 'User2'
-            }
-        ]);
-
-        expect(users!).toEqual(
-            [
-                new UserDto('123', 'User1'),
-                new UserDto('456', 'User2')
+            req.flush([
+                {
+                    id: '123',
+                    displayName: 'User1',
+                },
+                {
+                    id: '456',
+                    displayName: 'User2',
+                },
             ]);
-    }));
+
+            expect(users!).toEqual(
+                [
+                    new UserDto('123', 'User1'),
+                    new UserDto('456', 'User2'),
+                ]);
+        }));
 
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
+            let users: ReadonlyArray<UserDto>;
 
-        let users: ReadonlyArray<UserDto>;
+            usersService.getUsers('my-query').subscribe(result => {
+                users = result;
+            });
 
-        usersService.getUsers('my-query').subscribe(result => {
-            users = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/users?query=my-query');
 
-        const req = httpMock.expectOne('http://service/p/api/users?query=my-query');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush([
-            {
-                id: '123',
-                displayName: 'User1'
-            },
-            {
-                id: '456',
-                displayName: 'User2'
-            }
-        ]);
-
-        expect(users!).toEqual(
-            [
-                new UserDto('123', 'User1'),
-                new UserDto('456', 'User2')
+            req.flush([
+                {
+                    id: '123',
+                    displayName: 'User1',
+                },
+                {
+                    id: '456',
+                    displayName: 'User2',
+                },
             ]);
-    }));
+
+            expect(users!).toEqual(
+                [
+                    new UserDto('123', 'User1'),
+                    new UserDto('456', 'User2'),
+                ]);
+        }));
 
     it('should make get request to get single user',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
+            let user: UserDto;
 
-        let user: UserDto;
+            usersService.getUser('123').subscribe(result => {
+                user = result;
+            });
 
-        usersService.getUser('123').subscribe(result => {
-            user = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/users/123');
 
-        const req = httpMock.expectOne('http://service/p/api/users/123');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({ id: '123', displayName: 'User1' });
 
-        req.flush({ id: '123', displayName: 'User1' });
-
-        expect(user!).toEqual(new UserDto('123', 'User1'));
-    }));
+            expect(user!).toEqual(new UserDto('123', 'User1'));
+        }));
 
     it('should make get request to get resources',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
+            let resources: ResourcesDto;
 
-        let resources: ResourcesDto;
+            usersService.getResources().subscribe(result => {
+                resources = result;
+            });
 
-        usersService.getResources().subscribe(result => {
-            resources = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api');
 
-        const req = httpMock.expectOne('http://service/p/api');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush({
+                _links: {
+                    schemas: { method: 'GET', href: '/api/schemas' },
+                },
+            });
 
-        req.flush({
-            _links: {
-                schemas: { method: 'GET', href: '/api/schemas' }
-            }
-        });
+            const expected = new ResourcesDto({
+                schemas: { method: 'GET', href: '/api/schemas' },
+            });
 
-        const expected = new ResourcesDto({
-            schemas: { method: 'GET', href: '/api/schemas' }
-        });
-
-        expect(resources!).toEqual(expected);
-    }));
+            expect(resources!).toEqual(expected);
+        }));
 });

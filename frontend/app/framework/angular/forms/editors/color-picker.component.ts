@@ -11,7 +11,7 @@ import { MathHelper, ModalModel, StatefulControlComponent } from '@app/framework
 import { FocusComponent } from './../forms-helper';
 
 export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ColorPickerComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ColorPickerComponent), multi: true,
 };
 
 interface State {
@@ -27,9 +27,9 @@ interface State {
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
     providers: [
-        SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR
+        SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
     private wasOpen = false;
@@ -69,7 +69,7 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
         if (previousColor !== value) {
             let foreground = 'black';
 
-            if (MathHelper.toLuminance(MathHelper.parseColor(value)!) < .5) {
+            if (MathHelper.toLuminance(MathHelper.parseColor(value)!) < 0.5) {
                 foreground = 'white';
             }
 

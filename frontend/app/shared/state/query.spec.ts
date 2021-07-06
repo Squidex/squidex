@@ -14,9 +14,9 @@ describe('equalsQuery', () => {
 
         const rhs: Query = {
             filter: {
-                and: []
+                and: [],
             },
-            sort: []
+            sort: [],
         };
 
         expect(equalsQuery(lhs, rhs)).toBeTruthy();
@@ -25,15 +25,15 @@ describe('equalsQuery', () => {
     it('should return true if comparing without sort', () => {
         const lhs: Query = {
             filter: {
-                and: []
-            }
+                and: [],
+            },
         };
 
         const rhs: Query = {
             filter: {
-                and: []
+                and: [],
             },
-            sort: []
+            sort: [],
         };
 
         expect(equalsQuery(lhs, rhs)).toBeTruthy();
@@ -41,14 +41,14 @@ describe('equalsQuery', () => {
 
     it('should return true if comparing without filter', () => {
         const lhs: Query = {
-            sort: []
+            sort: [],
         };
 
         const rhs: Query = {
             filter: {
-                and: []
+                and: [],
             },
-            sort: []
+            sort: [],
         };
 
         expect(equalsQuery(lhs, rhs)).toBeTruthy();

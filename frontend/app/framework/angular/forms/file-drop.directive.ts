@@ -5,21 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: prefer-for-of
-// tslint:disable: readonly-array
-
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 import { Types } from '@app/framework/internal';
 
-const ImageTypes: ReadonlyArray<string> = [
-    'image/jpeg',
-    'image/png',
-    'image/jpg',
-    'image/gif'
-];
-
 @Directive({
-    selector: '[sqxDropFile]'
+    selector: '[sqxDropFile]',
 })
 export class FileDropDirective {
     private dragCounter = 0;
@@ -41,7 +31,7 @@ export class FileDropDirective {
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 
@@ -117,7 +107,7 @@ export class FileDropDirective {
         }
     }
 
-    private dragEnd(number?: number ) {
+    private dragEnd(number?: number) {
         this.dragCounter = number || this.dragCounter - 1;
 
         if (this.dragCounter === 0 && !this.disabled) {
@@ -148,6 +138,7 @@ export class FileDropDirective {
                 const webkitEntry = item.webkitGetAsEntry();
 
                 if (webkitEntry && webkitEntry.isDirectory) {
+                    // eslint-disable-next-line no-await-in-loop
                     await this.transferWebkitTree(webkitEntry, files);
                 }
             }
@@ -171,6 +162,7 @@ export class FileDropDirective {
             const entries = await getFilesPromise(item);
 
             for (const entry of entries) {
+                // eslint-disable-next-line no-await-in-loop
                 await this.transferWebkitTree(entry, files);
             }
         }
@@ -205,7 +197,7 @@ export class FileDropDirective {
     }
 
     private isImage(file: { type: string }) {
-        return !this.onlyImages || ImageTypes.indexOf(file.type) >= 0;
+        return !this.onlyImages || file.type.indexOf('image/') === 0;
     }
 }
 

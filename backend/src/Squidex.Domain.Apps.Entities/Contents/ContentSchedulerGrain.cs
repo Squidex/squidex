@@ -33,11 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IClock clock,
             ISemanticLog log)
         {
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(log, nameof(log));
-
             this.clock = clock;
 
             this.commandBus = commandBus;
@@ -94,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     }
                     catch (DomainObjectNotFoundException)
                     {
-                        await contentRepository.ResetScheduledAsync(content.UniqueId);
+                        await contentRepository.ResetScheduledAsync(content.UniqueId, default);
                     }
                     catch (Exception ex)
                     {
@@ -104,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             .WriteProperty("contentId", logContentId));
                     }
                 });
-            });
+            }, default);
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)

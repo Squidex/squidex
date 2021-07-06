@@ -28,9 +28,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             {
                 try
                 {
-                    var stream = DefaultPools.MemoryStream.Get();
-
-                    try
+                    using (var stream = DefaultPools.MemoryStream.GetStream())
                     {
                         serializer.Serialize(value, stream, true);
 
@@ -39,10 +37,6 @@ namespace Squidex.Domain.Apps.Core.Contents
                         geoJSON = serializer.Deserialize<GeoJSONObject>(stream, null, leaveOpen: true);
 
                         return GeoJsonParseResult.Success;
-                    }
-                    finally
-                    {
-                        DefaultPools.MemoryStream.Return(stream);
                     }
                 }
                 catch

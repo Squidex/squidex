@@ -1,0 +1,54 @@
+name: Marketplace - Azure
+concurrency: marketplace-azure
+
+on:
+  release:
+    types: [ released ]
+
+# az ad sp create-for-rbac --name squidex
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Validate Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: packer/azure.pkr.hcl
+
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Init
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: init
+          target: packer/azure.pkr.hcl
+        env:
+          PACKER_LOG: 1
+
+      - name: Build
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort"
+          target: packer/azure.pkr.hcl
+        env:
+          PACKER_LOG: 1
+          PKR_VAR_squidex_version: "${{ env.GITHUB_REF_SLUG }}"
+          PKR_VAR_subscription_id: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+          PKR_VAR_tenant_id: "${{ secrets.AZURE_TENANT_ID }}"
+          PKR_VAR_client_id: "${{ secrets.AZURE_CLIENT_ID }}"
+          PKR_VAR_client_secret: "${{ secrets.AZURE_CLIENT_SECRET }}"

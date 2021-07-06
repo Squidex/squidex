@@ -11,7 +11,7 @@ import { TriggerForm } from '@app/shared';
 @Component({
     selector: 'sqx-schema-changed-trigger',
     styleUrls: ['./schema-changed-trigger.component.scss'],
-    templateUrl: './schema-changed-trigger.component.html'
+    templateUrl: './schema-changed-trigger.component.html',
 })
 export class SchemaChangedTriggerComponent {
     @Input()

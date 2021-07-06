@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Infrastructure;
 using Xunit;
@@ -21,56 +23,79 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly long assetFileVersion = 21;
-        private readonly string fileNameOld;
-        private readonly string fileNameNew;
+        private readonly AssetOptions options = new AssetOptions();
         private readonly DefaultAssetFileStore sut;
 
         public DefaultAssetFileStoreTests()
         {
-            fileNameOld = $"{assetId}_{assetFileVersion}";
-            fileNameNew = $"{appId}_{assetId}_{assetFileVersion}";
-
-            sut = new DefaultAssetFileStore(assetStore);
+            sut = new DefaultAssetFileStore(assetStore, Options.Create(options));
         }
 
-        [Fact]
-        public void Should_get_public_url_from_store()
+        public static IEnumerable<object[]> PathCases()
         {
+            yield return new object[] { true, "resize=100", "derived/{appId}/{assetId}_{assetFileVersion}_resize=100" };
+            yield return new object[] { true, string.Empty, "{appId}/{assetId}_{assetFileVersion}" };
+            yield return new object[] { false, "resize=100", "{appId}_{assetId}_{assetFileVersion}_resize=100" };
+            yield return new object[] { false, string.Empty, "{appId}_{assetId}_{assetFileVersion}" };
+        }
+
+        public static IEnumerable<object?[]> PathCasesOld()
+        {
+            yield return new object?[] { "resize=100", "{assetId}_{assetFileVersion}_resize=100" };
+            yield return new object?[] { string.Empty, "{assetId}_{assetFileVersion}" };
+        }
+
+        [Theory]
+        [MemberData(nameof(PathCases))]
+        public void Should_get_public_url_from_store(bool folderPerApp, string? suffix, string fileName)
+        {
+            var fullName = GetFullName(fileName);
+
+            options.FolderPerApp = folderPerApp;
+
             var url = "http_//squidex.io/assets";
 
-            A.CallTo(() => assetStore.GeneratePublicUrl(fileNameNew))
+            A.CallTo(() => assetStore.GeneratePublicUrl(fullName))
                 .Returns(url);
 
-            var result = sut.GeneratePublicUrl(appId, assetId, assetFileVersion);
+            var result = sut.GeneratePublicUrl(appId, assetId, assetFileVersion, suffix);
 
             Assert.Equal(url, result);
         }
 
-        [Fact]
-        public async Task Should_get_file_size_from_store()
+        [Theory]
+        [MemberData(nameof(PathCases))]
+        public async Task Should_get_file_size_from_store(bool folderPerApp, string? suffix, string fileName)
         {
+            var fullName = GetFullName(fileName);
+
+            options.FolderPerApp = folderPerApp;
+
             var size = 1024L;
 
-            A.CallTo(() => assetStore.GetSizeAsync(fileNameNew, default))
+            A.CallTo(() => assetStore.GetSizeAsync(fullName, default))
                 .Returns(size);
 
-            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion);
+            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix);
 
             Assert.Equal(size, result);
         }
 
-        [Fact]
-        public async Task Should_get_file_size_from_store_with_old_file_name_if_new_name_not_found()
+        [Theory]
+        [MemberData(nameof(PathCasesOld))]
+        public async Task Should_get_file_size_from_store_with_old_file_name_if_new_name_not_found(string? suffix, string fileName)
         {
+            var fullName = GetFullName(fileName);
+
             var size = 1024L;
 
-            A.CallTo(() => assetStore.GetSizeAsync(fileNameOld, default))
-                .Throws(new AssetNotFoundException(fileNameOld));
+            A.CallTo(() => assetStore.GetSizeAsync(A<string>._, default))
+                .Throws(new AssetNotFoundException(assetId.ToString()));
 
-            A.CallTo(() => assetStore.GetSizeAsync(fileNameNew, default))
+            A.CallTo(() => assetStore.GetSizeAsync(fullName, default))
                 .Returns(size);
 
-            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion);
+            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix);
 
             Assert.Equal(size, result);
         }
@@ -86,51 +111,82 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .MustHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_upload_file_to_store()
+        [Theory]
+        [MemberData(nameof(PathCases))]
+        public async Task Should_upload_file_to_store(bool folderPerApp, string? suffix, string fileName)
         {
+            var fullName = GetFullName(fileName);
+
+            options.FolderPerApp = folderPerApp;
+
             var stream = new MemoryStream();
 
-            await sut.UploadAsync(appId, assetId, assetFileVersion, stream);
+            await sut.UploadAsync(appId, assetId, assetFileVersion, suffix, stream);
 
-            A.CallTo(() => assetStore.UploadAsync(fileNameNew, stream, true, CancellationToken.None))
+            A.CallTo(() => assetStore.UploadAsync(fullName, stream, true, CancellationToken.None))
+                .MustHaveHappened();
+        }
+
+        [Theory]
+        [MemberData(nameof(PathCases))]
+        public async Task Should_download_file_from_store(bool folderPerApp, string? suffix, string fileName)
+        {
+            var fullName = GetFullName(fileName);
+
+            options.FolderPerApp = folderPerApp;
+
+            var stream = new MemoryStream();
+
+            await sut.DownloadAsync(appId, assetId, assetFileVersion, suffix, stream);
+
+            A.CallTo(() => assetStore.DownloadAsync(fullName, stream, default, CancellationToken.None))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_download_file_from_store()
+        public async Task Should_download_file_from_store_with_folder_only_if_configured()
         {
+            options.FolderPerApp = true;
+
             var stream = new MemoryStream();
 
-            await sut.DownloadAsync(appId, assetId, assetFileVersion, stream);
+            A.CallTo(() => assetStore.DownloadAsync(A<string>._, stream, default, CancellationToken.None))
+                .Throws(new AssetNotFoundException(assetId.ToString())).Once();
 
-            A.CallTo(() => assetStore.DownloadAsync(fileNameNew, stream, default, CancellationToken.None))
+            await Assert.ThrowsAsync<AssetNotFoundException>(() => sut.DownloadAsync(appId, assetId, assetFileVersion, null, stream));
+
+            A.CallTo(() => assetStore.DownloadAsync(A<string>._, stream, default, CancellationToken.None))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Theory]
+        [MemberData(nameof(PathCasesOld))]
+        public async Task Should_download_file_from_store_with_old_file_name_if_new_name_not_found(string suffix, string fileName)
+        {
+            var fullName = GetFullName(fileName);
+
+            var stream = new MemoryStream();
+
+            A.CallTo(() => assetStore.DownloadAsync(A<string>.That.Matches(x => x != fileName), stream, default, CancellationToken.None))
+                .Throws(new AssetNotFoundException(assetId.ToString())).Once();
+
+            await sut.DownloadAsync(appId, assetId, assetFileVersion, suffix, stream);
+
+            A.CallTo(() => assetStore.DownloadAsync(fullName, stream, default, CancellationToken.None))
                 .MustHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_download_file_from_store_with_old_file_name_if_new_name_not_found()
+        [Theory]
+        [MemberData(nameof(PathCases))]
+        public async Task Should_copy_file_to_store(bool folderPerApp, string? suffix, string fileName)
         {
-            var stream = new MemoryStream();
+            var fullName = GetFullName(fileName);
 
-            A.CallTo(() => assetStore.DownloadAsync(fileNameNew, stream, default, CancellationToken.None))
-                .Throws(new AssetNotFoundException(fileNameNew));
+            options.FolderPerApp = folderPerApp;
 
-            await sut.DownloadAsync(appId, assetId, assetFileVersion, stream);
+            await sut.CopyAsync("Temp", appId, assetId, assetFileVersion, suffix);
 
-            A.CallTo(() => assetStore.DownloadAsync(fileNameOld, stream, default, CancellationToken.None))
-                .MustHaveHappened();
-
-            A.CallTo(() => assetStore.DownloadAsync(fileNameNew, stream, default, CancellationToken.None))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_copy_file_to_store()
-        {
-            await sut.CopyAsync("Temp", appId, assetId, assetFileVersion);
-
-            A.CallTo(() => assetStore.CopyAsync("Temp", fileNameNew, CancellationToken.None))
+            A.CallTo(() => assetStore.CopyAsync("Temp", fullName, CancellationToken.None))
                 .MustHaveHappened();
         }
 
@@ -143,16 +199,29 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .MustHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_delete_file_from_store()
+        [Theory]
+        [MemberData(nameof(PathCases))]
+        public async Task Should_delete_file_from_store(bool folderPerApp, string? suffix, string fileName)
         {
-            await sut.DeleteAsync(appId, assetId, assetFileVersion);
+            var fullName = GetFullName(fileName);
 
-            A.CallTo(() => assetStore.DeleteAsync(fileNameNew))
+            options.FolderPerApp = folderPerApp;
+
+            await sut.DeleteAsync(appId, assetId, assetFileVersion, suffix);
+
+            A.CallTo(() => assetStore.DeleteAsync(fullName))
                 .MustHaveHappened();
 
-            A.CallTo(() => assetStore.DeleteAsync(fileNameOld))
-                .MustHaveHappened();
+            A.CallTo(() => assetStore.DeleteAsync(A<string>._))
+                .MustHaveHappenedANumberOfTimesMatching(x => x == (folderPerApp ? 1 : 2));
+        }
+
+        private string GetFullName(string fileName)
+        {
+            return fileName
+                .Replace("{appId}", appId.ToString())
+                .Replace("{assetId}", assetId.ToString())
+                .Replace("{assetFileVersion}", assetFileVersion.ToString());
         }
     }
 }

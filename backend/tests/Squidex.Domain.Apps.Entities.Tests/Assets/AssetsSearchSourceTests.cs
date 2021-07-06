@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -36,11 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("logo", ctx);
+            var result = await sut.SearchAsync("logo", ctx, default);
 
             Assert.Empty(result);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -57,10 +58,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => urlGenerator.AssetsUI(appId, "logo"))
                 .Returns("assets-url");
 
-            A.CallTo(() => assetQuery.QueryAsync(ctx, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5")))
+            A.CallTo(() => assetQuery.QueryAsync(ctx, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5"), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, asset1, asset2));
 
-            var result = await sut.SearchAsync("logo", ctx);
+            var result = await sut.SearchAsync("logo", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()

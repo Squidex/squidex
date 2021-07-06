@@ -1,11 +1,11 @@
-<div class="references-container" [class.disabled]="snapshot.isDisabled"
+<div class="references-container"
     (sqxResizeCondition)="setCompact($event)"
     [sqxResizeMinWidth]="600"
     [sqxResizeMaxWidth]="0">
     <ng-container>
-        <div class="drop-area-container">
+        <div class="drop-area-container" [class.disabled]="snapshot.isDisabled">
             <div class="drop-area">
-                <a (click)="contentCreatorDialog.show()">{{ 'contents.referencesCreateNew' | sqxTranslate }}</a>
+                <a (click)="createContent()">{{ 'contents.referencesCreateNew' | sqxTranslate }}</a>
 
                 &middot;
 
@@ -23,6 +23,7 @@
                 class="table-drag"
                 cdkDrag
                 cdkDragLockAxis="y" 
+                (clone)="createContent(content)"
                 [columns]="snapshot.contentItems | sqxContentsColumns"
                 [isCompact]="snapshot.isCompact"
                 [isDisabled]="snapshot.isDisabled"
@@ -38,8 +39,10 @@
     <sqx-content-creator
         (select)="select($event)"
         [formContext]="formContext"
+        [initialData]="clonedContent?.data"
         [language]="language"
         [languages]="languages"
+        [schemaName]="clonedContent?.schemaName"
         [schemaIds]="schemaIds">
     </sqx-content-creator>
 </ng-container>

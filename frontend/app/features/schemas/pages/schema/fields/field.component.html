@@ -4,7 +4,7 @@
             <ng-content></ng-content>
         </span>  
 
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-6">
                 <span class="field-name">
                     <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
@@ -41,7 +41,7 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpenChanges | async" #buttonOptions>
+                    <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
 

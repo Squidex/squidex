@@ -19,7 +19,7 @@ namespace Squidex.Extensions.Actions.Medium
         Display = "Post to Medium",
         Description = "Create a new story or post at medium.",
         ReadMore = "https://medium.com/")]
-    public sealed class MediumAction : RuleAction
+    public sealed record MediumAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Access Token", Description = "The self issued access token.")]

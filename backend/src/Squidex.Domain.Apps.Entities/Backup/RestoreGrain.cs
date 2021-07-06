@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -61,17 +61,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IUserResolver userResolver,
             ISemanticLog log)
         {
-            Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(log, nameof(log));
-
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
             this.commandBus = commandBus;
@@ -356,7 +345,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var batchBlock = new BatchBlock<(string, Envelope<IEvent>)>(BatchSize, new GroupingDataflowBlockOptions
             {
-                BoundedCapacity = BatchSize
+                BoundedCapacity = BatchSize * 2
             });
 
             batchBlock.LinkTo(writeBlock, new DataflowLinkOptions

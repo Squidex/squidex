@@ -19,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Lazy<IGraphType> assetsList;
         private readonly Lazy<IGraphType> assetsResult;
         private readonly Lazy<IInterfaceGraphType> contentInterface;
+        private readonly Lazy<IInterfaceGraphType> componentInterface;
         private readonly Lazy<FieldType> findAsset;
         private readonly Lazy<FieldType> queryAssets;
         private readonly Lazy<FieldType> queryAssetsWithTotal;
@@ -30,6 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public IGraphType AssetsResult => assetsResult.Value;
 
         public IInterfaceGraphType ContentInterface => contentInterface.Value;
+
+        public IInterfaceGraphType ComponentInterface => componentInterface.Value;
 
         public FieldType FindAsset => findAsset.Value;
 
@@ -57,6 +60,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             contentInterface = new Lazy<IInterfaceGraphType>(() =>
             {
                 return new ContentInterfaceGraphType();
+            });
+
+            componentInterface = new Lazy<IInterfaceGraphType>(() =>
+            {
+                return new ComponentInterfaceGraphType();
             });
 
             findAsset = new Lazy<FieldType>(() =>

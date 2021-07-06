@@ -24,10 +24,6 @@ namespace Squidex.Web.Pipeline
 
         public UsageMiddleware(IAppLogStore usageLog, IApiUsageTracker usageTracker, IClock clock)
         {
-            Guard.NotNull(usageLog, nameof(usageLog));
-            Guard.NotNull(usageTracker, nameof(usageTracker));
-            Guard.NotNull(clock, nameof(clock));
-
             this.usageLog = usageLog;
             this.usageTracker = usageTracker;
 
@@ -48,7 +44,7 @@ namespace Squidex.Web.Pipeline
             {
                 if (context.Response.StatusCode != StatusCodes.Status429TooManyRequests)
                 {
-                    var appId = context.Features.Get<IAppFeature>()?.AppId;
+                    var appId = context.Features.Get<IAppFeature>()?.App.Id;
 
                     if (appId != null)
                     {
@@ -72,13 +68,13 @@ namespace Squidex.Web.Pipeline
                         request.UserClientId = clientId;
                         request.UserId = context.User.OpenIdSubject();
 
-                        await usageLog.LogAsync(appId.Id, request);
+                        await usageLog.LogAsync(appId.Value, request);
 
                         if (request.Costs > 0)
                         {
                             var date = request.Timestamp.ToDateTimeUtc().Date;
 
-                            await usageTracker.TrackAsync(date, appId.Id.ToString(),
+                            await usageTracker.TrackAsync(date, appId.Value.ToString(),
                                 request.UserClientId,
                                 request.Costs,
                                 request.ElapsedMs,

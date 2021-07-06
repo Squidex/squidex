@@ -18,7 +18,7 @@ describe('ContributorsState', () => {
         app,
         appsState,
         newVersion,
-        version
+        version,
     } = TestValues;
 
     const allIds: number[] = [];
@@ -63,7 +63,7 @@ describe('ContributorsState', () => {
 
         it('should reset loading state if loading failed', () => {
             contributorsService.setup(x => x.getContributors(app))
-                .returns(() => throwError('error'));
+                .returns(() => throwError(() => 'Service Error'));
 
             contributorsState.load().pipe(onErrorResumeNext()).subscribe();
 
@@ -152,7 +152,7 @@ describe('ContributorsState', () => {
             const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
 
             contributorsService.setup(x => x.postContributor(app, request, version))
-                .returns(() => throwError(new ErrorDto(404, '404')));
+                .returns(() => throwError(() => new ErrorDto(404, '404')));
 
             let error: ErrorDto;
 
@@ -161,7 +161,7 @@ describe('ContributorsState', () => {
                     error = err;
 
                     return EMPTY;
-                })
+                }),
             ).subscribe();
 
             expect(error!.message).toBe('i18n:contributors.userNotFound');
@@ -171,7 +171,7 @@ describe('ContributorsState', () => {
             const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
 
             contributorsService.setup(x => x.postContributor(app, request, version))
-                .returns(() => throwError(new ErrorDto(500, '500')));
+                .returns(() => throwError(() => new ErrorDto(500, '500')));
 
             let error: ErrorDto;
 
@@ -180,7 +180,7 @@ describe('ContributorsState', () => {
                     error = err;
 
                     return EMPTY;
-                })
+                }),
             ).subscribe();
 
             expect(error!.message).toBe('500');

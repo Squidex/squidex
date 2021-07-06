@@ -8,12 +8,12 @@
 import { Injectable } from '@angular/core';
 import { LocalStoreService, Version } from '@app/framework';
 
-export declare type AutoSaveKey = { schemaId: string, schemaVersion: Version, contentId?: string };
+export declare type AutoSaveKey = { schemaId: string; schemaVersion: Version; contentId?: string };
 
 @Injectable()
 export class AutoSaveService {
     constructor(
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
     }
 

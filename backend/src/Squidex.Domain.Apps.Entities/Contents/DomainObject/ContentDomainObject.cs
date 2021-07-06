@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -32,8 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             IServiceProvider serviceProvider)
             : base(persistence, log)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
 
             Capacity = int.MaxValue;
@@ -95,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                         await CreateCore(c, operation);
 
-                        if (operation.Schema.SchemaDef.IsSingleton)
+                        if (operation.Schema.SchemaDef.Type == SchemaType.Singleton)
                         {
                             ChangeStatus(c.AsChange(Status.Published));
                         }
@@ -222,6 +221,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private async Task CreateCore(CreateContent c, OperationContext operation)
         {
             operation.MustNotCreateSingleton();
+            operation.MustNotCreateForUnpublishedSchema();
             operation.MustHaveData(c.Data);
 
             if (!c.DoNotValidate)
@@ -265,11 +265,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 await operation.CheckTransitionAsync(c.Status);
             }
 
-            if (c.CheckReferrers && Snapshot.IsPublished())
-            {
-                await operation.CheckReferrersAsync();
-            }
-
             if (!c.DoNotScript)
             {
                 var newData = await operation.ExecuteChangeScriptAsync(c.Status, GetChange(c.Status));
@@ -291,6 +286,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 }
             }
 
+            if (c.CheckReferrers && Snapshot.IsPublished())
+            {
+                await operation.CheckReferrersAsync();
+            }
+
             if (!c.DoNotValidate && c.Status == Status.Published && operation.SchemaDef.Properties.ValidateOnPublish)
             {
                 await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation, true);
@@ -306,7 +306,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotValidate)
             {
-                await operation.ValidateInputPartialAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
+                await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished());
             }
 
             if (!c.DoNotValidateWorkflow)
@@ -374,14 +374,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             operation.MustHavePermission(Permissions.AppContentsDeleteOwn);
             operation.MustNotDeleteSingleton();
 
-            if (c.CheckReferrers)
-            {
-                await operation.CheckReferrersAsync();
-            }
-
             if (!c.DoNotScript)
             {
                 await operation.ExecuteDeleteScriptAsync();
+            }
+
+            if (c.CheckReferrers)
+            {
+                await operation.CheckReferrersAsync();
             }
 
             Delete(c);

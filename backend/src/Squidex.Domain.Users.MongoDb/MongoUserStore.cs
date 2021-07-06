@@ -138,7 +138,8 @@ namespace Squidex.Domain.Users.MongoDb
             return "Identity_Users";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection,
+            CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {

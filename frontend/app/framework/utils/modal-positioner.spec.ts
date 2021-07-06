@@ -15,7 +15,7 @@ describe('position', () => {
             right: x + w,
             width: w,
             height: h,
-            bottom: y + h
+            bottom: y + h,
         };
     }
 
@@ -33,19 +33,19 @@ describe('position', () => {
         { position: 'left-bottom', x: 160, y: 270 },
         { position: 'right', x: 310, y: 235 },
         { position: 'right-top', x: 310, y: 200 },
-        { position: 'right-bottom', x: 310, y: 270 }
+        { position: 'right-bottom', x: 310, y: 270 },
     ];
 
-    for (const test of tests) {
-        const modalRect = buildRect(0, 0, 30, 30);
-
+    tests.forEach(test => {
         it(`should calculate modal position for ${test.position}`, () => {
+            const modalRect = buildRect(0, 0, 30, 30);
+
             const result = positionModal(targetRect, modalRect, test.position, 10, false, 0, 0);
 
             expect(result.x).toBe(test.x);
             expect(result.y).toBe(test.y);
         });
-    }
+    });
 
     it('should calculate modal position for vertical top fix', () => {
         const modalRect = buildRect(0, 0, 30, 200);

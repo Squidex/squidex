@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var settings = new AppSettings
             {
-                HideDateTimeQuickButtons = true
+                HideDateTimeModeButton = true
             };
 
             var command = new UpdateAppSettings { Settings = settings };

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -103,14 +103,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AlwaysCreateClientCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<CreateBlogCommandMiddleware>()
+            services.AddSingletonAs<TemplateCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<CreateIdentityCommandMiddleware>()
-                .As<ICommandMiddleware>();
+            services.AddSingletonAs<CreateBlog>()
+                .As<ITemplate>();
 
-            services.AddSingletonAs<CreateProfileCommandMiddleware>()
-                .As<ICommandMiddleware>();
+            services.AddSingletonAs<CreateProfile>()
+                .As<ITemplate>();
 
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();

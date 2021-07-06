@@ -19,8 +19,8 @@ describe('FocusOnInitDirective', () => {
             },
             select: () => {
                 isSelectCalled = true;
-            }
-        }
+            },
+        },
     };
 
     beforeEach(() => {

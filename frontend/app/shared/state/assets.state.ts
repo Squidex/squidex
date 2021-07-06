@@ -13,11 +13,11 @@ import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsServ
 import { AppsState } from './apps.state';
 import { Query } from './query';
 
-export type AssetPathItem = { id: string, folderName: string };
+export type AssetPathItem = { id: string; folderName: string };
 
 export type TagsAvailable = { [name: string]: number };
 export type TagsSelected = { [name: string]: boolean };
-export type TagItem = { name: string, count: number; };
+export type TagItem = { name: string; count: number };
 
 export const ROOT_ITEM: AssetPathItem = { id: MathHelper.EMPTY_GUID, folderName: 'i18n:assets.specialFolder.root' };
 
@@ -107,7 +107,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     protected constructor(name: string,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super({
             folders: [],
@@ -118,7 +118,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             path: [ROOT_ITEM],
             tagsAvailable: {},
             tagsSelected: {},
-            total: 0
+            total: 0,
         }, name);
     }
 
@@ -170,7 +170,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     isLoading: false,
                     path,
                     tagsAvailable,
-                    total
+                    total,
                 }, 'Loading Success');
             }),
             finalize(() => {
@@ -254,7 +254,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     return { ...s, assets };
                 }, 'Asset Moving Failed');
 
-                return throwError(error);
+                return throwError(() => error);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -278,7 +278,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     return { ...s, folders };
                 }, 'Folder Moving Done');
 
-                return throwError(error);
+                return throwError(() => error);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -290,7 +290,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     return this.dialogs.confirm(
                         'i18n:assets.deleteReferrerConfirmTitle',
                         'i18n:assets.deleteReferrerConfirmText',
-                        'deleteReferencedAsset'
+                        'deleteReferencedAsset',
                     ).pipe(
                         switchMap(confirmed => {
                             if (confirmed) {
@@ -298,10 +298,10 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                             } else {
                                 return EMPTY;
                             }
-                        })
+                        }),
                     );
                 } else {
-                    return throwError(error);
+                    return throwError(() => error);
                 }
             }),
             tap(() => {
@@ -336,7 +336,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    public page(paging: { page: number, pageSize: number }) {
+    public page(paging: { page: number; pageSize: number }) {
         if (!this.next(paging, 'Loading Paged')) {
             return EMPTY;
         }
@@ -442,8 +442,8 @@ function createQuery(snapshot: Snapshot) {
         page,
         pageSize,
         query,
-        tagsSelected
-    } =  snapshot;
+        tagsSelected,
+    } = snapshot;
 
     const result: any = { take: pageSize, skip: pageSize * page };
 
@@ -481,7 +481,7 @@ function getSortedTags(tags: { [name: string]: number }) {
 @Injectable()
 export class AssetsState extends AssetsStateBase {
     constructor(
-        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService
+        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
     ) {
         super('Assets', appsState, assetsService, dialogs);
     }
@@ -490,7 +490,7 @@ export class AssetsState extends AssetsStateBase {
 @Injectable()
 export class ComponentAssetsState extends AssetsStateBase {
     constructor(
-        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService
+        appsState: AppsState, assetsService: AssetsService, dialogs: DialogService,
     ) {
         super('Component Assets', appsState, assetsService, dialogs);
     }

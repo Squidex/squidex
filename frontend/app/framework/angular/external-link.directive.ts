@@ -8,7 +8,7 @@
 import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular/core';
 
 @Directive({
-    selector: '[sqxExternalLink]'
+    selector: '[sqxExternalLink]',
 })
 export class ExternalLinkDirective implements AfterViewInit {
     @Input('sqxExternalLink')
@@ -16,7 +16,7 @@ export class ExternalLinkDirective implements AfterViewInit {
 
     constructor(
         private readonly element: ElementRef<Element>,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

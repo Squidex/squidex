@@ -15,13 +15,13 @@ describe('AppLanguagesService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                HttpClientTestingModule
+                HttpClientTestingModule,
             ],
             providers: [
                 AppLanguagesService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-                { provide: AnalyticsService, useValue: new AnalyticsService() }
-            ]
+                { provide: AnalyticsService, useValue: new AnalyticsService() },
+            ],
         });
     });
 
@@ -31,111 +31,107 @@ describe('AppLanguagesService', () => {
 
     it('should make get request to get app languages',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
+            let languages: AppLanguagesDto;
 
-        let languages: AppLanguagesDto;
+            appLanguagesService.getLanguages('my-app').subscribe(result => {
+                languages = result;
+            });
 
-        appLanguagesService.getLanguages('my-app').subscribe(result => {
-            languages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
 
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+            req.flush(languagesResponse('en', 'de', 'it'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        req.flush(languagesResponse('en', 'de', 'it'), {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(languages!).toEqual({payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
-    }));
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+        }));
 
     it('should make post request to add language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
+            const dto = { language: 'de' };
 
-        const dto = { language: 'de' };
+            let languages: AppLanguagesDto;
 
-        let languages: AppLanguagesDto;
+            appLanguagesService.postLanguage('my-app', dto, version).subscribe(result => {
+                languages = result;
+            });
 
-        appLanguagesService.postLanguage('my-app', dto, version).subscribe(result => {
-            languages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages');
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            req.flush(languagesResponse('en', 'de', 'it'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        req.flush(languagesResponse('en', 'de', 'it'), {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(languages!).toEqual({payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
-    }));
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+        }));
 
     it('should make put request to make master language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
+            const dto = { isMaster: true };
 
-        const dto = { isMaster: true };
+            const resource: Resource = {
+                _links: {
+                    update: { method: 'PUT', href: 'api/apps/my-app/languages/de' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                update: { method: 'PUT', href: 'api/apps/my-app/languages/de' }
-            }
-        };
+            let languages: AppLanguagesDto;
 
-        let languages: AppLanguagesDto;
+            appLanguagesService.putLanguage('my-app', resource, dto, version).subscribe(result => {
+                languages = result;
+            });
 
-        appLanguagesService.putLanguage('my-app', resource, dto, version).subscribe(result => {
-            languages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            req.flush(languagesResponse('en', 'de', 'it'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        req.flush(languagesResponse('en', 'de', 'it'), {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(languages!).toEqual({payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
-    }));
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+        }));
 
     it('should make delete request to remove language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    delete: { method: 'DELETE', href: 'api/apps/my-app/languages/de' },
+                },
+            };
 
-        const resource: Resource = {
-            _links: {
-                delete: { method: 'DELETE', href: 'api/apps/my-app/languages/de' }
-            }
-        };
+            let languages: AppLanguagesDto;
 
-        let languages: AppLanguagesDto;
+            appLanguagesService.deleteLanguage('my-app', resource, version).subscribe(result => {
+                languages = result;
+            });
 
-        appLanguagesService.deleteLanguage('my-app', resource, version).subscribe(result => {
-            languages = result;
-        });
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+            req.flush(languagesResponse('en', 'de', 'it'), {
+                headers: {
+                    etag: '2',
+                },
+            });
 
-        req.flush(languagesResponse('en', 'de', 'it'), {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(languages!).toEqual({payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
-    }));
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+        }));
 
     function languagesResponse(...codes: string[]) {
         return {
@@ -146,12 +142,12 @@ describe('AppLanguagesService', () => {
                 isOptional: i % 2 === 1,
                 fallback: codes.removed(code),
                 _links: {
-                    update: { method: 'PUT', href: `/languages/${code}` }
-                }
+                    update: { method: 'PUT', href: `/languages/${code}` },
+                },
             })),
             _links: {
-                create: { method: 'POST', href: '/languages' }
-            }
+                create: { method: 'POST', href: '/languages' },
+            },
         };
     }
 });
@@ -160,14 +156,14 @@ export function createLanguages(...codes: ReadonlyArray<string>): AppLanguagesPa
     return {
         items: codes.map((code, i) => createLanguage(code, codes, i)),
         _links: {
-            create: { method: 'POST', href: '/languages' }
+            create: { method: 'POST', href: '/languages' },
         },
-        canCreate: true
+        canCreate: true,
     };
 }
 function createLanguage(code: string, codes: ReadonlyArray<string>, i: number) {
     const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/languages/${code}` }
+        update: { method: 'PUT', href: `/languages/${code}` },
     };
 
     return new AppLanguageDto(links, code, code, i === 0, i % 2 === 1, codes.removed(code));

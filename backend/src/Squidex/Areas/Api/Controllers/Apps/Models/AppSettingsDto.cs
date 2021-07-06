@@ -5,10 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
@@ -20,18 +18,23 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The configured app patterns.
         /// </summary>
         [LocalizedRequired]
-        public List<PatternDto> Patterns { get; set; }
+        public PatternDto[] Patterns { get; set; }
 
         /// <summary>
         /// The configured UI editors.
         /// </summary>
         [LocalizedRequired]
-        public List<EditorDto> Editors { get; set; }
+        public EditorDto[] Editors { get; set; }
 
         /// <summary>
         /// Hide the scheduler for content items.
         /// </summary>
         public bool HideScheduler { get; set; }
+
+        /// <summary>
+        /// Hide the datetime mode button.
+        /// </summary>
+        public bool HideDateTimeModeButton { get; set; }
 
         /// <summary>
         /// The version of the app.
@@ -44,13 +47,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             var result = new AppSettingsDto
             {
+                Editors = settings.Editors.Select(EditorDto.FromEditor).ToArray(),
+                HideDateTimeModeButton = settings.HideDateTimeModeButton,
                 HideScheduler = settings.HideScheduler,
-                Patterns =
-                    settings.Patterns
-                        .Select(x => SimpleMapper.Map(x, new PatternDto())).ToList(),
-                Editors =
-                    settings.Editors
-                        .Select(x => SimpleMapper.Map(x, new EditorDto())).ToList(),
+                Patterns = settings.Patterns.Select(PatternDto.FromPattern).ToArray(),
                 Version = app.Version
             };
 

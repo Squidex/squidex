@@ -12,7 +12,7 @@ import { RootViewComponent } from './root-view.component';
 declare type Model = DialogModel | ModalModel | any;
 
 @Directive({
-    selector: '[sqxModal]'
+    selector: '[sqxModal]',
 })
 export class ModalDirective implements OnDestroy {
     private readonly eventsView = new ResourceOwner();
@@ -48,7 +48,7 @@ export class ModalDirective implements OnDestroy {
         private readonly renderer: Renderer2,
         private readonly rootView: RootViewComponent,
         private readonly templateRef: TemplateRef<any>,
-        private readonly viewContainer: ViewContainerRef
+        private readonly viewContainer: ViewContainerRef,
     ) {
     }
 
@@ -78,16 +78,14 @@ export class ModalDirective implements OnDestroy {
 
                 this.changeDetector.detectChanges();
             }
-        } else {
-            if (this.renderedView) {
-                this.renderedView.destroy();
-                this.renderedView = null;
-                this.renderRoots = null;
+        } else if (this.renderedView) {
+            this.renderedView.destroy();
+            this.renderedView = null;
+            this.renderRoots = null;
 
-                remove(this.renderer, ModalDirective.backdrop);
+            remove(this.renderer, ModalDirective.backdrop);
 
-                this.changeDetector.detectChanges();
-            }
+            this.changeDetector.detectChanges();
         }
 
         this.isOpen = isOpen;
@@ -153,13 +151,13 @@ export class ModalDirective implements OnDestroy {
         if (this.isClickedInside(event)) {
             this.hideModal(this.currentModel);
         }
-    }
+    };
 
     private backdropListener = (event: MouseEvent) => {
         if (!this.isClickedInside(event)) {
             this.hideModal(this.currentModel);
         }
-    }
+    };
 
     private isClickedInside(event: MouseEvent) {
         try {

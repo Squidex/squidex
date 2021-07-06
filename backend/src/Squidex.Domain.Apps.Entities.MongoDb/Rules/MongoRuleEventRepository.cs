@@ -36,7 +36,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return "RuleEvents";
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection, CancellationToken ct = default)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection,
+            CancellationToken ct = default)
         {
             await statisticsCollection.InitializeAsync(ct);
 
@@ -63,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
         }
 
-        public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20)
+        public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20, CancellationToken ct = default)
         {
             var filter = Filter.Eq(x => x.AppId, appId);
 
@@ -72,22 +73,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 filter = Filter.And(filter, Filter.Eq(x => x.RuleId, ruleId.Value));
             }
 
-            var ruleEventEntities = await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync();
+            var ruleEventEntities = await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.Created).ToListAsync(ct);
             var ruleEventTotal = (long)ruleEventEntities.Count;
 
             if (ruleEventTotal >= take || skip > 0)
             {
-                ruleEventTotal = await Collection.Find(filter).CountDocumentsAsync();
+                ruleEventTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
             }
 
             return ResultList.Create(ruleEventTotal, ruleEventEntities);
         }
 
-        public async Task<IRuleEventEntity> FindAsync(DomainId id)
+        public async Task<IRuleEventEntity> FindAsync(DomainId id, CancellationToken ct = default)
         {
             var ruleEvent =
                 await Collection.Find(x => x.DocumentId == id)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(ct);
 
             return ruleEvent;
         }
@@ -149,9 +150,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             }
         }
 
-        public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(DomainId appId)
+        public Task<IReadOnlyList<RuleStatistics>> QueryStatisticsByAppAsync(DomainId appId, CancellationToken ct = default)
         {
-            return statisticsCollection.QueryByAppAsync(appId);
+            return statisticsCollection.QueryByAppAsync(appId, ct);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newLanguages = new Dictionary<string, LanguageConfig>(languages)
             {
-                [language] = new LanguageConfig(isOptional, fallbacks)
+                [language] = new LanguageConfig(isOptional, ImmutableList.Create(fallbacks))
             };
 
             return Build(newLanguages, master);

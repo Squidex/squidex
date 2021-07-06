@@ -1,10 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -23,15 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.appProvider = appProvider;
 
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<SearchResults> SearchAsync(string query, Context context)
+        public async Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 
@@ -51,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     {
                         AddSchemaUrl(result, appId, schemaId, name);
 
-                        if (HasPermission(context, schemaId))
+                        if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
                         {
                             AddContentsUrl(result, appId, schema, schemaId, name);
                         }
@@ -71,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
         {
-            if (schema.SchemaDef.IsSingleton)
+            if (schema.SchemaDef.Type == SchemaType.Singleton)
             {
                 var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 

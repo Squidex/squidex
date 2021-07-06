@@ -53,7 +53,7 @@ export function getCellWidth(field: TableField) {
 
 @Pipe({
     name: 'sqxContentsColumns',
-    pure: true
+    pure: true,
 })
 export class ContentsColumnsPipe implements PipeTransform {
     public transform(value: ReadonlyArray<ContentDto>) {
@@ -69,7 +69,7 @@ export class ContentsColumnsPipe implements PipeTransform {
 
 @Pipe({
     name: 'sqxContentListWidth',
-    pure: true
+    pure: true,
 })
 export class ContentListWidthPipe implements PipeTransform {
     public transform(value: ReadonlyArray<TableField>) {
@@ -82,7 +82,7 @@ export class ContentListWidthPipe implements PipeTransform {
 }
 
 @Directive({
-    selector: '[sqxContentListCell]'
+    selector: '[sqxContentListCell]',
 })
 export class ContentListCellDirective implements OnChanges {
     @Input('sqxContentListCell')
@@ -90,7 +90,7 @@ export class ContentListCellDirective implements OnChanges {
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

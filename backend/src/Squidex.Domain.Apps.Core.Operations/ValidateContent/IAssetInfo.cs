@@ -20,6 +20,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         string FileHash { get; }
 
+        string MimeType { get; }
+
         string Slug { get; }
 
         AssetMetadata Metadata { get; }

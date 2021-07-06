@@ -45,7 +45,7 @@ export function allParams(value: ActivatedRouteSnapshot | ActivatedRoute): Param
 export function childComponent(value: RouterStateSnapshot) {
     let current = value.root;
 
-    while (true) {
+    while (current) {
         if (current.firstChild) {
             current = current.firstChild;
         } else {

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -16,6 +18,7 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
@@ -27,29 +30,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IContentRepository contentRepository;
         private readonly IContentLoader contentLoader;
         private readonly ContentQueryParser queryParser;
+        private readonly ContentOptions options;
 
         public ContentQueryService(
             IAppProvider appProvider,
             IContentEnricher contentEnricher,
             IContentRepository contentRepository,
             IContentLoader contentLoader,
+            IOptions<ContentOptions> options,
             ContentQueryParser queryParser)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(contentEnricher, nameof(contentEnricher));
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-            Guard.NotNull(contentLoader, nameof(contentLoader));
-            Guard.NotNull(queryParser, nameof(queryParser));
-
             this.appProvider = appProvider;
             this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;
             this.contentLoader = contentLoader;
-            this.queryParser = queryParser;
+            this.options = options.Value;
             this.queryParser = queryParser;
         }
 
-        public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any)
+        public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 }
                 else
                 {
-                    content = await contentRepository.FindContentAsync(context.App, schema, id, context.Scope());
+                    content = await FindCoreAsync(context, id, schema, ct);
                 }
 
                 if (content == null || content.SchemaId.Id != schema.Id)
@@ -73,11 +73,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     return null;
                 }
 
-                return await TransformAsync(context, content);
+                return await TransformAsync(context, content, ct);
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q q)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q q,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -97,18 +98,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 q = await queryParser.ParseAsync(context, q, schema);
 
-                var contents = await contentRepository.QueryAsync(context.App, schema, q, context.Scope());
+                var contents = await QueryCoreAsync(context, q, schema, ct);
 
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }
 
-                return await TransformAsync(context, contents);
+                return await TransformAsync(context, contents, ct);
             }
         }
 
-        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q)
+        public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -128,36 +130,39 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 q = await queryParser.ParseAsync(context, q);
 
-                var contents = await contentRepository.QueryAsync(context.App, schemas, q, context.Scope());
+                var contents = await QueryCoreAsync(context, q, schemas, ct);
 
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
                     contents = contents.SortSet(x => x.Id, q.Ids);
                 }
 
-                return await TransformAsync(context, contents);
+                return await TransformAsync(context, contents, ct);
             }
         }
 
-        private async Task<IResultList<IEnrichedContentEntity>> TransformAsync(Context context, IResultList<IContentEntity> contents)
+        private async Task<IResultList<IEnrichedContentEntity>> TransformAsync(Context context, IResultList<IContentEntity> contents,
+            CancellationToken ct)
         {
-            var transformed = await TransformCoreAsync(context, contents);
+            var transformed = await TransformCoreAsync(context, contents, ct);
 
             return ResultList.Create(contents.Total, transformed);
         }
 
-        private async Task<IEnrichedContentEntity> TransformAsync(Context context, IContentEntity content)
+        private async Task<IEnrichedContentEntity> TransformAsync(Context context, IContentEntity content,
+            CancellationToken ct)
         {
-            var transformed = await TransformCoreAsync(context, Enumerable.Repeat(content, 1));
+            var transformed = await TransformCoreAsync(context, Enumerable.Repeat(content, 1), ct);
 
             return transformed[0];
         }
 
-        private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, IEnumerable<IContentEntity> contents)
+        private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, IEnumerable<IContentEntity> contents,
+            CancellationToken ct)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                return await contentEnricher.EnrichAsync(contents, context);
+                return await contentEnricher.EnrichAsync(contents, context, ct);
             }
         }
 
@@ -206,7 +211,48 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var schemas = await appProvider.GetSchemasAsync(context.App.Id);
 
-            return schemas.Where(x => HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
+            return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
+        }
+
+        private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, ISchemaEntity schema,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await contentRepository.QueryAsync(context.App, schema, q, context.Scope(), ct);
+                }
+            }
+        }
+
+        private async Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, Q q, List<ISchemaEntity> schemas,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutQuery))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await contentRepository.QueryAsync(context.App, schemas, q, context.Scope(), ct);
+                }
+            }
+        }
+
+        private async Task<IContentEntity?> FindCoreAsync(Context context, DomainId id, ISchemaEntity schema,
+            CancellationToken ct)
+        {
+            using (var timeout = new CancellationTokenSource(options.TimeoutFind))
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, ct))
+                {
+                    return await contentRepository.FindContentAsync(context.App, schema, id, context.Scope(), combined.Token);
+                }
+            }
+        }
+
+        private static bool IsAccessible(ISchemaEntity schema)
+        {
+            return schema.SchemaDef.IsPublished;
         }
 
         private static bool HasPermission(Context context, ISchemaEntity schema, string permissionId)

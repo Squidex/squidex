@@ -58,9 +58,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public AppLanguageDto WithLinks(Resources resources, IAppEntity app)
+        public AppLanguageDto CreateLinks(Resources resources, IAppEntity app)
         {
-            var values = new { app = app.Name, language = Iso2Code };
+            var values = new { app = resources.App, language = Iso2Code };
 
             if (!IsMaster)
             {

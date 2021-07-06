@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             Func<IEventSubscriber, IEventSubscription> factory,
             TaskScheduler scheduler)
         {
-            var batchSize = Math.Max(1, eventConsumer!.BatchSize);
+            var batchSize = Math.Max(1, eventConsumer.BatchSize);
             var batchDelay = Math.Max(100, eventConsumer.BatchDelay);
 
             var parse = new TransformBlock<Job, Job>(job =>
@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             buffer.LinkTo(handle, new DataflowLinkOptions
             {
-                PropagateCompletion = true
+                PropagateCompletion = true,
             });
 
             pipelineStart = parse;
@@ -189,6 +189,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             var job = new Job
             {
                 Sender = subscription,
+                StoredEvent = null,
                 Exception = exception
             };
 

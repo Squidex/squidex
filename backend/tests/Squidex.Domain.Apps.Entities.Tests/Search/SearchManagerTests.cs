@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -36,10 +37,10 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             Assert.Empty(result);
 
-            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -50,10 +51,10 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             Assert.Empty(result);
 
-            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -65,10 +66,10 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             var query = "a query";
 
-            A.CallTo(() => source1.SearchAsync(query, requestContext))
+            A.CallTo(() => source1.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Returns(result1);
 
-            A.CallTo(() => source2.SearchAsync(query, requestContext))
+            A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Returns(result2);
 
             var result = await sut.SearchAsync(query, requestContext);
@@ -86,10 +87,10 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             var query = "a query";
 
-            A.CallTo(() => source1.SearchAsync(query, requestContext))
+            A.CallTo(() => source1.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Throws(new InvalidOperationException());
 
-            A.CallTo(() => source2.SearchAsync(query, requestContext))
+            A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Returns(result2);
 
             var result = await sut.SearchAsync(query, requestContext);

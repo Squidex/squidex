@@ -49,7 +49,7 @@ export class Profile {
     }
 
     constructor(
-        public readonly user: User
+        public readonly user: User,
     ) {
     }
 }
@@ -77,15 +77,15 @@ export class AuthService {
 
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
-                           scope: 'squidex-api openid profile email squidex-profile role permissions',
-                   response_type: 'id_token token',
+                           scope: 'squidex-api openid profile email permissions',
+                   response_type: 'code',
                     redirect_uri: apiUrl.buildUrl('login;'),
         post_logout_redirect_uri: apiUrl.buildUrl('logout'),
              silent_redirect_uri: apiUrl.buildUrl('client-callback-silent'),
               popup_redirect_uri: apiUrl.buildUrl('client-callback-popup'),
                        authority: apiUrl.buildUrl('identity-server/'),
                        userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
-            automaticSilentRenew: true
+            automaticSilentRenew: true,
         });
 
         this.userManager.events.addUserLoaded(user => {
@@ -168,12 +168,12 @@ export class AuthService {
             retryWhen(errors =>
                 concat(
                     errors.pipe(
-                        mergeMap(e => Types.is(e, TimeoutError) ? of(e) : throwError(e)),
+                        mergeMap(e => (Types.is(e, TimeoutError) ? of(e) : throwError(() => e))),
                         delay(500),
                         take(5)),
-                    throwError(new Error('Retry limit exceeded.'))
-                )
-            )
+                    throwError(() => new Error('Retry limit exceeded.')),
+                ),
+            ),
         );
     }
 

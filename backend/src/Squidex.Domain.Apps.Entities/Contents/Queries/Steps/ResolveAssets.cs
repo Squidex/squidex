@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
@@ -31,16 +32,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ResolveAssets(IUrlGenerator urlGenerator, IAssetQueryService assetQuery, IRequestCache requestCache)
         {
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(requestCache, nameof(requestCache));
-
             this.urlGenerator = urlGenerator;
             this.assetQuery = assetQuery;
             this.requestCache = requestCache;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             if (ShouldEnrich(context))
             {
@@ -48,23 +46,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    var schema = await schemas(group.Key);
+                    var (schema, components) = await schemas(group.Key);
 
-                    AddAssetIds(ids, schema, group);
+                    AddAssetIds(ids, schema, components, group);
                 }
 
-                var assets = await GetAssetsAsync(context, ids);
+                var assets = await GetAssetsAsync(context, ids, ct);
 
                 foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
                 {
-                    var schema = await schemas(group.Key);
+                    var (schema, components) = await schemas(group.Key);
 
-                    ResolveAssetsUrls(schema, group, assets);
+                    ResolveAssetsUrls(schema, components, group, assets);
                 }
             }
         }
 
-        private void ResolveAssetsUrls(ISchemaEntity schema, IGrouping<DomainId, ContentEntity> contents, ILookup<DomainId, IEnrichedAssetEntity> assets)
+        private void ResolveAssetsUrls(ISchemaEntity schema, ResolvedComponents components,
+            IGrouping<DomainId, ContentEntity> contents, ILookup<DomainId, IEnrichedAssetEntity> assets)
         {
             foreach (var field in schema.SchemaDef.ResolvingAssets())
             {
@@ -79,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                         foreach (var (partitionKey, partitionValue) in fieldData)
                         {
                             var referencedAsset =
-                                field.GetReferencedIds(partitionValue)
+                                field.GetReferencedIds(partitionValue, components)
                                     .Select(x => assets[x])
                                     .SelectMany(x => x)
                                     .FirstOrDefault();
@@ -88,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                             {
                                 IJsonValue array;
 
-                                if (referencedAsset.Type == AssetType.Image)
+                                if (IsImage(referencedAsset))
                                 {
                                     var url = urlGenerator.AssetContent(
                                         referencedAsset.AppId,
@@ -111,7 +110,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
         }
 
-        private async Task<ILookup<DomainId, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<DomainId> ids)
+        private static bool IsImage(IEnrichedAssetEntity asset)
+        {
+            const int PreviewLimit = 10 * 1024;
+
+            return asset.Type == AssetType.Image || (asset.MimeType == "image/svg+xml" && asset.FileSize < PreviewLimit);
+        }
+
+        private async Task<ILookup<DomainId, IEnrichedAssetEntity>> GetAssetsAsync(Context context, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
             if (ids.Count == 0)
             {
@@ -122,16 +129,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 .WithoutAssetEnrichment(true)
                 .WithoutTotal());
 
-            var assets = await assetQuery.QueryAsync(queryContext, null, Q.Empty.WithIds(ids));
+            var assets = await assetQuery.QueryAsync(queryContext, null, Q.Empty.WithIds(ids), ct);
 
             return assets.ToLookup(x => x.Id);
         }
 
-        private static void AddAssetIds(HashSet<DomainId> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
+        private static void AddAssetIds(HashSet<DomainId> ids, ISchemaEntity schema, ResolvedComponents components, IEnumerable<ContentEntity> contents)
         {
             foreach (var content in contents)
             {
-                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids, 1);
+                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingAssets(), ids, components, 1);
             }
         }
 

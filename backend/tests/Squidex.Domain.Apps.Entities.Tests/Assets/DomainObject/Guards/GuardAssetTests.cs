@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             var command = new MoveAsset { AppId = appId, ParentId = parentId };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, default))
                 .Returns(new List<IAssetFolderEntity>());
 
             await ValidationAssert.ThrowsAsync(() => GuardAsset.CanMove(command, Asset(), assetQuery),
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             var command = new MoveAsset { AppId = appId, ParentId = parentId, OptimizeValidation = true };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, default))
                 .Returns(new List<IAssetFolderEntity>());
 
             await GuardAsset.CanMove(command, Asset(), assetQuery);
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             var command = new MoveAsset { AppId = appId, ParentId = parentId };
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId))
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, default))
                 .Returns(new List<IAssetFolderEntity> { AssetFolder() });
 
             await GuardAsset.CanMove(command, Asset(), assetQuery);
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             var command = new DeleteAsset { AppId = appId, CheckReferrers = true };
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, asset.Id, SearchScope.All))
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, asset.Id, SearchScope.All, default))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => GuardAsset.CanDelete(command, asset, contentRepository));

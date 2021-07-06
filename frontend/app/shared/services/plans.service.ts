@@ -23,13 +23,13 @@ export class PlanDto {
         public readonly maxApiBytes: number,
         public readonly maxApiCalls: number,
         public readonly maxAssetSize: number,
-        public readonly maxContributors: number
+        public readonly maxContributors: number,
     ) {
     }
 }
 
 export type PlansDto =
-    Versioned<Readonly<{ currentPlanId: string; planOwner: string; hasPortal: boolean; plans: ReadonlyArray<PlanDto>; }>>;
+    Versioned<Readonly<{ currentPlanId: string; planOwner: string; hasPortal: boolean; plans: ReadonlyArray<PlanDto> }>>;
 
 export type PlanChangedDto =
     Readonly<{ redirectUri?: string }>;
@@ -42,7 +42,7 @@ export class PlansService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService
+        private readonly analytics: AnalyticsService,
     ) {
     }
 
@@ -71,7 +71,7 @@ export class PlansService {
                             item.maxApiCalls,
                             item.maxAssetSize,
                             item.maxContributors)),
-                    hasPortal
+                    hasPortal,
                 };
 
                 return plans;

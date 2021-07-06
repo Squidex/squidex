@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: max-line-length
+/* eslint-disable @typescript-eslint/naming-convention */
 
 import { AbstractControl, FormArray } from '@angular/forms';
 import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, RootFieldDto } from '@app/shared/internal';
@@ -17,7 +17,7 @@ import { TestValues } from './_test-helpers';
 const {
     createField,
     createNestedField,
-    createSchema
+    createSchema,
 } = TestValues;
 
 describe('GetContentValue', () => {
@@ -30,9 +30,9 @@ describe('GetContentValue', () => {
         const content: any = {
             referenceData: {
                 field1: {
-                    en: ['url/to/13', 'file13']
-                }
-            }
+                    en: ['url/to/13', 'file13'],
+                },
+            },
         };
 
         const assetWithImageAndFileName = createField({ properties: createProperties('Assets', { previewMode: 'ImageAndFileName' }) });
@@ -46,9 +46,9 @@ describe('GetContentValue', () => {
         const content: any = {
             referenceData: {
                 field1: {
-                    en: ['url/to/13', 'file13']
-                }
-            }
+                    en: ['url/to/13', 'file13'],
+                },
+            },
         };
 
         const assetWithImage = createField({ properties: createProperties('Assets', { previewMode: 'Image' }) });
@@ -62,9 +62,9 @@ describe('GetContentValue', () => {
         const content: any = {
             referenceData: {
                 field1: {
-                    en: ['url/to/13', 'file13']
-                }
-            }
+                    en: ['url/to/13', 'file13'],
+                },
+            },
         };
 
         const assetWithFileName = createField({ properties: createProperties('Assets', { previewMode: 'FileName' }) });
@@ -78,9 +78,9 @@ describe('GetContentValue', () => {
         const content: any = {
             referenceData: {
                 field1: {
-                    en: ['file13']
-                }
-            }
+                    en: ['file13'],
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldAssets);
@@ -92,9 +92,9 @@ describe('GetContentValue', () => {
         const content: any = {
             referenceData: {
                 field1: {
-                    en: null
-                }
-            }
+                    en: null,
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldAssets);
@@ -106,9 +106,9 @@ describe('GetContentValue', () => {
         const content: any = {
             referenceData: {
                 field1: {
-                    iv: '13'
-                }
-            }
+                    iv: '13',
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldInvariant);
@@ -121,10 +121,10 @@ describe('GetContentValue', () => {
             referenceData: {
                 field1: {
                     iv: {
-                        en: '13'
-                    }
-                }
-            }
+                        en: '13',
+                    },
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldInvariant);
@@ -137,10 +137,10 @@ describe('GetContentValue', () => {
             referenceData: {
                 field1: {
                     en: {
-                        en: '13'
-                    }
-                }
-            }
+                        en: '13',
+                    },
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldLocalized);
@@ -153,10 +153,10 @@ describe('GetContentValue', () => {
             referenceData: {
                 field1: {
                     iv: {
-                        en: '13'
-                    }
-                }
-            }
+                        en: '13',
+                    },
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldLocalized);
@@ -168,9 +168,9 @@ describe('GetContentValue', () => {
         const content: any = {
             data: {
                 field1: {
-                    iv: 13
-                }
-            }
+                    iv: 13,
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldInvariant);
@@ -182,9 +182,9 @@ describe('GetContentValue', () => {
         const content: any = {
             data: {
                 field1: {
-                    en: 13
-                }
-            }
+                    en: 13,
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldLocalized);
@@ -196,9 +196,9 @@ describe('GetContentValue', () => {
         const content: any = {
             data: {
                 other: {
-                    en: 13
-                }
-            }
+                    en: 13,
+                },
+            },
         };
 
         const result = getContentValue(content, language, fieldLocalized);
@@ -210,18 +210,23 @@ describe('GetContentValue', () => {
 describe('ContentForm', () => {
     const languages = [
         new AppLanguageDto({}, 'en', 'English', true, false, []),
-        new AppLanguageDto({}, 'de', 'English', false, true, [])
+        new AppLanguageDto({}, 'de', 'English', false, true, []),
     ];
 
     const complexSchema = createSchema({ fields: [
         createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
         createField({ id: 2, properties: createProperties('String'), isDisabled: true }),
         createField({ id: 3, properties: createProperties('String', { isRequired: true }) }),
-        createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant', nested: [
-            createNestedField({ id: 41, properties: createProperties('String') }),
-            createNestedField({ id: 42, properties: createProperties('String', { defaultValue: 'Default' }), isDisabled: true })
-        ]})
-    ]});
+        createField({
+            id: 4,
+            properties: createProperties('Array'),
+            partitioning: 'invariant',
+            nested: [
+                createNestedField({ id: 41, properties: createProperties('String') }),
+                createNestedField({ id: 42, properties: createProperties('String', { defaultValue: 'Default' }), isDisabled: true }),
+            ],
+        }),
+    ] });
 
     describe('should resolve partitions', () => {
         const partitions = new PartitionConfig(languages);
@@ -230,7 +235,7 @@ describe('ContentForm', () => {
             const result = partitions.getAll(createField({ id: 3, properties: createProperties('String'), partitioning: 'invariant' }));
 
             expect(result).toEqual([
-                { key: 'iv', isOptional: false }
+                { key: 'iv', isOptional: false },
             ]);
         });
 
@@ -239,7 +244,7 @@ describe('ContentForm', () => {
 
             expect(result).toEqual([
                 { key: 'en', isOptional: false },
-                { key: 'de', isOptional: true }
+                { key: 'de', isOptional: true },
             ]);
         });
 
@@ -260,7 +265,7 @@ describe('ContentForm', () => {
         it('should not enabled disabled fields', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('String') }),
-                createField({ id: 2, properties: createProperties('String'), isDisabled: true })
+                createField({ id: 2, properties: createProperties('String'), isDisabled: true }),
             ]);
 
             expectForm(contentForm.form, 'field1', { disabled: false });
@@ -269,7 +274,7 @@ describe('ContentForm', () => {
 
         it('should not create required validator for optional language', () => {
             const contentForm = createForm([
-                createField({ id: 3, properties: createProperties('String', { isRequired: true }) })
+                createField({ id: 3, properties: createProperties('String', { isRequired: true }) }),
             ]);
 
             expectForm(contentForm.form, 'field3.en', { invalid: true });
@@ -279,9 +284,9 @@ describe('ContentForm', () => {
         it('should require field based on context condition', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
-                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' })
+                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
             ], [{
-                field: 'field1', action: 'Require', condition: 'ctx.value < 100'
+                field: 'field1', action: 'Require', condition: 'ctx.value < 100',
             }]);
 
             contentForm.setContext({ value: 50 });
@@ -298,9 +303,9 @@ describe('ContentForm', () => {
         it('should require field based on condition', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
-                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' })
+                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
             ], [{
-                field: 'field1', action: 'Require', condition: 'data.field2.iv < 100'
+                field: 'field1', action: 'Require', condition: 'data.field2.iv < 100',
             }]);
 
             const field1 = contentForm.get('field1')!.get('iv');
@@ -310,8 +315,8 @@ describe('ContentForm', () => {
 
             contentForm.load({
                 field2: {
-                    iv: 120
-                }
+                    iv: 120,
+                },
             });
 
             expect(field1!.form.valid).toBeTruthy();
@@ -324,9 +329,9 @@ describe('ContentForm', () => {
         it('should disable field based on condition', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
-                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' })
+                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
             ], [{
-                field: 'field1', action: 'Disable', condition: 'data.field2.iv > 100'
+                field: 'field1', action: 'Disable', condition: 'data.field2.iv > 100',
             }]);
 
             const field1 = contentForm.get('field1');
@@ -338,11 +343,11 @@ describe('ContentForm', () => {
 
             contentForm.load({
                 field1: {
-                    iv: 120
+                    iv: 120,
                 },
                 field2: {
-                    iv: 120
-                }
+                    iv: 120,
+                },
             });
 
             expect(field1!.form.disabled).toBeTruthy();
@@ -357,9 +362,9 @@ describe('ContentForm', () => {
         it('should hide field based on condition', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
-                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' })
+                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
             ], [{
-                field: 'field1', action: 'Hide', condition: 'data.field2.iv > 100'
+                field: 'field1', action: 'Hide', condition: 'data.field2.iv > 100',
             }]);
 
             const field1 = contentForm.get('field1');
@@ -371,11 +376,11 @@ describe('ContentForm', () => {
 
             contentForm.load({
                 field1: {
-                    iv: 120
+                    iv: 120,
                 },
                 field2: {
-                    iv: 120
-                }
+                    iv: 120,
+                },
             });
 
             expect(field1!.hidden).toBeTruthy();
@@ -385,17 +390,21 @@ describe('ContentForm', () => {
 
             expect(field1!.hidden).toBeFalsy();
             expect(field1_iv!.hidden).toBeFalsy();
-
         });
 
         it('should disable nested fields based on condition', () => {
             const contentForm = createForm([
-                createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant', nested: [
-                    createNestedField({ id: 41, properties: createProperties('Number') }),
-                    createNestedField({ id: 42, properties: createProperties('Number') })
-                ]})
+                createField({
+                    id: 4,
+                    properties: createProperties('Array'),
+                    partitioning: 'invariant',
+                    nested: [
+                        createNestedField({ id: 41, properties: createProperties('Number') }),
+                        createNestedField({ id: 42, properties: createProperties('Number') }),
+                    ],
+                }),
             ], [{
-                field: 'field4.nested42', action: 'Disable', condition: 'itemData.nested41 > 100'
+                field: 'field4.nested42', action: 'Disable', condition: 'itemData.nested41 > 100',
             }]);
 
             const array = contentForm.get(complexSchema.fields[3])!.get(languages[0]) as FieldArrayForm;
@@ -404,12 +413,12 @@ describe('ContentForm', () => {
                 field4: {
                     iv: [{
                         nested41: 120,
-                        nested42: 120
+                        nested42: 120,
                     }, {
                         nested41: 99,
-                        nested42: 99
-                    }]
-                }
+                        nested42: 99,
+                    }],
+                },
             });
 
             expect(array.get(0)!.get('nested42')!.form.disabled).toBeTruthy();
@@ -418,12 +427,17 @@ describe('ContentForm', () => {
 
         it('should hide nested fields based on condition', () => {
             const contentForm = createForm([
-                createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant', nested: [
-                    createNestedField({ id: 41, properties: createProperties('Number') }),
-                    createNestedField({ id: 42, properties: createProperties('Number') })
-                ]})
+                createField({
+                    id: 4,
+                    properties: createProperties('Array'),
+                    partitioning: 'invariant',
+                    nested: [
+                        createNestedField({ id: 41, properties: createProperties('Number') }),
+                        createNestedField({ id: 42, properties: createProperties('Number') }),
+                    ],
+                }),
             ], [{
-                field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100'
+                field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100',
             }]);
 
             const array = contentForm.get(complexSchema.fields[3])!.get(languages[0]) as FieldArrayForm;
@@ -432,12 +446,12 @@ describe('ContentForm', () => {
                 field4: {
                     iv: [{
                         nested41: 120,
-                        nested42: 120
+                        nested42: 120,
                     }, {
                         nested41: 99,
-                        nested42: 99
-                    }]
-                }
+                        nested42: 99,
+                    }],
+                },
             });
 
             expect(array.get(0)!.get('nested42')!.hidden).toBeTruthy();
@@ -450,16 +464,16 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     iv: [{
-                        nested41: 'Text'
-                    }]
-                }
+                        nested41: 'Text',
+                    }],
+                },
             });
 
             const nestedItem = array.form.get([0])!;
 
             expectLength(array, 1);
             expectForm(nestedItem, 'nested41', { disabled: false, value: 'Text' });
-            expectForm(nestedItem, 'nested42', { disabled: true,  value: null });
+            expectForm(nestedItem, 'nested42', { disabled: true, value: null });
         });
 
         it('should add array item', () => {
@@ -471,7 +485,7 @@ describe('ContentForm', () => {
 
             expectLength(array, 3);
             expectForm(nestedItem, 'nested41', { disabled: false, value: null });
-            expectForm(nestedItem, 'nested42', { disabled: true,  value: 'Default' });
+            expectForm(nestedItem, 'nested42', { disabled: true, value: 'Default' });
         });
 
         it('should sort array item', () => {
@@ -512,7 +526,7 @@ describe('ContentForm', () => {
 
         it('should not array item if field has no nested fields', () => {
             const contentForm = createForm([
-                createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant' })
+                createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant' }),
             ]);
 
             const nestedForm = contentForm.form.get('field4.iv') as FormArray;
@@ -522,10 +536,15 @@ describe('ContentForm', () => {
 
         function createArrayFormWith2Items() {
             const contentForm = createForm([
-                createField({ id: 4, properties: createProperties('Array'), partitioning: 'invariant', nested: [
-                    createNestedField({ id: 41, properties: createProperties('String') }),
-                    createNestedField({ id: 42, properties: createProperties('String', { defaultValue: 'Default' }), isDisabled: true })
-                ]})
+                createField({
+                    id: 4,
+                    properties: createProperties('Array'),
+                    partitioning: 'invariant',
+                    nested: [
+                        createNestedField({ id: 41, properties: createProperties('String') }),
+                        createNestedField({ id: 42, properties: createProperties('String', { defaultValue: 'Default' }), isDisabled: true }),
+                    ],
+                }),
             ]);
 
             const array = contentForm.get('field4')!.get('iv') as FieldArrayForm;
@@ -533,11 +552,11 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     iv: [{
-                        nested41: 'Text1'
+                        nested41: 'Text1',
                     }, {
-                        nested41: 'Text2'
-                    }]
-                }
+                        nested41: 'Text2',
+                    }],
+                },
             });
 
             return { contentForm, array };
@@ -548,7 +567,7 @@ describe('ContentForm', () => {
             expect(array.items.length).toBe(length);
         }
 
-        function expectForm(parent: AbstractControl, path: string, test: { invalid?: boolean, disabled?: boolean, value?: any }) {
+        function expectForm(parent: AbstractControl, path: string, test: { invalid?: boolean; disabled?: boolean; value?: any }) {
             const form = parent.get(path);
 
             if (form) {
@@ -568,20 +587,20 @@ describe('ContentForm', () => {
 
     it('should return true if new value is not equal to current value', () => {
         const simpleForm = createForm([
-            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' })
+            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
         ]);
 
-        const hasChanged = simpleForm.hasChanges({ field1: { iv: 'other' }});
+        const hasChanged = simpleForm.hasChanges({ field1: { iv: 'other' } });
 
         expect(hasChanged).toBeTruthy();
     });
 
     it('should return false if new value is same as current value', () => {
         const simpleForm = createForm([
-            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' })
+            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
         ]);
 
-        const hasChanged = simpleForm.hasChanges({ field1: { iv: null }});
+        const hasChanged = simpleForm.hasChanges({ field1: { iv: null } });
 
         expect(hasChanged).toBeFalsy();
     });
@@ -591,7 +610,7 @@ describe('ContentForm', () => {
 
         beforeEach(() => {
             simpleForm = createForm([
-                createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' })
+                createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
             ]);
         });
 
@@ -600,13 +619,13 @@ describe('ContentForm', () => {
         });
 
         it('should be an unsaved change if value has changed but not saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' }});
+            simpleForm.form.setValue({ field1: { iv: 'Change' } });
 
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
 
         it('should not be an unsaved change if value has changed and saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' }});
+            simpleForm.form.setValue({ field1: { iv: 'Change' } });
             simpleForm.submit();
             simpleForm.submitCompleted();
 
@@ -614,7 +633,7 @@ describe('ContentForm', () => {
         });
 
         it('should subscribe to values', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' }});
+            simpleForm.form.setValue({ field1: { iv: 'Change' } });
 
             let value: any;
 
@@ -622,7 +641,7 @@ describe('ContentForm', () => {
                 value = v;
             });
 
-            expect(value).toEqual({ field1: { iv: 'Change' }});
+            expect(value).toEqual({ field1: { iv: 'Change' } });
         });
     });
 
@@ -631,7 +650,7 @@ describe('ContentForm', () => {
 
         beforeEach(() => {
             simpleForm = createForm([
-                createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' })
+                createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
             ]);
             simpleForm.load({ field1: { iv: 'Initial' } }, true);
         });
@@ -643,7 +662,7 @@ describe('ContentForm', () => {
         });
 
         it('should be an unsaved change if value has changed but not saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' }});
+            simpleForm.form.setValue({ field1: { iv: 'Change' } });
 
             expect(simpleForm.hasChanged()).toBeTruthy();
         });
@@ -655,7 +674,7 @@ describe('ContentForm', () => {
         });
 
         it('should not be an unsaved change if value has changed and saved', () => {
-            simpleForm.form.setValue({ field1: { iv: 'Change' }});
+            simpleForm.form.setValue({ field1: { iv: 'Change' } });
             simpleForm.submit();
             simpleForm.submitCompleted();
 
@@ -673,6 +692,6 @@ describe('ContentForm', () => {
 
     function createForm(fields: RootFieldDto[], fieldRules: FieldRule[] = []) {
         return new EditContentForm(languages,
-            createSchema({ fields, fieldRules }), {}, 0);
+            createSchema({ fields, fieldRules }), {}, {}, 0);
     }
 });

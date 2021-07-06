@@ -13,9 +13,9 @@ import { AssetFolderDto, AssetPathItem, DialogModel, fadeAnimation, ModalModel, 
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetFolderComponent {
     @Output()

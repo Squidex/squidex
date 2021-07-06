@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { ContentDto, fadeAnimation, interpolate, LocalStoreService, ModalModel, SchemaDetailsDto, Settings, StatefulComponent } from '@app/shared';
+import { ContentDto, fadeAnimation, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -23,9 +23,9 @@ interface State {
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
     animations: [
-        fadeAnimation
+        fadeAnimation,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewButtonComponent extends StatefulComponent<State> implements OnInit {
     @Input()
@@ -35,15 +35,15 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     public content: ContentDto;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public schema: SchemaDto;
 
     public dropdown = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
     ) {
         super(changeDetector, {
-            previewNamesMore: []
+            previewNamesMore: [],
         });
     }
 

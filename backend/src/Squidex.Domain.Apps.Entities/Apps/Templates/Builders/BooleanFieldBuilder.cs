@@ -10,16 +10,20 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class BooleanFieldBuilder : FieldBuilder
+    public class BooleanFieldBuilder : FieldBuilder<BooleanFieldBuilder>
     {
-        public BooleanFieldBuilder(UpsertSchemaField field, CreateSchema schema)
+        public BooleanFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
             : base(field, schema)
         {
         }
 
         public BooleanFieldBuilder AsToggle()
         {
-            Properties<BooleanFieldProperties>().Editor = BooleanFieldEditor.Toggle;
+            Properties<BooleanFieldProperties>(p => p with
+            {
+                Editor = BooleanFieldEditor.Toggle,
+                EditorUrl = null
+            });
 
             return this;
         }

@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
-            var etag = string.Concat(ruleRegistry.Actions.Select(x => x.Key)).Sha256Base64();
+            var etag = string.Concat(ruleRegistry.Actions.Select(x => x.Key)).ToSha256Base64();
 
             var response = Deferred.Response(() =>
             {
@@ -413,18 +413,18 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <summary>
         /// Provide the json schema for the event with the specified name.
         /// </summary>
-        /// <param name="name">The name of the event.</param>
+        /// <param name="type">The type name of the event.</param>
         /// <returns>
         /// 200 => Rule event type found.
         /// 404 => Rule event not found.
         /// </returns>
         [HttpGet]
-        [Route("rules/eventtypes/{name}")]
+        [Route("rules/eventtypes/{type}")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [AllowAnonymous]
-        public IActionResult GetEventSchema(string name)
+        public IActionResult GetEventSchema(string type)
         {
-            var schema = eventJsonSchemaGenerator.GetSchema(name);
+            var schema = eventJsonSchemaGenerator.GetSchema(type);
 
             if (schema == null)
             {

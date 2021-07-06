@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Squidex Headless CMS
  *
  * @license
@@ -31,7 +31,7 @@ export class Duration {
             hoursString = `0${hoursString}`;
         }
 
-        seconds = seconds % 3600;
+        seconds %= 3600;
 
         const minutes = Math.floor(seconds / 60);
 
@@ -41,9 +41,9 @@ export class Duration {
             minutesString = `0${minutesString}`;
         }
 
-        seconds = seconds % 60;
+        seconds %= 60;
 
-        let secondsString = seconds.toString();
+        let secondsString = Math.ceil(seconds).toString();
 
         if (secondsString.length === 1) {
             secondsString = `0${secondsString}`;

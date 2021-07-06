@@ -9,10 +9,10 @@ import { Injectable } from '@angular/core';
 import { DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from './../services/contents.service';
+import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService } from './../services/contents.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
-import { Query } from './query';
+import { Query, StatusInfo } from './query';
 import { SchemasState } from './schemas.state';
 
 interface Snapshot extends ListState<Query> {
@@ -89,14 +89,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     protected constructor(name: string,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService
+        private readonly dialogs: DialogService,
     ) {
         super({
             contents: [],
             page: 0,
             pageSize: 10,
             total: 0,
-            validationResults: {}
+            validationResults: {},
         }, name);
     }
 
@@ -205,7 +205,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         contents,
                         selectedContent,
                         statuses,
-                        total
+                        total,
                     };
                 }, 'Loading Success');
             }),
@@ -311,7 +311,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
-    public page(paging: { page: number, pageSize: number }) {
+    public page(paging: { page: number; pageSize: number }) {
         if (!this.next(paging, 'Loading Done')) {
             return EMPTY;
         }
@@ -336,14 +336,18 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 return { ...s, contents, selectedContent };
             }, 'Updated');
         }
+
+        return false;
     }
 
     private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>, confirmTitle: string, confirmText: string, confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
         return this.bulkMany(contents, true, job).pipe(
             switchMap(results => {
-                const failed = contents.filter(x => isReferrerError(results.find(r => r.contentId === x.id)?.error));
+                const referrerFailures = results.filter(x => isReferrerError(x.error));
 
-                if (failed.length > 0) {
+                if (referrerFailures.length > 0) {
+                    const failed = contents.filter(x => referrerFailures.find(r => r.contentId === x.id));
+
                     return this.dialogs.confirm(confirmTitle, confirmText, confirmKey).pipe(
                         switchMap(confirmed => {
                             if (confirmed) {
@@ -352,9 +356,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                                 return of([]);
                             }
                         }),
-                        map(results2 => {
-                            return [...results, ...results2];
-                        })
+                        map(retried => {
+                            const nonRetried = results.filter(x => !retried.find(y => y.contentId === x.contentId));
+
+                            return [...nonRetried, ...retried];
+                        }),
                     );
                 } else {
                     return of(results);
@@ -364,12 +370,13 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 const errors = results.filter(x => !!x.error);
 
                 if (errors.length > 0) {
-                    const errror = errors[0].error!;
+                    const error = errors[0].error!;
 
                     if (errors.length >= contents.length) {
-                        throw errror;
+                        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+                        throw error;
                     } else {
-                        this.dialogs.notifyError(errror);
+                        this.dialogs.notifyError(error);
                     }
                 }
             }));
@@ -383,9 +390,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 schema: x.schemaName,
                 status: undefined,
                 expectedVersion: parseInt(x.version.value, 10),
-                ...job
+                ...job,
             })),
-            checkReferrers
+            checkReferrers,
         };
 
         return this.contentsService.bulkUpdate(this.appName, this.schemaName, update as any);
@@ -401,7 +408,7 @@ function isReferrerError(error?: ErrorDto) {
 @Injectable()
 export class ContentsState extends ContentsStateBase {
     constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
     ) {
         super('Contents', appsState, contentsService, dialogs);
     }
@@ -416,7 +423,7 @@ export class ComponentContentsState extends ContentsStateBase {
     public schema: { name: string };
 
     constructor(
-        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
+        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
     ) {
         super('Components Contents', appsState, contentsService, dialogs);
     }
@@ -434,9 +441,9 @@ function buildStatusQuery(s: StatusInfo) {
     const query = {
         filter: {
             and: [
-                { path: 'status', op: 'eq', value: s.status }
-            ]
-        }
+                { path: 'status', op: 'eq', value: s.status },
+            ],
+        },
     };
 
     return ({ name: s.status, color: s.color, query });
