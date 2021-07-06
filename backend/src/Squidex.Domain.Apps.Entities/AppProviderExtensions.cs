@@ -28,16 +28,21 @@ namespace Squidex.Domain.Apps.Entities
                 {
                     foreach (var schemaId in schemaIds)
                     {
-                        if (result == null || !result.TryGetValue(schemaId, out _))
+                        if (schemaId == schema.Id)
                         {
-                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, true);
+                            result ??= new Dictionary<DomainId, Schema>();
+                            result[schemaId] = schema.SchemaDef;
+                        }
+                        else if (result == null || !result.TryGetValue(schemaId, out _))
+                        {
+                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false);
 
                             if (resolvedEntity != null)
                             {
-                                await ResolveSchemaAsync(resolvedEntity);
-
                                 result ??= new Dictionary<DomainId, Schema>();
                                 result[schemaId] = resolvedEntity.SchemaDef;
+
+                                await ResolveSchemaAsync(resolvedEntity);
                             }
                         }
                     }
