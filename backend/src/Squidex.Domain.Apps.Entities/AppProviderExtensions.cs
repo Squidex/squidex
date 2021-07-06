@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities
 
                             if (resolvedEntity != null)
                             {
+                                await ResolveSchemaAsync(resolvedEntity);
+
                                 result ??= new Dictionary<DomainId, Schema>();
                                 result[schemaId] = resolvedEntity.SchemaDef;
                             }
@@ -46,11 +48,11 @@ namespace Squidex.Domain.Apps.Entities
             {
                 foreach (var nestedField in arrayField.Fields)
                 {
-                    await ResolveAsync(nestedField);
+                    await ResolveFieldAsync(nestedField);
                 }
             }
 
-            async Task ResolveAsync(IField field)
+            async Task ResolveFieldAsync(IField field)
             {
                 switch (field)
                 {
@@ -68,10 +70,15 @@ namespace Squidex.Domain.Apps.Entities
                 }
             }
 
-            foreach (var field in schema.SchemaDef.Fields)
+            async Task ResolveSchemaAsync(ISchemaEntity schema)
             {
-                await ResolveAsync(field);
+                foreach (var field in schema.SchemaDef.Fields)
+                {
+                    await ResolveFieldAsync(field);
+                }
             }
+
+            await ResolveSchemaAsync(schema);
 
             if (result == null)
             {
