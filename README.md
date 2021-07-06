@@ -29,9 +29,9 @@ Current Version ![GitHub release](https://img.shields.io/github/release/squidex/
 
 | Platform | Documentation | Quicklink | 
 | -------- | ------------- | ---- |
-| Azure    | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-on-azure) |
+| Azure    | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-azure) |
 | AWS      | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-on-aws) |
-| Docker   | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-on-docker) | [![Docker Compose](https://img.shields.io/badge/-docker--compose.yml-2496ED?style=for-the-badge&logo=docker&logoColor=ffffff)](https://github.com/Squidex/squidex-hosting/blob/master/docker-compose/docker-compose.yml) |
+| Docker   | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-docker) | [![Docker Compose](https://img.shields.io/badge/-docker--compose.yml-2496ED?style=for-the-badge&logo=docker&logoColor=ffffff)](https://github.com/Squidex/squidex-hosting/blob/master/docker-compose/docker-compose.yml) |
 | GCP      | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-on-gcp) |
 | Heroku   | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-on-heroku) | [![Deploy to Heroku](https://img.shields.io/badge/-Deploy%20to%20Heroku-430098?style=for-the-badge&logo=heroku&logoColor=ffffff)](https://heroku.com/deploy?template=https://github.com/Squidex/squidex) |
 | IIS      | [Docs](https://docs.squidex.io/01-getting-started/installation/platforms/install-iis) |
