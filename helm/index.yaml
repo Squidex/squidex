@@ -3,7 +3,7 @@ entries:
   squidex:
   - apiVersion: v2
     appVersion: 5.7.0
-    created: "2021-07-06T05:18:03.615631-03:00"
+    created: "2021-07-06T05:21:22.195826-03:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -24,6 +24,6 @@ entries:
     - https://github.com/Squidex/squidex
     type: application
     urls:
-    - https://helm.squidex.io/squidex-1.0.0.tgz
+    - https://squidex.github.io/squidex/helm/squidex-1.0.0.tgz
     version: 1.0.0
-generated: "2021-07-06T05:18:03.612399-03:00"
+generated: "2021-07-06T05:21:22.194062-03:00"
