@@ -573,6 +573,10 @@ a {
             @include build-text-button($color-theme-orange);
         }
     }
+
+    &-outline-secondary {
+        color: $color-text-decent;
+    }
 }
 
 $icon-size: 4.5rem;
