@@ -21,7 +21,7 @@
                     ({{filteredSchemas.length}})
                 </ng-container>
                 <ng-template #noSchemas>
-                    <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()">
+                    <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()" *ngIf="schemaCategory.name">
                         <i class="icon-bin2"></i> 
                     </button>
                 </ng-template>
