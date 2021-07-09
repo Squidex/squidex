@@ -60,7 +60,6 @@ export * from './angular/pipes/markdown.pipe';
 export * from './angular/pipes/money.pipe';
 export * from './angular/pipes/name.pipe';
 export * from './angular/pipes/numbers.pipes';
-export * from './angular/pipes/numbers.pipes';
 export * from './angular/pipes/translate.pipe';
 export * from './angular/popup-link.directive';
 export * from './angular/resized.directive';
