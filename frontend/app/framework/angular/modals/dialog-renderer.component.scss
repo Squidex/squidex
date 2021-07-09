@@ -56,11 +56,12 @@
 $caret-size: 6px;
 
 .tooltip2 {
-    @include text-small;
     background: $color-tooltip;
     border: 0;
     border-radius: 0;
     color: $color-white;
+    font-size: $font-small;
+    font-weight: normal;
     padding: .5rem;
     white-space: nowrap;
 

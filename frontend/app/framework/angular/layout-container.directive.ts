@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable: readonly-array
+/* eslint-disable import/no-cycle */
 
 import { AfterViewInit, Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 import { LayoutComponent } from './layout.component';
 
 @Directive({
-    selector: '[sqxLayoutContainer]'
+    selector: '[sqxLayoutContainer]',
 })
 export class LayoutContainerDirective implements AfterViewInit {
     private readonly layouts: LayoutComponent[] = [];
@@ -20,7 +20,7 @@ export class LayoutContainerDirective implements AfterViewInit {
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer2
+        private readonly renderer: Renderer2,
     ) {
     }
 

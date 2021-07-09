@@ -8,7 +8,8 @@
     }
 
     &-info {
-        @include text-small;
+        font-size: $font-small;
+        font-weight: normal;
         line-height: 1.4rem;
     }
 

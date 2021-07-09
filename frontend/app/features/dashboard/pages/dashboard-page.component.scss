@@ -26,6 +26,9 @@ gridster-item {
     /* stylelint-enable */
 
     gridster-item {
+        background: none;
+        border: 0;
+        border-radius: 0;
         overflow: visible;
     }
 }
@@ -59,6 +62,8 @@ gridster-item {
         h4 {
             a {
                 color: $color-title;
+                text-align: left;
+                text-decoration: none;
             }
         }
 
@@ -81,8 +86,9 @@ gridster-item {
         }
 
         &-text {
-            @include text-small;
             color: $color-text-decent;
+            font-size: $font-small;
+            font-weight: normal;
         }
 
         &-href {

@@ -2,7 +2,7 @@
 
 <sqx-layout layout="main" titleText="common.contents" titleIcon="contents">
     <ng-container menu>
-        <div class="row flex-nowrap g-0 ps-1">
+        <div class="row flex-nowrap gx-2">
             <div class="col-auto ms-8">
                 <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
 
@@ -12,7 +12,7 @@
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
-            <div class="col ps-1">
+            <div class="col">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     (queryChange)="search($event)"
                     [query]="contentsState.query | async"
@@ -23,10 +23,10 @@
                     [enableShortcut]="true">
                 </sqx-search-form>
             </div>
-            <div class="col-auto ps-1" *ngIf="languages.length > 1">
+            <div class="col-auto" *ngIf="languages.length > 1">
                 <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
             </div>
-            <div class="col-auto ps-1">
+            <div class="col-auto">
                 <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
                     <i class="icon-plus"></i> {{ 'contents.create' | sqxTranslate }}
                 </button>

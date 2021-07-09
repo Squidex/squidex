@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [flexBody]="true">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [flexBody]="true" [hasTabs]="false">
     <ng-container title>
         <div class="row">
             <div class="col-selector">
@@ -12,14 +12,14 @@
     </ng-container>
 
     <ng-container tabs>
-        <div class="row g-0">
+        <div class="row gx-2 mt-3 mb-3">
             <ng-container *ngIf="schema">
                 <div class="col-auto">
                     <button type="button" class="btn btn-text-secondary" (click)="reload()">
                         <i class="icon-reset"></i>
                     </button>
                 </div>
-                <div class="col ps-1">
+                <div class="col">
                     <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}" 
                         [query]="contentsState.query | async"
                         [queryModel]="queryModel"
@@ -27,7 +27,7 @@
                     </sqx-search-form>
                 </div>
                     
-                <div class="col-auto ps-1" *ngIf="languages.length > 1">
+                <div class="col-auto" *ngIf="languages.length > 1">
                     <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
                 </div>
             </ng-container>
@@ -88,7 +88,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="button" class="btn text-secondary" (click)="emitComplete()">
+        <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 

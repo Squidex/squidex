@@ -89,9 +89,10 @@ sqx-list-view {
     }
 
     &-user-link {
-        @include text-small;
         @include truncate;
         color: $color-white;
+        font-size: $font-small;
+        font-weight: normal;
     }
 
     img {

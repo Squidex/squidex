@@ -64,7 +64,7 @@ $padding: 1rem;
     position: relative;
 
     &-icon {
-        color: $color-border-dark;
+        color: $color-border-darker;
         font-size: 1.2rem;
         font-weight: normal;
         margin-right: 1rem;
@@ -80,8 +80,9 @@ $padding: 1rem;
     }
 
     &-partitioning {
-        @include text-smallest;
         color: $color-text-decent;
+        font-size: $font-smallest;
+        font-weight: normal;
     }
 
     .tag {

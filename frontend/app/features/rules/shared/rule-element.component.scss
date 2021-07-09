@@ -37,7 +37,8 @@
     }
 
     &-link {
-        @include text-small;
+        font-size: $font-small;
+        font-weight: normal;
     }
 
     &-title {
@@ -47,7 +48,8 @@
     }
 
     &-text {
-        @include text-small;
+        font-size: $font-small;
+        font-weight: normal;
         margin-bottom: .125rem;
         margin-top: .25rem;
     }

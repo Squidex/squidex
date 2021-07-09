@@ -4,8 +4,8 @@
     <sqx-list-view innerWidth="70rem">
         <div class="card section" *ngIf="restoreJob | async; let job">
             <div class="card-header">
-                <div class="row g-0">
-                    <div class="col-auto pe-2">
+                <div class="row gx-2">
+                    <div class="col-auto">
                         <div *ngIf="job.status === 'Started'" class="restore-status restore-status-pending spin">
                             <i class="icon-hour-glass"></i>
                         </div>
@@ -45,14 +45,14 @@
         
         <div class="table-items-row table-items-row-summary">
             <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
-                <div class="row g-0">
+                <div class="row gx-2">
                     <div class="col">
                         <input class="form-control" formControlName="url" placeholder="{{ 'backups.restoreLastUrl' | sqxTranslate }}">
                     </div>
-                    <div class="col ps-1">
+                    <div class="col">
                         <input class="form-control" formControlName="name" placeholder="{{ 'backups.restoreNewAppName' | sqxTranslate }}">
                     </div>
-                    <div class="col-auto ps-1">
+                    <div class="col-auto">
                         <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">
                             {{ 'backups.restore' | sqxTranslate }}
                         </button>

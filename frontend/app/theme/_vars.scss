@@ -1,9 +1,9 @@
-$color-background:          #eef1f4;
+$color-background:          #f5f6f9;
 
 $color-border:              #dedfe3;
 $color-border-light:        #f5f6f9;
 $color-border-dark:         #e7e8ea;
-$color-border-darker:       darken($color-border, 3%);
+$color-border-darker:       darken($color-border, 15%);
 
 $color-title:               #000;
 $color-text:                #373a3c;
@@ -42,7 +42,7 @@ $color-theme-info:          #5bc0de;
 $color-asset-bg:            #f7f8fa;
 
 $color-input:               #e0e1e5;
-$color-input-shadow:          0 1px 1px rgba(0, 0, 0, .1);
+$color-input-shadow:          'none';
 $color-input-background:    #fff;
 $color-input-disabled:      #eff1f4;
 $color-input-placeholder:   lighten($color-text-decent, 20%);
@@ -68,14 +68,17 @@ $color-badge-secondary-foreground:  #999;
 
 $border-radius:             .375rem;
 
-$size-navbar-height:        3.25rem;
+$size-navbar-height:        3.5rem;
 $size-sidebar-width:        5rem;
 
 $color-dark-onboarding:   #273039;
 
-$panel-padding:                       1.5rem;
-$panel-header:                          5.4rem;
-$panel-sidebar:                         3.75rem;
+$panel-padding:             1.5rem;
+$panel-header:              5.4rem;
+$panel-sidebar:             3.75rem;
+
+$font-small:                85%;
+$font-smallest:             80%;
 
 $asset-width:               14.5rem;
 $asset-folder-height:       4rem;

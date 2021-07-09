@@ -23,9 +23,10 @@ $list-height: 2.25rem;
 }
 
 @mixin asset-type {
-    @include text-smallest;
     color: $color-white;
     cursor: none;
+    font-size: $font-smallest;
+    font-weight: normal;
     padding: .1rem .25rem;
     text-transform: uppercase;
 }
@@ -89,7 +90,8 @@ $list-height: 2.25rem;
     &-type {
         @include absolute(1rem, auto, auto, 1rem);
         @include asset-type;
-        @include border-radius(3px);
+        border: 0;
+        border-radius: .25rem;
         background: $color-black;
         transition: opacity .4s ease;
     }
@@ -106,7 +108,7 @@ $list-height: 2.25rem;
         line-height: 2rem;
 
         i {
-            @include text-smallest;
+            font-size: $font-smallest;
         }
     }
 
@@ -115,7 +117,7 @@ $list-height: 2.25rem;
     }
 
     &-info {
-        @include text-smallest;
+        font-size: $font-smallest;
     }
 
     &-icon {
@@ -129,7 +131,8 @@ $list-height: 2.25rem;
 
 .overlay {
     @include overlay;
-    @include text-smallest;
+    font-size: $font-smallest;
+    font-weight: normal;
 
     &-menu {
         @include absolute(1rem, 1rem, auto, auto);
@@ -139,6 +142,7 @@ $list-height: 2.25rem;
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: normal;
+            text-decoration: none;
 
             &:hover {
                 color: $color-white;
@@ -225,8 +229,9 @@ $list-height: 2.25rem;
         }
 
         &-info {
-            @include text-small;
             color: $color-text-decent;
+            font-size: $font-small;
+            font-weight: normal;
             width: 12rem;
         }
     }
@@ -242,6 +247,7 @@ $list-height: 2.25rem;
 
 .drop-overlay {
     @include overlay;
+    pointer-events: none;
 
     &-text {
         font-size: 1.25rem;

@@ -2,7 +2,7 @@
 
 <sqx-layout layout="main" titleText="common.assets" titleIcon="assets">    
     <ng-container menu>
-        <div class="row flex-nowrap g-0 ps-1">
+        <div class="row flex-nowrap gx-2">
             <div class="col-auto offset-xl-2">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
@@ -10,7 +10,7 @@
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
-            <div class="col ps-1" style="width: 300px;">
+            <div class="col" style="width: 300px;">
                 <div class="row g-0 search">
                     <div class="col-6">
                         <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
@@ -32,7 +32,7 @@
                 </div>
                 
             </div>
-            <div class="col-auto ps-1">
+            <div class="col-auto">
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
                         <i class="icon-list"></i>
@@ -42,7 +42,7 @@
                     </button>
                 </div>
             </div>
-            <div class="col-auto ps-1">
+            <div class="col-auto">
                 <sqx-shortcut keys="ctrl+shift+g" (trigger)="addAssetFolderDialog.show()"></sqx-shortcut>
 
                 <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="i18n:assets.createFolderTooltip">

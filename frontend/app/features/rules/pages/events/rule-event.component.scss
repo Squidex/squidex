@@ -10,7 +10,7 @@ $color-dark-onboarding:#273039;
 
 .event {
     &-stats {
-        @include text-smallest;
+        font-size: $font-smallest;
     }
 
     &-dump {

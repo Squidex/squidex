@@ -1,26 +1,24 @@
 <div class="table-items-row table-items-row-expandable language"> 
-    <div class="table-items-row-summary">        
-        <div class="row g-0">
-            <div class="col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
-                {{language.iso2Code}}
-            </div>
-            <div class="col" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
-                {{language.englishName}}
-            </div>
-            <div class="col-options">
-                <div class="float-end">
-                    <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster">
-                        <i class="icon-settings"></i>
-                    </button>
+    <div class="table-items-row-summary row gx-2 align-items-center">
+        <div class="col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            {{language.iso2Code}}
+        </div>
+        <div class="col" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            {{language.englishName}}
+        </div>
+        <div class="col-auto">
+            <div class="float-end">
+                <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster">
+                    <i class="icon-settings"></i>
+                </button>
 
-                    <button type="button" class="btn btn-text-danger" [disabled]="!language.canDelete"
-                        (sqxConfirmClick)="remove()"
-                        confirmTitle="i18n:languages.deleteConfirmTitle"
-                        confirmText="i18n:languages.deleteConfirmText"
-                        confirmRememberKey="removeLanguage">
-                        <i class="icon-bin2"></i>
-                    </button>
-                </div>
+                <button type="button" class="btn btn-text-danger" [disabled]="!language.canDelete"
+                    (sqxConfirmClick)="remove()"
+                    confirmTitle="i18n:languages.deleteConfirmTitle"
+                    confirmText="i18n:languages.deleteConfirmText"
+                    confirmRememberKey="removeLanguage">
+                    <i class="icon-bin2"></i>
+                </button>
             </div>
         </div>
     </div>

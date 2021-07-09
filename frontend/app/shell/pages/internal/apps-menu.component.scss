@@ -21,7 +21,7 @@ h3 {
 }
 
 .icon-plus {
-    @include text-smallest;
+    font-size: $font-smallest;
 }
 
 .apps-list {

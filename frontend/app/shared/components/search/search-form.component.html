@@ -3,31 +3,31 @@
 </ng-container>
 
 <form [class]="formClass" (ngSubmit)="search()">
-    <input class="form-control form-control-expandable" #inputFind [ngModel]="query?.fullText" (ngModelChange)="changeQueryFullText($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="placeholder">
+    <div class="input-group">
+        <input class="form-control form-control-expandable" #inputFind [ngModel]="query?.fullText" (ngModelChange)="changeQueryFullText($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="placeholder">
 
-    <div class="buttons">
         <ng-container *ngIf="queries">
             <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
-                <a class="save-search" (click)="queries.remove(key)">
+                <button type="button" class="btn btn-outline-secondary" (click)="queries.remove(key)">
                     <i class="icon-star-full"></i>
-                </a>
+                </button>
             </ng-container>
         
             <ng-template #notBookmarked>
-                <a class="save-search" (click)="saveQuery()">
+                <button type="button" class="btn btn-outline-secondary" (click)="saveQuery()">
                     <i class="icon-star-empty"></i>
-                </a>
+                </button>
             </ng-template>
         </ng-container>
 
         <ng-container *ngIf="queryModel">
-            <a class="expand-search" (click)="searchDialog.toggle()" [class.highlighted]="hasFilter" #expand>
-                <i class="icon-filter-filled"></i>
-            </a>
-    
             <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" [after]="60000">
                 {{ 'search.advancedTour' | sqxTranslate }}
             </sqx-onboarding-tooltip>
+
+            <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.toggle()" [class.highlighted]="hasFilter" #expand>
+                <i class="icon-filter-filled"></i>
+            </button>
         </ng-container>
     </div>
 </form>
@@ -45,13 +45,13 @@
         <ng-container content>
             <div class="buttons2" *ngIf="queries && queriesTypes">
                 <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
-                    <a class="save-search" (click)="queries.remove(key)">
+                    <a class="btn" (click)="queries.remove(key)">
                         <i class="icon-star-full"></i>
                     </a>
                 </ng-container>
             
                 <ng-template #notBookmarked>
-                    <a class="save-search" (click)="saveQuery()">
+                    <a class="btn" (click)="saveQuery()">
                         <i class="icon-star-empty"></i>
                     </a>
                 </ng-template>

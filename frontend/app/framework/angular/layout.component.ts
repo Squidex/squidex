@@ -5,17 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+/* eslint-disable import/no-cycle */
+
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, Input, OnDestroy, OnInit } from '@angular/core';
+import { QueryParamsHandling, RouterOutlet } from '@angular/router';
 import { LayoutContainerDirective } from './layout-container.directive';
 
 @Component({
     selector: 'sqx-layout',
     styleUrls: ['./layout.component.scss'],
     templateUrl: './layout.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     private parent?: LayoutComponent;
+
+    @Input()
+    public closeQueryParamsHandling: QueryParamsHandling = 'preserve';
 
     @Input()
     public titleText: string;
@@ -47,6 +53,9 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     public customHeader: boolean;
 
+    @ContentChild(RouterOutlet)
+    public routerOutlet: RouterOutlet;
+
     public childSize: any = 'auto';
 
     public setChildSize(size: any) {
@@ -63,8 +72,20 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
     constructor(
         private readonly container: LayoutContainerDirective,
-        private readonly changeDetector: ChangeDetectorRef
+        private readonly changeDetector: ChangeDetectorRef,
     ) {
+    }
+
+    public get isCollapsedOrEmpty() {
+        if (this.isCollapsed) {
+            return true;
+        }
+
+        if (this.routerOutlet && this.layout === 'main') {
+            return !this.routerOutlet.isActivated;
+        }
+
+        return false;
     }
 
     public ngOnInit() {

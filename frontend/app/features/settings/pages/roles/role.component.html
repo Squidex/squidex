@@ -1,29 +1,27 @@
 <div class="table-items-row table-items-row-expandable"> 
-    <div class="table-items-row-summary">        
-        <div class="row">
-            <div class="col-5" [class.built]="role.isDefaultRole">
-                <span class="role-name">{{role.name}}</span>
-            </div>
-            <div class="col text-decent">
-                {{ 'common.clients' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
-            </div>
-            <div class="col text-decent">
-                {{ 'common.users' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
-            </div>
-            <div class="col-auto">
-                <div class="float-end">
-                    <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()">
-                        <i class="icon-settings"></i>
-                    </button>
+    <div class="table-items-row-summary row gx-2 align-items-center">     
+        <div class="col-5" [class.built]="role.isDefaultRole">
+            <span class="role-name">{{role.name}}</span>
+        </div>
+        <div class="col text-decent">
+            {{ 'common.clients' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
+        </div>
+        <div class="col text-decent">
+            {{ 'common.users' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
+        </div>
+        <div class="col-auto">
+            <div class="float-end">
+                <button type="button" class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()">
+                    <i class="icon-settings"></i>
+                </button>
 
-                    <button type="button" class="btn btn-text-danger" [disabled]="!role.canDelete"
-                        (sqxConfirmClick)="delete()"
-                        confirmTitle="i18n:roles.deleteConfirmTitle"
-                        confirmText="i18n:roles.deleteConfirmText"
-                        confirmRememberKey="deleteRole">
-                        <i class="icon-bin2"></i>
-                    </button>
-                </div>
+                <button type="button" class="btn btn-text-danger" [disabled]="!role.canDelete"
+                    (sqxConfirmClick)="delete()"
+                    confirmTitle="i18n:roles.deleteConfirmTitle"
+                    confirmText="i18n:roles.deleteConfirmText"
+                    confirmRememberKey="deleteRole">
+                    <i class="icon-bin2"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -70,11 +68,13 @@
                     </sqx-form-alert>
                     
                     <table class="table table-bordered table-fixed">
-                        <tr *ngFor="let control of editForm.controls; let i = index">
-                            <td>
-                                {{control.value}}
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr *ngFor="let control of editForm.controls; let i = index">
+                                <td>
+                                    {{control.value}}
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </ng-template>
 

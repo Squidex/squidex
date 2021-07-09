@@ -6,7 +6,7 @@
     <label>{{ 'schemas.ui' | sqxTranslate }}</label>
 
     <div class="empty-hint" *ngIf="fieldsAdded.length === 0">
-        <sqx-form-hint>{{emptyText}}</sqx-form-hint>
+        <sqx-form-alert>{{emptyText}}</sqx-form-alert>
     </div>
 
     <div *ngFor="let field of fieldsAdded" class="table-items-row table-items-row-summary" cdkDrag>

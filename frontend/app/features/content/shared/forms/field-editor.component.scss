@@ -6,8 +6,9 @@
     }
 
     &-disabled {
-        @include text-smallest;
         color: $color-border-dark;
+        font-size: $font-smallest;
+        font-weight: normal;
     }
 }
 
@@ -15,7 +16,7 @@
     @include absolute(-.5rem, 0);
 
     i {
-        @include text-smallest;
+        font-size: $font-smallest;
     }
 }
 

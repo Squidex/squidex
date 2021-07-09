@@ -22,34 +22,9 @@
     @include absolute(.75rem, 1.75rem);
 }
 
-.save-search {
-    @include text-smallest;
-    color: $color-border-dark !important;
-
-    &:focus {
-        text-decoration: none;
-    }
-}
-
-.expand-search {
-    color: $color-border-dark !important;
-    padding: 0 .5rem;
-
-    &:focus {
-        text-decoration: none;
-    }
-
-    &:hover {
-        text-decoration: none;
-    }
-
-    &.highlighted {
-        color: $color-title !important;
-    }
-}
-
 .link {
-    @include text-small;
+    font-size: $font-small;
+    font-weight: normal;
     margin-top: 1.5rem;
 }
 

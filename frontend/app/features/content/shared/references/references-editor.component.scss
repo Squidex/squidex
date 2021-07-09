@@ -20,8 +20,8 @@
 }
 
 .drop-area {
-    @include border-radius;
     border: 2px dashed darken($color-border, 10%);
+    border-radius: $border-radius;
     color: darken($color-border, 30%);
     cursor: pointer;
     padding: 1rem;

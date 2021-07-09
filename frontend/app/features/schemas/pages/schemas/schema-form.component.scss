@@ -21,13 +21,13 @@ $icon-size: 4.5rem;
     }
 
     &-text {
-        @include text-small;
+        font-size: $font-small;
     }
 
     &-icon {
-        @include border-radius;
         background: transparent;
         border: 1px solid $color-border;
+        border-radius: $border-radius;
         color: $color-theme-blue;
         cursor: pointer;
         font-size: 1.75rem;

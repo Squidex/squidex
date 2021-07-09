@@ -28,9 +28,9 @@
 }
 
 .drop-area {
-    @include border-radius;
     @include truncate-nowidth;
     border: 2px dashed darken($color-border, 10%);
+    border-radius: $border-radius;
     color: darken($color-border, 30%);
     cursor: pointer;
     padding: 5px .5rem;

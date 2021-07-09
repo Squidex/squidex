@@ -1,18 +1,5 @@
 /* stylelint-disable */
 
-@mixin text-small {
-    font-size: 90%;
-}
-
-@mixin text-small-bold {
-    font-size: 90%;
-    font-weight: 500;
-}
-
-@mixin text-smallest {
-    font-size: 80%;
-}
-
 @mixin text-code {
     font-family: monospace;
     font-size: 80%;
@@ -140,9 +127,10 @@
 }
 
 @mixin circle($size) {
-    @include border-radius($size * .5);
     @include force-height($size);
     @include force-width($size);
+    border: 0;
+    border-radius: $size;
     display: inline-block;
 }
 
@@ -197,26 +185,6 @@
 
 @mixin box-shadow-inner($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
     box-shadow: inset $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
-}
-
-@mixin border-radius ($radius: 4px) {
-    border-radius: $radius;
-}
-
-@mixin border-radius-left ($radius: 4px) {
-    border-radius: $radius 0 0 $radius;
-}
-
-@mixin border-radius-right ($radius: 4px) {
-    border-radius: 0 $radius $radius 0;
-}
-
-@mixin border-radius-bottom ($radius: 4px) {
-    border-radius: 0 0 $radius $radius;
-}
-
-@mixin border-radius-top ($radius: 4px) {
-    border-radius: $radius $radius 0 0;
 }
 
 @mixin position($t: null, $r: null, $b: null, $l: null) {

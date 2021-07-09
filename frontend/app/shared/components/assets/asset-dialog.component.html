@@ -1,6 +1,10 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
-    <sqx-modal-dialog (close)="emitComplete()" size="xl" [fullHeight]="true" [showFooter]="false">
-        <ng-container plainTitle>
+    <sqx-modal-dialog (close)="emitComplete()" size="xl" [fullHeight]="true" [showFooter]="false" [hasTabs]="true">
+        <ng-container title>
+            {{ 'assets.edit' | sqxTranslate }}
+        </ng-container>
+
+        <ng-container tabs>
             <ul class="nav nav-tabs2">
                 <li class="nav-item">
                     <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">

@@ -26,7 +26,8 @@
     }
 
     &-info {
-        @include text-small;
+        font-size: $font-small;
+        font-weight: normal;
     }
 
     &-element {

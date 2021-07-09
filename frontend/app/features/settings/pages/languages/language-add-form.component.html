@@ -1,14 +1,14 @@
 <div class="card card-body mb-4">
-    <h5>{{ 'languages.add.title' | sqxTranslate }}</h5>
+    <h5 class="card-title">{{ 'languages.add.title' | sqxTranslate }}</h5>
 
     <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
-        <div class="row g-0">
+        <div class="row gx-2">
             <div class="col">
                 <select class="form-select" formControlName="language">
                     <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>
                 </select>
             </div>
-            <div class="col-auto ps-1">
+            <div class="col-auto">
                 <button type="submit" class="btn btn-success">
                     {{ 'languages.add' | sqxTranslate }}
                 </button>

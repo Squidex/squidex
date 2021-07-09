@@ -13,8 +13,9 @@
     }
 
     &-scheduled {
-        @include text-small;
         color: $color-text !important;
+        font-size: $font-small;
+        font-weight: normal;
     }
 
     &-label {

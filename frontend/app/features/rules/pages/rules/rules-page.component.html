@@ -36,15 +36,13 @@
                     </button>
                 </div>
     
-                <table class="table table-items table-fixed">
-                    <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
-                        [rule]="rule"
-                        [ruleActions]="supportedActions"
-                        [ruleTriggers]="supportedTriggers"
-                        (delete)="delete(rule)"
-                        (toggle)="toggle(rule)">
-                    </sqx-rule>
-                </table>
+                <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
+                    [rule]="rule"
+                    [ruleActions]="supportedActions"
+                    [ruleTriggers]="supportedTriggers"
+                    (delete)="delete(rule)"
+                    (toggle)="toggle(rule)">
+                </sqx-rule>
             </ng-container>
         </sqx-list-view>
     </ng-container>

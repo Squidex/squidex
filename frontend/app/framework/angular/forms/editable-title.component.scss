@@ -4,7 +4,7 @@
 
     &-edit {
         @include absolute(0, 0, null, null);
-        color: $color-border-dark;
+        color: darken($color-border-dark, 20%);
         cursor: pointer;
         padding: .6rem .25rem;
     }

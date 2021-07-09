@@ -67,12 +67,13 @@ $drag-margin: -8px;
 }
 
 .nav-link {
+    @include truncate;
     align-items: center;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .nav-item {
-    @include truncate;
-
     .drag-handle {
         margin-right: .5rem;
     }

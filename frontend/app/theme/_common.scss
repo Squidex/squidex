@@ -18,7 +18,7 @@ body {
 }
 
 * {
-    @include scrollbars(8px, $color-input, transparent);
+    @include scrollbars(8px, darken($color-border, 10%), transparent);
 }
 
 hr {
@@ -185,10 +185,10 @@ hr {
     .drop-area {
         & {
             @include absolute(30px, 30px, 30px, 30px);
-            @include border-radius;
             align-content: center;
             align-items: center;
             border: 2px dashed $color-border;
+            border-radius: $border-radius;
             color: darken($color-border, 30%);
             display: none;
             font-size: 1.2rem;
@@ -223,9 +223,10 @@ hr {
 
 .sidebar {
     @include absolute($size-navbar-height, null, 0, 0);
-    @include text-small;
     background: $color-theme-blue;
     color: $color-white;
+    font-size: $font-small;
+    font-weight: default;
     overflow: hidden;
     width: $size-sidebar-width;
 
@@ -242,8 +243,9 @@ hr {
         color: $color-white !important;
         cursor: pointer;
         padding: 1rem 0;
-        transition: background-color .3s ease;
+        transition: background-color .4s ease;
         text-align: center;
+        text-decoration: none;
 
         &:hover {
             background: $color-theme-blue-darker;
@@ -261,6 +263,61 @@ hr {
     .nav-text {
         @include truncate;
         margin-top: .5rem;
+    }
+}
+
+//
+// Status Icon
+//
+.status-icon {
+    & {
+        @include circle-icon(2rem);
+        background: $color-border;
+        border: 0;
+        color: $color-white;
+        display: inline-block;
+    }
+
+    &-sm {
+        @include circle-icon(1.6rem);
+    }
+
+    &-lg {
+        @include circle-icon(2.8rem);
+    }
+
+    &-pending {
+        color: inherit;
+    }
+
+    &-warning {
+        background: $color-theme-orange;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-green;
+    }
+}
+
+//
+// ACE
+//
+// sass-lint:disable class-name-format
+.ace_tooltip {
+    background: $color-white;
+    border: 1px solid $color-input;
+    border-radius: 0;
+    font-size: 14px;
+    max-width: 300px;
+    min-width: 100px;
+    white-space: pre-wrap;
+
+    hr {
+        margin: .5rem 0;
     }
 }
 

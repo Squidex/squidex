@@ -41,6 +41,10 @@
         &.synced {
             overflow-x: auto;
             overflow-y: auto;
+
+            .inner {
+                padding-right: 0;
+            }
         }
     }
 

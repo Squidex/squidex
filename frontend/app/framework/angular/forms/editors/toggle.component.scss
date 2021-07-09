@@ -19,10 +19,10 @@ $toggle-button-size: $toggle-height - .25rem;
     }
 
     &-container {
-        @include border-radius($toggle-height * .5);
         @include box-shadow-outer;
         background: lighten($color-border, 6%);
         border: 0;
+        border-radius: $toggle-height * .5;
         height: $toggle-height;
         margin: 0;
         margin-bottom: -3px;

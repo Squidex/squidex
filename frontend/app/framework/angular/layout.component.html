@@ -23,7 +23,7 @@
     </ng-container>
 
     <ng-container *ngIf="layout === 'left'">
-        <div class="panel2-slice left" [class.collapsed]="isCollapsed" [style.width]="width">
+        <div class="panel2-slice left" [class.collapsed]="isCollapsedOrEmpty" [style.width]="width">
             <div class="panel2-header left">
                 <div class="panel2-header-inner left">
                     <h3 *ngIf="titleText">
@@ -78,11 +78,11 @@
             </div>
         </div>
 
-        <div class="panel2-slice menu" [class.collapsed]="isCollapsed" *ngIf="!hideSidebar">
+        <div class="panel2-slice menu" [class.collapsed]="isCollapsedOrEmpty" *ngIf="!hideSidebar">
             <div class="panel2-header menu">            
-                <button class="btn panel2-collapse" (click)="toggle()">
+                <a class="btn panel2-collapse" sqxParentLink  [queryParamsHandling]="closeQueryParamsHandling" [class.hidden]="isCollapsedOrEmpty">
                     <i class="icon-angle-right"></i>
-                </button>
+                </a>
             </div>
     
             <div class="panel2-main menu">
@@ -90,7 +90,7 @@
             </div>
         </div>
     
-        <div class="panel2-slice right" [class.collapsed]="isCollapsed" [style.width]="childSize" [style.minWidth]="childSize">
+        <div class="panel2-slice right" [class.collapsed]="isCollapsedOrEmpty" [style.width]="childSize" [style.minWidth]="childSize">
             <div class="panel2-content-inner right">
                 <ng-container *ngTemplateOutlet="sidebarContentTemplate"></ng-container>
             </div>
