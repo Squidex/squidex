@@ -1,29 +1,51 @@
 <ng-container *ngIf="formModel.itemChanges | async; let items">
-    <div class="array-container" *ngIf="items.length > 0"
-        cdkDropList
-        [cdkDropListDisabled]="false"
-        [cdkDropListData]="items"
-        (cdkDropListDropped)="sort($event)">
-        <div *ngFor="let itemForm of items; index as i; last as isLast; first as isFirst" class="table-drag item"
-            cdkDrag
-            cdkDragLockAxis="y">
-            <sqx-array-item
-                [canUnset]="canUnset"
-                [form]="form"
-                [formContext]="formContext"
-                [formModel]="itemForm"
-                [index]="i"
-                [isDisabled]="isDisabled | async"
-                [isFirst]="isFirst"
-                [isLast]="isLast"
-                [language]="language"
-                [languages]="languages"
-                (clone)="addCopy(itemForm)"
-                (itemRemove)="removeItem(i)"
-                (itemMove)="move(itemForm, $event)" >
-                <i cdkDragHandle class="icon-drag2"></i>
-            </sqx-array-item>
+    <div class="array-container" *ngIf="items.length > 0">
+        <div class="cdk-container" *ngIf="items.length <= 50;"
+            cdkDropList
+            [cdkDropListDisabled]="false"
+            [cdkDropListData]="items"
+            (cdkDropListDropped)="sort($event)">
+            <div *ngFor="let itemForm of items; index as i; last as isLast; first as isFirst" class="table-drag item"
+                cdkDrag
+                cdkDragLockAxis="y">
+                <sqx-array-item
+                    [canUnset]="canUnset"
+                    [form]="form"
+                    [formContext]="formContext"
+                    [formModel]="itemForm"
+                    [index]="i"
+                    [isDisabled]="isDisabled | async"
+                    [isFirst]="isFirst"
+                    [isLast]="isLast"
+                    [language]="language"
+                    [languages]="languages"
+                    (clone)="addCopy(itemForm)"
+                    (itemRemove)="removeItem(i)"
+                    (itemMove)="move(itemForm, $event)" >
+                    <i cdkDragHandle class="icon-drag2"></i>
+                </sqx-array-item>
+            </div>
         </div>
+
+        <cdk-virtual-scroll-viewport autosize *ngIf="items.length > 50">
+            <div *cdkVirtualFor="let itemForm of items; index as i; last as isLast; first as isFirst" class="table-drag item">
+                <sqx-array-item
+                    [canUnset]="canUnset"
+                    [form]="form"
+                    [formContext]="formContext"
+                    [formModel]="itemForm"
+                    [index]="i"
+                    [isDisabled]="isDisabled | async"
+                    [isFirst]="isFirst"
+                    [isLast]="isLast"
+                    [language]="language"
+                    [languages]="languages"
+                    (clone)="addCopy(itemForm)"
+                    (itemRemove)="removeItem(i)"
+                    (itemMove)="move(itemForm, $event)" >
+                </sqx-array-item>
+            </div>
+        </cdk-virtual-scroll-viewport>
     </div>
 
     <div class="row no-gutters align-items-center">
