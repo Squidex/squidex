@@ -1,11 +1,25 @@
+:host ::ng-deep {
+    .cdk-virtual-scroll-content-wrapper {
+        right: 0;
+    }
+}
+
 .array-container {
     background: $color-border;
+    margin: 0;
     margin-bottom: 1rem;
-    padding: 1rem;
-    padding-bottom: 1px;
+    padding-bottom: 1rem;
     position: relative;
 }
 
+.drag-container {
+    position: relative;
+}
+
+cdk-virtual-scroll-viewport {
+    height: 1000px;
+}
+
 .item {
-    margin-bottom: 1rem;
+    padding: 1rem 1rem 0;
 }
