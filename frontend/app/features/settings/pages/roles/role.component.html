@@ -48,13 +48,13 @@
                 </sqx-form-hint>
 
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
-                    <div class="row g-0 mb-1" *ngFor="let control of editForm.controls; let i = index">
+                    <div class="row g-2 mb-1" *ngFor="let control of editForm.controls; let i = index">
                         <div class="col">
                             <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
 
                             <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                         </div>
-                        <div class="col-auto ps-1" *ngIf="isEditable">
+                        <div class="col-auto" *ngIf="isEditable">
                             <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
                                 <i class="icon-bin2"></i>
                             </button>
@@ -78,13 +78,13 @@
                     </table>
                 </ng-template>
 
-                <form class="form-group row g-0" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
+                <form class="form-group row g-2" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
                         <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput
                             placeholder="{{ 'roles.permissionsPlaceholder' | sqxTranslate }}">
                         </sqx-autocomplete>
                     </div>
-                    <div class="col-auto ps-1">
+                    <div class="col-auto">
                         <button type="submit" class="btn btn-success col-action">
                             <i class="icon-plus"></i>
                         </button>
@@ -98,7 +98,7 @@
                         {{ 'roles.propertiesDescription' | sqxTranslate }}
                     </sqx-form-hint>
 
-                    <div class="row rule-section">
+                    <div class="row g-0 rule-section">
                         <div class="form-check col-6" *ngFor="let property of propertiesSimple; trackBy: trackByProperty">
                             <input class="form-check-input" type="checkbox" id="{{role.name}}_{{property.key}}"
                                 [disabled]="!isEditable"
@@ -114,7 +114,7 @@
                     <div class="mt-4" *ngIf="schemas && schemas.length > 0">
                         <h5>{{ 'common.schemas' | sqxTranslate }}</h5>
 
-                        <div class="row rule-section">
+                        <div class="row g-0 rule-section">
                             <div class="col-6">
                                 <div class="form-check" *ngFor="let schema of schemas | slice:0:halfSchemas; trackBy: trackBySchema">
                                     <input class="form-check-input" type="checkbox" id="{{role.name}}_schema_{{schema.name}}"

@@ -9,12 +9,12 @@
     }
 
     &-buttons {
-        @include absolute(-.5rem, 2rem);
+        @include absolute(-.6rem, 2rem);
         z-index: 1000;
     }
 
     &-buttons-compare {
-        @include absolute(-.5rem, 0);
+        @include absolute(-.6rem, 0);
         z-index: 1000;
     }
 }

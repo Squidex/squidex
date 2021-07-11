@@ -1,12 +1,12 @@
 <div class="assets-container" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled" tabindex="1000">
     <div class="header list">
-        <div class="row g-0">
+        <div class="row g-2">
             <div class="col" [class.disabled]="snapshot.isDisabled">
                 <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxDropFile)="addFiles($event)" [sqxDropDisabled]="snapshot.isDisabled">
                     {{ 'contents.assetsUpload' | sqxTranslate }}
                 </div>
             </div>
-            <div class="col-auto ps-1">
+            <div class="col-auto">
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
                         <i class="icon-list"></i>
