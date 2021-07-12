@@ -18,7 +18,7 @@ export class TitlesConfig {
     }
 }
 
-export type Title = { route?: any; name: string };
+export type Title = { route?: any; localized: string; value: string };
 
 @Injectable()
 export class TitleService {
@@ -50,10 +50,10 @@ export class TitleService {
             const lastIndex = clone.length - 1;
             const localized = this.localizer.getOrKey(value);
 
-            if (previous && clone[lastIndex].name === previous) {
-                clone[lastIndex] = { name: localized, route };
+            if (previous && clone[lastIndex].value === previous) {
+                clone[lastIndex] = { localized, value, route };
             } else {
-                clone.push({ name: localized, route });
+                clone.push({ localized, value, route });
             }
 
             this.path$.next(clone);
@@ -73,7 +73,7 @@ export class TitleService {
 
         let title = '';
 
-        const cleaned = path.map(x => x.name).filter(x => !!x);
+        const cleaned = path.map(x => x.localized).filter(x => !!x);
 
         if (cleaned.length > 0) {
             title = cleaned.join(separator || ' | ');
