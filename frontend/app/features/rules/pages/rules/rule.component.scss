@@ -14,10 +14,14 @@
     }
 
     &-footer {
-        background: lighten($color-border, 10%);
+        background: $color-border-lighter;
         font-size: $font-small;
         font-weight: normal;
     }
+}
+
+a {
+    text-decoration: none;
 }
 
 .col-last {

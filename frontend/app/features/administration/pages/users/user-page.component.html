@@ -2,7 +2,7 @@
 <form [formGroup]="userForm.form" (ngSubmit)="save()">
     <input style="display: none;" type="password" name="foilautofill">
 
-    <sqx-layout layout="simple" width="30rem" [white]="true" [padding]="true" [overflow]="true">
+    <sqx-layout layout="simple" [width]="30" [white]="true" [padding]="true" [overflow]="true">
         <ng-container title>
             <ng-container *ngIf="usersState.selectedUser | async; else noUserTitle">
                 <sqx-title message="i18n:users.editPageTitle"></sqx-title>

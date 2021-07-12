@@ -1,6 +1,6 @@
 <sqx-title message="i18n:assets.listPageTitle"></sqx-title>
 
-<sqx-layout layout="main" titleText="common.assets" titleIcon="assets">    
+<sqx-layout layout="main" titleText="i18n:common.assets" titleIcon="assets">    
     <ng-container menu>
         <div class="row flex-nowrap gx-2">
             <div class="col-auto offset-xl-2">
@@ -75,11 +75,9 @@
             </a>    
         </div> 
     </ng-container>
-
-    <ng-container sidebarContent>
-        <router-outlet></router-outlet>
-    </ng-container>
 </sqx-layout>
+
+<router-outlet></router-outlet>
 
 <ng-container *sqxModal="addAssetFolderDialog">
     <sqx-asset-folder-dialog (complete)="addAssetFolderDialog.hide()"></sqx-asset-folder-dialog>

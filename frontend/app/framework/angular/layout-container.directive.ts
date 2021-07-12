@@ -28,7 +28,8 @@ export class LayoutContainerDirective implements AfterViewInit {
     public onResize() {
         this.invalidate(true);
     }
-    public pushLayout(layout: LayoutComponent) {
+
+    public push(layout: LayoutComponent) {
         this.layouts.push(layout);
     }
 
@@ -39,10 +40,6 @@ export class LayoutContainerDirective implements AfterViewInit {
     }
 
     public peek() {
-        return this.layouts[this.layouts.length - 1];
-    }
-
-    public popLayout() {
         this.layouts.splice(-1, 1);
 
         this.invalidate();
@@ -57,7 +54,50 @@ export class LayoutContainerDirective implements AfterViewInit {
             this.containerWidth = this.element.nativeElement.offsetWidth;
         }
 
-        const diff = Math.max(0, this.element.nativeElement.scrollWidth - this.containerWidth);
+        const layouts = this.layouts;
+
+        for (const layout of layouts) {
+            if (!layout.isViewInit) {
+                return;
+            }
+        }
+
+        let currentSize = 0;
+        let layoutsWidthSpread = 0;
+
+        for (const layout of layouts) {
+            if (layout.desiredWidth > 0) {
+                const layoutWidth = layout.desiredWidth;
+
+                layout.measure(`${layoutWidth}rem`);
+
+                currentSize += layout.renderWidth;
+            } else {
+                layoutsWidthSpread++;
+            }
+        }
+
+        for (const layout of layouts) {
+            if (layout.desiredWidth <= 0) {
+                const layoutWidth = (this.containerWidth - currentSize) / layoutsWidthSpread;
+
+                layout.measure(`${layoutWidth}px`);
+
+                currentSize += layout.renderWidth;
+            }
+        }
+
+        let currentPosition = 0;
+        let currentLayer = layouts.length * 10;
+
+        for (const layout of layouts) {
+            layout.arrange(`${currentPosition}px`, currentLayer.toString());
+
+            currentPosition += layout.renderWidth;
+            currentLayer -= 10;
+        }
+
+        const diff = Math.max(0, currentPosition - this.containerWidth);
 
         this.renderer.setProperty(this.element.nativeElement, 'scrollLeft', diff);
     }

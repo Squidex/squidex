@@ -1,8 +1,18 @@
 <sqx-title message="i18n:rules.listPageTitle" [url]="['..']"></sqx-title>
 <sqx-title message="i18n:rules.itemPageTitle"></sqx-title>
 
-<form (ngSubmit)="save()">
-    <sqx-layout titleText="common.rule" layout="main" width="54rem">    
+<form (ngSubmit)="save()">#
+    <sqx-layout layout="main" [width]="54">
+        <ng-container title>
+            <div class="d-flex align-items-center">
+                <a class="btn btn-text-secondary" (click)="back()">
+                    <i class="icon-angle-left"></i>
+                </a>
+    
+                <h3 class="title">{{ 'common.rule' | sqxTranslate }}</h3>
+            </div>
+        </ng-container>
+
         <ng-container menu>
             <div class="btn btn-outline-secondary btn-enabled" *ngIf="rule">
                 <span class="me-1" *ngIf="isEnabled">
@@ -153,9 +163,7 @@
                 </sqx-onboarding-tooltip>
             </div>
         </ng-container>
-
-        <ng-container sidebarContent>
-            <router-outlet></router-outlet>
-        </ng-container>
     </sqx-layout>
 </form>
+
+<router-outlet></router-outlet>

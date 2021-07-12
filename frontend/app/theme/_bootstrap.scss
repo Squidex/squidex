@@ -52,6 +52,7 @@
         border: 0;
         border-radius: $border-radius;
         box-shadow: $color-input-shadow;
+        flex-wrap: nowrap;
     }
 
     .form-control {
@@ -308,6 +309,10 @@ a {
 // Button improvements
 //
 .btn {
+    &.active {
+        box-shadow: none;
+    }
+
     &-outline-secondary {
         color: $color-text-decent;
 
@@ -442,7 +447,6 @@ a {
 
     // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
     &-text {
-        &,
         &-primary {
             @include build-text-button($color-theme-blue);
         }
@@ -471,6 +475,10 @@ a {
             @include build-text-button($color-text);
         }
     }
+}
+
+.form-text {
+    line-height: 1.5rem;
 }
 
 $icon-size: 4.5rem;

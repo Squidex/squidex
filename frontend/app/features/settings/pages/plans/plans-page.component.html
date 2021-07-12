@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.subscription"></sqx-title>
 
-<sqx-layout layout="main" titleText="common.subscription" titleIcon="subscription" width="65rem">
+<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" [width]="65">
     <ng-container menu>
         <sqx-notifo topic="apps/{{plansState.appId}}/settings/plan"></sqx-notifo>
 
@@ -47,9 +47,7 @@
             </a>
         </div>
     </ng-container>
-
-    <ng-component sidebarContent>
-        <router-outlet></router-outlet>
-    </ng-component>
 </sqx-layout>
+
+<router-outlet></router-outlet>
 

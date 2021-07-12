@@ -34,6 +34,8 @@ h3 {
     margin: 0;
 
     &-item {
+        white-space: nowrap;
+
         &.active {
             color: $color-text-decent;
         }
@@ -44,4 +46,13 @@ h3 {
             text-decoration: none;
         }
     }
+}
+
+.form-select {
+    white-space: nowrap;
+}
+
+.breadcrumb,
+.breadcrumb-item {
+    flex-wrap: nowrap !important;
 }

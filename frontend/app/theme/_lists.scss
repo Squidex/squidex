@@ -169,6 +169,14 @@
     }
 }
 
+tbody {
+    &:last-child {
+        .spacer {
+            display: none
+        }
+    }
+}
+
 //
 // Cell styles
 //

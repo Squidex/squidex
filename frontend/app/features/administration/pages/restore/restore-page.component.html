@@ -1,10 +1,10 @@
 <sqx-title message="i18n:backups.restorePageTitle"></sqx-title>
 
-<sqx-layout layout="main" titleText="backups.restoreTitle" titleIcon="backup" width="70rem">
+<sqx-layout layout="main" titleText="i18n:backups.restoreTitle" titleIcon="backup" [width]="70">
     <sqx-list-view innerWidth="70rem">
         <div class="card section" *ngIf="restoreJob | async; let job">
             <div class="card-header">
-                <div class="row gx-2">
+                <div class="row gx-2 align-items-center">
                     <div class="col-auto">
                         <div *ngIf="job.status === 'Started'" class="restore-status restore-status-pending spin">
                             <i class="icon-hour-glass"></i>

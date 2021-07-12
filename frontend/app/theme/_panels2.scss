@@ -35,36 +35,27 @@
 //
 .panel-container {
     @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
-    @include scrollbars(8px, $color-border-dark);
     overflow-x: auto;
     overflow-y: hidden;
 }
 
 .panel2 {
-    @include absolute(0, 0, 0, 0);
     align-items: stretch;
     display: flex;
     flex-direction: row;
-    flex-grow: 1;
 
     &-slice {
         align-items: stretch;
         display: flex;
         flex-direction: column;
         flex-grow: 0;
-        position: relative;
-
-        router-outlet {
-            display: none;
-        }
 
         &.left {
             background-color: $color-white;
             border: 0;
             border-right: 1px solid $color-border;
-            flex-grow: 0;
-            flex-shrink: 1;
-            z-index: 20;
+            flex-grow: 1;
+            flex-shrink: 0;
 
             &.collapsed {
                 width: 3.25rem !important;
@@ -111,6 +102,7 @@
         &.main {
             flex-grow: 1;
             flex-shrink: 1;
+            overflow: hidden;
         }
 
         &.simple {
@@ -240,10 +232,11 @@
     }
 
     &-sidebar-title {
-        @include absolute(8rem, null, null, 0);
+        @include absolute(7rem, 1.5rem);
         font-size: $font-small;
         opacity: 0;
         transform: rotate(270deg);
+        transform-origin: right;
         transition: opacity .4s ease-in;
     }
 }
@@ -273,7 +266,7 @@
     .nav-link {
         border: 0;
         border-radius: $border-radius;
-        color: lighten($color-text, 25%);
+        color: lighten($color-text, 20%);
         cursor: pointer;
         font-size: inherit;
         font-weight: 500;

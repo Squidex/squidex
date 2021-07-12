@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.clients"></sqx-title>
 
-<sqx-layout layout="main" titleText="common.clients" titleIcon="clients" width="55rem">
+<sqx-layout layout="main" titleText="i18n:common.clients" titleIcon="clients" [width]="55">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:clients.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -39,8 +39,6 @@
             </a>
         </div>
     </ng-container>
-
-    <ng-container sidebarContent>
-        <router-outlet></router-outlet>
-    </ng-container>
 </sqx-layout>
+
+<router-outlet></router-outlet>

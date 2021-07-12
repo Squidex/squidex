@@ -1,6 +1,6 @@
 <sqx-title [message]="schemasState.schemaName"></sqx-title>
 
-<sqx-layout layout="main" width="50rem" *ngIf="schemaTab | async; let tab">
+<sqx-layout layout="main" [width]="50" *ngIf="schemaTab | async; let tab">
     <ng-container title>
         <ul class="nav nav-tabs2">
             <li class="nav-item">
@@ -115,8 +115,6 @@
             </a>
         </div>
     </ng-container>
-
-    <ng-container sidebarContent>
-        <router-outlet></router-outlet>
-    </ng-container>
 </sqx-layout>
+
+<router-outlet></router-outlet>

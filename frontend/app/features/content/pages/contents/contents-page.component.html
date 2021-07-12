@@ -1,6 +1,6 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
-<sqx-layout layout="main" titleText="common.contents" titleIcon="contents">
+<sqx-layout layout="main" titleText="i18n:common.contents" titleIcon="contents">
     <ng-container menu>
         <div class="row flex-nowrap gx-2">
             <div class="col-auto ms-8">
@@ -141,11 +141,8 @@
             </a>
         </div>
     </ng-container>
-
-    <ng-container sidebarContent>
-        <router-outlet></router-outlet>
-    </ng-container>
 </sqx-layout>
 
+<router-outlet></router-outlet>
 
 <sqx-due-time-selector [disabled]="disableScheduler" #dueTimeSelector></sqx-due-time-selector>

@@ -14,6 +14,11 @@
     }
 }
 
+.title {
+    display: inline-block;
+    margin-left: 2rem;
+}
+
 .card-body {
     &:empty {
         display: none;

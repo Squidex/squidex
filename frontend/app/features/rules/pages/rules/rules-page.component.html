@@ -1,6 +1,6 @@
 <sqx-title message="i18n:rules.listPageTitle"></sqx-title>
 
-<sqx-layout layout="main" titleText="common.rules" titleIcon="rules" width="54rem">
+<sqx-layout layout="main" titleText="i18n:common.rules" titleIcon="rules" [width]="54">
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary me-1" (click)="reload()" title="i18n:rules.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
@@ -62,8 +62,6 @@
             </sqx-onboarding-tooltip>
         </div>
     </ng-container>
-
-    <ng-container sidebarContent>
-        <router-outlet></router-outlet>
-    </ng-container>
 </sqx-layout>
+
+<router-outlet></router-outlet>

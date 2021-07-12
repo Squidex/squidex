@@ -1,7 +1,7 @@
 <sqx-title message="i18n:common.settings"></sqx-title>
 
-<sqx-layout layout="left" titleText="common.settings" titleIcon="settings" width="16rem" [white]="true" [overflow]="true" [padding]="true">
-    <ng-container sidebarContent>
+<sqx-layout layout="left" titleText="i18n:common.settings" titleIcon="settings" [width]="16" [white]="true" [overflow]="true" [padding]="true">
+    <ng-container>
         <ul class="nav nav-light flex-column" *ngIf="selectedApp | async; let app">
             <li class="nav-item nav-heading" *ngIf="app.canReadClients || app.canReadRoles || app.canReadContributors">
                 {{ 'common.security' | sqxTranslate }}
@@ -56,8 +56,6 @@
             </li>
         </ul>
     </ng-container>
-
-    <ng-container>
-        <router-outlet></router-outlet>
-    </ng-container>
 </sqx-layout>
+
+<router-outlet></router-outlet>

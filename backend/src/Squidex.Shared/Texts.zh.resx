@@ -1168,6 +1168,9 @@
   <data name="validation.notAnImage" xml:space="preserve">
     <value>图片不是有效图片。</value>
   </data>
+  <data name="validation.notAnValidSvg" xml:space="preserve">
+    <value>The SVG is malicious and contains script tags.</value>
+  </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>只能上传一个文件。</value>
   </data>

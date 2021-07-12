@@ -43,6 +43,14 @@
             }
         }
 
+        &-text {
+            font-size: $font-small;
+
+            a {
+                text-decoration: none;
+            }
+        }
+
         &-title {
             @include truncate;
             color: $color-title;

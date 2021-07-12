@@ -1,4 +1,4 @@
-<div class="panel2">
+<div class="panel2" #panel>
     <ng-container *ngIf="layout === 'simple'">
         <div class="panel2-slice simple">
             <div class="panel2-header simple">
@@ -23,7 +23,7 @@
     </ng-container>
 
     <ng-container *ngIf="layout === 'left'">
-        <div class="panel2-slice left" [class.collapsed]="isCollapsedOrEmpty" [style.width]="width">
+        <div class="panel2-slice left" [class.collapsed]="isCollapsed">
             <div class="panel2-header left">
                 <div class="panel2-header-inner left">
                     <h3 *ngIf="titleText">
@@ -41,25 +41,21 @@
                     <i class="icon-angle-left"></i>
                 </button>
 
-                <div class="panel2-sidebar-title">{{titleText}}</div>
+                <div class="panel2-sidebar-title">{{ (titleCollapsed || titleText) | sqxTranslate }}</div>
             </div>
 
             <div class="panel2-main left">
                 <div class="panel2-main-inner left" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
-                    <ng-container *ngTemplateOutlet="sidebarContentTemplate"></ng-container>
+                    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
                 </div>
             </div>
-        </div>
-
-        <div class="panel2-slice main">
-            <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
         </div>
     </ng-container>
     
     <ng-container *ngIf="layout === 'main'">
-        <div class="panel2-slice main" [style.minWidth]="minWidth">
+        <div class="panel2-slice main">
             <div class="panel2-header main">
-                <div class="panel2-header-inner main" [style.minWidth]="width" [style.width]="width"> 
+                <div class="panel2-header-inner main" [style.width]="innerWidth"> 
                     <h3 *ngIf="titleText">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
                     </h3>
@@ -78,21 +74,15 @@
             </div>
         </div>
 
-        <div class="panel2-slice menu" [class.collapsed]="isCollapsedOrEmpty" *ngIf="!hideSidebar">
+        <div class="panel2-slice menu" *ngIf="!hideSidebar">
             <div class="panel2-header menu">            
-                <a class="btn panel2-collapse" sqxParentLink  [queryParamsHandling]="closeQueryParamsHandling" [class.hidden]="isCollapsedOrEmpty">
+                <a class="btn panel2-collapse" [routerLink]="['./']" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" *ngIf="firstChild | async">
                     <i class="icon-angle-right"></i>
                 </a>
             </div>
     
             <div class="panel2-main menu">
                 <ng-container *ngTemplateOutlet="sidebarMenuTemplate"></ng-container>
-            </div>
-        </div>
-    
-        <div class="panel2-slice right" [class.collapsed]="isCollapsedOrEmpty" [style.width]="childSize" [style.minWidth]="childSize">
-            <div class="panel2-content-inner right">
-                <ng-container *ngTemplateOutlet="sidebarContentTemplate"></ng-container>
             </div>
         </div>
     </ng-container>
@@ -115,9 +105,5 @@
 
     <ng-template #sidebarMenuTemplate>
         <ng-content select="[sidebarMenu]"></ng-content>
-    </ng-template>
-
-    <ng-template #sidebarContentTemplate>
-        <ng-content select="[sidebarContent]"></ng-content>
     </ng-template>
 </div>

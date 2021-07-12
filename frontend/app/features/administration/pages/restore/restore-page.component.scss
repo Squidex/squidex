@@ -10,9 +10,8 @@ h3 {
 
 .card {
     &-header {
-        h3 {
-            line-height: $circle-size;
-        }
+        padding-bottom: 1rem;
+        padding-top: 1rem;
     }
 
     &-body {

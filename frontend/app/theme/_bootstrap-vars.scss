@@ -43,7 +43,7 @@ $body-bg:                       $color-background;
 
 // Borders.
 $border-color:                  $color-border;
-
+$border-radius:                 .25rem;
 //
 // COMPONENTS
 //
@@ -65,9 +65,6 @@ $input-border-color:            $color-input;
 $input-disabled-bg:             $color-input-disabled;
 $input-group-addon-bg:          $color-white;
 $input-placeholder-color:       $color-input-placeholder;
-
-// Select
-$form-select-box-shadow:        $color-input-shadow;
 
 $badge-bg-level: 2;
 
