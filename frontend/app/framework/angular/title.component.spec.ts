@@ -27,7 +27,7 @@ describe('TitleComponent', () => {
         const tree: any = {};
 
         router.setup(x => x.createUrlTree(It.isAny(), { relativeTo: route }))
-            .returns(tree);
+            .returns(() => tree);
 
         router.setup(x => x.serializeUrl(tree))
             .returns(() => 'my-url');

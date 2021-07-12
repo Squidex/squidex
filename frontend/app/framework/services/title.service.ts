@@ -50,10 +50,12 @@ export class TitleService {
             const lastIndex = clone.length - 1;
             const localized = this.localizer.getOrKey(value);
 
+            const title = { localized, value, route };
+
             if (previous && clone[lastIndex].value === previous) {
-                clone[lastIndex] = { localized, value, route };
+                clone[lastIndex] = title;
             } else {
-                clone.push({ localized, value, route });
+                clone.push(title);
             }
 
             this.path$.next(clone);

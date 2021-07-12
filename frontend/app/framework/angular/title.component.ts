@@ -33,9 +33,10 @@ export class TitleComponent implements OnDestroy, OnChanges {
     }
 
     public ngOnChanges() {
-        const route = this.router.serializeUrl(this.router.createUrlTree(this.url, { relativeTo: this.route }));
+        const routeTree = this.router.createUrlTree(this.url, { relativeTo: this.route });
+        const routeUrl = this.router.serializeUrl(routeTree);
 
-        this.titleService.push(this.message, this.previous, route);
+        this.titleService.push(this.message, this.previous, routeUrl);
 
         this.previous = this.message;
     }

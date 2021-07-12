@@ -41,6 +41,6 @@ export class AppsMenuComponent {
     }
 
     public trackByTitle(_index: number, title: Title) {
-        return title.name;
+        return title.value;
     }
 }

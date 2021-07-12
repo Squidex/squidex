@@ -52,7 +52,7 @@
         <ol class="breadcrumb ms-2" *ngIf="path.length > 0">
             <li class="breadcrumb-item"></li>
             <li class="breadcrumb-item" *ngFor="let item of path; trackBy: trackByTitle; let last = last" [class.active]="last">
-                <a [routerLink]="item.route" [relativeTo]="route" [class.disabled]="last">{{item.name}}</a>
+                <a [routerLink]="item.route" [relativeTo]="route" [class.disabled]="last">{{item.localized}}</a>
             </li>
         </ol>
     </nav>
