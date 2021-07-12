@@ -31,6 +31,8 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         public Status Status { get; set; }
 
+        public Status? NewStatus { get; set; }
+
         public override long Partition
         {
             get => Id.GetHashCode();

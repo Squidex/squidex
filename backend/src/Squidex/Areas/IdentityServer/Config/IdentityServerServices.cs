@@ -20,6 +20,7 @@ using Squidex.Hosting;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 using static OpenIddict.Abstractions.OpenIddictConstants;
+using static OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers;
 using static OpenIddict.Server.OpenIddictServerEvents;
 using static OpenIddict.Server.OpenIddictServerHandlers;
 
@@ -80,6 +81,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 })
                 .AddServer(builder =>
                 {
+                    builder.RemoveEventHandler(ValidateTransportSecurityRequirement.Descriptor);
+
                     builder.AddEventHandler<ProcessSignInContext>(builder =>
                     {
                         builder.UseSingletonHandler<AlwaysAddTokenHandler>()

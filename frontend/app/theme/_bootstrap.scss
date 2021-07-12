@@ -475,6 +475,10 @@ a {
             @include build-text-button($color-text);
         }
     }
+
+    &-outline-secondary {
+        color: $color-text-decent;
+    }
 }
 
 .form-text {

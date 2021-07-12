@@ -32,7 +32,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.7" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.8" />
     <PackageReference Include="GraphQL.DataLoader" Version="4.5.0" />
     <PackageReference Include="GraphQL.Server.Core" Version="5.0.2" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="5.0.2" />

@@ -28,14 +28,21 @@ namespace Squidex.Domain.Apps.Entities
                 {
                     foreach (var schemaId in schemaIds)
                     {
-                        if (result == null || !result.TryGetValue(schemaId, out _))
+                        if (schemaId == schema.Id)
                         {
-                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, true);
+                            result ??= new Dictionary<DomainId, Schema>();
+                            result[schemaId] = schema.SchemaDef;
+                        }
+                        else if (result == null || !result.TryGetValue(schemaId, out _))
+                        {
+                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false);
 
                             if (resolvedEntity != null)
                             {
                                 result ??= new Dictionary<DomainId, Schema>();
                                 result[schemaId] = resolvedEntity.SchemaDef;
+
+                                await ResolveSchemaAsync(resolvedEntity);
                             }
                         }
                     }
@@ -46,11 +53,11 @@ namespace Squidex.Domain.Apps.Entities
             {
                 foreach (var nestedField in arrayField.Fields)
                 {
-                    await ResolveAsync(nestedField);
+                    await ResolveFieldAsync(nestedField);
                 }
             }
 
-            async Task ResolveAsync(IField field)
+            async Task ResolveFieldAsync(IField field)
             {
                 switch (field)
                 {
@@ -68,10 +75,15 @@ namespace Squidex.Domain.Apps.Entities
                 }
             }
 
-            foreach (var field in schema.SchemaDef.Fields)
+            async Task ResolveSchemaAsync(ISchemaEntity schema)
             {
-                await ResolveAsync(field);
+                foreach (var field in schema.SchemaDef.Fields)
+                {
+                    await ResolveFieldAsync(field);
+                }
             }
+
+            await ResolveSchemaAsync(schema);
 
             if (result == null)
             {
