@@ -9,7 +9,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -19,20 +21,29 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
         private readonly DomainId appId = DomainId.NewGuid();
-        private readonly string fileName;
+        private readonly string fileNameDefault;
+        private readonly string fileNameFolder;
+        private readonly AssetOptions options = new AssetOptions();
         private readonly DefaultAppImageStore sut;
 
         public DefaultAppImageStoreTests()
         {
-            fileName = appId.ToString();
+            fileNameDefault = appId.ToString();
+            fileNameFolder = $"{appId}/thumbnail";
 
-            sut = new DefaultAppImageStore(assetStore);
+            sut = new DefaultAppImageStore(assetStore, Options.Create(options));
         }
 
-        [Fact]
-        public async Task Should_invoke_asset_store_to_upload_archive()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_invoke_asset_store_to_upload_archive(bool folderPerApp)
         {
             var stream = new MemoryStream();
+
+            options.FolderPerApp = folderPerApp;
+
+            var fileName = GetFileName(folderPerApp);
 
             await sut.UploadAsync(appId, stream);
 
@@ -40,15 +51,26 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .MustHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_invoke_asset_store_to_download_archive()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_invoke_asset_store_to_download_archive(bool folderPerApp)
         {
             var stream = new MemoryStream();
+
+            options.FolderPerApp = folderPerApp;
+
+            var fileName = GetFileName(folderPerApp);
 
             await sut.DownloadAsync(appId, stream);
 
             A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, CancellationToken.None))
                 .MustHaveHappened();
+        }
+
+        private string GetFileName(bool folderPerApp)
+        {
+            return folderPerApp ? fileNameFolder : fileNameDefault;
         }
     }
 }
