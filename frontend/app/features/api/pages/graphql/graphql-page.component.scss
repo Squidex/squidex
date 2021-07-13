@@ -16,6 +16,20 @@
         svg {
             fill: $color-black;
         }
+
+        /* stylelint-disable-next-line selector-class-pattern */
+        .historyPaneWrap {
+            border-radius: 0;
+            border-left: 1px solid $color-border;
+            box-shadow: none !important;
+        }
+
+        /* stylelint-disable-next-line selector-class-pattern */
+        .docExplorerWrap {
+            border-radius: 0;
+            border-left: 1px solid $color-border;
+            box-shadow: none !important;
+        }
     }
 
     /* stylelint-disable-next-line selector-class-pattern */

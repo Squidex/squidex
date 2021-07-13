@@ -51,6 +51,9 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public overflow = false;
 
     @Input()
+    public hideHeader = false;
+
+    @Input()
     public hideSidebar = false;
 
     @Input()

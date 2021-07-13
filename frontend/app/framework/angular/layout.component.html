@@ -1,7 +1,7 @@
 <div class="panel2" #panel>
     <ng-container *ngIf="layout === 'simple'">
         <div class="panel2-slice simple">
-            <div class="panel2-header simple">
+            <div class="panel2-header simple" *ngIf="!hideHeader">
                 <div class="panel2-header-inner simple">
                     <h3 *ngIf="titleText">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
@@ -24,7 +24,7 @@
 
     <ng-container *ngIf="layout === 'left'">
         <div class="panel2-slice left" [class.collapsed]="isCollapsed">
-            <div class="panel2-header left">
+            <div class="panel2-header left" *ngIf="!hideHeader">
                 <div class="panel2-header-inner left">
                     <h3 *ngIf="titleText">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
@@ -54,7 +54,7 @@
     
     <ng-container *ngIf="layout === 'main'">
         <div class="panel2-slice main">
-            <div class="panel2-header main">
+            <div class="panel2-header main" *ngIf="!hideHeader">
                 <div class="panel2-header-inner main" [style.width]="innerWidth"> 
                     <h3 *ngIf="titleText">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
