@@ -20,7 +20,7 @@ export class TitleComponent implements OnDestroy, OnChanges {
     private previous: any;
 
     @Input()
-    public url: any[] = [];
+    public url: any[] = ['./'];
 
     @Input()
     public message: string;
