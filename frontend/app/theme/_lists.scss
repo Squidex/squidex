@@ -237,6 +237,16 @@ tbody {
     }
 }
 
+.cell-select {
+    font-size: 1rem !important;
+    font-weight: normal;
+    text-transform: none;
+
+    .form-check {
+        margin: 0;
+    }
+}
+
 //
 // Table cell with truncated content.
 //

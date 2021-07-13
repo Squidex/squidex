@@ -229,7 +229,6 @@
 .col-form-label {
     font-size: 90%;
 }
-
 label {
     & {
         font-size: 90%;
@@ -237,11 +236,6 @@ label {
     }
 
     &.form-check-label {
-        font-size: 100%;
-        font-weight: normal;
-    }
-
-    &.custom-control-label {
         font-size: 100%;
         font-weight: normal;
     }

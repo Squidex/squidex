@@ -34,6 +34,9 @@ h3 {
     margin: 0;
 
     &-item {
+        @include truncate;
+        max-width: 10rem;
+        min-width: 0;
         white-space: nowrap;
 
         &.active {

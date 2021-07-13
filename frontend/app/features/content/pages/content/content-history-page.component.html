@@ -3,15 +3,12 @@
         <div class="section mb-4">
             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
 
-            <div class="row g-0">
-                <div class="col">
-                    <input readonly class="form-control" name="id" id="id" value="{{content.id}}" #inputId>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-text-secondary" [sqxCopy]="inputId">
-                        <i class="icon-copy"></i>
-                    </button>
-                </div>
+            <div class="input-group">
+                <input readonly class="form-control" name="id" id="id" value="{{content.id}}" #inputId>
+        
+                <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
+                    <i class="icon-copy"></i>
+                </button>
             </div>
         </div>
 

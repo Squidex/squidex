@@ -7,7 +7,7 @@
                         <i class="icon-circle" [style.color]="saved.color" [class.hidden]="!saved.color"></i> {{saved.name | sqxTranslate}}
                     </div>
                     <div class="col-auto">
-                        <a class="text-danger" (click)="remove.emit(saved)" *ngIf="canRemove" sqxStopClick>
+                        <a class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" *ngIf="canRemove" sqxStopClick>
                             <i class="icon-close"></i>
                         </a>
                     </div>   

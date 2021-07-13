@@ -2,6 +2,10 @@
     cursor: pointer;
 }
 
+.alert {
+    border-radius: 0;
+}
+
 .table-container {
     display: inline-block;
     min-width: 100%;
@@ -40,7 +44,7 @@
 }
 
 .selection {
-    background: $color-theme-secondary;
     border-bottom: 1px solid $color-border;
+    border-radius: 0;
     padding: .25 * $panel-padding $panel-padding;
 }

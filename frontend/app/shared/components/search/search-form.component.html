@@ -4,7 +4,7 @@
 
 <form [class]="formClass" (ngSubmit)="search()">
     <div class="input-group">
-        <input class="form-control form-control-expandable" #inputFind [ngModel]="query?.fullText" (ngModelChange)="changeQueryFullText($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="placeholder">
+        <input class="form-control" #inputFind [ngModel]="query?.fullText" (ngModelChange)="changeQueryFullText($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="placeholder">
 
         <ng-container *ngIf="queries">
             <ng-container *ngIf="saveKey | async; else notBookmarked; let key">

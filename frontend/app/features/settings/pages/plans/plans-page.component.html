@@ -1,6 +1,6 @@
 <sqx-title message="i18n:common.subscription"></sqx-title>
 
-<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" [width]="65">
+<sqx-layout layout="main" titleText="i18n:common.subscription" titleIcon="subscription" [width]="60">
     <ng-container menu>
         <sqx-notifo topic="apps/{{plansState.appId}}/settings/plan"></sqx-notifo>
 
@@ -12,31 +12,28 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view innerWidth="65rem" [isLoading]="plansState.isLoading | async">
-            <ng-container header>
-                <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
-                    <div class="panel-alert panel-alert-danger" *ngIf="(plansState.isOwner | async) === false">
-                        {{ 'plans.notPlanOwner' | sqxTranslate }}
-                    </div>
-                </ng-container>
-            </ng-container>
+        <sqx-list-view innerWidth="60rem" [isLoading]="plansState.isLoading | async">
+            <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
+                <div class="alert alert-danger" *ngIf="(plansState.isOwner | async) === false">
+                    {{ 'plans.notPlanOwner' | sqxTranslate }}
+                </div>
 
-            <div>
-                <ng-container *ngIf="(plansState.isLoaded | async) && (plansState.plans | async); let plans">
+                <div>
                     <div class="text-muted text-center empty" *ngIf="plans.length === 0">
                         {{ 'plans.noPlanConfigured' | sqxTranslate }}
                     </div>
 
-                    <div class="clearfix">
-                        <sqx-plan *ngFor="let planInfo of plans; trackBy: trackByPlan" [planInfo]="planInfo">
-                        </sqx-plan>
+                    <div class="row g-2">
+                        <div class="col-3" *ngFor="let planInfo of plans; trackBy: trackByPlan">
+                            <sqx-plan [planInfo]="planInfo"></sqx-plan>
+                        </div>
                     </div>
 
                     <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
                         {{ 'plans.billingPortalHint' | sqxTranslate }} <a [href]="portalUrl" sqxExternalLink>{{ 'plans.billingPortal' | sqxTranslate }}</a>
                     </div>
-                </ng-container>
-            </div>
+                </div>
+            </ng-container>
         </sqx-list-view>
     </ng-container>
 
