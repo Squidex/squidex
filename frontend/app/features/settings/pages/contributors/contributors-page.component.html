@@ -9,7 +9,7 @@
                 <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
             </button>
 
-            <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+            <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
 
             <div class="form-inline">
                 <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" [ngModel]="contributorsState.query | async" (ngModelChange)="search($event)">

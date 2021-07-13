@@ -1,9 +1,9 @@
 <sqx-title [message]="schema.displayName" [url]="['..']"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-    <sqx-layout layout="main" [width]="60" [hideSidebar]="!content">
+    <sqx-layout layout="main" [hideSidebar]="!content">
         <ng-container title>
-            <a class="btn btn-text" (click)="back()" *ngIf="schema.type === 'Default'">
+            <a class="btn btn-text-secondary" (click)="back()" *ngIf="schema.type === 'Default'">
                 <i class="icon-angle-left"></i>
             </a>
 
@@ -83,10 +83,10 @@
 
                         <ng-container *ngIf="content?.canUpdate">
                             <button type="submit" class="btn btn-primary ms-1" title="i18n:common.saveShortcut">
-                                {{ 'common.save' | sqxTranslate }}
+                                {{ 'common.save' | sqxTranslate }} <span class="btn-tooltip">S</span>
                             </button>
         
-                            <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                            <sqx-shortcut keys="alt+s" (trigger)="saveAndPublish()"></sqx-shortcut>
                         </ng-container>
                     </ng-template>
                 </ng-container>
@@ -98,10 +98,10 @@
                 </button>
 
                 <button type="submit" class="btn btn-primary ms-1" title="i18n:common.saveShortcut" *ngIf="contentsState.canCreateAndPublish | async">
-                    {{ 'contents.saveAndPublish' | sqxTranslate }}
+                    {{ 'contents.saveAndPublish' | sqxTranslate }} <span class="btn-tooltip">S</span>
                 </button>
 
-                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                <sqx-shortcut keys="alt+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-template>
 
             <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>

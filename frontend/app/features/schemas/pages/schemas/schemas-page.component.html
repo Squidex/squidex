@@ -3,16 +3,16 @@
 <sqx-layout layout="left" titleCollapsed="i18n:common.schemas" [width]="18" [white]="true" [padding]="true" [overflow]="true">    
     <ng-container menu>
         <div class="row g-0">
-            <div class="col-auto" *ngIf="schemasState.canCreate | async">
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
-    
+            <div class="col-auto" *ngIf="schemasState.canCreate | async">    
                 <button type="button" class="btn btn-success me-2" (click)="createSchema()" title="i18n:schemas.createSchemaTooltip" titlePosition="top-left">
                     <i class="icon-plus"></i>          
                 </button>
+
+                <sqx-shortcut keys="alt+n" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
             </div>
             
             <div class="col search-form">
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+                <sqx-shortcut keys="alt+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
                 <input class="form-control" #inputFind [formControl]="schemasFilter" placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}">
     

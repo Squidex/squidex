@@ -12,13 +12,32 @@ noscript {
     margin-bottom: 20px;
 }
 
+@media (max-width: 550px) {
+    .profile {
+        background-color: $color-white;
+    }
+
+    .profile-card {
+        border: 0;
+    }
+
+    .profile-card-body {
+        padding: 0;
+    }
+
+    .profile-footer {
+        border: 0;
+    }
+}
+
 //
 // Profile element
 //
 .profile {
-    & {
+    &-container {
         margin: 0 auto;
-        max-width: 20rem;
+        max-width: 40rem;
+        min-width: 10rem;
         padding: 1rem 2rem;
     }
 
@@ -33,16 +52,12 @@ noscript {
         height: 1.75rem;
     }
 
-    &-lg {
-        max-width: 40rem;
-    }
-
     &-password-signup {
         color: $color-text-decent;
     }
 
     &-section {
-        margin-top: 2rem;
+        margin-top: 3rem;
     }
 
     &-section-sm {
@@ -107,8 +122,6 @@ noscript {
     .external {
         &-button {
             line-height: 1.8rem;
-            text-align: left;
-            text-transform: none;
         }
 
         &-button-small {
@@ -122,9 +135,9 @@ noscript {
             display: inline-block;
             font-size: 1.1rem;
             font-weight: normal;
-            height: 20px;
+            margin-bottom: 4px;
+            margin-right: .5rem;
             vertical-align: middle;
-            width: 1.6rem;
         }
     }
 
@@ -143,6 +156,12 @@ noscript {
     }
 }
 
+.login-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 20rem;
+}
+
 //
 // Splash text for loader.
 //
@@ -157,6 +176,10 @@ noscript {
         margin-bottom: 2rem;
         max-width: 100%;
     }
+}
+
+.card-consent {
+    border-color: transparent;
 }
 
 //

@@ -31,7 +31,7 @@
 
     <div class="nav nav-light flex-column" *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
         <ng-container *ngIf="!forContent; else simpleMode">
-            <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item" [style.height]="getItemHeight()"
+            <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
                 cdkDrag
                 cdkDragLockAxis="y"
                 [cdkDragData]="schema"
@@ -46,7 +46,7 @@
         </ng-container>
     
         <ng-template #simpleMode>
-            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item">
+            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate">
                 <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
                     <span class="schema-name">{{schema.displayName}}</span>
                 </a>

@@ -55,7 +55,8 @@
             border: 0;
             border-right: 1px solid $color-border;
             flex-grow: 1;
-            flex-shrink: 0;
+            flex-shrink: 1;
+            max-width: 100%;
 
             &.collapsed {
                 width: 3.25rem !important;
@@ -134,6 +135,7 @@
             border: 0;
             border-radius: 0;
             display: flex;
+            direction: ltr;
             padding: $panel-padding;
             width: 100%;
 

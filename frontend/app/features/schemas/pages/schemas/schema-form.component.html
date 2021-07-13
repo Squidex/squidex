@@ -98,10 +98,10 @@
             </ng-container>
 
             <div class="form-group">
-                <button type="button" class="btn btn-sm btn-text" (click)="toggleImport()" [class.hidden]="showImport">
+                <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggleImport()" [class.hidden]="showImport">
                     {{ 'schemas.import' | sqxTranslate }}
                 </button>
-                <button type="button" class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="!showImport">
+                <button type="button" class="btn btn-sm btn-text-secondary force" (click)="toggleImport()" [class.hidden]="!showImport">
                     {{ 'common.hide' | sqxTranslate }}
                 </button>
         

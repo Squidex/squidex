@@ -51,12 +51,8 @@
         // Fix drop shadow with custom border radius.
         border: 0;
         border-radius: $border-radius;
-        box-shadow: $color-input-shadow;
+        box-shadow: $input-shadow;
         flex-wrap: nowrap;
-    }
-
-    .form-control {
-        box-shadow: none;
     }
 }
 
@@ -479,10 +475,6 @@ a {
     &-outline-secondary {
         color: $color-text-decent;
     }
-}
-
-.form-text {
-    line-height: 1.5rem;
 }
 
 $icon-size: 4.5rem;

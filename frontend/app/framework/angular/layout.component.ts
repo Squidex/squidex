@@ -67,7 +67,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     public get innerWidth() {
-        return this.width > 0 ? `${this.width}rem` : 'auto';
+        return this.width > 0 ? `${this.width}rem` : '100%';
     }
 
     public get isViewInit() {
@@ -86,7 +86,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
             map(() => {
                 return !!this.route.firstChild;
             }),
-            startWith(() => !!this.route.firstChild),
+            startWith(!!this.route.firstChild),
         );
 
     constructor(

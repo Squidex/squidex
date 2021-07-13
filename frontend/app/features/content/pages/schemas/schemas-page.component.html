@@ -2,7 +2,7 @@
 
 <sqx-layout layout="left" titleCollapsed="i18n:common.schemas" [width]="18" [white]="true" [padding]="true" [overflow]="true">
     <ng-container menu>
-        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+        <sqx-shortcut keys="alt+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
         <div class="search-form">
             <input class="form-control" #inputFind [formControl]="schemasFilter" placeholder="{{ 'contents.searchSchemasPlaceholder' | sqxTranslate }}">

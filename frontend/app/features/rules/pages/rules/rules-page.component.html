@@ -6,14 +6,14 @@
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+        <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
 
         <ng-container *ngIf="rulesState.canCreate | async">
-            <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
-    
             <a type="button" class="btn btn-success" #buttonNew routerLink="new" title="i18n:rules.createTooltip">
                 <i class="icon-plus"></i> {{ 'rules.create' | sqxTranslate }}
             </a>
+
+            <sqx-shortcut keys="alt+n" (trigger)="buttonNew.click()"></sqx-shortcut>
         </ng-container>
     </ng-container>
 

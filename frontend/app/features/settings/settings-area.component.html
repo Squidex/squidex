@@ -27,7 +27,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" routerLink="settings" routerLinkActive="active">
-                    <i class="icon-settings"></i> {{ 'appSettings.title' | sqxTranslate }}
+                    <i class="icon-patterns"></i> {{ 'appSettings.title' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadLanguages">
@@ -52,6 +52,11 @@
             <li class="nav-item" *ngIf="app.canReadPlans">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
                     <i class="icon-subscription"></i> {{ 'common.subscription' | sqxTranslate }}
+                </a>
+            </li>
+            <li class="nav-item" *ngIf="app.canReadPlans">
+                <a class="nav-link" routerLink="more" routerLinkActive="active">
+                    <i class="icon-settings"></i> {{ 'common.settings' | sqxTranslate }}
                 </a>
             </li>
         </ul>
