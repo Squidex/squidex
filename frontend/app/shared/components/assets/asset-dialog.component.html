@@ -84,30 +84,24 @@
                         <div class="form-group g-0">
                             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
 
-                            <div class="row g-0">
-                                <div class="col">
-                                    <input readonly class="form-control" name="id" id="id" value="{{asset.id}}" #inputId>
-                                </div>
-                                <div class="col-auto">
-                                    <button type="button" class="btn btn-text-secondary" [sqxCopy]="inputId">
-                                        <i class="icon-copy"></i>
-                                    </button>
-                                </div>
+                            <div class="input-group">
+                                <input readonly class="form-control" name="id" id="id" value="{{asset.id}}" #inputId>
+
+                                <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
+                                    <i class="icon-copy"></i>
+                                </button>
                             </div>
                         </div>
 
                         <div class="form-group g-0">
                             <label for="url">{{ 'common.url' | sqxTranslate }}</label>
 
-                            <div class="row g-0">
-                                <div class="col">
-                                    <input readonly class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.version:false}}" #inputUrl>
-                                </div>
-                                <div class="col-auto">
-                                    <button type="button" class="btn btn-text-secondary" [sqxCopy]="inputUrl">
-                                        <i class="icon-copy"></i>
-                                    </button>
-                                </div>
+                            <div class="input-group">
+                                <input readonly class="form-control" name="url" id="url" value="{{asset | sqxAssetUrl:asset.version:false}}" #inputUrl>
+
+                                <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputUrl">
+                                    <i class="icon-copy"></i>
+                                </button>
                             </div>
                         </div>
             

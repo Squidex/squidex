@@ -48,7 +48,7 @@
                 </sqx-form-hint>
 
                 <ng-container *ngIf="!role.isDefaultRole; else defaultRole">
-                    <div class="row g-2 mb-1" *ngFor="let control of editForm.controls; let i = index">
+                    <div class="row gx-2 mb-1" *ngFor="let control of editForm.controls; let i = index">
                         <div class="col">
                             <sqx-control-errors [for]="control" [fieldName]="'Permission'"></sqx-control-errors>
 
@@ -78,7 +78,7 @@
                     </table>
                 </ng-template>
 
-                <form class="form-group row g-2" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
+                <form class="form-group row gx-2" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
                         <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput
                             placeholder="{{ 'roles.permissionsPlaceholder' | sqxTranslate }}">

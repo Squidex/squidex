@@ -5,19 +5,3 @@
         padding: .75rem 1.25rem;
     }
 }
-
-.no-padding {
-    padding: 0;
-}
-
-.cell-actions {
-    @include force-width(3.2rem);
-}
-
-.cell-input {
-    padding-right: 0;
-}
-
-.cell-button {
-    padding-left: .25rem;
-}

@@ -66,7 +66,7 @@
                         </div>
 
                         <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()" *ngIf="otherLanguage && isEditable">
-                            <div class="row g-2">
+                            <div class="row gx-2">
                                 <div class="col">
                                     <select class="form-select fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
                                         <option *ngFor="let otherLanguage of fallbackLanguagesNew; trackBy: trackByLanguage" [ngValue]="otherLanguage">{{otherLanguage.englishName}}</option>

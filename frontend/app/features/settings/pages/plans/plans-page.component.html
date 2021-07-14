@@ -23,7 +23,7 @@
                         {{ 'plans.noPlanConfigured' | sqxTranslate }}
                     </div>
 
-                    <div class="row g-2">
+                    <div class="row gx-2">
                         <div class="col-3" *ngFor="let planInfo of plans; trackBy: trackByPlan">
                             <sqx-plan [planInfo]="planInfo"></sqx-plan>
                         </div>
