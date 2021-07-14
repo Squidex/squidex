@@ -177,9 +177,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         this.searchBoxInput.nativeElement.remove();
 
         Promise.all([
-            this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.css'),
-            this.resourceLoader.loadStyle('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css'),
-            this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js'),
+            this.resourceLoader.loadLocalStyle('dependencies/leaflet/Control.Geocoder.css'),
+            this.resourceLoader.loadLocalStyle('dependencies/leaflet/leaflet.css'),
+            this.resourceLoader.loadLocalScript('dependencies/leaflet/leaflet.js'),
         ]).then(() => {
             this.map = L.map(this.editor.nativeElement).fitWorld();
 
@@ -188,7 +188,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
                     attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
                 }).addTo(this.map);
 
-            this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/perliedman-leaflet-control-geocoder/1.9.0/Control.Geocoder.min.js')
+            this.resourceLoader.loadLocalScript('dependencies/leaflet/Control.Geocoder.min.js')
                 .then(() => {
                     L.Control.geocoder({
                         defaultMarkGeocode: false,

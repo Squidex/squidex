@@ -44,6 +44,8 @@
     "graphql": "15.5.0",
     "image-focus": "1.2.0",
     "keycharm": "0.4.0",
+    "leaflet": "^1.7.1",
+    "leaflet-control-geocoder": "^2.3.0",
     "marked": "2.0.6",
     "mersenne-twister": "1.1.0",
     "mousetrap": "1.6.5",
