@@ -20,12 +20,13 @@
         </style>
     </noscript>
 
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.css">
+    <link rel="stylesheet" type="text/css" href="./scripts/outdatedbrowser/outdatedbrowser.min.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.js"></script>
+    <script src="./scripts/outdatedbrowser/outdatedbrowser.min.js"></script>
     <script> 
         function addLoadEvent(callback) {
             var oldOnload = window.onload;
+
             if (typeof window.onload != 'function') {
                 window.onload = callback;
             } else {
@@ -39,7 +40,10 @@
         }
 
         addLoadEvent(function () {
-            outdatedBrowser({ lowerThan: 'object-fit', languagePath: '' });
+            outdatedBrowser({ 
+                lowerThan: 'object-fit', 
+                languagePath: './scripts/outdatedbrowser/lang/en.html'
+            });
         });
     </script>
 </head>
@@ -52,16 +56,6 @@
         </div>
     </sqx-app>
     
-    <div id="outdated">
-        <h6>Your browser is out-of-date!</h6>
-
-        <p>
-            Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update my browser now </a>
-        </p>
-
-        <p class="last">
-            <a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a>
-         </p>
-    </div>
+    <div id="outdated"></div>
 </body>
 </html>
