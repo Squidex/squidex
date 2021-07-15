@@ -58,6 +58,7 @@ namespace Squidex.Config.Orleans
                 options.HideTrace = true;
             });
 
+            builder.UseDashboardEmbeddedFiles();
             builder.UseDashboard(options =>
             {
                 options.HostSelf = false;
