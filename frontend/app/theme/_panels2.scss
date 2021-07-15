@@ -1,0 +1,306 @@
+/* stylelint-disable no-descending-specificity */
+
+@mixin panel-icon {
+    color: $color-border-darker;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 400;
+    padding: .6rem;
+    text-align: center;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        color: darken($color-border-darker, 10%);
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    &:not([href]) {
+        color: $color-border-dark;
+
+        &:hover,
+        &:focus {
+            color: darken($color-border-darker, 10%);
+        }
+    }
+
+    &.active {
+        color: $color-theme-blue;
+    }
+}
+
+//
+// Panel container to enforce horizontal stacking and scrolling.
+//
+.panel-container {
+    @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.panel2 {
+    align-items: stretch;
+    display: flex;
+    flex-direction: row;
+
+    &-slice {
+        align-items: stretch;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 0;
+
+        &.left {
+            background-color: $color-white;
+            border: 0;
+            border-right: 1px solid $color-border;
+            flex-grow: 1;
+            flex-shrink: 1;
+            max-width: 100%;
+
+            &.collapsed {
+                width: 3.25rem !important;
+
+                .panel2-sidebar-title {
+                    opacity: 1;
+                }
+
+                .panel2-main {
+                    display: none;
+                }
+
+                .panel2-header-inner {
+                    display: none;
+                }
+
+                .panel2-header {
+                    padding-left: 0;
+                    padding-right: 0;
+                    width: 3rem !important;
+                }
+
+                .panel2-collapse {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+
+        &.menu {
+            @include force-width(3.25rem);
+            background-color: $color-white;
+            border: 0;
+            border-left: 1px solid $color-border;
+
+            &.collapsed {
+                width: 3rem !important;
+
+                .panel2-collapse {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+
+        &.main {
+            flex-grow: 1;
+            flex-shrink: 1;
+            overflow: hidden;
+        }
+
+        &.simple {
+            border: 0;
+            border-left: 1px solid $color-border;
+            width: 100%;
+        }
+
+        &.right {
+            &.collapsed {
+                display: none;
+            }
+        }
+    }
+
+    &-header {
+        @include force-height($panel-header);
+        background-color: $color-white;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        position: relative;
+
+        &-inner {
+            align-items: center;
+            background-color: $color-white;
+            border: 0;
+            border-radius: 0;
+            display: flex;
+            direction: ltr;
+            padding: $panel-padding;
+            width: 100%;
+
+            &.left {
+                padding-right: 3rem;
+            }
+
+            &.main {
+                border: 0;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        h3 {
+            margin: 0;
+            margin-right: 4rem;
+            white-space: nowrap;
+
+            & > i {
+                margin-right: .5rem;
+            }
+        }
+
+        &.middle {
+            .panel2-header-inner {
+                justify-content: space-between;
+            }
+        }
+
+        &.left {
+            .panel2-collapse {
+                @include absolute(50%, .5rem, null, null);
+            }
+        }
+
+        &.menu {
+            .panel2-collapse {
+                @include absolute(50%, null, null, .5rem);
+            }
+        }
+    }
+
+    &-collapse {
+        color: $color-text-decent;
+        font-size: 1.1rem;
+        font-weight: normal;
+        margin-top: -1.25rem;
+        transition: transform .3s ease-in;
+
+        i {
+            margin: 0;
+        }
+    }
+
+    &-main {
+        align-items: stretch;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        overflow-y: hidden;
+        position: relative;
+
+        &-inner {
+            &.main {
+                display: flex;
+                flex-grow: 1;
+                flex-direction: column;
+                overflow-y: hidden;
+            }
+
+            &.left {
+                width: 100%;
+            }
+
+            &.simple {
+                width: 100%;
+            }
+
+            &.white {
+                background-color: $color-white;
+            }
+
+            &.padded {
+                padding: $panel-padding;
+            }
+
+            &.overflow {
+                overflow-y: overlay;
+            }
+        }
+
+        &.menu {
+            display: block;
+        }
+    }
+
+    &-sidebar-title {
+        @include absolute(7rem, 1.5rem);
+        font-size: $font-small;
+        opacity: 0;
+        transform: rotate(270deg);
+        transform-origin: right;
+        transition: opacity .4s ease-in;
+    }
+}
+
+.panel-link {
+    @include panel-icon;
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    display: block;
+
+    &:hover {
+        color: $color-theme-blue-dark;
+    }
+
+    &.active {
+        border-color: $color-border;
+
+        &:first-child {
+            border-top-color: transparent;
+        }
+    }
+}
+
+.nav-light {
+    font-size: $font-small;
+
+    .nav-link {
+        border: 0;
+        border-radius: $border-radius;
+        color: lighten($color-text, 20%);
+        cursor: pointer;
+        font-size: inherit;
+        font-weight: 500;
+        margin-left: -.5rem;
+        margin-right: -.5rem;
+        margin-bottom: .125rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        transition: background-color .4s ease-in, color .4s ease-in;
+
+        i {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-right: 1rem;
+        }
+
+        &.active {
+            background-color: $color-theme-blue-lightest;
+            color: $color-theme-blue;
+            cursor: default;
+            font-weight: 500;
+        }
+
+        &:hover {
+            background-color: $color-theme-blue-lightest;
+            color: $color-text;
+        }
+    }
+
+    .nav-heading {
+        color: $color-text-decent;
+        margin-bottom: .5rem;
+        margin-top: 1rem;
+    }
+}

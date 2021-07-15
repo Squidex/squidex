@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ContributorDto, ContributorsState, DialogModel, RolesState, Router2State } from '@app/shared';
+import { ContributorDto, ContributorsState, RolesState, Router2State } from '@app/shared';
 
 @Component({
     selector: 'sqx-contributors-page',
@@ -17,8 +17,6 @@ import { ContributorDto, ContributorsState, DialogModel, RolesState, Router2Stat
     ],
 })
 export class ContributorsPageComponent implements OnInit {
-    public importDialog = new DialogModel();
-
     constructor(
         public readonly contributorsRoute: Router2State,
         public readonly contributorsState: ContributorsState,

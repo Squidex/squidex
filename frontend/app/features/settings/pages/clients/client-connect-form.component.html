@@ -5,7 +5,7 @@
 
     <ng-container content>
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb steps">
+            <ol class="breadcrumb mb-4 steps">
                 <li class="breadcrumb-item done">
                     <i class="icon-checkmark"></i> {{ 'clients.connectWizard.step0Title' | sqxTranslate }}
                 </li>
@@ -66,7 +66,7 @@
 
             <ng-container *ngSwitchCase="'HTTP'">
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">1</span> {{ 'clients.connectWizard.manuallyStep1' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">1</span> {{ 'clients.connectWizard.manuallyStep1' | sqxTranslate }}</h5>
 
                     <p>                 
                         <sqx-code>{{connectHttpText}}</sqx-code>
@@ -74,7 +74,7 @@
                 </div>
                 
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">2</span> {{ 'clients.connectWizard.manuallyStep2' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">2</span> {{ 'clients.connectWizard.manuallyStep2' | sqxTranslate }}</h5>
 
                     <p>              
                         <sqx-code>{{connectToken?.accessToken}}</sqx-code>
@@ -82,7 +82,7 @@
                 </div>
                 
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">3</span> {{ 'clients.connectWizard.manuallyStep3' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">3</span> {{ 'clients.connectWizard.manuallyStep3' | sqxTranslate }}</h5>
 
                     <p>              
                         <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
@@ -95,7 +95,7 @@
             </ng-container>
             <ng-container *ngSwitchCase="'CLI'">
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">1</span> {{ 'clients.connectWizard.cliStep1' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">1</span> {{ 'clients.connectWizard.cliStep1' | sqxTranslate }}</h5>
 
                     <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown"></div>
 
@@ -105,11 +105,11 @@
                 </div>
                 
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline"></span></h5>
+                    <h5><span class="badge rounded-pill badge-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline"></span></h5>
                 </div>
 
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">3</span> {{ 'clients.connectWizard.cliStep3' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">3</span> {{ 'clients.connectWizard.cliStep3' | sqxTranslate }}</h5>
 
                     <p>                 
                         <sqx-code>sq config add {{appName}} {{appName}}:{{client.id}} {{client.secret}} -u {{apiUrl.value}}</sqx-code>
@@ -121,7 +121,7 @@
                 </div>
 
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">4</span> {{ 'clients.connectWizard.cliStep4' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">4</span> {{ 'clients.connectWizard.cliStep4' | sqxTranslate }}</h5>
             
                     <p>    
                         <sqx-code>sq config use {{appName}}</sqx-code>
@@ -130,7 +130,7 @@
             </ng-container>
             <ng-container *ngSwitchCase="'SDK'">
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">1</span> {{ 'clients.connectWizard.sdkStep1' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">1</span> {{ 'clients.connectWizard.sdkStep1' | sqxTranslate }}</h5>
 
                     <div [innerHTML]="'clients.connectWizard.sdkStep1Download' | sqxTranslate | sqxMarkdown"></div>
 
@@ -140,7 +140,7 @@
                 </div>
 
                 <div class="section step">
-                    <h5><span class="badge badge-pill badge-dark">2</span> {{ 'clients.connectWizard.sdkStep2' | sqxTranslate }}</h5>
+                    <h5><span class="badge rounded-pill badge-dark">2</span> {{ 'clients.connectWizard.sdkStep2' | sqxTranslate }}</h5>
 
                     <p>              
                         <sqx-code>{{connectLibraryText}}</sqx-code>

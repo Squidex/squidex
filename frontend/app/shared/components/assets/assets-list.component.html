@@ -22,7 +22,7 @@
                     <h5>{{ 'common.folders' | sqxTranslate }}</h5>
                 </ng-container>
         
-                <div class="row no-gutters">
+                <div class="row g-0">
                     <div class="folder-container" *ngIf="assetsState.parentFolder | async; let parent"
                         cdkDropList
                         [cdkDropListData]="parent?.id"
@@ -57,7 +57,7 @@
                     <h5>{{ 'common.files' | sqxTranslate }}</h5>
                 </ng-container>
                 
-                <div class="row no-gutters" [class.unrow]="isListView" *ngIf="assetsState.tagsNames | async; let tags"
+                <div class="row g-0" [class.unrow]="isListView" *ngIf="assetsState.tagsNames | async; let tags"
                     cdkDropList
                     cdkDropListSortingDisabled>
                     <sqx-asset *ngFor="let file of snapshot.newFiles" 

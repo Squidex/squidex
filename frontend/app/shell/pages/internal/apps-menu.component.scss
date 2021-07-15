@@ -2,40 +2,6 @@ $color-apps-border: #65a6ff;
 
 $color-nav-shadow: rgba(26, 93, 184, .26);
 
-.nav {
-    & {
-        flex-direction: row;
-    }
-
-    .nav-item {
-        .nav-link {
-            & {
-                @include border-radius;
-                @include box-shadow-outer(0, 2px, 4px $color-nav-shadow);
-                background: $color-theme-blue;
-                border: 1px solid $color-theme-blue-lighter;
-                color: $color-dark-foreground;
-                cursor: pointer;
-                line-height: 1.25rem;
-                min-width: 150px;
-                opacity: .95;
-                padding-left: 1rem;
-                padding-right: 2rem;
-                transition: opacity .4s ease;
-                user-select: none;
-            }
-
-            &:hover {
-                opacity: 1;
-            }
-
-            &::after {
-                @include absolute(45%, 1rem, auto, auto);
-            }
-        }
-    }
-}
-
 .dropdown {
     &-button {
         padding: 1rem 1.5rem;
@@ -46,61 +12,50 @@ $color-nav-shadow: rgba(26, 93, 184, .26);
     }
 }
 
+h3 {
+    margin: 0;
+}
+
 .btn-block {
     white-space: nowrap;
 }
 
 .icon-plus {
-    font-size: .8rem;
+    font-size: $font-smallest;
 }
 
 .apps-list {
-    margin: -.5rem 0;
     max-height: 600px;
+    overflow-x: hidden;
     overflow-y: auto;
 }
 
-.all-apps {
-    & {
-        position: relative;
-    }
+.breadcrumb {
+    margin: 0;
 
-    &-text {
-        font-weight: bold;
-    }
+    &-item {
+        @include truncate;
+        max-width: 10rem;
+        min-width: 0;
+        white-space: nowrap;
 
-    &-pill {
-        @include absolute(.5rem, .625rem, auto, auto);
+        &.active {
+            color: $color-text-decent;
+        }
+
+        a {
+            color: inherit !important;
+            text-align: left;
+            text-decoration: none;
+        }
     }
 }
 
-.app-upgrade {
-    & {
-        margin-left: 2rem;
-        margin-right: 0;
-        vertical-align: top;
-    }
+.form-select {
+    white-space: nowrap;
+}
 
-    .btn {
-        padding: .375rem;
-    }
-
-    .btn-plan {
-        padding: .375rem 1rem;
-    }
-
-    .btn-warning {
-        color: $color-dark-foreground;
-    }
-
-    .btn-primary {
-        @include box-shadow-outer;
-        background: $color-theme-blue-dark;
-        border: 0;
-        pointer-events: none;
-    }
-
-    @media (max-width: 1400px) {
-        display: none;
-    }
+.breadcrumb,
+.breadcrumb-item {
+    flex-wrap: nowrap !important;
 }

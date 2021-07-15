@@ -1,15 +1,11 @@
 <sqx-title message="i18n:backups.restorePageTitle"></sqx-title>
 
-<sqx-panel theme="light" desiredWidth="70rem">
-    <ng-container title>
-        {{ 'backups.restoreTitle' | sqxTranslate }}
-    </ng-container>
-
-    <ng-container content>
+<sqx-layout layout="main" titleText="i18n:backups.restoreTitle" titleIcon="backup" [width]="70">
+    <sqx-list-view innerWidth="70rem">
         <div class="card section" *ngIf="restoreJob | async; let job">
             <div class="card-header">
-                <div class="row no-gutters">
-                    <div class="col-auto pr-2">
+                <div class="row gx-2 align-items-center">
+                    <div class="col-auto">
                         <div *ngIf="job.status === 'Started'" class="restore-status restore-status-pending spin">
                             <i class="icon-hour-glass"></i>
                         </div>
@@ -25,7 +21,7 @@
                         <h3>{{ 'backups.restoreLastStatus' | sqxTranslate }}</h3>
                     </div>
 
-                    <div class="col text-right restore-url">
+                    <div class="col text-end restore-url">
                         {{job.url}}
                     </div>
                 </div>
@@ -35,28 +31,28 @@
                     {{row}}
                 </div>
             </div>
-            <div class="card-footer text-muted">
+            <div class="card-footer small text-muted">
                 <div class="row">
                     <div class="col">
                         {{ 'backups.restoreStartedLabel' | sqxTranslate }}: {{job.started | sqxISODate}}
                     </div>
-                    <div class="col text-right" *ngIf="job.stopped">
+                    <div class="col text-end" *ngIf="job.stopped">
                         {{ 'backups.restoreStoppedLabel' | sqxTranslate }}: {{job.stopped | sqxISODate}}
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="table-items-row">
+        <div class="table-items-row table-items-row-summary">
             <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
-                <div class="row no-gutters">
+                <div class="row gx-2">
                     <div class="col">
                         <input class="form-control" formControlName="url" placeholder="{{ 'backups.restoreLastUrl' | sqxTranslate }}">
                     </div>
-                    <div class="col pl-1">
+                    <div class="col">
                         <input class="form-control" formControlName="name" placeholder="{{ 'backups.restoreNewAppName' | sqxTranslate }}">
                     </div>
-                    <div class="col-auto pl-1">
+                    <div class="col-auto">
                         <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">
                             {{ 'backups.restore' | sqxTranslate }}
                         </button>
@@ -64,5 +60,5 @@
                 </div>
             </form>
         </div>
-    </ng-container>
-</sqx-panel>
+    </sqx-list-view>
+</sqx-layout>

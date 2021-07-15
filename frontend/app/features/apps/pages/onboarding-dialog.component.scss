@@ -26,7 +26,7 @@ p {
         &-content {
             background-color: $color-dark-onboarding;
             background-image: url('./images/onboarding-background.png');
-            color: $color-dark-foreground;
+            color: $color-white;
             position: relative;
         }
 
@@ -40,7 +40,7 @@ p {
         }
 
         &-close {
-            color: $color-dark-foreground;
+            color: $color-white;
             cursor: pointer;
             text-decoration: underline !important;
         }
@@ -65,12 +65,10 @@ p {
 
 .onboarding {
     &-enter-leave {
-        & {
-            @include force-width(28rem);
-            margin: 4rem auto 0;
-            text-align: center;
-            text-decoration: none;
-        }
+        @include force-width(28rem);
+        margin: 4rem auto 0;
+        text-align: center;
+        text-decoration: none;
 
         p {
             margin: 2rem 0;

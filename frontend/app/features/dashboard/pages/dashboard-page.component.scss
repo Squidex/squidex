@@ -1,10 +1,12 @@
+gridster-item {
+    position: absolute;
+}
+
 .dashboard {
-    & {
-        @include absolute(0, 0, 0, 0);
-    }
+    @include absolute(0, 0, 0, 0);
 
     &-summary {
-        @include absolute(2rem, null, null, 2rem);
+        @include absolute(2rem, null, null, 16px);
         z-index: 0;
     }
 
@@ -17,17 +19,18 @@
         font-size: 1.4rem;
     }
 
+    /* stylelint-disable */
     gridster {
         background: none;
     }
+    /* stylelint-enable */
 
     gridster-item {
+        background: none;
+        border: 0;
+        border-radius: 0;
         overflow: visible;
     }
-}
-
-gridster-item {
-    position: absolute;
 }
 
 .btn {
@@ -35,18 +38,20 @@ gridster-item {
 }
 
 :host ::ng-deep {
+    /* stylelint-disable */
     chart {
         @include absolute(0, 1rem, 1rem, 1rem);
     }
+    /* stylelint-enable */
 
     .subtext {
         margin-bottom: 2rem;
     }
 
     .card {
-        & {
-            @include absolute(0, 0, 0, 0);
-        }
+        @include absolute(0, 0, 0, 0);
+        margin-bottom: .5rem;
+        margin-right: .5rem;
 
         &-image {
             text-align: center;
@@ -59,6 +64,8 @@ gridster-item {
         h4 {
             a {
                 color: $color-title;
+                text-align: left;
+                text-decoration: none;
             }
         }
 
@@ -72,21 +79,18 @@ gridster-item {
             position: relative;
         }
 
+        &-title {
+            margin-top: 1rem;
+        }
+
         &-history {
             overflow-y: auto;
         }
 
         &-text {
             color: $color-text-decent;
-            font-size: .9rem;
+            font-size: $font-small;
             font-weight: normal;
-        }
-
-        &-title {
-            color: $color-title;
-            font-size: 1.2rem;
-            font-weight: normal;
-            margin-top: 1rem;
         }
 
         &-href {
@@ -97,9 +101,7 @@ gridster-item {
     }
 
     .aggregation {
-        & {
-            text-align: center;
-        }
+        text-align: center;
 
         &-label {
             color: $color-text-decent;

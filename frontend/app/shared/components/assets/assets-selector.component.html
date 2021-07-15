@@ -1,17 +1,17 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [hasTabs]="true">
     <ng-container title>
         {{ 'assets.selectMany' | sqxTranslate }}
     </ng-container>
 
     <ng-container tabs>
-        <div class="row no-gutters">
+        <div class="row gx-2 mt-3 mb-3">
             <div class="col-auto">
                 <button type="button" class="btn btn-text-secondary" (click)="reload()">
                     <i class="icon-reset"></i>
                 </button>
             </div>
-            <div class="col pl-1">
-                <div class="row no-gutters search">
+            <div class="col">
+                <div class="row g-0 search">
                     <div class="col-6">
                         <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}" 
                             [suggestions]="assetsState.tagsNames | async"
@@ -26,7 +26,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto">
                 <div class="btn-group" data-toggle="buttons">
                     <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
                         <i class="icon-list"></i>

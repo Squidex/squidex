@@ -116,7 +116,9 @@ export class EditContentForm extends Form<FormGroup, any> {
 
                 this.form.setControl(field.name, childForm.form);
             } else {
-                sections.push(new FieldSection<RootFieldDto, FieldForm>(currentSeparator, currentFields));
+                if (currentFields.length > 0) {
+                    sections.push(new FieldSection<RootFieldDto, FieldForm>(currentSeparator, currentFields));
+                }
 
                 currentFields = [];
                 currentSeparator = field;
@@ -527,7 +529,9 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
 
                     this.fields[field.name] = childForm;
                 } else {
-                    this.fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(currentSeparator, currentFields));
+                    if (currentFields.length > 0) {
+                        this.fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(currentSeparator, currentFields));
+                    }
 
                     currentFields = [];
                     currentSeparator = field;

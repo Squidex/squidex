@@ -1,7 +1,7 @@
 <div class="card item" [class.invalid]="isInvalid | async">
     <div class="card-header drag-handle">
         <div class="row">
-            <div class="col-auto pr-1">
+            <div class="col-auto pe-1">
                 <ng-content></ng-content>
             </div>
             <div class="col">
@@ -10,7 +10,7 @@
                     <span class="header-title">{{title | async }}</span>
                 </div>
             </div>
-            <div class="col-auto pr-4">
+            <div class="col-auto pe-4">
                 <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="moveTop()" title="i18n:contents.arrayMoveTop">
                     <i class="icon-caret-top"></i>
                 </button>

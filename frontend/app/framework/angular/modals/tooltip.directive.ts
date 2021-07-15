@@ -9,7 +9,7 @@ import { Directive, ElementRef, HostListener, Input, OnDestroy, Renderer2 } from
 import { DialogService, Tooltip } from '@app/framework/internal';
 
 @Directive({
-    selector: '[title]',
+    selector: '[title]:not(sqx-layout)',
 })
 export class TooltipDirective implements OnDestroy {
     private titleText: string;

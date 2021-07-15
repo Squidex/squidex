@@ -85,27 +85,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public bool CanAccessContent { get; set; }
 
         /// <summary>
-        /// Gets the current plan name.
-        /// </summary>
-        public string? PlanName { get; set; }
-
-        /// <summary>
-        /// Gets the next plan name.
-        /// </summary>
-        public string? PlanUpgrade { get; set; }
-
-        /// <summary>
         /// The properties from the role.
         /// </summary>
         [LocalizedRequired]
         public JsonObject RoleProperties { get; set; } = EmptyObject;
 
-        public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, IAppPlansProvider plans, Resources resources)
+        public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, Resources resources)
         {
-            var result = SimpleMapper.Map(app, new AppDto
-            {
-                PlanName = plans.GetPlanForApp(app).Plan.Name
-            });
+            var result = SimpleMapper.Map(app, new AppDto());
 
             var permissions = PermissionSet.Empty;
 
@@ -124,11 +111,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (resources.Includes(Shared.Permissions.ForApp(Shared.Permissions.AppContents, app.Name), permissions))
             {
                 result.CanAccessContent = true;
-            }
-
-            if (resources.IsAllowed(Shared.Permissions.AppPlansChange, app.Name, additional: permissions))
-            {
-                result.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
             }
 
             return result.CreateLinks(app, resources, permissions, isContributor);

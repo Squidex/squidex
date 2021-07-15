@@ -1,35 +1,34 @@
-$color-background:          #eef1f4;
+$color-background:          #f5f6f9;
 
-$color-border:              #e4e7e9;
-$color-border-dark:         #b3bbbf;
-$color-border-darker:       darken($color-border, 3%);
+$color-border:              #dedfe3;
+$color-border-light:        #f5f6f9;
+$color-border-lighter:      lighten($color-border-light, 1%);
+$color-border-dark:         #e7e8ea;
+$color-border-darker:       darken($color-border, 15%);
 
 $color-title:               #000;
 $color-text:                #373a3c;
-$color-text-decent:         #8091a5;
+$color-text-decent:         #9aa1b6;
 $color-tooltip:             #1a2129;
 
 $color-code-background:     #f5f7f9;
 $color-code-text:           #708090;
 
-$color-extern-google:           #d34836;
-$color-extern-google-icon:      #b02c1b;
-$color-extern-microsoft:        #004185;
-$color-extern-microsoft-icon:   #1e75cc;
-$color-extern-github:           #353535;
-$color-extern-github-icon:      #727272;
-$color-extern-twitter:          #1da1f2;
-$color-extern-twitter-icon:     #1681bf;
+$color-extern-google:       #d34836;
+$color-extern-microsoft:    #004185;
+$color-extern-github:       #353535;
+$color-extern-twitter:      #1da1f2;
 
 $color-theme-blue:          #3389ff;
-$color-theme-blue-dark:     #297ff6;
-$color-theme-blue-lighter:  #65a6ff;
-$color-theme-blue-light:    #9ebeea;
+$color-theme-blue-dark:     #3284f4;
+$color-theme-blue-darker:   #2f7deb;
+$color-theme-blue-lighter:  #d0e6ff;
+$color-theme-blue-light:    #edf5fe;
 $color-theme-blue-lightest: #d9e8fc;
-$color-theme-secondary:     #ecf2f6;
+$color-theme-secondary:     #e0e1e5;
 
-$color-theme-green:         #4bb958;
-$color-theme-green-dark:    #47b353;
+$color-theme-green:         #3ab480;
+$color-theme-green-dark:    #38a678;
 $color-theme-orange:        #ffb136;
 $color-theme-orange-dark:   #a65b00;
 
@@ -43,29 +42,11 @@ $color-theme-info:          #5bc0de;
 
 $color-asset-bg:            #f7f8fa;
 
-$color-input:               #dbe4eb;
+$color-input:               #e0e1e5;
 $color-input-background:    #fff;
-$color-input-disabled:      $color-theme-secondary;
+$color-input-disabled:      #eff1f4;
 $color-input-placeholder:   lighten($color-text-decent, 20%);
-
-$color-dark1-background:        #2e3842;
-$color-dark1-foreground:        #6a7681;
-$color-dark1-border1:           #37424c;
-$color-dark1-border2:           #222a32;
-$color-dark1-focus-foreground:  #fff;
-$color-dark1-active-background: #273039;
-
-$color-dark2-background:        #273039;
-$color-dark2-foreground:        #6a7681;
-$color-dark2-border1:           #37424c;
-$color-dark2-border2:           #222a32;
-$color-dark2-focus-foreground:  #fff;
-$color-dark2-active-background: #222931;
-$color-dark2-control:           #2e3842;
-$color-dark2-separator:         #2e3842;
-$color-dark2-placeholder:       #757e8d;
-
-$color-dark-onboarding:         #273039;
+$color-input-shortcut:      rgba(255, 255, 255, .2);
 
 $color-badge-success-background:    #e4f6e6;
 $color-badge-success-foreground:    #4cc159;
@@ -85,26 +66,21 @@ $color-badge-primary-foreground:    #438cef;
 $color-badge-secondary-background:  #e6e6e6;
 $color-badge-secondary-foreground:  #999;
 
-$color-table-background:    #fff;
-$color-table-footer:        $color-theme-secondary;
+$border-radius:             .25rem;
 
-$color-table-border:        $color-border;
-$color-table-header:        $color-text-decent;
+$input-shadow:              inset 0 1px 2px rgb(0 0 0 / 8%);
 
-$color-modal-header-background: #2e3842;
-$color-modal-header-foreground: #9eafbc;
+$size-navbar-height:        3.75rem;
+$size-sidebar-width:        5rem;
 
-$color-dark-black:          #000;
-$color-dark-foreground:     #fff;
-
-$size-navbar-height:        3.25rem;
-
-$size-sidebar-width:        7.25rem;
+$color-dark-onboarding:   #273039;
 
 $panel-padding:             1.5rem;
 $panel-header:              5.4rem;
 $panel-sidebar:             3.75rem;
-$panel-light-background:    #fff;
+
+$font-small:                85%;
+$font-smallest:             80%;
 
 $asset-width:               14.5rem;
 $asset-folder-height:       4rem;

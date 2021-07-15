@@ -5,9 +5,7 @@ $color-gold: #ffd700;
 }
 
 .stars {
-    & {
-        line-height: 2.4rem;
-    }
+    line-height: 2.4rem;
 
     &.disabled {
         cursor: not-allowed;
@@ -19,10 +17,9 @@ $color-gold: #ffd700;
 }
 
 .star {
-    & {
-        line-height: 1px;
-        vertical-align: middle;
-    }
+    line-height: 1px;
+    list-style: none;
+    vertical-align: middle;
 
     &::before {
         color: $color-gold;

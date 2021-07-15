@@ -1,11 +1,9 @@
 .inline-edit {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     .edit-menu {
         @include absolute(.75rem, auto, auto, .25rem);
-        background: $color-table-background;
+        background: $color-white;
         border-right: 1px solid $color-border;
         padding-right: 1rem;
         white-space: nowrap;

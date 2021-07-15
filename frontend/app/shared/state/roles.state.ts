@@ -36,6 +36,12 @@ export class RolesState extends State<Snapshot> {
     public roles =
         this.project(x => x.roles);
 
+    public defaultRoles =
+        this.project(x => x.roles.filter(y => y.isDefaultRole));
+
+    public customRoles =
+        this.project(x => x.roles.filter(y => !y.isDefaultRole));
+
     public isLoaded =
         this.project(x => x.isLoaded === true);
 

@@ -1,18 +1,3 @@
-:host(.ng-invalid) {
-    &.ng-dirty {
-        .form-control {
-            & {
-                border-color: $color-theme-error;
-            }
-
-            &:hover,
-            &:focus {
-                border-color: $color-theme-error-dark;
-            }
-        }
-    }
-}
-
 .form-group {
     position: relative;
 }
@@ -38,9 +23,21 @@
         width: 11rem;
     }
 
-
     .form-time {
         width: 7rem;
+    }
+}
+
+:host(.ng-invalid) {
+    &.ng-dirty {
+        .form-control {
+            border-color: $color-theme-error;
+
+            &:hover,
+            &:focus {
+                border-color: $color-theme-error-dark;
+            }
+        }
     }
 }
 

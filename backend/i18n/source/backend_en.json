@@ -361,6 +361,7 @@
   "validation.lessEqualsThan": "{property|upper} must be less or equal to {other|lower}.",
   "validation.lessThan": "{property|upper} must be less than {other|lower}.",
   "validation.notAnImage": "Picture is not a valid image.",
+  "validation.notAnValidSvg": "The SVG is malicious and contains script tags.",
   "validation.onlyOneFile": "Can only upload one file.",
   "validation.required": "{property|upper} is required.",
   "validation.requiredBoth": "If {property1|lower} or {property2|lower} is used both must be defined.",

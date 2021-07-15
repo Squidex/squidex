@@ -48,7 +48,7 @@
         </cdk-virtual-scroll-viewport>
     </div>
 
-    <div class="row no-gutters align-items-center">
+    <div class="row g-0 align-items-center">
         <div class="col-auto">
             <ng-container *ngIf="isArray; else component">
                 <ng-container *ngIf="hasField">
@@ -91,7 +91,7 @@
         </div>
 
         <div class="col">            
-            <button type="button" class="btn btn-text-danger ml-2" *ngIf="items.length > 0"
+            <button type="button" class="btn btn-text-danger ms-2" *ngIf="items.length > 0"
                 (sqxConfirmClick)="clear()"
                 confirmTitle="i18n:contents.arrayClearConfirmTitle"
                 confirmText="i18n:contents.arrayClearConfirmText"

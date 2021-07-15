@@ -1,64 +1,66 @@
 <sqx-title message="i18n:common.settings"></sqx-title>
 
-<sqx-panel theme="dark" desiredWidth="16rem">
-    <ng-container title>
-        <a class="header-link" routerLink="./">
-            {{ 'common.settings' | sqxTranslate }}
-        </a>
-    </ng-container>
-    
-    <ng-container content>
-        <ul class="nav nav-panel nav-dark flex-column" *ngIf="selectedApp | async; let app">
-            <li class="nav-item" *ngIf="app.canReadBackups">
-                <a class="nav-link" routerLink="backups" routerLinkActive="active">
-                    {{ 'common.backups' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
-                </a>
+<sqx-layout layout="left" titleText="i18n:common.settings" titleIcon="settings" [width]="16" [white]="true" [overflow]="true" [padding]="true">
+    <ng-container>
+        <ul class="nav nav-light flex-column" *ngIf="selectedApp | async; let app">
+            <li class="nav-item nav-heading" *ngIf="app.canReadClients || app.canReadRoles || app.canReadContributors">
+                {{ 'common.security' | sqxTranslate }}
             </li>
             <li class="nav-item" *ngIf="app.canReadClients">
                 <a class="nav-link" routerLink="clients" routerLinkActive="active">
-                    {{ 'common.clients' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
+                    <i class="icon-clients"></i> {{ 'common.clients' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadContributors">
                 <a class="nav-link" routerLink="contributors" routerLinkActive="active">
-                    {{ 'common.contributors' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
+                    <i class="icon-contributors"></i> {{ 'common.contributors' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadRoles">
                 <a class="nav-link" routerLink="roles" routerLinkActive="active">
-                    {{ 'common.roles' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
+                    <i class="icon-roles"></i> {{ 'common.roles' | sqxTranslate }}
+                </a>
+            </li>
+
+            <li class="nav-item nav-heading">
+                {{ 'common.editing' | sqxTranslate }}
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="settings" routerLinkActive="active">
+                    <i class="icon-patterns"></i> {{ 'appSettings.title' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadLanguages">
                 <a class="nav-link" routerLink="languages" routerLinkActive="active">
-                    {{ 'common.languages' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" routerLink="settings" routerLinkActive="active">
-                    {{ 'appSettings.title' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
+                    <i class="icon-languages"></i> {{ 'common.languages' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadWorkflows">
                 <a class="nav-link" routerLink="workflows" routerLinkActive="active">
-                    {{ 'common.workflows' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
+                    <i class="icon-workflows"></i> {{ 'common.workflows' | sqxTranslate }}
+                </a>
+            </li>
+
+            <li class="nav-item nav-heading">
+                {{ 'common.more' | sqxTranslate }}
+            </li>
+            <li class="nav-item" *ngIf="app.canReadBackups">
+                <a class="nav-link" routerLink="backups" routerLinkActive="active">
+                    <i class="icon-backups"></i> {{ 'common.backups' | sqxTranslate }}
                 </a>
             </li>
             <li class="nav-item" *ngIf="app.canReadPlans">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
-                    {{ 'common.subscription' | sqxTranslate }}
-                    <i class="icon-angle-right"></i>
+                    <i class="icon-subscription"></i> {{ 'common.subscription' | sqxTranslate }}
+                </a>
+            </li>
+            <li class="nav-item" *ngIf="app.canReadPlans">
+                <a class="nav-link" routerLink="more" routerLinkActive="active">
+                    <i class="icon-settings"></i> {{ 'common.settings' | sqxTranslate }}
                 </a>
             </li>
         </ul>
     </ng-container>
-</sqx-panel>
+</sqx-layout>
 
 <router-outlet></router-outlet>

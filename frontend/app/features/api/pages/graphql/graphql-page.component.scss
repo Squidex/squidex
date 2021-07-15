@@ -2,24 +2,37 @@
     @import '~graphiql/graphiql';
 
     .graphiql-container {
-        & {
-            @include absolute(0, 0, 0, 0);
-        }
+        @include absolute(0, 0, 0, 0);
 
         & * {
             box-sizing: content-box;
         }
 
-        // sass-lint:disable class-name-format
+        /* stylelint-disable-next-line selector-class-pattern */
         & .editorWrap {
             overflow: hidden;
         }
 
         svg {
-            fill: $color-dark-black;
+            fill: $color-black;
+        }
+
+        /* stylelint-disable-next-line selector-class-pattern */
+        .historyPaneWrap {
+            border-radius: 0;
+            border-left: 1px solid $color-border;
+            box-shadow: none !important;
+        }
+
+        /* stylelint-disable-next-line selector-class-pattern */
+        .docExplorerWrap {
+            border-radius: 0;
+            border-left: 1px solid $color-border;
+            box-shadow: none !important;
         }
     }
 
+    /* stylelint-disable-next-line selector-class-pattern */
     .CodeMirror-linenumbers {
         min-width: 29px;
     }

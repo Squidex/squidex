@@ -4,7 +4,7 @@
             <span class="star" *ngFor="let star of snapshot.starsArray" (mouseenter)="setPreview(star)" (click)="setValue(star)" [class.selected]="star <= snapshot.stars"></span>
         </span>
 
-        <button type="button" class="btn btn-text" [class.hidden]="!snapshot.value" (click)="reset()">
+        <button type="button" class="btn btn-text-secondary" [class.hidden]="!snapshot.value" (click)="reset()">
             {{ 'common.clear' | sqxTranslate }}
         </button>
     </ng-container>

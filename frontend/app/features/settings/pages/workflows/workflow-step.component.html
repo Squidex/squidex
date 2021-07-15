@@ -1,14 +1,14 @@
 <div class="step">
-    <div class="row no-gutters step-header">
+    <div class="row g-0 step-header">
         <div class="col-auto">
-            <button class="btn btn-initial mr-1" (click)="makeInitial.emit()" 
+            <button class="btn btn-initial me-1" (click)="makeInitial.emit()" 
                 [class.enabled]="step.name !== workflow.initial && !step.isLocked" 
                 [class.active]="step.name === workflow.initial"
                 [disabled]="step.name === workflow.initial || step.isLocked || disabled">
                 <i class="icon-arrow-right text-decent" *ngIf="!step.isLocked"></i>
             </button>
         </div>
-        <div class="col-auto color pr-2">
+        <div class="col-auto color pe-2">
             <sqx-color-picker mode="Circle"
                 [disabled]="$any(disabled)"
                 [ngModelOptions]="onBlur" 
@@ -40,7 +40,7 @@
             (update)="changeTransition(transition, $event)">
         </sqx-workflow-transition>
 
-        <div class="row transition no-gutters" *ngIf="openSteps.length > 0 && !disabled">
+        <div class="row transition g-0" *ngIf="openSteps.length > 0 && !disabled">
             <div class="col col-arrow">
                 <i class="icon-corner-down-right text-decent"></i>
             </div>
@@ -51,23 +51,23 @@
                     </ng-template>
                 </sqx-dropdown>
             </div>
-            <div class="col pl-2">
+            <div class="col ps-2">
                 <button class="btn btn-outline-secondary" (click)="transitionAdd.emit(openStep)">
                     <i class="icon-plus"></i>
                 </button>
             </div>
         </div>
 
-        <div class="row transition-prevent-updates no-gutters align-items-center">
+        <div class="row transition-prevent-updates g-0 align-items-center">
             <div class="col col-arrow"></div>
             <div class="col col-step">
-                <div class="custom-control custom-checkbox float-right">
-                    <input class="custom-control-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
+                <div class="form-check float-end">
+                    <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
                         [disabled]="!!disabled" 
                         [ngModel]="step.noUpdate" 
                         (ngModelChange)="changeNoUpdate($event)">
 
-                    <label class="custom-control-label" for="preventUpdates_{{step.name}}">
+                    <label class="form-check-label" for="preventUpdates_{{step.name}}">
                         {{ 'workflows.preventUpdates' | sqxTranslate }}
                     </label>
                 </div>

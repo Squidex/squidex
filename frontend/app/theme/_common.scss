@@ -1,6 +1,8 @@
 @import '_mixins';
 @import '_vars';
 
+/* stylelint-disable */
+
 body {
     // Default body with padding for fixed navbar and sidebar.
     & {
@@ -11,12 +13,16 @@ body {
 
     // White body for login and profile page.
     &.white {
-        background: $color-dark-foreground;
+        background: $color-white;
     }
 }
 
 * {
-    @include scrollbars(8px, $color-border-dark, transparent);
+    @include scrollbars(8px, darken($color-border, 15%), transparent);
+}
+
+hr {
+    background-color: $color-border;
 }
 
 // Common style for user email.
@@ -51,20 +57,6 @@ body {
     }
 }
 
-.cdk-drag-preview {
-    opacity: .7;
-
-    &.table-drag {
-        background: $color-dark-foreground;
-        border: 2px dashed darken($color-border, 5%);
-        display: table;
-
-        * {
-            display: none;
-        }
-    }
-}
-
 .cdk-drag-placeholder {
     opacity: 0;
 }
@@ -80,6 +72,20 @@ body {
 
     .cdk-drag-placeholder {
         transition: none;
+    }
+}
+
+.cdk-drag-preview {
+    opacity: .7;
+
+    &.table-drag {
+        background: $color-white;
+        border: 2px dashed darken($color-border, 5%);
+        display: table;
+
+        * {
+            display: none;
+        }
     }
 }
 
@@ -179,10 +185,10 @@ body {
     .drop-area {
         & {
             @include absolute(30px, 30px, 30px, 30px);
-            @include border-radius;
             align-content: center;
             align-items: center;
             border: 2px dashed $color-border;
+            border-radius: $border-radius;
             color: darken($color-border, 30%);
             display: none;
             font-size: 1.2rem;
@@ -204,7 +210,7 @@ body {
     }
 
     .drop-text {
-        background: $color-dark-foreground;
+        background: $color-white;
     }
 }
 
@@ -212,6 +218,51 @@ body {
     &,
     & > * {
         opacity: .5;
+    }
+}
+
+.sidebar {
+    @include absolute($size-navbar-height, null, 0, 0);
+    background: $color-theme-blue;
+    color: $color-white;
+    font-size: $font-small;
+    font-weight: default;
+    overflow: hidden;
+    width: $size-sidebar-width;
+
+    .bottom {
+        @include absolute(null, 0, 0, 0);
+    }
+
+    .nav-item {
+        max-width: 100%;
+    }
+
+    .nav-link {
+        background: $color-theme-blue;
+        color: $color-white !important;
+        cursor: pointer;
+        padding: 1rem 0;
+        transition: background-color .4s ease;
+        text-align: center;
+        text-decoration: none;
+
+        &:hover {
+            background: $color-theme-blue-darker;
+        }
+
+        &.active {
+            background: $color-theme-blue-darker;
+        }
+
+        i {
+            font-size: 1.1rem;
+        }
+    }
+
+    .nav-text {
+        @include truncate;
+        margin-top: .5rem;
     }
 }
 
@@ -223,7 +274,7 @@ body {
         @include circle-icon(2rem);
         background: $color-border;
         border: 0;
-        color: $color-dark-foreground;
+        color: $color-white;
         display: inline-block;
     }
 
@@ -257,7 +308,7 @@ body {
 //
 // sass-lint:disable class-name-format
 .ace_tooltip {
-    background: $color-dark-foreground;
+    background: $color-white;
     border: 1px solid $color-input;
     border-radius: 0;
     font-size: 14px;

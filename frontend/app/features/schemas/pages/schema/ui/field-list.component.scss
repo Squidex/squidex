@@ -1,10 +1,8 @@
 .field-list {
-    & {
-        overflow-x: hidden;
-        overflow-y: auto;
-        padding: $panel-padding;
-        padding-top: 1rem;
-    }
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: $panel-padding;
+    padding-top: 1rem;
 
     &-assigned {
         @include absolute(0, 50%, 0, 0);

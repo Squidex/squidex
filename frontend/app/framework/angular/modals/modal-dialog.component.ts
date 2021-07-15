@@ -31,6 +31,9 @@ export class ModalDialogComponent implements AfterViewInit {
     public showFooter?: boolean | null = true;
 
     @Input()
+    public hasTabs?: boolean | null = false;
+
+    @Input()
     public size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
 
     @Input()

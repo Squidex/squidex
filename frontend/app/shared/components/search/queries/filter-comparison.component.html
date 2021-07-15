@@ -1,4 +1,4 @@
-<div class="row no-gutters mb-1 align-items-center" *ngIf="fieldModel">
+<div class="row gx-2 mb-1 align-items-center" *ngIf="fieldModel">
     <div class="col-auto path">
         <sqx-query-path 
             (pathChange)="changePath($event)"
@@ -6,18 +6,17 @@
             [model]="model">
         </sqx-query-path>
     </div>
-    <div class="col-auto operator pl-1">
-        <select class="custom-select" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
+    <div class="col-auto operator">
+        <select class="form-select" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
             <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name | sqxTranslate}}</option>
         </select>
     </div>
-    <div class="col pl-1" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
+    <div class="col" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
         <ng-container *ngSwitchCase="'boolean'">
-            <div class="custom-control custom-checkbox custom-control custom-checkbox-inline pl-2">
-                <input type="checkbox" class="custom-control-input"
+            <div class="form-check form-check-inline ps-2">
+                <input type="checkbox" class="form-check-input"
                     [ngModel]="filter.value"
-                    (ngModelChange)="changeValue($event)"
-                />
+                    (ngModelChange)="changeValue($event)" />
             </div>
         </ng-container>
         <ng-container *ngSwitchCase="'date'">
@@ -37,8 +36,7 @@
         <ng-container *ngSwitchCase="'number'">
             <input type="number" class="form-control"
                 [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)"
-            />
+                (ngModelChange)="changeValue($event)" />
         </ng-container>
         <ng-container *ngSwitchCase="'reference'">
             <sqx-references-dropdown [schemaId]="fieldModel.extra"
@@ -88,11 +86,10 @@
         <ng-container *ngSwitchCase="'string'">
             <input type="text" class="form-control" *ngIf="!fieldModel.extra"
                 [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)"
-            />
+                (ngModelChange)="changeValue($event)" />
         </ng-container>
     </div>
-    <div class="col-auto pl-2">
+    <div class="col-auto ps-2">
         <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
             <i class="icon-bin2"></i>
         </button>

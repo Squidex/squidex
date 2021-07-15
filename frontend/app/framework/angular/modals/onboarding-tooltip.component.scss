@@ -1,16 +1,21 @@
 $hide-shadow: rgba(0, 0, 0, .5);
 
+:host {
+    display: none;
+}
+
 .onboarding {
     &-help {
-        @include border-radius;
         background: $color-tooltip;
+        border: 0;
+        border-radius: $border-radius;
         max-width: 20rem;
         min-width: 10rem;
         padding: .75rem 1rem;
     }
 
     &-text {
-        color: $color-dark-foreground;
+        color: $color-white;
     }
 
     &-buttons {

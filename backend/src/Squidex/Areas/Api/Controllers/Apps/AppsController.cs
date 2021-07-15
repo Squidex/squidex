@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -39,21 +39,18 @@ namespace Squidex.Areas.Api.Controllers.Apps
     {
         private static readonly ResizeOptions ResizeOptions = new ResizeOptions { Width = 50, Height = 50, Mode = ResizeMode.Crop };
         private readonly IAppImageStore appImageStore;
-        private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppProvider appProvider;
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AppsController(ICommandBus commandBus,
             IAppImageStore appImageStore,
-            IAppPlansProvider appPlansProvider,
             IAppProvider appProvider,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
             this.appImageStore = appImageStore;
-            this.appPlansProvider = appPlansProvider;
             this.appProvider = appProvider;
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -85,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, isFrontend, appPlansProvider, Resources)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, isFrontend, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -114,7 +111,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromApp(App, userOrClientId, isFrontend, appPlansProvider, Resources);
+                return AppDto.FromApp(App, userOrClientId, isFrontend, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -354,7 +351,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromApp(x, userOrClientId, isFrontend, appPlansProvider, Resources);
+                return AppDto.FromApp(x, userOrClientId, isFrontend, Resources);
             });
         }
 

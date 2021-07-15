@@ -15,7 +15,7 @@
                                 {{ 'assets.uploaderUploadHere' | sqxTranslate }}
                             </small>
                 
-                            <div class="upload row no-gutters" *ngFor="let upload of uploads; trackBy: trackByUpload">
+                            <div class="upload row g-0" *ngFor="let upload of uploads; trackBy: trackByUpload">
                                 <div class="col-auto" [ngSwitch]="upload.status">
                                     <div *ngSwitchCase="'Failed'" class="upload-status upload-status-failed">
                                         <i class="icon-exclamation"></i>

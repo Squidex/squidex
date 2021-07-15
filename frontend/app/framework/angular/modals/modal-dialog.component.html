@@ -1,16 +1,14 @@
 <div class="modal" @fade>
     <div class="modal-dialog modal-{{size}}" [class.modal-fh]="fullHeight">
         <div class="modal-content">
-            <div class="modal-header" *ngIf="showHeader">
+            <div class="modal-header" [class.with-tabs]="hasTabs" *ngIf="showHeader">
                 <h4 class="modal-title">
                     <ng-content select="[title]"></ng-content>
                 </h4>
 
                 <ng-content select="[plainTitle]"></ng-content>
 
-                <button type="button" class="btn btn-close" (click)="close.emit()">
-                    <i class="icon-close"></i>
-                </button>
+                <button type="button" class="btn btn-close" (click)="close.emit()"></button>
             </div>
 
             <div class="modal-tabs clearfix" #tabsElement>

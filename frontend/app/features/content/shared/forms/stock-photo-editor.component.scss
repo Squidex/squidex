@@ -16,9 +16,7 @@ $height: 300px;
 }
 
 .value {
-    & {
-        padding-right: 2.5rem;
-    }
+    padding-right: 2.5rem;
 
     &-clear {
         @include absolute(0, 0, auto, auto);
@@ -26,18 +24,16 @@ $height: 300px;
 }
 
 .preview {
-    & {
-        @include force-height($height);
-        align-items: center;
-        background: $color-background;
-        border: 0;
-        border-radius: .25rem;
-        color: $color-dark-foreground;
-        display: flex;
-        justify-content: center;
-        margin: 0;
-        margin-top: .5rem;
-    }
+    @include force-height($height);
+    align-items: center;
+    background: $color-background;
+    border: 0;
+    border-radius: .25rem;
+    color: $color-white;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    margin-top: .5rem;
 
     &-empty {
         padding: 1rem;
@@ -70,14 +66,12 @@ sqx-list-view {
 }
 
 .photo {
-    & {
-        border: 2px solid $color-border;
-        border-radius: 0;
-        break-inside: avoid-column;
-        margin-bottom: .5rem;
-        margin-right: .5rem;
-        position: relative;
-    }
+    border: 2px solid $color-border;
+    border-radius: 0;
+    break-inside: avoid-column;
+    margin-bottom: .5rem;
+    margin-right: .5rem;
+    position: relative;
 
     &:hover {
         border-color: $color-theme-blue;
@@ -96,8 +90,8 @@ sqx-list-view {
 
     &-user-link {
         @include truncate;
-        color: $color-dark-foreground;
-        font-size: 90%;
+        color: $color-white;
+        font-size: $font-small;
         font-weight: normal;
     }
 

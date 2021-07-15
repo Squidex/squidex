@@ -33,7 +33,7 @@
                             <label>
                                 <input type="radio" class="radio-input" name="type" formControlName="type" value="{{fieldType.type}}">
 
-                                <div class="row no-gutters">
+                                <div class="row g-0">
                                     <div class="col-auto">
                                         <div class="btn-radio" [class.active]="addFieldForm.form.controls['type'].value === fieldType.type">
                                             <i class="icon-type-{{fieldType.type}}"></i>
@@ -56,9 +56,9 @@
                 </div>
 
                 <div class="form-group" *ngIf="!parent && (addFieldForm.isContentField | async)">
-                    <div class="custom-control custom-checkbox">
-                        <input class="custom-control-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable">
-                        <label class="custom-control-label" for="isLocalizable">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable">
+                        <label class="form-check-label" for="isLocalizable">
                             {{ 'schemas.field.localizable' | sqxTranslate }}
                         </label>
                     </div>
@@ -76,7 +76,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="reset" class="float-left btn btn-text-secondary" (click)="emitComplete()">
+        <button type="reset" class="float-start btn btn-text-secondary" (click)="emitComplete()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 
@@ -85,11 +85,11 @@
                 {{ 'schemas.addFieldAndClose' | sqxTranslate }}
             </button>
 
-            <button type="button" class="btn btn-success ml-1" (click)="addField(true)">
+            <button type="button" class="btn btn-success ms-1" (click)="addField(true)">
                 {{ 'schemas.addFieldAndCreate' | sqxTranslate }}
             </button>
 
-            <button type="button" class="btn btn-success ml-1" (click)="addField(false, true)">
+            <button type="button" class="btn btn-success ms-1" (click)="addField(false, true)">
                 {{ 'schemas.addFieldAndEdit' | sqxTranslate }}
             </button>
         </div>
@@ -99,7 +99,7 @@
                 {{ 'schemas.saveFieldAndNew' | sqxTranslate }}
             </button>
             
-            <button type="button" class="btn btn-primary ml-1" (click)="save()">
+            <button type="button" class="btn btn-primary ms-1" (click)="save()">
                 {{ 'schemas.saveFieldAndClose' | sqxTranslate }}
             </button>
         </div>

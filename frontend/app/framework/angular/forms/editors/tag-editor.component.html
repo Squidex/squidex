@@ -47,13 +47,13 @@
             <div class="control-dropdown suggestions-dropdown" [sqxAnchoredTo]="form" position="bottom-left" @fade>
                 <div class="row">
                     <div class=" col-6" *ngFor="let item of suggestionsSorted; let i = index">
-                        <div class="custom-control custom-checkbox custom-control custom-checkbox">
-                            <input class="custom-control-input" type="checkbox" id="tag_{{i}}"
+                        <div class="form-check form-check">
+                            <input class="form-check-input" type="checkbox" id="tag_{{i}}"
                                 [ngModel]="isSelected(item)"
                                 (ngModelChange)="toggleValue($event, item)"
                             />
 
-                            <label class="custom-control-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
+                            <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
                                 <span class="truncate">{{item.name}}</span>
                             </label>
                         </div>

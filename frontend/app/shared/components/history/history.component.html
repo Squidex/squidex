@@ -1,9 +1,3 @@
-<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
-    <ng-container title>
-        {{ 'history.title' | sqxTranslate }}
-    </ng-container>
-
-    <ng-container content>
-        <sqx-history-list [events]="events | async"></sqx-history-list>
-    </ng-container>
-</sqx-panel>
+<sqx-layout titleText="i18n:history.title" [width]="20" titleIcon="time" [white]="true" [padding]="true">
+    <sqx-history-list [events]="events | async"></sqx-history-list>
+</sqx-layout>

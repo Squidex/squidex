@@ -1,6 +1,6 @@
 <tr [class.expanded]="expanded">
     <td class="cell-label">
-        <span class="badge badge-pill badge-{{statusClass}}">{{status}}</span>
+        <span class="badge rounded-pill badge-{{statusClass}}">{{status}}</span>
     </td>
     <td class="cell-40">
         <span class="truncate">{{event.eventName}}</span>
@@ -9,7 +9,7 @@
         <small class="truncate">{{event.skipReason}}</small>
     </td>
     <td class="cell-actions">
-        <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="expanded" [disabled]="!event.error && !event.actionData" (click)="expandedChange.emit()">
+        <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" [disabled]="!event.error && !event.actionData" (click)="expandedChange.emit()">
             <i class="icon-settings"></i>
         </button>
     </td>

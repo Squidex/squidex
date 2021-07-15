@@ -1,16 +1,16 @@
 <tr [sqxTabRouterLink]="link">
     <td class="cell-select inline-edit" sqxStopClick>
-        <div class="custom-control custom-checkbox">
-            <input class="custom-control-input" type="checkbox" id="{{content.id}}_selected" 
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="{{content.id}}_selected" 
                 [ngModel]="selected"
                 (ngModelChange)="selectedChange.emit($event)" />
 
-            <label class="custom-control-label" for="{{content.id}}_selected" ></label>
+            <label class="form-check-label" for="{{content.id}}_selected" ></label>
         </div>
 
         <ng-container *ngIf="isDirty">
             <div class="edit-menu">
-                <button type="button" class="btn btn-text-secondary btn-cancel mr-2" (click)="cancel()" sqxStopClick>
+                <button type="button" class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" sqxStopClick>
                     <i class="icon-close"></i>
                 </button>
 

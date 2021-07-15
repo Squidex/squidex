@@ -1,5 +1,5 @@
 .image {
-    background: $color-dark-black;
+    background: $color-black;
     padding: 0;
     padding-top: 100%;
     position: relative;
@@ -11,9 +11,7 @@
 }
 
 .preview {
-    & {
-        border: 1px solid $color-border;
-    }
+    border: 1px solid $color-border;
 
     &-wide {
         padding-top: 20%;

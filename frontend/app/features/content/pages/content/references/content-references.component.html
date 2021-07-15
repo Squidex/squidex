@@ -1,5 +1,5 @@
 <sqx-list-view [isLoading]="contentsState.isLoading | async" [table]="true">
-    <ng-container content>
+    <ng-container>
         <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let contents">
             <tbody *ngFor="let content of contents; trackBy: trackByContent"
                 [sqxReferenceItem]="content"

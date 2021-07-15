@@ -1,11 +1,5 @@
-<sqx-panel desiredWidth="24rem" [isBlank]="true" [isLazyLoaded]="false">
-    <ng-container title>
-        {{ 'common.help' | sqxTranslate }}
-    </ng-container>
-
-    <ng-container content>
-        <div class="help">
-            <div [innerHTML]="helpMarkdown | async | sqxHelpMarkdown"></div>
-        </div>
-    </ng-container>
-</sqx-panel>
+<sqx-layout titleText="i18n:common.help" titleIcon="help2" [width]="20" layout="simple" [white]="true" [padding]="true" [overflow]="true">
+    <div class="help">
+        <div [innerHTML]="helpMarkdown | async | sqxHelpMarkdown"></div>
+    </div>
+</sqx-layout>

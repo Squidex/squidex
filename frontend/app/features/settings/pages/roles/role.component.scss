@@ -1,7 +1,5 @@
 .form-group {
-    & {
-        margin-bottom: .375rem;
-    }
+    margin-bottom: .375rem;
 
     &:last-child {
         margin: 0;
@@ -44,7 +42,7 @@
     width: 42px;
 }
 
-.custom-control-label {
+.form-check-label {
     max-width: 100%;
 }
 

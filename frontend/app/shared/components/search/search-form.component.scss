@@ -6,10 +6,6 @@
     position: relative;
 }
 
-.form-control-expandable {
-    padding-right: 3rem;
-}
-
 .form-horizontal {
     min-width: 35rem;
 }
@@ -22,37 +18,8 @@
     @include absolute(.75rem, 1.75rem);
 }
 
-.save-search {
-    color: $color-border-dark !important;
-    cursor: pointer !important;
-    font-size: .9rem;
-    font-weight: normal;
-}
-
-.expand-search {
-    & {
-        color: $color-border-dark !important;
-        cursor: pointer !important;
-        font-size: .9rem;
-        font-weight: normal;
-        padding: 0 .5rem;
-    }
-
-    &:focus {
-        text-decoration: none;
-    }
-
-    &:hover {
-        text-decoration: none;
-    }
-
-    &.highlighted {
-        color: $color-title !important;
-    }
-}
-
 .link {
-    font-size: .8rem;
+    font-size: $font-small;
     font-weight: normal;
     margin-top: 1.5rem;
 }

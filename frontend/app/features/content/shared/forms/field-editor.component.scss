@@ -1,7 +1,5 @@
 .field {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     &-required {
         color: $color-theme-error;
@@ -9,7 +7,7 @@
 
     &-disabled {
         color: $color-border-dark;
-        font-size: .8rem;
+        font-size: $font-smallest;
         font-weight: normal;
     }
 }
@@ -18,14 +16,12 @@
     @include absolute(-.5rem, 0);
 
     i {
-        font-size: 80%;
+        font-size: $font-smallest;
     }
 }
 
 .ui {
-    & {
-        margin-bottom: 1rem;
-    }
+    margin-bottom: 1rem;
 
     &-separator {
         border-bottom: 1px solid darken($color-border, 5%);

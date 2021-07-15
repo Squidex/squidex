@@ -8,8 +8,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { SchemaDto, SchemasState } from '@app/shared';
 
-type State = { fieldsInLists: ReadonlyArray<string>; fieldsInReferences: ReadonlyArray<string> };
-
 @Component({
     selector: 'sqx-schema-ui-form',
     styleUrls: ['./schema-ui-form.component.scss'],
@@ -23,10 +21,8 @@ export class SchemaUIFormComponent implements OnChanges {
 
     public isEditable = false;
 
-    public state: State = {
-        fieldsInLists: [],
-        fieldsInReferences: [],
-    };
+    public fieldsInLists: ReadonlyArray<string> = [];
+    public fieldsInReferences: ReadonlyArray<string> = [];
 
     constructor(
         private readonly schemasState: SchemasState,
@@ -36,18 +32,16 @@ export class SchemaUIFormComponent implements OnChanges {
     public ngOnChanges() {
         this.isEditable = this.schema.canUpdate;
 
-        this.state = {
-            fieldsInLists: this.schema.fieldsInLists,
-            fieldsInReferences: this.schema.fieldsInReferences,
-        };
+        this.fieldsInLists = this.schema.fieldsInLists;
+        this.fieldsInReferences = this.schema.fieldsInReferences;
     }
 
     public setFieldsInLists(names: ReadonlyArray<string>) {
-        this.state.fieldsInLists = names;
+        this.fieldsInLists = names;
     }
 
     public setFieldsInReferences(names: ReadonlyArray<string>) {
-        this.state.fieldsInReferences = names;
+        this.fieldsInReferences = names;
     }
 
     public selectTab(tab: number) {
@@ -59,6 +53,9 @@ export class SchemaUIFormComponent implements OnChanges {
             return;
         }
 
-        this.schemasState.configureUIFields(this.schema, this.state);
+        this.schemasState.configureUIFields(this.schema, {
+            fieldsInLists: this.fieldsInLists,
+            fieldsInReferences: this.fieldsInReferences,
+        });
     }
 }

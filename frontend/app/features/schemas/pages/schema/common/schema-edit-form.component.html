@@ -1,8 +1,8 @@
 
 <form [formGroup]="fieldForm.form" (ngSubmit)="saveSchema()">
-    <div class="card">
-        <div class="card-header">{{ 'common.generalSettings' | sqxTranslate }}</div>
+    <h5>{{ 'common.generalSettings' | sqxTranslate }}</h5>
 
+    <div class="card">
         <div class="card-body">
             <div class="form-group">
                 <label for="name">{{ 'common.name' | sqxTranslate }}</label>
@@ -71,16 +71,16 @@
             </div>
 
             <div class="form-group">
-                <div class="custom-control custom-checkbox">
-                    <input class="custom-control-input" type="checkbox" id="validateOnPublish" formControlName="validateOnPublish">
-                    <label class="custom-control-label" for="validateOnPublish">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="validateOnPublish" formControlName="validateOnPublish">
+                    <label class="form-check-label" for="validateOnPublish">
                         {{ 'schemas.validateOnPublish' | sqxTranslate }}
                     </label>
                 </div>
             </div>
         </div>
         <div class="card-footer">
-            <button type="submit" class="float-right btn btn-primary" *ngIf="isEditable">
+            <button type="submit" class="float-end btn btn-primary" *ngIf="isEditable">
                 {{ 'common.save' | sqxTranslate }}
             </button>
         </div>

@@ -1,6 +1,6 @@
 <ng-container *ngIf="isMultiline; else simple">
     <div class="content-status-summary">
-        <span class="content-status default mr-1" [style.color]="statusColor" title="{{tooltipText}}">
+        <span class="content-status default me-1" [style.color]="statusColor" title="{{tooltipText}}">
             <i class="icon-circle icon-sm"></i>
         </span>
 
@@ -11,7 +11,7 @@
         <div>
             <span class="label">{{ 'contents.scheduledTo' | sqxTranslate }}&nbsp;</span>
 
-            <span class="content-status default mr-1" [style.color]="scheduled?.color" title="{{tooltipText}}">
+            <span class="content-status default me-1" [style.color]="scheduled?.color" title="{{tooltipText}}">
                 <i class="icon-circle icon-sm"></i>
             </span>
 
@@ -40,6 +40,6 @@
             </span>
         </ng-template>
         
-        <span class="content-status-label ml-1" *ngIf="isText">{{status}}</span>
+        <span class="content-status-label ms-1" *ngIf="isText">{{status}}</span>
     </span>
 </ng-template>
