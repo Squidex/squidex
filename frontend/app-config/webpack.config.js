@@ -272,6 +272,12 @@ module.exports = function calculateConfig(env) {
                     { from: './node_modules/ace-builds/src-min/snippets', to: 'dependencies/ace/snippets' },
                     { from: './node_modules/ace-builds/src-min/worker-*.js', to: 'dependencies/ace/[name][ext]' },
 
+                    { from: './node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css', to: 'dependencies/leaflet' },
+                    { from: './node_modules/leaflet-control-geocoder/dist/Control.Geocoder.min.js', to: 'dependencies/leaflet' },
+                    { from: './node_modules/leaflet/dist/leaflet.js', to: 'dependencies/leaflet' },
+                    { from: './node_modules/leaflet/dist/leaflet.css', to: 'dependencies/leaflet' },
+                    { from: './node_modules/leaflet/dist/images', to: 'dependencies/leaflet/images' },
+
                     { from: './node_modules/video.js/dist/video.min.js', to: 'dependencies/videojs' },
                     { from: './node_modules/video.js/dist/video-js.min.css', to: 'dependencies/videojs' },
 
