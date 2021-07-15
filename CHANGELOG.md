@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * **UI**: Several fixes to fontsize.
 * **UI**: Virtual scrolling for nested fields with a lot of items (> 50) to improve performance.
 
-## Added
+### Added
 
 * **Assets**: Check SVG files for embedded scripts and block uploads.
 * **Assets**: Option to create one folder per app for uploaded assets.
