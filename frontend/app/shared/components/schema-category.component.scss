@@ -7,6 +7,10 @@ $drag-margin: -8px;
 .btn {
     width: 2rem;
 
+    &-toggle {
+        margin-bottom: -.125rem;
+    }
+
     &:focus {
         border-color: transparent;
     }

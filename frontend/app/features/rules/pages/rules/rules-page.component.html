@@ -9,7 +9,7 @@
         <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
 
         <ng-container *ngIf="rulesState.canCreate | async">
-            <a type="button" class="btn btn-success" #buttonNew routerLink="new" title="i18n:rules.createTooltip">
+            <a class="btn btn-success" #buttonNew routerLink="new" title="i18n:rules.createTooltip">
                 <i class="icon-plus"></i> {{ 'rules.create' | sqxTranslate }}
             </a>
 

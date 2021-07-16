@@ -198,12 +198,13 @@
 		</ng-template>
     </div>
 
-    <div *ngIf="canUnset" class="unset" title="i18n:contents.unsetValue">
-        <button type="button" class="btn btn-sm btn-text-secondary force" [disabled]="isEmpty | async" 
+    <div *ngIf="canUnset" class="unset" >
+        <button type="button" class="btn btn-sm btn-text-secondary force" [disabled]="isEmpty | async"
             (sqxConfirmClick)="unset()"
             confirmTitle="i18n:contents.unsetValueConfirmTitle"
             confirmText="i18n:contents.unsetValueConfirmText"
-            confirmRememberKey="unsetValue">
+            confirmRememberKey="unsetValue"
+            title="i18n:contents.unsetValue">
             <i class="icon-close"></i>
         </button>
     </div>
