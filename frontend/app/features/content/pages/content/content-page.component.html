@@ -51,11 +51,11 @@
 
                 <ng-container *ngIf="contentTab | async; let tab">
                     <ng-container *ngIf="tab === 'references' || tab === 'referencing'; else defaultHeader">
-                        <button type="button" class="btn btn-primary ms-1" (click)="publish()">
+                        <button type="button" class="btn btn-primary ms-2" (click)="publish()">
                             {{ 'contents.publishAll' | sqxTranslate }}
                         </button>
     
-                        <button type="button" class="btn btn-primary ms-1" (click)="validate()">
+                        <button type="button" class="btn btn-primary ms-2" (click)="validate()">
                             {{ 'contents.validate' | sqxTranslate }}
                         </button>
                     </ng-container>
@@ -82,7 +82,7 @@
                         </ng-container>
 
                         <ng-container *ngIf="content?.canUpdate">
-                            <button type="submit" class="btn btn-primary ms-1" title="i18n:common.saveShortcut">
+                            <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut">
                                 {{ 'common.save' | sqxTranslate }} <span class="btn-tooltip">S</span>
                             </button>
         
@@ -97,7 +97,7 @@
                     {{ 'common.save' | sqxTranslate }}
                 </button>
 
-                <button type="submit" class="btn btn-primary ms-1" title="i18n:common.saveShortcut" *ngIf="contentsState.canCreateAndPublish | async">
+                <button type="submit" class="btn btn-primary me-2" title="i18n:common.saveShortcut" *ngIf="contentsState.canCreateAndPublish | async">
                     {{ 'contents.saveAndPublish' | sqxTranslate }} <span class="btn-tooltip">S</span>
                 </button>
 

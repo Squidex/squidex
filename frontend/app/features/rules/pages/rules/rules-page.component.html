@@ -2,14 +2,14 @@
 
 <sqx-layout layout="main" titleText="i18n:common.rules" titleIcon="rules" [width]="54">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary me-1" (click)="reload()" title="i18n:rules.refreshTooltip">
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:rules.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
         <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
 
         <ng-container *ngIf="rulesState.canCreate | async">
-            <a class="btn btn-success" #buttonNew routerLink="new" title="i18n:rules.createTooltip">
+            <a class="btn btn-success me-2" #buttonNew routerLink="new" title="i18n:rules.createTooltip">
                 <i class="icon-plus"></i> {{ 'rules.create' | sqxTranslate }}
             </a>
 
@@ -31,7 +31,7 @@
                 <div class="table-items-row table-items-row-summary table-items-row-empty" *ngIf="rules.length === 0">
                     {{ 'rules.empty' | sqxTranslate }}
     
-                    <button type="button" class="btn btn-success btn-sm ms-2" routerLink="new" *ngIf="rulesState.canCreate | async">
+                    <button type="button" class="btn btn-success btn-sm ms-1" routerLink="new" *ngIf="rulesState.canCreate | async">
                         <i class="icon icon-plus"></i> {{ 'rules.emptyAddRule' | sqxTranslate }}
                     </button>
                 </div>

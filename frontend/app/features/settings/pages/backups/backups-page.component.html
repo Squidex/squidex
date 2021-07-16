@@ -2,7 +2,7 @@
 
 <sqx-layout layout="main" titleText="i18n:common.backups" titleIcon="backups" [width]="40">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary me-1" (click)="reload()" title="i18n:backups.refreshTooltip">
+        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:backups.refreshTooltip">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
 
@@ -23,7 +23,7 @@
                 <div class="table-items-row table-items-row-summary table-items-row-empty" *ngIf="backups.length === 0">
                     {{ 'backups.empty' | sqxTranslate }}
     
-                    <button type="button" class="btn btn-success btn-sm ms-2" (click)="start()">
+                    <button type="button" class="btn btn-success btn-sm me-2" (click)="start()">
                         {{ 'backups.start' | sqxTranslate }}
                     </button>
                 </div>

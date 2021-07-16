@@ -15,18 +15,18 @@
 
         <ng-container menu>
             <div class="btn btn-outline-secondary btn-enabled" *ngIf="rule">
-                <span class="me-1" *ngIf="isEnabled">
+                <span class="me-2" *ngIf="isEnabled">
                     {{ 'common.enabled' | sqxTranslate }}
                 </span>
     
-                <span class="me-1" *ngIf="!isEnabled">
+                <span class="me-2" *ngIf="!isEnabled">
                     {{ 'common.disabled' | sqxTranslate }}
                 </span>
         
                 <sqx-toggle [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }" [disabled]="!isEditable"></sqx-toggle>
             </div>
 
-            <button type="button" class="btn btn-primary ms-2" (click)="save()">
+            <button type="button" class="btn btn-primary me-2" (click)="save()">
                 {{ 'common.save' | sqxTranslate }}
             </button>
         </ng-container>
