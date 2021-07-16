@@ -1,8 +1,32 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [5.8.1] - 2021-07-17
+
+### Fixed
+
+* **API**: Several bugfixes for components, especially around caching of components.
+* **GraphQL**: Several bufixes for components.
+* **UI**: Several bugfixes for components.
+* **UI**: Several fixes to fontsize.
+* **UI**: Virtual scrolling for nested fields with a lot of items (> 50) to improve performance.
+
+### Added
+
+* **Assets**: Check SVG files for embedded scripts and block uploads.
+* **Assets**: Option to create one folder per app for uploaded assets.
+* **Rules**: Add `newStatus` to content changed event.
+* **UI**: Define your custom date or date-time format for Date fields.
+
+### Changed
+
+* **API**: Support hosting without https (not recommended).
+* **UI**: Load outdated-browser from local files instead of CDN.
+* **UI**: Load leaflet from local files instead of CDN.
+* **UI**: Load leaflet geocoder from local files instead of CDN.
+* **UI**: Load Orleans Dashboard assets from local files instead of CDN.
 
 ## [5.8.0] - 2021-06-28
 

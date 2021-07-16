@@ -13,6 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public ContentInterfaceGraphType()
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "Content";
 
             AddField(ContentFields.Id);

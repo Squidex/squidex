@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public ReferenceUnionGraphType(Builder builder, FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = fieldInfo.ReferenceType;
 
             if (schemaIds?.Any() == true)

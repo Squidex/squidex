@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public ComponentGraphType(SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.ComponentType;
 
             IsTypeOf = CheckType(schemaInfo.Schema.Id.ToString());

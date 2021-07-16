@@ -14,6 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
     {
         public JsonNoopGraphType()
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "JsonScalar";
 
             Description = "Unstructured Json object";

@@ -20,6 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public DataInputGraphType(Builder builder, SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.DataInputType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
@@ -30,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new InputObjectGraphType
                     {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
                         Name = fieldInfo.LocalizedInputType
                     };
 

@@ -131,6 +131,13 @@ namespace Squidex.Domain.Apps.Entities.History
 
                 await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.NotifoKey, response.First().ApiKey, true);
             }
+            catch (NotifoException ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "RegisterToNotifo")
+                    .WriteProperty("status", "Failed")
+                    .WriteProperty("details", ex.ToString()));
+            }
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
@@ -148,140 +155,168 @@ namespace Squidex.Domain.Apps.Entities.History
                 return;
             }
 
-            var now = clock.GetCurrentInstant();
-
-            var publishedEvents = events
-                .Where(x => x.AppEvent.Headers.Restored() == false)
-                .Where(x => IsTooOld(x.AppEvent.Headers, now) == false)
-                .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null);
-
-            foreach (var batch in publishedEvents.Batch(50))
+            try
             {
-                var requests = new List<PublishDto>();
+                var now = clock.GetCurrentInstant();
 
-                foreach (var @event in batch)
+                var publishedEvents = events
+                    .Where(x => x.AppEvent.Headers.Restored() == false)
+                    .Where(x => IsTooOld(x.AppEvent.Headers, now) == false)
+                    .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null);
+
+                foreach (var batch in publishedEvents.Batch(50))
                 {
-                    var payload = @event.AppEvent.Payload;
+                    var requests = new List<PublishDto>();
 
-                    if (payload is CommentCreated comment && IsComment(payload))
+                    foreach (var @event in batch)
                     {
-                        foreach (var userId in comment.Mentions!)
+                        var payload = @event.AppEvent.Payload;
+
+                        if (payload is CommentCreated comment && IsComment(payload))
                         {
-                            var publishRequest = new PublishDto
-                            {
-                                Topic = $"users/{userId}"
-                            };
-
-                            publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
-
-                            publishRequest.Preformatted = new NotificationFormattingDto
-                            {
-                                Subject =
-                                {
-                                    ["en"] = comment.Text
-                                }
-                            };
-
-                            if (comment.Url?.IsAbsoluteUri == true)
-                            {
-                                publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
-                            }
-
-                            SetUser(comment, publishRequest);
-
-                            requests.Add(publishRequest);
+                            AddMentions(requests, comment);
+                        }
+                        else if (@event.HistoryEvent != null)
+                        {
+                            AddHistoryEvent(requests, @event.HistoryEvent, payload);
                         }
                     }
-                    else if (@event.HistoryEvent != null)
+
+                    var request = new PublishManyDto
                     {
-                        var historyEvent = @event.HistoryEvent;
+                        Requests = requests
+                    };
 
-                        var publishRequest = new PublishDto
-                        {
-                            Properties = new EventProperties()
-                        };
-
-                        foreach (var (key, value) in historyEvent.Parameters)
-                        {
-                            publishRequest.Properties.Add(key, value);
-                        }
-
-                        publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
-
-                        if (payload is ContentEvent c && !(payload is ContentDeleted))
-                        {
-                            var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
-
-                            publishRequest.Properties["SquidexUrl"] = url;
-                        }
-
-                        publishRequest.TemplateCode = @event.HistoryEvent.EventType;
-
-                        SetUser(payload, publishRequest);
-                        SetTopic(payload, publishRequest, historyEvent);
-
-                        requests.Add(publishRequest);
-                    }
+                    await client.Events.PostEventsAsync(options.AppId, request);
                 }
 
-                var request = new PublishManyDto
+                foreach (var @event in events)
                 {
-                    Requests = requests
-                };
+                    switch (@event.AppEvent.Payload)
+                    {
+                        case AppContributorAssigned contributorAssigned:
+                            await AssignContributorAsync(client, contributorAssigned);
+                            break;
 
-                await client.Events.PostEventsAsync(options.AppId, request);
+                        case AppContributorRemoved contributorRemoved:
+                            await RemoveContributorAsync(client, contributorRemoved);
+                            break;
+                    }
+                }
+            }
+            catch (NotifoException ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "RegisterToNotifo")
+                    .WriteProperty("status", "Failed")
+                    .WriteProperty("details", ex.ToString()));
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "RegisterToNotifo")
+                    .WriteProperty("status", "Failed"));
+            }
+        }
+
+        private async Task AssignContributorAsync(INotifoClient actualClient, AppContributorAssigned contributorAssigned)
+        {
+            var userId = contributorAssigned.ContributorId;
+
+            var user = await userResolver.FindByIdAsync(userId);
+
+            if (user != null)
+            {
+                await UpsertUserAsync(user);
             }
 
-            foreach (var @event in events)
+            try
             {
-                switch (@event.AppEvent.Payload)
+                var request = new AddAllowedTopicDto
                 {
-                    case AppContributorAssigned contributorAssigned:
-                        {
-                            var userId = contributorAssigned.ContributorId;
+                    Prefix = GetAppPrefix(contributorAssigned)
+                };
 
-                            var user = await userResolver.FindByIdAsync(userId);
+                await actualClient.Users.PostAllowedTopicAsync(options.AppId, userId, request);
+            }
+            catch (NotifoException ex) when (ex.StatusCode != 404)
+            {
+                throw;
+            }
+        }
 
-                            if (user != null)
-                            {
-                                await UpsertUserAsync(user);
-                            }
+        private async Task RemoveContributorAsync(INotifoClient actualClient, AppContributorRemoved contributorRemoved)
+        {
+            var userId = contributorRemoved.ContributorId;
 
-                            try
-                            {
-                                var request = new AddAllowedTopicDto
-                                {
-                                    Prefix = GetAppPrefix(contributorAssigned)
-                                };
+            try
+            {
+                var prefix = GetAppPrefix(contributorRemoved);
 
-                                await client.Users.PostAllowedTopicAsync(options.AppId, userId, request);
-                            }
-                            catch (NotifoException ex) when (ex.StatusCode == 404)
-                            {
-                                break;
-                            }
+                await actualClient.Users.DeleteAllowedTopicAsync(options.ApiKey, userId, prefix);
+            }
+            catch (NotifoException ex) when (ex.StatusCode != 404)
+            {
+                throw;
+            }
+        }
 
-                            break;
-                        }
+        private void AddHistoryEvent(List<PublishDto> requests, HistoryEvent historyEvent, AppEvent payload)
+        {
+            var publishRequest = new PublishDto
+            {
+                Properties = new EventProperties()
+            };
 
-                    case AppContributorRemoved contributorRemoved:
-                        {
-                            var userId = contributorRemoved.ContributorId;
+            foreach (var (key, value) in historyEvent.Parameters)
+            {
+                publishRequest.Properties.Add(key, value);
+            }
 
-                            try
-                            {
-                                var prefix = GetAppPrefix(contributorRemoved);
+            publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
 
-                                await client.Users.DeleteAllowedTopicAsync(options.ApiKey, userId, prefix);
-                            }
-                            catch (NotifoException ex) when (ex.StatusCode == 404)
-                            {
-                                break;
-                            }
+            if (payload is ContentEvent c && !(payload is ContentDeleted))
+            {
+                var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
 
-                            break;
-                        }
+                publishRequest.Properties["SquidexUrl"] = url;
+            }
+
+            publishRequest.TemplateCode = historyEvent.EventType;
+
+            SetUser(payload, publishRequest);
+            SetTopic(payload, publishRequest, historyEvent);
+
+            requests.Add(publishRequest);
+        }
+
+        private static void AddMentions(List<PublishDto> requests, CommentCreated comment)
+        {
+            foreach (var userId in comment.Mentions!)
+            {
+                var publishRequest = new PublishDto
+                {
+                    Topic = $"users/{userId}"
+                };
+
+                publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
+
+                publishRequest.Preformatted = new NotificationFormattingDto
+                {
+                    Subject =
+                    {
+                        ["en"] = comment.Text
+                    }
+                };
+
+                if (comment.Url?.IsAbsoluteUri == true)
+                {
+                    publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
                 }
+
+                SetUser(comment, publishRequest);
+
+                requests.Add(publishRequest);
             }
         }
 

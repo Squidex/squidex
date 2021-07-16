@@ -16,6 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public DataGraphType(Builder builder, SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.DataType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
@@ -26,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new ObjectGraphType
                     {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
                         Name = fieldInfo.LocalizedType
                     };
 
@@ -57,6 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new ObjectGraphType
                     {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
                         Name = fieldInfo.LocalizedType
                     };
 

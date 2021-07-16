@@ -16,6 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public NestedInputGraphType(Builder builder, FieldInfo fieldInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = fieldInfo.NestedInputType;
 
             foreach (var nestedFieldInfo in fieldInfo.Fields)

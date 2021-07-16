@@ -15,6 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public DataFlatGraphType(Builder builder, SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.DataFlatType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
