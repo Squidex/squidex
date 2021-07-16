@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
     {
         public AssetsResultGraphType(IGraphType assetsList)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "AssetResultDto";
 
             AddField(new FieldType

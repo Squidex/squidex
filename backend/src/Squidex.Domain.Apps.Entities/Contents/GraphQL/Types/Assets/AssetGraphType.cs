@@ -20,6 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
     {
         public AssetGraphType(bool canGenerateSourceUrl)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "Asset";
 
             AddField(new FieldType

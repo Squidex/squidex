@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public UserGraphType()
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "User";
 
             AddField(new FieldType

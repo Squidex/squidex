@@ -19,9 +19,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public ContentGraphType(SchemaInfo schemaInfo)
         {
-            schemaId = schemaInfo.Schema.Id;
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+            Name = schemaInfo.ContentType;
 
             IsTypeOf = CheckType;
+
+            schemaId = schemaInfo.Schema.Id;
         }
 
         private bool CheckType(object value)
@@ -31,8 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> allSchemas)
         {
-            Name = schemaInfo.ContentType;
-
             AddField(ContentFields.Id);
             AddField(ContentFields.Version);
             AddField(ContentFields.Created);
