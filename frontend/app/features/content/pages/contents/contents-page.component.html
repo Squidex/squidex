@@ -6,9 +6,7 @@
             <div class="col-auto ms-8">
                 <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
 
-                <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
-
-                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip" shortcut="CTRL + B">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
@@ -27,11 +25,9 @@
                 <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
-                    <i class="icon-plus"></i> {{ 'contents.create' | sqxTranslate }} <span class="btn-tooltip">N</span>
+                <button type="button" class="btn btn-success" routerLink="new" title="i18n:contents.createContentTooltip" shortcut="CTRL + U" [disabled]="(contentsState.canCreateAny | async) === false">
+                    <i class="icon-plus"></i> {{ 'contents.create' | sqxTranslate }} <span class="btn-tooltip">U</span>
                 </button>
-                
-                <sqx-shortcut keys="alt+n" (trigger)="newButton.click()"></sqx-shortcut>
             </div>
         </div>
     </ng-container>

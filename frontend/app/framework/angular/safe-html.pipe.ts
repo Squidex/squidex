@@ -6,7 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
 @Pipe({
     name: 'sqxSafeHtml',
@@ -33,7 +33,22 @@ export class SafeUrlPipe implements PipeTransform {
     ) {
     }
 
-    public transform(url: string): SafeHtml {
+    public transform(url: string): SafeUrl {
         return this.domSanitizer.bypassSecurityTrustUrl(url);
+    }
+}
+
+@Pipe({
+    name: 'sqxSafeResourceUrl',
+    pure: true,
+})
+export class SafeResourceUrlPipe implements PipeTransform {
+    constructor(
+        public readonly domSanitizer: DomSanitizer,
+    ) {
+    }
+
+    public transform(url: string): SafeResourceUrl {
+        return this.domSanitizer.bypassSecurityTrustResourceUrl(url);
     }
 }

@@ -5,14 +5,16 @@
         <div class="d-flex justify-content-end">
             <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
 
-            <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:contributors.refreshTooltip">
+            <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:contributors.refreshTooltip" shortcut="CTRL + B">
                 <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
             </button>
 
-            <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
-
             <div class="form-inline">
-                <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" [ngModel]="contributorsState.query | async" (ngModelChange)="search($event)">
+                <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" 
+                    [ngModel]="contributorsState.query | async" 
+                    (ngModelChange)="search($event)"
+                    shortcut="CTRL + I"
+                    shortcutAction="focus">
             </div>
         </div>
     </ng-container>

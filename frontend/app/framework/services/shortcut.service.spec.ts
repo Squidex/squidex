@@ -19,8 +19,8 @@ describe('ShortcutService', () => {
 
         let isTriggered = false;
 
-        shortcutService.on('ctrl+a', () => { isTriggered = true; });
-        shortcutService.trigger('ctrl+a');
+        shortcutService.listen('ctrl+a', () => { isTriggered = true; });
+        shortcutService.raise('ctrl+a');
 
         expect(isTriggered).toBeTruthy();
     });
@@ -30,9 +30,8 @@ describe('ShortcutService', () => {
 
         let isTriggered = false;
 
-        shortcutService.on('ctrl+a', () => { isTriggered = true; });
-        shortcutService.off('ctrl+a');
-        shortcutService.trigger('ctrl+a');
+        shortcutService.listen('ctrl+a', () => { isTriggered = true; })();
+        shortcutService.raise('ctrl+a');
 
         expect(isTriggered).toBeFalsy();
     });

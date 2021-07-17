@@ -4,17 +4,15 @@
     <ng-container menu>
         <div class="row g-0">
             <div class="col-auto" *ngIf="schemasState.canCreate | async">    
-                <button type="button" class="btn btn-success me-2" (click)="createSchema()" title="i18n:schemas.createSchemaTooltip" titlePosition="top-left">
+                <button type="button" class="btn btn-success me-2" (click)="createSchema()" title="i18n:schemas.createSchemaTooltip" titlePosition="top-left" shortcut="CTRL + U">
                     <i class="icon-plus"></i>          
                 </button>
-
-                <sqx-shortcut keys="alt+n" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
             </div>
             
             <div class="col search-form">
-                <sqx-shortcut keys="alt+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-
-                <input class="form-control" #inputFind [formControl]="schemasFilter" placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}">
+                <input class="form-control" [formControl]="schemasFilter" placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}"
+                    shortcut="CTRL + I"
+                    shortcutAction="focus">
     
                 <i class="icon-search"></i>
             </div>

@@ -82,11 +82,9 @@
                         </ng-container>
 
                         <ng-container *ngIf="content?.canUpdate">
-                            <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut">
+                            <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S">
                                 {{ 'common.save' | sqxTranslate }} <span class="btn-tooltip">S</span>
                             </button>
-        
-                            <sqx-shortcut keys="alt+s" (trigger)="saveAndPublish()"></sqx-shortcut>
                         </ng-container>
                     </ng-template>
                 </ng-container>
@@ -97,11 +95,9 @@
                     {{ 'common.save' | sqxTranslate }}
                 </button>
 
-                <button type="submit" class="btn btn-primary me-2" title="i18n:common.saveShortcut" *ngIf="contentsState.canCreateAndPublish | async">
+                <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
                     {{ 'contents.saveAndPublish' | sqxTranslate }} <span class="btn-tooltip">S</span>
                 </button>
-
-                <sqx-shortcut keys="alt+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-template>
 
             <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>

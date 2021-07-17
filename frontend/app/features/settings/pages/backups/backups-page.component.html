@@ -2,11 +2,9 @@
 
 <sqx-layout layout="main" titleText="i18n:common.backups" titleIcon="backups" [width]="40">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:backups.refreshTooltip">
+        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:backups.refreshTooltip" shortcut="CTRL + B">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
-
-        <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
 
         <button type="button" class="btn btn-success" [disabled]="backupsState.maxBackupsReached | async" *ngIf="backupsState.canCreate | async" (click)="start()">
             {{ 'backups.start' | sqxTranslate }}

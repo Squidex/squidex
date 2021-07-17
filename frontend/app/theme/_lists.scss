@@ -10,6 +10,7 @@
     & {
         border-collapse: separate;
         border-spacing: 0;
+        margin: 0;
     }
 
     th,
@@ -135,10 +136,6 @@
                 position: relative;
             }
 
-            .nav-tabs2 {
-                @include absolute(auto, auto, -2px, 1.25rem);
-            }
-
             &-tab {
                 padding: 1.5rem;
             }
@@ -150,6 +147,10 @@
                 height: 3.75rem;
                 padding: .75rem 1.25rem;
                 position: relative;
+
+                .nav-tabs2 {
+                    @include absolute(auto, auto, -2px, 1.25rem);
+                }
             }
         }
     }

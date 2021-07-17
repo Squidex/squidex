@@ -4,9 +4,7 @@
     <ng-container menu>
         <div class="row flex-nowrap gx-2">
             <div class="col-auto offset-xl-2">
-                <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
-
-                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:assets.refreshTooltip">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:assets.refreshTooltip" shortcut="CTRL + B">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
@@ -43,11 +41,9 @@
                 </div>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="i18n:assets.createFolderTooltip">
+                <button type="button" class="btn btn-success" (click)="addAssetFolderDialog.show()" title="i18n:assets.createFolderTooltip" shortcut="CTRL + U">
                     <i class="icon-create_new_folder"></i>
                 </button>
-
-                <sqx-shortcut keys="alt+n" (trigger)="addAssetFolderDialog.show()"></sqx-shortcut>
             </div>
         </div>
     </ng-container>

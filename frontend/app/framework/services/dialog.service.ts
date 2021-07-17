@@ -61,6 +61,8 @@ export class Tooltip {
         public readonly target: any,
         public readonly text: string | null,
         public readonly position: string,
+        public readonly multiple?: boolean,
+        public readonly shortcut?: string,
     ) {
     }
 }

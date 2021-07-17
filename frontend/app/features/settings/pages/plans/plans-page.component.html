@@ -4,11 +4,9 @@
     <ng-container menu>
         <sqx-notifo topic="apps/{{plansState.appId}}/settings/plan"></sqx-notifo>
 
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:plans.refreshTooltip">
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:plans.refreshTooltip" shortcut="CTRL + B">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
-
-        <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
     </ng-container>
 
     <ng-container>

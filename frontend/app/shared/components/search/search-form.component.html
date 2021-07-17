@@ -1,10 +1,16 @@
 <ng-container *ngIf="enableShortcut">
-    <sqx-shortcut keys="alt+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+    <sqx-shortcut keys="CTRL + I" (trigger)="inputFind.focus()"></sqx-shortcut>
 </ng-container>
 
 <form [class]="formClass" (ngSubmit)="search()">
     <div class="input-group">
-        <input class="form-control" #inputFind [ngModel]="query?.fullText" (ngModelChange)="changeQueryFullText($event)" [ngModelOptions]="{ standalone: true }" [placeholder]="placeholder">
+        <input class="form-control" #inputFind 
+            [ngModel]="query?.fullText" 
+            (ngModelChange)="changeQueryFullText($event)" 
+            [ngModelOptions]="{ standalone: true }" 
+            [placeholder]="placeholder"
+            shortcut="CTRL + I"
+            shortcutAction="none">
 
         <ng-container *ngIf="queries">
             <ng-container *ngIf="saveKey | async; else notBookmarked; let key">

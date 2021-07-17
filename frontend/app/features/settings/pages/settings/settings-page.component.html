@@ -2,11 +2,9 @@
 
 <sqx-layout layout="main" titleText="i18n:appSettings.title" titleIcon="patterns" [width]="55">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:appSettings.refreshTooltip">
+        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:appSettings.refreshTooltip" shortcut="CTRL + B">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
-
-        <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
 
         <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable" (click)="save()">
             {{ 'common.save' | sqxTranslate }}

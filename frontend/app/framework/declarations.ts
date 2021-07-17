@@ -69,6 +69,7 @@ export * from './angular/routers/router-2-state';
 export * from './angular/safe-html.pipe';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
+export * from './angular/shortcut.directive';
 export * from './angular/status-icon.component';
 export * from './angular/stop-click.directive';
 export * from './angular/sync-scrolling.directive';

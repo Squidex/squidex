@@ -3,24 +3,20 @@
 <sqx-layout layout="main" titleText="i18n:users.listTitle" titleIcon="user-o" [width]="50">
     <ng-container menu>
         <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:users.refreshTooltip">
+            <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:users.refreshTooltip" shortcut="CTRL + B">
                 <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
             </button>
     
-            <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
-    
             <form class="form-inline ms-2" (ngSubmit)="search()">
-                <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="{{ 'users.search' | sqxTranslate }}">
+                <input class="form-control" [formControl]="usersFilter" placeholder="{{ 'users.search' | sqxTranslate }}"
+                    shortcut="CTRL + SHIFT + S"
+                    shortcutAction="focus">
             </form>
-            
-            <sqx-shortcut keys="alt+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
             <ng-container *ngIf="usersState.canCreate | async">
-                <button type="button" class="btn btn-success ms-2" #buttonNew routerLink="new" title="i18n:users.createTooltip">
-                    <i class="icon-plus"></i> {{ 'users.create' | sqxTranslate }} <span class="btn-tooltip">N</span>
+                <button type="button" class="btn btn-success ms-2" routerLink="new" title="i18n:users.createTooltip" shortcut="CTRL + U">
+                    <i class="icon-plus"></i> {{ 'users.create' | sqxTranslate }} <span class="btn-tooltip">U</span>
                 </button>
-
-                <sqx-shortcut keys="alt+n" (trigger)="buttonNew.click()"></sqx-shortcut>
             </ng-container>
         </div>
     </ng-container>

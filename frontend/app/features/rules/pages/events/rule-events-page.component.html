@@ -2,11 +2,9 @@
 
 <sqx-layout titleText="i18n:common.events" titleIcon="events" [width]="50">    
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:rules.refreshEventsTooltip">
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:rules.refreshEventsTooltip" shortcut="CTRL + B">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
-
-        <sqx-shortcut keys="alt+l" (trigger)="reload()"></sqx-shortcut>
     </ng-container>
     
     <ng-container>
