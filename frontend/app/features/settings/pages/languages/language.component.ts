@@ -92,7 +92,7 @@ export class LanguageComponent implements OnChanges {
         this.otherLanguage = this.fallbackLanguagesNew[0];
     }
 
-    public trackByLanguage(_index: number, language: AppLanguageDto) {
+    public trackByLanguage(_index: number, language: LanguageDto) {
         return language.iso2Code;
     }
 }
