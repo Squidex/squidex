@@ -17,7 +17,7 @@ describe('ShortcutDirective', () => {
     beforeEach(() => {
         shortcutElement = {};
         shortcutService = new ShortcutService();
-        shortcutElement = new ShortcutDirective(new ElementRef(shortcutElement), shortcutService);
+        shortcutDirective = new ShortcutDirective(new ElementRef(shortcutElement), shortcutService);
     });
 
     it('should init without keys', () => {
@@ -63,7 +63,7 @@ describe('ShortcutDirective', () => {
 
         shortcutService.raise('ctrl+a');
 
-        expect(isTriggered).toBeTruthy();
+        expect(isTriggered).toBeFalsy();
     });
 
     it('should not raise event if triggered but disabled', () => {
