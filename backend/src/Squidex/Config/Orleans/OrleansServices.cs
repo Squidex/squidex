@@ -102,6 +102,11 @@ namespace Squidex.Config.Orleans
 
                         options.Configure(config);
                     });
+
+                    if (config.GetValue<bool>("orleans:kubernetes"))
+                    {
+                        builder.UseKubernetesHosting();
+                    }
                 },
                 ["Development"] = () =>
                 {
