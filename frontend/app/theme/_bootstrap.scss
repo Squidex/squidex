@@ -335,17 +335,6 @@ a {
         @include button-variant($color-extern-twitter, $color-extern-twitter);
     }
 
-    &-tooltip {
-        background-color: $color-input-shortcut;
-        border: 0;
-        border-radius: $border-radius;
-        display: inline-block;
-        margin-left: .25rem;
-        padding-left: .5rem;
-        padding-right: .5rem;
-        text-transform: uppercase;
-    }
-
     // Special radio button.
     &-radio {
         & {

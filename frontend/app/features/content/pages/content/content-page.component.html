@@ -83,7 +83,7 @@
 
                         <ng-container *ngIf="content?.canUpdate">
                             <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S">
-                                {{ 'common.save' | sqxTranslate }} <span class="btn-tooltip">S</span>
+                                {{ 'common.save' | sqxTranslate }}
                             </button>
                         </ng-container>
                     </ng-template>
@@ -96,7 +96,7 @@
                 </button>
 
                 <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
-                    {{ 'contents.saveAndPublish' | sqxTranslate }} <span class="btn-tooltip">S</span>
+                    {{ 'contents.saveAndPublish' | sqxTranslate }}
                 </button>
             </ng-template>
 
