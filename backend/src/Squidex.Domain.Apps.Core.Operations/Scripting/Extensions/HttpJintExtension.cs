@@ -7,6 +7,7 @@
 
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Jint;
 using Jint.Native;
@@ -18,7 +19,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
     public sealed class HttpJintExtension : IJintExtension
     {
-        private delegate void GetJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null);
+        private delegate void HttpJson(string url, Action<JsValue> callback, JsValue? headers = null);
+        private delegate void HttpJsonWithBody(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null);
         private readonly IHttpClientFactory httpClientFactory;
 
         public HttpJintExtension(IHttpClientFactory httpClientFactory)
@@ -28,17 +30,35 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public void ExtendAsync(ExecutionContext context)
         {
-            var action = new GetJsonDelegate((url, callback, headers) => GetJson(context, url, callback, headers));
+            AddMethod(context, HttpMethod.Get, "getJSON");
+            AddMethod(context, HttpMethod.Delete, "deleteJSON");
 
-            context.Engine.SetValue("getJSON", action);
+            AdBodyMethod(context, HttpMethod.Patch, "patchJSON");
+            AdBodyMethod(context, HttpMethod.Post, "postJSON");
+            AdBodyMethod(context, HttpMethod.Put, "putJSON");
         }
 
-        private void GetJson(ExecutionContext context, string url, Action<JsValue> callback, JsValue? headers)
+        private void AddMethod(ExecutionContext context, HttpMethod method, string name)
         {
-            GetJsonAsync(context, url, callback, headers).Forget();
+            var action = new HttpJson((url, callback, headers) =>
+            {
+                RequestAsync(context, method, url, null, callback, headers).Forget();
+            });
+
+            context.Engine.SetValue(name, action);
         }
 
-        private async Task GetJsonAsync(ExecutionContext context, string url, Action<JsValue> callback, JsValue? headers)
+        private void AdBodyMethod(ExecutionContext context, HttpMethod method, string name)
+        {
+            var action = new HttpJsonWithBody((url, body, callback, headers) =>
+            {
+                RequestAsync(context, method, url, body, callback, headers).Forget();
+            });
+
+            context.Engine.SetValue(name, action);
+        }
+
+        private async Task RequestAsync(ExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers)
         {
             if (callback == null)
             {
@@ -46,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
                 return;
             }
 
-            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
             {
                 context.Fail(new JavaScriptException("URL is not valid."));
                 return;
@@ -58,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             {
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
-                    using (var request = CreateRequest(url, headers))
+                    using (var request = CreateRequest(context, method, uri, body, headers))
                     {
                         using (var response = await httpClient.SendAsync(request, context.CancellationToken))
                         {
@@ -79,14 +99,21 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         }
 
-        private static HttpRequestMessage CreateRequest(string url, JsValue? headers)
+        private static HttpRequestMessage CreateRequest(ExecutionContext context, HttpMethod method, Uri uri, JsValue? body, JsValue? headers)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            {
-                throw new ArgumentException("Url must be an absolute URL");
-            }
+            var request = new HttpRequestMessage(method, uri);
 
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            if (body != null)
+            {
+                var serializer = new JsonSerializer(context.Engine);
+
+                var json = serializer.Serialize(body, JsValue.Undefined, JsValue.Undefined)?.ToString();
+
+                if (json != null)
+                {
+                    request.Content = new StringContent(json, Encoding.UTF8, "text/json");
+                }
+            }
 
             if (headers != null && headers.Type == Types.Object)
             {

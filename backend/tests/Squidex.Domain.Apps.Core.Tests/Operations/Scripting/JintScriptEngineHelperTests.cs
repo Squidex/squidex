@@ -323,7 +323,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_make_json_request()
+        public async Task Should_make_getJson_request()
         {
             var httpHandler = SetupRequest();
 
@@ -348,7 +348,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task Should_make_json_request_with_headers()
+        public async Task Should_make_getJson_request_with_headers()
         {
             var httpHandler = SetupRequest();
 
@@ -373,6 +373,115 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeUrl("http://squidex.io/");
             httpHandler.ShouldBeHeader("X-Header1", "1");
             httpHandler.ShouldBeHeader("X-Header2", "2");
+
+            var expectedResult = JsonValue.Object().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_deleteJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                deleteJSON(url, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var vars = new ScriptVars();
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Delete);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+
+            var expectedResult = JsonValue.Object().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_patchJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                var body = { key: 42 };
+
+                patchJSON(url, body, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var vars = new ScriptVars();
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Patch);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+            httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+
+            var expectedResult = JsonValue.Object().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_postJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                var body = { key: 42 };
+
+                postJSON(url, body, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var vars = new ScriptVars();
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Post);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+            httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
+
+            var expectedResult = JsonValue.Object().Add("key", 42);
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public async Task Should_make_putJson_request()
+        {
+            var httpHandler = SetupRequest();
+
+            const string script = @"
+                var url = 'http://squidex.io';
+
+                var body = { key: 42 };
+
+                putJSON(url, body, function(result) {
+                    complete(result);
+                });
+            ";
+
+            var vars = new ScriptVars();
+
+            var result = await sut.ExecuteAsync(vars, script);
+
+            httpHandler.ShouldBeMethod(HttpMethod.Put);
+            httpHandler.ShouldBeUrl("http://squidex.io/");
+            httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
 
             var expectedResult = JsonValue.Object().Add("key", 42);
 
