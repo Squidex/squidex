@@ -39,12 +39,9 @@ export class ShortcutDirective implements OnDestroy, OnInit {
                     try {
                         target[this.shortcutAction]();
                     } catch {
-                        // eslint-disable-next-line no-console
-                        console.error('Invalid shortcut config.');
+                        // NOOP
                     }
                 }
-
-                return false;
             });
         }
     }

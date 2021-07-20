@@ -11,7 +11,7 @@ import * as Mousetrap from 'mousetrap';
 @Injectable()
 export class ShortcutService {
     public listen(keys: string, callback: (e: KeyboardEvent, combo: string) => void): () => void {
-        const trimmed = keys.toLowerCase().replaceAll(' ', '').split(',');
+        const trimmed = keys.toLowerCase().replace(/\s/g, '').split(',');
 
         Mousetrap.bind(trimmed, (event: any, combo: any) => {
             return callback(event, combo);
