@@ -26,7 +26,7 @@
   "apps.createProfileApp": "New Profile Sample",
   "apps.createProfileAppDescription": "Create your profile page.",
   "apps.createWithTemplate": "Create {template} Sample",
-  "apps.empty": "You are not collaborating to any app yet",
+  "apps.empty": "You are not collaborating on any apps yet",
   "apps.generalSettings": "General",
   "apps.generalSettingsDangerZone": "General",
   "apps.image": "Image",

@@ -16,21 +16,29 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
     internal sealed class MockupHttpHandler : HttpMessageHandler
     {
         private readonly HttpResponseMessage response;
-        private HttpRequestMessage madeRequest;
+        private HttpRequestMessage currentRequest;
+        private string? currentContent;
+        private string? currentContentType;
 
         public void ShouldBeMethod(HttpMethod method)
         {
-            Assert.Equal(method, madeRequest.Method);
+            Assert.Equal(method, currentRequest.Method);
         }
 
         public void ShouldBeUrl(string url)
         {
-            Assert.Equal(url, madeRequest.RequestUri?.ToString());
+            Assert.Equal(url, currentRequest.RequestUri?.ToString());
         }
 
         public void ShouldBeHeader(string key, string value)
         {
-            Assert.Equal(value, madeRequest.Headers.GetValues(key).FirstOrDefault());
+            Assert.Equal(value, currentRequest.Headers.GetValues(key).FirstOrDefault());
+        }
+
+        public void ShouldBeBody(string content, string contentType)
+        {
+            Assert.Equal(content, currentContent);
+            Assert.Equal(contentType, currentContentType);
         }
 
         public MockupHttpHandler(HttpResponseMessage response)
@@ -42,7 +50,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             await Task.Delay(1000, cancellationToken);
 
-            madeRequest = request;
+            currentRequest = request;
+
+            if (request.Content is StringContent body)
+            {
+                currentContent = await body.ReadAsStringAsync();
+                currentContentType = body.Headers.ContentType?.MediaType;
+            }
 
             return response;
         }

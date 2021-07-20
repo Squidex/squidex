@@ -48,6 +48,7 @@
     <PackageReference Include="Microsoft.OData.Core" Version="7.9.0" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="3.4.3" />
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.4.3" />
+    <PackageReference Include="Microsoft.Orleans.Hosting.Kubernetes" Version="3.4.3" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.4.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.12.4" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.23" />
