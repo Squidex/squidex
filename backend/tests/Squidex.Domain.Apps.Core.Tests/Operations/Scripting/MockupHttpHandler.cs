@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             if (request.Content is StringContent body)
             {
-                currentContent = await body.ReadAsStringAsync();
+                currentContent = await body.ReadAsStringAsync(cancellationToken);
                 currentContentType = body.Headers.ContentType?.MediaType;
             }
 

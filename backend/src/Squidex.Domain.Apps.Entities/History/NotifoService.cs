@@ -61,6 +61,11 @@ namespace Squidex.Domain.Apps.Entities.History
                     builder = builder.SetApiUrl(options.Value.ApiUrl);
                 }
 
+                if (options.Value.Debug)
+                {
+                    builder = builder.ReadResponseAsString(true);
+                }
+
                 client = builder.Build();
             }
         }
