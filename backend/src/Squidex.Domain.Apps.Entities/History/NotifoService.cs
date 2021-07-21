@@ -164,12 +164,15 @@ namespace Squidex.Domain.Apps.Entities.History
             {
                 var now = clock.GetCurrentInstant();
 
-                var publishedEvents = events
-                    .Where(x => x.AppEvent.Headers.Restored() == false)
-                    .Where(x => IsTooOld(x.AppEvent.Headers, now) == false)
-                    .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null);
+                var maxAge = now - MaxAge;
 
-                foreach (var batch in publishedEvents.Batch(50))
+                var batches = events
+                    .Where(x => !x.AppEvent.Headers.Restored())
+                    .Where(x => IsNewer(x.AppEvent.Headers, maxAge))
+                    .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null)
+                    .Batch(50);
+
+                foreach (var batch in batches)
                 {
                     var requests = new List<PublishDto>();
 
@@ -280,9 +283,9 @@ namespace Squidex.Domain.Apps.Entities.History
 
             publishRequest.Properties["SquidexApp"] = payload.AppId.Name;
 
-            if (payload is ContentEvent c && !(payload is ContentDeleted))
+            if (payload is ContentEvent @event && payload is not ContentDeleted)
             {
-                var url = urlGenerator.ContentUI(c.AppId, c.SchemaId, c.ContentId);
+                var url = urlGenerator.ContentUI(@event.AppId, @event.SchemaId, @event.ContentId);
 
                 publishRequest.Properties["SquidexUrl"] = url;
             }
@@ -325,9 +328,9 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private static bool IsTooOld(EnvelopeHeaders headers, Instant now)
+        private static bool IsNewer(EnvelopeHeaders headers, Instant maxAge)
         {
-            return now - headers.Timestamp() > MaxAge;
+            return headers.Timestamp() > maxAge;
         }
 
         private static bool IsComment(AppEvent appEvent)
