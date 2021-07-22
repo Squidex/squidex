@@ -10,7 +10,7 @@
 .form-control {
     &:disabled,
     &.disabled {
-        background: $panel-light-background;
+        background: $color-white;
     }
 }
 

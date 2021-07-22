@@ -4,52 +4,59 @@
     flex-grow: 1;
     overflow: hidden;
     padding: 0;
-    position: relative;
 }
 
-:host(.overflow) {
-    overflow: visible;
-}
+.inner {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 $panel-padding;
 
-.grid {
-    &-content,
-    &-header,
-    &-footer {
-        padding: 0 $panel-padding;
-        transition: opacity .2s ease;
+    &.tabled {
+        padding-bottom: .5rem !important;
+        padding-top: .5rem !important;
     }
+}
 
+%transition-opacity {
+    transition: opacity .2s ease;
+}
+
+.list {
     &-content {
+        @extend %transition-opacity;
         flex-direction: column;
         flex-grow: 1;
-        padding: $panel-padding;
-
-        &.tabled {
-            padding-bottom: .5rem;
-            padding-top: .5rem;
-        }
 
         &.normal {
-            overflow-y: auto;
+            overflow-x: hidden;
+            overflow-y: overlay;
+        }
+
+        .inner {
+            &.normal {
+                padding: $panel-padding;
+            }
         }
 
         &.synced {
             overflow-x: auto;
             overflow-y: auto;
-            padding-right: 0;
+
+            .inner {
+                padding-right: 0;
+            }
         }
     }
 
     &-header {
-        & {
-            border: 0;
-            border-bottom: 1px solid $color-border;
-            flex-shrink: 0;
-            overflow-x: hidden;
-            overflow-y: hidden;
-        }
+        @extend %transition-opacity;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        flex-shrink: 0;
+        overflow-x: hidden;
+        overflow-y: hidden;
 
-        .inner {
+        .sync-inner {
             display: table-cell;
         }
 
@@ -69,11 +76,10 @@
     }
 
     &-footer {
-        & {
-            border: 0;
-            border-top: 1px solid $color-border;
-            flex-shrink: 0;
-        }
+        @extend %transition-opacity;
+        border: 0;
+        border-top: 1px solid $color-border;
+        flex-shrink: 0;
 
         ::ng-deep {
             .pagination {
@@ -83,15 +89,20 @@
     }
 }
 
-.loader,
-.loading-indicator {
+:host(.overflow) {
+    overflow: visible;
+}
+
+%disabled {
     pointer-events: none;
 }
 
 .loading-indicator {
+    @extend %disabled;
     opacity: .5;
 }
 
 .loader {
     @include absolute(20%, 0, auto, 0);
+    @extend %disabled;
 }

@@ -1,23 +1,25 @@
-<sqx-title [message]="schema.displayName"></sqx-title>
+<sqx-title [message]="schema.displayName" [url]="['..']"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="!!content" [grid]="true" (close)="back()">
+    <sqx-layout layout="main" [hideSidebar]="!content">
         <ng-container title>
-            <a class="btn btn-text" (click)="back()" *ngIf="schema.type === 'Default'">
+            <a class="btn btn-text-secondary" (click)="back()" *ngIf="schema.type === 'Default'">
                 <i class="icon-angle-left"></i>
             </a>
 
-            <ng-container *ngIf="!content">
-                <sqx-title message="i18n:contents.createPageTitle"></sqx-title>
-
-                {{ 'contents.createTitle' | sqxTranslate }}
+            <ng-container *ngIf="content; noContentTitle">
+                <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
             </ng-container>
+
+            <ng-template #noContentTitle>
+                {{ 'contents.createTitle' | sqxTranslate }}
+
+                <sqx-title message="i18n:contents.createPageTitle"></sqx-title>
+            </ng-template>
         </ng-container>
         
-        <ng-container header>
+        <ng-container menu>
             <ng-container *ngIf="content">
-                <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
-
                 <ul class="nav nav-tabs2" *ngIf="contentTab | async; let tab">
                     <li class="nav-item">
                         <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'editor' }" [class.active]="tab === 'editor'">
@@ -44,16 +46,16 @@
         </ng-container>
  
         <ng-container menu>
-            <ng-container *ngIf="content; else noContent">
+            <ng-container *ngIf="content; else noContentMenu">
                 <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
 
                 <ng-container *ngIf="contentTab | async; let tab">
                     <ng-container *ngIf="tab === 'references' || tab === 'referencing'; else defaultHeader">
-                        <button type="button" class="btn btn-primary ml-1" (click)="publish()">
+                        <button type="button" class="btn btn-primary ms-2" (click)="publish()">
                             {{ 'contents.publishAll' | sqxTranslate }}
                         </button>
     
-                        <button type="button" class="btn btn-primary ml-1" (click)="validate()">
+                        <button type="button" class="btn btn-primary ms-2" (click)="validate()">
                             {{ 'contents.validate' | sqxTranslate }}
                         </button>
                     </ng-container>
@@ -62,7 +64,7 @@
                         <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
 
                         <ng-container *ngIf="content?.canDelete">
-                            <button type="button" class="btn btn-outline-secondary ml-2" (click)="dropdown.toggle()" #buttonOptions>
+                            <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
                                 <i class="icon-dots"></i>
                             </button>
 
@@ -80,32 +82,28 @@
                         </ng-container>
 
                         <ng-container *ngIf="content?.canUpdate">
-                            <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut">
+                            <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S">
                                 {{ 'common.save' | sqxTranslate }}
                             </button>
-        
-                            <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
                         </ng-container>
                     </ng-template>
                 </ng-container>
             </ng-container>
 
-            <ng-template #noContent>
+            <ng-template #noContentMenu>
                 <button type="button" class="btn btn-secondary" (click)="save()" *ngIf="contentsState.canCreate | async">
                     {{ 'common.save' | sqxTranslate }}
                 </button>
 
-                <button type="submit" class="btn btn-primary ml-1" title="i18n:common.saveShortcut" *ngIf="contentsState.canCreateAndPublish | async">
+                <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
                     {{ 'contents.saveAndPublish' | sqxTranslate }}
                 </button>
-
-                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-template>
 
             <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>
         </ng-container>
 
-        <ng-container content>
+        <ng-container>
             <ng-container *ngIf="content; else noContentEditor">
                 <ng-container [ngSwitch]="contentTab | async">
                     <ng-container *ngSwitchCase="'references'">
@@ -134,6 +132,7 @@
                             [(language)]="language"
                             [contentForm]="contentForm"
                             [contentFormCompare]="contentFormCompare"
+                            [contentVersion]="contentVersion"
                             [formContext]="formContext"
                             [languages]="languages"
                             [schema]="schema">
@@ -147,6 +146,7 @@
                     [(language)]="language"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
+                    [contentVersion]="contentVersion"
                     [formContext]="formContext"
                     [languages]="languages"
                     [schema]="schema">
@@ -154,7 +154,7 @@
             </ng-template>
         </ng-container>
 
-        <ng-container sidebar>
+        <ng-container sidebarMenu>
             <div class="panel-nav">
                 <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.workflow" titlePosition="left" #linkHistory>
                     <i class="icon-time"></i>
@@ -173,7 +173,7 @@
                 </sqx-onboarding-tooltip>
             </div>
         </ng-container>
-    </sqx-panel>
+    </sqx-layout>
 </form>
 
 <router-outlet></router-outlet>

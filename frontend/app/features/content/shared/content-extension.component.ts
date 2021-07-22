@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiUrlConfig, ResourceOwner, Types } from '@app/framework/internal';
 import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto } from '@app/shared';
@@ -16,13 +16,9 @@ import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto } from 
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentExtensionComponent extends ResourceOwner implements AfterViewInit, OnChanges {
+export class ContentExtensionComponent extends ResourceOwner implements OnChanges {
     private readonly context: any;
-    private computedUrl: string;
     private isInitialized = false;
-
-    @Input()
-    public url?: string | null;
 
     @Input()
     public content?: ContentDto | null;
@@ -33,9 +29,15 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
     @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
 
+    @Input()
+    public set url(value: string | undefined | null) {
+        this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
+    }
+
+    public computedUrl: string;
+
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         private readonly appsState: AppsState,
-        private readonly renderer: Renderer2,
         private readonly router: Router,
     ) {
         super();
@@ -49,12 +51,6 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['url']) {
-            this.computedUrl = computeEditorUrl(this.url, this.appsState.snapshot.selectedSettings);
-
-            this.setupUrl();
-        }
-
         if (changes['contentSchema']) {
             this.context['schemaName'] = this.contentSchema?.name;
             this.context['schemaId'] = this.contentSchema?.id;
@@ -65,36 +61,26 @@ export class ContentExtensionComponent extends ResourceOwner implements AfterVie
         }
     }
 
-    private setupUrl() {
-        if (this.iframe?.nativeElement) {
-            this.iframe.nativeElement.src = this.computedUrl;
+    @HostListener('window:message', ['$event'])
+    public onWindowMessage(event: MessageEvent) {
+        if (event.source === this.iframe.nativeElement.contentWindow) {
+            const { type } = event.data;
+
+            if (type === 'started') {
+                this.isInitialized = true;
+
+                this.sendInit();
+                this.sendContent();
+            } else if (type === 'resize') {
+                const { height } = event.data;
+
+                this.iframe.nativeElement.height = `${height}px`;
+            } else if (type === 'navigate') {
+                const { url } = event.data;
+
+                this.router.navigateByUrl(url);
+            }
         }
-    }
-
-    public ngAfterViewInit() {
-        this.setupUrl();
-
-        this.own(
-            this.renderer.listen('window', 'message', (event: MessageEvent) => {
-                if (event.source === this.iframe.nativeElement.contentWindow) {
-                    const { type } = event.data;
-
-                    if (type === 'started') {
-                        this.isInitialized = true;
-
-                        this.sendInit();
-                        this.sendContent();
-                    } else if (type === 'resize') {
-                        const { height } = event.data;
-
-                        this.iframe.nativeElement.height = `${height}px`;
-                    } else if (type === 'navigate') {
-                        const { url } = event.data;
-
-                        this.router.navigateByUrl(url);
-                    }
-                }
-            }));
     }
 
     private sendInit() {

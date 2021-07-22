@@ -1,63 +1,47 @@
 <sqx-title message="i18n:rules.listPageTitle"></sqx-title>
 
-<sqx-panel desiredWidth="54rem" [showSidebar]="true" [grid]="true">
-    <ng-container title>
-        {{ 'common.rules' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" titleText="i18n:common.rules" titleIcon="rules" [width]="54">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="i18n:rules.refreshTooltip">
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:rules.refreshTooltip" shortcut="CTRL + B">
             <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
         </button>
-
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
-
-        <ng-container *ngIf="rulesState.canCreate | async">
-            <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
     
-            <a type="button" class="btn btn-success" #buttonNew routerLink="new" title="i18n:rules.createTooltip">
-                <i class="icon-plus"></i> {{ 'rules.create' | sqxTranslate }}
-            </a>
-        </ng-container>
+        <a class="btn btn-success me-2" routerLink="new" title="i18n:rules.createTooltip" shortcut="CTRL + U"> *ngIf="rulesState.canCreate | async"
+            <i class="icon-plus"></i> {{ 'rules.create' | sqxTranslate }}
+        </a>
     </ng-container>
 
-    <ng-container content>
-        <sqx-list-view [isLoading]="rulesState.isLoading | async">
-            <ng-container topHeader>
-                <div class="panel-alert panel-alert-danger" *ngIf="rulesState.runningRule | async; let runningRule">
-                    <div class="float-right">
-                        <a class="force" (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>
-                    </div>
-
-                    {{ 'rules.runningRule' | sqxTranslate: { name: runningRule.name || 'Unnamed Rule' } }}
+    <ng-container>
+        <sqx-list-view innerWidth="54rem" [isLoading]="rulesState.isLoading | async">
+            <div class="alert alert-danger mb-4" *ngIf="rulesState.runningRule | async; let runningRule">
+                <div class="float-end">
+                    <a class="force" (click)="cancelRun()">{{ 'common.cancel' | sqxTranslate }}</a>
                 </div>
-            </ng-container>
 
-            <div content>
-                <ng-container *ngIf="supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
-                    <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
-                        {{ 'rules.empty' | sqxTranslate }}
-        
-                        <button type="button" class="btn btn-success btn-sm ml-2" routerLink="new" *ngIf="rulesState.canCreate | async">
-                            <i class="icon icon-plus"></i> {{ 'rules.emptyAddRule' | sqxTranslate }}
-                        </button>
-                    </div>
-        
-                    <table class="table table-items table-fixed">
-                        <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
-                            [rule]="rule"
-                            [ruleActions]="supportedActions"
-                            [ruleTriggers]="supportedTriggers"
-                            (delete)="delete(rule)"
-                            (toggle)="toggle(rule)">
-                        </sqx-rule>
-                    </table>
-                </ng-container>
+                {{ 'rules.runningRule' | sqxTranslate: { name: runningRule.name || 'Unnamed Rule' } }}
             </div>
+
+            <ng-container *ngIf="supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); let rules">
+                <div class="table-items-row table-items-row-summary table-items-row-empty" *ngIf="rules.length === 0">
+                    {{ 'rules.empty' | sqxTranslate }}
+    
+                    <button type="button" class="btn btn-success btn-sm ms-1" routerLink="new" *ngIf="rulesState.canCreate | async">
+                        <i class="icon icon-plus"></i> {{ 'rules.emptyAddRule' | sqxTranslate }}
+                    </button>
+                </div>
+    
+                <sqx-rule *ngFor="let rule of rules; trackBy: trackByRule"
+                    [rule]="rule"
+                    [ruleActions]="supportedActions"
+                    [ruleTriggers]="supportedTriggers"
+                    (delete)="delete(rule)"
+                    (toggle)="toggle(rule)">
+                </sqx-rule>
+            </ng-container>
         </sqx-list-view>
     </ng-container>
 
-    <ng-container sidebar>
+    <ng-container sidebarMenu>
         <div class="panel-nav">
             <a class="panel-link panel-link-gray" routerLink="events" routerLinkActive="active" title="i18n:common.history" titlePosition="left" *ngIf="rulesState.canReadEvents | async">
                 <i class="icon-time"></i>
@@ -72,6 +56,6 @@
             </sqx-onboarding-tooltip>
         </div>
     </ng-container>
-</sqx-panel>
+</sqx-layout>
 
 <router-outlet></router-outlet>

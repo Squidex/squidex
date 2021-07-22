@@ -1,5 +1,5 @@
-<div class="comment row no-gutters">
-    <div class="col-auto pr-2">
+<div class="comment row g-0">
+    <div class="col-auto pe-2">
         <img class="user-picture" title="{{comment.user | sqxUserNameRef}}" [src]="comment.user | sqxUserPictureRef">
     </div>
 
@@ -48,7 +48,7 @@
                 </textarea>
     
                 <div>
-                    <button type="button" class="btn btn-sm btn-text-secondary mr-1" (click)="cancelEdit()">
+                    <button type="button" class="btn btn-sm btn-text-secondary me-1" (click)="cancelEdit()">
                         {{ 'common.cancel' | sqxTranslate }}
                     </button>
 

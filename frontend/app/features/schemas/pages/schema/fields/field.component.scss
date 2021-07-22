@@ -4,9 +4,7 @@ $field-line: #c7cfd7;
 $padding: 1rem;
 
 .table-items-row-details {
-    & {
-        cursor: default;
-    }
+    cursor: default;
 
     &::before {
         right: 4.8rem;
@@ -25,18 +23,13 @@ $padding: 1rem;
 }
 
 .col {
-    &-tags,
-    &-options {
-        white-space: nowrap;
-    }
-
     &-options {
         max-width: 140px;
     }
 }
 
 .nested-fields {
-    background: $color-theme-secondary;
+    background: $color-border-lighter;
     border: 0;
     padding: $padding;
     padding-left: 2 * $padding;
@@ -44,9 +37,7 @@ $padding: 1rem;
 }
 
 .nested-field {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     &-add {
         border: 2px dashed $field-line;
@@ -70,12 +61,10 @@ $padding: 1rem;
 }
 
 .field {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     &-icon {
-        color: $color-border-dark;
+        color: $color-border-darker;
         font-size: 1.2rem;
         font-weight: normal;
         margin-right: 1rem;
@@ -92,7 +81,7 @@ $padding: 1rem;
 
     &-partitioning {
         color: $color-text-decent;
-        font-size: .85rem;
+        font-size: $font-smallest;
         font-weight: normal;
     }
 

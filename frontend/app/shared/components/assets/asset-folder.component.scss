@@ -11,12 +11,10 @@ img {
 }
 
 .card {
-    & {
-        border-bottom-width: 1px;
-        border-width: 1px;
-        cursor: pointer;
-        width: $asset-width;
-    }
+    border-width: 1px;
+    border-bottom-width: 1px;
+    cursor: pointer;
+    width: $asset-width;
 
     &-body {
         font-size: 1.1rem;
@@ -28,7 +26,7 @@ img {
 }
 
 .icon-folder {
-    color: $color-dark1-border1;
+    color: $color-text;
     margin-right: .5rem;
     margin-top: 0;
 }

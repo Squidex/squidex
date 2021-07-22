@@ -5,9 +5,9 @@
     (cdkDropListDropped)="changeCategory($event)">
 
     <div class="header clearfix">
-        <div class="row no-gutters">
+        <div class="row g-0 align-items-center mb-1">
             <div class="col-auto">
-                <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggle()">
+                <button type="button" class="btn btn-sm btn-text-secondary btn-toggle" (click)="toggle()">
                     <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
                 </button>
             </div>
@@ -18,7 +18,7 @@
             </div>
             <div class="col-auto">
                 <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
-                    ({{filteredSchemas.length}})
+                    <span class="badge rounded-pill badge-secondary">{{filteredSchemas.length}}</span>
                 </ng-container>
                 <ng-template #noSchemas>
                     <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()" *ngIf="schemaCategory.name">
@@ -29,40 +29,24 @@
         </div>
     </div>
 
-    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
+    <div class="nav nav-light flex-column" *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
         <ng-container *ngIf="!forContent; else simpleMode">
-            <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item"
-                [style.height]="getItemHeight()"
-                routerLinkActive="active"
+            <div *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
                 cdkDrag
                 cdkDragLockAxis="y"
                 [cdkDragData]="schema"
                 (cdkDragStarted)="dragStarted($event)">
 
-                <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+                <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
+                    <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 
-                <a class="nav-link" [routerLink]="schemaRoute(schema)">
-                    <div class="row">
-                        <div class="col-4">
-                            <span class="schema-name schema-name-accent" title="{{schema.displayName}}" titlePosition="top-left">{{schema.displayName}}</span> 
-                        </div>
-                        <div class="col-4">
-                            <span class="schema-user">
-                                <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
-                            </span>
-                        </div>
-                        <div class="col-4 schema-modified">
-                            <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
-                            
-                            <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
-                        </div>
-                    </div>
+                    <span class="item-published me-1" [class.unpublished]="!schema.isPublished"></span> {{schema.displayName}}
                 </a>
             </div>
         </ng-container>
     
         <ng-template #simpleMode>
-            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item">
+            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate">
                 <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
                     <span class="schema-name">{{schema.displayName}}</span>
                 </a>

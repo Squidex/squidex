@@ -3,6 +3,8 @@
 
 @import './../../node_modules/bootstrap/scss/mixins/_buttons';
 
+/* stylelint-disable */
+
 //
 // Bade colors
 //
@@ -44,58 +46,36 @@
     }
 }
 
-// 
-// Alert overrides.
-//
-.alert-success,
-.alert-warning,
-.alert-info,
-.alert-danger {
+.input-group {
     & {
+        // Fix drop shadow with custom border radius.
         border: 0;
-    }
-
-    .alert-link {
-        color: $color-dark-foreground !important;
-        font-size: inherit;
-        font-weight: normal;
-        text-decoration: underline;
-    }
-
-    .close {
-        & {
-            font-size: 1.6rem;
-            font-weight: 400;
-            padding-top: .25rem;
-        }
-
-        &:hover,
-        &:focus {
-            color: inherit;
-        }
+        border-radius: $border-radius;
+        box-shadow: $input-shadow;
+        flex-wrap: nowrap;
     }
 }
 
-.alert-info {
-    background: $color-theme-blue;
-    border: 0;
+.alert {
+    .alert-link {
+        color: inherit;
+    }
 }
 
 .alert-hint {
     background: lighten($color-theme-blue, 35%);
-    border: 1px solid $color-border;
-    border-radius: 0;
+    border: 0;
+    border-radius: $border-radius;
     color: $color-text;
     font-size: 90%;
     font-weight: normal;
-
-    .alert-link {
-        color: $color-text !important;
-    }
+    padding-left: 3rem;
+    position: relative;
 
     i {
+        @include absolute(1rem, null, null, 1rem);
         color: $color-theme-blue;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: normal;
         vertical-align: text-bottom;
     }
@@ -131,6 +111,10 @@ a {
     }
 }
 
+.navbar {
+    @include box-shadow-outer(0, 2px, 4px, .2);
+}
+
 .navbar-nav {
     .nav-link {
         cursor: pointer;
@@ -138,31 +122,15 @@ a {
 
     .nav-icon {
         & {
-            line-height: 2rem;
             margin-left: .5rem;
-            margin-right: 0;
-            position: relative;
-            vertical-align: middle;
         }
 
         .nav-link {
-            color: $color-dark-foreground;
-            padding-bottom: 0;
-            padding-top: 0;
-
             i {
                 font-size: 1.5rem;
                 font-weight: lighter;
                 vertical-align: middle;
             }
-        }
-
-        .badge {
-            @include absolute(-.25rem, auto, auto, -.375rem);
-            background: $color-theme-error;
-            font-size: .75rem;
-            font-weight: normal;
-            padding: .25rem .5rem;
         }
     }
 }
@@ -173,10 +141,29 @@ a {
 .dropdown-menu {
     // White dropdown menu without border and shadow.
     & {
-        @include box-shadow-outer(0, 3px, 16px, .2);
-        background: $panel-light-background;
-        border: 0;
         z-index: 1200;
+    }
+
+    .dropdown-header {
+        font-size: 80%;
+        text-transform: uppercase;
+    }
+
+    .dropdown-divider {
+        margin-left: 1rem;
+        margin-right: 1rem;
+
+        &:first-child {
+            display: none;
+        }
+        
+        &:last-child {
+            display: none;
+        }
+
+        & + .dropdown-divider {
+            display: none;
+        }
     }
 
     a {
@@ -187,23 +174,20 @@ a {
             }
 
             &:hover {
-                color: $color-theme-error-dark;
+                background: $color-theme-error-dark;
+                // Make the color white on active.
+                color: $color-white;
             }
 
             &:active {
                 background: $color-theme-error-dark;
+                // Make the color white on active.
+                color: $color-white;
             }
 
             &:disabled,
             &.disabled {
                 color: lighten($color-theme-error, 20%);
-            }
-        }
-
-        &.dropdown-item {
-            // Make the color white on active.
-            &:active {
-                color: $color-dark-foreground;
             }
         }
     }
@@ -213,14 +197,10 @@ a {
 // Breadcrump
 //
 .breadcrumb {
-    & {
-        background: none;
-        border: 1px solid $color-border;
-        margin-bottom: 2rem;
-    }
-
     &.steps {
         & {
+            border: 1px solid $color-border;
+            border-radius: $border-radius;
             padding: 0;
         }
 
@@ -287,77 +267,17 @@ a {
     }
 }
 
-.dropdown-divider {
-    &:first-child {
-        display: none;
-    }
-
-    &:last-child {
-        display: none;
-    }
-
-    & + .dropdown-divider {
-        display: none;
-    }
-}
-
-//
-// Dark vertical menu for dark panels.
-//
-.nav-dark {
-    & {
-        background: $color-dark2-background;
-    }
-
-    .nav-item + .nav-item {
-        margin: 0;
-    }
-
-    &-bordered {
-        .nav-link {
-            border-bottom: 1px solid $color-dark2-separator;
-        }
-
-        .nav-item {
-            &:last-child {
-                .nav-link {
-                    // Keep border between two items, not after last item.
-                    border: 0;
-                }
-            }
-        }
-    }
-
-    .nav-link {
-        & {
-            color: $color-dark2-foreground;
-        }
-
-        &:hover,
-        &.active {
-            color: $color-dark1-focus-foreground;
-        }
-
-        &.active {
-            background: $color-dark2-active-background;
-        }
-    }
-}
-
 //
 // Tab control navigation.
 //
 .nav-tabs2 {
-    & {
-        @include absolute(auto, auto, 0, 1.25rem);
-    }
-
     & .nav-link {
         & {
-            border-bottom: .25rem solid transparent;
+            border-bottom: 2px solid transparent;
             color: $color-text;
             cursor: pointer;
-            margin: 0 1rem;
+            margin-left: 1rem;
+            margin-right: 1rem;
             padding: 1rem 0;
             text-align: center;
         }
@@ -373,90 +293,54 @@ a {
     }
 }
 
-//
-// Corresponding icon colors for external login buttons.
-//
-.icon {
-    &-github {
-        color: $color-extern-github-icon;
-    }
-
-    &-google {
-        color: $color-extern-google-icon;
-    }
-
-    &-microsoft {
-        color: $color-extern-microsoft-icon;
-    }
-
-    &-twitter {
-        color: $color-extern-twitter-icon;
-    }
-}
-
 .icon-sm {
     font-size: 70%;
+}
+
+.icon-decent {
+    opacity: .5;
 }
 
 //
 // Button improvements
 //
 .btn {
+    &.active {
+        box-shadow: none;
+    }
+
+    &-outline-secondary {
+        color: $color-text-decent;
+
+        &:hover {
+            color: $color-text;
+
+        }
+    }
+
     // Buttons for external logins.
     &-github {
         @include button-variant($color-extern-github, $color-extern-github);
-
-        &:hover,
-        &:focus {
-            .icon-github {
-                color: darken($color-extern-github-icon, 5%);
-            }
-        }
     }
 
     &-google {
         @include button-variant($color-extern-google, $color-extern-google);
-
-        &:hover,
-        &:focus {
-            .icon-google {
-                color: darken($color-extern-google-icon, 5%);
-            }
-        }
     }
 
     &-microsoft {
         @include button-variant($color-extern-microsoft, $color-extern-microsoft);
-
-        &:hover,
-        &:focus {
-            .icon-microsoft {
-                color: darken($color-extern-microsoft-icon, 5%);
-            }
-        }
     }
 
     &-twitter {
         @include button-variant($color-extern-twitter, $color-extern-twitter);
-
-        & {
-            color: $color-dark-foreground;
-        }
-
-        &:hover,
-        &:focus {
-            .icon-twitter {
-                color: darken($color-extern-twitter-icon, 5%);
-            }
-        }
     }
 
     // Special radio button.
     &-radio {
         & {
-            @include border-radius;
             background: transparent;
             border: 1px solid $color-border;
+            border-radius: $border-radius;
             color: $color-text-decent;
             cursor: pointer;
             font-size: 1.5rem;
@@ -516,8 +400,8 @@ a {
     &-group {
         .btn-toggle {
             & {
-                background: $color-dark-foreground;
-                border: 1px solid $color-input;
+                background: $color-white;
+                border: 1px solid $color-theme-secondary;
             }
 
             &.btn-primary {
@@ -548,7 +432,6 @@ a {
 
     // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
     &-text {
-        &,
         &-primary {
             @include build-text-button($color-theme-blue);
         }
@@ -571,6 +454,10 @@ a {
 
         &-warning {
             @include build-text-button($color-theme-orange);
+        }
+
+        &-secondary2 {
+            @include build-text-button($color-text);
         }
     }
 
@@ -626,6 +513,7 @@ $icon-size: 4.5rem;
 //
 .modal {
     &-header,
+    &-tabs,
     &-footer {
         flex-shrink: 0;
     }
@@ -635,34 +523,27 @@ $icon-size: 4.5rem;
     }
 
     &-header {
-        & {
-            @include border-radius-top(.25rem);
-            background: $color-modal-header-background;
+        &.with-tabs {
             border: 0;
-            color: $color-modal-header-foreground;
+            padding-bottom: 0;
         }
 
         h4 {
-            font-size: 1rem;
-            font-weight: normal;
+            font-size: 1.1rem;
+            font-weight: 500;
             line-height: 2.25rem;
         }
+    }
 
-        .btn-close {
-            & {
-                color: $color-modal-header-foreground;
-            }
-
-            &:hover {
-                color: lighten($color-modal-header-foreground, 15%);
-            }
-        }
+    &-tabs {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
 
     &-content {
         @include box-shadow-outer(0, 8px, 16px, .3);
         border: 0;
-        border-radius: .4rem .35rem .35rem .4rem;
+        border-radius: $border-radius;
         max-height: 100%;
     }
 
@@ -686,9 +567,12 @@ $icon-size: 4.5rem;
     }
 
     &-tabs {
-        background: $color-theme-secondary;
-        padding: .75rem 1.25rem;
-        position: relative;
+        background-color: $color-white;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        padding-bottom: 0;
+        padding-left: .75rem;
+        padding-top: 0;
     }
 
     &-footer {
@@ -701,12 +585,12 @@ $icon-size: 4.5rem;
     }
 }
 
-//
-// Cards
-//
-.card {
-    border-bottom-width: 2px;
-    border-top-width: 0;
+.card-title {
+    margin-bottom: 1rem;
+}
+
+.card-footer {
+    padding: .75rem 1.25rem;
 }
 
 // 

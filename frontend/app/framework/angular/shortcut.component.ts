@@ -5,15 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
-import { ShortcutService, StatefulComponent } from '@app/framework/internal';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ShortcutService } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-shortcut',
     template: '',
 })
-export class ShortcutComponent extends StatefulComponent implements OnDestroy, OnInit {
-    private lastKeys: string;
+export class ShortcutComponent implements OnDestroy, OnInit {
+    private subscription?: Function;
 
     @Output()
     public trigger = new EventEmitter();
@@ -24,31 +24,21 @@ export class ShortcutComponent extends StatefulComponent implements OnDestroy, O
     @Input()
     public disabled?: boolean | null;
 
-    constructor(
-        changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly shortcutService: ShortcutService,
-        private readonly zone: NgZone,
     ) {
-        super(changeDetector, {});
-
         changeDetector.detach();
     }
 
     public ngOnDestroy() {
-        if (this.lastKeys) {
-            this.shortcutService.off(this.lastKeys);
-        }
+        this.subscription?.();
     }
 
     public ngOnInit() {
-        this.lastKeys = this.keys;
-
-        if (this.lastKeys) {
-            this.shortcutService.on(this.lastKeys, () => {
+        if (this.keys) {
+            this.subscription = this.shortcutService.listen(this.keys, () => {
                 if (!this.disabled) {
-                    this.zone.run(() => {
-                        this.trigger.next(true);
-                    });
+                    this.trigger.next(true);
                 }
 
                 return false;

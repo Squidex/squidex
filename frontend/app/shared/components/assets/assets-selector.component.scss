@@ -1,14 +1,12 @@
 :host ::ng-deep {
     .search {
         .form-control {
-            @include border-radius-right;
+            border-radius: 0 $border-radius $border-radius 0;
         }
 
         .tags {
-            & {
-                @include border-radius-left;
-                border-right: 0;
-            }
+            border-radius: $border-radius 0 0 $border-radius;
+            border-right: 0;
 
             &:focus,
             &.focus {
@@ -22,6 +20,6 @@
     }
 
     .modal-tabs {
-        background: $color-dark-foreground;
+        background: $color-white;
     }
 }

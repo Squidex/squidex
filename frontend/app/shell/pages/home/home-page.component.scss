@@ -1,7 +1,5 @@
 .card {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     &-body {
         padding: 2rem 3rem;
@@ -28,7 +26,8 @@
     }
 
     &-info {
-        font-size: .9rem;
+        font-size: $font-small;
+        font-weight: normal;
     }
 
     &-element {

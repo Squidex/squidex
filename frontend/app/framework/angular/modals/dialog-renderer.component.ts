@@ -17,7 +17,7 @@ interface State {
     notifications: ReadonlyArray<Notification>;
 
     // The current tooltip.
-    tooltip?: Tooltip | null;
+    tooltips: ReadonlyArray<Tooltip>;
 }
 
 @Component({
@@ -35,7 +35,7 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
     constructor(changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
     ) {
-        super(changeDetector, { notifications: [] });
+        super(changeDetector, { notifications: [], tooltips: [] });
     }
 
     public ngOnInit() {
@@ -73,11 +73,23 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
         this.own(
             this.dialogs.tooltips
                 .subscribe(tooltip => {
-                    if (tooltip.text) {
-                        this.next({ tooltip });
-                    } else if (!this.snapshot.tooltip || tooltip.target === this.snapshot.tooltip.target) {
-                        this.next({ tooltip: null });
-                    }
+                    this.next(s => {
+                        let tooltips = s.tooltips;
+
+                        if (tooltip.multiple || !tooltip.text) {
+                            tooltips = tooltips.filter(x => x.target !== tooltip.target);
+                        }
+
+                        if (tooltip.text) {
+                            if (tooltip.multiple) {
+                                tooltips = [tooltip, ...tooltips];
+                            } else {
+                                tooltips = [tooltip];
+                            }
+                        }
+
+                        return { ...s, tooltips };
+                    });
                 }));
     }
 

@@ -1,10 +1,14 @@
-// sass-lint:disable no-vendor-prefixes, one-declaration-per-line, no-misspelled-properties, no-color-keywords, no-color-literals
+/* stylelint-disable */
+
+@mixin text-code {
+    font-family: monospace;
+    font-size: 80%;
+    font-weight: normal;
+}
 
 @mixin build-icon($color) {
-    & {
-        color: $color;
-        transition: color .3s ease;
-    }
+    color: $color;
+    transition: color .3s ease;
 
     &:hover,
     &:focus {
@@ -13,20 +17,16 @@
 }
 
 @mixin build-toggle-button($color, $background) {
-    & {
-        background: $background;
-        border-color: $color;
-        color: $color;
-        z-index: 1000;
-    }
+    background: $background;
+    border-color: $color;
+    color: $color;
+    z-index: 1000;
 }
 
 @mixin build-text-button($color) {
-    & {
-        color: $color;
-    }
+    color: $color;
 
-    &:disabled
+    &:disabled,
     &.disabled {
         opacity: .4;
     }
@@ -57,12 +57,10 @@
         background: $background-color;
     }
 
-    & {
-        scrollbar-color: $foreground-color $background-color;
-        scrollbar-face-color: $foreground-color;
-        scrollbar-track-color: $background-color;
-        scrollbar-width: thin;
-    }
+    scrollbar-color: $foreground-color $background-color;
+    scrollbar-face-color: $foreground-color;
+    scrollbar-track-color: $background-color;
+    scrollbar-width: thin;
 }
 
 @mixin clearfix {
@@ -86,12 +84,12 @@
     max-width: $width;
     min-width: $width;
     // Normal width definition.
-    width:  $width;
+    width: $width;
 }
 
 @mixin force-height($height) {
     // Normal height definition.
-    height:  $height;
+    height: $height;
     // Ensure that we use the minimum height in flex scenarios.
     max-height: $height;
     min-height: $height;
@@ -129,9 +127,10 @@
 }
 
 @mixin circle($size) {
-    @include border-radius($size * .5);
     @include force-height($size);
     @include force-width($size);
+    border: 0;
+    border-radius: $size;
     display: inline-block;
 }
 
@@ -186,26 +185,6 @@
 
 @mixin box-shadow-inner($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
     box-shadow: inset $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
-}
-
-@mixin border-radius ($radius: 4px) {
-    border-radius: $radius;
-}
-
-@mixin border-radius-left ($radius: 4px) {
-    border-radius: $radius 0 0 $radius;
-}
-
-@mixin border-radius-right ($radius: 4px) {
-    border-radius: 0 $radius $radius 0;
-}
-
-@mixin border-radius-bottom ($radius: 4px) {
-    border-radius: 0 0 $radius $radius;
-}
-
-@mixin border-radius-top ($radius: 4px) {
-    border-radius: $radius $radius 0 0;
 }
 
 @mixin position($t: null, $r: null, $b: null, $l: null) {

@@ -1,3 +1,7 @@
+.user-ref {
+    padding-right: .25rem;
+}
+
 :host ::ng-deep {
     .user-ref {
         font-weight: 500;
@@ -12,20 +16,13 @@
     margin-top: .25rem;
 }
 
-.user-ref {
-    padding-right: .25rem;
-}
-
 .event {
-    & {
-        color: $color-text-decent;
-        font-size: .9rem;
-        font-weight: normal;
-        margin-bottom: 1.5rem;
-    }
+    font-size: $font-small;
+    font-weight: normal;
+    margin-bottom: 1.5rem;
 
     &-created {
-        font-size: .75rem;
+        font-size: $font-smallest;
     }
 
     &-right {

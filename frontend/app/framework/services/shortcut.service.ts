@@ -10,17 +10,19 @@ import * as Mousetrap from 'mousetrap';
 
 @Injectable()
 export class ShortcutService {
-    public on(keys: string, callback: (e: KeyboardEvent, combo: string) => void) {
-        return Mousetrap.bind(keys, (event: any, combo: any) => {
+    public listen(keys: string, callback: (e: KeyboardEvent, combo: string) => void): () => void {
+        const trimmed = keys.toLowerCase().replace(/\s/g, '').split(',');
+
+        Mousetrap.bind(trimmed, (event: any, combo: any) => {
             return callback(event, combo);
         });
+
+        return () => {
+            Mousetrap.unbind(trimmed);
+        };
     }
 
-    public off(keys: string) {
-        Mousetrap.unbind(keys);
-    }
-
-    public trigger(keys: string) {
+    public raise(keys: string) {
         Mousetrap.trigger(keys);
     }
 }

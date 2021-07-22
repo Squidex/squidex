@@ -20,7 +20,7 @@
             <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.dateTime.defaultMode' | sqxTranslate }}</label>
 
             <div class="col-3">
-                <select class="custom-select" formControlName="calculatedDefaultValue">
+                <select class="form-select" formControlName="calculatedDefaultValue">
                     <option></option>
                     <option *ngFor="let value of calculatedDefaultValues" [ngValue]="value">{{value}}</option>
                 </select>

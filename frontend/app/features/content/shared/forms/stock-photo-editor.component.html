@@ -1,5 +1,4 @@
-<div class="row no-gutters" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="600" [sqxResizeMaxWidth]="0">
-
+<div class="row g-0" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="600" [sqxResizeMaxWidth]="0">
     <div class="col-auto col-image" [class.expand]="snapshot.isCompact">
         <input class="form-control value" [formControl]="valueControl" readonly>
 
@@ -17,26 +16,25 @@
             </div>
         </ng-template>
     </div>
-    <div class="col pl-4" *ngIf="!snapshot.isCompact">
+
+    <div class="col ps-4" *ngIf="!snapshot.isCompact">
         <i class="icon-angle-left icon"></i>
 
         <input class="form-control" [formControl]="stockPhotoSearch" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}">
 
         <sqx-list-view [isLoading]="snapshot.isLoading" [table]="true">
-            <div content>
-                <div class="photos">
-                    <ng-container *ngIf="stockPhotos | async; let photos; trackBy: trackByPhoto">
-                        <div *ngFor="let photo of photos" class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
-                            <img [src]="photo.thumbUrl">
+            <div class="photos">
+                <ng-container *ngIf="stockPhotos | async; let photos; trackBy: trackByPhoto">
+                    <div *ngFor="let photo of photos" class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
+                        <img [src]="photo.thumbUrl">
 
-                            <div class="photo-user">
-                                <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick>
-                                    {{photo.user}}
-                                </a>
-                            </div>
+                        <div class="photo-user">
+                            <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick>
+                                {{photo.user}}
+                            </a>
                         </div>
-                    </ng-container>
-                </div>
+                    </div>
+                </ng-container>
             </div>
         </sqx-list-view>
     </div>

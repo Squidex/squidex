@@ -3,9 +3,7 @@
 }
 
 .editor {
-    & {
-        @include absolute(0, 0, 0, 0);
-    }
+    @include absolute(0, 0, 0, 0);
 
     &-progress {
         @include absolute(0, 0, null, 0);
@@ -41,9 +39,7 @@
 }
 
 .slug-generate {
-    & {
-        @include absolute(auto, 10px, 3px, auto);
-    }
+    @include absolute(auto, 10px, 3px, auto);
 
     &:focus {
         box-shadow: none;

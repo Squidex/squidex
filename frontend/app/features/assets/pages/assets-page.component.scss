@@ -1,10 +1,10 @@
 .search ::ng-deep {
     .form-control {
-        @include border-radius-right;
+        border-radius: 0 $border-radius $border-radius 0;
     }
 
     .tags {
-        @include border-radius-left;
+        border-radius: $border-radius 0 0 $border-radius;
         border-right: 0;
 
         &:focus,

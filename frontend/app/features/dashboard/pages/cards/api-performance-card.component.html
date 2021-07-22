@@ -2,11 +2,11 @@
     <div class="card-header">
         {{ 'dashboard.apiPerformanceCard' | sqxTranslate: { summary: chartSummary } }}
 
-        <div class="float-right">
-            <div class="custom-control custom-checkbox">
-                <input class="custom-control-input" type="checkbox" id="stacked" [ngModel]="isStacked" (ngModelChange)="isStackedChange.emit($event)">
+        <div class="float-end">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="stacked" [ngModel]="isStacked" (ngModelChange)="isStackedChange.emit($event)">
 
-                <label class="custom-control-label" for="stacked">
+                <label class="form-check-label" for="stacked">
                     {{ 'dashboard.stackedChart' | sqxTranslate }}
                 </label>
             </div>

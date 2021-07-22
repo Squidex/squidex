@@ -1,30 +1,30 @@
 <sqx-title message="i18n:common.contributors"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [showSidebar]="true" [grid]="true" closeQueryParamsHandling="">
-    <ng-container title>
-        {{ 'common.contributors' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" titleText="i18n:common.contributors" titleIcon="contributors" [width]="55">
     <ng-container menu>
-        <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
+        <div class="d-flex justify-content-end">
+            <sqx-notifo topic="apps/{{contributorsState.appId}}/settings/contributors"></sqx-notifo>
 
-        <button type="button" class="btn btn-text-secondary mr-2" (click)="reload()" title="i18n:contributors.refreshTooltip">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
-        </button>
+            <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:contributors.refreshTooltip" shortcut="CTRL + B">
+                <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+            </button>
 
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
-
-        <div class="form-inline">
-            <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" [ngModel]="contributorsState.query | async" (ngModelChange)="search($event)">
+            <div class="form-inline">
+                <input class="form-control" placeholder="{{ 'contributors.search' | sqxTranslate }}" 
+                    [ngModel]="contributorsState.query | async" 
+                    (ngModelChange)="search($event)"
+                    shortcut="CTRL + I"
+                    shortcutAction="focus">
+            </div>
         </div>
     </ng-container>
 
-    <ng-container content>
-        <sqx-list-view [isLoading]="contributorsState.isLoading | async">
-            <ng-container topHeader>
+    <ng-container>
+        <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading | async">
+            <ng-container>
                 <ng-container *ngIf="rolesState.roles | async; let roles">
                     <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
-                        <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
+                        <div class="alert alert-success mb-2" *ngIf="maxContributors > 0">
                             {{ 'contributors.planHint' | sqxTranslate: { maxContributors: maxContributors } }}
                         </div>
                     </ng-container>
@@ -32,17 +32,9 @@
                         <sqx-contributor-add-form
                             [roles]="roles">
                         </sqx-contributor-add-form>
-
-                        <div class="import-hint">
-                            <sqx-form-hint class="text-right">
-                                {{ 'contributors.importHintg' | sqxTranslate }} <a class="force" (click)="importDialog.show()">{{ 'contributors.importButton' | sqxTranslate }}</a>
-                            </sqx-form-hint>
-                        </div>
                     </ng-container>
                 </ng-container>
-            </ng-container>
 
-            <div content>
                 <ng-container *ngIf="contributorsState.contributorsFiltered | async; let contributors">
                     <ng-container *ngIf="rolesState.roles | async; let roles">                        
                         <ng-container *ngIf="contributors.length > 0; else noContributors">
@@ -54,13 +46,13 @@
                         </ng-container>
     
                         <ng-template #noContributors>
-                            <div class="table-items-row table-items-row-empty">
+                            <div class="table-items-row  table-items-row-summary table-items-row-empty">
                                 {{ 'contributors.empty' | sqxTranslate }}
                             </div>
                         </ng-template>
                     </ng-container>
                 </ng-container>
-            </div>
+            </ng-container>
 
             <ng-container footer>
                 <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)"></sqx-pager>
@@ -68,7 +60,7 @@
         </sqx-list-view>
     </ng-container>
 
-    <ng-container sidebar>
+    <ng-container sidebarMenu>
         <div class="panel-nav">
             <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left">
                 <i class="icon-time"></i>
@@ -79,12 +71,6 @@
             </a>
         </div>
     </ng-container>
-</sqx-panel>
-
-<ng-container *sqxModal="importDialog">
-    <sqx-import-contributors-dialog [roles]="(rolesState.roles | async)!" 
-        (close)="importDialog.hide()">
-    </sqx-import-contributors-dialog>
-</ng-container>
+</sqx-layout>
 
 <router-outlet></router-outlet>

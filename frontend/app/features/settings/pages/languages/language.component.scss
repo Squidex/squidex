@@ -12,17 +12,17 @@ $field-header: #e7ebef;
 
 .fallback {
     &-languages {
-        @include border-radius;
         background: $color-border;
         border-bottom: 1px solid $color-border;
+        border-radius: $border-radius;
         border-top: .5rem solid $color-border;
         padding: 0 .5rem;
     }
 
     &-language {
-        @include border-radius(2px);
-        background: $color-dark-foreground;
+        background: $color-white;
         border: 0;
+        border-radius: $border-radius;
         line-height: 2rem;
         margin: 0;
         margin-bottom: .5rem;

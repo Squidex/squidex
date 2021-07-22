@@ -1,33 +1,28 @@
 <sqx-title message="i18n:users.listPageTitle"></sqx-title>
 
-<sqx-panel desiredWidth="50rem" [grid]="true" closeQueryParamsHandling="">
-    <ng-container title>
-        {{ 'users.listTitle' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" titleText="i18n:users.listTitle" titleIcon="user-o" [width]="50">
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="i18n:users.refreshTooltip">
-            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
-        </button>
-
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
-        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-
-        <form class="form-inline mr-1" (ngSubmit)="search()">
-            <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="{{ 'users.search' | sqxTranslate }}">
-        </form>
-
-        <ng-container *ngIf="usersState.canCreate | async">
-            <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
-
-            <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="i18n:users.createTooltip">
-                <i class="icon-plus"></i> {{ 'users.create' | sqxTranslate }}
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:users.refreshTooltip" shortcut="CTRL + B">
+                <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
             </button>
-        </ng-container>
+    
+            <form class="form-inline ms-2" (ngSubmit)="search()">
+                <input class="form-control" [formControl]="usersFilter" placeholder="{{ 'users.search' | sqxTranslate }}"
+                    shortcut="CTRL + SHIFT + S"
+                    shortcutAction="focus">
+            </form>
+
+            <ng-container *ngIf="usersState.canCreate | async">
+                <button type="button" class="btn btn-success ms-2" routerLink="new" title="i18n:users.createTooltip" shortcut="CTRL + U">
+                    <i class="icon-plus"></i> {{ 'users.create' | sqxTranslate }}
+                </button>
+            </ng-container>
+        </div>
     </ng-container>
 
-    <ng-container content>
-        <sqx-list-view [isLoading]="usersState.isLoading | async" [table]="true">
+    <ng-container>
+        <sqx-list-view innerWidth="50rem" [isLoading]="usersState.isLoading | async" [table]="true">
             <ng-container header>
                 <table class="table table-items table-fixed" #header>
                     <thead>
@@ -49,17 +44,17 @@
                 </table>
             </ng-container>
                 
-            <div content>
+            <ng-container>
                 <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users" [sqxSyncWidth]="header">
                     <tbody *ngFor="let user of users; trackBy: trackByUser" [sqxUser]="user"></tbody>
                 </table>
-            </div>
+            </ng-container>
     
             <ng-container footer>
                 <sqx-pager [paging]="usersState.paging | async" (pagingChange)="usersState.page($event)"></sqx-pager>
             </ng-container>
         </sqx-list-view>
     </ng-container>
-</sqx-panel>
+</sqx-layout>
 
 <router-outlet></router-outlet>

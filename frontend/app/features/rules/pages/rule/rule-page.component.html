@@ -1,34 +1,41 @@
+<sqx-title message="i18n:rules.listPageTitle" [url]="['..']"></sqx-title>
 <sqx-title message="i18n:rules.itemPageTitle"></sqx-title>
 
-<form (ngSubmit)="save()">
-    <sqx-panel desiredWidth="54rem" [showSidebar]="true" (close)="back()">
+<form (ngSubmit)="save()">#
+    <sqx-layout layout="main" [width]="54">
         <ng-container title>
-            {{ 'common.rule' | sqxTranslate }}
-        </ng-container>
+            <div class="d-flex align-items-center">
+                <a class="btn btn-text-secondary" (click)="back()">
+                    <i class="icon-angle-left"></i>
+                </a>
     
+                <h3 class="title">{{ 'common.rule' | sqxTranslate }}</h3>
+            </div>
+        </ng-container>
+
         <ng-container menu>
             <div class="btn btn-outline-secondary btn-enabled" *ngIf="rule">
-                <span class="mr-1" *ngIf="isEnabled">
+                <span class="me-2" *ngIf="isEnabled">
                     {{ 'common.enabled' | sqxTranslate }}
                 </span>
     
-                <span class="mr-1" *ngIf="!isEnabled">
+                <span class="me-2" *ngIf="!isEnabled">
                     {{ 'common.disabled' | sqxTranslate }}
                 </span>
         
                 <sqx-toggle [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }" [disabled]="!isEditable"></sqx-toggle>
             </div>
 
-            <button type="button" class="btn btn-primary ml-2" (click)="save()">
+            <button type="button" class="btn btn-primary me-2" (click)="save()">
                 {{ 'common.save' | sqxTranslate }}
             </button>
         </ng-container>
     
-        <ng-container content>
-            <div *ngIf="supportedActions && supportedTriggers">
+        <ng-container>
+            <sqx-list-view innerWidth="54rem" *ngIf="supportedActions && supportedTriggers">
                 <div class="card mb-2">
                     <div class="card-header">
-                        <div class="row align-items-center no-gutters summary-row">
+                        <div class="row align-items-center g-0 summary-row">
                             <div class="col-auto col-syntax">
                                 <h3>{{ 'rules.ruleSyntax.if' | sqxTranslate }}</h3>
                             </div>
@@ -37,7 +44,7 @@
                                 <sqx-rule-element [type]="currentTrigger.type" [isSmall]="true" [element]="triggerElement" [disabled]="true"></sqx-rule-element>
                             </div>
 
-                            <div class="col text-right" *ngIf="currentTrigger && !rule">
+                            <div class="col text-end" *ngIf="currentTrigger && !rule">
                                 <button type="button" class="btn btn-text-danger" (click)="resetTrigger()">
                                     <i class="icon-bin2"></i>
                                 </button>
@@ -78,7 +85,7 @@
                         </ng-container>
         
                         <ng-template #triggerSelector>        
-                            <div class="row no-gutters">
+                            <div class="row g-0">
                                 <div *ngFor="let triggerType of supportedTriggers | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectTrigger(triggerType)">
                                         <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="supportedTriggers[triggerType]"></sqx-rule-element>
@@ -91,7 +98,7 @@
 
                 <div class="card">
                     <div class="card-header">    
-                        <div class="row align-items-center no-gutters summary-row">
+                        <div class="row align-items-center g-0 summary-row">
                             <div class="col-auto col-syntax">
                                 <h3>{{ 'rules.ruleSyntax.then' | sqxTranslate }}</h3>
                             </div>
@@ -100,7 +107,7 @@
                                 <sqx-rule-element [type]="currentAction.type" [isSmall]="true" [element]="actionElement" [disabled]="true"></sqx-rule-element>
                             </div>
 
-                            <div class="col text-right" *ngIf="currentAction && !rule">
+                            <div class="col text-end" *ngIf="currentAction && !rule">
                                 <button type="button" class="btn btn-text-danger" (click)="resetAction()">
                                     <i class="icon-bin2"></i>
                                 </button>
@@ -122,7 +129,7 @@
                         </ng-container>
                 
                         <ng-template #actionSelector>        
-                            <div class="row no-gutters">
+                            <div class="row g-0">
                                 <div *ngFor="let actionType of supportedActions | sqxKeys" class="col-12 col-md-6">
                                     <div class="rule-element" (click)="selectAction(actionType)">
                                         <sqx-rule-element [type]="actionType" [isSmall]="false" [element]="supportedActions[actionType]"></sqx-rule-element>
@@ -131,11 +138,11 @@
                             </div>
                         </ng-template>
                     </div>
-                </div>        
-            </div>
+                </div>
+            </sqx-list-view>
         </ng-container>
 
-        <ng-container sidebar>
+        <ng-container sidebarMenu>
             <div class="panel-nav">
                 <ng-container  *ngIf="rule && (rulesState.canReadEvents | async)">
                     <a class="panel-link panel-link-gray" routerLink="events" [queryParams]="{ ruleId: rule.id }" routerLinkActive="active" title="i18n:common.history" titlePosition="left">
@@ -156,7 +163,7 @@
                 </sqx-onboarding-tooltip>
             </div>
         </ng-container>
-    </sqx-panel>
+    </sqx-layout>
 </form>
 
 <router-outlet></router-outlet>

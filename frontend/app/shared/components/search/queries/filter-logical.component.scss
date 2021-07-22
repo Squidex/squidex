@@ -6,9 +6,7 @@ $field-line: #e1e8ef;
 }
 
 .filter {
-    & {
-        position: relative;
-    }
+    position: relative;
 
     &-line-v {
         @include absolute(-.5rem, auto, 1.8rem, 1.5rem);

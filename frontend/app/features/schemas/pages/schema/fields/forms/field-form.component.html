@@ -17,12 +17,12 @@
         </li>
     </ul>
 
-    <div class="float-right" *ngIf="showButtons">
+    <div class="float-end" *ngIf="showButtons">
         <button [disabled]="field.isLocked" type="reset" class="btn btn-text-secondary" (click)="cancel.emit()">
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 
-        <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">
+        <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ms-1" *ngIf="isEditable">
             {{ 'common.save' | sqxTranslate }}
         </button>
     </div>

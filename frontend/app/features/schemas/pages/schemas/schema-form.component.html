@@ -31,7 +31,7 @@
                         <label>
                             <input type="radio" class="radio-input" name="type" formControlName="type" [value]="'Default'">
                         
-                            <div class="row no-gutters">
+                            <div class="row g-0">
                                 <div class="col-auto">
                                     <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Default'">
                                         <i class="icon-multiple-content"></i>
@@ -49,7 +49,7 @@
                         <label>
                             <input type="radio" class="radio-input" name="type" formControlName="type" [value]="'Singleton'">
                         
-                            <div class="row no-gutters">
+                            <div class="row g-0">
                                 <div class="col-auto">
                                     <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Singleton'">
                                         <i class="icon-single-content"></i>
@@ -66,7 +66,7 @@
                         <label>
                             <input type="radio" class="radio-input" name="type" formControlName="type" [value]="'Component'">
                         
-                            <div class="row no-gutters">
+                            <div class="row g-0">
                                 <div class="col-auto">
                                     <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Component'">
                                         <i class="icon-component"></i>
@@ -90,7 +90,7 @@
                 <div class="form-group" *ngIf="categories.size > 0">
                     <label for="category">{{ 'common.category' | sqxTranslate }}</label>
             
-                    <select class="custom-select" id="category" formControlName="initialCategory">
+                    <select class="form-select" id="category" formControlName="initialCategory">
                         <option></option>
                         <option *ngFor="let category of categories" [ngValue]="category">{{category}}</option>
                     </select>
@@ -98,10 +98,10 @@
             </ng-container>
 
             <div class="form-group">
-                <button type="button" class="btn btn-sm btn-text" (click)="toggleImport()" [class.hidden]="showImport">
+                <button type="button" class="btn btn-sm btn-text-secondary" (click)="toggleImport()" [class.hidden]="showImport">
                     {{ 'schemas.import' | sqxTranslate }}
                 </button>
-                <button type="button" class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="!showImport">
+                <button type="button" class="btn btn-sm btn-text-secondary force" (click)="toggleImport()" [class.hidden]="!showImport">
                     {{ 'common.hide' | sqxTranslate }}
                 </button>
         

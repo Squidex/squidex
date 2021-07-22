@@ -1,12 +1,10 @@
-
 .content-status {
-
     &.default {
         color: $color-text-decent;
     }
 
     &.pending {
-        color: $color-dark-black;
+        color: $color-black;
     }
 
     &-summary {
@@ -16,7 +14,7 @@
 
     &-scheduled {
         color: $color-text !important;
-        font-size: .9rem;
+        font-size: $font-small;
         font-weight: normal;
     }
 

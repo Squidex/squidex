@@ -3,7 +3,7 @@
         {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
 
-    <small class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</small>
+    <small class="field-disabled ps-1" *ngIf="field.isDisabled">Disabled</small>
 
     <sqx-control-errors *ngIf="form" [for]="editorControl" [fieldName]="field.displayName"></sqx-control-errors>
 
@@ -39,9 +39,9 @@
                             <sqx-toggle [formControl]="editorControl" [threeStates]="!field.properties.isRequired"></sqx-toggle>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Checkbox'">
-                            <div class="custom-control custom-checkbox">
-                                <input class="custom-control-input" type="checkbox" [formControl]="editorControl" id="{{uniqueId}}" sqxIndeterminateValue [threeStates]="!field.properties.isRequired">
-                                <label class="custom-control-label" for="{{uniqueId}}"></label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" [formControl]="editorControl" id="{{uniqueId}}" sqxIndeterminateValue [threeStates]="!field.properties.isRequired">
+                                <label class="form-check-label" for="{{uniqueId}}"></label>
                             </div>
                         </ng-container>
                     </ng-container>
@@ -84,15 +84,15 @@
 							<sqx-stars [formControl]="editorControl" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Dropdown'">
-							<select class="custom-select" [formControl]="editorControl">
+							<select class="form-select" [formControl]="editorControl">
 								<option [ngValue]="null"></option>
 								<option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
 							</select>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-							<div class="custom-control custom-radio custom-control-inline" *ngFor="let value of field.rawProperties.allowedValues">
-								<input class="custom-control-input" type="radio" [value]="value" [formControl]="editorControl" [name]="uniqueId" id="{{uniqueId}}_{{value}}">
-								<label class="custom-control-label" for="{{uniqueId}}_{{value}}">
+							<div class="form-check" *ngFor="let value of field.rawProperties.allowedValues">
+								<input class="form-check-input" type="radio" [value]="value" [formControl]="editorControl" [name]="uniqueId" id="{{uniqueId}}_{{value}}">
+								<label class="form-check-label" for="{{uniqueId}}_{{value}}">
 									{{value}}
 								</label>
 							</div>
@@ -158,15 +158,15 @@
 							<sqx-stock-photo-editor [formControl]="editorControl"></sqx-stock-photo-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Dropdown'">
-							<select class="custom-select" [formControl]="editorControl">
+							<select class="form-select" [formControl]="editorControl">
 								<option [ngValue]="null"></option>
 								<option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
 							</select>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Radio'">
-							<div class="custom-control custom-radio custom-control-inline" *ngFor="let value of field.rawProperties.allowedValues">
-								<input class="custom-control-input" type="radio" [value]="value" [formControl]="editorControl" [name]="uniqueId" id="{{uniqueId}}_{{value}}">
-								<label class="custom-control-label" for="{{uniqueId}}_{{value}}">
+							<div class="form-check custom-control-inline" *ngFor="let value of field.rawProperties.allowedValues">
+								<input class="form-check-input" type="radio" [value]="value" [formControl]="editorControl" [name]="uniqueId" id="{{uniqueId}}_{{value}}">
+								<label class="form-check-label" for="{{uniqueId}}_{{value}}">
 									{{value}}
 								</label>
 							</div>
@@ -185,7 +185,7 @@
                             <sqx-checkbox-group [formControl]="editorControl" [values]="field.rawProperties.allowedValues"></sqx-checkbox-group>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Dropdown'">
-                            <select multiple class="custom-select" [formControl]="editorControl">
+                            <select multiple class="form-select" [formControl]="editorControl">
                                 <option *ngFor="let value of field.rawProperties.allowedValues" [ngValue]="value">{{value}}</option>
                             </select>
                         </ng-container>
@@ -198,12 +198,13 @@
 		</ng-template>
     </div>
 
-    <div *ngIf="canUnset" class="unset" title="i18n:contents.unsetValue">
-        <button type="button" class="btn btn-sm btn-text-secondary force" [disabled]="isEmpty | async" 
+    <div *ngIf="canUnset" class="unset" >
+        <button type="button" class="btn btn-sm btn-text-secondary force" [disabled]="isEmpty | async"
             (sqxConfirmClick)="unset()"
             confirmTitle="i18n:contents.unsetValueConfirmTitle"
             confirmText="i18n:contents.unsetValueConfirmText"
-            confirmRememberKey="unsetValue">
+            confirmRememberKey="unsetValue"
+            title="i18n:contents.unsetValue">
             <i class="icon-close"></i>
         </button>
     </div>

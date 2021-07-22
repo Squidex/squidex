@@ -26,20 +26,20 @@
                     <div class="overlay-background"></div>
                     
                     <div class="overlay-menu">
-                        <a class="file-edit ml-2" (click)="edit()" *ngIf="!isDisabled">
+                        <a class="file-edit ms-2" (click)="edit()" *ngIf="!isDisabled">
                             <i class="icon-pencil"></i>
                         </a>
 
-                        <a class="file-download ml-2" [href]="asset | sqxAssetUrl:asset.version:false" sqxStopClick sqxExternalLink="noicon">
+                        <a class="file-download ms-2" [href]="asset | sqxAssetUrl:asset.version:false" sqxStopClick sqxExternalLink="noicon">
                             <i class="icon-download"></i>
                         </a>
 
-                        <a class="file-folder ml-2" (click)="selectFolder.emit(asset.parentId)">
+                        <a class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)">
                             <i class="icon-folder"></i>
                         </a>
 
                         <ng-container *ngIf="!isDisabled">
-                            <a class="file-delete ml-2" *ngIf="!removeMode && asset.canDelete"
+                            <a class="file-delete ms-2" *ngIf="!removeMode && asset.canDelete"
                                 (sqxConfirmClick)="delete.emit()"
                                 confirmTitle="i18n:assets.deleteConfirmTitle"
                                 confirmText="i18n:assets.deleteConfirmText"
@@ -47,7 +47,7 @@
                                 <i class="icon-delete"></i>
                             </a>
 
-                            <a class="file-delete ml-2" *ngIf="removeMode"
+                            <a class="file-delete ms-2" *ngIf="removeMode"
                                 (sqxConfirmClick)="remove.emit()"
                                 confirmTitle="i18n:assets.removeConfirmTitle"
                                 confirmText="i18n:assets.removeConfirmText"
@@ -102,7 +102,7 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row" (click)="select.emit()" 
+    <div class="table-items-row table-items-row-summary" (click)="select.emit()" 
         [class.selectable]="isSelectable" 
         (sqxDropFile)="updateFile($event)"
         [sqxDropDisabled]="!asset || !asset.canUpload"
@@ -138,7 +138,7 @@
                         <td class="col-user">
                             <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [src]="asset.lastModifiedBy | sqxUserPictureRef">
                         </td>
-                        <td class="col-actions text-right">
+                        <td class="col-actions text-end">
                             <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl:asset.version:false" sqxStopClick sqxExternalLink="noicon">
                                 <i class="icon-download"></i>
                             </a>
@@ -149,7 +149,7 @@
                         </td>
                     </ng-container>
 
-                    <td class="col-delete text-right">
+                    <td class="col-delete text-end">
                         <button type="button" class="btn btn-text-danger" *ngIf="!removeMode && asset.canDelete" [disabled]="isDisabled"
                             (sqxConfirmClick)="delete.emit()"
                             confirmTitle="i18n:assets.deleteConfirmTitle"

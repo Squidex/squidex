@@ -1,21 +1,14 @@
-<sqx-panel desiredWidth="20rem" [isBlank]="true" [isLazyLoaded]="false">
-    <ng-container title>
-        {{ 'common.workflow' | sqxTranslate }}
-    </ng-container>
-
-    <ng-container content>
+<sqx-layout layout="simple" titleText="i18n:common.workflow" [width]="20" [white]="true" [overflow]="true" [padding]="true">
+    <ng-container>
         <div class="section mb-4">
             <label for="id">{{ 'common.id' | sqxTranslate }}</label>
 
-            <div class="row no-gutters">
-                <div class="col">
-                    <input readonly class="form-control" name="id" id="id" value="{{content.id}}" #inputId>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-text" [sqxCopy]="inputId">
-                        <i class="icon-copy"></i>
-                    </button>
-                </div>
+            <div class="input-group">
+                <input readonly class="form-control" name="id" id="id" value="{{content.id}}" #inputId>
+        
+                <button type="button" class="btn btn-outline-secondary" [sqxCopy]="inputId">
+                    <i class="icon-copy"></i>
+                </button>
             </div>
         </div>
 
@@ -133,6 +126,6 @@
             </sqx-content-event>
         </div>
     </ng-container>
-</sqx-panel>
+</sqx-layout>
 
 <sqx-due-time-selector [disabled]="disableScheduler" #dueTimeSelector></sqx-due-time-selector>

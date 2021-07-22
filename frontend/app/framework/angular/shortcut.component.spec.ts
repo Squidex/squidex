@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { NgZone } from '@angular/core';
 import { ShortcutService } from '@app/framework/internal';
 import { ShortcutComponent } from './shortcut.component';
 
@@ -17,20 +16,14 @@ describe('ShortcutComponent', () => {
     };
 
     let shortcutService: ShortcutService;
+    let shortcutComponent: ShortcutComponent;
 
     beforeEach(() => {
         shortcutService = new ShortcutService();
-    });
-
-    it('should instantiate', () => {
-        const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
-
-        expect(shortcutComponent).toBeDefined();
+        shortcutComponent = new ShortcutComponent(changeDetector, shortcutService);
     });
 
     it('should init without keys', () => {
-        const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
-
         shortcutComponent.keys = null!;
         shortcutComponent.ngOnInit();
 
@@ -38,8 +31,6 @@ describe('ShortcutComponent', () => {
     });
 
     it('should destroy without keys', () => {
-        const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
-
         shortcutComponent.keys = null!;
         shortcutComponent.ngOnDestroy();
 
@@ -47,22 +38,18 @@ describe('ShortcutComponent', () => {
     });
 
     it('should raise event if triggered', () => {
-        const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
-
         let isTriggered = false;
 
         shortcutComponent.keys = 'ctrl+a';
         shortcutComponent.ngOnInit();
         shortcutComponent.trigger.subscribe(() => { isTriggered = true; });
 
-        shortcutService.trigger('ctrl+a');
+        shortcutService.raise('ctrl+a');
 
         expect(isTriggered).toBeTruthy();
     });
 
     it('should not raise event if triggered but disabled', () => {
-        const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
-
         let isTriggered = false;
 
         shortcutComponent.keys = 'ctrl+a';
@@ -70,14 +57,12 @@ describe('ShortcutComponent', () => {
         shortcutComponent.trigger.subscribe(() => { isTriggered = true; });
         shortcutComponent.disabled = true;
 
-        shortcutService.trigger('ctrl+a');
+        shortcutService.raise('ctrl+a');
 
         expect(isTriggered).toBeFalsy();
     });
 
     it('should not raise event if triggered but destroyed', () => {
-        const shortcutComponent = new ShortcutComponent(changeDetector, shortcutService, new NgZone({}));
-
         let isTriggered = false;
 
         shortcutComponent.keys = 'ctrl+a';
@@ -85,7 +70,7 @@ describe('ShortcutComponent', () => {
         shortcutComponent.trigger.subscribe(() => { isTriggered = true; });
         shortcutComponent.ngOnDestroy();
 
-        shortcutService.trigger('ctrl+a');
+        shortcutService.raise('ctrl+a');
 
         expect(isTriggered).toBeFalsy();
     });

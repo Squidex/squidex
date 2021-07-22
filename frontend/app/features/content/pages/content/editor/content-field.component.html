@@ -1,11 +1,13 @@
-<div class="row no-gutters" [class.compare]="formModelCompare">
+<div class="row g-0" [class.compare]="formModelCompare">
     <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
-        <div class="table-items-row" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
+        <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons">
-                    <button *ngIf="isTranslatable" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="i18n:contents.autotranslate">
-                        <i class="icon-translate"></i>
-                    </button>
+                    <ng-container *ngIf="!formModel.field.isDisabled">
+                        <button *ngIf="isTranslatable" type="button" class="btn btn-text-secondary btn-sm me-1" title="i18n:contents.autotranslate" (click)="translate()">
+                            <i class="icon-translate"></i>
+                        </button>
+                    </ng-container>
     
                     <sqx-field-languages 
                         [field]="formModel.field"
@@ -21,7 +23,7 @@
             <ng-container *ngIf="showAllControls; else singleControl">
                 <div class="form-group" *ngFor="let language of languages">
                     <sqx-field-editor
-                        [canUnset]="true"
+                        [canUnset]="!formModel.field.isDisabled"
                         [form]="form"
                         [formContext]="formContext"
                         [formModel]="formModel.get(language)"
@@ -34,7 +36,7 @@
         
             <ng-template #singleControl>
                 <sqx-field-editor
-                    [canUnset]="true"
+                    [canUnset]="!formModel.field.isDisabled"
                     [form]="form"
                     [formContext]="formContext"
                     [formModel]="getControl()"
@@ -50,7 +52,7 @@
             <i class="icon-arrow_back"></i>
         </button>
 
-        <div class="table-items-row" *ngIf="!(formModelCompare!.hiddenChanges | async)">
+        <div class="table-items-row table-items-row-summary" *ngIf="!(formModelCompare!.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons-compare">
                     <sqx-field-languages

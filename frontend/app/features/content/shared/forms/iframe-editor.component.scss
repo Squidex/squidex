@@ -6,7 +6,7 @@ iframe {
 
 .fullscreen {
     @include fixed(0, 0, 0, 0);
-    background: $panel-light-background;
+    background: $color-white;
     border: 0;
     border-radius: 0;
     z-index: 1040;

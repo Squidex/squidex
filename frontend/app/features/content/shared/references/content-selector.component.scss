@@ -2,14 +2,6 @@
     .modal-body {
         background: $color-background;
     }
-
-    .modal-tabs {
-        background: $color-dark-foreground;
-    }
-
-    .form-control-dark {
-        border: 1px solid darken($color-modal-header-foreground, 20%);
-    }
 }
 
 .col-selector {
@@ -18,7 +10,7 @@
     .form-control {
         @include absolute(-.125rem, auto, auto, 0);
         @include force-width(300px);
-        color: $color-dark-foreground;
+        color: $color-white;
     }
 }
 

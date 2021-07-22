@@ -72,7 +72,7 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
             if (!this.topic) {
                 notifo.push(['show-notifications', element, { position: 'bottom-right' }]);
             } else {
-                notifo.push(['show-topic', element, this.topic, { style: 'bell' }]);
+                notifo.push(['show-topic', element, this.topic, { style: 'bell', position: 'bottom-right' }]);
             }
 
             if (element) {

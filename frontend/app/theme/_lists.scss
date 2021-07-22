@@ -1,12 +1,16 @@
 @import '_mixins';
 @import '_vars';
 
+/* stylelint-disable */
+
 //
 // Custom list that can either be used with a table or divs.
 //
 .table-items {
     & {
-        margin-bottom: -.25rem;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 0;
     }
 
     th,
@@ -35,10 +39,12 @@
         // Small font size for the table header, content is more important!
         th {
             border: 0;
-            color: $color-table-header;
+            color: $color-text-decent;
             font-size: .8rem;
             font-weight: normal;
             padding-top: 0;
+            text-decoration: none;
+            text-transform: uppercase;
             vertical-align: middle;
 
             // Auto truncate all header elements.
@@ -53,38 +59,33 @@
     //
     tbody {
         td {
+            background: $color-white;
+            border-bottom: 1px solid $color-border;
+            border-top: 1px solid $color-border;
             margin: 0;
             margin-bottom: 10px;
             vertical-align: middle;
+
+            &:first-child {
+                border-left: 1px solid $color-border;
+                border-radius: $border-radius 0 0 $border-radius;
+            }
+
+            &:last-child {
+                border-radius: 0 $border-radius $border-radius 0;
+                border-right: 1px solid $color-border;
+            }
         }
 
         tr {
-            // Each row is white and a has a border.
-            & {
-                background: $color-table-background;
-                border: 1px solid $color-table-border;
-                border-bottom: 2px solid $color-table-border;
-                margin-bottom: .5rem;
-            }
-
             &:focus {
                 outline: none;
             }
 
             // Blue background and white text when active.
             &.active {
-                & {
-                    background: $color-theme-blue;
+                td {
                     border-color: $color-theme-blue;
-                    color: $color-dark-foreground;
-                }
-
-                .btn-text {
-                    &,
-                    &:hover {
-                        // Enforce white color for links.
-                        color: $color-dark-foreground;
-                    }
                 }
             }
         }
@@ -95,27 +96,38 @@
     //
     &-row {
         & {
-            background: $color-table-background;
+            background: $color-white;
             border: 1px solid $color-border;
-            border-bottom-width: 2px;
-            border-top: 0;
+            border-radius: $border-radius;
             margin-bottom: .25rem;
-            padding: .75rem 1.25rem;
         }
 
         // Summary row for expandable rows.
         &-summary {
-            line-height: 2.5rem;
             padding: .75rem 1.25rem;
-            position: relative;
-        }
-
-        &-expandable {
-            padding: 0;
         }
 
         &-empty {
             color: $color-text-decent;
+        }
+
+        .btn-expand {
+            position: relative;
+
+            &.expanded {
+                background-color: $color-theme-blue-lightest;
+                border-color: $color-theme-blue-lightest;
+                color: $color-theme-blue;
+                font-size: inherit;
+                font-weight: 500;
+
+                // Caret that is placed next to the expand button.
+                &::before {
+                    @include caret-top($color-border-light, 10px);
+                    @include absolute(null, null, -1.1rem, 50%);
+                    margin-left: -10px;
+                }
+            }
         }
 
         // Detail row for expandable rows.
@@ -124,65 +136,45 @@
                 position: relative;
             }
 
-            // Caret that is placed next to the expand button.
-            &::before {
-                @include caret-top($color-theme-secondary);
-                @include absolute(-1.1rem, 0, auto, auto);
-            }
-
             &-tab {
                 padding: 1.5rem;
             }
 
             &-tabs {
-                background: $color-table-footer;
-                height: 70px;
-                padding: 1rem 1.25rem;
+                background: $color-border-light;
+                border: 0;
+                border-bottom: 2px solid $color-border;
+                height: 3.75rem;
+                padding: .75rem 1.25rem;
                 position: relative;
+
+                .nav-tabs2 {
+                    @include absolute(auto, auto, -2px, 1.25rem);
+                }
             }
         }
     }
 
-    // Footer that typically contains an add-item-form.
-    &-footer {
-        background: $color-table-footer;
-        border: 1px solid $color-input;
-        border-bottom-width: 2px;
-        margin-top: .75rem;
-        padding: .75rem 1.25rem;
-    }
-
     &-header {
-        background: $color-table-footer;
+        background: $color-theme-secondary;
         border-bottom: 1px solid $color-border-darker;
         margin-bottom: .75rem;
         padding: .75rem 1.25rem;
     }
 
-    // Edit or expand button.
-    &-edit-button {
-        & {
-            color: $color-theme-blue;
-            padding-left: 0;
-            padding-right: 0;
-            width: 2.2rem;
-        }
-
-        &:hover {
-            color: $color-theme-blue-dark !important;
-        }
-
-        &.active {
-            background: $color-theme-blue !important;
-            border-color: $color-theme-blue !important;
-            color: $color-dark-foreground !important;
-        }
-    }
-
     // Spacer item between two normal items, because table rows cannot have margins.
     .spacer {
         border: 0;
+        box-shadow: none;
         height: .25rem;
+    }
+}
+
+tbody {
+    &:last-child {
+        .spacer {
+            display: none
+        }
     }
 }
 
@@ -243,6 +235,16 @@
 
     &-actions-left {
         text-align: left;
+    }
+}
+
+.cell-select {
+    font-size: 1rem !important;
+    font-weight: normal;
+    text-transform: none;
+
+    .form-check {
+        margin: 0;
     }
 }
 

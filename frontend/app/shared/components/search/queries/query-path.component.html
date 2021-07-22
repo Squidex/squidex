@@ -5,9 +5,9 @@
     <ng-template let-field="$implicit">
         <div class="row">
             <div class="col-auto">
-                <div class="badge badge-pill badge-primary">{{model.fields[field].displayName}}</div>
+                <div class="badge rounded-pill badge-primary">{{model.fields[field].displayName}}</div>
             </div>
-            <div class="col text-right">
+            <div class="col text-end">
                 <sqx-form-hint>{{model.fields[field].description | sqxTranslate: model.fields[field]}}</sqx-form-hint>
             </div>
         </div>

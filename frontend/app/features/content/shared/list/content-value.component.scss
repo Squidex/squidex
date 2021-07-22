@@ -11,11 +11,11 @@
         top: 50%;
     }
 
-    img + span {
-        padding-left: 60px;
-    }
-
     span {
         @include truncate;
+    }
+
+    img + span {
+        padding-left: 60px;
     }
 }

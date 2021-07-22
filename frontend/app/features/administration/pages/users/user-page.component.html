@@ -1,43 +1,37 @@
 
 <form [formGroup]="userForm.form" (ngSubmit)="save()">
-    <input style="display:none" type="password" name="foilautofill">
+    <input style="display: none;" type="password" name="foilautofill">
 
-    <sqx-panel desiredWidth="26rem" [isBlank]="true" [isLazyLoaded]="false">
+    <sqx-layout layout="simple" [width]="30" [white]="true" [padding]="true" [overflow]="true">
         <ng-container title>
             <ng-container *ngIf="usersState.selectedUser | async; else noUserTitle">
                 <sqx-title message="i18n:users.editPageTitle"></sqx-title>
 
-                {{ 'users.editTitle' | sqxTranslate }}
+                <h3>{{ 'users.editTitle' | sqxTranslate }}</h3>
             </ng-container>
 
             <ng-template #noUserTitle>
                 <sqx-title message="i18n:users.createPageTitle"></sqx-title>
 
-                {{ 'users.createTitle' | sqxTranslate }}
+                <h3>{{ 'users.createTitle' | sqxTranslate }}</h3>
             </ng-template>
         </ng-container>
 
         <ng-container menu>
             <ng-container *ngIf="usersState.selectedUser | async; let user; else noUserMenu">
-                <ng-container *ngIf="isEditable">
-                    <button type="submit" class="btn btn-primary" title="i18n:common.saveShortcut">
-                        {{ 'common.save' | sqxTranslate }}
-                    </button>
-                    
-                    <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
-                </ng-container>
+                <button type="submit" class="btn btn-primary" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="isEditable">
+                    {{ 'common.save' | sqxTranslate }}
+                </button>
             </ng-container>
 
             <ng-template #noUserMenu>
-                <button type="submit" class="btn btn-primary" title="i18n:common.saveShortcut">
+                <button type="submit" class="btn btn-primary" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S">
                     {{ 'common.save' | sqxTranslate }}
                 </button>
-                
-                <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
             </ng-template>
         </ng-container>
 
-        <ng-container content>
+        <ng-container >
             <sqx-form-error [error]="userForm.error | async"></sqx-form-error>
 
             <div class="form-group">
@@ -81,5 +75,5 @@
                 <textarea class="form-control" id="permissions" formControlName="permissions" placeholder="{{ 'common.separateByLine' | sqxTranslate }}" autocomplete="off" spellcheck="false"></textarea>
             </div>
         </ng-container>
-    </sqx-panel>
+    </sqx-layout>
 </form>

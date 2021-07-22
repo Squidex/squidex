@@ -8,15 +8,17 @@
     }
 }
 
+a {
+    text-decoration: none;
+}
+
 .event {
-    & {
-        font-size: .9rem;
-        font-weight: normal;
-        margin-bottom: 1.5rem;
-    }
+    font-size: $font-small;
+    font-weight: normal;
+    margin-bottom: 1.5rem;
 
     &-created {
-        font-size: .75rem;
+        font-size: $font-smallest;
         font-weight: normal;
         margin: .25rem 0;
     }

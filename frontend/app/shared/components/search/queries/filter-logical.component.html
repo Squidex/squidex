@@ -1,5 +1,5 @@
 <div class="group">
-    <div class="row no-gutters">
+    <div class="row g-0">
         <div class="col">
             <div class="btn-group">
                 <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isAnd" [disabled]="isAnd" (click)="toggleType()">
@@ -12,7 +12,7 @@
         </div>
 
         
-        <div class="col-auto pl-2" *ngIf="!isRoot">
+        <div class="col-auto ps-2" *ngIf="!isRoot">
             <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
                 <i class="icon-bin2"></i>
             </button>
@@ -37,7 +37,7 @@
         <div class="filter filter-add mt-3">
             <span class="filter-line-h"></span>
 
-            <button class="btn btn-outline-success btn-sm mr-2" (click)="addComparison()">
+            <button class="btn btn-outline-success btn-sm me-2" (click)="addComparison()">
                 {{ 'search.addFilter' | sqxTranslate }}
             </button>
             

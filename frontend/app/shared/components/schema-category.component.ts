@@ -11,7 +11,7 @@ import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasLis
 import { AppsState } from '../state/apps.state';
 import { Settings } from '../state/settings';
 
-const ITEM_HEIGHT = 3.125;
+const ITEM_HEIGHT = 2.5;
 
 @Component({
     selector: 'sqx-schema-category',

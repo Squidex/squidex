@@ -5,7 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
+// tslint:disable: readonly-array
+
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TitleService } from '@app/framework/internal';
 
 @Component({
@@ -13,19 +16,29 @@ import { TitleService } from '@app/framework/internal';
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TitleComponent implements OnDestroy {
+export class TitleComponent implements OnDestroy, OnChanges {
     private previous: any;
 
     @Input()
-    public set message(value: any) {
-        this.titleService.push(value, this.previous);
+    public url: any[] = ['./'];
 
-        this.previous = value;
-    }
+    @Input()
+    public message: string;
 
     constructor(
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly titleService: TitleService,
     ) {
+    }
+
+    public ngOnChanges() {
+        const routeTree = this.router.createUrlTree(this.url, { relativeTo: this.route });
+        const routeUrl = this.router.serializeUrl(routeTree);
+
+        this.titleService.push(this.message, this.previous, routeUrl);
+
+        this.previous = this.message;
     }
 
     public ngOnDestroy() {

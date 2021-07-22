@@ -1,12 +1,10 @@
 .title {
-    & {
-        @include hover-visible('.title-edit', inline);
-        position: relative;
-    }
+    @include hover-visible('.title-edit', inline);
+    position: relative;
 
     &-edit {
         @include absolute(0, 0, null, null);
-        color: $color-border-dark;
+        color: darken($color-border-dark, 20%);
         cursor: pointer;
         padding: .6rem .25rem;
     }

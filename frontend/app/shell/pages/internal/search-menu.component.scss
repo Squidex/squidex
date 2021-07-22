@@ -1,22 +1,5 @@
-:host ::ng-deep {
-    .form-control {
-        @include placeholder-color($color-theme-blue-light);
-        background: darken($color-theme-blue-dark, 5%);
-        border: 0;
-        color: $color-dark-foreground;
-    }
-
-    i {
-        color: $color-dark-foreground;
-    }
-}
-
 .search-container {
     width: 300px;
-}
-
-.search-icon {
-    font-size: 1.25rem;
 }
 
 .row {

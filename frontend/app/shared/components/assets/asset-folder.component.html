@@ -1,6 +1,6 @@
 <div class="card" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)">
     <div class="card-body">
-        <div class="row no-gutters">
+        <div class="row g-2">
             <div class="col-auto">
                 <img src="./images/folder.svg">
             </div>
@@ -9,7 +9,7 @@
             </div>
             <div class="col-auto">
                 <ng-container *ngIf="canDelete || canUpdate">
-                    <button type="button" class="btn btn-sm btn-text-secondary ml-1" (click)="dropdown.toggle()" #buttonOptions>
+                    <button type="button" class="btn btn-sm btn-text-secondary" (click)="dropdown.toggle()" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
     

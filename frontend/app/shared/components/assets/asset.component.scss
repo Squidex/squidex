@@ -1,4 +1,4 @@
-// sass-lint:disable single-line-per-selector
+/* stylelint-disable no-descending-specificity */
 
 $list-height: 2.25rem;
 
@@ -9,37 +9,30 @@ $list-height: 2.25rem;
 }
 
 @mixin overlay {
-    & {
-        @include absolute(0, 0, 0, 0);
-        color: $color-dark-foreground;
-        display: flex;
-        opacity: 0;
-        transition: opacity .4s ease;
-    }
+    @include absolute(0, 0, 0, 0);
+    color: $color-white;
+    display: flex;
+    opacity: 0;
+    transition: opacity .4s ease;
 
     &-background {
         @include absolute(0, 0, 0, 0);
-        background: $color-dark-black;
+        background: $color-black;
         opacity: .7;
     }
 }
 
 @mixin asset-type {
-    color: $color-dark-foreground;
+    color: $color-white;
     cursor: none;
-    font-size: .7rem;
+    font-size: $font-smallest;
     font-weight: normal;
     padding: .1rem .25rem;
     text-transform: uppercase;
 }
 
-:host(.isListView) {
-    padding: 0;
-}
-
 :host ::ng-deep {
     .form-control {
-
         &.disabled,
         &:disabled {
             background: transparent;
@@ -47,15 +40,18 @@ $list-height: 2.25rem;
     }
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
+:host(.isListView) {
+    padding: 0;
+}
+
 .card {
-    & {
-        @include overlay-container;
-        border-top-width: 1px;
-        border-width: 1px;
-        margin-bottom: 1rem;
-        margin-right: .5rem;
-        width: $asset-width;
-    }
+    @include overlay-container;
+    border-width: 1px;
+    border-top-width: 1px;
+    margin-bottom: 1rem;
+    margin-right: .5rem;
+    width: $asset-width;
 
     &-body {
         @include force-height($asset-header);
@@ -78,9 +74,7 @@ $list-height: 2.25rem;
 
 .file {
     &-preview {
-        & {
-            @include absolute(0, 0, 0, 0);
-        }
+        @include absolute(0, 0, 0, 0);
 
         &:hover {
             .overlay {
@@ -96,8 +90,9 @@ $list-height: 2.25rem;
     &-type {
         @include absolute(1rem, auto, auto, 1rem);
         @include asset-type;
-        @include border-radius(3px);
-        background: $color-dark-black;
+        border: 0;
+        border-radius: .25rem;
+        background: $color-black;
         transition: opacity .4s ease;
     }
 
@@ -113,7 +108,7 @@ $list-height: 2.25rem;
         line-height: 2rem;
 
         i {
-            font-size: 80%;
+            font-size: $font-smallest;
         }
     }
 
@@ -122,7 +117,7 @@ $list-height: 2.25rem;
     }
 
     &-info {
-        font-size: .75rem;
+        font-size: $font-smallest;
     }
 
     &-icon {
@@ -135,27 +130,22 @@ $list-height: 2.25rem;
 }
 
 .overlay {
-    & {
-        @include overlay;
-        font-size: .8rem;
-        font-weight: normal;
-    }
+    @include overlay;
+    font-size: $font-smallest;
+    font-weight: normal;
 
     &-menu {
-        & {
-            @include absolute(1rem, 1rem, auto, auto);
-        }
+        @include absolute(1rem, 1rem, auto, auto);
 
         a {
-            & {
-                color: darken($color-dark-foreground, 10%);
-                cursor: pointer;
-                font-size: 1.1rem;
-                font-weight: normal;
-            }
+            color: darken($color-white, 10%);
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: normal;
+            text-decoration: none;
 
             &:hover {
-                color: $color-dark-foreground;
+                color: $color-white;
             }
 
             &:focus,
@@ -176,20 +166,16 @@ $list-height: 2.25rem;
 }
 
 .table-items-row {
-    & {
-        height: $list-height + 2rem;
-        padding-left: $list-height + 3rem;
-        position: relative;
-    }
+    height: $list-height + 2rem;
+    padding-left: $list-height + 3rem;
+    position: relative;
 
     .left-border {
-        & {
-            @include absolute(0, auto, auto, 0);
-            background: $color-border;
-            border: 0;
-            height: $list-height + 2rem;
-            width: 4px;
-        }
+        @include absolute(0, auto, auto, 0);
+        background: $color-border;
+        border: 0;
+        height: $list-height + 2rem;
+        width: 4px;
 
         &.selected {
             background: $color-theme-blue;
@@ -197,12 +183,10 @@ $list-height: 2.25rem;
     }
 
     .image {
-        & {
-            @include absolute(0, auto, 0, 4px);
-            background: $color-asset-bg;
-            border: 0;
-            width: $list-height + 2rem;
-        }
+        @include absolute(0, auto, 0, 4px);
+        background: $color-asset-bg;
+        border: 0;
+        width: $list-height + 2rem;
 
         &-padded {
             padding: 1rem;
@@ -218,11 +202,13 @@ $list-height: 2.25rem;
     }
 
     .col {
-        & {
-            height: $list-height;
+        height: $list-height;
+
+        &-name {
+            width: 50% !important;
         }
 
-        &-name, &-info {
+        &-info {
             width: 50% !important;
         }
 
@@ -244,7 +230,7 @@ $list-height: 2.25rem;
 
         &-info {
             color: $color-text-decent;
-            font-size: .9rem;
+            font-size: $font-small;
             font-weight: normal;
             width: 12rem;
         }
@@ -260,10 +246,8 @@ $list-height: 2.25rem;
 }
 
 .drop-overlay {
-    & {
-        @include overlay;
-        pointer-events: none;
-    }
+    @include overlay;
+    pointer-events: none;
 
     &-text {
         font-size: 1.25rem;

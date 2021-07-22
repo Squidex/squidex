@@ -1,22 +1,16 @@
 <sqx-title [message]="schema.displayName"></sqx-title>
 
-<sqx-panel desiredWidth="*" minWidth="50rem" [showSidebar]="true" [grid]="true" closeQueryParamsHandling="">
-    <ng-container title>
-        {{ 'common.contents' | sqxTranslate }}
-    </ng-container>
-
+<sqx-layout layout="main" titleText="i18n:common.contents" titleIcon="contents">
     <ng-container menu>
-        <div class="row no-gutters pl-1">
-            <div class="col-auto ml-8">
+        <div class="row flex-nowrap gx-2">
+            <div class="col-auto ms-8">
                 <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.id}}/contents"></sqx-notifo>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
-
-                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:contents.refreshTooltip" shortcut="CTRL + B">
                     <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
                 </button>
             </div>
-            <div class="col pl-1">
+            <div class="col">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     (queryChange)="search($event)"
                     [query]="contentsState.query | async"
@@ -27,27 +21,25 @@
                     [enableShortcut]="true">
                 </sqx-search-form>
             </div>
-            <div class="col-auto pl-1" *ngIf="languages.length > 1">
+            <div class="col-auto" *ngIf="languages.length > 1">
                 <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
             </div>
-            <div class="col-auto pl-1">
-                <button type="button" class="btn btn-success" #newButton routerLink="new" title="i18n:contents.createContentTooltip" [disabled]="(contentsState.canCreateAny | async) === false">
+            <div class="col-auto">
+                <button type="button" class="btn btn-success" routerLink="new" title="i18n:contents.createContentTooltip" shortcut="CTRL + U" [disabled]="(contentsState.canCreateAny | async) === false">
                     <i class="icon-plus"></i> {{ 'contents.create' | sqxTranslate }}
                 </button>
-                
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()"></sqx-shortcut>
             </div>
         </div>
     </ng-container>
 
-    <ng-container content>
+    <ng-container>
         <ng-container *ngIf="tableView.listFields | async; let listFields">    
             <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [table]="true">
                 <ng-container topHeader>
                     <div class="selection" *ngIf="selectionCount > 0">
                         {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
             
-                        <button type="button" class="btn btn-outline-secondary btn-status mr-1" *ngFor="let status of selectionStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
+                        <button type="button" class="btn btn-outline-secondary btn-status me-2" *ngFor="let status of selectionStatuses | sqxKeys" (click)="changeSelectedStatus(status)">
                             <sqx-content-status layout="text"
                                 [status]="status"
                                 [statusColor]="selectionStatuses[status]">
@@ -79,17 +71,17 @@
                     </div>
                 </ng-container>
 
-                <ng-container syncedHeader>
+                <ng-container header>
                     <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" #header>
                         <thead>
                             <tr>
                                 <th class="cell-select">
-                                    <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input" type="checkbox" id="all_selected"
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="all_selected"
                                             [ngModel]="selectedAll" 
                                             (ngModelChange)="selectAll($event)">
 
-                                        <label class="custom-control-label" for="all_selected"></label>
+                                        <label class="form-check-label" for="all_selected"></label>
                                     </div>
                                 </th>
                                 <th class="cell-actions cell-actions-left">
@@ -108,7 +100,7 @@
                     </table>
                 </ng-container>
 
-                <ng-container syncedContent>
+                <ng-container>
                     <div class="table-container">
                         <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" [sqxSyncWidth]="header">
                             <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent" 
@@ -134,7 +126,7 @@
         </ng-container>
     </ng-container>    
 
-    <ng-container sidebar>
+    <ng-container sidebarMenu>
         <div class="panel-nav">
             <a class="panel-link" routerLink="filters" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.filters" titlePosition="left">
                 <i class="icon-filter"></i>
@@ -145,7 +137,7 @@
             </a>
         </div>
     </ng-container>
-</sqx-panel>
+</sqx-layout>
 
 <router-outlet></router-outlet>
 
