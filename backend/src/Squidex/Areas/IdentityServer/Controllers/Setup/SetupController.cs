@@ -20,6 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Setup
 {
@@ -99,12 +100,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         {
             var externalProviders = await SignInManager.GetExternalProvidersAsync();
 
-            var request = HttpContext.Request;
-
             var result = new SetupVM
             {
                 BaseUrlConfigured = urlGenerator.BuildUrl(string.Empty, false),
-                BaseUrlCurrent = $"{request.Scheme}://{request.Host}",
+                BaseUrlCurrent = GetCurrentUrl(),
                 ErrorMessage = errorMessage,
                 EverybodyCanCreateApps = !uiOptions.OnlyAdminsCanCreateApps,
                 IsValidHttps = HttpContext.Request.IsHttps,
@@ -120,6 +119,20 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
             }
 
             return result;
+        }
+
+        private string GetCurrentUrl()
+        {
+            var request = HttpContext.Request;
+
+            var url = $"{request.Scheme}://{request.Host}{request.PathBase}";
+
+            if (url.EndsWith(Constants.PrefixIdentityServer, StringComparison.Ordinal))
+            {
+                url = url[0..^Constants.PrefixIdentityServer.Length];
+            }
+
+            return url.TrimEnd('/');
         }
     }
 }

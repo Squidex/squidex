@@ -25,7 +25,9 @@ namespace Squidex.Web.Pipeline
         {
             if (!isUserFound && await userService.IsEmptyAsync())
             {
-                context.Response.Redirect("/identity-server/setup");
+                var url = context.Request.PathBase.Add("/identity-server/setup");
+
+                context.Response.Redirect(url);
             }
             else
             {

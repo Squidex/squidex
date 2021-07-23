@@ -959,10 +959,10 @@
     <value>System Checklist</value>
   </data>
   <data name="setup.ruleUrl.failure" xml:space="preserve">
-    <value>You should access Squidex only over one one canonical URL and configure this URL over the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;.</value>
+    <value>You should access Squidex only over one canonical URL and configure this URL with the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;.</value>
   </data>
   <data name="setup.ruleUrl.success" xml:space="preserve">
-    <value>Congratulations the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly.</value>
+    <value>Congratulations, the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly.</value>
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
