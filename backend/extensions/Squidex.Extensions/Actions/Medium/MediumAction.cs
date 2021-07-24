@@ -23,37 +23,37 @@ namespace Squidex.Extensions.Actions.Medium
     {
         [LocalizedRequired]
         [Display(Name = "Access Token", Description = "The self issued access token.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string AccessToken { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Title", Description = "The title, used for the url.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string Title { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Content", Description = "The content, either html or markdown.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Content { get; set; }
 
         [Display(Name = "Canonical Url", Description = "The original home of this content, if it was originally published elsewhere.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string CanonicalUrl { get; set; }
 
         [Display(Name = "Tags", Description = "The optional comma separated list of tags.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string Tags { get; set; }
 
         [Display(Name = "Publication Id", Description = "Optional publication id.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string PublicationId { get; set; }
 
         [Display(Name = "Is Html", Description = "Indicates whether the content is markdown or html.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public bool IsHtml { get; set; }
     }
 }

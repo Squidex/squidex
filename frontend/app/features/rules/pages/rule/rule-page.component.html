@@ -14,19 +14,31 @@
         </ng-container>
 
         <ng-container menu>
-            <div class="btn btn-outline-secondary btn-enabled" *ngIf="rule">
-                <span class="me-2" *ngIf="isEnabled">
-                    {{ 'common.enabled' | sqxTranslate }}
-                </span>
-    
-                <span class="me-2" *ngIf="!isEnabled">
-                    {{ 'common.disabled' | sqxTranslate }}
-                </span>
-        
-                <sqx-toggle [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }" [disabled]="!isEditable"></sqx-toggle>
-            </div>
+            <ng-container *ngIf="isManual; else notManual">
+                <button class="btn btn-secondary" [disabled]="!rule?.canTrigger"
+                    (sqxConfirmClick)="trigger()"
+                    confirmTitle="i18n:rules.triggerConfirmTitle"
+                    confirmText="i18n:rules.triggerConfirmText"
+                    confirmRememberKey="triggerRule">
+                    <i class="icon-play-line"></i>
+                </button>
+            </ng-container>
 
-            <button type="button" class="btn btn-primary me-2" (click)="save()">
+            <ng-template #notManual>
+                <div class="btn btn-outline-secondary btn-enabled" *ngIf="rule">
+                    <span class="me-2" *ngIf="isEnabled">
+                        {{ 'common.enabled' | sqxTranslate }}
+                    </span>
+        
+                    <span class="me-2" *ngIf="!isEnabled">
+                        {{ 'common.disabled' | sqxTranslate }}
+                    </span>
+            
+                    <sqx-toggle [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }" [disabled]="!isEditable"></sqx-toggle>
+                </div>
+            </ng-template>
+
+            <button type="button" class="btn btn-primary ms-2" (click)="save()">
                 {{ 'common.save' | sqxTranslate }}
             </button>
         </ng-container>

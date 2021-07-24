@@ -67,13 +67,15 @@
             vertical-align: middle;
 
             &:first-child {
+                border-bottom-left-radius: $border-radius;
                 border-left: 1px solid $color-border;
-                border-radius: $border-radius 0 0 $border-radius;
+                border-top-left-radius: $border-radius;
             }
 
             &:last-child {
-                border-radius: 0 $border-radius $border-radius 0;
+                border-bottom-right-radius: $border-radius;
                 border-right: 1px solid $color-border;
+                border-top-right-radius: $border-radius;
             }
         }
 
@@ -173,7 +175,7 @@
 tbody {
     &:last-child {
         .spacer {
-            display: none
+            display: none;
         }
     }
 }

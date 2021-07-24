@@ -119,40 +119,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         var values = Enum.GetNames(type);
 
                         actionProperty.Options = values;
-                        actionProperty.Editor = RuleActionPropertyEditor.Dropdown;
+                        actionProperty.Editor = RuleFieldEditor.Dropdown;
+                    }
+                    else if (IsBoolean(type))
+                    {
+                        actionProperty.Editor = RuleFieldEditor.Checkbox;
+                    }
+                    else if (IsNumericType(type))
+                    {
+                        actionProperty.Editor = RuleFieldEditor.Number;
                     }
                     else
                     {
-                        var dataType = GetDataAttribute<DataTypeAttribute>(property)?.DataType;
-
-                        if (IsBoolean(type))
-                        {
-                            actionProperty.Editor = RuleActionPropertyEditor.Checkbox;
-                        }
-                        else if (IsNumericType(type))
-                        {
-                            actionProperty.Editor = RuleActionPropertyEditor.Number;
-                        }
-                        else if (dataType == DataType.Url)
-                        {
-                            actionProperty.Editor = RuleActionPropertyEditor.Url;
-                        }
-                        else if (dataType == DataType.Password)
-                        {
-                            actionProperty.Editor = RuleActionPropertyEditor.Password;
-                        }
-                        else if (dataType == DataType.EmailAddress)
-                        {
-                            actionProperty.Editor = RuleActionPropertyEditor.Email;
-                        }
-                        else if (dataType == DataType.MultilineText)
-                        {
-                            actionProperty.Editor = RuleActionPropertyEditor.TextArea;
-                        }
-                        else
-                        {
-                            actionProperty.Editor = RuleActionPropertyEditor.Text;
-                        }
+                        actionProperty.Editor = GetEditor(property);
                     }
 
                     definition.Properties.Add(actionProperty);
@@ -169,6 +148,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             result?.IsValid(null);
 
             return result;
+        }
+
+        private static RuleFieldEditor GetEditor(PropertyInfo property)
+        {
+            return property.GetCustomAttribute<EditorAttribute>()?.Editor ?? RuleFieldEditor.Text;
         }
 
         private static bool IsNullable(Type type)

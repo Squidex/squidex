@@ -24,7 +24,7 @@ namespace Squidex.Extensions.Actions.Webhook
     {
         [LocalizedRequired]
         [Display(Name = "Url", Description = "The url to the webhook.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public Uri Url { get; set; }
 
@@ -33,21 +33,21 @@ namespace Squidex.Extensions.Actions.Webhook
         public WebhookMethod Method { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Payload { get; set; }
 
         [Display(Name = "Payload Type", Description = "The mime type of the payload.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string PayloadType { get; set; }
 
         [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Headers { get; set; }
 
         [Display(Name = "Shared Secret", Description = "The shared secret that is used to calculate the payload signature.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string SharedSecret { get; set; }
     }
 

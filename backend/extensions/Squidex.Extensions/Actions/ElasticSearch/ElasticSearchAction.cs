@@ -25,30 +25,30 @@ namespace Squidex.Extensions.Actions.ElasticSearch
         [AbsoluteUrl]
         [LocalizedRequired]
         [Display(Name = "Server Url", Description = "The url to the elastic search instance or cluster.")]
-        [DataType(DataType.Url)]
+        [Editor(RuleFieldEditor.Url)]
         public Uri Host { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Index Name", Description = "The name of the index.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string IndexName { get; set; }
 
         [Display(Name = "Username", Description = "The optional username.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Username { get; set; }
 
         [Display(Name = "Password", Description = "The optional password.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Password { get; set; }
 
         [Display(Name = "Document", Description = "The optional custom document.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Document { get; set; }
 
         [Display(Name = "Deletion", Description = "The condition when to delete the document.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Delete { get; set; }
     }
 }

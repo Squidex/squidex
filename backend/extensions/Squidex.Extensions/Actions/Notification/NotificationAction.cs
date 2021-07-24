@@ -22,22 +22,22 @@ namespace Squidex.Extensions.Actions.Notification
     {
         [LocalizedRequired]
         [Display(Name = "User", Description = "The user id or email.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string User { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Title", Description = "The text to send.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Text { get; set; }
 
         [Display(Name = "Url", Description = "The optional url to attach to the notification.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string Url { get; set; }
 
         [Display(Name = "Client", Description = "An optional client name.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Client { get; set; }
     }
 }

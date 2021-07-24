@@ -14,6 +14,9 @@
                 <ng-container *ngSwitchCase="'TextArea'">
                     <sqx-formattable-input [formControlName]="property.name" type="Code" [formattable]="property.isFormattable"></sqx-formattable-input>
                 </ng-container>
+                <ng-container *ngSwitchCase="'Javascript'">
+                    <sqx-code-editor [formControlName]="property.name" [height]="350"></sqx-code-editor>
+                </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="{{property.name}}" [formControlName]="property.name">

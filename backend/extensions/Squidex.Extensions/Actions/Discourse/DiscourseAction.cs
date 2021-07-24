@@ -25,36 +25,36 @@ namespace Squidex.Extensions.Actions.Discourse
         [AbsoluteUrl]
         [LocalizedRequired]
         [Display(Name = "Server Url", Description = "The url to the discourse server.")]
-        [DataType(DataType.Url)]
+        [Editor(RuleFieldEditor.Url)]
         public Uri Url { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Api Key", Description = "The api key to authenticate to your discourse server.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string ApiKey { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Api User", Description = "The api username to authenticate to your discourse server.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string ApiUsername { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Text", Description = "The text as markdown.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Text { get; set; }
 
         [Display(Name = "Title", Description = "The optional title when creating new topics.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string Title { get; set; }
 
         [Display(Name = "Topic", Description = "The optional topic id.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public int? Topic { get; set; }
 
         [Display(Name = "Category", Description = "The optional category id.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public int? Category { get; set; }
     }
 }

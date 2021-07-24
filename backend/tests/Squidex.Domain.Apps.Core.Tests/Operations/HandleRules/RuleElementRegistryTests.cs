@@ -28,19 +28,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             }
         }
 
-        [RuleAction(
-            Title = "Invalid",
-            IconImage = "<svg></svg>",
-            IconColor = "#1e5470",
-            Display = "Action display",
-            Description = "Action description.",
-            ReadMore = "https://www.readmore.com/")]
-        public sealed record MyInvalidRuleAction : RuleAction
-        {
-            [DataType(DataType.Custom)]
-            public string Custom { get; set; }
-        }
-
         public enum ActionEnum
         {
             Yes,
@@ -58,38 +45,38 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             [LocalizedRequired]
             [Display(Name = "Url Name", Description = "Url Description")]
-            [DataType(DataType.Url)]
+            [Editor(RuleFieldEditor.Url)]
             [Formattable]
             public Uri Url { get; set; }
 
-            [DataType(DataType.EmailAddress)]
-            public string Email { get; set; }
+            [Editor(RuleFieldEditor.Javascript)]
+            public string Script { get; set; }
 
-            [DataType(DataType.Text)]
+            [Editor(RuleFieldEditor.Text)]
             public string Text { get; set; }
 
-            [DataType(DataType.MultilineText)]
+            [Editor(RuleFieldEditor.TextArea)]
             public string TextMultiline { get; set; }
 
-            [DataType(DataType.Password)]
+            [Editor(RuleFieldEditor.Password)]
             public string Password { get; set; }
 
-            [DataType(DataType.Text)]
+            [Editor(RuleFieldEditor.Text)]
             public ActionEnum Enum { get; set; }
 
-            [DataType(DataType.Text)]
+            [Editor(RuleFieldEditor.Text)]
             public ActionEnum? EnumOptional { get; set; }
 
-            [DataType(DataType.Text)]
+            [Editor(RuleFieldEditor.Text)]
             public bool Boolean { get; set; }
 
-            [DataType(DataType.Text)]
+            [Editor(RuleFieldEditor.Text)]
             public bool? BooleanOptional { get; set; }
 
-            [DataType(DataType.Text)]
+            [Editor(RuleFieldEditor.Text)]
             public int Number { get; set; }
 
-            [DataType(DataType.Text)]
+            [Editor(RuleFieldEditor.Text)]
             public int? NumberOptional { get; set; }
         }
 
@@ -112,17 +99,17 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "url",
                 Display = "Url Name",
                 Description = "Url Description",
-                Editor = RuleActionPropertyEditor.Url,
+                Editor = RuleFieldEditor.Url,
                 IsFormattable = true,
                 IsRequired = true
             });
 
             expected.Properties.Add(new RuleActionProperty
             {
-                Name = "email",
-                Display = "Email",
+                Name = "script",
+                Display = "Script",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Email,
+                Editor = RuleFieldEditor.Javascript,
                 IsRequired = false
             });
 
@@ -131,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "text",
                 Display = "Text",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Text,
+                Editor = RuleFieldEditor.Text,
                 IsRequired = false
             });
 
@@ -140,7 +127,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "textMultiline",
                 Display = "TextMultiline",
                 Description = null,
-                Editor = RuleActionPropertyEditor.TextArea,
+                Editor = RuleFieldEditor.TextArea,
                 IsRequired = false
             });
 
@@ -149,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "password",
                 Display = "Password",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Password,
+                Editor = RuleFieldEditor.Password,
                 IsRequired = false
             });
 
@@ -158,7 +145,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "enum",
                 Display = "Enum",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Dropdown,
+                Editor = RuleFieldEditor.Dropdown,
                 IsRequired = false,
                 Options = new[] { "Yes", "No" }
             });
@@ -168,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "enumOptional",
                 Display = "EnumOptional",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Dropdown,
+                Editor = RuleFieldEditor.Dropdown,
                 IsRequired = false,
                 Options = new[] { "Yes", "No" }
             });
@@ -178,7 +165,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "boolean",
                 Display = "Boolean",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Checkbox,
+                Editor = RuleFieldEditor.Checkbox,
                 IsRequired = false
             });
 
@@ -187,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "booleanOptional",
                 Display = "BooleanOptional",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Checkbox,
+                Editor = RuleFieldEditor.Checkbox,
                 IsRequired = false
             });
 
@@ -196,7 +183,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "number",
                 Display = "Number",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Number,
+                Editor = RuleFieldEditor.Number,
                 IsRequired = true
             });
 
@@ -205,7 +192,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Name = "numberOptional",
                 Display = "NumberOptional",
                 Description = null,
-                Editor = RuleActionPropertyEditor.Number,
+                Editor = RuleFieldEditor.Number,
                 IsRequired = false
             });
 
@@ -214,12 +201,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var currentDefinition = sut.Actions.Values.First();
 
             currentDefinition.Should().BeEquivalentTo(expected);
-        }
-
-        [Fact]
-        public void Should_throw_exception_if_validation_attribute_used_incorrectly()
-        {
-            Assert.Throws<InvalidOperationException>(() => sut.Add<MyInvalidRuleAction>());
         }
     }
 }

@@ -22,12 +22,12 @@ namespace Squidex.Extensions.Actions.Comment
     {
         [LocalizedRequired]
         [Display(Name = "Text", Description = "The comment text.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Text { get; set; }
 
         [Display(Name = "Client", Description = "An optional client name.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Client { get; set; }
     }
 }

@@ -7,20 +7,16 @@
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public sealed class RuleActionProperty
+    public enum RuleFieldEditor
     {
-        public RuleFieldEditor Editor { get; set; }
-
-        public string Name { get; set; }
-
-        public string Display { get; set; }
-
-        public string? Description { get; set; }
-
-        public string[]? Options { get; set; }
-
-        public bool IsFormattable { get; set; }
-
-        public bool IsRequired { get; set; }
+        Checkbox,
+        Dropdown,
+        Email,
+        Javascript,
+        Number,
+        Password,
+        Text,
+        TextArea,
+        Url
     }
 }

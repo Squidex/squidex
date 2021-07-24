@@ -29,6 +29,10 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     public isEnabled = false;
     public isEditable = false;
 
+    public get isManual() {
+        return this.rule?.triggerType === 'Manual';
+    }
+
     public get actionElement() {
         return this.supportedActions[this.currentAction?.type || ''];
     }
@@ -107,6 +111,10 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
 
     public resetTrigger() {
         this.currentTrigger = undefined;
+    }
+
+    public trigger() {
+        this.rulesState.trigger(this.rule!);
     }
 
     public save() {

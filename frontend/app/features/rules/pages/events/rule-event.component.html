@@ -1,4 +1,4 @@
-<tr [class.expanded]="expanded">
+<tr [class.expanded]="expanded" class="table-items-row" [class.expanded]>
     <td class="cell-label">
         <span class="badge rounded-pill badge-{{jobResultClass}}">{{event.jobResult}}</span>
     </td>
@@ -18,7 +18,7 @@
     </td>
 </tr>
 <tr *ngIf="expanded">
-    <td colspan="5">
+    <td colspan="5" class="details">
         <div class="event-header">
             <h4>{{ 'rules.ruleEvents.lastInvokedLabel' | sqxTranslate }}</h4>
         </div>

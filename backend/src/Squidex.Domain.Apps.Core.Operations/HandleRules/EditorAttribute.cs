@@ -5,17 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public enum RuleActionPropertyEditor
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class EditorAttribute : Attribute
     {
-        Checkbox,
-        Dropdown,
-        Email,
-        Number,
-        Password,
-        Text,
-        TextArea,
-        Url
+        public RuleFieldEditor Editor { get; }
+
+        public EditorAttribute(RuleFieldEditor editor)
+        {
+            Editor = editor;
+        }
     }
 }

@@ -25,18 +25,18 @@ namespace Squidex.Extensions.Actions.AzureQueue
     {
         [LocalizedRequired]
         [Display(Name = "Connection", Description = "The connection string to the storage account.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string ConnectionString { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Queue", Description = "The name of the queue.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string Queue { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Payload { get; set; }
 
