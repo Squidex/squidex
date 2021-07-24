@@ -73,7 +73,7 @@
             </div>
             <div class="col col-last text-end">
                 <ng-container *ngIf="isManual; else notManual">
-                    <button class="btn btn-secondary" [disabled]="!rule.canTrigger"
+                    <button class="btn btn-outline-secondary btn-run" [disabled]="!rule.canTrigger"
                         (sqxConfirmClick)="trigger()"
                         confirmTitle="i18n:rules.triggerConfirmTitle"
                         confirmText="i18n:rules.triggerConfirmText"
@@ -91,10 +91,14 @@
     <div class="card-footer">
         <div class="row">
             <div class="col-3">
-                {{ 'common.succeeded' | sqxTranslate }}: <strong>{{rule.numSucceeded}}</strong>
+                {{ 'common.succeeded' | sqxTranslate }} 
+                
+                <span class="badge badge-success rounded-pill" *ngIf="rule.numSucceeded > 0">{{rule.numSucceeded}}</span>
             </div>
             <div class="col-3">
-                {{ 'common.failed' | sqxTranslate }}: <strong>{{rule.numFailed}}</strong>
+                {{ 'common.failed' | sqxTranslate }} 
+                
+                <span class="badge badge-danger rounded-pill" *ngIf="rule.numFailed > 0">{{rule.numFailed}}</span>
             </div>
             <div class="col">
                 {{ 'common.executed' | sqxTranslate }}: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>

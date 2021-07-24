@@ -15,7 +15,7 @@
 
         <ng-container menu>
             <ng-container *ngIf="isManual; else notManual">
-                <button class="btn btn-secondary" [disabled]="!rule?.canTrigger"
+                <button class="btn btn-outline-secondary btn-run" [disabled]="!rule?.canTrigger"
                     (sqxConfirmClick)="trigger()"
                     confirmTitle="i18n:rules.triggerConfirmTitle"
                     confirmText="i18n:rules.triggerConfirmText"

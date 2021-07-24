@@ -19,10 +19,20 @@
     margin-left: 2rem;
 }
 
-.card-body {
-    &:empty {
-        display: none;
+.card {
+    &-header {
+        margin-bottom: -1px;
     }
+
+    &-body {
+        &:empty {
+            display: none;
+        }
+    }
+}
+
+.btn-run {
+    color: $color-theme-blue !important;
 }
 
 .btn-enabled {

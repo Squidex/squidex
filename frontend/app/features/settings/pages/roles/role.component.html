@@ -4,10 +4,14 @@
             <span class="role-name">{{role.name}}</span>
         </div>
         <div class="col text-decent">
-            {{ 'common.clients' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
+            {{ 'common.clients' | sqxTranslate }}
+            
+            <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numClients <= 0">{{role.numClients}}</span>
         </div>
         <div class="col text-decent">
-            {{ 'common.users' | sqxTranslate }}: <span class="badge badge-secondary rounded-pill" [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
+            {{ 'common.users' | sqxTranslate }}
+            
+            <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numContributors <=  0">{{role.numContributors}}</span>
         </div>
         <div class="col-auto">
             <div class="float-end">

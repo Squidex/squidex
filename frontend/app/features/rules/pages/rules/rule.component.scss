@@ -1,23 +1,13 @@
-%card-element {
-    padding: .75rem 1.25rem;
-}
-
 .card {
-    margin-bottom: .25rem;
-
-    &-header {
-        @extend %card-element;
-    }
-
-    &-body {
-        @extend %card-element;
-    }
+    margin-bottom: .5rem;
 
     &-footer {
-        background: $color-border-lighter;
         font-size: $font-small;
-        font-weight: normal;
     }
+}
+
+.btn-run {
+    color: $color-theme-blue !important;
 }
 
 a {

@@ -585,12 +585,21 @@ $icon-size: 4.5rem;
     }
 }
 
-.card-title {
-    margin-bottom: 1rem;
-}
+// 
+// Cards
+// 
+.card {
+    &-header,
+    &-footer {
+        margin-left: .5rem;
+        margin-right: .5rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
 
-.card-footer {
-    padding: .75rem 1.25rem;
+    &-title {
+        margin-bottom: 1rem;
+    }
 }
 
 // 
