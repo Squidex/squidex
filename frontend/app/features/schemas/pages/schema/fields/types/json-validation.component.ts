@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-json-validation',
+    selector: 'sqx-json-validation[field][fieldForm][properties]',
     styleUrls: ['json-validation.component.scss'],
     templateUrl: 'json-validation.component.html',
 })

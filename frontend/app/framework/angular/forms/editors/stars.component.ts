@@ -37,7 +37,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
     private maximumStarsValue = 5;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

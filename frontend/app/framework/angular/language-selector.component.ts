@@ -11,7 +11,7 @@ import { fadeAnimation, ModalModel } from '@app/framework/internal';
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
 @Component({
-    selector: 'sqx-language-selector',
+    selector: 'sqx-language-selector[language][languages]',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
     animations: [
@@ -21,10 +21,10 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
 })
 export class LanguageSelectorComponent implements OnChanges, OnInit {
     @Output()
-    public selectedLanguageChange = new EventEmitter<any>();
+    public languageChange = new EventEmitter<any>();
 
     @Input()
-    public selectedLanguage: Language;
+    public language: Language;
 
     @Input()
     public languages: ReadonlyArray<Language> = [];
@@ -51,7 +51,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     }
 
     private update() {
-        if (this.languages && this.languages.length > 0 && (!this.selectedLanguage || this.languages.indexOf(this.selectedLanguage) < 0)) {
+        if (this.languages && this.languages.length > 0 && (!this.language || this.languages.indexOf(this.language) < 0)) {
             const selectedLanguage =
                 this.languages.find(l => l.isMasterLanguage) ||
                 this.languages[0];
@@ -61,9 +61,9 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     }
 
     public selectLanguage(language: Language) {
-        if (language?.iso2Code !== this.selectedLanguage?.iso2Code) {
-            this.selectedLanguage = language;
-            this.selectedLanguageChange.emit(language);
+        if (language?.iso2Code !== this.language?.iso2Code) {
+            this.language = language;
+            this.languageChange.emit(language);
         }
     }
 

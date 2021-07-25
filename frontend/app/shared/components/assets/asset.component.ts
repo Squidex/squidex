@@ -89,18 +89,21 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
             this.setProgress(1);
 
             this.assetUploader.uploadFile(assetFile, this.assetsState, this.folderId)
-                .subscribe(dto => {
-                    if (Types.isNumber(dto)) {
-                        this.setProgress(dto);
-                    } else {
-                        this.emitLoad(dto);
-                    }
-                }, error => {
-                    if (!Types.is(error, UploadCanceled)) {
-                        this.dialogs.notifyError(error);
-                    }
+                .subscribe({
+                    next: dto => {
+                        if (Types.isNumber(dto)) {
+                            this.setProgress(dto);
+                        } else {
+                            this.emitLoad(dto);
+                        }
+                    },
+                    error: error => {
+                        if (!Types.is(error, UploadCanceled)) {
+                            this.dialogs.notifyError(error);
+                        }
 
-                    this.emitLoadError(error);
+                        this.emitLoadError(error);
+                    },
                 });
         }
     }
@@ -113,19 +116,23 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
                         this.setProgress(1);
 
                         this.assetUploader.uploadAsset(this.asset, files[0])
-                            .subscribe(asset => {
-                                if (Types.isNumber(asset)) {
-                                    this.setProgress(asset);
-                                } else {
-                                    this.setProgress(0);
-                                    this.setAsset(asset);
-                                }
-                            }, error => {
-                                this.dialogs.notifyError(error);
+                            .subscribe({
+                                next: asset => {
+                                    if (Types.isNumber(asset)) {
+                                        this.setProgress(asset);
+                                    } else {
+                                        this.setProgress(0);
+                                        this.setAsset(asset);
+                                    }
+                                },
+                                error: error => {
+                                    this.dialogs.notifyError(error);
 
-                                this.setProgress(0);
-                            }, () => {
-                                this.setProgress(0);
+                                    this.setProgress(0);
+                                },
+                                complete: () => {
+                                    this.setProgress(0);
+                                },
                             });
                     }
                 });

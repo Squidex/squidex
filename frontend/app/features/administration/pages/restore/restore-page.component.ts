@@ -36,10 +36,13 @@ export class RestorePageComponent {
             this.restoreForm.submitCompleted();
 
             this.backupsService.postRestore(value)
-                .subscribe(() => {
-                    this.dialogs.notifyInfo('i18n:backups.restoreStarted');
-                }, error => {
-                    this.dialogs.notifyError(error);
+                .subscribe({
+                    next: () => {
+                        this.dialogs.notifyInfo('i18n:backups.restoreStarted');
+                    },
+                    error: error => {
+                        this.dialogs.notifyError(error);
+                    },
                 });
         }
     }

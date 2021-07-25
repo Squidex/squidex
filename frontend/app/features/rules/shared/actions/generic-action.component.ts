@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-generic-action',
+    selector: 'sqx-generic-action[actionForm]',
     styleUrls: ['./generic-action.component.scss'],
     templateUrl: './generic-action.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

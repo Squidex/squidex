@@ -17,7 +17,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-array-item',
+    selector: 'sqx-array-item[form][formContext][language][languages][index]',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

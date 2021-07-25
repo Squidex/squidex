@@ -61,10 +61,13 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
 
         if (value) {
             this.appsState.update(this.app, value)
-                .subscribe(app => {
-                    this.updateForm.submitCompleted({ newValue: app });
-                }, error => {
-                    this.updateForm.submitFailed(error);
+                .subscribe({
+                    next: app => {
+                        this.updateForm.submitCompleted({ newValue: app });
+                    },
+                    error: error => {
+                        this.updateForm.submitFailed(error);
+                    },
                 });
         }
     }
@@ -78,14 +81,18 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
         this.uploadProgress = 0;
 
         this.appsState.uploadImage(this.app, file[0])
-            .subscribe(value => {
+            .subscribe({
+                next: value => {
                 if (Types.isNumber(value)) {
-                    this.uploadProgress = value;
-                }
-            }, () => {
-                this.uploading = false;
-            }, () => {
-                this.uploading = false;
+                        this.uploadProgress = value;
+                    }
+                },
+                error: () => {
+                    this.uploading = false;
+                },
+                complete: () => {
+                    this.uploading = false;
+                },
             });
     }
 

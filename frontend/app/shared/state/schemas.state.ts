@@ -251,7 +251,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public addField(schema: SchemaDto, request: AddFieldDto, parent?: RootFieldDto): Observable<FieldDto> {
+    public addField(schema: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | null): Observable<FieldDto> {
         return this.schemasService.postField(this.appName, parent || schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -359,7 +359,7 @@ export class SchemasState extends State<Snapshot> {
     }
 }
 
-function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto): FieldDto {
+function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | null): FieldDto {
     if (parent) {
         return x.fields.find(f => f.fieldId === parent.fieldId)!.nested.find(f => f.name === request.name)!;
     } else {

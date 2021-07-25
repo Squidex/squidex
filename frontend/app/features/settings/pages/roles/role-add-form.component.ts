@@ -29,10 +29,13 @@ export class RoleAddFormComponent {
 
         if (value) {
             this.rolesState.add(value)
-                .subscribe(() => {
-                    this.addRoleForm.submitCompleted();
-                }, error => {
-                    this.addRoleForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.addRoleForm.submitCompleted();
+                    },
+                    error: error => {
+                        this.addRoleForm.submitFailed(error);
+                    },
                 });
         }
     }

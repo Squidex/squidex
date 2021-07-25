@@ -59,7 +59,7 @@ export class DialogRequest {
 export class Tooltip {
     constructor(
         public readonly target: any,
-        public readonly text: string | null,
+        public readonly text: string | null | undefined,
         public readonly position: string,
         public readonly multiple?: boolean,
         public readonly shortcut?: string,

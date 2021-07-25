@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } f
 import { ErrorDto } from '@app/framework/internal';
 
 @Component({
-    selector: 'sqx-form-error',
+    selector: 'sqx-form-error[error]',
     styleUrls: ['./form-error.component.scss'],
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

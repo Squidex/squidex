@@ -27,6 +27,9 @@ export class FilterNodeComponent {
     public language: LanguageDto;
 
     @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
     public level: number;
 
     @Input()

@@ -38,7 +38,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     public folderId?: string;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
@@ -248,14 +248,17 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         };
 
         this.assetUploader.uploadFile(file, undefined, this.folderId)
-            .subscribe(asset => {
-                if (Types.is(asset, AssetDto)) {
-                    replaceText(this.buildMarkup(asset));
-                }
-            }, error => {
-                if (!Types.is(error, UploadCanceled)) {
-                    replaceText('FAILED');
-                }
+            .subscribe({
+                next: asset => {
+                    if (Types.is(asset, AssetDto)) {
+                        replaceText(this.buildMarkup(asset));
+                    }
+                },
+                error: error => {
+                    if (!Types.is(error, UploadCanceled)) {
+                        replaceText('FAILED');
+                    }
+                },
             });
     }
 

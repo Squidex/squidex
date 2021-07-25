@@ -10,11 +10,13 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto, REFERENCES_FIELD_EDITORS } from '@app/shared';
 
 @Component({
-    selector: 'sqx-references-ui',
+    selector: 'sqx-references-ui[field][fieldForm][properties]',
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html',
 })
 export class ReferencesUIComponent {
+    public readonly editors = REFERENCES_FIELD_EDITORS;
+
     @Input()
     public fieldForm: FormGroup;
 
@@ -23,6 +25,4 @@ export class ReferencesUIComponent {
 
     @Input()
     public properties: ReferencesFieldPropertiesDto;
-
-    public editors = REFERENCES_FIELD_EDITORS;
 }

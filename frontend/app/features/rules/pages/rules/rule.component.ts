@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ActionsDto, fadeAnimation, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-rule',
+    selector: 'sqx-rule[rule]',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
     animations: [

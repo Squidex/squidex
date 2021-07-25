@@ -17,7 +17,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-control-errors',
+    selector: 'sqx-control-errors[for]',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
     animations: [
@@ -34,7 +34,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     public for: string | AbstractControl;
 
     @Input()
-    public fieldName: string;
+    public fieldName: string | null | undefined;
 
     public get isTouched() {
         return this.control.touched || Types.is(this.control, FormArray);

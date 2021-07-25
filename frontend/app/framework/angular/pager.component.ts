@@ -11,7 +11,7 @@ import { PagingInfo } from '../state';
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
 
 @Component({
-    selector: 'sqx-pager',
+    selector: 'sqx-pager[paging]',
     styleUrls: ['./pager.component.scss'],
     templateUrl: './pager.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

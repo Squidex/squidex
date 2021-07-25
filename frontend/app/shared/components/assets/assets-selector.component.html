@@ -14,14 +14,16 @@
                 <div class="row g-0 search">
                     <div class="col-6">
                         <sqx-tag-editor class="tags" [singleLine]="true" placeholder="{{ 'assets.searchByTags' | sqxTranslate }}" 
-                            [suggestions]="assetsState.tagsNames | async"
+                            (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false"
                             [ngModel]="assetsState.selectedTagNames | async"
-                            (ngModelChange)="selectTags($event)" [undefinedWhenEmpty]="false">
+                            [suggestions]="assetsState.tagsNames | async">
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" 
-                            [query]="assetsState.query | async" (queryChange)="search($event)" [enableShortcut]="true">
+                            (queryChange)="search($event)"
+                            [enableShortcut]="true">
+                            [query]="assetsState.query | async" 
                         </sqx-search-form>
                     </div>
                 </div>

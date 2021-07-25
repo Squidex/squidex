@@ -10,8 +10,8 @@ import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, UIOptions } from '@app/shared/internal';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
-export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesCheckboxesComponent), multi: true,
+export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesTagsComponent), multi: true,
 };
 
 interface State {
@@ -22,15 +22,15 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-checkboxes',
-    styleUrls: ['./references-checkboxes.component.scss'],
-    templateUrl: './references-checkboxes.component.html',
+    selector: 'sqx-references-tags[language][schemaId]',
+    styleUrls: ['./references-tags.component.scss'],
+    templateUrl: './references-tags.component.html',
     providers: [
-        SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR,
+        SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
+export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
     private readonly itemCount: number;
     private contentItems: ReadonlyArray<ContentDto> | null = null;
 
@@ -41,7 +41,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     public language: LanguageDto;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
@@ -81,14 +81,17 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
 
             if (this.isValid) {
                 this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount })
-                    .subscribe(contents => {
-                        this.contentItems = contents.items;
+                    .subscribe({
+                        next: contents => {
+                            this.contentItems = contents.items;
 
-                        this.resetConverterState();
-                    }, () => {
-                        this.contentItems = null;
+                            this.resetConverterState();
+                        },
+                        error: () => {
+                            this.contentItems = null;
 
-                        this.resetConverterState();
+                            this.resetConverterState();
+                        },
                     });
             } else {
                 this.contentItems = null;

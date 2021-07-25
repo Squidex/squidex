@@ -29,10 +29,13 @@ export class WorkflowAddFormComponent {
 
         if (value) {
             this.workflowsState.add(value.name)
-                .subscribe(() => {
-                    this.addWorkflowForm.submitCompleted();
-                }, error => {
-                    this.addWorkflowForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.addWorkflowForm.submitCompleted();
+                    },
+                    error: error => {
+                        this.addWorkflowForm.submitFailed(error);
+                    },
                 });
         }
     }

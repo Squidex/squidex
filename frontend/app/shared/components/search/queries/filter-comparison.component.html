@@ -39,12 +39,13 @@
                 (ngModelChange)="changeValue($event)" />
         </ng-container>
         <ng-container *ngSwitchCase="'reference'">
-            <sqx-references-dropdown [schemaId]="fieldModel.extra"
+            <sqx-reference-input [schemaIds]="fieldModel.extra"
                 mode="Single"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)"
-                [language]="language">
-            </sqx-references-dropdown>
+                [language]="language"
+                [languages]="languages">
+            </sqx-reference-input>
         </ng-container>
         <ng-container *ngSwitchCase="'status'">
             <sqx-dropdown [items]="fieldModel.extra"

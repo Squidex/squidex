@@ -27,6 +27,9 @@ export class FilterLogicalComponent {
     public language: LanguageDto;
 
     @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
     public level = 0;
 
     @Input()

@@ -13,16 +13,17 @@
             <div class="col">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     (queryChange)="search($event)"
-                    [query]="contentsState.query | async"
+                    [enableShortcut]="true"
+                    [language]="(languagesState.isoMasterLanguage | async)!"
+                    [languages]="languages"
                     [queries]="queries | async"
                     [queriesTypes]="'common.contents' | sqxTranslate"
-                    [queryModel]="queryModel | async"
-                    [language]="(languagesState.isoMasterLanguage | async)!"
-                    [enableShortcut]="true">
+                    [query]="contentsState.query | async"
+                    [queryModel]="queryModel | async">
                 </sqx-search-form>
             </div>
             <div class="col-auto" *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
+                <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
             </div>
             <div class="col-auto">
                 <button type="button" class="btn btn-success" routerLink="new" title="i18n:contents.createContentTooltip" shortcut="CTRL + U" [disabled]="(contentsState.canCreateAny | async) === false">
@@ -62,7 +63,8 @@
 
                         <ng-container *sqxModal="tableViewModal">
                             <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
-                                <sqx-custom-view-editor [allFields]="tableView.allFields" 
+                                <sqx-custom-view-editor
+                                    [allFields]="tableView.allFields" 
                                     (fieldNamesChange)="tableView.updateFields($event)"
                                     [fieldNames]="$any(tableView.listFieldNames | async)">
                                 </sqx-custom-view-editor>
@@ -105,15 +107,15 @@
                         <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" [sqxSyncWidth]="header">
                             <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent" 
                                 [sqxContent]="content"
+                                (clone)="clone(content)"
                                 (delete)="delete(content)"
-                                [selected]="isItemSelected(content)"
                                 (selectedChange)="selectItem(content, $event)"
                                 (statusChange)="changeStatus(content, $event)"
                                 [cloneable]="contentsState.snapshot.canCreate"
-                                (clone)="clone(content)"
                                 [language]="language"
                                 [link]="[content.id, 'history']"
-                                [listFields]="listFields">
+                                [listFields]="listFields"
+                                [selected]="isItemSelected(content)">
                             </tbody>
                         </table>
                     </div>

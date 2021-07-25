@@ -21,14 +21,16 @@
                 </div>
                 <div class="col">
                     <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}" 
+                        [language]="language"
+                        [languages]="languages"
+                        (queryChange)="search($event)"
                         [query]="contentsState.query | async"
-                        [queryModel]="queryModel"
-                        (queryChange)="search($event)">
+                        [queryModel]="queryModel">
                     </sqx-search-form>
                 </div>
                     
                 <div class="col-auto" *ngIf="languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language" [languages]="languages"></sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
                 </div>
             </ng-container>
         </div>
@@ -47,7 +49,7 @@
                                         (ngModelChange)="selectAll($event)">
                                 </th>
                                 <th sqxContentListCell="meta.lastModifiedBy.avatar">
-                                    <sqx-content-list-header field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
+                                    <sqx-content-list-header [language]="language" field="meta.lastModifiedBy.avatar"></sqx-content-list-header>
                                 </th>
                                 <th *ngFor="let field of schema.defaultReferenceFields" [sqxContentListCell]="field">
                                     <sqx-content-list-header
@@ -58,7 +60,7 @@
                                     </sqx-content-list-header>
                                 </th>
                                 <th sqxContentListCell="meta.status.color">
-                                    <sqx-content-list-header field="meta.status.color"></sqx-content-list-header>
+                                    <sqx-content-list-header [language]="language" field="meta.status.color"></sqx-content-list-header>
                                 </th>
                             </tr>
                         </thead>

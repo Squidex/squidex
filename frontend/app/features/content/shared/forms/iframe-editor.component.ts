@@ -21,7 +21,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-iframe-editor',
+    selector: 'sqx-iframe-editor[context][formValue]',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     providers: [
@@ -56,7 +56,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     public language?: string | null;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

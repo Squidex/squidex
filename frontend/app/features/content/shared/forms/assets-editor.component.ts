@@ -50,7 +50,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
     public folderId?: string;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

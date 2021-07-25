@@ -12,12 +12,13 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-    selector: 'sqx-number-ui',
+    selector: 'sqx-number-ui[field][fieldForm][properties]',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',
 })
 export class NumberUIComponent extends ResourceOwner implements OnChanges {
     public readonly converter = FloatConverter.INSTANCE;
+    public readonly editors = NUMBER_FIELD_EDITORS;
 
     @Input()
     public fieldForm: FormGroup;
@@ -27,8 +28,6 @@ export class NumberUIComponent extends ResourceOwner implements OnChanges {
 
     @Input()
     public properties: NumberFieldPropertiesDto;
-
-    public editors = NUMBER_FIELD_EDITORS;
 
     public hideAllowedValues: Observable<boolean>;
     public hideInlineEditable: Observable<boolean>;

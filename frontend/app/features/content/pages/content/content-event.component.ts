@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import { ContentDto, HistoryEventDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-event',
+    selector: 'sqx-content-event[content][event]',
     styleUrls: ['./content-event.component.scss'],
     templateUrl: './content-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

@@ -11,7 +11,7 @@
         <div class="row gx-2 mt-3 mb-3">
             <div class="col-auto">          
                 <div *ngIf="schema && languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" [(selectedLanguage)]="language!" [languages]="languages"></sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
                 </div>
             </div>
 

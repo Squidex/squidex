@@ -31,7 +31,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
     public threeStates?: boolean | null;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

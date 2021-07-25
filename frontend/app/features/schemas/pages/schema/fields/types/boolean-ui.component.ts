@@ -10,11 +10,13 @@ import { FormGroup } from '@angular/forms';
 import { BooleanFieldPropertiesDto, BOOLEAN_FIELD_EDITORS, FieldDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-boolean-ui',
+    selector: 'sqx-boolean-ui[field][fieldForm][properties]',
     styleUrls: ['boolean-ui.component.scss'],
     templateUrl: 'boolean-ui.component.html',
 })
 export class BooleanUIComponent {
+    public readonly editors = BOOLEAN_FIELD_EDITORS;
+
     @Input()
     public fieldForm: FormGroup;
 
@@ -23,6 +25,4 @@ export class BooleanUIComponent {
 
     @Input()
     public properties: BooleanFieldPropertiesDto;
-
-    public editors = BOOLEAN_FIELD_EDITORS;
 }

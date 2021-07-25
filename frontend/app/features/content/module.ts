@@ -10,7 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, LoadSchemasGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ScrollingModuleExperimental } from '@angular/cdk-experimental/scrolling';
-import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentPageComponent, ContentReferencesComponent, ContentsColumnsPipe, ContentSectionComponent, ContentSelectorComponent, ContentSelectorItemComponent, ContentsFiltersPageComponent, ContentsPageComponent, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
+import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentPageComponent, ContentReferencesComponent, ContentSectionComponent, ContentsFiltersPageComponent, ContentsPageComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -89,29 +89,19 @@ const routes: Routes = [
         AssetsEditorComponent,
         CommentsPageComponent,
         ComponentComponent,
+        ContentCreatorComponent,
         ComponentSectionComponent,
         ContentComponent,
-        ContentCreatorComponent,
         ContentEditorComponent,
         ContentEventComponent,
         ContentExtensionComponent,
         ContentFieldComponent,
         ContentHistoryPageComponent,
-        ContentListCellDirective,
-        ContentListFieldComponent,
-        ContentListHeaderComponent,
-        ContentListWidthPipe,
         ContentPageComponent,
         ContentReferencesComponent,
-        ContentsColumnsPipe,
         ContentSectionComponent,
-        ContentSelectorComponent,
-        ContentSelectorItemComponent,
         ContentsFiltersPageComponent,
         ContentsPageComponent,
-        ContentStatusComponent,
-        ContentValueComponent,
-        ContentValueEditorComponent,
         CustomViewEditorComponent,
         DueTimeSelectorComponent,
         FieldEditorComponent,

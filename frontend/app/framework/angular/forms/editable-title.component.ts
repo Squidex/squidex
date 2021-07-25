@@ -10,7 +10,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
 
 @Component({
-    selector: 'sqx-editable-title',
+    selector: 'sqx-editable-title[name]',
     styleUrls: ['./editable-title.component.scss'],
     templateUrl: './editable-title.component.html',
 })

@@ -22,6 +22,9 @@ export class QueryComponent {
     public language: LanguageDto;
 
     @Input()
+    public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
     public model: QueryModel;
 
     @Input()

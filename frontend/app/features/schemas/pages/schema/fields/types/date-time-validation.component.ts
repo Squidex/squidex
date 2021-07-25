@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
 @Component({
-    selector: 'sqx-date-time-validation',
+    selector: 'sqx-date-time-validation[field][fieldForm][properties]',
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
 })

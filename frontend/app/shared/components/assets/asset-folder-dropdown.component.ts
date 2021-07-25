@@ -32,7 +32,7 @@ interface State {
 })
 export class AssetFolderDropdownComponent extends StatefulControlComponent<State, any> implements OnInit {
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

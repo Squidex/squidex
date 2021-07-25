@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-    selector: 'sqx-field-editor',
+    selector: 'sqx-field-editor[form][formContext][formModel][language][languages]',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
 })
@@ -33,7 +33,7 @@ export class FieldEditorComponent implements OnChanges {
     public languages: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public index: number;
+    public index: number | null | undefined;
 
     @Input()
     public canUnset?: boolean | null;

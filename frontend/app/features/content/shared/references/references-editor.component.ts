@@ -48,7 +48,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public allowDuplicates?: boolean | null = true;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
@@ -70,14 +70,17 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
                 const contentIds: string[] = obj;
 
                 this.contentsService.getContentsByIds(this.appsState.appName, contentIds)
-                    .subscribe(dtos => {
-                        this.setContentItems(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r));
+                    .subscribe({
+                        next: dtos => {
+                            this.setContentItems(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r));
 
-                        if (this.snapshot.contentItems.length !== contentIds.length) {
-                            this.updateValue();
-                        }
-                    }, () => {
-                        this.setContentItems([]);
+                            if (this.snapshot.contentItems.length !== contentIds.length) {
+                                this.updateValue();
+                            }
+                        },
+                        error: () => {
+                            this.setContentItems([]);
+                        },
                     });
             }
         } else {

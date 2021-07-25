@@ -167,10 +167,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }
 
                 this.contentsState.update(this.content, value)
-                    .subscribe(() => {
-                        this.contentForm.submitCompleted({ noReset: true });
-                    }, error => {
-                        this.contentForm.submitFailed(error);
+                    .subscribe({
+                        next: () => {
+                            this.contentForm.submitCompleted({ noReset: true });
+                        },
+                        error: error => {
+                            this.contentForm.submitFailed(error);
+                        },
                     });
             } else {
                 if (!this.canCreate(publish)) {
@@ -178,12 +181,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }
 
                 this.contentsState.create(value, publish)
-                    .subscribe(() => {
-                        this.contentForm.submitCompleted({ noReset: true });
-
-                        this.back();
-                    }, error => {
-                        this.contentForm.submitFailed(error);
+                    .subscribe({
+                        next: () => {
+                            this.contentForm.submitCompleted({ noReset: true });
+                        },
+                        error: error => {
+                            this.contentForm.submitFailed(error);
+                        },
                     });
             }
         } else {

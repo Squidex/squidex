@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/c
 import { AppDto, CallsUsageDto, fadeAnimation } from '@app/shared';
 
 @Component({
-    selector: 'sqx-api-calls-summary-card',
+    selector: 'sqx-api-calls-summary-card[app][usage]',
     styleUrls: ['./api-calls-summary-card.component.scss'],
     templateUrl: './api-calls-summary-card.component.html',
     animations: [

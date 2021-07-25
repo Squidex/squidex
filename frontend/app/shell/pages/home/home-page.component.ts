@@ -28,10 +28,13 @@ export class HomePageComponent {
             this.authService.loginRedirect();
         } else {
             this.authService.loginPopup()
-                .subscribe(() => {
-                    this.router.navigate(['/app']);
-                }, () => {
-                    this.showLoginError = true;
+                .subscribe({
+                    next: () => {
+                        this.router.navigate(['/app']);
+                    },
+                    error: () => {
+                        this.showLoginError = true;
+                    },
                 });
         }
     }

@@ -29,6 +29,9 @@ export class SearchFormComponent implements OnChanges {
     public language: LanguageDto;
 
     @Input()
+    public languages: ReadonlyArray<LanguageDto> = [];
+
+    @Input()
     public queryModel?: QueryModel | null;
 
     @Input()

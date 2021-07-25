@@ -43,7 +43,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     private value: Geolocation | null = null;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

@@ -10,7 +10,7 @@ import { AppDto, fadeAnimation, StorageUsagePerDateDto } from '@app/shared';
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
-    selector: 'sqx-asset-uploads-size-card',
+    selector: 'sqx-asset-uploads-size-card[app][usage]',
     styleUrls: ['./asset-uploads-size-card.component.scss'],
     templateUrl: './asset-uploads-size-card.component.html',
     animations: [

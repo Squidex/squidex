@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppDto, fadeAnimation } from '@app/shared';
 
 @Component({
-    selector: 'sqx-support-card',
+    selector: 'sqx-support-card[app]',
     styleUrls: ['./support-card.component.scss'],
     templateUrl: './support-card.component.html',
     animations: [

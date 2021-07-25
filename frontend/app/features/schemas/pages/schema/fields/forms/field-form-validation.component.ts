@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { AppSettingsDto, FieldDto, LanguageDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-form-validation',
+    selector: 'sqx-field-form-validation[field][fieldForm][languages][settings]',
     styleUrls: ['./field-form-validation.component.scss'],
     templateUrl: './field-form-validation.component.html',
 })

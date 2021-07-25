@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ContentDto, FieldValue, getContentValue, LanguageDto, MetaFields, RootFieldDto, StatefulComponent, TableField, Types } from '@app/shared';
+import { ContentDto, FieldValue, getContentValue, LanguageDto, MetaFields, RootFieldDto, StatefulComponent, TableField, Types } from '@app/shared/internal';
 
 interface State {
     // The formatted value.
@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-list-field',
+    selector: 'sqx-content-list-field[content][field][language]',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,12 @@
+<div class="form-control disabled" (click)="contentSelectorDialog.show()">
+    {{snapshot.selectedName}}
+</div>
+
+<ng-container *sqxModal="contentSelectorDialog">
+    <sqx-content-selector
+        (select)="select($event)"
+        [language]="language"
+        [languages]="languages"
+        [schemaIds]="schemaIds">
+    </sqx-content-selector>
+</ng-container>

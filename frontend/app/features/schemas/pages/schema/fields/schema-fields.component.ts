@@ -10,7 +10,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, SchemaDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-fields',
+    selector: 'sqx-schema-fields[schema]',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
 })

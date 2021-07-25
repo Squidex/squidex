@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TitleService } from '@app/framework/internal';
 
 @Component({
-    selector: 'sqx-title',
+    selector: 'sqx-title[message]',
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

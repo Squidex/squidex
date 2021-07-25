@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { HistoryEventDto } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-history-list',
+    selector: 'sqx-history-list[events]',
     styleUrls: ['./history-list.component.scss'],
     templateUrl: './history-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

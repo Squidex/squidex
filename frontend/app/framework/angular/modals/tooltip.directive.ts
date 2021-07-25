@@ -12,7 +12,7 @@ import { DialogService, Keys, Tooltip } from '@app/framework/internal';
     selector: '[title]:not(sqx-layout),[shortcut]',
 })
 export class TooltipDirective implements OnDestroy {
-    private titleText: string;
+    private titleText: string | undefined | null;
     private timer: any;
     private shortcutTimer: any;
 
@@ -32,7 +32,7 @@ export class TooltipDirective implements OnDestroy {
     public titleDelay = 1000;
 
     @Input()
-    public set title(value: string) {
+    public set title(value: string | undefined | null) {
         this.titleText = value;
 
         this.unsetAttribute();
@@ -136,7 +136,7 @@ export class TooltipDirective implements OnDestroy {
     }
 
     private show() {
-        this.dialogs.tooltip(new Tooltip(this.target, this.titleText, this.titlePosition, false, this.shortcut));
+        this.dialogs.tooltip(new Tooltip(this.target, this.titleText!, this.titlePosition, false, this.shortcut));
     }
 
     private showShortcut(shortcut: string) {

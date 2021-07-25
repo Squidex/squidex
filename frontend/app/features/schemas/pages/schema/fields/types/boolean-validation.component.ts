@@ -11,7 +11,7 @@ import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-boolean-validation',
+    selector: 'sqx-boolean-validation[field][fieldForm][properties]',
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html',
 })

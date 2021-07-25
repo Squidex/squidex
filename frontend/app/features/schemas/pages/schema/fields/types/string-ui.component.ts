@@ -12,11 +12,13 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-    selector: 'sqx-string-ui',
+    selector: 'sqx-string-ui[field][fieldForm][properties]',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',
 })
 export class StringUIComponent extends ResourceOwner implements OnChanges {
+    public readonly editors = STRING_FIELD_EDITORS;
+
     @Input()
     public fieldForm: FormGroup;
 
@@ -25,8 +27,6 @@ export class StringUIComponent extends ResourceOwner implements OnChanges {
 
     @Input()
     public properties: StringFieldPropertiesDto;
-
-    public editors = STRING_FIELD_EDITORS;
 
     public hideAllowedValues: Observable<boolean>;
     public hideInlineEditable: Observable<boolean>;

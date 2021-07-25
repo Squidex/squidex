@@ -33,7 +33,7 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
 }];
 
 @Component({
-    selector: 'sqx-role',
+    selector: 'sqx-role[allPermissions][role][schemas]',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -121,10 +121,13 @@ export class RoleComponent implements OnChanges {
 
         if (value) {
             this.rolesState.update(this.role, { ...value, properties: this.properties })
-                .subscribe(() => {
-                    this.editForm.submitCompleted({ noReset: true });
-                }, error => {
-                    this.editForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.editForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.editForm.submitFailed(error);
+                    },
                 });
         }
     }

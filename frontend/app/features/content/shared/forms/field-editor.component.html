@@ -112,11 +112,11 @@
                             </sqx-references-editor>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Dropdown'">
-                            <sqx-references-dropdown
+                            <sqx-reference-dropdown
                                 [formControl]="editorControl" 
                                 [language]="language"
 								[schemaId]="field.rawProperties.singleId">
-                            </sqx-references-dropdown>
+                            </sqx-reference-dropdown>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Tags'">
                             <sqx-references-tags

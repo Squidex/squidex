@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared';
 
 @Component({
-    selector: 'sqx-array-validation',
+    selector: 'sqx-array-validation[field][fieldForm][properties]',
     styleUrls: ['array-validation.component.scss'],
     templateUrl: 'array-validation.component.html',
 })

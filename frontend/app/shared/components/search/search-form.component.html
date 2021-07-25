@@ -77,7 +77,8 @@
                     <sqx-query [model]="queryModel" 
                         [query]="query" 
                         (queryChange)="changeQuery($event)"
-                        [language]="language">
+                        [language]="language"
+                        [languages]="languages">
                     </sqx-query>
     
                     <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown"></div>

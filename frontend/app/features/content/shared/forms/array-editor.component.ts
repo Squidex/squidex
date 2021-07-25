@@ -13,7 +13,7 @@ import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
-    selector: 'sqx-array-editor',
+    selector: 'sqx-array-editor[form][formContext][formModel][language][languages]',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

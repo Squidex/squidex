@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } f
 import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-client',
+    selector: 'sqx-client[client][clientRoles]',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

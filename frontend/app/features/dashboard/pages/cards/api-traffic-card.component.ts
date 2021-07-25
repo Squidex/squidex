@@ -10,7 +10,7 @@ import { AppDto, CallsUsageDto, fadeAnimation } from '@app/shared';
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
-    selector: 'sqx-api-traffic-card',
+    selector: 'sqx-api-traffic-card[app][usage]',
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
     animations: [

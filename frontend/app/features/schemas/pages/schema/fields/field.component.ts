@@ -11,7 +11,7 @@ import { FormBuilder } from '@angular/forms';
 import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field',
+    selector: 'sqx-field[field][languages][schema][settings]',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
     animations: [
@@ -112,10 +112,13 @@ export class FieldComponent implements OnChanges {
             const properties = createProperties(this.field.properties.fieldType, value);
 
             this.schemasState.updateField(this.schema, this.field, { properties })
-                .subscribe(() => {
-                    this.editForm.submitCompleted({ noReset: true });
-                }, error => {
-                    this.editForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.editForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.editForm.submitFailed(error);
+                    },
                 });
         }
     }

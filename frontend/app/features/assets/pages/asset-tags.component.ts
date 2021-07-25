@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { TagItem, TagsSelected } from '@app/shared';
 
 @Component({
-    selector: 'sqx-asset-tags',
+    selector: 'sqx-asset-tags[tags][tagsSelected]',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

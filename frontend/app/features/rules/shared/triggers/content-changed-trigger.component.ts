@@ -15,7 +15,7 @@ export interface TriggerSchemaForm {
 }
 
 @Component({
-    selector: 'sqx-content-changed-trigger',
+    selector: 'sqx-content-changed-trigger[trigger][triggerForm]',
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
 })

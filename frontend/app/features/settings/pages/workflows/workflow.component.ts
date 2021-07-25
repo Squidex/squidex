@@ -9,7 +9,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { ErrorDto, MathHelper, SchemaTagSource, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
 
 @Component({
-    selector: 'sqx-workflow',
+    selector: 'sqx-workflow[roles][schemasSource][workflow]',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',
 })

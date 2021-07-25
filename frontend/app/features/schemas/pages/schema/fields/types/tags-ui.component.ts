@@ -10,11 +10,13 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, TagsFieldPropertiesDto, TAGS_FIELD_EDITORS } from '@app/shared';
 
 @Component({
-    selector: 'sqx-tags-ui',
+    selector: 'sqx-tags-ui[field][fieldForm][properties]',
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html',
 })
 export class TagsUIComponent {
+    public readonly editors = TAGS_FIELD_EDITORS;
+
     @Input()
     public fieldForm: FormGroup;
 
@@ -23,6 +25,4 @@ export class TagsUIComponent {
 
     @Input()
     public properties: TagsFieldPropertiesDto;
-
-    public editors = TAGS_FIELD_EDITORS;
 }

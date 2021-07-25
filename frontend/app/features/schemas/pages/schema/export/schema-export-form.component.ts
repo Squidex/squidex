@@ -10,7 +10,7 @@ import { FormBuilder } from '@angular/forms';
 import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-export-form',
+    selector: 'sqx-schema-export-form[schema]',
     styleUrls: ['./schema-export-form.component.scss'],
     templateUrl: './schema-export-form.component.html',
 })
@@ -43,10 +43,13 @@ export class SchemaExportFormComponent implements OnChanges {
 
         if (value) {
             this.schemasState.synchronize(this.schema, value)
-                .subscribe(() => {
-                    this.synchronizeForm.submitCompleted({ noReset: true });
-                }, error => {
-                    this.synchronizeForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.synchronizeForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.synchronizeForm.submitFailed(error);
+                    },
                 });
         }
     }

@@ -22,13 +22,13 @@ export class LoginPageComponent implements OnInit {
 
     public ngOnInit() {
         this.authService.loginRedirectComplete()
-            .subscribe(
-                () => {
+            .subscribe({
+                next: () => {
                     this.router.navigate(['/app'], { replaceUrl: true });
                 },
-                () => {
+                error: () => {
                     this.router.navigate(['/'], { replaceUrl: true });
                 },
-            );
+            });
     }
 }

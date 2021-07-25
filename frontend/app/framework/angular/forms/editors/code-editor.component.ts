@@ -56,7 +56,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public height: number | 'auto' | 'full' = 'full';
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

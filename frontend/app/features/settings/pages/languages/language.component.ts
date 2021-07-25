@@ -11,7 +11,7 @@ import { FormBuilder } from '@angular/forms';
 import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted } from '@app/shared';
 
 @Component({
-    selector: 'sqx-language',
+    selector: 'sqx-language[language][fallbackLanguages][fallbackLanguagesNew]',
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',
 })
@@ -70,10 +70,13 @@ export class LanguageComponent implements OnChanges {
             const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code) };
 
             this.languagesState.update(this.language, request)
-                .subscribe(() => {
-                    this.editForm.submitCompleted({ noReset: true });
-                }, error => {
-                    this.editForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.editForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.editForm.submitFailed(error);
+                    },
                 });
         }
     }

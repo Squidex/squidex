@@ -56,17 +56,23 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
         if (value) {
             if (this.user) {
                 this.usersState.update(this.user, value)
-                    .subscribe(user => {
-                        this.userForm.submitCompleted({ newValue: user });
-                    }, error => {
-                        this.userForm.submitFailed(error);
+                    .subscribe({
+                        next: user => {
+                            this.userForm.submitCompleted({ newValue: user });
+                        },
+                        error: error => {
+                            this.userForm.submitFailed(error);
+                        },
                     });
             } else {
                 this.usersState.create(<CreateUserDto>value)
-                    .subscribe(() => {
-                        this.back();
-                    }, error => {
-                        this.userForm.submitFailed(error);
+                    .subscribe({
+                        next: () => {
+                            this.back();
+                        },
+                        error: error => {
+                            this.userForm.submitFailed(error);
+                        },
                     });
             }
         }

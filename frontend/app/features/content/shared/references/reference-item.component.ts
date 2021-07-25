@@ -11,7 +11,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Out
 import { AppLanguageDto, ContentDto, getContentValue } from '@app/shared';
 
 @Component({
-    selector: '[sqxReferenceItem]',
+    selector: '[sqxReferenceItem][language]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
