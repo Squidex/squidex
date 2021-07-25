@@ -94,8 +94,8 @@
             {{ 'common.cancel' | sqxTranslate }}
         </button>
 
-        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0">
-            {{ 'contents.referencesLink' | sqxTranslate: { count: selectionCount} }})
+        <button type="submit" class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems">
+            {{ 'contents.referencesLink' | sqxTranslate: { count: selectionCount } }}
         </button>
     </ng-container>
 </sqx-modal-dialog>

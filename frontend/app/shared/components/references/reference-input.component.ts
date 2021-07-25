@@ -66,22 +66,33 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, str
             this.contentsService.getContentsByIds(this.appsState.appName, [obj])
                 .subscribe({
                     next: contents => {
-                        this.selectContent(contents.items[0]);
+                        this.updateContent(contents.items[0]);
                     },
                     error: () => {
-                        this.selectContent(undefined);
+                        this.updateContent(undefined);
                     },
                 });
         } else {
-            this.selectContent(undefined);
+            this.updateContent();
         }
     }
 
     public select(contents: ReadonlyArray<ContentDto>) {
-        this.selectContent(contents[0]);
+        if (contents.length > 0) {
+            this.selectContent(contents[0]);
+        }
+
+        this.contentSelectorDialog.hide();
     }
 
-    private selectContent(selectedContent?: ContentDto) {
+    public selectContent(selectedContent?: ContentDto) {
+        this.callChange(selectedContent?.id);
+        this.callTouched();
+
+        this.updateContent(selectedContent);
+    }
+
+    private updateContent(selectedContent?: ContentDto) {
         this.next(s => ({
             ...s,
             selectedContent,

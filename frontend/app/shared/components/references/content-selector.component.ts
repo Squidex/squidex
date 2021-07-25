@@ -21,6 +21,9 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
     @Input()
+    public maxItems = Number.MAX_VALUE;
+
+    @Input()
     public schemaName?: string | null;
 
     @Input()
