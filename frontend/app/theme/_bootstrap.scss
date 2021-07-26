@@ -641,4 +641,8 @@ $icon-size: 4.5rem;
     tbody + tbody {
         border: 0;
     }
+
+    .form-control {
+        border-bottom-width: 1px;
+    }
 }

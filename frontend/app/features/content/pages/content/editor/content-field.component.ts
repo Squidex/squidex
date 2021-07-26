@@ -11,7 +11,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-    selector: 'sqx-content-field[form][formContext][formModel][schema][language][languages]',
+    selector: 'sqx-content-field[form][formContext][formModel][language][languages][schema]',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
 })

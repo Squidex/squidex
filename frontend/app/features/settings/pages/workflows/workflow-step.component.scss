@@ -3,6 +3,7 @@
         @include placeholder-color($color-theme-secondary);
         border-style: dashed;
         border-width: 1px;
+        box-shadow: none;
     }
 
     .color {
@@ -30,7 +31,6 @@
     }
 
     .transition {
-        line-height: 2.2rem;
         margin-bottom: .5rem;
         margin-top: .25rem;
 
@@ -87,8 +87,4 @@
         padding: .5rem .75rem;
         padding-right: 0;
     }
-}
-
-.transition-prevent-updates-checkbox {
-    margin-top: .8rem;
 }

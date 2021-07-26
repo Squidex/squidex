@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FeatureDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-news-dialog',
+    selector: 'sqx-news-dialog[features]',
     styleUrls: ['./news-dialog.component.scss'],
     templateUrl: './news-dialog.component.html',
 })

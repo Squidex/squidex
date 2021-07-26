@@ -23,7 +23,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-references-editor',
+    selector: 'sqx-references-editor[formContext][language][languages][schemaIds]',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
     providers: [
