@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "status",
             ResolvedType = AllTypes.NonNullString,
             Resolver = Resolve(x => x.Status.ToString().ToUpperInvariant()),
-            Description = "The the status of the content."
+            Description = "The status of the content."
         };
 
         public static readonly FieldType StatusColor = new FieldType
@@ -93,7 +93,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "statusColor",
             ResolvedType = AllTypes.NonNullString,
             Resolver = Resolve(x => x.StatusColor),
-            Description = "The color status of the content."
+            Description = "The status color of the content."
+        };
+
+        public static readonly FieldType NewStatus = new FieldType
+        {
+            Name = "newStatus",
+            ResolvedType = AllTypes.String,
+            Resolver = Resolve(x => x.NewStatus?.ToString().ToUpperInvariant()),
+            Description = "The new status of the content."
+        };
+
+        public static readonly FieldType NewStatusColor = new FieldType
+        {
+            Name = "newStatus",
+            ResolvedType = AllTypes.String,
+            Resolver = Resolve(x => x.NewStatusColor),
+            Description = "The new status color of the content."
         };
 
         public static readonly FieldType SchemaId = new FieldType
@@ -103,6 +119,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Resolver = Resolve(x => x[Component.Discriminator].ToString()),
             Description = "The id of the schema."
         };
+
+        public static readonly FieldType Url = new FieldType
+        {
+            Name = "url",
+            ResolvedType = AllTypes.NonNullString,
+            Resolver = ContentResolvers.Url,
+            Description = "The url to the content."
+        });
 
         private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)
         {

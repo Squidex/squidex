@@ -24,6 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(ContentFields.LastModifiedBy);
             AddField(ContentFields.Status);
             AddField(ContentFields.StatusColor);
+            AddField(ContentFields.NewStatus);
+            AddField(ContentFields.NewStatusColor);
+            AddField(ContentFields.Url);
 
             Description = "The structure of all content types.";
         }

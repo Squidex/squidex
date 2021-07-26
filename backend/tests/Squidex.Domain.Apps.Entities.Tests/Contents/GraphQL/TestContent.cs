@@ -34,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
             status
             statusColor
+            newStatus
+            newStatusColor
             url
             data {
               myJson {
@@ -113,6 +115,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
             status
             statusColor
+            newStatus
+            newStatusColor
             url
             flatData {
               myJson
@@ -229,7 +233,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Data = data,
                 SchemaId = TestSchemas.DefaultId,
                 Status = Status.Draft,
-                StatusColor = "red"
+                StatusColor = "red",
+                NewStatus = Status.Published,
+                NewStatusColor = "blue"
             };
 
             return content;
@@ -257,7 +263,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,
-                StatusColor = "red"
+                StatusColor = "red",
+                NewStatus = Status.Published,
+                NewStatusColor = "blue"
             };
 
             return content;
@@ -287,6 +295,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 status = "DRAFT",
                 statusColor = "red",
+                newStatus = "PUBLISHED",
+                newStatusColor = "blue",
                 url = $"contents/my-schema/{content.Id}",
                 data = Data(content)
             };
@@ -316,6 +326,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 status = "DRAFT",
                 statusColor = "red",
+                newStatus = "PUBLISHED",
+                newStatusColor = "blue",
                 url = $"contents/my-schema/{content.Id}",
                 flatData = FlatData(content)
             };
