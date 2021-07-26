@@ -78,7 +78,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public dropdownWidth = '18rem';
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

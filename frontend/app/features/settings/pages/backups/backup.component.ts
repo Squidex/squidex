@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ApiUrlConfig, BackupDto, BackupsState, Duration } from '@app/shared';
 
 @Component({
-    selector: 'sqx-backup',
+    selector: 'sqx-backup[backup]',
     styleUrls: ['./backup.component.scss'],
     templateUrl: './backup.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

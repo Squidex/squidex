@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } from '@app/shared';
 
 @Component({
-    selector: 'sqx-number-validation',
+    selector: 'sqx-number-validation[field][fieldForm][properties]',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
 })

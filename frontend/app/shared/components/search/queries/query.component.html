@@ -1,4 +1,9 @@
-<sqx-filter-logical [isRoot]="true" [filter]="queryValue.filter" [model]="model" [language]="language"
+<sqx-filter-logical 
+    [filter]="queryValue.filter" 
+    [isRoot]="true" 
+    [language]="language"
+    [languages]="languages"
+    [model]="model" 
     (change)="emitQueryChange()">
 </sqx-filter-logical>
 

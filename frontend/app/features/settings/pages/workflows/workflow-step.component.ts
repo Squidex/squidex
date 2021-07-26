@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
-    selector: 'sqx-workflow-step',
+    selector: 'sqx-workflow-step[roles][step][workflow]',
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
 })

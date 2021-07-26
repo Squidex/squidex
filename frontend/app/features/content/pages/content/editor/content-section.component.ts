@@ -14,7 +14,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-section',
+    selector: 'sqx-content-section[form][formContext][formSection][language][languages][schema]',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

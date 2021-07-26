@@ -10,7 +10,7 @@ import { FormBuilder } from '@angular/forms';
 import { EditSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-schema-edit-form',
+    selector: 'sqx-schema-edit-form[schema]',
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html',
 })
@@ -44,10 +44,13 @@ export class SchemaEditFormComponent implements OnChanges {
 
         if (value) {
             this.schemasState.update(this.schema, value)
-                .subscribe(() => {
-                    this.fieldForm.submitCompleted({ noReset: true });
-                }, error => {
-                    this.fieldForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.fieldForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.fieldForm.submitFailed(error);
+                    },
                 });
         }
     }

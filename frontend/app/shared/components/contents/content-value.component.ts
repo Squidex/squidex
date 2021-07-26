@@ -6,10 +6,10 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { HtmlValue, Types } from '@app/shared';
+import { HtmlValue, Types } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-value',
+    selector: 'sqx-content-value[value]',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

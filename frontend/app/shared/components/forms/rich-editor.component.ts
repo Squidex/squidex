@@ -35,7 +35,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     public folderId: string;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
@@ -101,14 +101,17 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
                 const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
 
                 self.assetUploader.uploadFile(file)
-                    .subscribe(asset => {
-                        if (Types.is(asset, AssetDto)) {
-                            success(asset.fullUrl(self.apiUrl));
-                        }
-                    }, error => {
-                        if (!Types.is(error, UploadCanceled)) {
-                            failure('Failed');
-                        }
+                    .subscribe({
+                        next: asset => {
+                            if (Types.is(asset, AssetDto)) {
+                                success(asset.fullUrl(self.apiUrl));
+                            }
+                        },
+                        error: error => {
+                            if (!Types.is(error, UploadCanceled)) {
+                                failure('Failed');
+                            }
+                        },
                     });
             },
 
@@ -246,14 +249,17 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         };
 
         this.assetUploader.uploadFile(file, undefined, this.folderId)
-            .subscribe(asset => {
-                if (Types.is(asset, AssetDto)) {
-                    replaceText(this.buildMarkup(asset));
-                }
-            }, error => {
-                if (!Types.is(error, UploadCanceled)) {
-                    replaceText('FAILED');
-                }
+            .subscribe({
+                next: asset => {
+                    if (Types.is(asset, AssetDto)) {
+                        replaceText(this.buildMarkup(asset));
+                    }
+                },
+                error: error => {
+                    if (!Types.is(error, UploadCanceled)) {
+                        replaceText('FAILED');
+                    }
+                },
             });
     }
 

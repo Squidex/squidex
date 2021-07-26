@@ -10,7 +10,7 @@ import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, EditContent
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    selector: 'sqx-component',
+    selector: 'sqx-component[form][formContext][formModel][language][languages]',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

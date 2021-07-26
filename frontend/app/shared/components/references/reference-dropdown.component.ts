@@ -9,8 +9,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Inpu
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppsState, ContentDto, ContentsService, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, Types, UIOptions, value$ } from '@app/shared/internal';
 
-export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesDropdownComponent), multi: true,
+export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,
 };
 
 interface State {
@@ -29,42 +29,34 @@ type ContentName = { name: string; id?: string };
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-dropdown',
-    styleUrls: ['./references-dropdown.component.scss'],
-    templateUrl: './references-dropdown.component.html',
+    selector: 'sqx-reference-dropdown[schemaId]',
+    styleUrls: ['./reference-dropdown.component.scss'],
+    templateUrl: './reference-dropdown.component.html',
     providers: [
-        SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR,
+        SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferencesDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
+export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
     private readonly itemCount: number;
-    private languageField: LanguageDto;
     private selectedId: string | undefined;
+
+    @Input()
+    public language: LanguageDto;
 
     @Input()
     public schemaId: string;
 
     @Input()
-    public mode: 'Array' | 'Single';
+    public mode: 'Array' | 'Single' = 'Single';
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
-    @Input()
-    public set language(value: LanguageDto) {
-        this.languageField = value;
-
-        this.next(s => ({
-            ...s,
-            contentNames: this.createContentNames(s.contents),
-        }));
-    }
-
     public get isValid() {
-        return !!this.schemaId && !!this.languageField;
+        return !!this.schemaId && !!this.language;
     }
 
     public control = new FormControl('');
@@ -108,18 +100,28 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
             if (this.isValid) {
                 this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount })
-                    .subscribe(({ items: contents }) => {
-                        const contentNames = this.createContentNames(contents);
+                    .subscribe({
+                        next: ({ items: contents }) => {
+                            const contentNames = this.createContentNames(contents);
 
-                        this.next({ contents, contentNames });
+                            this.next({ contents, contentNames });
 
-                        this.selectContent();
-                    }, () => {
-                        this.control.disable(NO_EMIT);
+                            this.selectContent();
+                        },
+                        error: () => {
+                            this.control.disable(NO_EMIT);
+                        },
                     });
             } else {
                 this.control.disable(NO_EMIT);
             }
+        }
+
+        if (changes['language']) {
+            this.next(s => ({
+                ...s,
+                contentNames: this.createContentNames(this.snapshot.contents),
+            }));
         }
     }
 
@@ -163,7 +165,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         const names = contents.map(content => {
             const name =
                 content.referenceFields
-                    .map(f => getContentValue(content, this.languageField, f, false))
+                    .map(f => getContentValue(content, this.language, f, false))
                     .map(v => v.formatted || this.localizer.getOrKey('common.noValue'))
                     .filter(v => !!v)
                     .join(', ');

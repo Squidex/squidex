@@ -51,11 +51,13 @@ export class ContentSummaryCardComponent extends StatefulComponent<State> implem
         query.take = 0;
 
         this.contentsService.getContents(this.app.name, this.options.schema, { query })
-            .subscribe(({ total: itemCount }) => {
-                this.next({ itemCount });
-            },
-            () => {
-                this.next({ itemCount: 0 });
+            .subscribe({
+                next: ({ total: itemCount }) => {
+                    this.next({ itemCount });
+                },
+                error: () => {
+                    this.next({ itemCount: 0 });
+                },
             });
     }
 }

@@ -11,7 +11,7 @@ import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, Langua
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-string-validation',
+    selector: 'sqx-string-validation[field][fieldForm][properties]',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
     animations: [
@@ -19,6 +19,8 @@ import { Observable } from 'rxjs';
     ],
 })
 export class StringValidationComponent extends ResourceOwner implements OnChanges {
+    public readonly contentTypes = STRING_CONTENT_TYPES;
+
     @Input()
     public fieldForm: FormGroup;
 
@@ -36,8 +38,6 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
     @Input()
     public isLocalizable?: boolean | null;
-
-    public contentTypes = STRING_CONTENT_TYPES;
 
     public showPatternMessage: Observable<boolean>;
     public showPatternSuggestions: Observable<boolean>;

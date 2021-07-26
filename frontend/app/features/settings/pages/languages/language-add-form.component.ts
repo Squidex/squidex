@@ -40,10 +40,13 @@ export class LanguageAddFormComponent implements OnChanges {
 
         if (value) {
             this.languagesState.add(value.language)
-                .subscribe(() => {
-                    this.addLanguageForm.submitCompleted();
-                }, error => {
-                    this.addLanguageForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.addLanguageForm.submitCompleted();
+                    },
+                    error: error => {
+                        this.addLanguageForm.submitFailed(error);
+                    },
                 });
         }
     }

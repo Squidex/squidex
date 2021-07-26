@@ -56,7 +56,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public separated?: boolean | null;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

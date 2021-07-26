@@ -8,10 +8,10 @@
 /* tslint:disable: component-selector */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ContentDto, LanguageDto, SchemaDto } from '@app/shared';
+import { ContentDto, LanguageDto, SchemaDto } from '@app/shared/internal';
 
 @Component({
-    selector: '[sqxContentSelectorItem]',
+    selector: '[sqxContentSelectorItem][language][schema]',
     styleUrls: ['./content-selector-item.component.scss'],
     templateUrl: './content-selector-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

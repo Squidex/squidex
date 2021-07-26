@@ -71,16 +71,19 @@ export class ContributorAddFormComponent implements OnChanges {
 
         if (value) {
             this.contributorsState.assign(value)
-                .subscribe(isCreated => {
-                    this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
+                .subscribe({
+                    next: isCreated => {
+                        this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
 
-                    if (isCreated) {
-                        this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
-                    } else {
-                        this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
-                    }
-                }, error => {
-                    this.assignContributorForm.submitFailed(error);
+                        if (isCreated) {
+                            this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
+                        } else {
+                            this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
+                        }
+                    },
+                    error: error => {
+                        this.assignContributorForm.submitFailed(error);
+                    },
                 });
         }
     }

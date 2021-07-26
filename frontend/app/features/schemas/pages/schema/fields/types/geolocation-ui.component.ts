@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-geolocation-ui',
+    selector: 'sqx-geolocation-ui[field][fieldForm][properties]',
     styleUrls: ['geolocation-ui.component.scss'],
     templateUrl: 'geolocation-ui.component.html',
 })

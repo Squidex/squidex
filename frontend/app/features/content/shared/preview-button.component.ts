@@ -19,7 +19,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-preview-button',
+    selector: 'sqx-preview-button[content][schema]',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
     animations: [

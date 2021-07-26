@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, RootFieldDto, SchemaDto, Version } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-editor',
+    selector: 'sqx-content-editor[contentForm][formContext][language][languages][schema]',
     styleUrls: ['./content-editor.component.scss'],
     templateUrl: './content-editor.component.html',
 })
@@ -36,10 +36,10 @@ export class ContentEditorComponent {
     public formContext: any;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public language: AppLanguageDto;
 
     @Input()
-    public language: AppLanguageDto;
+    public languages: ReadonlyArray<AppLanguageDto>;
 
     public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
         return section.separator?.fieldId;

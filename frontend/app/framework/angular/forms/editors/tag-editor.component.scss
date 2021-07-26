@@ -48,6 +48,8 @@ $inner-height: 1.75rem;
 
     &.dashed {
         border-style: dashed;
+        border-width: 1px;
+        box-shadow: none;
     }
 
     &.readonly {

@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-form-common',
+    selector: 'sqx-field-form-common[field][fieldForm]',
     styleUrls: ['./field-form-common.component.scss'],
     templateUrl: './field-form-common.component.html',
 })

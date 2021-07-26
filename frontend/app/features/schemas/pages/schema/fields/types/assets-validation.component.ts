@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-assets-validation',
+    selector: 'sqx-assets-validation[field][fieldForm][properties]',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
 })

@@ -44,7 +44,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     public containerElement: ElementRef<HTMLDivElement>;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

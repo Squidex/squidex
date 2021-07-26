@@ -88,7 +88,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputName = 'tag-editor';
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

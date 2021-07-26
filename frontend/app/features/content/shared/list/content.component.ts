@@ -6,13 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentsState, fadeAnimation, ModalModel, PatchContentForm, RootFieldDto, TableField, Types } from '@app/shared';
-import { ContentListFieldComponent } from './content-list-field.component';
+import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, fadeAnimation, ModalModel, PatchContentForm, RootFieldDto, TableField, Types } from '@app/shared';
 
 /* tslint:disable: component-selector */
 
 @Component({
-    selector: '[sqxContent]',
+    selector: '[sqxContent][language][listFields]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
     animations: [
@@ -88,14 +87,17 @@ export class ContentComponent implements OnChanges {
 
         if (value) {
             this.contentsState.patch(this.content, value)
-                .subscribe(() => {
-                    this.patchForm.submitCompleted({ noReset: true });
+                .subscribe({
+                    next: () => {
+                        this.patchForm.submitCompleted({ noReset: true });
 
-                    this.changeDetector.markForCheck();
-                }, error => {
-                    this.patchForm.submitFailed(error);
+                        this.changeDetector.markForCheck();
+                    },
+                    error: error => {
+                        this.patchForm.submitFailed(error);
 
-                    this.changeDetector.markForCheck();
+                        this.changeDetector.markForCheck();
+                    },
                 });
         }
     }

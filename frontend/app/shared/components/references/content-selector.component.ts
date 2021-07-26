@@ -6,10 +6,10 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-selector',
+    selector: 'sqx-content-selector[language][languages]',
     styleUrls: ['./content-selector.component.scss'],
     templateUrl: './content-selector.component.html',
     providers: [
@@ -21,10 +21,13 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public select = new EventEmitter<ReadonlyArray<ContentDto>>();
 
     @Input()
+    public maxItems = Number.MAX_VALUE;
+
+    @Input()
     public schemaName?: string | null;
 
     @Input()
-    public schemaIds: ReadonlyArray<string>;
+    public schemaIds?: ReadonlyArray<string>;
 
     @Input()
     public language: LanguageDto;
@@ -36,7 +39,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public allowDuplicates?: boolean | null;
 
     @Input()
-    public alreadySelected: ReadonlyArray<ContentDto>;
+    public alreadySelected: ReadonlyArray<ContentDto> | undefined | null;
 
     public schema: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
@@ -66,7 +69,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canReadContents);
 
         if (this.schemaIds && this.schemaIds.length > 0) {
-            this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
+            this.schemas = this.schemas.filter(x => this.schemaIds!.indexOf(x.id) >= 0);
         }
 
         this.selectSchema(this.schemas[0]);

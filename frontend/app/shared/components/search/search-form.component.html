@@ -31,8 +31,8 @@
                 {{ 'search.advancedTour' | sqxTranslate }}
             </sqx-onboarding-tooltip>
 
-            <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.toggle()" [class.highlighted]="hasFilter" #expand>
-                <i class="icon-filter-filled"></i>
+            <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.toggle()" #expand>
+                <i [class.icon-filter]="!hasFilter" [class.icon-filter-filled]="hasFilter"></i>
             </button>
         </ng-container>
     </div>
@@ -77,7 +77,8 @@
                     <sqx-query [model]="queryModel" 
                         [query]="query" 
                         (queryChange)="changeQuery($event)"
-                        [language]="language">
+                        [language]="language"
+                        [languages]="languages">
                     </sqx-query>
     
                     <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown"></div>

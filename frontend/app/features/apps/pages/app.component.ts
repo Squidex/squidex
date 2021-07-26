@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { AppDto, fadeAnimation, ModalModel } from '@app/shared';
 
 @Component({
-    selector: 'sqx-app',
+    selector: 'sqx-app[app]',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
     animations: [

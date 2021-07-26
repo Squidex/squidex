@@ -81,7 +81,9 @@
         
             <ng-template #singleControlCompare>
                 <sqx-field-editor
+                    [form]="formCompare"
                     [formModel]="getControlCompare()!"
+                    [formContext]="formContext"
                     [language]="language"
                     [languages]="languages">
                 </sqx-field-editor>

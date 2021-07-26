@@ -18,7 +18,7 @@ type TemplateMode = 'Text' | 'Script' | 'Liquid';
 const MODES: ReadonlyArray<TemplateMode> = ['Text', 'Script', 'Liquid'];
 
 @Component({
-    selector: 'sqx-formattable-input',
+    selector: 'sqx-formattable-input[type]',
     styleUrls: ['./formattable-input.component.scss'],
     templateUrl: './formattable-input.component.html',
     providers: [

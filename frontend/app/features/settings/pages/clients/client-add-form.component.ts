@@ -29,10 +29,13 @@ export class ClientAddFormComponent {
 
         if (value) {
             this.clientsState.attach(value)
-                .subscribe(() => {
-                    this.addClientForm.submitCompleted();
-                }, error => {
-                    this.addClientForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.addClientForm.submitCompleted();
+                    },
+                    error: error => {
+                        this.addClientForm.submitFailed(error);
+                    },
                 });
         }
     }

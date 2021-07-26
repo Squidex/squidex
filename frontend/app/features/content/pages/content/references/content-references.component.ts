@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } f
 import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-references',
+    selector: 'sqx-content-references[content][language][languages]',
     styleUrls: ['./content-references.component.scss'],
     templateUrl: './content-references.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ScheduleDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-status',
+    selector: 'sqx-content-status[status][statusColor]',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

@@ -12,7 +12,7 @@ import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 
 @Component({
-    selector: 'sqx-field-wizard',
+    selector: 'sqx-field-wizard[schema][settings]',
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
 })
@@ -27,7 +27,7 @@ export class FieldWizardComponent implements OnInit {
     public settings: AppSettingsDto;
 
     @Input()
-    public parent: RootFieldDto;
+    public parent: RootFieldDto | null | undefined;
 
     @Output()
     public complete = new EventEmitter();
@@ -65,23 +65,26 @@ export class FieldWizardComponent implements OnInit {
 
         if (value) {
             this.schemasState.addField(this.schema, value, this.parent)
-                .subscribe(dto => {
-                    this.field = dto;
+                .subscribe({
+                    next: dto => {
+                        this.field = dto;
 
-                    this.addFieldForm.submitCompleted({ newValue: { ...DEFAULT_FIELD } });
+                        this.addFieldForm.submitCompleted({ newValue: { ...DEFAULT_FIELD } });
 
-                    if (addNew) {
-                        if (Types.isFunction(this.nameInput.nativeElement.focus)) {
-                            this.nameInput.nativeElement.focus();
+                        if (addNew) {
+                            if (Types.isFunction(this.nameInput.nativeElement.focus)) {
+                                this.nameInput.nativeElement.focus();
+                            }
+                        } else if (edit) {
+                            this.editForm = new EditFieldForm(this.formBuilder, this.field.properties);
+                            this.editForm.load(this.field.properties);
+                        } else {
+                            this.emitComplete();
                         }
-                    } else if (edit) {
-                        this.editForm = new EditFieldForm(this.formBuilder, this.field.properties);
-                        this.editForm.load(this.field.properties);
-                    } else {
-                        this.emitComplete();
-                    }
-                }, error => {
-                    this.addFieldForm.submitFailed(error);
+                    },
+                    error: error => {
+                        this.addFieldForm.submitFailed(error);
+                    },
                 });
         }
     }
@@ -97,16 +100,19 @@ export class FieldWizardComponent implements OnInit {
             const properties = createProperties(this.field.properties.fieldType, value);
 
             this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
-                .subscribe(() => {
-                    this.editForm!.submitCompleted();
+                .subscribe({
+                    next: () => {
+                        this.editForm!.submitCompleted();
 
-                    if (addNew) {
-                        this.editForm = undefined;
-                    } else {
-                        this.emitComplete();
-                    }
-                }, error => {
-                    this.editForm!.submitFailed(error);
+                        if (addNew) {
+                            this.editForm = undefined;
+                        } else {
+                            this.emitComplete();
+                        }
+                    },
+                    error: error => {
+                        this.editForm!.submitFailed(error);
+                    },
                 });
         }
     }

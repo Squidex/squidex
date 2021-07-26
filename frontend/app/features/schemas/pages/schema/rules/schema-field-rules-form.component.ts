@@ -67,10 +67,13 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
 
         if (value) {
             this.schemasState.configureFieldRules(this.schema, value)
-                .subscribe(() => {
-                    this.editForm.submitCompleted({ noReset: true });
-                }, error => {
-                    this.editForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.editForm.submitCompleted({ noReset: true });
+                    },
+                    error: error => {
+                        this.editForm.submitFailed(error);
+                    },
                 });
         }
     }

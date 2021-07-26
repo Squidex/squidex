@@ -131,20 +131,24 @@ export class AssetDialogComponent implements OnChanges {
                 this.setProgress(0);
 
                 this.assetUploader.uploadAsset(this.asset, file)
-                    .subscribe(dto => {
-                        if (Types.isNumber(dto)) {
-                            this.setProgress(dto);
-                        } else {
-                            this.changed.emit(dto);
+                    .subscribe({
+                        next: dto => {
+                            if (Types.isNumber(dto)) {
+                                this.setProgress(dto);
+                            } else {
+                                this.changed.emit(dto);
 
-                            this.dialogs.notifyInfo('i18n:assets.updated');
-                        }
-                    }, error => {
-                        if (!Types.is(error, UploadCanceled)) {
-                            this.dialogs.notifyError(error);
-                        }
-                    }, () => {
+                                this.dialogs.notifyInfo('i18n:assets.updated');
+                            }
+                        },
+                        error: error => {
+                            if (!Types.is(error, UploadCanceled)) {
+                                this.dialogs.notifyError(error);
+                            }
+                        },
+                        complete: () => {
                         this.setProgress(0);
+                        },
                     });
             } else {
                 this.dialogs.notifyInfo('i18n:common.nothingChanged');
@@ -171,12 +175,15 @@ export class AssetDialogComponent implements OnChanges {
     private annoateAssetInternal(value: AnnotateAssetDto | null) {
         if (value) {
             this.assetsState.updateAsset(this.asset, value)
-                .subscribe(() => {
-                    this.annotateForm.submitCompleted({ noReset: true });
+                .subscribe({
+                    next: () => {
+                        this.annotateForm.submitCompleted({ noReset: true });
 
-                    this.dialogs.notifyInfo('i18n:assets.updated');
-                }, error => {
-                    this.annotateForm.submitFailed(error);
+                        this.dialogs.notifyInfo('i18n:assets.updated');
+                    },
+                    error: error => {
+                        this.annotateForm.submitFailed(error);
+                    },
                 });
         } else {
             this.dialogs.notifyInfo('i18n:common.nothingChanged');

@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-creator',
+    selector: 'sqx-content-creator[formContext][language][languages]',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
     providers: [
@@ -94,12 +94,15 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
             }
 
             this.contentsState.create(value, publish)
-                .subscribe(content => {
-                    this.contentForm.submitCompleted({ noReset: true });
+                .subscribe({
+                    next: content => {
+                        this.contentForm.submitCompleted({ noReset: true });
 
-                    this.emitSelect(content);
-                }, error => {
-                    this.contentForm.submitFailed(error);
+                        this.emitSelect(content);
+                    },
+                    error: error => {
+                        this.contentForm.submitFailed(error);
+                    },
                 });
         } else {
             this.contentForm.submitFailed('i18n:contents.contentNotValid');

@@ -12,8 +12,8 @@
     <ng-container *ngIf="field.properties.isComplexUI || !showAllControls">
         <div class="button-container">
             <sqx-language-selector size="sm" #buttonLanguages
-                [selectedLanguage]="language"
-                (selectedLanguageChange)="languageChange.emit($event)"
+                (languageChange)="languageChange.emit($event)"
+                [language]="language"
                 [languages]="languages">
             </sqx-language-selector>
         </div>

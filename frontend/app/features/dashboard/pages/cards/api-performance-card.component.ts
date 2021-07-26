@@ -10,7 +10,7 @@ import { AppDto, CallsUsageDto, fadeAnimation } from '@app/shared';
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
-    selector: 'sqx-api-performance-card',
+    selector: 'sqx-api-performance-card[app][usage]',
     styleUrls: ['./api-performance-card.component.scss'],
     templateUrl: './api-performance-card.component.html',
     animations: [

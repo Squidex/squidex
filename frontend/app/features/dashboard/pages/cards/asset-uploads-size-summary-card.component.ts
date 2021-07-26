@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/c
 import { AppDto, CurrentStorageDto, fadeAnimation } from '@app/shared';
 
 @Component({
-    selector: 'sqx-asset-uploads-size-summary-card',
+    selector: 'sqx-asset-uploads-size-summary-card[app][usage]',
     styleUrls: ['./asset-uploads-size-summary-card.component.scss'],
     templateUrl: './asset-uploads-size-summary-card.component.html',
     animations: [

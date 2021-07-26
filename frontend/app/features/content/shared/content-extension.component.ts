@@ -11,7 +11,7 @@ import { ApiUrlConfig, ResourceOwner, Types } from '@app/framework/internal';
 import { AppsState, AuthService, computeEditorUrl, ContentDto, SchemaDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-extension',
+    selector: 'sqx-content-extension[content][contentSchema]',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

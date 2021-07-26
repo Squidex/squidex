@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { AppLanguageDto, RootFieldDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-languages',
+    selector: 'sqx-field-languages[field][language][languages]',
     styleUrls: ['./field-languages.component.scss'],
     templateUrl: './field-languages.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

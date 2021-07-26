@@ -10,7 +10,7 @@ import { AppDto, CallsUsageDto, fadeAnimation, UsagesService } from '@app/shared
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
-    selector: 'sqx-api-calls-card',
+    selector: 'sqx-api-calls-card[app][usage]',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
     animations: [

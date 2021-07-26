@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
 
 @Component({
-    selector: 'sqx-components-validation',
+    selector: 'sqx-components-validation[field][fieldForm][properties]',
     styleUrls: ['components-validation.component.scss'],
     templateUrl: 'components-validation.component.html',
 })

@@ -11,7 +11,7 @@ import { ResourceLoaderService, WorkflowDto } from '@app/shared';
 declare const vis: any;
 
 @Component({
-    selector: 'sqx-workflow-diagram',
+    selector: 'sqx-workflow-diagram[workflow]',
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',
 })

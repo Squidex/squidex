@@ -7,10 +7,10 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, MathHelper } from '@app/shared';
+import { FieldDto, MathHelper } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-content-value-editor',
+    selector: 'sqx-content-value-editor[field][form]',
     styleUrls: ['./content-value-editor.component.scss'],
     templateUrl: './content-value-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

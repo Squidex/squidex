@@ -6,7 +6,7 @@
  */
 
 import { Directive, ElementRef, Input, OnChanges, Pipe, PipeTransform, Renderer2 } from '@angular/core';
-import { ContentDto, MetaFields, RootFieldDto, TableField, Types } from '@app/shared';
+import { ContentDto, MetaFields, RootFieldDto, TableField, Types } from '@app/shared/internal';
 
 export function getTableWidth(fields: ReadonlyArray<TableField>) {
     let result = 0;

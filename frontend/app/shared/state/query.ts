@@ -349,7 +349,7 @@ export function queryModelFromSchema(schema: SchemaDto, languages: ReadonlyArray
         } else if (field.properties.fieldType === 'DateTime') {
             type = TypeDateTime;
         } else if (field.properties.fieldType === 'References') {
-            const extra = field.rawProperties.singleId;
+            const extra = field.rawProperties.schemaIds;
 
             type = { ...TypeReference, extra };
         }

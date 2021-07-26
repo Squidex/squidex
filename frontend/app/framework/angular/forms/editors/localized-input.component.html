@@ -1,9 +1,9 @@
 <div class="row mb-1">
     <div class="col">
         <sqx-language-selector size="sm" 
-            [languages]="languages" 
-            [selectedLanguage]="snapshot.language"
-            (selectedLanguageChange)="setLanguage($event)">
+            (languageChange)="setLanguage($event)"
+            [language]="snapshot.language"
+            [languages]="languages">
         </sqx-language-selector>
     </div>
     <div class="col-auto">

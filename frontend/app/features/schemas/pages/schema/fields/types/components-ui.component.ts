@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-components-ui',
+    selector: 'sqx-components-ui[field][fieldForm][properties]',
     styleUrls: ['components-ui.component.scss'],
     templateUrl: 'components-ui.component.html',
 })

@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-geolocation-validation',
+    selector: 'sqx-geolocation-validation[field][fieldForm][properties]',
     styleUrls: ['geolocation-validation.component.scss'],
     templateUrl: 'geolocation-validation.component.html',
 })

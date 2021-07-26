@@ -45,17 +45,23 @@ export class AssetFolderDialogComponent implements OnInit {
         if (value) {
             if (this.assetFolder) {
                 this.assetsState.updateAssetFolder(this.assetFolder, value)
-                    .subscribe(() => {
-                        this.emitComplete();
-                    }, error => {
-                        this.editForm.submitFailed(error);
+                    .subscribe({
+                        next: () => {
+                            this.emitComplete();
+                        },
+                        error: error => {
+                            this.editForm.submitFailed(error);
+                        },
                     });
             } else {
                 this.assetsState.createAssetFolder(value.folderName)
-                    .subscribe(() => {
-                        this.emitComplete();
-                    }, error => {
-                        this.editForm.submitFailed(error);
+                    .subscribe({
+                        next: () => {
+                            this.emitComplete();
+                        },
+                        error: error => {
+                            this.editForm.submitFailed(error);
+                        },
                     });
             }
         }

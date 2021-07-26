@@ -10,12 +10,13 @@ import { FormGroup } from '@angular/forms';
 import { DateTimeFieldPropertiesDto, DATETIME_FIELD_EDITORS, FieldDto, FloatConverter } from '@app/shared';
 
 @Component({
-    selector: 'sqx-date-time-ui',
+    selector: 'sqx-date-time-ui[field][fieldForm][properties]',
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html',
 })
 export class DateTimeUIComponent {
     public readonly converter = FloatConverter.INSTANCE;
+    public readonly editors = DATETIME_FIELD_EDITORS;
 
     @Input()
     public fieldForm: FormGroup;
@@ -25,6 +26,4 @@ export class DateTimeUIComponent {
 
     @Input()
     public properties: DateTimeFieldPropertiesDto;
-
-    public editors = DATETIME_FIELD_EDITORS;
 }

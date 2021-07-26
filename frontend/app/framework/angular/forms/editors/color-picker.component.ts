@@ -41,7 +41,7 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
     public mode: 'Input' | 'Circle' = 'Input';
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

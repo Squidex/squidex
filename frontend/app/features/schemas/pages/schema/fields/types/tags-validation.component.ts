@@ -10,7 +10,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-tags-validation',
+    selector: 'sqx-tags-validation[field][fieldForm][languages][properties]',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
 })

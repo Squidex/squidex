@@ -63,7 +63,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     public isCompact?: boolean | null;
 
     @Input()
-    public set disabled(value: boolean | null | undefined) {
+    public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 

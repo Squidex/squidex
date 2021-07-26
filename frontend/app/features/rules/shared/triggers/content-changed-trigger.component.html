@@ -1,9 +1,9 @@
 <ng-container *ngIf="!triggerForm.form.controls.handleAll.value">
     <table class="table table-middle table-sm table-fixed table-borderless">
         <colgroup>
-            <col style="width: 40%" />
-            <col style="width: 60%" />
-            <col style="width: 40px" />
+            <col style="width: 40%;" />
+            <col style="width: 60%;" />
+            <col style="width: 40px;" />
         </colgroup>
 
         <tr>
@@ -36,14 +36,16 @@
     </table>
 
     <div class="section" *ngIf="schemasToAdd.length > 0">
-        <form class="form-inline" (ngSubmit)="addSchema()">
-            <div class="form-group me-1">
+        <form class="row g-2" (ngSubmit)="addSchema()">
+            <div class="col">
                 <select class="form-select schemas-control" [disabled]="triggerForm.form.disabled" [(ngModel)]="schemaToAdd" name="schema">
                     <option *ngFor="let schema of schemasToAdd; trackBy: trackBySchema" [ngValue]="schema">{{schema.displayName}}</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-success" [disabled]="triggerForm.form.disabled">Add Schema</button>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-success" [disabled]="triggerForm.form.disabled">Add Schema</button>
+            </div>
         </form>
     </div>
     

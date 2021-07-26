@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { PlanInfo, PlansState } from '@app/shared';
 
 @Component({
-    selector: 'sqx-plan',
+    selector: 'sqx-plan[planInfo]',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,

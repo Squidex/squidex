@@ -51,12 +51,15 @@ export class ClientConnectFormComponent implements OnInit {
         this.connectLibraryText = connectLibrary(this.apiUrl, this.appName, this.client);
 
         this.clientsService.createToken(this.appsState.appName, this.client)
-            .subscribe(dto => {
-                this.connectToken = dto;
+            .subscribe({
+                next: dto => {
+                    this.connectToken = dto;
 
-                this.changeDetector.markForCheck();
-            }, error => {
-                this.dialogs.notifyError(error);
+                    this.changeDetector.markForCheck();
+                },
+                error: error => {
+                    this.dialogs.notifyError(error);
+                },
             });
     }
 

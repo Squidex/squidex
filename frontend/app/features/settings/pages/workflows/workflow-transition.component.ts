@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RoleDto, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
 
 @Component({
-    selector: 'sqx-workflow-transition',
+    selector: 'sqx-workflow-transition[roles][transition]',
     styleUrls: ['./workflow-transition.component.scss'],
     templateUrl: './workflow-transition.component.html',
 })
