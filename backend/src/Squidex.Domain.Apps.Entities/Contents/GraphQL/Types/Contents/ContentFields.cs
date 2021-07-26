@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public static readonly FieldType NewStatusColor = new FieldType
         {
-            Name = "newStatus",
+            Name = "newStatusColor",
             ResolvedType = AllTypes.String,
             Resolver = Resolve(x => x.NewStatusColor),
             Description = "The new status color of the content."
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             ResolvedType = AllTypes.NonNullString,
             Resolver = ContentResolvers.Url,
             Description = "The url to the content."
-        });
+        };
 
         private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)
         {
