@@ -44,14 +44,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(ContentFields.LastModifiedByUser);
             AddField(ContentFields.Status);
             AddField(ContentFields.StatusColor);
-
-            AddField(new FieldType
-            {
-                Name = "url",
-                ResolvedType = AllTypes.NonNullString,
-                Resolver = ContentResolvers.Url,
-                Description = "The url to the content."
-            });
+            AddField(ContentFields.NewStatus);
+            AddField(ContentFields.NewStatusColor);
+            AddField(ContentFields.Url);
 
             var contentDataType = new DataGraphType(builder, schemaInfo);
 
