@@ -1,3 +1,6 @@
 .loader {
-    @include absolute(12px, null, null, 20px);
+    @include absolute(50%, null, null, 50%);
+    margin-left: -14px;
+    margin-top: -14px;
+    width: 28px;
 }
