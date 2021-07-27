@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -127,6 +127,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             try
             {
                 return edmModel.ParseQuery(odata).ToQuery();
+            }
+            catch (ValidationException)
+            {
+                throw;
             }
             catch (NotSupportedException)
             {

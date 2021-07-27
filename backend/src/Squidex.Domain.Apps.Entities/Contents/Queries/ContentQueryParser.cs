@@ -193,6 +193,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 return model.ParseQuery(odata).ToQuery();
             }
+            catch (ValidationException)
+            {
+                throw;
+            }
             catch (NotSupportedException)
             {
                 throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
