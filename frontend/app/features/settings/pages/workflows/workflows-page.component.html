@@ -8,7 +8,7 @@
     </ng-container>
 
     <ng-container>
-        <sqx-list-view [isLoading]="workflowsState.isLoading | async">
+        <sqx-list-view innerWidth="80rem" [isLoading]="workflowsState.isLoading | async">
             <ng-container>
                 <ng-container *ngIf="workflowsState.errors | async; let errors">
                     <div class="alert alert-danger" *ngIf="errors.length > 1">

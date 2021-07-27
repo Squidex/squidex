@@ -13,6 +13,10 @@ $inner-height: 1.75rem;
     position: relative;
 }
 
+.form-check {
+    margin: 0;
+}
+
 .form-control {
     cursor: text;
     padding: .25rem;
@@ -91,6 +95,7 @@ div {
     background: transparent;
     border: 0;
     border-radius: 0;
+    box-shadow: none;
     padding: 0;
 
     &:focus,
@@ -176,7 +181,6 @@ div {
 }
 
 .suggestions-dropdown {
-    max-width: 420px;
-    min-width: 420px;
+    @include force-width(450px);
     padding: 1rem;
 }

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
@@ -36,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public IReadOnlyList<DomainId>? SchemaIds { get; set; }
+        public ImmutableList<DomainId>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.
