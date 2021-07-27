@@ -74,11 +74,11 @@ sqx-list-view {
     position: relative;
 
     &:hover {
-        border-color: $color-theme-blue;
+        border-color: $color-theme-brand;
     }
 
     &.selected {
-        border-color: $color-theme-blue;
+        border-color: $color-theme-brand;
     }
 
     &-user {

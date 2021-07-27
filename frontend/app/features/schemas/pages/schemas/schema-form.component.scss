@@ -28,7 +28,7 @@ $icon-size: 4.5rem;
         background: transparent;
         border: 1px solid $color-border;
         border-radius: $border-radius;
-        color: $color-theme-blue;
+        color: $color-theme-brand;
         cursor: pointer;
         font-size: 1.75rem;
         font-weight: normal;
@@ -45,8 +45,8 @@ $icon-size: 4.5rem;
 
         &.active {
             @include box-shadow-outer(0, 0, 10px, .5);
-            background: $color-theme-blue;
-            border-color: $color-theme-blue;
+            background: $color-theme-brand;
+            border-color: $color-theme-brand;
             color: $color-white;
 
             &:hover {

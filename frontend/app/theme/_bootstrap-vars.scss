@@ -30,13 +30,14 @@ $text-muted:                    $color-text-decent;
 $min-contrast-ratio:            1.5;
 
 // Primary color.
-$primary:                       $color-theme-blue;
+$primary:                       $color-theme-brand;
 
 // Theme colors.
 $danger:                        $color-theme-error;
+$info:                          $color-theme-info;
 $secondary:                     $color-theme-secondary;
-$success:                       $color-theme-green;
-$warning:                       $color-theme-orange;
+$success:                       $color-theme-success;
+$warning:                       $color-theme-warning;
 
 // Background.
 $body-bg:                       $color-background;
@@ -55,6 +56,7 @@ $btn-white-space:               nowrap;
 // Alerts
 $alert-color-scale:             -100%;
 $alert-bg-scale:                0%;
+$alert-border-scale:                0%;
 $alert-link-font-weight:        normal;
 
 // Labels
@@ -74,7 +76,7 @@ $badge-bg-level: 2;
 $dropdown-border-color:         0;
 $dropdown-box-shadow:           0 3px 16px rgba(0, 0, 0, .2);
 $dropdown-divider-bg:           $color-border-dark;
-$dropdown-link-hover-bg:        $color-theme-blue-lightest;
+$dropdown-link-hover-bg:        $color-theme-brand-light;
 
 // Horizontal separator
 $hr-opacity:                    1;

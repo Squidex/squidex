@@ -131,7 +131,7 @@ hr {
 .item-published {
     & {
         @include circle(.5rem);
-        background: $color-theme-green;
+        background: $color-theme-success;
         border: 0;
         margin-left: .4rem;
     }
@@ -223,7 +223,7 @@ hr {
 
 .sidebar {
     @include absolute($size-navbar-height, null, 0, 0);
-    background: $color-theme-blue;
+    background: $color-theme-brand;
     color: $color-white;
     font-size: $font-small;
     font-weight: default;
@@ -239,7 +239,7 @@ hr {
     }
 
     .nav-link {
-        background: $color-theme-blue;
+        background: $color-theme-brand;
         color: $color-white !important;
         cursor: pointer;
         padding: 1rem 0;
@@ -248,11 +248,11 @@ hr {
         text-decoration: none;
 
         &:hover {
-            background: $color-theme-blue-darker;
+            background: $color-theme-brand-darker;
         }
 
         &.active {
-            background: $color-theme-blue-darker;
+            background: $color-theme-brand-darker;
         }
 
         i {
@@ -291,7 +291,7 @@ hr {
     }
 
     &-warning {
-        background: $color-theme-orange;
+        background: $color-theme-warning;
     }
 
     &-failed {
@@ -299,7 +299,7 @@ hr {
     }
 
     &-success {
-        background: $color-theme-green;
+        background: $color-theme-success;
     }
 }
 

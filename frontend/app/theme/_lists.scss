@@ -87,7 +87,7 @@
             // Blue background and white text when active.
             &.active {
                 td {
-                    border-color: $color-theme-blue;
+                    border-color: $color-theme-brand;
                 }
             }
         }
@@ -117,9 +117,9 @@
             position: relative;
 
             &.expanded {
-                background-color: $color-theme-blue-lightest;
-                border-color: $color-theme-blue-lightest;
-                color: $color-theme-blue;
+                background-color: $color-theme-brand-light;
+                border-color: $color-theme-brand-light;
+                color: $color-theme-brand;
                 font-size: inherit;
                 font-weight: 500;
 

@@ -60,12 +60,12 @@ $circle-size: 1.6rem;
     }
 
     &-success {
-        background: $color-theme-green;
+        background: $color-theme-success;
     }
 }
 
 .drag {
     & > .uploads {
-        border-color: $color-theme-blue;
+        border-color: $color-theme-brand;
     }
 }

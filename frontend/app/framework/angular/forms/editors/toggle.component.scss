@@ -31,7 +31,7 @@ $toggle-button-size: $toggle-height - .25rem;
         width: $toggle-width;
 
         &.checked {
-            background: $color-theme-green-dark;
+            background: $color-theme-success-dark;
 
             .toggle-button {
                 left: $toggle-height * .5;

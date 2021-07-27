@@ -86,7 +86,7 @@
     }
 
     &-success {
-        background: $color-theme-green-dark;
+        background: $color-theme-success-dark;
     }
 
     &.closeable {
@@ -182,18 +182,18 @@
 
         &:active,
         &.active {
-            background: $color-theme-blue;
+            background: $color-theme-brand;
 
             &.separated {
-                border-color: $color-theme-blue;
+                border-color: $color-theme-brand;
             }
         }
 
         &:hover {
-            background: $color-theme-blue;
+            background: $color-theme-brand;
 
             &.separated {
-                border-color: $color-theme-blue;
+                border-color: $color-theme-brand;
             }
         }
 

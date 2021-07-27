@@ -26,7 +26,7 @@
     }
 
     &.active {
-        color: $color-theme-blue;
+        color: $color-theme-brand;
     }
 }
 
@@ -250,7 +250,7 @@
     display: block;
 
     &:hover {
-        color: $color-theme-blue-dark;
+        color: $color-theme-brand-dark;
     }
 
     &.active {
@@ -286,14 +286,14 @@
         }
 
         &.active {
-            background-color: $color-theme-blue-lightest;
-            color: $color-theme-blue;
+            background-color: $color-theme-brand-light;
+            color: $color-theme-brand;
             cursor: default;
             font-weight: 500;
         }
 
         &:hover {
-            background-color: $color-theme-blue-lightest;
+            background-color: $color-theme-brand-light;
             color: $color-text;
         }
     }

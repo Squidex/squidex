@@ -65,7 +65,7 @@
 }
 
 .alert-hint {
-    background: lighten($color-theme-blue, 35%);
+    background: lighten($color-theme-brand, 35%);
     border: 0;
     border-radius: $border-radius;
     color: $color-text;
@@ -76,7 +76,7 @@
 
     i {
         @include absolute(1rem, null, null, 1rem);
-        color: $color-theme-blue;
+        color: $color-theme-brand;
         font-size: 1.3rem;
         font-weight: normal;
         vertical-align: text-bottom;
@@ -102,7 +102,7 @@ a {
 
     &.force {
         & {
-            color: $color-theme-blue !important;
+            color: $color-theme-brand !important;
         }
 
         &:hover {
@@ -229,10 +229,10 @@ a {
             }
 
             &.done {
-                color: $color-theme-green !important;
+                color: $color-theme-success !important;
 
                 a {
-                    color: $color-theme-green !important;
+                    color: $color-theme-success !important;
                 }
             }
 
@@ -256,10 +256,10 @@ a {
         }
 
         &.done {
-            color: $color-theme-green;
+            color: $color-theme-success;
 
             a {
-                color: $color-theme-green !important;
+                color: $color-theme-success !important;
             }
 
             i {
@@ -290,7 +290,7 @@ a {
 
         &.active,
         &:hover {
-            border-color: $color-theme-blue;
+            border-color: $color-theme-brand;
         }
     }
 }
@@ -372,28 +372,28 @@ a {
         &.active {
             & {
                 background: none;
-                border-color: $color-theme-blue;
-                color: $color-theme-blue;
+                border-color: $color-theme-brand;
+                color: $color-theme-brand;
             }
 
             i {
-                color: $color-theme-blue;
+                color: $color-theme-brand;
             }
 
             &:hover {
-                color: $color-theme-blue-dark;
+                color: $color-theme-brand-dark;
 
                 i {
-                    color: $color-theme-blue-dark;
+                    color: $color-theme-brand-dark;
                 }
             }
         }
 
         &:hover {
-            color: $color-theme-blue;
+            color: $color-theme-brand;
 
             i {
-                color: $color-theme-blue;
+                color: $color-theme-brand;
             }
         }
     }
@@ -407,7 +407,7 @@ a {
             }
 
             &.btn-primary {
-                @include build-toggle-button($color-theme-blue, $color-badge-primary-background);
+                @include build-toggle-button($color-theme-brand, $color-badge-primary-background);
             }
 
             &.btn-info {
@@ -419,11 +419,11 @@ a {
             }
 
             &.btn-success {
-                @include build-toggle-button($color-theme-green, $color-badge-success-background);
+                @include build-toggle-button($color-theme-success, $color-badge-success-background);
             }
 
             &.btn-warning {
-                @include build-toggle-button($color-theme-orange, $color-badge-warning-background);
+                @include build-toggle-button($color-theme-warning, $color-badge-warning-background);
             }
         }
 
@@ -435,7 +435,7 @@ a {
     // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
     &-text {
         &-primary {
-            @include build-text-button($color-theme-blue);
+            @include build-text-button($color-theme-brand);
         }
 
         &-secondary {
@@ -447,7 +447,7 @@ a {
         }
 
         &-success {
-            @include build-text-button($color-theme-green);
+            @include build-text-button($color-theme-success);
         }
 
         &-info {
@@ -455,7 +455,7 @@ a {
         }
 
         &-warning {
-            @include build-text-button($color-theme-orange);
+            @include build-text-button($color-theme-warning);
         }
 
         &-secondary2 {
@@ -497,7 +497,7 @@ $icon-size: 4.5rem;
         }
 
         i {
-            color: $color-theme-blue;
+            color: $color-theme-brand;
         }
 
         .radio-input {
