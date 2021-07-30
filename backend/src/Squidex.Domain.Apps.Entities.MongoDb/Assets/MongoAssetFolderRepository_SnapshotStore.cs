@@ -54,14 +54,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetFolderRepository>())
             {
-                var entities = snapshots.Select(Map).ToList();
+                var updates = snapshots.Select(Map).Select(x =>
+                    new ReplaceOneModel<MongoAssetFolderEntity>(
+                        Filter.Eq(y => y.DocumentId, x.DocumentId),
+                        x)
+                    {
+                        IsUpsert = true
+                    }).ToList();
 
-                if (entities.Count == 0)
+                if (updates.Count == 0)
                 {
                     return;
                 }
 
-                await Collection.InsertManyAsync(entities, InsertUnordered);
+                await Collection.BulkWriteAsync(updates);
             }
         }
 

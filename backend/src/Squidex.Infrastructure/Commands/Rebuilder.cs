@@ -45,7 +45,9 @@ namespace Squidex.Infrastructure.Commands
             this.localCache = localCache;
         }
 
-        public virtual async Task RebuildAsync<T, TState>(string filter, int batchSize, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        public virtual async Task RebuildAsync<T, TState>(string filter, int batchSize,
+            CancellationToken ct = default)
+            where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             var store = serviceProvider.GetRequiredService<IStore<TState>>();
 
@@ -62,7 +64,9 @@ namespace Squidex.Infrastructure.Commands
             }, batchSize, ct);
         }
 
-        public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize,
+            CancellationToken ct = default)
+            where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             Guard.NotNull(source, nameof(source));
             Guard.Between(batchSize, 1, 1000, nameof(batchSize));
@@ -78,7 +82,9 @@ namespace Squidex.Infrastructure.Commands
             }, batchSize, ct);
         }
 
-        private async Task InsertManyAsync<T, TState>(IStore<TState> store, Func<Func<DomainId, Task>, Task> source, int batchSize, CancellationToken ct = default) where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        private async Task InsertManyAsync<T, TState>(IStore<TState> store, Func<Func<DomainId, Task>, Task> source, int batchSize,
+            CancellationToken ct = default)
+            where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             var parallelism = Environment.ProcessorCount;
 

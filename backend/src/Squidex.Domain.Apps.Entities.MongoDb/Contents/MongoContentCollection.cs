@@ -216,7 +216,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 return Task.CompletedTask;
             }
 
-            return Collection.InsertManyAsync(entities, InsertUnordered);
+            var writes = entities.Select(x => new ReplaceOneModel<MongoContentEntity>(
+                Filter.Eq(y => y.DocumentId, x.DocumentId),
+                x)
+            {
+                IsUpsert = true
+            }).ToList();
+
+            return Collection.BulkWriteAsync(writes);
         }
     }
 }

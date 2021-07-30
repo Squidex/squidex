@@ -72,12 +72,17 @@ namespace Squidex.Infrastructure.States
         {
             using (Profiler.TraceMethod<MongoSnapshotStore<T>>())
             {
-                var writes = snapshots.Select(x => new InsertOneModel<MongoState<T>>(new MongoState<T>
+                var writes = snapshots.Select(x => new ReplaceOneModel<MongoState<T>>(
+                    Filter.Eq(y => y.DocumentId, x.Key),
+                    new MongoState<T>
+                    {
+                        Doc = x.Value,
+                        DocumentId = x.Key,
+                        Version = x.Version
+                    })
                 {
-                    Doc = x.Value,
-                    DocumentId = x.Key,
-                    Version = x.Version
-                })).ToList();
+                    IsUpsert = true
+                }).ToList();
 
                 if (writes.Count == 0)
                 {

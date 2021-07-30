@@ -126,6 +126,67 @@ namespace Squidex.Infrastructure.States
                 .MustHaveHappenedOnceExactly();
         }
 
+        [Fact]
+        public async Task Should_write_each_id_only_once_if_same_id_requested_twice()
+        {
+            var key1 = DomainId.NewGuid();
+            var key2 = DomainId.NewGuid();
+
+            var bulk = sut.WithBatchContext(None.Type);
+
+            await bulk.LoadAsync(new[] { key1, key2 });
+
+            var persistedEvents1_1 = Save.Events();
+            var persistence1_1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1_1.Write);
+
+            var persistedEvents1_2 = Save.Events();
+            var persistence1_2 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1_2.Write);
+
+            await persistence1_1.WriteSnapshotAsync(12);
+            await persistence1_2.WriteSnapshotAsync(12);
+
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._))
+                .MustNotHaveHappened();
+
+            await bulk.CommitAsync();
+            await bulk.DisposeAsync();
+
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1)))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public async Task Should_write_each_id_only_once_if_same_persistence_written_twice()
+        {
+            var key1 = DomainId.NewGuid();
+            var key2 = DomainId.NewGuid();
+
+            var bulk = sut.WithBatchContext(None.Type);
+
+            await bulk.LoadAsync(new[] { key1, key2 });
+
+            var persistedEvents1 = Save.Events();
+            var persistence1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1.Write);
+
+            await persistence1.WriteSnapshotAsync(12);
+            await persistence1.WriteSnapshotAsync(13);
+
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._))
+                .MustNotHaveHappened();
+
+            await bulk.CommitAsync();
+            await bulk.DisposeAsync();
+
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1)))
+                .MustHaveHappenedOnceExactly();
+        }
+
         private void SetupEventStore(Dictionary<DomainId, List<MyEvent>> streams)
         {
             var storedStreams = new Dictionary<string, IReadOnlyList<StoredEvent>>();
