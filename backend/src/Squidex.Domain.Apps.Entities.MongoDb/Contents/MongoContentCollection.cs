@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 IsUpsert = true
             }).ToList();
 
-            return Collection.BulkWriteAsync(writes);
+            return Collection.BulkWriteAsync(writes, BulkUnordered);
         }
     }
 }

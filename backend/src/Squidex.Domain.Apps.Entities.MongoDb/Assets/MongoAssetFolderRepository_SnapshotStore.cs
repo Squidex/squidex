@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     return;
                 }
 
-                await Collection.BulkWriteAsync(updates);
+                await Collection.BulkWriteAsync(updates, BulkUnordered);
             }
         }
 

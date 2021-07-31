@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 return Task.CompletedTask;
             }
 
-            return Collection.BulkWriteAsync(writes);
+            return Collection.BulkWriteAsync(writes, BulkUnordered);
         }
 
         public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope)

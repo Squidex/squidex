@@ -33,6 +33,10 @@ namespace Migrations.Migrations
                 var filter = Builders<BsonDocument>.Filter;
 
                 var writes = new List<WriteModel<BsonDocument>>();
+                var writeOptions = new BulkWriteOptions
+                {
+                    IsOrdered = false
+                };
 
                 async Task WriteAsync(WriteModel<BsonDocument>? model, bool force)
                 {
@@ -43,7 +47,7 @@ namespace Migrations.Migrations
 
                     if (writes.Count == 1000 || (force && writes.Count > 0))
                     {
-                        await collection.BulkWriteAsync(writes, cancellationToken: ct);
+                        await collection.BulkWriteAsync(writes, writeOptions, ct);
 
                         writes.Clear();
                     }

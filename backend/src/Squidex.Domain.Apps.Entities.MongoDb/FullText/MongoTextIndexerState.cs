@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 return Task.CompletedTask;
             }
 
-            return Collection.BulkWriteAsync(writes);
+            return Collection.BulkWriteAsync(writes, BulkUnordered);
         }
     }
 }

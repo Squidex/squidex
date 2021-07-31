@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
                 return Task.CompletedTask;
             }
 
-            return Collection.BulkWriteAsync(writes);
+            return Collection.BulkWriteAsync(writes, BulkUnordered);
         }
 
         public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app)

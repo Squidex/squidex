@@ -17,8 +17,6 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class MongoUsageRepository : MongoRepositoryBase<MongoUsage>, IUsageRepository
     {
-        private static readonly BulkWriteOptions Unordered = new BulkWriteOptions { IsOrdered = false };
-
         public MongoUsageRepository(IMongoDatabase database)
             : base(database)
         {
@@ -75,7 +73,7 @@ namespace Squidex.Infrastructure.UsageTracking
                     }
                 }
 
-                await Collection.BulkWriteAsync(writes, Unordered);
+                await Collection.BulkWriteAsync(writes, BulkUnordered);
             }
         }
 

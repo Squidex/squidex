@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             }
         }
 
-        public async Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents)
+        public Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents)
         {
             var writes = historyEvents
                 .Select(x =>
@@ -82,10 +82,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                     })
                 .ToList();
 
-            if (writes.Count > 0)
+            if (writes.Count == 0)
             {
-                await Collection.BulkWriteAsync(writes);
+                return Task.CompletedTask;
             }
+
+            return Collection.BulkWriteAsync(writes, BulkUnordered);
         }
     }
 }
