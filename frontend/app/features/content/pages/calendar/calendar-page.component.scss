@@ -4,12 +4,14 @@
     }
 }
 
-.btn-navigate {
-    @include circle(2.25rem);
+.calendar {
+    @include absolute(-1px, 0, 0, 0);
 }
 
-.calendar {
-    @include absolute(0, 0, 0, 0);
+.form-select {
+    display: inline-block;
+    white-space: normal;
+    width: auto;
 }
 
 .form-group-aligned {

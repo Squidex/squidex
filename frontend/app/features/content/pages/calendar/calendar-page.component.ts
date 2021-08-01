@@ -10,6 +10,8 @@ import { AppsState, ContentDto, ContentsService, DateTime, DialogModel, getConte
 
 declare const tui: any;
 
+type ViewMode = 'day' | 'week' | 'month';
+
 @Component({
     selector: 'sqx-calendar-page',
     styleUrls: ['./calendar-page.component.scss'],
@@ -21,6 +23,8 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
 
     @ViewChild('calendarContainer', { static: false })
     public calendarContainer: ElementRef;
+
+    public view: ViewMode = 'month';
 
     public content?: ContentDto;
     public contentDialog = new DialogModel();
@@ -68,6 +72,14 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
 
             this.load();
         });
+    }
+
+    public changeView(view: ViewMode) {
+        this.view = view;
+
+        this.calendar?.changeView(view);
+
+        this.load();
     }
 
     public goPrev() {
