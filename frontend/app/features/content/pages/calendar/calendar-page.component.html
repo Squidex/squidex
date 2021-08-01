@@ -47,7 +47,7 @@
                     <label class="col-4 col-form-label">{{ 'common.content' | sqxTranslate }}</label>
             
                     <div class="col-8">
-                        <a [routerLink]="['../', content.schemaName, content.id]">
+                        <a class="truncate" [routerLink]="['../', content.schemaName, content.id]">
                             {{createContentName(content)}}
                         </a>
                     </div>
@@ -57,7 +57,7 @@
                     <label class="col-4 col-form-label">{{ 'common.schema' | sqxTranslate }}</label>
             
                     <div class="col-8">
-                        <a [routerLink]="['../', content.schemaName]">
+                        <a class="truncate" [routerLink]="['../', content.schemaName]">
                             {{content.schemaDisplayName}}
                         </a>
                     </div>
@@ -70,7 +70,8 @@
                         <sqx-content-status
                             layout="text"
                             [status]="content.status"
-                            [statusColor]="content.statusColor">
+                            [statusColor]="content.statusColor"
+                            [small]="true">
                         </sqx-content-status>
                     </div>
                 </div>
@@ -82,7 +83,8 @@
                         <sqx-content-status
                             layout="text"
                             [status]="content.scheduleJob.status"
-                            [statusColor]="content.scheduleJob.color">
+                            [statusColor]="content.scheduleJob.color"
+                            [small]="true">
                         </sqx-content-status>
                     </div>
                 </div>
