@@ -2,7 +2,9 @@
 
 <sqx-layout layout="main" titleText="i18n:contents.calendar" [hideSidebar]="true">
     <ng-container menu>
-        <select class="form-select" [ngModel]="view" (ngModelChange)="changeView($event)" [disabled]="isLoading">
+        {{title}}
+
+        <select class="form-select ms-4" [ngModel]="view" (ngModelChange)="changeView($event)" [disabled]="isLoading">
             <option ngValue="day">{{ 'common.daily' | sqxTranslate }}</option>
             <option ngValue="week">{{ 'common.weekly' | sqxTranslate }}</option>
             <option ngValue="month">{{ 'common.monthly' | sqxTranslate }}</option>

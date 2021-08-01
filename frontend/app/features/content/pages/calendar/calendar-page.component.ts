@@ -29,6 +29,8 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
     public content?: ContentDto;
     public contentDialog = new DialogModel();
 
+    public title: string;
+
     public isLoading: boolean;
 
     constructor(
@@ -59,8 +61,10 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
 
             this.calendar = new Calendar(this.calendarContainer.nativeElement, {
                 taskView: false,
+                scheduleView: ['time'],
                 defaultView: 'month',
                 isReadOnly: true,
+                ...getLocalizationSettings(),
             });
 
             this.calendar.on('clickSchedule', (event: any) => {
@@ -95,6 +99,8 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
     }
 
     private load() {
+        this.updateRange();
+
         if (!this.calendar || this.isLoading) {
             return;
         }
@@ -129,6 +135,30 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
         });
     }
 
+    private updateRange() {
+        if (!this.calendar) {
+            return;
+        }
+
+        const scheduledFrom = new DateTime(this.calendar.getDateRangeStart().toDate());
+        const scheduledTo = new DateTime(this.calendar.getDateRangeEnd().toDate());
+
+        switch (this.view) {
+            case 'month': {
+                this.title = scheduledFrom.toStringFormat('LLLL yyyy');
+                break;
+            }
+            case 'day': {
+                this.title = scheduledFrom.toStringFormat('PPPP');
+                break;
+            }
+            case 'week': {
+                this.title = `${scheduledFrom.toStringFormat('PP')} - ${scheduledTo.toStringFormat('PP')}`;
+                break;
+            }
+        }
+    }
+
     public createContentName(content: ContentDto) {
         const name =
             content.referenceFields
@@ -140,4 +170,44 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
 
         return name;
     }
+}
+
+let localizedValues: any;
+
+function getLocalizationSettings() {
+    if (!localizedValues) {
+        localizedValues = {
+            month: {
+                daynames: [],
+            },
+            week: {
+                daynames: [],
+            },
+            template: {
+                timegridDisplayPrimaryTime: (time: any) => {
+                    return new DateTime(new Date(2020, 1, 1, time.hour, time.minutes, 0)).toStringFormat('p');
+                },
+                timegridCurrentTime: (timezone: any) => {
+                    const templates = [];
+
+                    if (timezone.dateDifference) {
+                        templates.push(`[${timezone.dateDifferenceSign}${timezone.dateDifference}]<br>`);
+                    }
+
+                    templates.push(new DateTime(timezone.hourmarker.toDate()).toStringFormat('p'));
+
+                    return templates.join('');
+                },
+            },
+        };
+
+        for (let i = 1; i <= 7; i++) {
+            const weekDay = new DateTime(new Date(2020, 10, i, 12, 0, 0));
+
+            localizedValues.month.daynames.push(weekDay.toStringFormat('EEE'));
+            localizedValues.week.daynames.push(weekDay.toStringFormat('EEE'));
+        }
+    }
+
+    return localizedValues;
 }
