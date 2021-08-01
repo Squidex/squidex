@@ -99,20 +99,24 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
     }
 
     private load() {
-        this.updateRange();
+        if (!this.calendar) {
+            return;
+        }
 
-        if (!this.calendar || this.isLoading) {
+        const scheduledFrom = new DateTime(this.calendar.getDateRangeStart().toDate());
+        const scheduledTo = new DateTime(this.calendar.getDateRangeEnd().toDate());
+
+        this.updateRange(scheduledFrom, scheduledTo);
+
+        if (this.isLoading) {
             return;
         }
 
         this.isLoading = true;
 
-        const scheduledFrom = new DateTime(this.calendar.getDateRangeStart().toDate()).toISOString();
-        const scheduledTo = new DateTime(this.calendar.getDateRangeEnd().toDate()).toISOString();
-
         this.contentsService.getAllContents(this.appsState.appName, {
-            scheduledFrom,
-            scheduledTo,
+            scheduledFrom: scheduledFrom.toISOString(),
+            scheduledTo: scheduledTo.toISOString(),
         }).subscribe({
             next: contents => {
                 this.calendar.clear();
@@ -135,25 +139,18 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
         });
     }
 
-    private updateRange() {
-        if (!this.calendar) {
-            return;
-        }
-
-        const scheduledFrom = new DateTime(this.calendar.getDateRangeStart().toDate());
-        const scheduledTo = new DateTime(this.calendar.getDateRangeEnd().toDate());
-
+    private updateRange(from: DateTime, to: DateTime) {
         switch (this.view) {
             case 'month': {
-                this.title = scheduledFrom.toStringFormat('LLLL yyyy');
+                this.title = from.toStringFormat('LLLL yyyy');
                 break;
             }
             case 'day': {
-                this.title = scheduledFrom.toStringFormat('PPPP');
+                this.title = from.toStringFormat('PPPP');
                 break;
             }
             case 'week': {
-                this.title = `${scheduledFrom.toStringFormat('PP')} - ${scheduledTo.toStringFormat('PP')}`;
+                this.title = `${from.toStringFormat('PP')} - ${to.toStringFormat('PP')}`;
                 break;
             }
         }

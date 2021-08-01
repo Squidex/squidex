@@ -78,6 +78,8 @@
                     </div>
                 </div>
 
+                <hr />
+
                 <div class="form-group form-group-aligned  row">
                     <label class="col-4 col-form-label">{{ 'contents.scheduledToLabel' | sqxTranslate }}</label>
             
@@ -88,6 +90,14 @@
                             [statusColor]="content.scheduleJob.color"
                             [small]="true">
                         </sqx-content-status>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-aligned  row">
+                    <label class="col-4 col-form-label">{{ 'contents.scheduledAt' | sqxTranslate }}</label>
+            
+                    <div class="col-8">
+                        {{content.scheduleJob.dueTime | sqxFullDateTime}}
                     </div>
                 </div>
 
