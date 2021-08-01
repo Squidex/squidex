@@ -69,7 +69,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
             if (!Types.equals(obj, this.snapshot.contentItems.map(x => x.id))) {
                 const contentIds: string[] = obj;
 
-                this.contentsService.getContentsByIds(this.appsState.appName, contentIds)
+                this.contentsService.getAllContents(this.appsState.appName, { ids: contentIds })
                     .subscribe({
                         next: dtos => {
                             this.setContentItems(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r));

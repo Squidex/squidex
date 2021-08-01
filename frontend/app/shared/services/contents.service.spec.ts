@@ -154,11 +154,11 @@ describe('ContentsService', () => {
             req.flush({ total: 10, items: [] });
         }));
 
-    it('should make get request to get contents by ids',
+    it('should make get request to get all contents by ids',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const ids = ['1', '2', '3'];
 
-            contentsService.getContentsByIds('my-app', ids).subscribe();
+            contentsService.getAllContents('my-app', { ids }).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/content/my-app?ids=1,2,3');
 
@@ -168,11 +168,11 @@ describe('ContentsService', () => {
             req.flush({ total: 10, items: [] });
         }));
 
-    it('should make post request to get contents by ids if request limit reached',
+    it('should make post request to get all contents by ids if request limit reached',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const ids = ['1', '2', '3'];
 
-            contentsService.getContentsByIds('my-app', ids, 5).subscribe();
+            contentsService.getAllContents('my-app', { ids, maxLength: 5 }).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/content/my-app');
 

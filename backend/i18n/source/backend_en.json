@@ -122,6 +122,7 @@
   "contents.bulkInsertQueryNotUnique": "More than one content matches to the query.",
   "contents.draftNotCreateForUnpublished": "You can only create a new version when the content is published.",
   "contents.draftToDeleteNotFound": "There is nothing to delete.",
+  "contents.invalidAllQuery": "Either Ids or Schedule range must be defined.",
   "contents.invalidArrayOfObjects": "Invalid json type, expected array of objects.",
   "contents.invalidArrayOfStrings": "Invalid json type, expected array of strings.",
   "contents.invalidBoolean": "Invalid json type, expected boolean.",

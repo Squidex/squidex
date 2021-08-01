@@ -451,6 +451,9 @@
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
     <value>没有要删除的内容。</value>
   </data>
+  <data name="contents.invalidAllQuery" xml:space="preserve">
+    <value>Either Ids or Schedule range must be defined.</value>
+  </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>无效的 json 类型，预期的对象数组。</value>
   </data>
