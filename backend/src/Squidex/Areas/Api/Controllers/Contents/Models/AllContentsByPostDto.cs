@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -15,41 +13,28 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ContentsAllQueryDto
+    public sealed class AllContentsByPostDto
     {
         /// <summary>
         /// The list of ids to query.
         /// </summary>
-        public List<DomainId>? Ids { get; set; }
-
-        /// <summary>
-        /// The list of ids to query.
-        /// </summary>
-        [FromQuery(Name = "ids")]
-        public string? IdsString { get; set; }
+        public DomainId[]? Ids { get; set; }
 
         /// <summary>
         /// The start of the schedule.
         /// </summary>
-        [FromQuery]
         public Instant? ScheduledFrom { get; set; }
 
         /// <summary>
         /// The end of the schedule.
         /// </summary>
-        [FromQuery]
         public Instant? ScheduledTo { get; set; }
 
         public Q ToQuery()
         {
-            if (Ids != null)
+            if (Ids?.Length > 0)
             {
                 return Q.Empty.WithIds(Ids);
-            }
- 
-            if (!string.IsNullOrWhiteSpace(IdsString))
-            {
-                return Q.Empty.WithIds(IdsString);
             }
 
             if (ScheduledFrom != null && ScheduledTo != null)

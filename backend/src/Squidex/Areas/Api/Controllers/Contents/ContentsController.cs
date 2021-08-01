@@ -81,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, ContentsAllQueryDto query)
+        public async Task<IActionResult> GetAllContents(string app, AllContentsByGetDto query)
         {
             var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsAllQueryDto query)
+        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] AllContentsByPostDto query)
         {
             var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
