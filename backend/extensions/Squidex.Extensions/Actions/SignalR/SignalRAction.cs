@@ -18,37 +18,37 @@ namespace Squidex.Extensions.Actions.SignalR
     {
         [LocalizedRequired]
         [Display(Name = "Connection", Description = "The connection string to the Signal R Azure.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string ConnectionString { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Hub Name", Description = "The name of the hub.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string HubName { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Action", Description = "BROADCAST -> send to all User, USER => send to one user, USERS => send to list of users, GROUP => send to group, GROUPS => send to list of groups.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public ActionTypeEnum ActionType { get; set; }
 
         [Display(Name = "Methode Name", Description = "Set the Name of the hub method received by the customer, default value 'push.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string MethodName { get; set; }
 
         [Display(Name = "User", Description = "Set for notity one user by Id (command 'user'), one id by line for notity multi user (command 'users').")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string User { get; set; }
 
         [Display(Name = "Group", Description = "Set for notity one group by Name (Command 'group'), one id by line for notity multi groups (command 'groups').")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Group { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Payload { get; set; }
 
