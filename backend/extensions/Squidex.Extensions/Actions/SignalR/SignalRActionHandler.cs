@@ -106,7 +106,7 @@ namespace Squidex.Extensions.Actions.SignalR
                         {
                             await signalRContext.Clients.User(job.User).SendAsync(methodeName, job.Payload);
                         }
-                        else
+                        else if (job.Users.Length > 0)
                         {
                             await signalRContext.Clients.Users(job.Users).SendAsync(methodeName, job.Payload);
                         }
@@ -117,7 +117,7 @@ namespace Squidex.Extensions.Actions.SignalR
                         {
                             await signalRContext.Clients.Group(job.Group).SendAsync(methodeName, job.Payload);
                         }
-                        else
+                        else if (job.Groups.Length > 0)
                         {
                             await signalRContext.Clients.Groups(job.Groups).SendAsync(methodeName, job.Payload);
                         }
