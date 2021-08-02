@@ -40,7 +40,7 @@ namespace Squidex.Extensions.Actions.SignalR
 
             string requestBody;
 
-            if (!string.IsNullOrEmpty(action.Payload))
+            if (!string.IsNullOrWhiteSpace(action.Payload))
             {
                 requestBody = await FormatAsync(action.Payload, @event);
             }
@@ -49,16 +49,24 @@ namespace Squidex.Extensions.Actions.SignalR
                 requestBody = ToEnvelopeJson(@event);
             }
 
-            string[] users = null;
-            if (!string.IsNullOrEmpty(action.User) && action.User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            string[] users = new string[0];
+            string user = string.Empty;
+            if (!string.IsNullOrWhiteSpace(action.User) && action.User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 users = action.User.Split('\n');
+            } else if (!string.IsNullOrWhiteSpace(action.User))
+            {
+                user = await FormatAsync(action.User, @event);
             }
 
-            string[] groups = null;
+            string[] groups = new string[0];
+            string group = string.Empty;
             if (!string.IsNullOrEmpty(action.Group) && action.Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 groups = action.Group.Split('\n');
+            } else if (!string.IsNullOrWhiteSpace(action.Group))
+            {
+                group = await FormatAsync(action.Group, @event);
             }
 
             var ruleDescription = $"Send SignalRJob to signalR hub '{hubName}'";
@@ -69,10 +77,10 @@ namespace Squidex.Extensions.Actions.SignalR
                 HubName = hubName,
                 Action = action.ActionType,
                 MethodName = action.MethodName,
-                User = await FormatAsync(action.User, @event),
-                Users = users ?? new string[0],
-                Group = await FormatAsync(action.Group, @event),
-                Groups = groups ?? new string[0],
+                User = user,
+                Users = users,
+                Group = group,
+                Groups = groups,
                 Payload = requestBody
             };
             return (ruleDescription, ruleJob);
@@ -92,16 +100,26 @@ namespace Squidex.Extensions.Actions.SignalR
                         await signalRContext.Clients.All.SendAsync(methodeName, job.Payload);
                         break;
                     case ActionTypeEnum.User:
-                        await signalRContext.Clients.User(job.User).SendAsync(methodeName, job.Payload);
-                        break;
-                    case ActionTypeEnum.Users:
-                        await signalRContext.Clients.Users(job.Users).SendAsync(methodeName, job.Payload);
+                        if (!string.IsNullOrWhiteSpace(job.User))
+                        {
+                            await signalRContext.Clients.User(job.User).SendAsync(methodeName, job.Payload);
+                        }
+                        else
+                        {
+                            await signalRContext.Clients.Users(job.Users).SendAsync(methodeName, job.Payload);
+                        }
+
                         break;
                     case ActionTypeEnum.Group:
-                        await signalRContext.Clients.Group(job.Group).SendAsync(methodeName, job.Payload);
-                        break;
-                    case ActionTypeEnum.Groups:
-                        await signalRContext.Clients.Groups(job.Groups).SendAsync(methodeName, job.Payload);
+                        if (!string.IsNullOrWhiteSpace(job.User))
+                        {
+                            await signalRContext.Clients.Group(job.Group).SendAsync(methodeName, job.Payload);
+                        }
+                        else
+                        {
+                            await signalRContext.Clients.Groups(job.Groups).SendAsync(methodeName, job.Payload);
+                        }
+
                         break;
                 }
             }

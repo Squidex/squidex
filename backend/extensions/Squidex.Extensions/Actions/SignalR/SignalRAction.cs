@@ -44,12 +44,12 @@ namespace Squidex.Extensions.Actions.SignalR
         [Editor(RuleFieldEditor.Text)]
         public string MethodName { get; set; }
 
-        [Display(Name = "User", Description = "Set for notity one user by Id (command 'user'), one id by line for notity multi user (command 'users').")]
+        [Display(Name = "User (Optional)", Description = "Set for notity one user by Id (command 'user'), one id by line for notity multi user.")]
         [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string User { get; set; }
 
-        [Display(Name = "Group", Description = "Set for notity one group by Name (Command 'group'), one id by line for notity multi groups (command 'groups').")]
+        [Display(Name = "Group (Optional)", Description = "Set for notity one group by Name (Command 'group'), one id by line for notity multi groups.")]
         [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Group { get; set; }
@@ -66,25 +66,16 @@ namespace Squidex.Extensions.Actions.SignalR
                 yield return new ValidationError("Hub must be valid azure hub name.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.User && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
+            if (ActionType == ActionTypeEnum.User && string.IsNullOrWhiteSpace(User))
             {
-                yield return new ValidationError("Group must be specified and unique with 'USER' Action.", nameof(HubName));
+                yield return new ValidationError("User must be specified with 'User' Action.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.Users && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
+            if (ActionType == ActionTypeEnum.Group && string.IsNullOrWhiteSpace(Group))
             {
-                yield return new ValidationError("User must be specified and multiple with 'USERS' Action.", nameof(HubName));
+                yield return new ValidationError("Group must be specified with 'Group' Action.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.Group && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
-            {
-                yield return new ValidationError("Group must be specified and unique with 'GROUP' Action.", nameof(HubName));
-            }
-
-            if (ActionType == ActionTypeEnum.Groups && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
-            {
-                yield return new ValidationError("Group must be specified and multiple with 'GROUPS' Action.", nameof(HubName));
-            }
         }
     }
 
@@ -92,8 +83,6 @@ namespace Squidex.Extensions.Actions.SignalR
     {
         Broadcast,
         User,
-        Users,
-        Group,
-        Groups
+        Group
     }
 }
