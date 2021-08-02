@@ -42,6 +42,18 @@ namespace Squidex.Extensions.Actions.SignalR
                 requestBody = ToEnvelopeJson(@event);
             }
 
+            string[] users = null;
+            if (!string.IsNullOrEmpty(action.User) && action.User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                users = action.User.Split('\n');
+            }
+
+            string[] groups = null;
+            if (!string.IsNullOrEmpty(action.Group) && action.Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                groups = action.Group.Split('\n');
+            }
+
             var ruleDescription = $"Send SignalRJob to signalR hub '{hubName}'";
 
             var ruleJob = new SignalRJob
@@ -50,8 +62,10 @@ namespace Squidex.Extensions.Actions.SignalR
                 HubName = hubName,
                 Action = action.ActionType,
                 MethodName = action.MethodName,
-                Group = await FormatAsync(action.Group, @event),
                 User = await FormatAsync(action.User, @event),
+                Users = users ?? new string[0],
+                Group = await FormatAsync(action.Group, @event),
+                Groups = groups ?? new string[0],
                 Payload = requestBody
             };
             return (ruleDescription, ruleJob);
@@ -74,19 +88,16 @@ namespace Squidex.Extensions.Actions.SignalR
                         await signalRContext.Clients.User(job.User).SendAsync(methodeName, job.Payload);
                         break;
                     case ActionTypeEnum.Users:
-                        var userIds = job.User.Split('\n');
-                        await signalRContext.Clients.Users(userIds).SendAsync(methodeName, job.Payload);
+                        await signalRContext.Clients.Users(job.Users).SendAsync(methodeName, job.Payload);
                         break;
                     case ActionTypeEnum.Group:
                         await signalRContext.Clients.Group(job.Group).SendAsync(methodeName, job.Payload);
                         break;
                     case ActionTypeEnum.Groups:
-                        var groupIds = job.Group.Split('\n');
-                        await signalRContext.Clients.Groups(groupIds).SendAsync(methodeName, job.Payload);
+                        await signalRContext.Clients.Groups(job.Groups).SendAsync(methodeName, job.Payload);
                         break;
                 }
             }
-
 
             return Result.Complete();
         }
@@ -104,7 +115,11 @@ namespace Squidex.Extensions.Actions.SignalR
 
         public string User { get; set; }
 
+        public string[] Users { get; set; }
+
         public string Group { get; set; }
+
+        public string[] Groups { get; set; }
 
         public string Payload { get; set; }
     }
