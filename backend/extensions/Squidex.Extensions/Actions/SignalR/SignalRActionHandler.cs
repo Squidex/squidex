@@ -54,7 +54,8 @@ namespace Squidex.Extensions.Actions.SignalR
             if (!string.IsNullOrWhiteSpace(action.User) && action.User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 users = action.User.Split('\n');
-            } else if (!string.IsNullOrWhiteSpace(action.User))
+            }
+            else if (!string.IsNullOrWhiteSpace(action.User))
             {
                 user = await FormatAsync(action.User, @event);
             }
@@ -64,7 +65,8 @@ namespace Squidex.Extensions.Actions.SignalR
             if (!string.IsNullOrEmpty(action.Group) && action.Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 groups = action.Group.Split('\n');
-            } else if (!string.IsNullOrWhiteSpace(action.Group))
+            }
+            else if (!string.IsNullOrWhiteSpace(action.Group))
             {
                 group = await FormatAsync(action.Group, @event);
             }

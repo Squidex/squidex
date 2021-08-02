@@ -75,7 +75,6 @@ namespace Squidex.Extensions.Actions.SignalR
             {
                 yield return new ValidationError("Group must be specified with 'Group' Action.", nameof(HubName));
             }
-
         }
     }
 
