@@ -60,32 +60,33 @@ namespace Squidex.Extensions.Actions.SignalR
         protected override async Task<Result> ExecuteJobAsync(SignalRJob job, CancellationToken ct = default)
         {
             var signalR = await clients.GetClientAsync((job.ConnectionString, job.HubName));
-            var signalRContext = await signalR.CreateHubContextAsync(job.HubName);
 
-            var methodeName = !string.IsNullOrWhiteSpace(job.MethodName) ? job.MethodName : "push";
-
-            switch (job.Action)
+            await using (var signalRContext = await signalR.CreateHubContextAsync(job.HubName))
             {
-                case ActionTypeEnum.Broadcast:
-                    await signalRContext.Clients.All.SendAsync(methodeName, job.Payload);
-                    break;
-                case ActionTypeEnum.User:
-                    await signalRContext.Clients.User(job.User).SendAsync(methodeName, job.Payload);
-                    break;
-                case ActionTypeEnum.Users:
-                    var userIds = job.User.Split('\n');
-                    await signalRContext.Clients.Users(userIds).SendAsync(methodeName, job.Payload);
-                    break;
-                case ActionTypeEnum.Group:
-                    await signalRContext.Clients.Group(job.Group).SendAsync(methodeName, job.Payload);
-                    break;
-                case ActionTypeEnum.Groups:
-                    var groupIds = job.Group.Split('\n');
-                    await signalRContext.Clients.Groups(groupIds).SendAsync(methodeName, job.Payload);
-                    break;
+                var methodeName = !string.IsNullOrWhiteSpace(job.MethodName) ? job.MethodName : "push";
+
+                switch (job.Action)
+                {
+                    case ActionTypeEnum.Broadcast:
+                        await signalRContext.Clients.All.SendAsync(methodeName, job.Payload);
+                        break;
+                    case ActionTypeEnum.User:
+                        await signalRContext.Clients.User(job.User).SendAsync(methodeName, job.Payload);
+                        break;
+                    case ActionTypeEnum.Users:
+                        var userIds = job.User.Split('\n');
+                        await signalRContext.Clients.Users(userIds).SendAsync(methodeName, job.Payload);
+                        break;
+                    case ActionTypeEnum.Group:
+                        await signalRContext.Clients.Group(job.Group).SendAsync(methodeName, job.Payload);
+                        break;
+                    case ActionTypeEnum.Groups:
+                        var groupIds = job.Group.Split('\n');
+                        await signalRContext.Clients.Groups(groupIds).SendAsync(methodeName, job.Payload);
+                        break;
+                }
             }
 
-            await signalRContext.DisposeAsync();
 
             return Result.Complete();
         }
