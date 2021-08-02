@@ -77,7 +77,7 @@ namespace Squidex.Extensions.Actions.SignalR
             {
                 ConnectionString = action.ConnectionString,
                 HubName = hubName,
-                Action = action.ActionType,
+                Action = action.Action,
                 MethodName = action.MethodName,
                 User = user,
                 Users = users,

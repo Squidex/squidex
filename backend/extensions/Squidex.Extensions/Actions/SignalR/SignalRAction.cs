@@ -38,7 +38,7 @@ namespace Squidex.Extensions.Actions.SignalR
         [LocalizedRequired]
         [Display(Name = "Action", Description = "**Broadcast** = send to all User, **User** = send to user(s), **Group** = send to group(s)")]
         [Editor(RuleFieldEditor.Text)]
-        public ActionTypeEnum ActionType { get; set; }
+        public ActionTypeEnum Action { get; set; }
 
         [Display(Name = "Methode Name", Description = "Set the Name of the hub method received by the customer, default value 'push.")]
         [Editor(RuleFieldEditor.Text)]
@@ -66,12 +66,12 @@ namespace Squidex.Extensions.Actions.SignalR
                 yield return new ValidationError("Hub must be valid azure hub name.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.User && string.IsNullOrWhiteSpace(User))
+            if (Action == ActionTypeEnum.User && string.IsNullOrWhiteSpace(User))
             {
                 yield return new ValidationError("User must be specified with 'User' Action.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.Group && string.IsNullOrWhiteSpace(Group))
+            if (Action == ActionTypeEnum.Group && string.IsNullOrWhiteSpace(Group))
             {
                 yield return new ValidationError("Group must be specified with 'Group' Action.", nameof(HubName));
             }
