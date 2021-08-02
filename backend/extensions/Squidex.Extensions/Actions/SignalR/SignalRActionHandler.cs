@@ -10,6 +10,7 @@ namespace Squidex.Extensions.Actions.SignalR
     public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, SignalRJob>
     {
         private readonly ClientPool<(string ConnectionString, string HubName), IServiceManager> clients;
+
         public SignalRActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
@@ -95,10 +96,15 @@ namespace Squidex.Extensions.Actions.SignalR
         public string ConnectionString { get; set; }
 
         public string HubName { get; set; }
+
         public ActionTypeEnum Action { get; set; }
+
         public string MethodName { get; set; }
+
         public string User { get; set; }
+
         public string Group { get; set; }
+
         public string Payload { get; set; }
     }
 }
