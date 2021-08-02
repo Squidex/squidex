@@ -174,13 +174,11 @@ export class ContentsService {
     }
 
     public getAllContents(appName: string, q?: ContentQueryDto): Observable<ContentsDto> {
-        const { maxLength } = q || {};
+        const { maxLength, ...body } = q || {};
 
         const { fullQuery } = buildQuery(q);
 
         if (fullQuery.length > (maxLength || 2000)) {
-            const body = q;
-
             const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
 
             return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body).pipe(
