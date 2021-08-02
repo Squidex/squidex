@@ -1,4 +1,11 @@
-﻿using System.Collections.Generic;
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -18,37 +25,37 @@ namespace Squidex.Extensions.Actions.SignalR
     {
         [LocalizedRequired]
         [Display(Name = "Connection", Description = "The connection string to the Signal R Azure.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string ConnectionString { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Hub Name", Description = "The name of the hub.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string HubName { get; set; }
 
         [LocalizedRequired]
-        [Display(Name = "Action", Description = "BROADCAST -> send to all User, USER => send to one user, USERS => send to list of users, GROUP => send to group, GROUPS => send to list of groups.")]
-        [DataType(DataType.Text)]
-        public ActionTypeEnum ActionType { get; set; }
+        [Display(Name = "Action", Description = "**Broadcast** = send to all User, **User** = send to user(s), **Group** = send to group(s)")]
+        [Editor(RuleFieldEditor.Text)]
+        public ActionTypeEnum Action { get; set; }
 
         [Display(Name = "Methode Name", Description = "Set the Name of the hub method received by the customer, default value 'push.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string MethodName { get; set; }
 
-        [Display(Name = "User", Description = "Set for notity one user by Id (command 'user'), one id by line for notity multi user (command 'users').")]
-        [DataType(DataType.MultilineText)]
+        [Display(Name = "User (Optional)", Description = "Set for notity one user by Id (command 'user'), one id by line for notity multi user.")]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string User { get; set; }
 
-        [Display(Name = "Group", Description = "Set for notity one group by Name (Command 'group'), one id by line for notity multi groups (command 'groups').")]
-        [DataType(DataType.MultilineText)]
+        [Display(Name = "Group (Optional)", Description = "Set for notity one group by Name (Command 'group'), one id by line for notity multi groups.")]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Group { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Payload { get; set; }
 
@@ -59,34 +66,22 @@ namespace Squidex.Extensions.Actions.SignalR
                 yield return new ValidationError("Hub must be valid azure hub name.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.USER && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
+            if (Action == ActionTypeEnum.User && string.IsNullOrWhiteSpace(User))
             {
-                yield return new ValidationError("Group must be specified and unique with 'USER' Action.", nameof(HubName));
+                yield return new ValidationError("User must be specified with 'User' Action.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.USERS && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
+            if (Action == ActionTypeEnum.Group && string.IsNullOrWhiteSpace(Group))
             {
-                yield return new ValidationError("User must be specified and multiple with 'USERS' Action.", nameof(HubName));
-            }
-
-            if (ActionType == ActionTypeEnum.GROUP && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
-            {
-                yield return new ValidationError("Group must be specified and unique with 'GROUP' Action.", nameof(HubName));
-            }
-
-            if (ActionType == ActionTypeEnum.GROUPS && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
-            {
-                yield return new ValidationError("Group must be specified and multiple with 'GROUPS' Action.", nameof(HubName));
+                yield return new ValidationError("Group must be specified with 'Group' Action.", nameof(HubName));
             }
         }
     }
 
     public enum ActionTypeEnum
     {
-        BROADCAST,
-        USER,
-        USERS,
-        GROUP,
-        GROUPS
+        Broadcast,
+        User,
+        Group
     }
 }
