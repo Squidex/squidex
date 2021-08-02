@@ -1,4 +1,11 @@
-﻿using System.Threading;
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.SignalR.Management;
