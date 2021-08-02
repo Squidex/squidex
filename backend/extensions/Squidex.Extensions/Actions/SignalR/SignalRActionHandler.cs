@@ -65,20 +65,20 @@ namespace Squidex.Extensions.Actions.SignalR
 
             switch (job.Action)
             {
-                case ActionTypeEnum.BROADCAST:
+                case ActionTypeEnum.Broadcast:
                     await signalRContext.Clients.All.SendAsync(methodeName, job.Payload);
                     break;
-                case ActionTypeEnum.USER:
+                case ActionTypeEnum.User:
                     await signalRContext.Clients.User(job.User).SendAsync(methodeName, job.Payload);
                     break;
-                case ActionTypeEnum.USERS:
+                case ActionTypeEnum.Users:
                     var userIds = job.User.Split('\n');
                     await signalRContext.Clients.Users(userIds).SendAsync(methodeName, job.Payload);
                     break;
-                case ActionTypeEnum.GROUP:
+                case ActionTypeEnum.Group:
                     await signalRContext.Clients.Group(job.Group).SendAsync(methodeName, job.Payload);
                     break;
-                case ActionTypeEnum.GROUPS:
+                case ActionTypeEnum.Groups:
                     var groupIds = job.Group.Split('\n');
                     await signalRContext.Clients.Groups(groupIds).SendAsync(methodeName, job.Payload);
                     break;

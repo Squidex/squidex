@@ -59,22 +59,22 @@ namespace Squidex.Extensions.Actions.SignalR
                 yield return new ValidationError("Hub must be valid azure hub name.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.USER && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
+            if (ActionType == ActionTypeEnum.User && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
             {
                 yield return new ValidationError("Group must be specified and unique with 'USER' Action.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.USERS && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
+            if (ActionType == ActionTypeEnum.Users && (string.IsNullOrWhiteSpace(User) || User.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
             {
                 yield return new ValidationError("User must be specified and multiple with 'USERS' Action.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.GROUP && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
+            if (ActionType == ActionTypeEnum.Group && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) >= 0))
             {
                 yield return new ValidationError("Group must be specified and unique with 'GROUP' Action.", nameof(HubName));
             }
 
-            if (ActionType == ActionTypeEnum.GROUPS && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
+            if (ActionType == ActionTypeEnum.Groups && (string.IsNullOrWhiteSpace(Group) || Group.IndexOf("\n", System.StringComparison.OrdinalIgnoreCase) < 0))
             {
                 yield return new ValidationError("Group must be specified and multiple with 'GROUPS' Action.", nameof(HubName));
             }
@@ -83,10 +83,10 @@ namespace Squidex.Extensions.Actions.SignalR
 
     public enum ActionTypeEnum
     {
-        BROADCAST,
-        USER,
-        USERS,
-        GROUP,
-        GROUPS
+        Broadcast,
+        User,
+        Users,
+        Group,
+        Groups
     }
 }
