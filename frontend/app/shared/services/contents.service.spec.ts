@@ -9,7 +9,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { inject, TestBed } from '@angular/core/testing';
 import { ErrorDto } from '@app/framework';
 import { AnalyticsService, ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ResourceLinks, ScheduleDto, Version, Versioned } from '@app/shared/internal';
-import { encodeQuery, sanitize } from './../state/query';
+import { sanitize } from './../state/query';
 import { BulkResultDto, BulkUpdateDto } from './contents.service';
 
 describe('ContentsService', () => {
@@ -32,18 +32,23 @@ describe('ContentsService', () => {
         httpMock.verify();
     }));
 
-    it('should make get request to get contents',
+    it('should make post request to get contents with json query',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+            const query = { fullText: 'my-query' };
+
             let contents: ContentsDto;
 
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13 }).subscribe(result => {
+            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe(result => {
                 contents = result;
             });
 
-            const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema?q=${encodeQuery({ take: 17, skip: 13 })}`);
+            const expectedQuery = { ...query, take: 17, skip: 13 };
 
-            expect(req.request.method).toEqual('GET');
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
+
+            expect(req.request.method).toEqual('POST');
             expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
 
             req.flush({
                 total: 10,
@@ -61,23 +66,6 @@ describe('ContentsService', () => {
                     createContent(12),
                     createContent(13),
                 ]));
-        }));
-
-    it('should make post request to get contents with json query',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const query = { fullText: 'my-query' };
-
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe();
-
-            const expectedQuery = { ...query, take: 17, skip: 13 };
-
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
-
-            req.flush({ total: 10, items: [] });
         }));
 
     it('should make post request to get contents with odata filter',
@@ -278,7 +266,7 @@ describe('ContentsService', () => {
 
             let content: ContentDto;
 
-            contentsService.deleteVersion('my-app', resource, version).subscribe(result => {
+            contentsService.cancelStatus('my-app', resource, version).subscribe(result => {
                 content = result;
             });
 
