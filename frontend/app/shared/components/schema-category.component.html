@@ -29,7 +29,7 @@
         </div>
     </li>
 
-    <ng-container *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
+    <div *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
         <ng-container *ngIf="!forContent; else simpleMode">
             <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
                 cdkDrag
@@ -52,7 +52,7 @@
                 </a>
             </li>
         </ng-template>
-    </ng-container>
+    </div>
 
     <div class="drop-indicator"></div>
 </ul>

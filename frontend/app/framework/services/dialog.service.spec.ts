@@ -35,7 +35,7 @@ describe('DialogService', () => {
 
         expect(notification.displayTime).toBe(10000);
         expect(notification.message).toBe('MyInfo');
-        expect(notification.messageType).toBe('info');
+        expect(notification.messageType).toBe('primary');
     });
 
     [true, false].forEach(confirmed => {

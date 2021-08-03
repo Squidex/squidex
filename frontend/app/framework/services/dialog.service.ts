@@ -80,7 +80,7 @@ export class Notification {
     }
 
     public static info(message: string | ErrorDto): Notification {
-        return new Notification(message, 'info');
+        return new Notification(message, 'primary');
     }
 }
 
