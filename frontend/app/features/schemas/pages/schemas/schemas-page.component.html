@@ -28,8 +28,8 @@
             </sqx-schema-category>
         </div>
 
-        <form [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
-            <input class="form-control underlined" formControlName="name" placeholder="{{ 'schemas.createCategory' | sqxTranslate }}">
+        <form class="mt-4" [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
+            <input class="form-control" formControlName="name" placeholder="{{ 'schemas.createCategory' | sqxTranslate }}">
         </form>
     </ng-container>
 </sqx-layout>

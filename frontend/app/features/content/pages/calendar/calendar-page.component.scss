@@ -1,0 +1,24 @@
+:host ::ng-deep {
+    .tui-full-calendar-weekday-schedule-bullet {
+        top: 10px !important;
+    }
+}
+
+.calendar {
+    @include absolute(-1px, 0, 0, 0);
+}
+
+.form-select {
+    display: inline-block;
+    white-space: normal;
+    width: auto;
+}
+
+.form-group-aligned {
+    align-items: center;
+
+    .col-form-label {
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+}

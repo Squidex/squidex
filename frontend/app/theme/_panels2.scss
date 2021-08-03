@@ -264,6 +264,8 @@
 
 .nav-light {
     font-size: $font-small;
+    margin-left: -.5rem;
+    margin-right: -.5rem;
 
     .nav-link {
         border: 0;
@@ -272,8 +274,6 @@
         cursor: pointer;
         font-size: inherit;
         font-weight: 500;
-        margin-left: -.5rem;
-        margin-right: -.5rem;
         margin-bottom: .125rem;
         padding-left: 1rem;
         padding-right: 1rem;

@@ -62,6 +62,7 @@
     "slugify": "1.6.0",
     "tinymce": "5.8.2",
     "tslib": "2.3.0",
+    "tui-calendar": "^1.13.1",
     "video.js": "7.13.3",
     "vis-data": "7.1.2",
     "vis-network": "9.0.4",

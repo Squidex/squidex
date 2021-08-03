@@ -127,17 +127,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var query = q.Query;
 
-            if (!string.IsNullOrWhiteSpace(q.JsonQueryString))
+            if (!string.IsNullOrWhiteSpace(q.QueryAsJson))
             {
-                query = ParseJson(context, schema, q.JsonQueryString, components);
+                query = ParseJson(context, schema, q.QueryAsJson, components);
             }
             else if (q?.JsonQuery != null)
             {
                 query = ParseJson(context, schema, q.JsonQuery, components);
             }
-            else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+            else if (!string.IsNullOrWhiteSpace(q?.QueryAsOdata))
             {
-                query = ParseOData(context, schema, q.ODataQuery, components);
+                query = ParseOData(context, schema, q.QueryAsOdata, components);
             }
 
             return query;

@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Queries contents.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="ids">The optional ids of the content to fetch.</param>
+        /// <param name="query">The required query object.</param>
         /// <returns>
         /// 200 => Contents returned.
         /// 404 => App not found.
@@ -81,9 +81,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
+        public async Task<IActionResult> GetAllContents(string app, AllContentsByGetDto query)
         {
-            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids), HttpContext.RequestAborted);
+            var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {
@@ -110,9 +110,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] ContentsIdsQueryDto query)
+        public async Task<IActionResult> GetAllContentsPost(string app, [FromBody] AllContentsByPostDto query)
         {
-            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(query.Ids), HttpContext.RequestAborted);
+            var contents = await contentQuery.QueryAsync(Context, query?.ToQuery() ?? Q.Empty, HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {

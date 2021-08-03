@@ -129,8 +129,8 @@
 @mixin circle($size) {
     @include force-height($size);
     @include force-width($size);
-    border: 0;
     border-radius: $size;
+    border-width: 0;
     display: inline-block;
 }
 

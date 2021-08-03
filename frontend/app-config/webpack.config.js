@@ -267,6 +267,9 @@ module.exports = function calculateConfig(env) {
                     { from: './node_modules/tinymce/themes/silver', to: 'dependencies/tinymce/themes/silver' },
                     { from: './node_modules/tinymce/tinymce.min.js', to: 'dependencies/tinymce' },
 
+                    { from: './node_modules/tui-code-snippet/dist', to: 'dependencies/tui-calendar' },
+                    { from: './node_modules/tui-calendar/dist', to: 'dependencies/tui-calendar' },
+
                     { from: './node_modules/ace-builds/src-min/ace.js', to: 'dependencies/ace/ace.js' },
                     { from: './node_modules/ace-builds/src-min/ext-language_tools.js', to: 'dependencies/ace/ext/language_tools.js' },
                     { from: './node_modules/ace-builds/src-min/ext-modelist.js', to: 'dependencies/ace/ext/modelist.js' },

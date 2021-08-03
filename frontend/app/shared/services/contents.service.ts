@@ -124,7 +124,7 @@ export type BulkUpdateJobDto =
     Readonly<{ id: string; type: BulkUpdateType; status?: string; schema?: string; dueTime?: string | null; expectedVersion?: number }>;
 
 export type ContentQueryDto =
-    Readonly<{ ids?: ReadonlyArray<string>; maxLength?: number; query?: Query; skip?: number; take?: number }>;
+    Readonly<{ ids?: ReadonlyArray<string>; maxLength?: number; query?: Query; skip?: number; take?: number; scheduledFrom?: string | null; scheduledTo?: string | null }>;
 
 @Injectable()
 export class ContentsService {
@@ -173,12 +173,12 @@ export class ContentsService {
         }
     }
 
-    public getContentsByIds(appName: string, ids: ReadonlyArray<string>, maxLength?: number): Observable<ContentsDto> {
-        const fullQuery = `ids=${ids.join(',')}`;
+    public getAllContents(appName: string, q?: ContentQueryDto): Observable<ContentsDto> {
+        const { maxLength, ...body } = q || {};
+
+        const { fullQuery } = buildQuery(q);
 
         if (fullQuery.length > (maxLength || 2000)) {
-            const body = { ids };
-
             const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
 
             return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body).pipe(
@@ -337,7 +337,7 @@ export class ContentsService {
 }
 
 function buildQuery(q?: ContentQueryDto) {
-    const { ids, query, skip, take } = q || {};
+    const { ids, query, scheduledFrom, scheduledTo, skip, take } = q || {};
 
     const queryParts: string[] = [];
     const odataParts: string[] = [];
@@ -356,6 +356,9 @@ function buildQuery(q?: ContentQueryDto) {
         if (skip && skip > 0) {
             odataParts.push(`$skip=${skip}`);
         }
+    } else if (scheduledFrom && scheduledTo) {
+        queryParts.push(`scheduledFrom=${encodeURIComponent(scheduledFrom)}`);
+        queryParts.push(`scheduledTo=${encodeURIComponent(scheduledTo)}`);
     } else {
         queryObj = { ...query };
 

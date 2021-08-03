@@ -37,9 +37,10 @@ export class ReferencesTagsConverter implements TagConverter {
             const name =
                 content.referenceFields
                     .map(f => getContentValue(content, language, f, false))
-                    .map(v => v.formatted || this.localizer.getOrKey('common.noValue'))
+                    .map(v => v.formatted)
                     .filter(v => !!v)
-                    .join(', ');
+                    .join(', ')
+                || this.localizer.getOrKey('common.noValue');
 
             return new TagValue(content.id, name, content.id);
         });

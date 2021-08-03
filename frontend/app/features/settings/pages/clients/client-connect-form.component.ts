@@ -55,7 +55,7 @@ export class ClientConnectFormComponent implements OnInit {
                 next: dto => {
                     this.connectToken = dto;
 
-                    this.changeDetector.markForCheck();
+                    this.changeDetector.detectChanges();
                 },
                 error: error => {
                     this.dialogs.notifyError(error);

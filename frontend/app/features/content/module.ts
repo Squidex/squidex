@@ -11,6 +11,7 @@ import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, LoadSche
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ScrollingModuleExperimental } from '@angular/cdk-experimental/scrolling';
 import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentPageComponent, ContentReferencesComponent, ContentSectionComponent, ContentsFiltersPageComponent, ContentsPageComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
+import { CalendarPageComponent } from './pages/calendar/calendar-page.component';
 
 const routes: Routes = [
     {
@@ -20,6 +21,10 @@ const routes: Routes = [
         children: [
             {
                 path: '',
+            },
+            {
+                path: '__calendar',
+                component: CalendarPageComponent,
             },
             {
                 path: ':schemaName',
@@ -87,6 +92,7 @@ const routes: Routes = [
         ArrayEditorComponent,
         ArrayItemComponent,
         AssetsEditorComponent,
+        CalendarPageComponent,
         CommentsPageComponent,
         ComponentComponent,
         ContentCreatorComponent,

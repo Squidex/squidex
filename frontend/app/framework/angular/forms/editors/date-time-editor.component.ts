@@ -8,7 +8,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
-import format from 'date-fns/format';
 import * as Pikaday from 'pikaday/pikaday';
 import { FocusComponent } from './../forms-helper';
 
@@ -268,19 +267,17 @@ function getLocalizationSettings() {
             weekdaysShort: [],
         };
 
-        const options = { locale: DateHelper.getFnsLocale() };
-
         for (let i = 0; i < 12; i++) {
-            const firstOfMonth = new Date(2020, i, 1, 12, 0, 0);
+            const firstOfMonth = new DateTime(new Date(2020, i, 1, 12, 0, 0));
 
-            localizedValues.months.push(format(firstOfMonth, 'LLLL', options));
+            localizedValues.months.push(firstOfMonth.toStringFormat('LLLL'));
         }
 
         for (let i = 1; i <= 7; i++) {
-            const weekDay = new Date(2020, 10, i, 12, 0, 0);
+            const weekDay = new DateTime(new Date(2020, 10, i, 12, 0, 0));
 
-            localizedValues.weekdays.push(format(weekDay, 'EEEE', options));
-            localizedValues.weekdaysShort.push(format(weekDay, 'EEE', options));
+            localizedValues.weekdays.push(weekDay.toStringFormat('EEEE'));
+            localizedValues.weekdaysShort.push(weekDay.toStringFormat('EEE'));
         }
     }
 

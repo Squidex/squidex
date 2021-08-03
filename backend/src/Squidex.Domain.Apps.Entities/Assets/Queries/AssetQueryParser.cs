@@ -72,13 +72,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             var query = q.Query;
 
-            if (!string.IsNullOrWhiteSpace(q?.JsonQueryString))
+            if (!string.IsNullOrWhiteSpace(q?.QueryAsJson))
             {
-                query = ParseJson(q.JsonQueryString);
+                query = ParseJson(q.QueryAsJson);
             }
-            else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+            else if (!string.IsNullOrWhiteSpace(q?.QueryAsOdata))
             {
-                query = ParseOData(q.ODataQuery);
+                query = ParseOData(q.QueryAsOdata);
             }
 
             return query;

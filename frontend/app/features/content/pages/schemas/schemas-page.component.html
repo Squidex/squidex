@@ -10,6 +10,14 @@
     </ng-container>
 
     <ng-container>
+        <ul class="nav nav-light mb-2 flex-column">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="__calendar" routerLinkActive="active">
+                    {{ 'contents.calendar' | sqxTranslate }}
+                </a>
+            </li>
+        </ul>
+    
         <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
             <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
                 [schemaCategory]="category"

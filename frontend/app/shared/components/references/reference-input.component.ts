@@ -63,7 +63,7 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, str
 
     public writeValue(obj: any) {
         if (Types.isString(obj)) {
-            this.contentsService.getContentsByIds(this.appsState.appName, [obj])
+            this.contentsService.getAllContents(this.appsState.appName, { ids: [obj] })
                 .subscribe({
                     next: contents => {
                         this.updateContent(contents.items[0]);
@@ -108,10 +108,11 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, str
         const name =
             content.referenceFields
                 .map(f => getContentValue(content, this.language, f, false))
-                .map(v => v.formatted || this.localizer.getOrKey('common.noValue'))
+                .map(v => v.formatted)
                 .filter(v => !!v)
-                .join(', ');
+                .join(', ')
+            || this.localizer.getOrKey('common.noValue');
 
-        return name;
+        return name || this.localizer.getOrKey('common.noValue');
     }
 }

@@ -114,6 +114,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     return await queryByIds.QueryAsync(app.Id, schemas, q, ct);
                 }
 
+                if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                {
+                    return await queryScheduled.QueryAsync(app.Id, schemas, q, ct);
+                }
+
                 if (q.Referencing != default)
                 {
                     return await queryReferences.QueryAsync(app.Id, schemas, q, ct);
@@ -136,6 +141,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
                     return await queryByIds.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
+                }
+
+                if (q.ScheduledFrom != null && q.ScheduledTo != null)
+                {
+                    return await queryScheduled.QueryAsync(app.Id, new List<ISchemaEntity> { schema }, q, ct);
                 }
 
                 if (q.Referencing == default)

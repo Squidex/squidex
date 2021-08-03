@@ -350,12 +350,13 @@ a {
             font-size: 1.5rem;
             font-weight: normal;
             margin-right: .5rem;
+            margin-bottom: .5rem;
             text-align: center;
             width: 4.5rem;
         }
 
         i {
-            color: $color-border-dark;
+            color: $color-border-darker;
         }
 
         .radio-label {
@@ -593,14 +594,6 @@ $icon-size: 4.5rem;
 // Cards
 // 
 .card {
-    &-header,
-    &-footer {
-        margin-left: .5rem;
-        margin-right: .5rem;
-        padding-left: .5rem;
-        padding-right: .5rem;
-    }
-
     &-title {
         margin-bottom: 1rem;
     }

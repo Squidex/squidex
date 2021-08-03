@@ -11,6 +11,7 @@ $list-height: 2.25rem;
 @mixin overlay {
     @include absolute(0, 0, 0, 0);
     color: $color-white;
+    cursor: none;
     display: flex;
     opacity: 0;
     transition: opacity .4s ease;
@@ -18,6 +19,8 @@ $list-height: 2.25rem;
     &-background {
         @include absolute(0, 0, 0, 0);
         background: $color-black;
+        border: 0;
+        border-radius: 0;
         opacity: .7;
     }
 }
@@ -29,6 +32,10 @@ $list-height: 2.25rem;
     font-weight: normal;
     padding: .1rem .25rem;
     text-transform: uppercase;
+}
+
+:host {
+    width: auto;
 }
 
 :host ::ng-deep {
@@ -121,7 +128,7 @@ $list-height: 2.25rem;
     }
 
     &-icon {
-        background: $color-asset-bg;
+        background: $color-border-light;
         border: 0;
         height: $asset-image;
         padding: 2rem;
@@ -184,7 +191,7 @@ $list-height: 2.25rem;
 
     .image {
         @include absolute(0, auto, 0, 4px);
-        background: $color-asset-bg;
+        background: $color-border-light;
         border: 0;
         width: $list-height + 2rem;
 

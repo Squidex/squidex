@@ -56,28 +56,13 @@ $drag-margin: -8px;
     transition: none;
 }
 
-.header {
-    align-items: center;
-    margin-bottom: 0;
+.nav-heading {
     margin-left: -1rem;
-
-    h3 {
-        margin: 0;
-    }
-}
-
-.nav-light {
-    margin: 0;
-}
-
-.nav-link {
-    @include truncate;
-    align-items: center;
-    margin-left: 0;
-    margin-right: 0;
 }
 
 .nav-item {
+    align-items: center;
+
     .drag-handle {
         margin-right: .5rem;
     }
