@@ -36,23 +36,17 @@ namespace Squidex.Extensions.Actions.SignalR
         public string HubName { get; set; }
 
         [LocalizedRequired]
-        [Display(Name = "Action", Description = "Broadcast = send to all User, User = send to user(s), Group = send to group(s)")]
-        [Editor(RuleFieldEditor.Text)]
+        [Display(Name = "Action", Description = "Broadcast = send to all User, User = send to specific user(s) specified in the 'Target' field, Group = send to specific group(s) specified in the 'Target' field")]
         public ActionTypeEnum Action { get; set; }
 
         [Display(Name = "Methode Name", Description = "Set the Name of the hub method received by the customer, default value 'push.")]
         [Editor(RuleFieldEditor.Text)]
         public string MethodName { get; set; }
 
-        [Display(Name = "User (Optional)", Description = "Set for notity one user by Id (command 'user'), one id by line for notity multi user.")]
+        [Display(Name = "Target (Optional)", Description = "Defines a user, group or target list by an id or name. For a list, define one value per line. Not necessary with the 'Broadcast' action")]
         [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
-        public string User { get; set; }
-
-        [Display(Name = "Group (Optional)", Description = "Set for notity one group by Name (Command 'group'), one id by line for notity multi groups.")]
-        [Editor(RuleFieldEditor.TextArea)]
-        [Formattable]
-        public string Group { get; set; }
+        public string Target { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
         [Editor(RuleFieldEditor.TextArea)]
@@ -66,14 +60,9 @@ namespace Squidex.Extensions.Actions.SignalR
                 yield return new ValidationError("Hub must be valid azure hub name.", nameof(HubName));
             }
 
-            if (Action == ActionTypeEnum.User && string.IsNullOrWhiteSpace(User))
+            if ((Action == ActionTypeEnum.User || Action == ActionTypeEnum.Group) && string.IsNullOrWhiteSpace(Target))
             {
-                yield return new ValidationError("User must be specified with 'User' Action.", nameof(HubName));
-            }
-
-            if (Action == ActionTypeEnum.Group && string.IsNullOrWhiteSpace(Group))
-            {
-                yield return new ValidationError("Group must be specified with 'Group' Action.", nameof(HubName));
+                yield return new ValidationError("Target must be specified with 'User' or 'Group' Action.", nameof(HubName));
             }
         }
     }
