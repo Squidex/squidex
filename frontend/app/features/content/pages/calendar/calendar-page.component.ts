@@ -74,6 +74,15 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
                 this.changeDetector.detectChanges();
             });
 
+            this.calendar.on('clickDayname', (event: any) => {
+                if (this.calendar.getViewName() === 'day') {
+                    this.calendar.setDate(new Date(event.date));
+                    this.calendar.changeView('day', true);
+
+                    this.load();
+                }
+            });
+
             this.load();
         });
     }
@@ -122,8 +131,9 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
                 this.calendar.clear();
                 this.calendar.createSchedules(contents.items.map(x => ({
                     id: x.id,
+                    bgColor: '#fff',
                     borderColor: x.scheduleJob!.color,
-                    color: x.scheduleJob?.color,
+                    color: 'x.scheduleJob?.color',
                     calendarId: '1',
                     category: 'time',
                     end: x.scheduleJob?.dueTime.toISOString(),

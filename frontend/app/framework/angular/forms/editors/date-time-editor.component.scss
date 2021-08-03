@@ -5,6 +5,7 @@
 .input-group {
     .form-control {
         &:last-child {
+            padding-left: .75rem;
             padding-right: 2rem;
             position: relative;
         }
@@ -20,6 +21,7 @@
 
     .form-date-time-only {
         padding-left: 3.3rem;
+        padding-right: .75rem;
         width: 11rem;
     }
 

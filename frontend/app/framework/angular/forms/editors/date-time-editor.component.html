@@ -1,5 +1,5 @@
-<div (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="500" [sqxResizeMaxWidth]="0">
-    <div class="form-inline">
+<div class="d-flex" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="500" [sqxResizeMaxWidth]="0">
+    <div class="d-flex">
         <div class="form-group me-1">
             <div *ngIf="!isCompact && isDateTimeMode && shouldShowDateTimeModeButton">
                 <button type="button" class="btn btn-text-secondary btn-sm btn-time-mode" (click)="setLocalMode(false)" *ngIf="snapshot.isLocal">
