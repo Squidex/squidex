@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
@@ -34,23 +34,23 @@ export class TableHeaderComponent implements OnChanges {
     public sortable?: boolean | null;
 
     @Input()
-    public default: boolean | undefined | null;
+    public defaultOrder: SortMode | undefined | null;
 
-    public order: SortMode | null;
+    public order: SortMode | undefined | null;
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public ngOnChanges() {
         if (this.sortable) {
-            if (changes['query'] || changes['fieldPath']) {
-                const { sort } = this.query || {};
+            const { sort } = this.query || {};
 
-                if (this.fieldPath && sort && sort.length === 1 && sort[0].path === this.fieldPath) {
-                    this.order = sort[0].order;
-                } else if (this.default && (!sort || sort.length === 0)) {
-                    this.order = 'ascending';
-                } else {
-                    this.order = null;
-                }
+            if (this.fieldPath && sort && sort.length === 1 && sort[0].path === this.fieldPath) {
+                this.order = sort[0].order;
+            } else if (this.defaultOrder && (!sort || sort.length === 0)) {
+                this.order = this.defaultOrder;
+            } else {
+                this.order = null;
             }
+        } else {
+            this.order = null;
         }
     }
 
