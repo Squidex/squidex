@@ -92,6 +92,16 @@
                             <div class="dropdown-divider"></div>
                         </ng-container>
 
+                        <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canCancelStatus"
+                            (sqxConfirmClick)="cancelStatus()"
+                            confirmTitle="i18n:contents.cancelStatusConfirmTitle"
+                            confirmText="i18n:contents.cancelStatusConfirmText"
+                            confirmRememberKey="cancelStatus">
+                            {{ 'contents.cancelStatus' | sqxTranslate }}
+                        </a>
+                        
+                        <div class="dropdown-divider"></div>
+
                         <a class="dropdown-item dropdown-item-delete" [class.disabled]="!content.canDelete"
                             (sqxConfirmClick)="delete()"
                             confirmTitle="i18n:contents.deleteConfirmTitle"

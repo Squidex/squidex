@@ -74,7 +74,7 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
                 this.changeDetector.detectChanges();
             });
 
-            this.calendar.on('clickDayname', (event: any) => {
+            this.calendar.on('click', (event: any) => {
                 if (this.calendar.getViewName() === 'day') {
                     this.calendar.setDate(new Date(event.date));
                     this.calendar.changeView('day', true);
@@ -105,6 +105,16 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
         this.calendar?.next();
 
         this.load();
+    }
+
+    public cancelStatus() {
+        this.contentsService.cancelStatus(this.appsState.appName, this.content!, this.content!.version)
+            .subscribe(content => {
+                this.calendar?.deleteSchedule(content.id, '1');
+
+                this.contentDialog.hide();
+                this.content = undefined;
+            });
     }
 
     private load() {

@@ -795,6 +795,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
+        public async Task CancelContentSchedule_create_events_and_unset_schedule()
+        {
+            var dueTime = Instant.MaxValue;
+
+            var command = new CancelContentSchedule();
+
+            await ExecuteCreateAsync();
+            await ExecuteChangeStatusAsync(Status.Published, SystemClock.Instance.GetCurrentInstant().Plus(Duration.FromDays(1)));
+
+            var result = await PublishAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Null(sut.Snapshot.ScheduleJob);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentSchedulingCancelled())
+                );
+        }
+
+        [Fact]
         public async Task Validate_should_not_update_state()
         {
             await ExecuteCreateAsync();

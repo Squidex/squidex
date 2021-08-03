@@ -279,6 +279,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
+    public cancelStatus(content: ContentDto): Observable<ContentDto> {
+        return this.contentsService.cancelStatus(this.appName, content, content.version).pipe(
+            tap(updated => {
+                this.replaceContent(updated, content.version, 'i18n:contents.updated');
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
     public createDraft(content: ContentDto): Observable<ContentDto> {
         return this.contentsService.createVersion(this.appName, content, content.version).pipe(
             tap(updated => {

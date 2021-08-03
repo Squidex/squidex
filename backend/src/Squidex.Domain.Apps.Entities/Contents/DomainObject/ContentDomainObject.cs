@@ -166,6 +166,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         return Snapshot;
                     });
 
+                case CancelContentSchedule cancelContentSchedule:
+                    return UpdateReturnAsync(cancelContentSchedule, async c =>
+                    {
+                        var operation = await OperationContext.CreateAsync(serviceProvider, c, () => Snapshot);
+
+                        operation.MustHavePermission(Permissions.AppContentsChangeStatusCancel);
+
+                        if (Snapshot.ScheduleJob != null)
+                        {
+                            CancelChangeStatus(c);
+                        }
+
+                        return Snapshot;
+                    });
+
                 case ChangeContentStatus changeContentStatus:
                     return UpdateReturnAsync(changeContentStatus, async c =>
                     {
@@ -407,7 +422,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Raise(command, new ContentStatusScheduled { DueTime = dueTime });
         }
 
-        private void CancelChangeStatus(ChangeContentStatus command)
+        private void CancelChangeStatus(ContentCommand command)
         {
             Raise(command, new ContentSchedulingCancelled());
         }

@@ -30,6 +30,8 @@ namespace Squidex.Web
 
         public bool CanDeleteContentVersion(string schema) => IsAllowedForSchema(Permissions.AppContentsVersionDeleteOwn, schema);
 
+        public bool CanCancelContentStatus(string schema) => IsAllowedForSchema(Permissions.AppContentsChangeStatusCancelOwn, schema);
+
         public bool CanUpdateContent(string schema) => IsAllowedForSchema(Permissions.AppContentsUpdateOwn, schema);
 
         // Schemas
