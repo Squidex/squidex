@@ -42,17 +42,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var filter = CreateFilter(appId, schemas.Select(x => x.Id), q.ScheduledFrom.Value, q.ScheduledTo.Value);
 
-            var contentEntities = await Collection.Find(filter).ToListAsync(ct);
+            var contentEntities = await Collection.Find(filter).Limit(100).ToListAsync(ct);
             var contentTotal = (long)contentEntities.Count;
-
-            if (q.NoTotal)
-            {
-                contentTotal = -1;
-            }
-            else if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
-            {
-                contentTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
-            }
 
             return ResultList.Create(contentTotal, contentEntities);
         }

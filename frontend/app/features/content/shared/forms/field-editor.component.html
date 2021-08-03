@@ -113,6 +113,7 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'Dropdown'">
                             <sqx-reference-dropdown
+                                mode="Array"
                                 [formControl]="editorControl" 
                                 [language]="language"
 								[schemaId]="field.rawProperties.singleId">

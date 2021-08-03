@@ -31,6 +31,7 @@ $padding: 1rem;
 .nested-fields {
     background: $color-border-lighter;
     border: 0;
+    border-radius: 0 0 $border-radius $border-radius;
     padding: $padding;
     padding-left: 2 * $padding;
     position: relative;

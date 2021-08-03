@@ -29,7 +29,7 @@ type ContentName = { name: string; id?: string };
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-reference-dropdown[schemaId]',
+    selector: 'sqx-reference-dropdown[mode][schemaId]',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',
     providers: [
