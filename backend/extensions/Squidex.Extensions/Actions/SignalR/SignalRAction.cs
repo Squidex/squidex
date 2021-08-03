@@ -36,7 +36,7 @@ namespace Squidex.Extensions.Actions.SignalR
         public string HubName { get; set; }
 
         [LocalizedRequired]
-        [Display(Name = "Action", Description = "**Broadcast** = send to all User, **User** = send to user(s), **Group** = send to group(s)")]
+        [Display(Name = "Action", Description = "Broadcast = send to all User, User = send to user(s), Group = send to group(s)")]
         [Editor(RuleFieldEditor.Text)]
         public ActionTypeEnum Action { get; set; }
 
