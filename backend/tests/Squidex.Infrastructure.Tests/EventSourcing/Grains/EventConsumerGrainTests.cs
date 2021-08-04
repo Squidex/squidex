@@ -17,6 +17,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
+    [Trait("Category", "Dependencies")]
     public class EventConsumerGrainTests
     {
         public sealed class MyEventConsumerGrain : EventConsumerGrain
