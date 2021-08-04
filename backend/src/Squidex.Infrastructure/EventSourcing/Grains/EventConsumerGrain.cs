@@ -24,8 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
-        private TaskScheduler? scheduler;
-        private BatchSubscriber? currentSubscriber;
+        private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
 
         private EventConsumerState State
@@ -51,8 +50,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         protected override Task OnActivateAsync(string key)
         {
-            scheduler = TaskScheduler.Current;
-
             eventConsumer = eventConsumerFactory(key);
 
             return Task.CompletedTask;
@@ -67,9 +64,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public async Task CompleteAsync()
         {
-            if (currentSubscriber != null)
+            if (currentSubscription is BatchSubscriber batchSubscriber)
             {
-                await currentSubscriber.CompleteAsync();
+                await batchSubscriber.CompleteAsync();
             }
         }
 
@@ -85,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
         {
-            if (!ReferenceEquals(sender, currentSubscriber?.Sender))
+            if (!ReferenceEquals(sender, currentSubscription?.Sender))
             {
                 return Task.CompletedTask;
             }
@@ -100,7 +97,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task OnErrorAsync(object sender, Exception exception)
         {
-            if (!ReferenceEquals(sender, currentSubscriber?.Sender))
+            if (!ReferenceEquals(sender, currentSubscription?.Sender))
             {
                 return Task.CompletedTask;
             }
@@ -262,31 +259,26 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private void Unsubscribe()
         {
-            var subscription = Interlocked.Exchange(ref currentSubscriber, null);
+            var subscription = Interlocked.Exchange(ref currentSubscription, null);
 
             subscription?.Unsubscribe();
         }
 
         private void Subscribe()
         {
-            if (currentSubscriber == null)
+            if (currentSubscription == null)
             {
-                currentSubscriber = CreateSubscription();
+                currentSubscription = CreateSubscription();
             }
             else
             {
-                currentSubscriber.WakeUp();
+                currentSubscription.WakeUp();
             }
-        }
-
-        protected virtual TaskScheduler GetScheduler()
-        {
-            return scheduler!;
         }
 
         private BatchSubscriber CreateSubscription()
         {
-            return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription, GetScheduler());
+            return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription);
         }
 
         protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)

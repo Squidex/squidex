@@ -6,9 +6,10 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace Squidex.Infrastructure.Tasks
 {
@@ -37,8 +38,7 @@ namespace Squidex.Infrastructure.Tasks
         public static TResult Sync<TResult>(Func<Task<TResult>> func)
         {
             return TaskFactory
-                .StartNew(func)
-                .Unwrap()
+                .StartNew(func).Unwrap()
                 .GetAwaiter()
                 .GetResult();
         }
@@ -46,42 +46,52 @@ namespace Squidex.Infrastructure.Tasks
         public static void Sync(Func<Task> func)
         {
             TaskFactory
-                .StartNew(func)
-                .Unwrap()
+                .StartNew(func).Unwrap()
                 .GetAwaiter()
                 .GetResult();
         }
 
-        public static IPropagatorBlock<T, T[]> CreateBatchBlock<T>(int batchSize, int timeout, GroupingDataflowBlockOptions? dataflowBlockOptions = null)
+        public static void Batch<TIn, TOut>(this Channel<object> source, Channel<TOut> target, Func<IReadOnlyList<TIn>, TOut> converter, int batchSize, int timeout,
+            CancellationToken ct = default)
         {
-            dataflowBlockOptions ??= new GroupingDataflowBlockOptions();
-
-            var batchBlock = new BatchBlock<T>(batchSize, dataflowBlockOptions);
-
-            var timer = new Timer(_ => batchBlock.TriggerBatch());
-
-            var timerBlock = new TransformBlock<T, T>(value =>
+            Task.Run(async () =>
             {
-                timer.Change(timeout, Timeout.Infinite);
+                var batch = new List<TIn>(batchSize);
 
-                return value;
-            }, new ExecutionDataflowBlockOptions
-            {
-                BoundedCapacity = 1,
-                CancellationToken = dataflowBlockOptions.CancellationToken,
-                EnsureOrdered = dataflowBlockOptions.EnsureOrdered,
-                MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = dataflowBlockOptions.MaxMessagesPerTask,
-                NameFormat = dataflowBlockOptions.NameFormat,
-                TaskScheduler = dataflowBlockOptions.TaskScheduler
-            });
+                var force = new object();
 
-            timerBlock.LinkTo(batchBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+                using var timer = new Timer(_ => source.Writer.TryWrite(force));
 
-            return DataflowBlock.Encapsulate(timerBlock, batchBlock);
+                async Task TrySendAsync()
+                {
+                    if (batch.Count > 0)
+                    {
+                        await target.Writer.WriteAsync(converter(batch), ct);
+                        batch.Clear();
+                    }
+                }
+
+                await foreach (var item in source.Reader.ReadAllAsync(ct))
+                {
+                    if (ReferenceEquals(item, force))
+                    {
+                        await TrySendAsync();
+                    }
+                    else if (item is TIn typed)
+                    {
+                        timer.Change(timeout, Timeout.Infinite);
+
+                        batch.Add(typed);
+
+                        if (batch.Count >= batchSize)
+                        {
+                            await TrySendAsync();
+                        }
+                    }
+                }
+
+                await TrySendAsync();
+            }, ct).ContinueWith(x => target.Writer.TryComplete(x.Exception));
         }
     }
 }
