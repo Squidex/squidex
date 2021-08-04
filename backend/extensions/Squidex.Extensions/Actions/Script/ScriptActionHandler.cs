@@ -32,10 +32,12 @@ namespace Squidex.Extensions.Actions.Script
 
         protected override async Task<Result> ExecuteJobAsync(ScriptJob job, CancellationToken ct = default)
         {
-            var result = await scriptEngine.ExecuteAsync(new ScriptVars
+            var vars = new ScriptVars
             {
                 ["event"] = job.Event
-            }, job.Script, ct: ct);
+            };
+
+            var result = await scriptEngine.ExecuteAsync(vars, job.Script, ct: ct);
 
             return Result.Success(result?.ToString());
         }
