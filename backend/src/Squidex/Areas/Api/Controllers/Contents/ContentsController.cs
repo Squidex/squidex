@@ -544,6 +544,34 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
+        /// Cancel status change of a content item.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="schema">The name of the schema.</param>
+        /// <param name="id">The id of the content item to cancel.</param>
+        /// <returns>
+        /// 200 => Content status change cancelled.
+        /// 400 => Content request not valid.
+        /// 404 => Content, schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
+        /// </remarks>
+        [HttpDelete]
+        [Route("content/{app}/{schema}/{id}/status/")]
+        [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsChangeStatusOwn)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DeleteContentStatus(string app, string schema, DomainId id)
+        {
+            var command = new CancelContentSchedule { ContentId = id };
+
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Create a new draft version.
         /// </summary>
         /// <param name="app">The name of the app.</param>

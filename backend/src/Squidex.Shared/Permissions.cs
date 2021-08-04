@@ -150,6 +150,8 @@ namespace Squidex.Shared
         public const string AppContentsCreate = "squidex.apps.{app}.contents.{schema}.create";
         public const string AppContentsUpdate = "squidex.apps.{app}.contents.{schema}.update";
         public const string AppContentsUpdateOwn = "squidex.apps.{app}.contents.{schema}.update.own";
+        public const string AppContentsChangeStatusCancel = "squidex.apps.{app}.contents.{schema}.changestatus.cancel";
+        public const string AppContentsChangeStatusCancelOwn = "squidex.apps.{app}.contents.{schema}.changestatus.cancel.own";
         public const string AppContentsChangeStatus = "squidex.apps.{app}.contents.{schema}.changestatus";
         public const string AppContentsChangeStatusOwn = "squidex.apps.{app}.contents.{schema}.changestatus.own";
         public const string AppContentsUpsert = "squidex.apps.{app}.contents.{schema}.upsert";

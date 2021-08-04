@@ -74,6 +74,10 @@ export class ContentHistoryPageComponent extends ResourceOwner implements OnInit
             .subscribe();
     }
 
+    public cancelStatus() {
+        this.contentsState.cancelStatus(this.content);
+    }
+
     public delete() {
         this.contentsState.deleteMany([this.content]);
     }

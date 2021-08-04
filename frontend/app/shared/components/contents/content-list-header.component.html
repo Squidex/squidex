@@ -18,7 +18,7 @@
         <sqx-table-header text="i18n:contents.tableHeaders.createdBy"></sqx-table-header>
     </ng-container>
     <ng-container *ngSwitchCase="metaFields.lastModified">
-        <sqx-table-header text="i18n:contents.tableHeaders.lastModified"
+        <sqx-table-header text="i18n:contents.tableHeaders.lastModified" defaultOrder="ascending"
             [sortable]="true"
             [fieldPath]="'lastModified'"
             [query]="query"

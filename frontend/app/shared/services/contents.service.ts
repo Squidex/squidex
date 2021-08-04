@@ -50,6 +50,7 @@ export class ContentDto {
     public readonly canDelete: boolean;
     public readonly canDraftDelete: boolean;
     public readonly canDraftCreate: boolean;
+    public readonly canCancelStatus: boolean;
     public readonly canUpdate: boolean;
 
     public get canPublish() {
@@ -79,6 +80,7 @@ export class ContentDto {
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDraftCreate = hasAnyLink(links, 'draft/create');
         this.canDraftDelete = hasAnyLink(links, 'draft/delete');
+        this.canCancelStatus = hasAnyLink(links, 'cancel');
         this.canUpdate = hasAnyLink(links, 'update');
 
         const updates: StatusInfo[] = [];
@@ -123,8 +125,14 @@ export type BulkUpdateDto =
 export type BulkUpdateJobDto =
     Readonly<{ id: string; type: BulkUpdateType; status?: string; schema?: string; dueTime?: string | null; expectedVersion?: number }>;
 
-export type ContentQueryDto =
-    Readonly<{ ids?: ReadonlyArray<string>; maxLength?: number; query?: Query; skip?: number; take?: number; scheduledFrom?: string | null; scheduledTo?: string | null }>;
+export type ContentsByIds =
+    Readonly<{ ids: ReadonlyArray<string> }>;
+
+export type ContentsBySchedule =
+    Readonly<{ scheduledFrom: string | null; scheduledTo: string | null }>;
+
+export type ContentsByQuery =
+    Readonly<{ query?: Query; skip?: number; take?: number }>;
 
 @Injectable()
 export class ContentsService {
@@ -135,70 +143,38 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, q?: ContentQueryDto): Observable<ContentsDto> {
-        const { ids, maxLength } = q || {};
+    public getContents(appName: string, schemaName: string, q?: ContentsByQuery): Observable<ContentsDto> {
+        const { odataParts, queryObj } = buildQuery(q);
 
-        const { fullQuery, odataParts: queryOdataParts, queryObj } = buildQuery(q);
+        const body: any = {};
 
-        if (fullQuery.length > (maxLength || 2000)) {
-            const body: any = {};
-
-            if (ids && ids.length > 0) {
-                body.ids = ids;
-            } else if (queryOdataParts.length > 0) {
-                body.odataQuery = queryOdataParts.join('&');
-            } else if (queryObj) {
-                body.q = queryObj;
-            }
-
-            const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/query`);
-
-            return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body).pipe(
-                map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(parseContent);
-
-                    return new ContentsDto(statuses, total, contents, _links);
-                }),
-                pretifyError('i18n:contents.loadFailed'));
-        } else {
-            const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
-
-            return this.http.get<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url).pipe(
-                map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(parseContent);
-
-                    return new ContentsDto(statuses, total, contents, _links);
-                }),
-                pretifyError('i18n:contents.loadFailed'));
+        if (odataParts.length > 0) {
+            body.odataQuery = odataParts.join('&');
+        } else if (queryObj) {
+            body.q = queryObj;
         }
+
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/query`);
+
+        return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(parseContent);
+
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('i18n:contents.loadFailed'));
     }
 
-    public getAllContents(appName: string, q?: ContentQueryDto): Observable<ContentsDto> {
-        const { maxLength, ...body } = q || {};
+    public getAllContents(appName: string, q: ContentsByIds | ContentsBySchedule): Observable<ContentsDto> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
 
-        const { fullQuery } = buildQuery(q);
+        return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, q).pipe(
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(parseContent);
 
-        if (fullQuery.length > (maxLength || 2000)) {
-            const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
-
-            return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body).pipe(
-                map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(parseContent);
-
-                    return new ContentsDto(statuses, total, contents, _links);
-                }),
-                pretifyError('i18n:contents.loadFailed'));
-        } else {
-            const url = this.apiUrl.buildUrl(`/api/content/${appName}?${fullQuery}`);
-
-            return this.http.get<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url).pipe(
-                map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(parseContent);
-
-                    return new ContentsDto(statuses, total, contents, _links);
-                }),
-                pretifyError('i18n:contents.loadFailed'));
-        }
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('i18n:contents.loadFailed'));
     }
 
     public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
@@ -211,7 +187,7 @@ export class ContentsService {
             pretifyError('i18n:contents.loadContentFailed'));
     }
 
-    public getContentReferences(appName: string, schemaName: string, id: string, q?: ContentQueryDto): Observable<ContentsDto> {
+    public getContentReferences(appName: string, schemaName: string, id: string, q?: ContentsByQuery): Observable<ContentsDto> {
         const { fullQuery } = buildQuery(q);
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/references?${fullQuery}`);
@@ -225,7 +201,7 @@ export class ContentsService {
             pretifyError('i18n:contents.loadFailed'));
     }
 
-    public getContentReferencing(appName: string, schemaName: string, id: string, q?: ContentQueryDto): Observable<ContentsDto> {
+    public getContentReferencing(appName: string, schemaName: string, id: string, q?: ContentsByQuery): Observable<ContentsDto> {
         const { fullQuery } = buildQuery(q);
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/referencing?${fullQuery}`);
@@ -307,6 +283,21 @@ export class ContentsService {
             pretifyError('i18n:contents.loadVersionFailed'));
     }
 
+    public cancelStatus(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
+        const link = resource._links['cancel'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Cancelled', appName);
+            }),
+            pretifyError('i18n:contents.updateFailed'));
+    }
+
     public deleteVersion(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
         const link = resource._links['draft/delete'];
 
@@ -336,17 +327,15 @@ export class ContentsService {
     }
 }
 
-function buildQuery(q?: ContentQueryDto) {
-    const { ids, query, scheduledFrom, scheduledTo, skip, take } = q || {};
+function buildQuery(q?: ContentsByQuery) {
+    const { query, skip, take } = q || {};
 
     const queryParts: string[] = [];
     const odataParts: string[] = [];
 
     let queryObj: Query | undefined;
 
-    if (ids && ids.length > 0) {
-        queryParts.push(`ids=${ids.join(',')}`);
-    } else if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
+    if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
         odataParts.push(`${query.fullText.trim()}`);
 
         if (take && take > 0) {
@@ -356,9 +345,6 @@ function buildQuery(q?: ContentQueryDto) {
         if (skip && skip > 0) {
             odataParts.push(`$skip=${skip}`);
         }
-    } else if (scheduledFrom && scheduledTo) {
-        queryParts.push(`scheduledFrom=${encodeURIComponent(scheduledFrom)}`);
-        queryParts.push(`scheduledTo=${encodeURIComponent(scheduledTo)}`);
     } else {
         queryObj = { ...query };
 

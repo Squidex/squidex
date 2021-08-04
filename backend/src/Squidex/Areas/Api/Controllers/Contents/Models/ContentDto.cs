@@ -181,6 +181,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
             }
 
+            if (content.ScheduleJob != null && resources.CanCancelContentStatus(schema))
+            {
+                AddDeleteLink($"cancel", resources.Url<ContentsController>(x => nameof(x.DeleteContentStatus), values));
+            }
+
             if (content.IsSingleton == false && resources.CanDeleteContent(schema))
             {
                 AddDeleteLink("delete", resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));

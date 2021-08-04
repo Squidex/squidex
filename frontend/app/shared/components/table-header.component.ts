@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-table-header',
+    selector: 'sqx-table-header[text]',
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,13 +19,13 @@ export class TableHeaderComponent implements OnChanges {
     public queryChange = new EventEmitter<Query>();
 
     @Input()
-    public query: Query | undefined;
+    public query: Query | undefined | null;
 
     @Input()
     public text: string;
 
     @Input()
-    public fieldPath: string;
+    public fieldPath?: string | undefined | null;
 
     @Input()
     public language: LanguageDto;
@@ -33,21 +33,24 @@ export class TableHeaderComponent implements OnChanges {
     @Input()
     public sortable?: boolean | null;
 
-    public order: SortMode | null;
+    @Input()
+    public defaultOrder: SortMode | undefined | null;
 
-    public ngOnChanges(changes: SimpleChanges) {
+    public order: SortMode | undefined | null;
+
+    public ngOnChanges() {
         if (this.sortable) {
-            if (changes['query'] || changes['fieldPath']) {
-                if (this.fieldPath &&
-                    this.query &&
-                    this.query.sort &&
-                    this.query.sort.length === 1 &&
-                    this.query.sort[0].path === this.fieldPath) {
-                    this.order = this.query.sort[0].order;
-                } else {
-                    this.order = null;
-                }
+            const { sort } = this.query || {};
+
+            if (this.fieldPath && sort && sort.length === 1 && sort[0].path === this.fieldPath) {
+                this.order = sort[0].order;
+            } else if (this.defaultOrder && (!sort || sort.length === 0)) {
+                this.order = this.defaultOrder;
+            } else {
+                this.order = null;
             }
+        } else {
+            this.order = null;
         }
     }
 

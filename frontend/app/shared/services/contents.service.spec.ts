@@ -9,7 +9,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { inject, TestBed } from '@angular/core/testing';
 import { ErrorDto } from '@app/framework';
 import { AnalyticsService, ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ResourceLinks, ScheduleDto, Version, Versioned } from '@app/shared/internal';
-import { encodeQuery, sanitize } from './../state/query';
+import { sanitize } from './../state/query';
 import { BulkResultDto, BulkUpdateDto } from './contents.service';
 
 describe('ContentsService', () => {
@@ -32,18 +32,23 @@ describe('ContentsService', () => {
         httpMock.verify();
     }));
 
-    it('should make get request to get contents',
+    it('should make post request to get contents with json query',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+            const query = { fullText: 'my-query' };
+
             let contents: ContentsDto;
 
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13 }).subscribe(result => {
+            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe(result => {
                 contents = result;
             });
 
-            const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema?q=${encodeQuery({ take: 17, skip: 13 })}`);
+            const expectedQuery = { ...query, take: 17, skip: 13 };
 
-            expect(req.request.method).toEqual('GET');
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
+
+            expect(req.request.method).toEqual('POST');
             expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
 
             req.flush({
                 total: 10,
@@ -63,87 +68,11 @@ describe('ContentsService', () => {
                 ]));
         }));
 
-    it('should make get request to get contents with json query',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const query = { fullText: 'my-query' };
-
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe();
-
-            const expectedQuery = { ...query, take: 17, skip: 13 };
-
-            const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema?q=${encodeQuery(expectedQuery)}`);
-
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get contents with json query if request limit reached',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const query = { fullText: 'my-query' };
-
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query, maxLength: 5 }).subscribe();
-
-            const expectedQuery = { ...query, take: 17, skip: 13 };
-
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make get request to get contents with ids',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const ids = ['1', '2'];
-
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, ids }).subscribe();
-
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?ids=1,2');
-
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get contents with ids if request limit reached',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const ids = ['1', '2'];
-
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, ids, maxLength: 5 }).subscribe();
-
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
-
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.body).toEqual({ ids });
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make get request to get contents with odata filter',
+    it('should make post request to get contents with odata filter',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const query = { fullText: '$filter=my-filter' };
 
             contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query }).subscribe();
-
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13');
-
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get contents with odata filter if request limit reached',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const query = { fullText: '$filter=my-filter' };
-
-            contentsService.getContents('my-app', 'my-schema', { take: 17, skip: 13, query, maxLength: 5 }).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/query');
 
@@ -154,25 +83,11 @@ describe('ContentsService', () => {
             req.flush({ total: 10, items: [] });
         }));
 
-    it('should make get request to get all contents by ids',
+    it('should make post request to get all contents by ids',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             const ids = ['1', '2', '3'];
 
             contentsService.getAllContents('my-app', { ids }).subscribe();
-
-            const req = httpMock.expectOne('http://service/p/api/content/my-app?ids=1,2,3');
-
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-
-            req.flush({ total: 10, items: [] });
-        }));
-
-    it('should make post request to get all contents by ids if request limit reached',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const ids = ['1', '2', '3'];
-
-            contentsService.getAllContents('my-app', { ids, maxLength: 5 }).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/content/my-app');
 
@@ -332,6 +247,30 @@ describe('ContentsService', () => {
             });
 
             const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/draft');
+
+            expect(req.request.method).toEqual('DELETE');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+            req.flush(contentResponse(12));
+
+            expect(content!).toEqual(createContent(12));
+        }));
+
+    it('should make delete request to cancel content',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    cancel: { method: 'DELETE', href: '/api/content/my-app/my-schema/content1/status' },
+                },
+            };
+
+            let content: ContentDto;
+
+            contentsService.cancelStatus('my-app', resource, version).subscribe(result => {
+                content = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
 
             expect(req.request.method).toEqual('DELETE');
             expect(req.request.headers.get('If-Match')).toBe(version.value);
