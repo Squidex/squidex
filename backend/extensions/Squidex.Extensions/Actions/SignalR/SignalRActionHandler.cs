@@ -30,6 +30,7 @@ namespace Squidex.Extensions.Actions.SignalR
                         option.ServiceTransportType = ServiceTransportType.Transient;
                     })
                     .Build();
+
                 return serviceManager;
             });
         }
@@ -49,26 +50,20 @@ namespace Squidex.Extensions.Actions.SignalR
                 requestBody = ToEnvelopeJson(@event);
             }
 
-            string[] targetArray = new string[0];
-            string target = string.Empty;
-            target = await FormatAsync(action.Target, @event);
-            if (!string.IsNullOrEmpty(target))
-            {
-                targetArray = target.Split('\n');
-            }
+            var target = (await FormatAsync(action.Target, @event)) ?? string.Empty;
 
             var ruleDescription = $"Send SignalRJob to signalR hub '{hubName}'";
 
             var ruleJob = new SignalRJob
             {
+                Action = action.Action,
                 ConnectionString = action.ConnectionString,
                 HubName = hubName,
-                Action = action.Action,
                 MethodName = action.MethodName,
-                Target = target,
-                TargetArray = targetArray,
-                Payload = requestBody
+                MethodPayload = requestBody,
+                Targets = target.Split("\n"),
             };
+
             return (ruleDescription, ruleJob);
         }
 
@@ -76,22 +71,20 @@ namespace Squidex.Extensions.Actions.SignalR
         {
             var signalR = await clients.GetClientAsync((job.ConnectionString, job.HubName));
 
-            await using (var signalRContext = await signalR.CreateHubContextAsync(job.HubName))
+            await using (var signalRContext = await signalR.CreateHubContextAsync(job.HubName, cancellationToken: ct))
             {
                 var methodeName = !string.IsNullOrWhiteSpace(job.MethodName) ? job.MethodName : "push";
 
                 switch (job.Action)
                 {
                     case ActionTypeEnum.Broadcast:
-                        await signalRContext.Clients.All.SendAsync(methodeName, job.Payload);
+                        await signalRContext.Clients.All.SendAsync(methodeName, job.MethodPayload, ct);
                         break;
                     case ActionTypeEnum.User:
-                        await signalRContext.Clients.Users(job.TargetArray).SendAsync(methodeName, job.Payload);
-
+                        await signalRContext.Clients.Users(job.Targets).SendAsync(methodeName, job.MethodPayload, ct);
                         break;
                     case ActionTypeEnum.Group:
-                        await signalRContext.Clients.Groups(job.TargetArray).SendAsync(methodeName, job.Payload);
-
+                        await signalRContext.Clients.Groups(job.Targets).SendAsync(methodeName, job.MethodPayload, ct);
                         break;
                 }
             }
@@ -110,10 +103,8 @@ namespace Squidex.Extensions.Actions.SignalR
 
         public string MethodName { get; set; }
 
-        public string Target { get; set; }
+        public string MethodPayload { get; set; }
 
-        public string[] TargetArray { get; set; }
-
-        public string Payload { get; set; }
+        public string[] Targets { get; set; }
     }
 }
