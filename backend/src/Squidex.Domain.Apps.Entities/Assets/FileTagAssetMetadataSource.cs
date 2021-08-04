@@ -153,12 +153,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             if (asset.Type == AssetType.Video)
             {
-                var videoWidth = asset.Metadata.GetVideoWidth();
-                var videoHeight = asset.Metadata.GetVideoWidth();
+                var w = asset.Metadata.GetVideoWidth();
+                var h = asset.Metadata.GetVideoHeight();
 
-                if (videoWidth != null && videoHeight != null)
+                if (w != null && h != null)
                 {
-                    yield return $"{videoHeight}x{videoHeight}pt";
+                    yield return $"{w}x{h}pt";
                 }
 
                 if (asset.Metadata.TryGetString("duration", out var duration))

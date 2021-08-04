@@ -68,39 +68,49 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public float? GetFocusX()
         {
-            return GetNumber(FocusX);
+            return GetSingle(FocusX);
         }
 
         public float? GetFocusY()
         {
-            return GetNumber(FocusY);
+            return GetSingle(FocusY);
         }
 
         public int? GetPixelWidth()
         {
-            return GetNumber(PixelWidth);
+            return GetIn32(PixelWidth);
         }
 
         public int? GetPixelHeight()
         {
-            return GetNumber(PixelHeight);
+            return GetIn32(PixelHeight);
         }
 
         public int? GetVideoWidth()
         {
-            return GetNumber(VideoWidth);
+            return GetIn32(VideoWidth);
         }
 
         public int? GetVideoHeight()
         {
-            return GetNumber(VideoHeight);
+            return GetIn32(VideoHeight);
         }
 
-        public int? GetNumber(string name)
+        public int? GetIn32(string name)
         {
             if (TryGetValue(name, out var n) && n is JsonNumber number)
             {
                 return (int)number.Value;
+            }
+
+            return null;
+        }
+
+        public float? GetSingle(string name)
+        {
+            if (TryGetValue(name, out var n) && n is JsonNumber number)
+            {
+                return (float)number.Value;
             }
 
             return null;
