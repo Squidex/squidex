@@ -674,7 +674,6 @@
   "schemas.fieldTypes.assets.countMin": "Min. bestanden",
   "schemas.fieldTypes.assets.description": "Afbeeldingen, video's, documenten.",
   "schemas.fieldTypes.assets.fileExtensions": "Bestandsextensies",
-  "schemas.fieldTypes.assets.mustBeImage": "Moet afbeelding zijn",
   "schemas.fieldTypes.assets.previewFileName": "Alleen bestandsnaam",
   "schemas.fieldTypes.assets.previewImage": "Alleen miniatuur- of bestandsnaam indien geen afbeelding",
   "schemas.fieldTypes.assets.previewImageAndFileName": "Miniatuur- en bestandsnaam",

@@ -129,13 +129,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     TryAddTimeSpan("duration", file.Properties.Duration);
 
+                    TryAddInt("bitsPerSample", file.Properties.BitsPerSample);
                     TryAddInt("audioBitrate", file.Properties.AudioBitrate);
                     TryAddInt("audioChannels", file.Properties.AudioChannels);
                     TryAddInt("audioSampleRate", file.Properties.AudioSampleRate);
-                    TryAddInt("bitsPerSample", file.Properties.BitsPerSample);
                     TryAddInt("imageQuality", file.Properties.PhotoQuality);
-                    TryAddInt("videoWidth", file.Properties.VideoWidth);
-                    TryAddInt("videoHeight", file.Properties.VideoHeight);
+
+                    TryAddInt(AssetMetadata.VideoWidth, file.Properties.VideoWidth);
+                    TryAddInt(AssetMetadata.VideoHeight, file.Properties.VideoHeight);
 
                     TryAddString("description", file.Properties.Description);
                 }
@@ -150,24 +151,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public IEnumerable<string> Format(IAssetEntity asset)
         {
-            var metadata = asset.Metadata;
-
             if (asset.Type == AssetType.Video)
             {
-                if (metadata.TryGetNumber("videoWidth", out var w) &&
-                    metadata.TryGetNumber("videoHeight", out var h))
+                var videoWidth = asset.Metadata.GetVideoWidth();
+                var videoHeight = asset.Metadata.GetVideoWidth();
+
+                if (videoWidth != null && videoHeight != null)
                 {
-                    yield return $"{w}x{h}pt";
+                    yield return $"{videoHeight}x{videoHeight}pt";
                 }
 
-                if (metadata.TryGetString("duration", out var duration))
+                if (asset.Metadata.TryGetString("duration", out var duration))
                 {
                     yield return duration;
                 }
             }
             else if (asset.Type == AssetType.Audio)
             {
-                if (metadata.TryGetString("duration", out var duration))
+                if (asset.Metadata.TryGetString("duration", out var duration))
                 {
                     yield return duration;
                 }

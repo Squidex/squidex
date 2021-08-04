@@ -266,6 +266,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['aspectWidth'] = undefined;
         this.config['defaultValue'] = undefined;
         this.config['defaultValues'] = undefined;
+        this.config['expectedType'] = undefined;
         this.config['folderId'] = undefined;
         this.config['maxHeight'] = undefined;
         this.config['maxItems'] = undefined;
@@ -275,7 +276,6 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['minItems'] = undefined;
         this.config['minSize'] = undefined;
         this.config['minWidth'] = undefined;
-        this.config['mustBeImage'] = undefined;
         this.config['previewMode'] = undefined;
         this.config['resolveFirst'] = undefined;
     }

@@ -728,7 +728,6 @@
   "schemas.fieldTypes.assets.fileExtensions": "文件扩展名",
   "schemas.fieldTypes.assets.folderId": "文件夹",
   "schemas.fieldTypes.assets.folderIdHint": "新资源将上传到的资源文件夹。",
-  "schemas.fieldTypes.assets.mustBeImage": "必须是图片",
   "schemas.fieldTypes.assets.previewFileName": "仅文件名",
   "schemas.fieldTypes.assets.previewImage": "如果不是图像，则只有缩略图或文件名",
   "schemas.fieldTypes.assets.previewImageAndFileName": "缩略图和文件名",

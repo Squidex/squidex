@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -39,12 +41,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? AspectHeight { get; init; }
 
-        public bool MustBeImage { get; init; }
+        public AssetType? ExpectedType { get; set; }
 
         public bool AllowDuplicates { get; init; }
 
         public bool ResolveFirst { get; init; }
 
+        [Obsolete("Use 'AllowDuplicates' field now")]
+        public bool MustBeImage
+        {
+            init => ExpectedType = value ? AssetType.Image : ExpectedType;
+        }
+
+        [Obsolete("Use 'ResolveFirst' field now")]
         public bool ResolveImage
         {
             init => ResolveFirst = value;

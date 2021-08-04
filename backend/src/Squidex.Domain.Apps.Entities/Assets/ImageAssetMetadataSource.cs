@@ -123,10 +123,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             if (asset.Type == AssetType.Image)
             {
-                if (asset.Metadata.TryGetNumber("pixelWidth", out var w) &&
-                    asset.Metadata.TryGetNumber("pixelHeight", out var h))
+                var pixelWidth = asset.Metadata.GetVideoWidth();
+                var pixelHeight = asset.Metadata.GetVideoHeight();
+
+                if (pixelWidth != null && pixelHeight != null)
                 {
-                    yield return $"{w}x{h}px";
+                    yield return $"{pixelWidth}x{pixelHeight}px";
                 }
             }
         }

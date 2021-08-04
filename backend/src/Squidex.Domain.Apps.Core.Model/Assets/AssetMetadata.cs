@@ -17,67 +17,88 @@ namespace Squidex.Domain.Apps.Core.Assets
     {
         private static readonly char[] PathSeparators = { '.', '[', ']' };
 
+        public const string FocusX = "focusX";
+        public const string FocusY = "focusY";
+        public const string PixelWidth = "pixelWidth";
+        public const string PixelHeight = "pixelHeight";
+        public const string VideoWidth = "videoWidth";
+        public const string VideoHeight = "videoHeight";
+
         public AssetMetadata SetFocusX(float value)
         {
-            this["focusX"] = JsonValue.Create(value);
+            this[FocusX] = JsonValue.Create(value);
 
             return this;
         }
 
         public AssetMetadata SetFocusY(float value)
         {
-            this["focusY"] = JsonValue.Create(value);
+            this[FocusY] = JsonValue.Create(value);
 
             return this;
         }
 
         public AssetMetadata SetPixelWidth(int value)
         {
-            this["pixelWidth"] = JsonValue.Create(value);
+            this[PixelWidth] = JsonValue.Create(value);
 
             return this;
         }
 
         public AssetMetadata SetPixelHeight(int value)
         {
-            this["pixelHeight"] = JsonValue.Create(value);
+            this[PixelHeight] = JsonValue.Create(value);
+
+            return this;
+        }
+
+        public AssetMetadata SetVideoWidth(int value)
+        {
+            this[VideoWidth] = JsonValue.Create(value);
+
+            return this;
+        }
+
+        public AssetMetadata SetVideoHeight(int value)
+        {
+            this[VideoHeight] = JsonValue.Create(value);
 
             return this;
         }
 
         public float? GetFocusX()
         {
-            if (TryGetValue("focusX", out var n) && n is JsonNumber number)
-            {
-                return (float)number.Value;
-            }
-
-            return null;
+            return GetNumber(FocusX);
         }
 
         public float? GetFocusY()
         {
-            if (TryGetValue("focusY", out var n) && n is JsonNumber number)
-            {
-                return (float)number.Value;
-            }
-
-            return null;
+            return GetNumber(FocusY);
         }
 
         public int? GetPixelWidth()
         {
-            if (TryGetValue("pixelWidth", out var n) && n is JsonNumber number)
-            {
-                return (int)number.Value;
-            }
-
-            return null;
+            return GetNumber(PixelWidth);
         }
 
         public int? GetPixelHeight()
         {
-            if (TryGetValue("pixelHeight", out var n) && n is JsonNumber number)
+            return GetNumber(PixelHeight);
+        }
+
+        public int? GetVideoWidth()
+        {
+            return GetNumber(VideoWidth);
+        }
+
+        public int? GetVideoHeight()
+        {
+            return GetNumber(VideoHeight);
+        }
+
+        public int? GetNumber(string name)
+        {
+            if (TryGetValue(name, out var n) && n is JsonNumber number)
             {
                 return (int)number.Value;
             }

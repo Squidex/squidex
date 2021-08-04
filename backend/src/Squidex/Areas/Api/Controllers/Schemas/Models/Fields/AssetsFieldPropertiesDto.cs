@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
@@ -85,14 +86,24 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public int? AspectHeight { get; set; }
 
         /// <summary>
-        /// Defines if the asset must be an image.
+        /// The expected type.
         /// </summary>
-        public bool MustBeImage { get; set; }
+        public AssetType? ExpectedType { get; set; }
 
         /// <summary>
         /// True to resolve first asset in the content list.
         /// </summary>
         public bool ResolveFirst { get; set; }
+
+        /// <summary>
+        /// True to resolve first image in the content list.
+        /// </summary>
+        [Obsolete("Use 'expectedType' field now")]
+        public bool MustBeImage
+        {
+            get => ExpectedType == AssetType.Image;
+            set => ExpectedType = value ? AssetType.Image : ExpectedType;
+        }
 
         /// <summary>
         /// True to resolve first image in the content list.

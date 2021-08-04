@@ -150,7 +150,6 @@
   "contents.validation.error": "验证失败，内部错误。",
   "contents.validation.exactValue": "必须正好是 {value}。",
   "contents.validation.extension": "必须是允许的扩展名。",
-  "contents.validation.image": "不是图片。",
   "contents.validation.invalid": "无效值。",
   "contents.validation.itemCount": "必须正好有 {count} 个项目。",
   "contents.validation.itemCountBetween": "必须介于 {min} 和 {max} 项之间。",

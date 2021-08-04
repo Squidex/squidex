@@ -215,7 +215,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly minItems?: number;
     public readonly minSize?: number;
     public readonly minWidth?: number;
-    public readonly mustBeImage?: boolean;
+    public readonly expectedType?: string;
 
     public get isSortable() {
         return false;

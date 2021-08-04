@@ -64,6 +64,21 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
             };
         }
 
+        public static AssetInfo Video(DomainId id)
+        {
+            return new AssetInfo
+            {
+                AssetId = id,
+                FileName = "MyImage.png",
+                FileSize = 1024 * 8,
+                Type = AssetType.Video,
+                Metadata =
+                    new AssetMetadata()
+                        .SetVideoWidth(800)
+                        .SetVideoHeight(600)
+            };
+        }
+
         public static AssetInfo Svg(DomainId id)
         {
             return new AssetInfo

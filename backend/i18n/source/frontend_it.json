@@ -709,7 +709,6 @@
   "schemas.fieldTypes.assets.countMin": "Min num. di Risorse",
   "schemas.fieldTypes.assets.description": "Immagini, video, documenti.",
   "schemas.fieldTypes.assets.fileExtensions": "Estensioni dei File",
-  "schemas.fieldTypes.assets.mustBeImage": "Deve essere un'immagine",
   "schemas.fieldTypes.assets.previewFileName": "Solamente il nome del file",
   "schemas.fieldTypes.assets.previewImage": "Solamente l'anteprima o il nome del file se non è un immagine",
   "schemas.fieldTypes.assets.previewImageAndFileName": "L'anteprima e il nome del file",

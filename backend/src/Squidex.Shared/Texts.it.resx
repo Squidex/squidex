@@ -517,6 +517,9 @@
   <data name="contents.validation.assetNotFound" xml:space="preserve">
     <value>Id {id} non trovato.</value>
   </data>
+  <data name="contents.validation.assetType" xml:space="preserve">
+    <value>Not of expected type: {type}.</value>
+  </data>
   <data name="contents.validation.between" xml:space="preserve">
     <value>Deve essere tra {min} e {max}.</value>
   </data>
@@ -537,9 +540,6 @@
   </data>
   <data name="contents.validation.extension" xml:space="preserve">
     <value>Deve essere un'estensione consentita.</value>
-  </data>
-  <data name="contents.validation.image" xml:space="preserve">
-    <value>Non è un'immagine.</value>
   </data>
   <data name="contents.validation.invalid" xml:space="preserve">
     <value>Valore non consentito.</value>

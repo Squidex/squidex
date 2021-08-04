@@ -145,7 +145,6 @@
   "contents.validation.error": "Non è stato possibile validare a causa di un errore interno.",
   "contents.validation.exactValue": "Deve essere esattamente {value}.",
   "contents.validation.extension": "Deve essere un'estensione consentita.",
-  "contents.validation.image": "Non è un'immagine.",
   "contents.validation.invalid": "Valore non consentito.",
   "contents.validation.itemCount": "Deve avere esattamente {count} elemento(i).",
   "contents.validation.itemCountBetween": "Deve essere tra {min} e {max} elemento(i).",

@@ -76,11 +76,27 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     foundIds.Add(asset.AssetId);
 
                     ValidateCommon(asset, path, addError);
-                    ValidateIsImage(asset, path, addError);
+                    ValidateType(asset, path, addError);
 
                     if (asset.Type == AssetType.Image)
                     {
-                        ValidateImage(asset, path, addError);
+                        var w = asset.Metadata.GetPixelWidth();
+                        var h = asset.Metadata.GetPixelHeight();
+
+                        if (w != null && h != null)
+                        {
+                            ValidateDimensions(w.Value, h.Value, path, addError);
+                        }
+                    }
+                    else if (asset.Type == AssetType.Video)
+                    {
+                        var w = asset.Metadata.GetVideoWidth();
+                        var h = asset.Metadata.GetVideoHeight();
+
+                        if (w != null && h != null)
+                        {
+                            ValidateDimensions(w.Value, h.Value, path, addError);
+                        }
                     }
                 }
             }
@@ -120,54 +136,47 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             }
         }
 
-        private void ValidateIsImage(IAssetInfo asset, ImmutableQueue<string> path, AddError addError)
+        private void ValidateType(IAssetInfo asset, ImmutableQueue<string> path, AddError addError)
         {
-            if (properties.MustBeImage && asset.Type != AssetType.Image && asset.MimeType != "image/svg+xml")
+            var type = asset.MimeType == "image/svg+xml" ? AssetType.Image : asset.Type;
+
+            if (properties.ExpectedType != null && properties.ExpectedType != type)
             {
-                addError(path, T.Get("contents.validation.image"));
+                addError(path, T.Get("contents.validation.assetType", new { type = properties.ExpectedType }));
             }
         }
 
-        private void ValidateImage(IAssetInfo asset, ImmutableQueue<string> path, AddError addError)
+        private void ValidateDimensions(int w, int h, ImmutableQueue<string> path, AddError addError)
         {
-            var pixelWidth = asset.Metadata.GetPixelWidth();
-            var pixelHeight = asset.Metadata.GetPixelHeight();
+            var actualRatio = (double)w / h;
 
-            if (pixelWidth != null && pixelHeight != null)
+            if (properties.MinWidth != null && w < properties.MinWidth)
             {
-                var w = pixelWidth.Value;
-                var h = pixelHeight.Value;
+                addError(path, T.Get("contents.validation.minimumWidth", new { width = w, min = properties.MinWidth }));
+            }
 
-                var actualRatio = (double)w / h;
+            if (properties.MaxWidth != null && w > properties.MaxWidth)
+            {
+                addError(path, T.Get("contents.validation.maximumWidth", new { width = w, max = properties.MaxWidth }));
+            }
 
-                if (properties.MinWidth != null && w < properties.MinWidth)
+            if (properties.MinHeight != null && h < properties.MinHeight)
+            {
+                addError(path, T.Get("contents.validation.minimumHeight", new { height = h, min = properties.MinHeight }));
+            }
+
+            if (properties.MaxHeight != null && h > properties.MaxHeight)
+            {
+                addError(path, T.Get("contents.validation.maximumHeight", new { height = h, max = properties.MaxHeight }));
+            }
+
+            if (properties.AspectHeight != null && properties.AspectWidth != null)
+            {
+                var expectedRatio = (double)properties.AspectWidth.Value / properties.AspectHeight.Value;
+
+                if (Math.Abs(expectedRatio - actualRatio) > double.Epsilon)
                 {
-                    addError(path, T.Get("contents.validation.minimumWidth", new { width = w, min = properties.MinWidth }));
-                }
-
-                if (properties.MaxWidth != null && w > properties.MaxWidth)
-                {
-                    addError(path, T.Get("contents.validation.maximumWidth", new { width = w, max = properties.MaxWidth }));
-                }
-
-                if (properties.MinHeight != null && h < properties.MinHeight)
-                {
-                    addError(path, T.Get("contents.validation.minimumHeight", new { height = h, min = properties.MinHeight }));
-                }
-
-                if (properties.MaxHeight != null && h > properties.MaxHeight)
-                {
-                    addError(path, T.Get("contents.validation.maximumHeight", new { height = h, max = properties.MaxHeight }));
-                }
-
-                if (properties.AspectHeight != null && properties.AspectWidth != null)
-                {
-                    var expectedRatio = (double)properties.AspectWidth.Value / properties.AspectHeight.Value;
-
-                    if (Math.Abs(expectedRatio - actualRatio) > double.Epsilon)
-                    {
-                        addError(path, T.Get("contents.validation.aspectRatio", new { width = properties.AspectWidth, height = properties.AspectHeight }));
-                    }
+                    addError(path, T.Get("contents.validation.aspectRatio", new { width = properties.AspectWidth, height = properties.AspectHeight }));
                 }
             }
         }

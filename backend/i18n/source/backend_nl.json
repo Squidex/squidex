@@ -141,7 +141,6 @@
   "contents.validation.error": "Validatie mislukt met interne fout.",
   "contents.validation.exactValue": "Moet exact {waarde} zijn.",
   "contents.validation.extension": "Moet een toegestane extensie zijn.",
-  "contents.validation.image": "Geen afbeelding.",
   "contents.validation.invalid": "Geen geldige waarde.",
   "contents.validation.itemCount": "Moet exact {count} item (s) bevatten.",
   "contents.validation.itemCountBetween": "Moet tussen {min} en {max} item (s) bevatten.",

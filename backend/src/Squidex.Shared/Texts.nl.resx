@@ -517,6 +517,9 @@
   <data name="contents.validation.assetNotFound" xml:space="preserve">
     <value>Id {id} niet gevonden.</value>
   </data>
+  <data name="contents.validation.assetType" xml:space="preserve">
+    <value>Not of expected type: {type}.</value>
+  </data>
   <data name="contents.validation.between" xml:space="preserve">
     <value>Moet tussen {min} en {max} liggen.</value>
   </data>
@@ -537,9 +540,6 @@
   </data>
   <data name="contents.validation.extension" xml:space="preserve">
     <value>Moet een toegestane extensie zijn.</value>
-  </data>
-  <data name="contents.validation.image" xml:space="preserve">
-    <value>Geen afbeelding.</value>
   </data>
   <data name="contents.validation.invalid" xml:space="preserve">
     <value>Geen geldige waarde.</value>

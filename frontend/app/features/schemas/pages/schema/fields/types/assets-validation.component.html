@@ -40,13 +40,24 @@
         </div>
     </div>
 
+    <hr />
+
     <div class="form-group row">
-        <div class="col-9 offset-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldMustBeImage" formControlName="mustBeImage">
-                <label class="form-check-label" for="{{field.fieldId}}_fieldMustBeImage">
-                    {{ 'schemas.fieldTypes.assets.mustBeImage' | sqxTranslate }}
-                </label>
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.expectedType' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <div class="row g-0">
+                <div class="col">
+                    <select class="form-select" formControlName="expectedType">
+                        <option></option>
+                        <option ngValue="Image">Image</option>
+                        <option ngValue="Audio">Audio</option>
+                        <option ngValue="Video">Video</option>
+                        <option ngValue="Unknown">Unknown</option>
+                    </select>
+                </div>
+                <div class="col col-label">
+                </div>
             </div>
         </div>
     </div>
@@ -114,6 +125,8 @@
         </div>
     </div>
 
+    <hr />
+
     <div class="form-group row">
         <div class="col-9 offset-3">
             <div class="form-check">
@@ -126,9 +139,7 @@
     </div>
     
     <div class="form-group row">
-        <label class="col-3 col-form-label">
-            {{ 'schemas.fieldTypes.assets.fileExtensions' | sqxTranslate }}
-        </label>
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.fileExtensions' | sqxTranslate }}</label>
 
         <div class="col-9">
             <sqx-tag-editor formControlName="allowedExtensions"></sqx-tag-editor>

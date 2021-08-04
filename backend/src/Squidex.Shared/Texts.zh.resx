@@ -517,6 +517,9 @@
   <data name="contents.validation.assetNotFound" xml:space="preserve">
     <value>未找到 ID {id}。</value>
   </data>
+  <data name="contents.validation.assetType" xml:space="preserve">
+    <value>Not of expected type: {type}.</value>
+  </data>
   <data name="contents.validation.between" xml:space="preserve">
     <value>必须介于 {min} 和 {max} 之间。</value>
   </data>
@@ -537,9 +540,6 @@
   </data>
   <data name="contents.validation.extension" xml:space="preserve">
     <value>必须是允许的扩展名。</value>
-  </data>
-  <data name="contents.validation.image" xml:space="preserve">
-    <value>不是图片。</value>
   </data>
   <data name="contents.validation.invalid" xml:space="preserve">
     <value>无效值。</value>
