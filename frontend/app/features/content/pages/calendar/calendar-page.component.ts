@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { AppsState, ContentDto, ContentsService, DateTime, DialogModel, getContentValue, LanguageDto, LanguagesState, LocalizerService, ResourceLoaderService } from '@app/shared';
 
 declare const tui: any;
@@ -74,17 +74,32 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
                 this.changeDetector.detectChanges();
             });
 
-            this.calendar.on('click', (event: any) => {
-                if (this.calendar.getViewName() === 'day') {
+            this.calendar.on('clickDayname', (event: any) => {
+                if (this.calendar.getViewName() === 'week') {
                     this.calendar.setDate(new Date(event.date));
-                    this.calendar.changeView('day', true);
 
-                    this.load();
+                    this.changeView('day');
                 }
             });
 
             this.load();
         });
+    }
+
+    @HostListener('click', ['$event'])
+    public onClick(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+
+        if (target.classList.contains('tui-full-calendar-weekday-grid-date')) {
+            const monthStart: Date = this.calendar.getDateRangeStart().toDate();
+
+            const dayOfMonth = parseInt(target.innerText, 10);
+            const dateOfMonth = new Date(monthStart.getFullYear(), monthStart.getMonth(), dayOfMonth);
+
+            this.calendar.setDate(dateOfMonth);
+
+            this.changeView('day');
+        }
     }
 
     public changeView(view: ViewMode) {
