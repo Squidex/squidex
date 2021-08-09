@@ -21,6 +21,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public string? UserClientId;
 
+        public int StatusCode;
+
+        public string? CacheServer;
+
+        public string? CacheStatus;
+
+        public int? CacheHits;
+
+        public int? CacheTTL;
+
         public long ElapsedMs;
 
         public long Bytes;

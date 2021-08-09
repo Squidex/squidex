@@ -25,9 +25,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string FieldAuthUserId = "AuthUserId";
         private const string FieldBytes = "Bytes";
         private const string FieldCosts = "Costs";
+        private const string FieldCacheStatus = "CacheStatus";
+        private const string FieldCacheServer = "CacheServer";
+        private const string FieldCacheTTL = "CacheTTL";
+        private const string FieldCacheHits = "CacheHits";
         private const string FieldRequestElapsedMs = "RequestElapsedMs";
         private const string FieldRequestMethod = "RequestMethod";
         private const string FieldRequestPath = "RequestPath";
+        private const string FieldStatusCode = "StatusCode";
         private const string FieldTimestamp = "Timestamp";
 
         private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -64,10 +69,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Append(storedRequest, FieldAuthClientId, request.UserClientId);
             Append(storedRequest, FieldAuthUserId, request.UserId);
             Append(storedRequest, FieldBytes, request.Bytes);
+            Append(storedRequest, FieldCacheHits, request.CacheHits);
+            Append(storedRequest, FieldCacheServer, request.CacheServer);
+            Append(storedRequest, FieldCacheStatus, request.CacheStatus);
+            Append(storedRequest, FieldCacheTTL, request.CacheTTL);
             Append(storedRequest, FieldCosts, request.Costs);
             Append(storedRequest, FieldRequestElapsedMs, request.ElapsedMs);
             Append(storedRequest, FieldRequestMethod, request.RequestMethod);
             Append(storedRequest, FieldRequestPath, request.RequestPath);
+            Append(storedRequest, FieldStatusCode, request.StatusCode);
 
             return requestLogStore.LogAsync(storedRequest);
         }
@@ -90,6 +100,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     csv.WriteField(FieldAuthClientId);
                     csv.WriteField(FieldAuthUserId);
                     csv.WriteField(FieldBytes);
+                    csv.WriteField(FieldCacheHits);
+                    csv.WriteField(FieldCacheServer);
+                    csv.WriteField(FieldCacheStatus);
+                    csv.WriteField(FieldCacheTTL);
+                    csv.WriteField(FieldStatusCode);
 
                     await csv.NextRecordAsync();
 
@@ -102,7 +117,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         csv.WriteField(GetDouble(request, FieldCosts));
                         csv.WriteField(GetString(request, FieldAuthClientId));
                         csv.WriteField(GetString(request, FieldAuthUserId));
-                        csv.WriteField(GetString(request, FieldBytes));
+                        csv.WriteField(GetLong(request, FieldBytes));
+                        csv.WriteField(GetLong(request, FieldCacheHits));
+                        csv.WriteField(GetString(request, FieldCacheServer));
+                        csv.WriteField(GetString(request, FieldCacheStatus));
+                        csv.WriteField(GetLong(request, FieldCacheTTL));
+                        csv.WriteField(GetLong(request, FieldStatusCode));
 
                         await csv.NextRecordAsync();
                     }, appId.ToString(), fromDate, toDate, ct);
@@ -122,29 +142,39 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private static void Append(Request request, string key, double value)
+        private static void Append(Request request, string key, object? value)
         {
-            request.Properties[key] = value.ToString(CultureInfo.InvariantCulture);
+            if (value != null)
+            {
+                Append(request, key, Convert.ToString(value, CultureInfo.InvariantCulture));
+            }
         }
 
-        private static void Append(Request request, string key, long value)
+        private static string? GetString(Request request, string key)
         {
-            request.Properties[key] = value.ToString(CultureInfo.InvariantCulture);
+            return request.Properties.GetValueOrDefault(key, string.Empty);
         }
 
-        private static string GetString(Request request, string key)
+        private static double? GetDouble(Request request, string key)
         {
-            return request.Properties.GetValueOrDefault(key, string.Empty)!;
-        }
-
-        private static double GetDouble(Request request, string key)
-        {
-            if (request.Properties.TryGetValue(key, out var value) && double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+            if (request.Properties.TryGetValue(key, out var value) &&
+                double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
             {
                 return result;
             }
 
-            return 0;
+            return null;
+        }
+
+        private static long? GetLong(Request request, string key)
+        {
+            if (request.Properties.TryGetValue(key, out var value) &&
+                long.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+            {
+                return result;
+            }
+
+            return null;
         }
     }
 }

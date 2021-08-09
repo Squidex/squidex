@@ -52,10 +52,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var request = default(RequestLog);
             request.Bytes = 1024;
+            request.CacheHits = 10;
+            request.CacheServer = "server-fra";
+            request.CacheStatus = "MISS";
+            request.CacheTTL = 3600;
             request.Costs = 1.5;
             request.ElapsedMs = 120;
             request.RequestMethod = "GET";
             request.RequestPath = "/my-path";
+            request.StatusCode = 200;
             request.Timestamp = default;
             request.UserClientId = "frontend";
             request.UserId = "user1";
@@ -64,17 +69,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.NotNull(recordedRequest);
 
-            Assert.Contains(request.Bytes.ToString(CultureInfo.InvariantCulture), recordedRequest!.Properties.Values);
-            Assert.Contains(request.Costs.ToString(CultureInfo.InvariantCulture), recordedRequest!.Properties.Values);
-            Assert.Contains(request.ElapsedMs.ToString(), recordedRequest!.Properties.Values);
-            Assert.Contains(request.RequestMethod, recordedRequest!.Properties.Values);
-            Assert.Contains(request.RequestPath, recordedRequest!.Properties.Values);
-            Assert.Contains(request.UserClientId, recordedRequest!.Properties.Values);
-            Assert.Contains(request.UserId, recordedRequest!.Properties.Values);
+            Contains(request.Bytes, recordedRequest);
+            Contains(request.CacheHits, recordedRequest);
+            Contains(request.CacheServer, recordedRequest);
+            Contains(request.CacheStatus, recordedRequest);
+            Contains(request.CacheTTL, recordedRequest);
+            Contains(request.ElapsedMs.ToString(), recordedRequest);
+            Contains(request.RequestMethod, recordedRequest);
+            Contains(request.RequestPath, recordedRequest);
+            Contains(request.StatusCode, recordedRequest);
+            Contains(request.UserClientId, recordedRequest);
+            Contains(request.UserId, recordedRequest);
         }
 
         [Fact]
-        public async Task Should_create_some_stream()
+        public async Task Should_write_to_stream()
         {
             var dateFrom = DateTime.UtcNow.Date.AddDays(-30);
             var dateTo = DateTime.UtcNow.Date;
@@ -109,6 +118,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
 
             Assert.Equal(5, lines);
+        }
+
+        private static void Contains(string value, Request? request)
+        {
+            Assert.Contains(value, request!.Properties.Values);
+        }
+
+        private static void Contains(object value, Request? request)
+        {
+            Assert.Contains(Convert.ToString(value, CultureInfo.InvariantCulture), request!.Properties.Values);
         }
 
         private static Request CreateRecord()

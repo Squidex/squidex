@@ -60,11 +60,14 @@ namespace Squidex.Web.Pipeline
                         var request = default(RequestLog);
 
                         request.Bytes = bytes;
+                        request.CacheStatus = "MISS";
+                        request.CacheHits = 0;
                         request.Costs = context.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
                         request.ElapsedMs = watch.Stop();
                         request.RequestMethod = context.Request.Method;
                         request.RequestPath = context.Request.Path;
                         request.Timestamp = clock.GetCurrentInstant();
+                        request.StatusCode = context.Response.StatusCode;
                         request.UserId = context.User.OpenIdSubject();
                         request.UserClientId = clientId;
 
