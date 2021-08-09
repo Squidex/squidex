@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -53,20 +53,20 @@ namespace GenerateLanguages
 
             var languages = GetLanguages(languageCodesFile).ToList();
 
-            foreach (var language in languages)
+            foreach (var (iso2Code, englishName) in languages)
             {
-                var fieldName = language.Iso2Code.ToUpperInvariant();
+                var fieldName = iso2Code.ToUpperInvariant();
 
-                writer.WriteLine($"        public static readonly Language {fieldName} = AddLanguage(\"{language.Iso2Code}\", \"{language.EnglishName}\");");
+                writer.WriteLine($"        public static readonly Language {fieldName} = AddLanguage(\"{iso2Code}\", \"{englishName}\");");
             }
 
             writer.WriteLine();
 
-            foreach (var culture in GetCultures(languages))
+            foreach (var (code, englishName) in GetCultures(languages))
             {
-                var fieldName = culture.EnglishName.ToFieldName();
+                var fieldName = englishName.ToFieldName();
 
-                writer.WriteLine($"        public static readonly Language {fieldName} = AddLanguage(\"{culture.Code}\", \"{culture.EnglishName}\");");
+                writer.WriteLine($"        public static readonly Language {fieldName} = AddLanguage(\"{code}\", \"{englishName}\");");
             }
 
             writer.WriteLine("    }");

@@ -65,8 +65,8 @@ namespace Squidex.Web.Pipeline
                         request.RequestMethod = context.Request.Method;
                         request.RequestPath = context.Request.Path;
                         request.Timestamp = clock.GetCurrentInstant();
-                        request.UserClientId = clientId;
                         request.UserId = context.User.OpenIdSubject();
+                        request.UserClientId = clientId;
 
                         await usageLog.LogAsync(appId.Value, request);
 
