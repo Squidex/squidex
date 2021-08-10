@@ -91,11 +91,11 @@
             </ng-container>
 
             <ng-template #noContentMenu>
-                <button type="button" class="btn btn-secondary" (click)="save()" *ngIf="contentsState.canCreate | async">
+                <button type="button" class="btn btn-primary" (click)="save()" *ngIf="contentsState.canCreate | async">
                     {{ 'common.save' | sqxTranslate }}
                 </button>
 
-                <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
+                <button type="submit" class="btn btn-success ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
                     {{ 'contents.saveAndPublish' | sqxTranslate }}
                 </button>
             </ng-template>

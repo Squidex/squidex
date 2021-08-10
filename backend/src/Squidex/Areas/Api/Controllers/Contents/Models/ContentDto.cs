@@ -173,7 +173,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
             }
 
-            if (content.NextStatuses != null && resources.CanUpdateContent(schema))
+            if (content.NextStatuses != null && resources.CanChangeStatus(schema))
             {
                 foreach (var next in content.NextStatuses)
                 {

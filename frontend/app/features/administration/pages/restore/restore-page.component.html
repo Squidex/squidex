@@ -47,9 +47,13 @@
             <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
                 <div class="row gx-2">
                     <div class="col">
+                        <sqx-control-errors for="url"></sqx-control-errors>
+
                         <input class="form-control" formControlName="url" placeholder="{{ 'backups.restoreLastUrl' | sqxTranslate }}">
                     </div>
                     <div class="col">
+                        <sqx-control-errors for="name"></sqx-control-errors>
+
                         <input class="form-control" formControlName="name" placeholder="{{ 'backups.restoreNewAppName' | sqxTranslate }}">
                     </div>
                     <div class="col-auto">

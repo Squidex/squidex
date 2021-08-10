@@ -41,6 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Should_allow_publish_on_create()
+        {
+            var result = await sut.CanPublishInitialAsync(null!, null);
+
+            Assert.True(result);
+        }
+
+        [Fact]
         public async Task Should_allow_if_transition_is_valid()
         {
             var content = new ContentEntity { Status = Status.Published };

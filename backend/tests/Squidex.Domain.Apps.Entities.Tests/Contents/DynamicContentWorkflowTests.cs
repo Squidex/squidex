@@ -133,29 +133,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_allow_publish_on_create()
         {
-            var content = CreateContent(Status.Draft, 2);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
 
         [Fact]
-        public async Task Should_not_allow_publish_on_create_if_data_is_invalid()
-        {
-            var content = CreateContent(Status.Draft, 4);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
-
-            Assert.False(result);
-        }
-
-        [Fact]
         public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
         {
-            var content = CreateContent(Status.Draft, 2);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }

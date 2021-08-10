@@ -35,6 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
+        public async Task<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, null, user);
+        }
+
         public async Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
         {
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
@@ -47,13 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
-        }
-
-        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal? user)
-        {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, data, user);
         }
 
         public async Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool IsTrue(WorkflowCondition condition, ContentData data, ClaimsPrincipal? user)
+        private bool IsTrue(WorkflowCondition condition, ContentData? data, ClaimsPrincipal? user)
         {
             if (condition?.Roles != null && user != null)
             {
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(condition?.Expression))
+            if (!string.IsNullOrWhiteSpace(condition?.Expression) && data != null)
             {
                 var vars = new ScriptVars
                 {
