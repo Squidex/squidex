@@ -18,6 +18,6 @@ namespace Squidex.Infrastructure.Log
 
         public string Key;
 
-        public Dictionary<string, string> Properties;
+        public Dictionary<string, string> Properties = new Dictionary<string, string>();
     }
 }

@@ -37,9 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
+            DetectDelimiter = false,
             Delimiter = "|",
-            LeaveOpen = true,
-            LineBreakInQuotedFieldIsBadData = false
+            LeaveOpen = true
         };
 
         private readonly IRequestLogStore requestLogStore;
@@ -59,10 +59,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var storedRequest = new Request
             {
                 Key = appId.ToString(),
-                Properties = new Dictionary<string, string>
-                {
-                    [FieldCosts] = request.Costs.ToString(CultureInfo.InvariantCulture)
-                },
                 Timestamp = request.Timestamp
             };
 
