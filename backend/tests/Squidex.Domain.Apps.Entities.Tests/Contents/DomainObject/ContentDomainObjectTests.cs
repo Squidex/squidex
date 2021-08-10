@@ -797,8 +797,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         [Fact]
         public async Task CancelContentSchedule_create_events_and_unset_schedule()
         {
-            var dueTime = Instant.MaxValue;
-
             var command = new CancelContentSchedule();
 
             await ExecuteCreateAsync();
