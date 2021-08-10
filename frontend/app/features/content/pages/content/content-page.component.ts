@@ -182,8 +182,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
                 this.contentsState.create(value, publish)
                     .subscribe({
-                        next: () => {
+                        next: content => {
                             this.contentForm.submitCompleted({ noReset: true });
+
+                            this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
                         },
                         error: error => {
                             this.contentForm.submitFailed(error);
