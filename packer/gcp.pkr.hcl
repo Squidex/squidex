@@ -1,6 +1,6 @@
 variable "squidex_version" {
   type = string
-  default = "5.7.0"
+  default = "5.8.0"
 }
 
 source "googlecompute" "squidex" {

@@ -4,15 +4,19 @@ metadata:
   name: {{ include "squidex.fullname" . }}
   labels:
     {{- include "squidex.labels" . | indent 4 }}
+    orleans/serviceId: "squidex-{{ default .Chart.AppVersion .Values.image.tag }}"
 spec:
   replicas: {{ .Values.deployment.replicaCount }}
   selector:
     matchLabels:
       {{- include "squidex.selectors" . | indent 6 }}
+      orleans/serviceId: "squidex="
   template:
     metadata:
       labels:
         {{- include "squidex.selectors" . | indent 8 }}
+      orleans/serviceId: "squidex-{{ default .Chart.AppVersion .Values.image.tag }}"
+      orleans/clusterId: "squidex"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -55,10 +59,32 @@ spec:
             - name: "EVENTSTORE__MONGODB__CONFIGURATION"
               value: {{ $mongoDefaultConnectionString | quote }}
           {{- end }}
+
           {{- if (not .Values.env.STORE__MONGODB__CONFIGURATION) }}
             - name: "STORE__MONGODB__CONFIGURATION"
               value: {{ $mongoDefaultConnectionString | quote }}
           {{- end }}
+
+            - name: ORLEANS_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['orleans/serviceId']
+            - name: ORLEANS_CLUSTER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['orleans/clusterId']
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
       affinity:
