@@ -17,7 +17,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
@@ -41,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId)
         {
-            using (Profiler.TraceMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartMethod<SchemasIndex>())
             {
                 var ids = await GetSchemaIdsAsync(appId);
 
@@ -55,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public async Task<ISchemaEntity?> GetSchemaByNameAsync(DomainId appId, string name, bool canCache)
         {
-            using (Profiler.TraceMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartMethod<SchemasIndex>())
             {
                 var cacheKey = GetCacheKey(appId, name);
 
@@ -80,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache)
         {
-            using (Profiler.TraceMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartMethod<SchemasIndex>())
             {
                 var cacheKey = GetCacheKey(appId, id);
 
@@ -105,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task<DomainId> GetSchemaIdAsync(DomainId appId, string name)
         {
-            using (Profiler.TraceMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartMethod<SchemasIndex>())
             {
                 return await Index(appId).GetIdAsync(name);
             }
@@ -113,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task<List<DomainId>> GetSchemaIdsAsync(DomainId appId)
         {
-            using (Profiler.TraceMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartMethod<SchemasIndex>())
             {
                 return await Index(appId).GetIdsAsync();
             }

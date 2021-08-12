@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Queries
 {
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             Guard.NotNull(rules, nameof(rules));
             Guard.NotNull(context, nameof(context));
 
-            using (Profiler.TraceMethod<RuleEnricher>())
+            using (Telemetry.Activities.StartMethod<RuleEnricher>())
             {
                 var results = new List<RuleEntity>();
 

@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
@@ -51,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<ContentEnricher>())
+            using (Telemetry.Activities.StartMethod<ContentEnricher>())
             {
                 var results = new List<ContentEntity>();
 
@@ -102,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         {
                             ct.ThrowIfCancellationRequested();
 
-                            using (Profiler.TraceMethod(step.ToString()!))
+                            using (Telemetry.Activities.StartMethod(step.ToString()!))
                             {
                                 await step.EnrichAsync(context, results, GetSchema, ct);
                             }

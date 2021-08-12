@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -19,7 +19,6 @@ using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Text;
 
@@ -77,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public async Task<List<IAppEntity>> GetAppsAsync()
         {
-            using (Profiler.TraceMethod<AppsIndex>())
+            using (Telemetry.Activities.StartMethod<AppsIndex>())
             {
                 var ids = await GetAppIdsAsync();
 
@@ -91,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions)
         {
-            using (Profiler.TraceMethod<AppsIndex>())
+            using (Telemetry.Activities.StartMethod<AppsIndex>())
             {
                 var ids =
                     await Task.WhenAll(
@@ -109,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public async Task<IAppEntity?> GetAppByNameAsync(string name, bool canCache = false)
         {
-            using (Profiler.TraceMethod<AppsIndex>())
+            using (Telemetry.Activities.StartMethod<AppsIndex>())
             {
                 if (canCache)
                 {
@@ -132,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache)
         {
-            using (Profiler.TraceMethod<AppsIndex>())
+            using (Telemetry.Activities.StartMethod<AppsIndex>())
             {
                 if (canCache)
                 {
@@ -155,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<List<DomainId>> GetAppIdsByUserAsync(string userId)
         {
-            using (Profiler.TraceMethod<AppProvider>())
+            using (Telemetry.Activities.StartMethod<AppProvider>())
             {
                 return await grainFactory.GetGrain<IAppsByUserIndexGrain>(userId).GetIdsAsync();
             }
@@ -163,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<List<DomainId>> GetAppIdsAsync()
         {
-            using (Profiler.TraceMethod<AppProvider>())
+            using (Telemetry.Activities.StartMethod<AppProvider>())
             {
                 return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetIdsAsync();
             }
@@ -171,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<List<DomainId>> GetAppIdsAsync(string[] names)
         {
-            using (Profiler.TraceMethod<AppProvider>())
+            using (Telemetry.Activities.StartMethod<AppProvider>())
             {
                 return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetIdsAsync(names);
             }
@@ -179,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<DomainId> GetAppIdAsync(string name)
         {
-            using (Profiler.TraceMethod<AppProvider>())
+            using (Telemetry.Activities.StartMethod<AppProvider>())
             {
                 return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetIdAsync(name);
             }

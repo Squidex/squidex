@@ -203,19 +203,19 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var suffix = resizeOptions.ToString();
 
-            using (Profiler.Trace("Resize"))
+            using (Telemetry.Activities.StartActivity("Resize"))
             {
                 using (var sourceStream = GetTempStream())
                 {
                     using (var destinationStream = GetTempStream())
                     {
-                        using (Profiler.Trace("ResizeDownload"))
+                        using (Telemetry.Activities.StartActivity("ResizeDownload"))
                         {
                             await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, null, sourceStream);
                             sourceStream.Position = 0;
                         }
 
-                        using (Profiler.Trace("ResizeImage"))
+                        using (Telemetry.Activities.StartActivity("ResizeImage"))
                         {
                             try
                             {
@@ -231,7 +231,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                         try
                         {
-                            using (Profiler.Trace("ResizeUpload"))
+                            using (Telemetry.Activities.StartActivity("ResizeUpload"))
                             {
                                 await assetFileStore.UploadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, suffix, destinationStream, overwrite);
                                 destinationStream.Position = 0;

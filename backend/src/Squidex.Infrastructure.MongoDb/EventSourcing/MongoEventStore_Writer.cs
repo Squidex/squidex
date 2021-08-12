@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -40,7 +39,7 @@ namespace Squidex.Infrastructure.EventSourcing
             Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
             Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartMethod<MongoEventStore>())
             {
                 if (events.Count == 0)
                 {
@@ -102,7 +101,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(commits, nameof(commits));
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartMethod<MongoEventStore>())
             {
                 var writes = new List<WriteModel<MongoEventCommit>>();
 

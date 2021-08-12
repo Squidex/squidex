@@ -32,16 +32,16 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.8" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.9" />
     <PackageReference Include="GraphQL.DataLoader" Version="4.5.0" />
     <PackageReference Include="GraphQL.Server.Core" Version="5.0.2" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.9" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.RulesetToEditorconfigConverter" Version="3.0.0" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
@@ -50,18 +50,20 @@
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.4.3" />
     <PackageReference Include="Microsoft.Orleans.Hosting.Kubernetes" Version="3.4.3" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.4.3" />
-    <PackageReference Include="MongoDB.Driver" Version="2.12.4" />
-    <PackageReference Include="Namotion.Reflection" Version="1.0.23" />
+    <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
+    <PackageReference Include="Namotion.Reflection" Version="2.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NJsonSchema" Version="10.4.4" />
+    <PackageReference Include="NJsonSchema" Version="10.5.2" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.11.3" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.13.2" />
     <PackageReference Include="OpenCover" Version="4.7.1221" PrivateAssets="all" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc7" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="3.3.1" />
     <PackageReference Include="OrleansDashboard" Version="3.5.2" />
     <PackageReference Include="OrleansDashboard.EmbeddedAssets" Version="3.5.2" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="ReportGenerator" Version="4.8.11" PrivateAssets="all" />
+    <PackageReference Include="ReportGenerator" Version="4.8.12" PrivateAssets="all" />
     <PackageReference Include="Squidex.Assets.Azure" Version="1.8.0" />
     <PackageReference Include="Squidex.Assets.GoogleCloud" Version="1.8.0" />
     <PackageReference Include="Squidex.Assets.FTP" Version="1.8.0" />

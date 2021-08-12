@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 jobUrl: CurrentJob.Url.ToString()
             );
 
-            using (Profiler.StartSession())
+            using (Telemetry.Activities.StartActivity("RestoreBackup"))
             {
                 try
                 {
@@ -156,14 +156,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     {
                         await reader.CheckCompatibilityAsync();
 
-                        using (Profiler.Trace("ReadEvents"))
+                        using (Telemetry.Activities.StartActivity("ReadEvents"))
                         {
                             await ReadEventsAsync(reader, handlers);
                         }
 
                         foreach (var handler in handlers)
                         {
-                            using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.RestoreAsync)))
+                            using (Telemetry.Activities.StartMethod(handler.GetType(), nameof(IBackupHandler.RestoreAsync)))
                             {
                                 await handler.RestoreAsync(runningContext);
                             }
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         foreach (var handler in handlers)
                         {
-                            using (Profiler.TraceMethod(handler.GetType(), nameof(IBackupHandler.CompleteRestoreAsync)))
+                            using (Telemetry.Activities.StartMethod(handler.GetType(), nameof(IBackupHandler.CompleteRestoreAsync)))
                             {
                                 await handler.CompleteRestoreAsync(runningContext);
                             }
@@ -194,8 +194,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         w.WriteProperty("status", "completed");
                         w.WriteProperty("operationId", ctx.jobId);
                         w.WriteProperty("url", ctx.jobUrl);
-
-                        Profiler.Session?.Write(w);
                     });
                 }
                 catch (Exception ex)
@@ -223,8 +221,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         w.WriteProperty("status", "failed");
                         w.WriteProperty("operationId", ctx.jobId);
                         w.WriteProperty("url", ctx.jobUrl);
-
-                        Profiler.Session?.Write(w);
                     });
                 }
                 finally
@@ -294,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task<IBackupReader> DownloadAsync()
         {
-            using (Profiler.Trace("Download"))
+            using (Telemetry.Activities.StartActivity("Download"))
             {
                 Log("Downloading Backup");
 
@@ -421,7 +417,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var userMapping = new UserMapping(CurrentJob.Actor);
 
-            using (Profiler.Trace("CreateUsers"))
+            using (Telemetry.Activities.StartActivity("CreateUsers"))
             {
                 Log("Creating Users");
 

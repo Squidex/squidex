@@ -99,7 +99,7 @@ namespace Squidex.Web.Pipeline
             {
                 if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
                 {
-                    using (Profiler.Trace("CalculateEtag"))
+                    using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
                         var cacheBuffer = hasher.GetHashAndReset();
                         var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty).ToUpperInvariant();
