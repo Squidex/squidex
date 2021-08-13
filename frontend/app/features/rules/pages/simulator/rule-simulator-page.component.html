@@ -8,7 +8,7 @@
     </ng-container>
     
     <ng-container>
-        <sqx-list-view>
+        <sqx-list-view [isLoading]="ruleSimulator.isLoading | async" [table]="true">
             <table class="table table-items table-fixed">
                 <thead>
                     <tr>
