@@ -43,16 +43,9 @@ namespace Squidex.Extensions.Actions.Algolia
             {
                 var delete = @event.ShouldDelete(scriptEngine, action.Delete);
 
-                var contentId = entityEvent.Id.ToString();
-
                 var ruleDescription = string.Empty;
-                var ruleJob = new AlgoliaJob
-                {
-                    AppId = action.AppId,
-                    ApiKey = action.ApiKey,
-                    ContentId = contentId,
-                    IndexName = await FormatAsync(action.IndexName, @event)
-                };
+                var contentId = entityEvent.Id.ToString();
+                var content = (JObject?)null;
 
                 if (delete)
                 {
@@ -62,7 +55,6 @@ namespace Squidex.Extensions.Actions.Algolia
                 {
                     ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
 
-                    JObject json;
                     try
                     {
                         string jsonString;
@@ -77,17 +69,24 @@ namespace Squidex.Extensions.Actions.Algolia
                             jsonString = ToJson(@event);
                         }
 
-                        json = JObject.Parse(jsonString);
+                        content = JObject.Parse(jsonString);
                     }
                     catch (Exception ex)
                     {
-                        json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
+                        content = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
                     }
 
-                    json["objectID"] = contentId;
-
-                    ruleJob.Content = json;
+                    content["objectID"] = contentId;
                 }
+
+                var ruleJob = new AlgoliaJob
+                {
+                    AppId = action.AppId,
+                    ApiKey = action.ApiKey,
+                    Content = content,
+                    ContentId = contentId,
+                    IndexName = await FormatAsync(action.IndexName, @event)
+                };
 
                 return (ruleDescription, ruleJob);
             }
