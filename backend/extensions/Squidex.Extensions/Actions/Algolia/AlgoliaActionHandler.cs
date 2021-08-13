@@ -86,7 +86,7 @@ namespace Squidex.Extensions.Actions.Algolia
 
                     json["objectID"] = contentId;
 
-                    ruleJob.Content = json.ToString();
+                    ruleJob.Content = json;
                 }
 
                 return (ruleDescription, ruleJob);
@@ -136,6 +136,6 @@ namespace Squidex.Extensions.Actions.Algolia
 
         public string IndexName { get; set; }
 
-        public string Content { get; set; }
+        public JObject Content { get; set; }
     }
 }
