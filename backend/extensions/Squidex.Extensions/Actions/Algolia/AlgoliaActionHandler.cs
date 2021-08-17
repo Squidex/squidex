@@ -45,7 +45,7 @@ namespace Squidex.Extensions.Actions.Algolia
 
                 var ruleDescription = string.Empty;
                 var contentId = entityEvent.Id.ToString();
-                var content = (JObject?)null;
+                var content = (JObject)null;
 
                 if (delete)
                 {

@@ -16,6 +16,7 @@
     <PackageReference Include="Datadog.Trace" Version="1.27.1" />
     <PackageReference Include="Elasticsearch.Net" Version="7.13.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
+    <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.0" />
     <PackageReference Include="Microsoft.Azure.SignalR.Management" Version="1.9.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.9.0" />
