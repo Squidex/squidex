@@ -87,7 +87,7 @@ namespace Squidex.Extensions.Assets.Azure
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
-                    .WriteProperty("action", "EnrichWithAssure")
+                    .WriteProperty("action", "EnrichWithAzure")
                     .WriteProperty("status", "Failed"));
             }
         }

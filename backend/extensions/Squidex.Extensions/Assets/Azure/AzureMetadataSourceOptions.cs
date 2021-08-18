@@ -7,7 +7,7 @@
 
 namespace Squidex.Extensions.Assets.Azure
 {
-    public sealed class AzureMetataSourceOptions
+    public sealed class AzureMetadataSourceOptions
     {
         public string Endpoint { get; set; }
 
