@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public class FieldTests
+    public class MongoFieldTests
     {
         public sealed class Entity
         {

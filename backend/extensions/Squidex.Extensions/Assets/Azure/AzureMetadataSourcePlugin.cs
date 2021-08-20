@@ -8,21 +8,20 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.Extensions.Assets.Azure
 {
-    public sealed class KafkaPlugin : IPlugin
+    public sealed class AzureMetadataSourcePlugin : IPlugin
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            var options = config.GetSection("kafka").Get<KafkaProducerOptions>();
+            var options = config.GetSection("assets:azureCognitive").Get<AzureMetadataSourceOptions>();
 
-            if (options.IsProducerConfigured())
+            if (options.IsConfigured())
             {
-                services.AddRuleAction<KafkaAction, KafkaActionHandler>();
-
-                services.AddSingleton<KafkaProducer>();
+                services.AddSingleton<IAssetMetadataSource, AzureMetadataSource>();
                 services.AddSingleton(Options.Create(options));
             }
         }

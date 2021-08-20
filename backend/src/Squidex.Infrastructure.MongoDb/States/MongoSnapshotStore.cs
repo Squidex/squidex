@@ -92,11 +92,12 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task ReadAllAsync(Func<T, long, Task> callback, CancellationToken ct = default)
+        public async Task ReadAllAsync(Func<T, long, Task> callback,
+            CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartMethod<MongoSnapshotStore<T>>())
             {
-                await Collection.Find(new BsonDocument(), options: Batching.Options).ForEachPipedAsync(x => callback(x.Doc, x.Version), ct);
+                await Collection.Find(new BsonDocument(), options: Batching.Options).ForEachAsync(x => callback(x.Doc, x.Version), ct);
             }
         }
 

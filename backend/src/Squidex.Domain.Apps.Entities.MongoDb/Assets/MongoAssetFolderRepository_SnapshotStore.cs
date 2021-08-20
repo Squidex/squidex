@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Telemetry.Activities.StartMethod<MongoAssetFolderRepository>())
             {
-                await Collection.Find(new BsonDocument(), Batching.Options).ForEachPipedAsync(x => callback(Map(x), x.Version), ct);
+                await Collection.Find(new BsonDocument(), Batching.Options).ForEachAsync(x => callback(Map(x), x.Version), ct);
             }
         }
 

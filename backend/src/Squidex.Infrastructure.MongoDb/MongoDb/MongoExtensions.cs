@@ -9,7 +9,6 @@ using System;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.States;
@@ -169,58 +168,6 @@ namespace Squidex.Infrastructure.MongoDb
                 else
                 {
                     throw new InconsistentStateException(EtagVersion.Any, oldVersion, ex);
-                }
-            }
-        }
-
-        public static async Task ForEachPipedAsync<T>(this IAsyncCursorSource<T> source, Func<T, Task> processor, CancellationToken cancellationToken = default)
-        {
-            using (var cursor = await source.ToCursorAsync(cancellationToken))
-            {
-                await cursor.ForEachPipedAsync(processor, cancellationToken);
-            }
-        }
-
-        public static async Task ForEachPipedAsync<T>(this IAsyncCursor<T> source, Func<T, Task> processor, CancellationToken cancellationToken = default)
-        {
-            using (var selfToken = new CancellationTokenSource())
-            {
-                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(selfToken.Token, cancellationToken))
-                {
-                    var actionBlock =
-                        new ActionBlock<T>(async x =>
-                            {
-                                if (!combined.IsCancellationRequested)
-                                {
-                                    await processor(x);
-                                }
-                            },
-                            new ExecutionDataflowBlockOptions
-                            {
-                                MaxDegreeOfParallelism = 1,
-                                MaxMessagesPerTask = 1,
-                                BoundedCapacity = Batching.BufferSize
-                            });
-                    try
-                    {
-                        await source.ForEachAsync(async i =>
-                        {
-                            if (!await actionBlock.SendAsync(i, combined.Token))
-                            {
-                                selfToken.Cancel();
-                            }
-                        }, combined.Token);
-
-                        actionBlock.Complete();
-                    }
-                    catch (Exception ex)
-                    {
-                        ((IDataflowBlock)actionBlock).Fault(ex);
-                    }
-                    finally
-                    {
-                        await actionBlock.Completion;
-                    }
                 }
             }
         }
