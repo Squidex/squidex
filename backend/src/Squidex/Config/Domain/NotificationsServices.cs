@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -19,7 +19,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexNotifications(this IServiceCollection services, IConfiguration config)
         {
-            var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>();
+            var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>() ?? new ();
 
             if (emailOptions.IsConfigured())
             {

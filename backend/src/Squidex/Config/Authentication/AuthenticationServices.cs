@@ -15,7 +15,7 @@ namespace Squidex.Config.Authentication
     {
         public static void AddSquidexAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
+            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>() ?? new ();
 
             services.AddAuthentication()
                 .AddSquidexCookies()
