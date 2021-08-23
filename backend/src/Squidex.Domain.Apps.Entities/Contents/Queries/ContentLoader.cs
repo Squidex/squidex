@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
@@ -24,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version)
         {
-            using (Profiler.TraceMethod<ContentLoader>())
+            using (Telemetry.Activities.StartMethod<ContentLoader>())
             {
                 var key = DomainId.Combine(appId, id).ToString();
 

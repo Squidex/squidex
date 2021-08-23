@@ -19,7 +19,7 @@ namespace Squidex.Web
     {
         public static string ToEtag<T>(this IReadOnlyList<T> items) where T : IEntity, IEntityWithVersion
         {
-            using (Profiler.Trace("CalculateEtag"))
+            using (Telemetry.Activities.StartActivity("CalculateEtag"))
             {
                 var hash = Create(items, 0);
 
@@ -29,7 +29,7 @@ namespace Squidex.Web
 
         public static string ToEtag<T>(this IResultList<T> entities) where T : IEntity, IEntityWithVersion
         {
-            using (Profiler.Trace("CalculateEtag"))
+            using (Telemetry.Activities.StartActivity("CalculateEtag"))
             {
                 var hash = Create(entities, entities.Total);
 

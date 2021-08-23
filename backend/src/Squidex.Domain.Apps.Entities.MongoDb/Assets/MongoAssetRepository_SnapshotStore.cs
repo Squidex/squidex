@@ -17,7 +17,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
@@ -25,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
     {
         async Task<(AssetDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartMethod<MongoAssetRepository>())
             {
                 var existing =
                     await Collection.Find(x => x.DocumentId == key)
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartMethod<MongoAssetRepository>())
             {
                 var entity = Map(value);
 
@@ -52,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> snapshots)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            using (Telemetry.Activities.StartMethod<MongoAssetFolderRepository>())
             {
                 var updates = snapshots.Select(Map).Select(x =>
                     new ReplaceOneModel<MongoAssetEntity>(
@@ -74,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         async Task ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(Func<AssetDomainObject.State, long, Task> callback,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartMethod<MongoAssetRepository>())
             {
                 await Collection.Find(new BsonDocument(), Batching.Options).ForEachAsync(x => callback(Map(x), x.Version), ct);
             }
@@ -82,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         async Task ISnapshotStore<AssetDomainObject.State>.RemoveAsync(DomainId key)
         {
-            using (Profiler.TraceMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartMethod<MongoAssetRepository>())
             {
                 await Collection.DeleteOneAsync(x => x.DocumentId == key);
             }

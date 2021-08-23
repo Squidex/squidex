@@ -21,7 +21,6 @@ using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
-            using (Profiler.TraceMethod<AssetQueryParser>())
+            using (Telemetry.Activities.StartMethod<AssetQueryParser>())
             {
                 var query = ParseClrQuery(q);
 

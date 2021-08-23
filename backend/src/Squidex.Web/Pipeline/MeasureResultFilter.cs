@@ -7,7 +7,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Log;
+using Squidex.Infrastructure;
 
 namespace Squidex.Web.Pipeline
 {
@@ -15,7 +15,7 @@ namespace Squidex.Web.Pipeline
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            using (Profiler.Trace("ExecuteAction"))
+            using (Telemetry.Activities.StartActivity("ExecuteAction"))
             {
                 await next();
             }
@@ -23,7 +23,7 @@ namespace Squidex.Web.Pipeline
 
         public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
-            using (Profiler.Trace("ExecuteResult"))
+            using (Telemetry.Activities.StartActivity("ExecuteResult"))
             {
                 await next();
             }

@@ -18,12 +18,11 @@ using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -267,25 +266,25 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 }
                 catch (AssetNotFoundException)
                 {
-                    using (Profiler.Trace("Resize"))
+                    using (Telemetry.Activities.StartActivity("Resize"))
                     {
                         using (var sourceStream = GetTempStream())
                         {
                             using (var destinationStream = GetTempStream())
                             {
-                                using (Profiler.Trace("ResizeDownload"))
+                                using (Telemetry.Activities.StartActivity("ResizeDownload"))
                                 {
                                     await appImageStore.DownloadAsync(App.Id, sourceStream);
                                     sourceStream.Position = 0;
                                 }
 
-                                using (Profiler.Trace("ResizeImage"))
+                                using (Telemetry.Activities.StartActivity("ResizeImage"))
                                 {
                                     await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, ResizeOptions);
                                     destinationStream.Position = 0;
                                 }
 
-                                using (Profiler.Trace("ResizeUpload"))
+                                using (Telemetry.Activities.StartActivity("ResizeUpload"))
                                 {
                                     await assetStore.UploadAsync(resizedAsset, destinationStream);
                                     destinationStream.Position = 0;

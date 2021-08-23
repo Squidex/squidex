@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Log;
 using EventFilter = MongoDB.Driver.FilterDefinition<Squidex.Infrastructure.EventSourcing.MongoEventCommit>;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -48,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return EmptyEvents;
             }
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartMethod<MongoEventStore>())
             {
                 var commits =
                     await Collection.Find(
@@ -65,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartMethod<MongoEventStore>())
             {
                 var commits =
                     await Collection.Find(
@@ -84,7 +83,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(streamNames, nameof(streamNames));
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartMethod<MongoEventStore>())
             {
                 var position = EtagVersion.Empty;
 

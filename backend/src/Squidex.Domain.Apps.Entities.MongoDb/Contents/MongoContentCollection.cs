@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -107,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
@@ -136,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
@@ -160,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, DomainId id,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 return await queryBdId.QueryAsync(schema, id, ct);
             }
@@ -169,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 await queryScheduled.QueryAsync(now, callback, ct);
             }
@@ -178,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 return await queryByIds.QueryIdsAsync(appId, ids, ct);
             }
@@ -187,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 return await queryByQuery.QueryIdsAsync(appId, schemaId, filterNode, ct);
             }
@@ -196,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId,
             CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 return await queryReferrers.CheckExistsAsync(appId, contentId, ct);
             }

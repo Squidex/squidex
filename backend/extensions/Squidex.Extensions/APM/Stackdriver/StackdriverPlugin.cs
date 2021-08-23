@@ -5,25 +5,31 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Trace;
 using Squidex.Infrastructure.Plugins;
+using Squidex.Log;
 
-namespace Squidex.Extensions.APM.ApplicationInsights
+namespace Squidex.Extensions.APM.Stackdriver
 {
-    public sealed class ApplicationInsightsPlugin : IPlugin
+    public sealed class StackdriverPlugin : IPlugin
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddOpenTelemetryTracing(builder =>
             {
-                if (config.GetValue<bool>("logging:applicationInsights:enabled"))
+                if (config.GetValue<bool>("logging:stackdriver:enabled"))
                 {
-                    builder.AddAzureMonitorTraceExporter(options =>
-                    {
-                        config.GetSection("logging:applicationInsights").Bind(options);
-                    });
+                    var projectId = config.GetValue<string>("logging:stackdriver:projectId");
+
+                    builder.UseStackdriverExporter(projectId);
+
+                    services.AddSingleton<ILogAppender,
+                        StackdriverSeverityLogAppender>();
+
+                    services.AddSingleton<ILogAppender,
+                        StackdriverExceptionHandler>();
                 }
             });
         }

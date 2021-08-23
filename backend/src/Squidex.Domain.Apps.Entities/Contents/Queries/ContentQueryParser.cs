@@ -28,7 +28,6 @@ using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
@@ -59,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
-            using (Profiler.TraceMethod<ContentQueryParser>())
+            using (Telemetry.Activities.StartMethod<ContentQueryParser>())
             {
                 var query = await ParseClrQueryAsync(context, q, schema);
 

@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -29,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task<(ContentDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 var version = await collectionAll.FindVersionAsync(key);
 
@@ -39,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync()
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 await collectionAll.ClearAsync();
                 await collectionPublished.ClearAsync();
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 await collectionAll.RemoveAsync(key);
                 await collectionPublished.RemoveAsync(key);
@@ -57,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 if (value.SchemaId.Id == DomainId.Empty)
                 {
@@ -72,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots)
         {
-            using (Profiler.TraceMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
             {
                 var entitiesPublished = new List<MongoContentEntity>();
                 var entitiesAll = new List<MongoContentEntity>();

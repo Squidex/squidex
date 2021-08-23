@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Guard.NotNull(assets, nameof(assets));
             Guard.NotNull(context, nameof(context));
 
-            using (Profiler.TraceMethod<AssetEnricher>())
+            using (Telemetry.Activities.StartMethod<AssetEnricher>())
             {
                 var results = assets.Select(x => SimpleMapper.Map(x, new AssetEntity())).ToList();
 

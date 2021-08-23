@@ -28,44 +28,23 @@ namespace Squidex.Web.Pipeline
 
         public async Task InvokeAsync(HttpContext context, ISemanticLog log)
         {
-            var shouldStartSession = requestLogOptions.LogRequests || Profiler.HasListener;
-
-            if (requestLogOptions.LogRequests || shouldStartSession)
+            if (requestLogOptions.LogRequests)
             {
-                var session =
-                    shouldStartSession ?
-                    Profiler.StartSession() :
-                    default;
+                var watch = ValueStopwatch.StartNew();
 
-                var watch =
-                    requestLogOptions.LogRequests ?
-                    ValueStopwatch.StartNew() :
-                    default;
-
-                using (session)
+                try
                 {
-                    try
-                    {
-                        await next(context);
-                    }
-                    finally
-                    {
-                        if (requestLogOptions.LogRequests)
-                        {
-                            var elapsedMs = watch.Stop();
+                    await next(context);
+                }
+                finally
+                {
+                    var elapsedMs = watch.Stop();
 
-                            log.LogInformation((elapsedMs, context), (ctx, w) =>
-                            {
-                                if (requestLogOptions.LogProfiler)
-                                {
-                                    Profiler.Session?.Write(w);
-                                }
-
-                                w.WriteObject("filters", ctx.context, LogFilters);
-                                w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
-                            });
-                        }
-                    }
+                    log.LogInformation((elapsedMs, context), (ctx, w) =>
+                    {
+                        w.WriteObject("filters", ctx.context, LogFilters);
+                        w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
+                    });
                 }
             }
             else
@@ -74,33 +53,33 @@ namespace Squidex.Web.Pipeline
             }
         }
 
-        private static void LogFilters(HttpContext httpContext, IObjectWriter c)
+        private static void LogFilters(HttpContext httpContext, IObjectWriter obj)
         {
             var app = httpContext.Context().App;
 
             if (app != null)
             {
-                c.WriteProperty("appId", app.Id.ToString());
-                c.WriteProperty("appName", app.Name);
+                obj.WriteProperty("appId", app.Id.ToString());
+                obj.WriteProperty("appName", app.Name);
             }
 
             var userId = httpContext.User.OpenIdSubject();
 
             if (!string.IsNullOrWhiteSpace(userId))
             {
-                c.WriteProperty(nameof(userId), userId);
+                obj.WriteProperty(nameof(userId), userId);
             }
 
             var clientId = httpContext.User.OpenIdClientId();
 
             if (!string.IsNullOrWhiteSpace(clientId))
             {
-                c.WriteProperty(nameof(clientId), clientId);
+                obj.WriteProperty(nameof(clientId), clientId);
             }
 
             var costs = httpContext.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
 
-            c.WriteProperty(nameof(costs), costs);
+            obj.WriteProperty(nameof(costs), costs);
         }
     }
 }
