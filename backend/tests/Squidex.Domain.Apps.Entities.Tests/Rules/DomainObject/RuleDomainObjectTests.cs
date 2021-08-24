@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateRuleEvent(new RuleCreated { Trigger = command.Trigger, Action = command.Action })
+                    CreateRuleEvent(new RuleCreated { Trigger = command.Trigger!, Action = command.Action! })
                 );
         }
 
@@ -81,6 +81,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             var result = await PublishIdempotentAsync(command);
 
             result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);

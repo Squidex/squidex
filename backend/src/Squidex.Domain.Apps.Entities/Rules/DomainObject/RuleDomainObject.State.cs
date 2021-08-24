@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                             {
                                 RuleDef = RuleDef.Enable();
                             }
-                            else
+                            else if (e.IsEnabled == false)
                             {
                                 RuleDef = RuleDef.Disable();
                             }
