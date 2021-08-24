@@ -54,6 +54,14 @@ export class RuleComponent {
         this.rulesState.update(this.rule, { name });
     }
 
+    public disable() {
+        this.rulesState.update(this.rule, { isEnabled: false });
+    }
+
+    public enable() {
+        this.rulesState.update(this.rule, { isEnabled: true });
+    }
+
     public toggle() {
         this.rulesState.update(this.rule, { isEnabled: !this.rule.isEnabled });
     }
