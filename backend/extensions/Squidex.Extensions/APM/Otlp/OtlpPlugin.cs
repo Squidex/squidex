@@ -17,9 +17,9 @@ namespace Squidex.Extensions.APM.Datadog
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            services.AddOpenTelemetryTracing(builder =>
+            if (config.GetValue<bool>("logging:otlp:enabled"))
             {
-                if (config.GetValue<bool>("logging:otlp:enabled"))
+                services.AddOpenTelemetryTracing(builder =>
                 {
                     // See: https://docs.microsoft.com/aspnet/core/grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client
                     AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
@@ -28,8 +28,8 @@ namespace Squidex.Extensions.APM.Datadog
                     {
                         config.GetSection("logging:otlp").Bind(options);
                     });
-                }
-            });
+                });
+            }
         }
     }
 }

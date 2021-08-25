@@ -6,33 +6,56 @@
 // ==========================================================================
 
 using System;
-using Google.Cloud.Diagnostics.AspNetCore;
+using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Squidex.Infrastructure;
 using Squidex.Log;
 
 namespace Squidex.Extensions.APM.Stackdriver
 {
-    internal class StackdriverExceptionHandler : ILogAppender
+    internal sealed class StackdriverExceptionHandler : ILogAppender
     {
-        private readonly DefaultHttpContext fallbackContext = new DefaultHttpContext();
-        private readonly IExceptionLogger logger;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IContextExceptionLogger logger;
+        private readonly HttpContextWrapper httpContextWrapper;
 
-        public StackdriverExceptionHandler(IExceptionLogger logger, IHttpContextAccessor httpContextAccessor)
+        public sealed class HttpContextWrapper : IContextWrapper
+        {
+            private readonly IHttpContextAccessor httpContextAccessor;
+
+            internal HttpContextWrapper(IHttpContextAccessor httpContextAccessor)
+            {
+                this.httpContextAccessor = httpContextAccessor;
+            }
+
+            public string GetHttpMethod()
+            {
+                return httpContextAccessor.HttpContext?.Request?.Method?.ToString();
+            }
+
+            public string GetUri()
+            {
+                return httpContextAccessor.HttpContext?.Request?.GetDisplayUrl();
+            }
+
+            public string GetUserAgent()
+            {
+                return httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString();
+            }
+        }
+
+        public StackdriverExceptionHandler(IContextExceptionLogger logger, IHttpContextAccessor httpContextAccessor)
         {
             this.logger = logger;
 
-            this.httpContextAccessor = httpContextAccessor;
+            httpContextWrapper = new HttpContextWrapper(httpContextAccessor);
         }
 
         public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
         {
             if (exception != null && exception is not DomainException)
             {
-                var httpContext = httpContextAccessor.HttpContext;
-
-                logger.Log(exception, httpContext ?? fallbackContext);
+                logger.Log(exception, httpContextWrapper);
             }
         }
     }

@@ -16,16 +16,16 @@ namespace Squidex.Extensions.APM.ApplicationInsights
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            services.AddOpenTelemetryTracing(builder =>
+            if (config.GetValue<bool>("logging:applicationInsights:enabled"))
             {
-                if (config.GetValue<bool>("logging:applicationInsights:enabled"))
+                services.AddOpenTelemetryTracing(builder =>
                 {
                     builder.AddAzureMonitorTraceExporter(options =>
                     {
                         config.GetSection("logging:applicationInsights").Bind(options);
                     });
-                }
-            });
+                });
+            }
         }
     }
 }

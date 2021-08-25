@@ -14,7 +14,7 @@
     <PackageReference Include="Confluent.SchemaRegistry.Serdes" Version="1.3.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="Elasticsearch.Net" Version="7.14.1" />
-    <PackageReference Include="Google.Cloud.Diagnostics.AspNetCore" Version="4.0.0" />
+    <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="4.0.0" />
     <PackageReference Include="Google.Cloud.Logging.V2" Version="3.3.0" />
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.0" />
     <PackageReference Include="Microsoft.Azure.SignalR.Management" Version="1.9.2" />
