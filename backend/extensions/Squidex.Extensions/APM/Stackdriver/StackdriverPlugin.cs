@@ -53,7 +53,7 @@ namespace Squidex.Extensions.APM.Stackdriver
                         StackdriverExceptionHandler>();
 
                     var serviceName = config.GetValue<string>("logging:name") ?? "Squidex";
-                    var serviceVersion = Assembly.GetEntryAssembly().GetName().Version?.ToString();
+                    var serviceVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
 
                     services.AddSingleton(c => ContextExceptionLogger.Create(projectId, serviceVersion, serviceVersion, null));
                 }
