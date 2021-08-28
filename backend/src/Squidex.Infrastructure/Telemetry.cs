@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure
 {
     public static class Telemetry
     {
-        public static readonly ActivitySource Activities = new ActivitySource("Notifo");
+        public static readonly ActivitySource Activities = new ActivitySource("Squidex");
 
         public static Activity? StartMethod(this ActivitySource activity, Type type, [CallerMemberName] string? memberName = null)
         {
