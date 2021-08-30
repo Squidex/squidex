@@ -91,11 +91,11 @@ describe('AssetsService', () => {
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let assets: AssetFoldersDto;
 
-            assetsService.getAssetFolders('my-app', 'parent1').subscribe(result => {
+            assetsService.getAssetFolders('my-app', 'parent1', 'Path').subscribe(result => {
                 assets = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/folders?parentId=parent1');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/folders?parentId=parent1&scope=Path');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

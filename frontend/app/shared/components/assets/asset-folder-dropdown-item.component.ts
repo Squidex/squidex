@@ -61,7 +61,7 @@ export class AssetFolderDropdownItemComponent {
 
         this.node.isLoading = true;
 
-        this.assetsService.getAssetFolders(this.appName, this.node.item.id)
+        this.assetsService.getAssetFolders(this.appName, this.node.item.id, 'Items')
             .subscribe({
                 next: dto => {
                     if (dto.items.length > 0) {

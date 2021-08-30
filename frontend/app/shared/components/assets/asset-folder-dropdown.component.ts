@@ -59,7 +59,7 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
             return;
         }
 
-        this.assetsService.getAssetFolders(this.appName, obj)
+        this.assetsService.getAssetFolders(this.appName, obj, 'PathAndItems')
             .subscribe(dto => {
                 let parent = this.root;
 

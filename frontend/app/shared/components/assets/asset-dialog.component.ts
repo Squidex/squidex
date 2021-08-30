@@ -89,7 +89,7 @@ export class AssetDialogComponent implements OnChanges {
         this.annotateForm.setEnabled(this.isEditable);
 
         this.path =
-            this.assetsService.getAssetFolders(this.appsState.appName, this.asset.parentId).pipe(
+            this.assetsService.getAssetFolders(this.appsState.appName, this.asset.parentId, 'Path').pipe(
                 map(folders => [ROOT_ITEM, ...folders.path]));
     }
 
