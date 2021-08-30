@@ -21,7 +21,7 @@ interface Message {
 export class MessageBus {
     private message$ = new Subject<Message>();
 
-    public emit<T>(data: T): void {
+    public emit<T>(data: T) {
         const channel = ((<any>data)['constructor']).name;
 
         this.message$.next({ channel, data });

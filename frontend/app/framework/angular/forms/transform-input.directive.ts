@@ -76,7 +76,7 @@ export class TransformInputDirective implements ControlValueAccessor {
         this.renderer.setProperty(this.element.nativeElement, 'value', normalizedValue);
     }
 
-    public setDisabledState(isDisabled: boolean): void {
+    public setDisabledState(isDisabled: boolean) {
         this.renderer.setProperty(this.element.nativeElement, 'disabled', isDisabled);
     }
 
