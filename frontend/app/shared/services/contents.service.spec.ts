@@ -122,11 +122,11 @@ describe('ContentsService', () => {
 
             let content: ContentDto;
 
-            contentsService.postContent('my-app', 'my-schema', dto, true).subscribe(result => {
+            contentsService.postContent('my-app', 'my-schema', dto, true, 'my-id').subscribe(result => {
                 content = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?publish=true');
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?publish=true&id=my-id');
 
             expect(req.request.method).toEqual('POST');
             expect(req.request.headers.get('If-Match')).toBeNull();

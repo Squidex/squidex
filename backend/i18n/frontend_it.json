@@ -424,6 +424,7 @@
   "contents.draftNew": "Nuova bozza",
   "contents.draftStatus": "Nuova versione",
   "contents.editPageTitle": "Modifica contenuto",
+  "contents.idPlaceholder": "Define a custom ID or leave empty to let Squidex generate one.",
   "contents.invariantFieldDescription": "Il campo '{fieldName}' del contenuto.",
   "contents.languageModeAll": "Tutte le lingue",
   "contents.languageModeSingle": "Una sola lingua",

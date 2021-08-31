@@ -130,6 +130,7 @@
                     <ng-container *ngSwitchDefault>
                         <sqx-content-editor
                             [(language)]="language"
+                            [contentId]="contentId"
                             [contentForm]="contentForm"
                             [contentFormCompare]="contentFormCompare"
                             [contentVersion]="contentVersion"
@@ -144,6 +145,8 @@
             <ng-template #noContentEditor>
                 <sqx-content-editor
                     [(language)]="language"
+                    [(contentId)]="contentId"
+                    [isNew]="!content"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
                     [contentVersion]="contentVersion"

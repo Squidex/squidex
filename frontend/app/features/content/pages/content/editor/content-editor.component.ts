@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, RootFieldDto, SchemaDto, Version } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-editor[contentForm][formContext][language][languages][schema]',
+    selector: 'sqx-content-editor[contentId][contentForm][formContext][language][languages][schema]',
     styleUrls: ['./content-editor.component.scss'],
     templateUrl: './content-editor.component.html',
 })
@@ -19,6 +19,15 @@ export class ContentEditorComponent {
 
     @Output()
     public loadLatest = new EventEmitter<any>();
+
+    @Output()
+    public contentIdChange = new EventEmitter<string>();
+
+    @Input()
+    public isNew = false;
+
+    @Input()
+    public contentId: string;
 
     @Input()
     public contentForm: EditContentForm;

@@ -7,6 +7,12 @@
 
             <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline"></div>
         </div>
+        
+        <div *ngIf="isNew">
+            <input class="form-control" placeholder="{{ 'i18n:contents.idPlaceholder' | sqxTranslate }}" 
+                [ngModel]="contentId"    
+                (ngModelChange)="contentIdChange.emit($event)" />
+        </div>
     </ng-container>
 
     <ng-container>
