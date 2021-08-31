@@ -13,7 +13,7 @@ import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDto, TableField } from './../services/schemas.service';
 import { ComponentFieldPropertiesDto, fieldInvariant } from './../services/schemas.types';
-import { AbstractContentForm, AbstractContentFormState, CompiledRule, FieldSection, FormGlobals, PartitionConfig } from './contents.forms-helpers';
+import { AbstractContentForm, AbstractContentFormState, ComponentRulesProvider, FieldSection, FormGlobals, PartitionConfig, RootRulesProvider, RulesProvider } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string; user: boolean };
@@ -93,12 +93,13 @@ export class EditContentForm extends Form<FormGroup, any> {
         super(new FormGroup({}));
 
         const globals: FormGlobals = {
-            allRules: schema.fieldRules.map(x => new CompiledRule(x)),
             schema,
             schemas,
             partitions: new PartitionConfig(languages),
             remoteValidator: this.remoteValidator,
         };
+
+        const rules = new RootRulesProvider(schema);
 
         const sections: FieldSection<RootFieldDto, FieldForm>[] = [];
 
@@ -107,8 +108,12 @@ export class EditContentForm extends Form<FormGroup, any> {
 
         for (const field of schema.fields) {
             if (field.properties.isContentField) {
-                const childPath = field.name;
-                const childForm = new FieldForm(globals, childPath, field);
+                const childForm =
+                    new FieldForm(
+                        globals,
+                        field,
+                        field.name,
+                        rules);
 
                 currentFields.push(childForm);
 
@@ -219,12 +224,23 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     private readonly partitions: { [partition: string]: FieldItemForm } = {};
     private isRequired: boolean;
 
-    constructor(globals: FormGlobals, fieldPath: string, field: RootFieldDto) {
-        super(globals, fieldPath, field, FieldForm.buildForm(), false);
+    constructor(
+        globals: FormGlobals,
+        field: RootFieldDto,
+        fieldPath: string,
+        rules: RulesProvider,
+    ) {
+        super(globals, field, fieldPath, FieldForm.buildForm(), false, rules);
 
         for (const { key, isOptional } of globals.partitions.getAll(field)) {
-            const childPath = `${fieldPath}.${key}`;
-            const childForm = buildForm(this.globals, childPath, field, isOptional, key);
+            const childForm =
+                buildForm(
+                    this.globals,
+                    field,
+                    this.getPath(key),
+                    isOptional,
+                    rules,
+                    key);
 
             this.partitions[key] = childForm;
 
@@ -308,13 +324,17 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
 export class FieldValueForm extends AbstractContentForm<FieldDto, FormControl> {
     private isRequired = false;
 
-    constructor(globals: FormGlobals, path: string, field: FieldDto,
-        isOptional: boolean, partition: string,
+    constructor(
+        globals: FormGlobals,
+        field: FieldDto,
+        fieldPath: string,
+        isOptional: boolean,
+        rules: RulesProvider,
+        partition: string,
     ) {
-        super(globals, path, field,
+        super(globals, field, fieldPath,
             FieldValueForm.buildControl(field, isOptional, partition, globals),
-            isOptional,
-        );
+            isOptional, rules);
 
         this.isRequired = field.properties.isRequired && !isOptional;
     }
@@ -366,14 +386,18 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, UndefinableFor
         this.item$.next(value);
     }
 
-    constructor(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean,
+    constructor(
+        globals: FormGlobals,
+        field: FieldDto,
+        fieldPath: string,
+        isOptional: boolean,
+        rules: RulesProvider,
         private readonly partition: string,
         private readonly isComponents: boolean,
     ) {
-        super(globals, path, field,
+        super(globals, field, fieldPath,
             FieldArrayForm.buildControl(field, isOptional),
-            isOptional,
-        );
+            isOptional, rules);
     }
 
     public get(index: number) {
@@ -382,13 +406,13 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, UndefinableFor
 
     public addCopy(source: ObjectForm) {
         if (this.isComponents) {
-            const child = new ComponentForm(this.globals, this.fieldPath, this.field as RootFieldDto, this.isOptional, this.partition);
+            const child = this.createComponent();
 
             child.load(getRawValue(source.form));
 
             this.addChild(child);
         } else {
-            const child = new ArrayItemForm(this.globals, this.fieldPath, this.field as RootFieldDto, this.isOptional, this.partition);
+            const child = this.createItem();
 
             child.load(getRawValue(source.form));
 
@@ -397,13 +421,13 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, UndefinableFor
     }
 
     public addComponent(schemaId?: string) {
-        const child = new ComponentForm(this.globals, this.fieldPath, this.field, this.isOptional, this.partition, schemaId);
+        const child = this.createComponent(schemaId);
 
         this.addChild(child);
     }
 
     public addItem() {
-        const child = new ArrayItemForm(this.globals, this.fieldPath, this.field as RootFieldDto, this.isOptional, this.partition);
+        const child = this.createItem();
 
         this.addChild(child);
     }
@@ -477,6 +501,27 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, UndefinableFor
         }
     }
 
+    private createItem() {
+        return new ArrayItemForm(
+            this.globals,
+            this.field as RootFieldDto,
+            this.fieldPath,
+            this.isOptional,
+            this.rules,
+            this.partition);
+    }
+
+    private createComponent(schemaId?: string) {
+        return new ComponentForm(
+            this.globals,
+            this.field as RootFieldDto,
+            this.fieldPath,
+            this.isOptional,
+            this.rules,
+            this.partition,
+            schemaId);
+    }
+
     private static buildControl(field: FieldDto, isOptional: boolean) {
         const validators = FieldsValidators.create(field, isOptional);
 
@@ -494,10 +539,17 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
         return this.fieldSections;
     }
 
-    constructor(globals: FormGlobals, path: string, field: TField, isOptional: boolean,
+    constructor(
+        globals: FormGlobals,
+        field: TField,
+        fieldPath: string,
+        isOptional: boolean,
+        rules: RulesProvider,
         private readonly partition: string,
     ) {
-        super(globals, path, field, ObjectForm.buildControl(field, isOptional, false), isOptional);
+        super(globals, field, fieldPath,
+            ObjectForm.buildControl(field, isOptional, false),
+            isOptional, rules);
     }
 
     public get(field: string | { name: string }): FieldItemForm | undefined {
@@ -520,8 +572,14 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
 
             for (const field of schema) {
                 if (field.properties.isContentField) {
-                    const childPath = `${this.fieldPath}.${field.name}`;
-                    const childForm = buildForm(this.globals, childPath, field, this.isOptional, this.partition);
+                    const childForm =
+                        buildForm(
+                            this.globals,
+                            field,
+                            this.getPath(field.name),
+                            this.isOptional,
+                            this.rules,
+                            this.partition);
 
                     this.form.setControl(field.name, childForm.form);
 
@@ -582,8 +640,15 @@ export class ObjectForm<TField extends FieldDto = FieldDto> extends AbstractCont
 }
 
 export class ArrayItemForm extends ObjectForm<RootFieldDto> {
-    constructor(globals: FormGlobals, path: string, field: RootFieldDto, isOptional: boolean, partition: string) {
-        super(globals, path, field, isOptional, partition);
+    constructor(
+        globals: FormGlobals,
+        field: RootFieldDto,
+        fieldPath: string,
+        isOptional: boolean,
+        rules: RulesProvider,
+        partition: string,
+    ) {
+        super(globals, field, fieldPath, isOptional, rules, partition);
 
         this.init(field.nested);
     }
@@ -598,8 +663,17 @@ export class ComponentForm extends ObjectForm {
         return this.globals.schemas[this.schemaId!];
     }
 
-    constructor(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean, partition: string, schemaId?: string) {
-        super(globals, path, field, isOptional, partition);
+    constructor(
+        globals: FormGlobals,
+        field: FieldDto,
+        fieldPath: string,
+        isOptional: boolean,
+        rules: RulesProvider,
+        partition: string,
+        schemaId?: string,
+    ) {
+        super(globals, field, fieldPath, isOptional,
+            new ComponentRulesProvider(fieldPath, rules), partition);
 
         this.properties = field.properties as ComponentFieldPropertiesDto;
 
@@ -613,6 +687,8 @@ export class ComponentForm extends ObjectForm {
             this.schemaId = schemaId;
 
             if (this.schema) {
+                this.rules.setSchema(this.schema);
+
                 this.init(this.schema.fields);
 
                 this.form.setControl('schemaId', new FormControl(schemaId));
@@ -635,15 +711,15 @@ export class ComponentForm extends ObjectForm {
     }
 }
 
-function buildForm(globals: FormGlobals, path: string, field: FieldDto, isOptional: boolean, partition: string) {
+function buildForm(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
     switch (field.properties.fieldType) {
         case 'Array':
-            return new FieldArrayForm(globals, path, field, isOptional, partition, false);
+            return new FieldArrayForm(globals, field, fieldPath, isOptional, rules, partition, false);
         case 'Component':
-            return new ComponentForm(globals, path, field, isOptional, partition);
+            return new ComponentForm(globals, field, fieldPath, isOptional, rules, partition);
         case 'Components':
-            return new FieldArrayForm(globals, path, field, isOptional, partition, true);
+            return new FieldArrayForm(globals, field, fieldPath, isOptional, rules, partition, true);
         default:
-            return new FieldValueForm(globals, path, field, isOptional, partition);
+            return new FieldValueForm(globals, field, fieldPath, isOptional, rules, partition);
     }
 }

@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @typescript-eslint/no-implied-eval */
 /* eslint-disable no-useless-return */
 
 import { AbstractControl, ValidatorFn } from '@angular/forms';
@@ -93,9 +94,9 @@ export class CompiledRule {
 
     constructor(
         private readonly rule: FieldRule,
+        private readonly useItemData: boolean,
     ) {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-implied-eval
             this.function = new Function(`return function(user, ctx, data, itemData) { return ${rule.condition} }`)();
         } catch {
             this.function = () => false;
@@ -104,7 +105,9 @@ export class CompiledRule {
 
     public eval(context: RuleContext) {
         try {
-            return this.function(context.user, context, context.data, context.itemData);
+            const data = this.useItemData ? context.itemData || context.data : context.data;
+
+            return this.function(context.user, context, data, context.itemData);
         } catch {
             return false;
         }
@@ -118,16 +121,113 @@ export type AbstractContentFormState = {
 };
 
 export interface FormGlobals {
-    allRules: ReadonlyArray<CompiledRule>;
     partitions: PartitionConfig;
     schema: SchemaDto;
     schemas: { [id: string ]: SchemaDto };
     remoteValidator?: ValidatorFn;
 }
 
+const EMPTY_RULES: CompiledRule[] = [];
+
+export interface RulesProvider {
+    compileRules(schema: SchemaDto | undefined): ReadonlyArray<CompiledRule>;
+
+    setSchema(schema?: SchemaDto): void;
+
+    getRules(form: AbstractContentForm<any, any>): ReadonlyArray<CompiledRule>;
+}
+
+export class ComponentRulesProvider implements RulesProvider {
+    private schema?: SchemaDto;
+
+    constructor(
+        private readonly parentPath: string,
+        private readonly parent: RulesProvider,
+    ) {
+    }
+
+    public setSchema(schema?: SchemaDto) {
+        this.schema = schema;
+    }
+
+    public compileRules(schema: SchemaDto | undefined): ReadonlyArray<CompiledRule> {
+        return this.parent.compileRules(schema);
+    }
+
+    public getRules(form: AbstractContentForm<any, any>) {
+        const rules1 = this.parent.getRules(form);
+        const rules2 = this.getRelativeRules(form);
+
+        if (rules2.length === 0) {
+            return rules1;
+        }
+
+        if (rules1.length === 0) {
+            return rules2;
+        }
+
+        return [...rules1, ...rules2];
+    }
+
+    private getRelativeRules(form: AbstractContentForm<any, any>) {
+        const rules = this.compileRules(this.schema);
+
+        if (rules.length === 0) {
+            return EMPTY_RULES;
+        }
+
+        const pathField = form.fieldPath.substr(this.parentPath.length + 1);
+        const pathSimplified = pathField.replace('.iv.', '.');
+
+        return rules.filter(x => x.field === pathField || x.field === pathSimplified);
+    }
+}
+
+export class RootRulesProvider implements RulesProvider {
+    private readonly compiledRules: { [id: string]: ReadonlyArray<CompiledRule> } = {};
+    private readonly rules: ReadonlyArray<CompiledRule>;
+
+    constructor(schema: SchemaDto) {
+        this.rules = schema.fieldRules.map(x => new CompiledRule(x, false));
+    }
+
+    public setSchema() {
+        return;
+    }
+
+    public compileRules(schema: SchemaDto | undefined) {
+        if (!schema) {
+            return EMPTY_RULES;
+        }
+
+        let result = this.compileRules[schema.id];
+
+        if (!result) {
+            result = schema.fieldRules.map(x => new CompiledRule(x, true));
+
+            this.compiledRules[schema.id] = result;
+        }
+
+        return result;
+    }
+
+    public getRules(form: AbstractContentForm<any, any>) {
+        const rules = this.rules;
+
+        if (rules.length === 0) {
+            return EMPTY_RULES;
+        }
+
+        const pathField = form.fieldPath;
+        const pathSimplified = pathField.replace('.iv.', '.');
+
+        return rules.filter(x => x.field === pathField || x.field === pathSimplified);
+    }
+}
+
 export abstract class AbstractContentForm<T extends FieldDto, TForm extends AbstractControl> extends Hidden {
     private readonly disabled$ = new BehaviorSubject<boolean>(false);
-    private readonly rules: ReadonlyArray<CompiledRule>;
+    private readonly currentRules: ReadonlyArray<CompiledRule>;
 
     public get disabled() {
         return this.disabled$.value;
@@ -139,16 +239,31 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
 
     protected constructor(
         public readonly globals: FormGlobals,
-        public readonly fieldPath: string,
         public readonly field: T,
+        public readonly fieldPath: string,
         public readonly form: TForm,
         public readonly isOptional: boolean,
+        public readonly rules: RulesProvider,
     ) {
         super();
 
-        const simplifiedPath = fieldPath.replace('.iv.', '.');
+        this.currentRules = rules.getRules(this);
+    }
 
-        this.rules = globals.allRules.filter(x => x.field === fieldPath || x.field === simplifiedPath);
+    public getPath(relative: string) {
+        if (!this.fieldPath && !relative) {
+            return '';
+        }
+
+        if (!relative) {
+            return this.fieldPath;
+        }
+
+        if (!this.fieldPath) {
+            return relative;
+        }
+
+        return `${this.fieldPath}.${relative}`;
     }
 
     public updateState(context: RuleContext, parentState: AbstractContentFormState) {
@@ -158,16 +273,14 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
             isRequired: this.field.properties.isRequired && !this.isOptional,
         };
 
-        if (this.rules) {
-            for (const rule of this.rules) {
-                if (rule.eval(context)) {
-                    if (rule.action === 'Disable') {
-                        state.isDisabled = true;
-                    } else if (rule.action === 'Hide') {
-                        state.isHidden = true;
-                    } else {
-                        state.isRequired = true;
-                    }
+        for (const rule of this.currentRules) {
+            if (rule.eval(context)) {
+                if (rule.action === 'Disable') {
+                    state.isDisabled = true;
+                } else if (rule.action === 'Hide') {
+                    state.isHidden = true;
+                } else {
+                    state.isRequired = true;
                 }
             }
         }
