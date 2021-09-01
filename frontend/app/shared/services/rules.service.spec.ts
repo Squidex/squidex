@@ -343,17 +343,17 @@ describe('RulesService', () => {
             req.flush({});
         }));
 
-    it('should make delete request to cancel rule event',
+    it('should make delete request to cancel all rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    delete: { method: 'DELETE', href: '/api/apps/my-app/rules/events/123' },
+                    cancel: { method: 'DELETE', href: '/api/apps/my-app/rules/events' },
                 },
             };
 
-            rulesService.cancelEvent('my-app', resource).subscribe();
+            rulesService.cancelEvents('my-app', resource).subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events/123');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events');
 
             expect(req.request.method).toEqual('DELETE');
             expect(req.request.headers.get('If-Match')).toBeNull();

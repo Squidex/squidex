@@ -1,4 +1,4 @@
-<tr [class.expanded]="expanded">
+<tr [class.expanded]="expanded" class="table-items-row">
     <td class="cell-label">
         <span class="badge rounded-pill badge-{{statusClass}}">{{status}}</span>
     </td>
@@ -15,17 +15,23 @@
     </td>
 </tr>
 <tr *ngIf="expanded">
-    <td colspan="4">
-        <div class="form-group" *ngIf="event.actionData">
-            <label>{{ 'rules.actionData' | sqxTranslate }}</label>
-                
-            <sqx-code-editor [ngModel]="data" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
+    <td colspan="4" class="details">
+        <div class="event-header">
+            <h4>{{ 'common.details' | sqxTranslate }}</h4>
         </div>
-    
-        <div class="form-group" *ngIf="event.error">
-            <label>{{ 'common.error' | sqxTranslate }}</label>
-               
-            <sqx-code-editor [ngModel]="event.error" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
+
+        <div class="row event-dump">
+            <div class="form-group" *ngIf="event.actionData">
+                <label>{{ 'rules.actionData' | sqxTranslate }}</label>
+                    
+                <sqx-code-editor [ngModel]="data" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
+            </div>
+        
+            <div class="form-group" *ngIf="event.error">
+                <label>{{ 'common.error' | sqxTranslate }}</label>
+                
+                <sqx-code-editor [ngModel]="event.error" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
+            </div>
         </div>
     </td>
 </tr>

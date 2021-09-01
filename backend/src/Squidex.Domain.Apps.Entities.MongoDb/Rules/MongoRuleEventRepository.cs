@@ -109,9 +109,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             await Collection.InsertOneIfNotExistsAsync(entity);
         }
 
-        public Task CancelAsync(DomainId id)
+        public Task CancelByEventAsync(DomainId id)
         {
             return Collection.UpdateOneAsync(x => x.DocumentId == id,
+                Update
+                    .Set(x => x.NextAttempt, null)
+                    .Set(x => x.JobResult, RuleJobResult.Cancelled));
+        }
+
+        public Task CancelByRuleAsync(DomainId ruleId)
+        {
+            return Collection.UpdateOneAsync(x => x.RuleId == ruleId,
+                Update
+                    .Set(x => x.NextAttempt, null)
+                    .Set(x => x.JobResult, RuleJobResult.Cancelled));
+        }
+
+        public Task CancelByAppAsync(DomainId appId)
+        {
+            return Collection.UpdateOneAsync(x => x.DocumentId == appId,
                 Update
                     .Set(x => x.NextAttempt, null)
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
