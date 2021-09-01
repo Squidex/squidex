@@ -43,9 +43,9 @@ spec:
           ports:
             - containerPort: 80
           env:
+            # The following can be set to create an admin user
             - name: CONTENTS__DEFAULTPAGESIZE
               value: '400'
-            # The following can be set to create an admin user
             - name: IDENTITY__ADMINRECREATE
               value: "true"
             - name: IDENTITY__ADMINEMAIL

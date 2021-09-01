@@ -52,9 +52,6 @@ pipeline {
     }
 
     stage('Render and validate the Kubernetes deployment yaml'){
-      when {
-        expression {deploy}
-      }
       steps {
         script {
           deploymentName = homerKubernetes.getDeploymentName()
