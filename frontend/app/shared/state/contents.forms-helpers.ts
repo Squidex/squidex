@@ -9,6 +9,7 @@
 /* eslint-disable no-useless-return */
 
 import { AbstractControl, ValidatorFn } from '@angular/forms';
+import { Types } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -35,6 +36,32 @@ export abstract class Hidden {
             this.hidden$.next(hidden);
         }
     }
+}
+
+export function groupFields<T extends FieldDto>(fields: ReadonlyArray<T>): { separator?: T; fields: ReadonlyArray<T> }[] {
+    const result: { separator?: T; fields: ReadonlyArray<T> }[] = [];
+
+    let currentSeparator: T | undefined;
+    let currentFields: T[] = [];
+
+    for (const field of fields) {
+        if (field.properties.isContentField) {
+            currentFields.push(field);
+        } else {
+            if (currentFields.length > 0) {
+                result.push({ separator: currentSeparator, fields: currentFields });
+            }
+
+            currentFields = [];
+            currentSeparator = field;
+        }
+    }
+
+    if (currentFields.length > 0) {
+        result.push({ separator: currentSeparator, fields: currentFields });
+    }
+
+    return result;
 }
 
 export class FieldSection<TSeparator, TChild extends { hidden: boolean }> extends Hidden {
@@ -79,7 +106,7 @@ export class PartitionConfig {
     }
 }
 
-type RuleContext = { data: any; itemData?: any; user?: any };
+type RuleContext = { data: any; user?: any };
 
 export class CompiledRule {
     private readonly function: Function;
@@ -103,11 +130,11 @@ export class CompiledRule {
         }
     }
 
-    public eval(context: RuleContext) {
+    public eval(context: RuleContext, localData: any) {
         try {
-            const data = this.useItemData ? context.itemData || context.data : context.data;
+            const data = this.useItemData ? localData || context.data : context.data;
 
-            return this.function(context.user, context, data, context.itemData);
+            return this.function(context.user, context, data, localData);
         } catch {
             return false;
         }
@@ -155,18 +182,7 @@ export class ComponentRulesProvider implements RulesProvider {
     }
 
     public getRules(form: AbstractContentForm<any, any>) {
-        const rules1 = this.parent.getRules(form);
-        const rules2 = this.getRelativeRules(form);
-
-        if (rules2.length === 0) {
-            return rules1;
-        }
-
-        if (rules1.length === 0) {
-            return rules2;
-        }
-
-        return [...rules1, ...rules2];
+        return Types.fastMerge(this.parent.getRules(form), this.getRelativeRules(form));
     }
 
     private getRelativeRules(form: AbstractContentForm<any, any>) {
@@ -250,23 +266,11 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         this.currentRules = rules.getRules(this);
     }
 
-    public getPath(relative: string) {
-        if (!this.fieldPath && !relative) {
-            return '';
-        }
-
-        if (!relative) {
-            return this.fieldPath;
-        }
-
-        if (!this.fieldPath) {
-            return relative;
-        }
-
+    public path(relative: string) {
         return `${this.fieldPath}.${relative}`;
     }
 
-    public updateState(context: RuleContext, parentState: AbstractContentFormState) {
+    public updateState(context: RuleContext, data: any, parentState: AbstractContentFormState) {
         const state = {
             isDisabled: this.field.isDisabled || parentState.isDisabled === true,
             isHidden: parentState.isHidden === true,
@@ -274,7 +278,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         };
 
         for (const rule of this.currentRules) {
-            if (rule.eval(context)) {
+            if (rule.eval(context, data)) {
                 if (rule.action === 'Disable') {
                     state.isDisabled = true;
                 } else if (rule.action === 'Hide') {
@@ -295,14 +299,14 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
             }
         }
 
-        this.updateCustomState(context, state);
+        this.updateCustomState(context, data, state);
     }
 
     public unset() {
         this.form.setValue(undefined);
     }
 
-    protected updateCustomState(_context: RuleContext, _state: AbstractContentFormState): void {
+    protected updateCustomState(_context: RuleContext, _data: any, _state: AbstractContentFormState): void {
         return;
     }
 
