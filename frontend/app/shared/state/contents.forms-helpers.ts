@@ -130,11 +130,11 @@ export class CompiledRule {
         }
     }
 
-    public eval(context: RuleContext, localData: any) {
+    public eval(context: RuleContext, itemData: any) {
         try {
-            const data = this.useItemData ? localData || context.data : context.data;
+            const data = this.useItemData ? itemData || context.data : context.data;
 
-            return this.function(context.user, context, data, localData);
+            return this.function(context.user, context, data, itemData);
         } catch {
             return false;
         }
@@ -270,7 +270,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         return `${this.fieldPath}.${relative}`;
     }
 
-    public updateState(context: RuleContext, data: any, parentState: AbstractContentFormState) {
+    public updateState(context: RuleContext, fieldData: any, itemData: any, parentState: AbstractContentFormState) {
         const state = {
             isDisabled: this.field.isDisabled || parentState.isDisabled === true,
             isHidden: parentState.isHidden === true,
@@ -278,7 +278,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         };
 
         for (const rule of this.currentRules) {
-            if (rule.eval(context, data)) {
+            if (rule.eval(context, itemData)) {
                 if (rule.action === 'Disable') {
                     state.isDisabled = true;
                 } else if (rule.action === 'Hide') {
@@ -299,14 +299,14 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
             }
         }
 
-        this.updateCustomState(context, data, state);
+        this.updateCustomState(context, fieldData, itemData, state);
     }
 
     public unset() {
         this.form.setValue(undefined);
     }
 
-    protected updateCustomState(_context: RuleContext, _data: any, _state: AbstractContentFormState): void {
+    protected updateCustomState(_context: RuleContext, _fieldData: any, _itemData: any, _state: AbstractContentFormState): void {
         return;
     }
 
