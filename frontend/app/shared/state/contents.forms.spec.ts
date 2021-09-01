@@ -8,8 +8,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { AbstractControl, FormArray } from '@angular/forms';
+import { MathHelper } from '@app/framework';
 import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, RootFieldDto } from '@app/shared/internal';
-import { FieldRule } from './../services/schemas.service';
+import { FieldRule, SchemaDto } from './../services/schemas.service';
 import { FieldArrayForm } from './contents.forms';
 import { PartitionConfig } from './contents.forms-helpers';
 import { TestValues } from './_test-helpers';
@@ -458,6 +459,49 @@ describe('ContentForm', () => {
             expect(array.get(1)!.get('nested42')!.hidden).toBeFalsy();
         });
 
+        it('should hide components fields based on condition', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                fields: [
+                    createField({
+                        id: 1,
+                        properties: createProperties('String'),
+                        partitioning: 'invariant',
+                    }),
+                ],
+                fieldRules: [{
+                    field: 'field1', action: 'Hide', condition: 'data.field1 > 100',
+                }],
+            });
+
+            const contentForm = createForm([
+                createField({
+                    id: 4,
+                    properties: createProperties('Components'),
+                    partitioning: 'invariant',
+                }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            const array = contentForm.get(complexSchema.fields[3])!.get(languages[0]) as FieldArrayForm;
+
+            contentForm.load({
+                field4: {
+                    iv: [{
+                        schemaId: componentId,
+                        field1: 120,
+                    }, {
+                        schemaId: componentId,
+                        field1: 99,
+                    }],
+                },
+            });
+
+            expect(array.get(0)!.get('field1')!.hidden).toBeTruthy();
+            expect(array.get(1)!.get('field1')!.hidden).toBeFalsy();
+        });
+
         it('should load with array and not enable disabled nested fields', () => {
             const { contentForm, array } = createArrayFormWith2Items();
 
@@ -690,8 +734,8 @@ describe('ContentForm', () => {
         });
     });
 
-    function createForm(fields: RootFieldDto[], fieldRules: FieldRule[] = []) {
+    function createForm(fields: RootFieldDto[], fieldRules: FieldRule[] = [], schemas: { [id: string]: SchemaDto } = {}) {
         return new EditContentForm(languages,
-            createSchema({ fields, fieldRules }), {}, {}, 0);
+            createSchema({ fields, fieldRules }), schemas, {}, 0);
     }
 });
