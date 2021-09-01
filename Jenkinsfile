@@ -35,7 +35,7 @@ pipeline {
             full_image_name = "${homer_image_name}:${tag}"
             cluster = params.cluster
             namespace = params.namespace
-            helm_data_file = "k8s/${cluster}/${namespace}"
+            helm_data_file = "k8s/${cluster}/${namespace}.yaml"
           }
       }
     }
