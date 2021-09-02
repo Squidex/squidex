@@ -43,50 +43,8 @@ spec:
           ports:
             - containerPort: 80
           env:
-            # The following can be set to create an admin user
-            - name: IDENTITY__ADMINRECREATE
-              value: "true"
-            - name: IDENTITY__ADMINEMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: squidex-params
-                  key: ADMIN_EMAIL
-            - name: IDENTITY__ADMINPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: squidex
-                  key: squidex_admin_password
-            - name: URLS__BASEURL
-              valueFrom:
-                secretKeyRef:
-                  name: squidex-params
-                  key: DOMAIN
-            - name: URLS__ENFORCEHTTPS
-              value: "false"
-            - name: HEALTHZ__GC__THRESHOLD
-              value: "8192"
             - name: ASSETS__MAXSIZE
               value: "52428800"
-            - name: LOGGING__HUMAN
-              value: "false"
-            - name: ORLEANS__CLUSTERING
-              value: "MongoDB"
-            - name: EVENTSTORE__MONGODB__CONFIGURATION
-              valueFrom:
-                secretKeyRef:
-                  name: squidex
-                  key: mongo_connection_string
-            - name: EVENTSTORE__MONGODB__DATABASE
-              value: "Squidex"
-            - name: STORE__MONGODB__CONFIGURATION
-              valueFrom:
-                secretKeyRef:
-                  name: squidex
-                  key: mongo_connection_string
-            - name: STORE__MONGODB__DATABASE
-              value: "Squidex"
-            - name: STORE__MONGODB__CONTENTDATABASE
-              value: "SquidexContentV2"
             - name: ASSETSTORE__TYPE
               value: "AmazonS3"
             - name: ASSETSTORE__AMAZONS3__BUCKET
@@ -106,27 +64,17 @@ spec:
                 secretKeyRef:
                   name: squidex
                   key: iam_secret_key
-            - name: IDENTITY__GOOGLECLIENT
-              valueFrom:
-                secretKeyRef:
-                  name: squidex
-                  key: google_auth_client_id
-            - name: IDENTITY__GOOGLESECRET
-              valueFrom:
-                secretKeyRef:
-                  name: squidex
-                  key: google_auth_secret
-            # Specifically Blanking out to deactive these options
-            - name: IDENTITY__GITHUBCLIENT
-              value: ""
-            - name: IDENTITY__MICROSOFTCLIENT
-              value: ""
-            - name: LOGGING__DATADOG
-              value: "true"
             - name: DD_AGENT_HOST
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: EVENTSTORE__MONGODB__CONFIGURATION
+              valueFrom:
+                secretKeyRef:
+                  name: squidex
+                  key: mongo_connection_string
+            - name: EVENTSTORE__MONGODB__DATABASE
+              value: "Squidex"
             - name: EMAIL__SMTP__SERVER
               value: "email-smtp.us-east-1.amazonaws.com"
             - name: EMAIL__SMTP__SENDER
@@ -142,4 +90,56 @@ spec:
               value: "true"
             - name: EMAIL__SMTP__PORT
               value: "587"
+            - name: HEALTHZ__GC__THRESHOLD
+              value: "8192"             
+            # The following can be set to create an admin user
+            - name: IDENTITY__ADMINRECREATE
+              value: "true"
+            - name: IDENTITY__ADMINEMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: squidex-params
+                  key: ADMIN_EMAIL
+            - name: IDENTITY__ADMINPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: squidex
+                  key: squidex_admin_password
+            - name: IDENTITY__GOOGLECLIENT
+              valueFrom:
+                secretKeyRef:
+                  name: squidex
+                  key: google_auth_client_id
+            - name: IDENTITY__GOOGLESECRET
+              valueFrom:
+                secretKeyRef:
+                  name: squidex
+                  key: google_auth_secret
+            # Specifically Blanking out to deactive these options
+            - name: IDENTITY__GITHUBCLIENT
+              value: ""
+            - name: IDENTITY__MICROSOFTCLIENT
+              value: ""
+            - name: LOGGING__HUMAN
+              value: "false"
+            - name: LOGGING__DATADOG
+              value: "true"
+            - name: ORLEANS__CLUSTERING
+              value: "MongoDB"
+            - name: STORE__MONGODB__CONFIGURATION
+              valueFrom:
+                secretKeyRef:
+                  name: squidex
+                  key: mongo_connection_string
+            - name: STORE__MONGODB__DATABASE
+              value: "Squidex"
+            - name: STORE__MONGODB__CONTENTDATABASE
+              value: "SquidexContentV2"                       
+            - name: URLS__BASEURL
+              valueFrom:
+                secretKeyRef:
+                  name: squidex-params
+                  key: DOMAIN
+            - name: URLS__ENFORCEHTTPS
+              value: "false"            
       terminationGracePeriodSeconds: 30
