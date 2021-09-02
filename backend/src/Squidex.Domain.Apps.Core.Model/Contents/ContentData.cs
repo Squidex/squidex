@@ -14,11 +14,6 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class ContentData : Dictionary<string, ContentFieldData?>, IEquatable<ContentData>
     {
-        public IEnumerable<KeyValuePair<string, ContentFieldData?>> ValidValues
-        {
-            get => this.Where(x => x.Value != null);
-        }
-
         public ContentData()
             : base(StringComparer.Ordinal)
         {
