@@ -459,7 +459,7 @@
   "dashboard.configSaved": "Configuratie opgeslagen.",
   "dashboard.contentApi": "Content API",
   "dashboard.contentApiDescription": "OpenAPI 3.0-compatibele documentatie voor uw app-inhoud.",
-  "dashboard.contentsSummaryCard": "Aantal items",
+  "dashboard.contentSummaryCard": "Aantal items",
   "dashboard.currentMonthLabel": "Deze maand",
   "dashboard.downloadLog": "Downloadlogboek",
   "dashboard.editConfig": "Configuratie bewerken",
