@@ -140,10 +140,10 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'inspect'">
                         <sqx-content-inspection
-                            [appName]="contentsState.appName"
+                            [content]="content"
                             [language]="language"
                             [languages]="languages"
-                            [content]="content">
+                            [appName]="contentsState.appName">
                         </sqx-content-inspection>
                     </ng-container>
                     <ng-container *ngSwitchCase="'extension'">
@@ -156,11 +156,11 @@
                     <ng-container *ngSwitchDefault>
                         <sqx-content-editor
                             [(language)]="language"
+                            [formContext]="formContext"
                             [contentId]="contentId"
                             [contentForm]="contentForm"
                             [contentFormCompare]="contentFormCompare"
                             [contentVersion]="contentVersion"
-                            [formContext]="formContext"
                             [languages]="languages"
                             [schema]="schema">
                         </sqx-content-editor>
