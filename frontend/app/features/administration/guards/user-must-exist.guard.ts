@@ -9,8 +9,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { UsersState } from '@app/features/administration/internal';
 import { allParams } from '@app/framework';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, map, tap } from 'rxjs';
 
 @Injectable()
 export class UserMustExistGuard implements CanActivate {

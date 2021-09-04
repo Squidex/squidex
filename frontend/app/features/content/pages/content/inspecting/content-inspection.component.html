@@ -1,0 +1,23 @@
+<div class="inner-menu">
+    <ul class="nav nav-tabs2" *ngIf="mode | async; let currentMode">
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="currentMode === 'Content'" (click)="setMode('Content')">
+                {{ 'contents.inspectContent' | sqxTranslate }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="currentMode === 'Data'" (click)="setMode('Data')">
+                {{ 'contents.inspectData' | sqxTranslate }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="currentMode === 'FlatData'" (click)="setMode('FlatData')">
+                {{ 'contents.inspectFlatData' | sqxTranslate }}
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="inner-main">
+    <sqx-code-editor [borderless]="true" [ngModel]="actualData | async" valueMode="Json"></sqx-code-editor>
+</div>

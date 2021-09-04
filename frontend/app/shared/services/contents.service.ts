@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
@@ -165,6 +165,23 @@ export class ContentsService {
             pretifyError('i18n:contents.loadFailed'));
     }
 
+    public getContent(appName: string, schemaName: string, id: string, language?: string): Observable<ContentDto> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+
+        let headers = new HttpHeaders();
+
+        if (language) {
+            headers = headers.set('X-Flatten', '1');
+            headers = headers.set('X-Languages', language);
+        }
+
+        return HTTP.getVersioned(this.http, url, undefined, headers).pipe(
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            pretifyError('i18n:contents.loadContentFailed'));
+    }
+
     public getAllContents(appName: string, q: ContentsByIds | ContentsBySchedule): Observable<ContentsDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
 
@@ -175,16 +192,6 @@ export class ContentsService {
                 return new ContentsDto(statuses, total, contents, _links);
             }),
             pretifyError('i18n:contents.loadFailed'));
-    }
-
-    public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
-
-        return HTTP.getVersioned(this.http, url).pipe(
-            map(({ payload }) => {
-                return parseContent(payload.body);
-            }),
-            pretifyError('i18n:contents.loadContentFailed'));
     }
 
     public getContentReferences(appName: string, schemaName: string, id: string, q?: ContentsByQuery): Observable<ContentsDto> {

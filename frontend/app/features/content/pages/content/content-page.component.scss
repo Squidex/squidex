@@ -8,8 +8,21 @@
 
 .nav-tabs2 {
     @include absolute(auto, auto, 0, 5rem);
+    flex-wrap: nowrap;
 
     a {
         padding-bottom: 1.5rem;
     }
+}
+
+.menu {
+    @include absolute(0, 0, 0);
+    align-items: center;
+    background: white;
+    border-radius: 0;
+    border: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: $panel-padding;
 }

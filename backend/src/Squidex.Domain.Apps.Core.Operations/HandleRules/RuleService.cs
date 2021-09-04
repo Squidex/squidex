@@ -203,10 +203,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     return;
                 }
 
+                var skipReason = SkipReason.None;
+
                 if (!triggerHandler.Trigger(typed, context))
                 {
-                    jobs.Add(JobResult.ConditionDoesNotMatch);
-                    return;
+                    skipReason = SkipReason.ConditionDoesNotMatch;
                 }
 
                 await foreach (var enrichedEvent in triggerHandler.CreateEnrichedEventsAsync(typed, context, ct))
@@ -222,17 +223,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         if (!triggerHandler.Trigger(enrichedEvent, context))
                         {
-                            if (jobs.Count == 0)
-                            {
-                                jobs.Add(JobResult.ConditionDoesNotMatch);
-                            }
-
-                            continue;
+                            skipReason = SkipReason.ConditionDoesNotMatch;
                         }
 
                         var job = await CreateJobAsync(actionHandler, enrichedEvent, context, now);
 
-                        jobs.Add(job);
+                        jobs.Add(job with { SkipReason = skipReason });
                     }
                     catch (Exception ex)
                     {

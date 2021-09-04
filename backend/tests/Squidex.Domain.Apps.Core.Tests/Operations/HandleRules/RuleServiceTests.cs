@@ -411,6 +411,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var context = Rule();
 
+            var enrichedEvent = new EnrichedContentEvent { AppId = appId };
+
             var @event = Envelope.Create(new ContentCreated());
 
             A.CallTo(() => ruleTriggerHandler.Handles(@event.Payload))
@@ -419,12 +421,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Trigger(MatchPayload(@event), context))
                 .Returns(false);
 
-            var (_, _, reason) = await sut.CreateJobsAsync(@event, context).SingleAsync();
+            A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(@event), context, default))
+                .Returns(new List<EnrichedEvent> { enrichedEvent }.ToAsyncEnumerable());
+
+            var (job, _, reason) = await sut.CreateJobsAsync(@event, context).SingleAsync();
 
             Assert.Equal(SkipReason.ConditionDoesNotMatch, reason);
-
-            A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(A<Envelope<AppEvent>>._, A<RuleContext>._, default))
-                .MustNotHaveHappened();
+            Assert.NotNull(job);
         }
 
         [Fact]
