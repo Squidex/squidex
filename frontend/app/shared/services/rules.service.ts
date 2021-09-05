@@ -377,14 +377,14 @@ export class RulesService {
             pretifyError('i18n:rules.ruleEvents.enqueueFailed'));
     }
 
-    public cancelEvent(appName: string, resource: Resource): Observable<any> {
-        const link = resource._links['delete'];
+    public cancelEvents(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['cancel'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url).pipe(
             tap(() => {
-                this.analytics.trackEvent('Rule', 'EventDequeued', appName);
+                this.analytics.trackEvent('Rule', 'EventsCancelled', appName);
             }),
             pretifyError('i18n:rules.ruleEvents.cancelFailed'));
     }
