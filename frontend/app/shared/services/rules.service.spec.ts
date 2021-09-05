@@ -416,6 +416,8 @@ describe('RulesService', () => {
 
         return {
             eventName: `name${key}`,
+            event: { value: 'simple' },
+            enrichedEvent: { value: 'enriched' },
             actionName: `action-name${key}`,
             actionData: `action-data${key}`,
             error: `error${key}`,
@@ -479,6 +481,8 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
 
     return new SimulatedRuleEventDto({},
         `name${key}`,
+        { value: 'simple' },
+        { value: 'enriched' },
         `action-name${key}`,
         `action-data${key}`,
         `error${key}`,

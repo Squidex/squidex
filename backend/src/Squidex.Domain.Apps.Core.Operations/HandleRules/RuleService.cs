@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 catch (Exception ex)
                 {
-                    job = new JobResult(null, ex);
+                    job = JobResult.Failed(ex);
                 }
 
                 yield return job;
@@ -144,7 +144,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        private async Task AddJobsAsync(List<JobResult> jobs, Envelope<IEvent> @event, RuleContext context, CancellationToken ct)
+        private async Task AddJobsAsync(List<JobResult> jobs, Envelope<IEvent> @event, RuleContext context,
+            CancellationToken ct)
         {
             try
             {
@@ -234,7 +235,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     {
                         if (jobs.Count == 0)
                         {
-                            jobs.Add(new JobResult(null, ex, SkipReason.Failed));
+                            jobs.Add(new JobResult
+                            {
+                                EnrichedEvent = enrichedEvent,
+                                Exception = ex,
+                                SkipReason = SkipReason.Failed
+                            });
                         }
 
                         log.LogError(ex, w => w
@@ -245,7 +251,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
             catch (Exception ex)
             {
-                jobs.Add(new JobResult(null, ex, SkipReason.Failed));
+                jobs.Add(JobResult.Failed(ex));
 
                 log.LogError(ex, w => w
                     .WriteProperty("action", "createRuleJob")
@@ -282,13 +288,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 job.ActionName = actionName;
                 job.Description = description;
 
-                return new JobResult(job, null);
+                return new JobResult { Job = job, EnrichedEvent = enrichedEvent };
             }
             catch (Exception ex)
             {
                 job.Description = "Failed to create job";
 
-                return new JobResult(job, ex);
+                return JobResult.Failed(ex, enrichedEvent, job);
             }
         }
 

@@ -7,16 +7,22 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
-    public sealed record SimulatedRuleEvent(
-        string EventName,
-        string? ActionName,
-        string? ActionData,
-        string? Error,
-        SkipReason SkipReason)
+    public sealed record SimulatedRuleEvent
     {
+        public string EventName { get; init; }
+
+        public object Event { get; init; }
+
+        public object? EnrichedEvent { get; init; }
+
+        public string? ActionName { get; init; }
+
+        public string? ActionData { get; init; }
+
+        public string? Error { get; init; }
+
+        public SkipReason SkipReason { get; init; }
     }
 }

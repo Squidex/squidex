@@ -199,6 +199,8 @@ export class SimulatedRuleEventDto {
 
     constructor(links: ResourceLinks,
         public readonly eventName: string,
+        public readonly event: any,
+        public readonly enrichedEvent: any | undefined,
         public readonly actionName: string | undefined,
         public readonly actionData: string | undefined,
         public readonly error: string | undefined,
@@ -451,6 +453,8 @@ function parseRuleEvent(response: any) {
 function parseSimulatedRuleEvent(response: any) {
     return new SimulatedRuleEventDto(response._links,
         response.eventName,
+        response.event,
+        response.enrichedEvent,
         response.actionName,
         response.actionData,
         response.error,
