@@ -1,6 +1,6 @@
 <sqx-title message="i18n:rules.ruleSimulator.listPageTitle"></sqx-title>
 
-<sqx-layout layout="simple" titleText="i18n:rules.simulator" [width]="50">    
+<sqx-layout layout="main" titleText="i18n:rules.simulator" [width]="50" [hideSidebar]="true">    
     <ng-container menu>
         <button type="button" class="btn btn-text-secondary" (click)="simulate()" title="i18n:rules.simulateTooltip">
             <i class="icon-play-line"></i> {{ 'rules.simulate' | sqxTranslate }}

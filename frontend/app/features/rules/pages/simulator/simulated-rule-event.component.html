@@ -9,7 +9,7 @@
         <small class="truncate">{{event.skipReason}}</small>
     </td>
     <td class="cell-actions">
-        <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" [disabled]="!event.error && !event.actionData" (click)="expandedChange.emit()">
+        <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()">
             <i class="icon-settings"></i>
         </button>
     </td>
@@ -20,17 +20,72 @@
             <h4>{{ 'common.details' | sqxTranslate }}</h4>
         </div>
 
-        <div class="row event-dump">
-            <div class="form-group" *ngIf="event.actionData">
-                <label>{{ 'rules.actionData' | sqxTranslate }}</label>
-                    
-                <sqx-code-editor [ngModel]="data" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
-            </div>
+        <div class="event-dump">
+            <div class="history">
+                <div class="history-start"></div>
+
+                <div>    
+                    <div class="history-transition">
+                        {{ 'rules.simulation.eventQueried' | sqxTranslate }}
+                    </div>
+
+                    <div class="history-state" *ngIf="event.event">
+                        <label>{{ 'common.event' | sqxTranslate }}</label>
+                            
+                        <sqx-code-editor [ngModel]="event.event" valueMode="Json" [disabled]="true" [wordWrap]="false" height="auto" [maxLines]="20"></sqx-code-editor>
+                    </div>
+
+                    <ng-container *ngIf="event.enrichedEvent; else error1">
+                        <div class="history-transition">
+                            {{ 'rules.simulation.eventEnriched' | sqxTranslate }}
+                        </div>
         
-            <div class="form-group" *ngIf="event.error">
-                <label>{{ 'common.error' | sqxTranslate }}</label>
+                        <div class="history-state" *ngIf="event.enrichedEvent">
+                            <label>{{ 'rules.enrichedEvent' | sqxTranslate }}</label>
+                                
+                            <sqx-code-editor [ngModel]="event.enrichedEvent" valueMode="Json" [disabled]="true" [wordWrap]="false" height="auto" [maxLines]="20"></sqx-code-editor>
+                        </div>
+        
+                        <ng-container *ngIf="event.enrichedEvent; else error2">
+                            <div class="history-transition">
+                                {{ 'rules.simulation.conditionEvaluated' | sqxTranslate }}
+                            </div>
+                            
+                            <div class="history-transition">
+                                {{ 'rules.simulation.actionCreated' | sqxTranslate }}
+                            </div>
+            
+                            <div class="history-state" *ngIf="event.actionData">
+                                <label>{{ 'rules.actionData' | sqxTranslate }}</label>
+                                    
+                                <sqx-code-editor [ngModel]="data" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
+                            </div>
+                            
+                            <div class="history-transition">
+                                {{ 'rules.simulation.actionExecuted' | sqxTranslate }}
+                            </div>
+                        </ng-container>
+                        <ng-template #error2>
+                            <div class="history-transition text-danger">
+                                {{ errorText | sqxTranslate }}
+                            </div>
+                        </ng-template>
+                    </ng-container>
+
+                    <ng-template #error1>
+                        <div class="history-transition text-danger">
+                            {{ errorText | sqxTranslate }}
+                        </div>
+                    </ng-template>
                 
-                <sqx-code-editor [ngModel]="event.error" [disabled]="true" [wordWrap]="true" height="auto"></sqx-code-editor>
+                    <div class="history-state" *ngIf="event.error">
+                        <label>{{ 'common.error' | sqxTranslate }}</label>
+                        
+                        <sqx-code-editor [ngModel]="event.error" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
+                    </div>
+                </div>
+
+                <div class="history-end"></div>
             </div>
         </div>
     </td>

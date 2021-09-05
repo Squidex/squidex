@@ -50,6 +50,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public valueMode: 'String' | 'Json' = 'String';
 
     @Input()
+    public maxLines: number | undefined;
+
+    @Input()
     public wordWrap: boolean;
 
     @Input()
@@ -80,7 +83,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             this.setMode();
         }
 
-        if (changes['height']) {
+        if (changes['height'] || changes['maxLines']) {
             this.setHeight();
         }
 
@@ -246,7 +249,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
             } else if (this.height === 'auto') {
                 this.aceEditor.setOptions({
                     minLines: 3,
-                    maxLines: 500,
+                    maxLines: this.maxLines || 500,
                 });
             }
         }
