@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -217,22 +217,22 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             var errors = 0;
 
-            await foreach (var (job, ex, _) in ruleService.CreateSnapshotJobsAsync(context, ct))
+            await foreach (var job in ruleService.CreateSnapshotJobsAsync(context, ct))
             {
-                if (job != null)
+                if (job.Job != null)
                 {
-                    await ruleEventRepository.EnqueueAsync(job, ex);
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.Exception);
                 }
-                else if (ex != null)
+                else if (job.Exception != null)
                 {
                     errors++;
 
                     if (errors >= MaxErrors)
                     {
-                        throw ex;
+                        throw job.Exception;
                     }
 
-                    log.LogWarning(ex, w => w
+                    log.LogWarning(job.Exception, w => w
                         .WriteProperty("action", "runRule")
                         .WriteProperty("status", "failedPartially"));
                 }
@@ -255,11 +255,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     {
                         var jobs = ruleService.CreateJobsAsync(@event, context, ct);
 
-                        await foreach (var (job, ex, _) in jobs)
+                        await foreach (var job in jobs)
                         {
-                            if (job != null)
+                            if (job.Job != null)
                             {
-                                await ruleEventRepository.EnqueueAsync(job, ex);
+                                await ruleEventRepository.EnqueueAsync(job.Job, job.Exception);
                             }
                         }
                     }

@@ -36,3 +36,67 @@ td {
         }
     }
 }
+
+$history-dot-size: 10px;
+$history-dot-offset-x: -($history-dot-size * .5 + 1px);
+$history-dot-sm-size: 6px;
+$history-dot-sm-offset-x: -($history-dot-sm-size * .5 + 1px);
+
+.history {
+    border-left: 2px dashed $color-border;
+    margin: .5rem 0;
+    padding: .5rem 1.5rem;
+    padding-right: 0;
+    position: relative;
+
+    &-state {
+        position: relative;
+
+        &::before {
+            @include circle($history-dot-size);
+            @include absolute(.5rem, null, null, -1.5rem);
+            background: $color-border;
+            content: '';
+            margin: 0;
+            margin-left: $history-dot-offset-x;
+        }
+    }
+
+    &-transition {
+        font-size: 85%;
+        font-weight: normal;
+        margin: 1rem 0;
+        position: relative;
+
+        &::before {
+            @include circle($history-dot-sm-size);
+            @include absolute(.5rem, null, null, -1.5rem);
+            background: $color-border;
+            content: '';
+            margin: 0;
+            margin-left: $history-dot-sm-offset-x;
+        }
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    &-start,
+    &-end {
+        @include circle($history-dot-size);
+        background: $color-border;
+    }
+
+    &-start {
+        @include absolute(-$history-dot-size * .5, null, null, $history-dot-offset-x);
+    }
+
+    &-end {
+        @include absolute(null, null, -$history-dot-size * .5, $history-dot-offset-x);
+    }
+}
