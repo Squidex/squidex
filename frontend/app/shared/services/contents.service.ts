@@ -232,8 +232,8 @@ export class ContentsService {
             pretifyError('i18n:contents.loadDataFailed'));
     }
 
-    public postContent(appName: string, schemaName: string, data: any, publish: boolean, id?: string): Observable<ContentDto> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}&id=${id}`);
+    public postContent(appName: string, schemaName: string, data: any, publish: boolean, id = ''): Observable<ContentDto> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}&id=${id ?? ''}`);
 
         return HTTP.postVersioned(this.http, url, data).pipe(
             map(({ payload }) => {

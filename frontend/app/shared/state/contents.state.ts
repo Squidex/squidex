@@ -219,7 +219,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(data: any, publish: boolean, id?: string): Observable<ContentDto> {
+    public create(data: any, publish: boolean, id = ''): Observable<ContentDto> {
         return this.contentsService.postContent(this.appName, this.schemaName, data, publish, id).pipe(
             tap(payload => {
                 this.dialogs.notifyInfo('i18n:contents.created');
