@@ -47,9 +47,17 @@
                         </div>
         
                         <ng-container *ngIf="event.enrichedEvent; else error2">
-                            <div class="history-transition">
-                                {{ 'rules.simulation.conditionEvaluated' | sqxTranslate }}
-                            </div>
+                            <ng-container *ngIf="event.skipReason == 'ConditionDoesNotMatch'"; else valid>
+                                <div class="history-transition text-danger">
+                                    {{ 'rules.simulation.errorConditionDoesNotMatch' | sqxTranslate }}
+                                </div>
+                            </ng-container>
+
+                            <ng-template #valid>
+                                <div class="history-transition">
+                                    {{ 'rules.simulation.conditionEvaluated' | sqxTranslate }}
+                                </div>
+                            </ng-template>
                             
                             <div class="history-transition">
                                 {{ 'rules.simulation.actionCreated' | sqxTranslate }}
