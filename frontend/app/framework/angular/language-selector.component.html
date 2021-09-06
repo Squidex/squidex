@@ -14,7 +14,7 @@
             <table>
                 <tbody>
                     <tr class="dropdown-item" *ngFor="let supported of languages; trackBy: trackByLanguage" [class.active]="supported === language" (click)="selectLanguage(supported)">
-                        <td><strong class="iso-code iso-code-dropdown">{{supported.iso2Code}}</strong></td>
+                        <td><strong class="iso-code">{{supported.iso2Code}}</strong></td>
                         <td>({{supported.englishName}})</td>
                     </tr>
                 </tbody>
