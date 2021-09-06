@@ -296,7 +296,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = await sut.CreateJobsAsync(@event, Rule()).SingleAsync();
 
-            Assert.Equal(SkipReason.EventMismatch, result.SkipReason);
+            Assert.Equal(SkipReason.WrongEvent, result.SkipReason);
 
             A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, A<RuleContext>._))
                 .MustNotHaveHappened();

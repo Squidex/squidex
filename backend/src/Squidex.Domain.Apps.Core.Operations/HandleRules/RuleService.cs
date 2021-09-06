@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 if (@event.Payload is not AppEvent)
                 {
-                    jobs.Add(JobResult.EventMismatch);
+                    jobs.Add(JobResult.WrongEvent);
                     return;
                 }
 

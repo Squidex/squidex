@@ -23,9 +23,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             SkipReason = SkipReason.Disabled
         };
 
-        public static readonly JobResult EventMismatch = new JobResult
+        public static readonly JobResult WrongEvent = new JobResult
         {
-            SkipReason = SkipReason.EventMismatch
+            SkipReason = SkipReason.WrongEvent
         };
 
         public static readonly JobResult FromRule = new JobResult
