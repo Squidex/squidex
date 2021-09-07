@@ -23,8 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(OpenIdClaims.ClientId, "1"));
 
-            Assert.Equal("1", GetValue(identity, "user.id"));
-            Assert.Equal(true, GetValue(identity, "user.isClient"));
+            AssetUser(identity, "1", true, false);
         }
 
         [Fact]
@@ -33,9 +32,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var identity = new ClaimsIdentity();
 
             identity.AddClaim(new Claim(OpenIdClaims.Subject, "2"));
+            identity.AddClaim(new Claim(OpenIdClaims.Name, "user"));
 
-            Assert.Equal("2", GetValue(identity, "user.id"));
-            Assert.Equal(false, GetValue(identity, "user.isClient"));
+            AssetUser(identity, "2", false, true);
         }
 
         [Fact]
@@ -80,6 +79,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             Assert.Equal(new[] { "1a", "1b" }, GetValue(identity, "user.claims.claim1"));
             Assert.Equal(new[] { "2a", "2b" }, GetValue(identity, "user.claims.claim2"));
+        }
+
+        private static void AssetUser(ClaimsIdentity identity, string id, bool isClient, bool isUser)
+        {
+            Assert.Equal(id, GetValue(identity, "user.id"));
+            Assert.Equal(isUser, GetValue(identity, "user.isUser"));
+            Assert.Equal(isClient, GetValue(identity, "user.isClient"));
         }
 
         private static object GetValue(ClaimsIdentity identity, string script)

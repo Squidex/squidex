@@ -10,7 +10,6 @@ using NJsonSchema;
 using NSwag;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Shared;
 using Squidex.Web;
 

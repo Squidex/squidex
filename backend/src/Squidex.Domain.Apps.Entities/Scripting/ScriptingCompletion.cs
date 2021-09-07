@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Scripting
 
         public IReadOnlyList<ScriptingValue> Asset()
         {
-            AddObject("ctx", "The context object holding all values.", () =>
+            AddObject("ctx", FieldDescriptions.Context, () =>
             {
                 AddShared();
 
