@@ -29,10 +29,13 @@ pipeline {
       steps {
           script {
             git branch:'5.6_homer', credentialsId: 'jenkins-aws-user', url: 'https://github.com/LearnWithHomer/squidex'
-            if (params.namespace == "content-v1"){
+            if (params.namespace == "content-v1") {
               full_image_name = "${upstream_image_name}:${upstream_image_tag}"
             }
-            full_image_name = "${homer_image_name}:${tag}"
+            else {
+              // For V2
+              full_image_name = "${homer_image_name}:${tag}"
+            }
             cluster = params.cluster
             namespace = params.namespace
             helm_data_file = "${cluster}/${namespace}.yaml"
