@@ -858,7 +858,7 @@
   "tour.step3Text": "内容是您的应用程序中按Schemas分组的实际数据。\n\n首先选择一个已发布的Schemas，然后为此Schemas添加内容。",
   "tour.step4Next": "知道了！",
   "tour.step4Text": "资源包含所有也可以链接到您的内容的文件。例如图像、视频或文档。\n\n您可以在此处上传资源供以后使用，也可以在创建时直接上传带有资源字段的新内容项。",
-  "tour.step5Text": "但这还不是我们可以提供的全部支持。\n\n您可以访问 https://docs.squidex.io/> 阅读更多信息。\n\n您想加入我们的社区吗？ ？",
+  "tour.step5Text": "但这还不是我们可以提供的全部支持。\n\n您可以访问 https://docs.squidex.io 阅读更多信息。\n\n您想加入我们的社区吗？ ？",
   "tour.step5Title": "太棒了，现在你知道基础了！",
   "tour.tooltipConfirm": "知道了",
   "tour.tooltipStop": "停止游览",

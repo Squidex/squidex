@@ -951,7 +951,7 @@
   "tour.step3Text": "Content is the actual data in your app which is grouped by the schema.\n\nSelect a published schema first, then add content for this schema.",
   "tour.step4Next": "Got It!",
   "tour.step4Text": "The assets contains all files that can also be linked to your content. For example images, videos or documents.\n\nYou can upload the assets here and use them later or also upload them directly when you create a new content item with an asset field.",
-  "tour.step5Text": "But that's not all of the support we can provide.\n\nYou can got to https://docs.squidex.io/> to read more.\n\nDo you want to join our community?",
+  "tour.step5Text": "But that's not all of the support we can provide.\n\nYou can got to https://docs.squidex.io to read more.\n\nDo you want to join our community?",
   "tour.step5Title": "Awesome, now you know the basics!",
   "tour.tooltipConfirm": "Got It",
   "tour.tooltipStop": "Stop Tour",
