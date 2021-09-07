@@ -140,7 +140,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
 
         const assetFolders$ =
             query.parentId ?
-                this.assetsService.getAssetFolders(this.appName, this.snapshot.parentId) :
+                this.assetsService.getAssetFolders(this.appName, this.snapshot.parentId, 'PathAndItems') :
                 of(EMPTY_FOLDERS);
 
         const tags$ =

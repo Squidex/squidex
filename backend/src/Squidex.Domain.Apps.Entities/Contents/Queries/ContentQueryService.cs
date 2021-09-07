@@ -23,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public sealed class ContentQueryService : IContentQueryService
     {
+        private const string SingletonId = "_schemaId_";
         private static readonly IResultList<IEnrichedContentEntity> EmptyContents = ResultList.CreateFrom<IEnrichedContentEntity>(0);
         private readonly IAppProvider appProvider;
         private readonly IContentEnricher contentEnricher;
@@ -57,6 +58,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
                 IContentEntity? content;
+
+                if (id.ToString().Equals(SingletonId))
+                {
+                    id = schema.Id;
+                }
 
                 if (version > EtagVersion.Empty)
                 {

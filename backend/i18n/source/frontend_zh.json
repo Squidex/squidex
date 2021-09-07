@@ -509,7 +509,7 @@
   "dashboard.configSaved": "配置已保存。",
   "dashboard.contentApi": "内容 API",
   "dashboard.contentApiDescription": "适用于您的应用内容的 OpenAPI 3.0 兼容文档。",
-  "dashboard.contentsSummaryCard": "项目数量",
+  "dashboard.contentSummaryCard": "项目数量",
   "dashboard.currentMonthLabel": "本月",
   "dashboard.downloadLog": "下载日志",
   "dashboard.editConfig": "编辑配置",

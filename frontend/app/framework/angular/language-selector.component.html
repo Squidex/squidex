@@ -11,9 +11,14 @@
 
     <ng-container *sqxModal="dropdown;closeAlways:true">
         <div class="dropdown-menu" [sqxAnchoredTo]="button" @fade>
-            <div class="dropdown-item" *ngFor="let supported of languages; trackBy: trackByLanguage" [class.active]="supported === language" (click)="selectLanguage(supported)">
-                <strong class="iso-code iso-code-dropdown">{{supported.iso2Code}}</strong> ({{supported.englishName}})
-            </div>
+            <table>
+                <tbody>
+                    <tr class="dropdown-item" *ngFor="let supported of languages; trackBy: trackByLanguage" [class.active]="supported === language" (click)="selectLanguage(supported)">
+                        <td><strong class="iso-code">{{supported.iso2Code}}</strong></td>
+                        <td>({{supported.englishName}})</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </ng-container>
 </ng-container>

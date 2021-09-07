@@ -33,6 +33,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public contentTab = this.route.queryParams.pipe(map(x => x['tab'] || 'editor'));
     public content?: ContentDto | null;
+    public contentId = '';
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
@@ -180,7 +181,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     return;
                 }
 
-                this.contentsState.create(value, publish)
+                this.contentsState.create(value, publish, this.contentId)
                     .subscribe({
                         next: content => {
                             this.contentForm.submitCompleted({ noReset: true });
@@ -217,6 +218,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 this.back();
             });
         }
+    }
+
+    public setContentId(id: string) {
+        this.contentId = id;
     }
 
     public checkPendingChangesBeforePreview() {

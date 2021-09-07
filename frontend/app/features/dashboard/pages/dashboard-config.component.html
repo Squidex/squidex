@@ -5,12 +5,12 @@
     
     <ng-container *sqxModal="dropdownModal">
         <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
-            <div class="dropdown-item" *ngFor="let item of configDefaults">
+            <div class="dropdown-item" *ngFor="let item of configOptions">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="field_{{item.type}}" [ngModel]="isSelected(item)" (ngModelChange)="addOrRemove(item)">
     
                     <label class="form-check-label" for="field_{{item.type}}">
-                        {{item.name | sqxTranslate}}
+                        {{item.name}}
                     </label>
                 </div>
             </div>

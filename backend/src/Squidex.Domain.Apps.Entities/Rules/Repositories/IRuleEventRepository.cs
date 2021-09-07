@@ -44,7 +44,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 
         Task EnqueueAsync(DomainId id, Instant nextAttempt);
 
-        Task CancelAsync(DomainId id);
+        Task CancelByEventAsync(DomainId eventId);
+
+        Task CancelByRuleAsync(DomainId ruleId);
+
+        Task CancelByAppAsync(DomainId appId);
 
         Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default);
 

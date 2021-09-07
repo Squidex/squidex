@@ -343,17 +343,17 @@ describe('RulesService', () => {
             req.flush({});
         }));
 
-    it('should make delete request to cancel rule event',
+    it('should make delete request to cancel all rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    delete: { method: 'DELETE', href: '/api/apps/my-app/rules/events/123' },
+                    cancel: { method: 'DELETE', href: '/api/apps/my-app/rules/events' },
                 },
             };
 
-            rulesService.cancelEvent('my-app', resource).subscribe();
+            rulesService.cancelEvents('my-app', resource).subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events/123');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events');
 
             expect(req.request.method).toEqual('DELETE');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -416,6 +416,8 @@ describe('RulesService', () => {
 
         return {
             eventName: `name${key}`,
+            event: { value: 'simple' },
+            enrichedEvent: { value: 'enriched' },
             actionName: `action-name${key}`,
             actionData: `action-data${key}`,
             error: `error${key}`,
@@ -479,6 +481,8 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
 
     return new SimulatedRuleEventDto({},
         `name${key}`,
+        { value: 'simple' },
+        { value: 'enriched' },
         `action-name${key}`,
         `action-data${key}`,
         `error${key}`,

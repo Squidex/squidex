@@ -9,8 +9,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -20,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// An optional query to identify the content to update.
         /// </summary>
-        public Query<IJsonValue>? Query { get; set; }
+        public JsonQueryDto? Query { get; set; }
 
         /// <summary>
         /// An optional id of the content to update.

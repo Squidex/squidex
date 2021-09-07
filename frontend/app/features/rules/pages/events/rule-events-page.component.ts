@@ -51,6 +51,10 @@ export class RuleEventsPageComponent extends ResourceOwner implements OnInit {
         this.ruleEventsState.enqueue(event);
     }
 
+    public cancelAll() {
+        this.ruleEventsState.cancelAll();
+    }
+
     public cancel(event: RuleEventDto) {
         this.ruleEventsState.cancel(event);
     }

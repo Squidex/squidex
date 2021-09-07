@@ -14,6 +14,7 @@ export * from './pages/content/editor/content-editor.component';
 export * from './pages/content/editor/content-field.component';
 export * from './pages/content/editor/content-section.component';
 export * from './pages/content/editor/field-languages.component';
+export * from './pages/content/inspecting/content-inspection.component';
 export * from './pages/content/references/content-references.component';
 export * from './pages/contents/contents-filters-page.component';
 export * from './pages/contents/contents-page.component';

@@ -23,14 +23,19 @@ gridster-item {
     gridster {
         background: none;
     }
-    /* stylelint-enable */
 
     gridster-item {
         background: none;
         border: 0;
         border-radius: 0;
         overflow: visible;
+
+        &.gridster-item-moving,
+        &.gridster-item-resizing {
+            box-shadow: none;
+        }
     }
+    /* stylelint-enable */
 }
 
 .btn {
@@ -50,8 +55,6 @@ gridster-item {
 
     .card {
         @include absolute(0, 0, 0, 0);
-        margin-bottom: .5rem;
-        margin-right: .5rem;
 
         &-image {
             text-align: center;

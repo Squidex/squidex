@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {
@@ -119,7 +120,10 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateStringMap<Status>(),
 
                 CreateObjectMap<JsonObject>(),
-                CreateObjectMap<AssetMetadata>()
+                CreateObjectMap<AssetMetadata>(),
+
+                CreateAnyMap<IJsonValue>(),
+                CreateAnyMap<FilterNode<IJsonValue>>()
             };
 
             settings.SchemaType = SchemaType.OpenApi3;
@@ -147,6 +151,14 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 schema.Type = JsonObjectType.String;
 
                 schema.Format = format;
+            });
+        }
+
+        private static ITypeMapper CreateAnyMap<T>()
+        {
+            return new PrimitiveTypeMapper(typeof(T), schema =>
+            {
+                schema.Type = JsonObjectType.None;
             });
         }
     }

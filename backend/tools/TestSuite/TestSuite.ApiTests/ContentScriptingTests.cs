@@ -29,7 +29,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_use_creating_and_query_tests()
         {
-            var schemaName = $"schema-{DateTime.UtcNow.Ticks}";
+            var schemaName = $"schema-{Guid.NewGuid()}";
 
             // STEP 1: Create a schema.
             await TestEntity.CreateSchemaAsync(_.Schemas, _.AppName, schemaName);

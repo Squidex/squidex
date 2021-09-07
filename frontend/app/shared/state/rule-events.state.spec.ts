@@ -111,13 +111,24 @@ describe('RuleEventsState', () => {
     });
 
     it('should call service if cancelling event', () => {
-        rulesService.setup(x => x.cancelEvent(app, oldRuleEvents[0]))
+        rulesService.setup(x => x.cancelEvents(app, oldRuleEvents[0]))
             .returns(() => of({}));
 
         ruleEventsState.cancel(oldRuleEvents[0]).subscribe();
 
         expect().nothing();
 
-        rulesService.verify(x => x.cancelEvent(app, oldRuleEvents[0]), Times.once());
+        rulesService.verify(x => x.cancelEvents(app, oldRuleEvents[0]), Times.once());
+    });
+
+    it('should call service if cancelling all events', () => {
+        rulesService.setup(x => x.cancelEvents(app, It.isAny()))
+            .returns(() => of({}));
+
+        ruleEventsState.cancelAll().subscribe();
+
+        expect().nothing();
+
+        rulesService.verify(x => x.cancelEvents(app, It.isAny()), Times.once());
     });
 });

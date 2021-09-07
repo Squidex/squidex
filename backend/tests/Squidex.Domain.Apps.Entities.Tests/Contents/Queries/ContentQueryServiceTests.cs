@@ -137,6 +137,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.Null(await sut.FindAsync(requestContext, schemaId.Name, content.Id));
         }
 
+        [Fact]
+        public async Task Should_return_content_by_special_id()
+        {
+            var requestContext = CreateContext();
+
+            var content = CreateContent(DomainId.NewGuid());
+
+            A.CallTo(() => contentRepository.FindContentAsync(requestContext.App, schema, schema.Id, SearchScope.Published, A<CancellationToken>._))
+                .Returns(content);
+
+            var result = await sut.FindAsync(requestContext, schemaId.Name, DomainId.Create("_schemaId_"));
+
+            AssertContent(content, result);
+        }
+
         [Theory]
         [InlineData(1, 0, SearchScope.All)]
         [InlineData(1, 1, SearchScope.All)]

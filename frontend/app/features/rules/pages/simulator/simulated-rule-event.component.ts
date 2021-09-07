@@ -38,6 +38,10 @@ export class SimulatedRuleEventComponent {
         return result;
     }
 
+    public get errorText() {
+        return `rules.simulation.error${this.event.skipReason}`;
+    }
+
     public get status() {
         if (this.event.error) {
             return 'Failed';

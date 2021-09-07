@@ -26,11 +26,8 @@
                     <ng-container *ngSwitchCase="'api-calls'">
                         <sqx-api-calls-card [app]="app" [usage]="callsUsage"></sqx-api-calls-card>
                     </ng-container>
-                    <ng-container *ngSwitchCase="'api-performance'">
-                        <sqx-api-performance-card [app]="app" [usage]="callsUsage"
-                            [isStacked]="isStacked"
-                            (isStackedChange)="changeIsStacked($event)">
-                        </sqx-api-performance-card>
+                    <ng-container *ngSwitchCase="'api-traffic-summary'">                
+                        <sqx-api-traffic-summary-card [app]="app" [usage]="callsUsage"></sqx-api-traffic-summary-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'api-calls-summary'">
                         <sqx-api-calls-summary-card [app]="app" [usage]="callsUsage"></sqx-api-calls-summary-card>
@@ -50,8 +47,17 @@
                             (isStackedChange)="changeIsStacked($event)">
                         </sqx-api-traffic-card>
                     </ng-container>
-                    <ng-container *ngSwitchCase="'api-traffic-summary'">                
-                        <sqx-api-traffic-summary-card [app]="app" [usage]="callsUsage"></sqx-api-traffic-summary-card>
+                    <ng-container *ngSwitchCase="'api-performance'">
+                        <sqx-api-performance-card [app]="app" [usage]="callsUsage"
+                            [isStacked]="isStacked"
+                            (isStackedChange)="changeIsStacked($event)">
+                        </sqx-api-performance-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'random-dog'">
+                        <sqx-random-dog-card></sqx-random-dog-card>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'random-cat'">
+                        <sqx-random-cat-card></sqx-random-cat-card>
                     </ng-container>
                     <ng-container *ngSwitchCase="'history'">
                         <sqx-history-card [app]="app"></sqx-history-card>

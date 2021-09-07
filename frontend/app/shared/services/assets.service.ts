@@ -135,6 +135,7 @@ export class AssetFolderDto {
 
 type Tags = readonly string[];
 
+type AssetFolderScope = 'PathAndItems' | 'Path' | 'Items';
 type AssetMetadata = { [key: string]: any };
 
 export type AnnotateAssetDto =
@@ -247,8 +248,8 @@ export class AssetsService {
         }
     }
 
-    public getAssetFolders(appName: string, parentId: string): Observable<AssetFoldersDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}`);
+    public getAssetFolders(appName: string, parentId: string, scope: AssetFolderScope): Observable<AssetFoldersDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}&scope=${scope}`);
 
         return this.http.get<{ total: number; items: any[]; folders: any[]; path: any[] } & Resource>(url).pipe(
             map(({ total, items, path, _links }) => {

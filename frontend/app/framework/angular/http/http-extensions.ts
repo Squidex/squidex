@@ -14,43 +14,49 @@ import { catchError, map } from 'rxjs/operators';
 
 export module HTTP {
     export function upload<T = any>(http: HttpClient, method: string, url: string, file: Blob, version?: Version): Observable<HttpEvent<T>> {
-        const req = new HttpRequest(method, url, getFormData(file), { headers: createHeaders(version), reportProgress: true });
+        const req = new HttpRequest(method, url, getFormData(file), { headers: createHeaders(version, undefined), reportProgress: true });
 
         return http.request<T>(req);
     }
 
-    export function getVersioned<T = any>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
-        const headers = createHeaders(version);
+    export function getVersioned<T = any>(http: HttpClient, url: string,
+        version?: Version, customHeaders?: HttpHeaders): Observable<Versioned<HttpResponse<T>>> {
+        const headers = createHeaders(version, customHeaders);
 
         return handleVersion(http.get<T>(url, { observe: 'response', headers }));
     }
 
-    export function postVersioned<T = any>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
-        const headers = createHeaders(version);
+    export function postVersioned<T = any>(http: HttpClient, url: string, body: any,
+        version?: Version, customHeaders?: HttpHeaders): Observable<Versioned<HttpResponse<T>>> {
+        const headers = createHeaders(version, customHeaders);
 
         return handleVersion(http.post<T>(url, body, { observe: 'response', headers }));
     }
 
-    export function putVersioned<T = any>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
-        const headers = createHeaders(version);
+    export function putVersioned<T = any>(http: HttpClient, url: string, body: any,
+        version?: Version, customHeaders?: HttpHeaders): Observable<Versioned<HttpResponse<T>>> {
+        const headers = createHeaders(version, customHeaders);
 
         return handleVersion(http.put<T>(url, body, { observe: 'response', headers }));
     }
 
-    export function patchVersioned<T = any>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
-        const headers = createHeaders(version);
+    export function patchVersioned<T = any>(http: HttpClient, url: string, body: any,
+        version?: Version, customHeaders?: HttpHeaders): Observable<Versioned<HttpResponse<T>>> {
+        const headers = createHeaders(version, customHeaders);
 
         return handleVersion(http.request<T>('PATCH', url, { body, observe: 'response', headers }));
     }
 
-    export function deleteVersioned<T = any>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
-        const headers = createHeaders(version);
+    export function deleteVersioned<T = any>(http: HttpClient, url: string,
+        version?: Version, customHeaders?: HttpHeaders): Observable<Versioned<HttpResponse<T>>> {
+        const headers = createHeaders(version, customHeaders);
 
         return handleVersion(http.delete<T>(url, { observe: 'response', headers }));
     }
 
-    export function requestVersioned<T = any>(http: HttpClient, method: string, url: string, version?: Version, body?: any): Observable<Versioned<HttpResponse<T>>> {
-        const headers = createHeaders(version);
+    export function requestVersioned<T = any>(http: HttpClient, method: string, url: string,
+        version?: Version, body?: any, customHeaders?: HttpHeaders): Observable<Versioned<HttpResponse<T>>> {
+        const headers = createHeaders(version, customHeaders);
 
         return handleVersion(http.request<T>(method, url, { observe: 'response', headers, body }));
     }
@@ -63,12 +69,14 @@ export module HTTP {
         return formData;
     }
 
-    function createHeaders(version?: Version): HttpHeaders {
+    function createHeaders(version: Version | undefined, customHeaders: HttpHeaders | undefined): HttpHeaders {
+        customHeaders ||= new HttpHeaders();
+
         if (version && version.value && version.value.length > 0) {
-            return new HttpHeaders().set('If-Match', version.value);
-        } else {
-            return new HttpHeaders();
+            return customHeaders.set('If-Match', version.value);
         }
+
+        return customHeaders;
     }
 
     function handleVersion<T>(httpRequest: Observable<HttpResponse<T>>): Observable<Versioned<HttpResponse<T>>> {

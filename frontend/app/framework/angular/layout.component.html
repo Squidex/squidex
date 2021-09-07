@@ -55,7 +55,7 @@
     <ng-container *ngIf="layout === 'main'">
         <div class="panel2-slice main">
             <div class="panel2-header main" *ngIf="!hideHeader">
-                <div class="panel2-header-inner main" [style.width]="innerWidth"> 
+                <div class="panel2-header-inner main" [style.width]="desiredInnerWidth"> 
                     <h3 *ngIf="titleText">
                         <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
                     </h3>

@@ -21,6 +21,17 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public string EventName { get; set; }
 
         /// <summary>
+        /// The source event.
+        /// </summary>
+        [Required]
+        public object Event { get; set; }
+
+        /// <summary>
+        /// The enriched event.
+        /// </summary>
+        public object? EnrichedEvent { get; set; }
+
+        /// <summary>
         /// The data for the action.
         /// </summary>
         public string? ActionName { get; set; }
