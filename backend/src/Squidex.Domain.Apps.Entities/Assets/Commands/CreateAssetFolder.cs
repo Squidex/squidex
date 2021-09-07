@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public DomainId ParentId { get; set; }
 
+        public bool OptimizeValidation { get; set; }
+
         public CreateAssetFolder()
         {
             AssetFolderId = DomainId.NewGuid();

@@ -12,12 +12,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         None,
         ConditionDoesNotMatch,
         Disabled,
-        WrongEvent,
         Failed,
         FromRule,
         NoAction,
         NoTrigger,
         TooOld,
+        WrongEvent,
         WrongEventForTrigger
     }
 }

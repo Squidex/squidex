@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task TransformAsync_should_return_original_content_if_script_failed()
         {
             var content = new ContentData();
-            var context = new ScriptVars { Data = content };
+            var context = new ScriptVars { ["data"] = content };
 
             const string script = @"
                 x => x
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(10.0));
 
-            var context = new ScriptVars { Data = content };
+            var context = new ScriptVars { ["data"] = content };
 
             const string script = @"
                 var data = ctx.data;
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task TransformAsync_should_throw_exception_if_script_failed()
         {
             var content = new ContentData();
-            var context = new ScriptVars { Data = content };
+            var context = new ScriptVars { ["data"] = content };
 
             const string script = @"
                 invalid();
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task TransformAsync_should_return_original_content_if_not_replaced()
         {
             var content = new ContentData();
-            var context = new ScriptVars { Data = content };
+            var context = new ScriptVars { ["data"] = content };
 
             const string script = @"
                 var x = 0;
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task TransformAsync_should_return_original_content_if_not_replaced_async()
         {
             var content = new ContentData();
-            var context = new ScriptVars { Data = content };
+            var context = new ScriptVars { ["data"] = content };
 
             const string script = @"
                 async = true;
@@ -207,7 +207,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant("MyOperation"));
 
-            var context = new ScriptVars { Data = content, Operation = "MyOperation" };
+            var context = new ScriptVars
+            {
+                ["data"] = content,
+                ["dataOld"] = null,
+                ["operation"] = "MyOperation"
+            };
 
             const string script = @"
                 var data = ctx.data;
@@ -233,7 +238,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(42));
 
-            var context = new ScriptVars { Data = content, Operation = "MyOperation" };
+            var context = new ScriptVars
+            {
+                ["data"] = content,
+                ["dataOld"] = null,
+                ["operation"] = "MyOperation"
+            };
 
             const string script = @"
                 async = true;
@@ -257,7 +267,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task TransformAsync_should_not_ignore_transformation_if_async_not_set()
         {
             var content = new ContentData();
-            var context = new ScriptVars { Data = content, Operation = "MyOperation" };
+            var context = new ScriptVars
+            {
+                ["data"] = content,
+                ["dataOld"] = null,
+                ["operation"] = "MyOperation"
+            };
 
             const string script = @"
                 var data = ctx.data;
@@ -279,7 +294,12 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task TransformAsync_should_timeout_if_replace_never_called()
         {
             var content = new ContentData();
-            var context = new ScriptVars { Data = content, Operation = "MyOperation" };
+            var context = new ScriptVars
+            {
+                ["data"] = content,
+                ["dataOld"] = null,
+                ["operation"] = "MyOperation"
+            };
 
             const string script = @"
                 async = true;
@@ -314,7 +334,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(10.0));
 
-            var context = new ScriptVars { Data = content };
+            var context = new ScriptVars { ["data"] = content };
 
             const string script = @"
                 var data = ctx.data;
@@ -358,10 +378,15 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             userIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, "2"));
 
-            var context = new ScriptVars { Data = content, DataOld = oldContent, User = userPrincipal };
+            var context = new ScriptVars
+            {
+                ["data"] = content,
+                ["dataOld"] = oldContent,
+                ["user"] = userPrincipal
+            };
 
             const string script = @"
-                ctx.data.number0.iv = ctx.data.number0.iv + ctx.oldData.number0.iv * parseInt(ctx.user.id, 10);
+                ctx.data.number0.iv = ctx.data.number0.iv + ctx.dataOld.number0.iv * parseInt(ctx.user.id, 10);
 
                 replace(ctx.data);
             ";

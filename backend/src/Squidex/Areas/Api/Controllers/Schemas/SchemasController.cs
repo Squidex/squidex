@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Domain.Apps.Entities.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -340,11 +341,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         public IActionResult GetScriptCompletion(string app, string schema)
         {
             var completer = new ScriptingCompletion();
-            var completion = completer.GetCompletion(Schema.SchemaDef, App.PartitionResolver());
+            var completion = completer.Content(Schema.SchemaDef, App.PartitionResolver());
 
-            var result = completion.Select(x => new { x.Name, x.Description });
-
-            return Ok(result);
+            return Ok(completion);
         }
 
         private Task<ISchemaEntity?> GetSchemaAsync(string schema)

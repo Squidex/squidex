@@ -197,7 +197,7 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
     }
 }
 
-export class EditScriptsForm extends Form<FormGroup, {}, SchemaDto> {
+export class EditSchemaScriptsForm extends Form<FormGroup, {}, object> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             query: '',

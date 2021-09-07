@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
 
         public void Extend(ExecutionContext context)
         {
-            if (context.TryGetValue<DomainId>(nameof(ScriptVars.AppId), out var appId))
+            if (context.TryGetValue<DomainId>("appId", out var appId))
             {
                 var engine = context.Engine;
 

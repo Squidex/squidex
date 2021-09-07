@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public DomainId AssetId { get; set; }
 
+        public bool DoNotScript { get; set; }
+
         [IgnoreDataMember]
         public DomainId AggregateId
         {

@@ -11,8 +11,10 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using Squidex.Areas.Api.Controllers.Contents.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 
@@ -50,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             var contentSchema = ResolveSchema("ContentDto", () =>
             {
-                return ContentJsonSchemaBuilder.BuildSchema("Shared", dataSchema, true);
+                return ContentJsonSchemaBuilder.BuildSchema(dataSchema, true);
             });
 
             var contentsSchema = ResolveSchema("ContentResultDto", () =>
@@ -102,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                     });
                 }
 
-                return ContentJsonSchemaBuilder.BuildSchema(displayName, contentDataSchema, true);
+                return ContentJsonSchemaBuilder.BuildSchema(contentDataSchema, true);
             });
 
             var contentsSchema = ResolveSchema($"{typeName}ContentResultDto", () =>
@@ -148,8 +150,10 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 AllowAdditionalProperties = false,
                 Properties =
                 {
-                    [ResultTotal] = SchemaBuilder.NumberProperty("The total number of content items.", true),
-                    [ResultItems] = SchemaBuilder.ArrayProperty(contentSchema, "The content items.", true)
+                    [ResultTotal] = SchemaBuilder.NumberProperty(
+                        FieldDescriptions.ContentsTotal, true),
+                    [ResultItems] = SchemaBuilder.ArrayProperty(contentSchema,
+                        FieldDescriptions.ContentsItems, true)
                 },
                 Type = JsonObjectType.Object
             };

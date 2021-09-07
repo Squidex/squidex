@@ -9,7 +9,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -20,7 +23,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObject.State>
     {
+        private readonly IAppEntity app;
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly DomainId parentId = DomainId.NewGuid();
         private readonly DomainId assetFolderId = DomainId.NewGuid();
         private readonly AssetFolderDomainObject sut;
@@ -32,10 +38,25 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetFolderDomainObjectTests()
         {
+            app = Mocks.App(AppNamedId, Language.DE);
+
+            A.CallTo(() => appProvider.GetAppAsync(AppId, false))
+                .Returns(app);
+
             A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            sut = new AssetFolderDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), assetQuery);
+            var log = A.Fake<ISemanticLog>();
+
+            var serviceProvider =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(assetQuery)
+                    .AddSingleton(contentRepository)
+                    .AddSingleton(log)
+                    .BuildServiceProvider();
+
+            sut = new AssetFolderDomainObject(PersistenceFactory, log, serviceProvider);
             sut.Setup(Id);
         }
 

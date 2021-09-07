@@ -13,16 +13,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class SecurityExtensions
     {
-        public static void MustHavePermission(this OperationContext context, string permissionId)
+        public static void MustHavePermission(this ContentOperation operation, string permissionId)
         {
-            var content = context.Content;
+            var content = operation.Snapshot;
 
-            if (Equals(content.CreatedBy, context.Actor) || context.User == null)
+            if (Equals(content.CreatedBy, operation.Actor) || operation.User == null)
             {
                 return;
             }
 
-            if (!context.User.Allows(permissionId, content.AppId.Name, content.SchemaId.Name))
+            if (!operation.User.Allows(permissionId, content.AppId.Name, content.SchemaId.Name))
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }

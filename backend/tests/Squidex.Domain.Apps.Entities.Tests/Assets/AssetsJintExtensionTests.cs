@@ -351,7 +351,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, asset));
 
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            var vars = new ScriptVars
+            {
+                ["data"] = data,
+                ["appId"] = appId.Id,
+                ["appName"] = appId.Name,
+                ["user"] = user
+            };
 
             return (vars, asset);
         }
@@ -375,7 +381,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, asset1, asset2));
 
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            var vars = new ScriptVars
+            {
+                ["data"] = data,
+                ["appId"] = appId.Id,
+                ["appName"] = appId.Name,
+                ["user"] = user
+            };
 
             return (vars, new[] { asset1, asset2 });
         }

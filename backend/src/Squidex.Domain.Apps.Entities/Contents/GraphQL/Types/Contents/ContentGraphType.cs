@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "data",
                     ResolvedType = new NonNullGraphType(contentDataType),
                     Resolver = ContentResolvers.Data,
-                    Description = "The data of the content."
+                    Description = FieldDescriptions.ContentData
                 });
             }
 
@@ -70,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     Name = "flatData",
                     ResolvedType = new NonNullGraphType(contentDataTypeFlat),
                     Resolver = ContentResolvers.FlatData,
-                    Description = "The flat data of the content."
+                    Description = FieldDescriptions.ContentFlatData
                 });
             }
 

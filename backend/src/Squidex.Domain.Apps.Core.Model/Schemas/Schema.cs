@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Name { get; }
 
-        public string Category { get; private set; }
+        public string? Category { get; private set; }
 
         public bool IsPublished { get; private set; }
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema Update(SchemaProperties newProperties)
+        public Schema Update(SchemaProperties? newProperties)
         {
             newProperties ??= new SchemaProperties();
 
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetScripts(SchemaScripts newScripts)
+        public Schema SetScripts(SchemaScripts? newScripts)
         {
             newScripts ??= new SchemaScripts();
 
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetFieldsInLists(FieldNames names)
+        public Schema SetFieldsInLists(FieldNames? names)
         {
             names ??= FieldNames.Empty;
 
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetFieldsInReferences(FieldNames names)
+        public Schema SetFieldsInReferences(FieldNames? names)
         {
             names ??= FieldNames.Empty;
 
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetFieldRules(FieldRules rules)
+        public Schema SetFieldRules(FieldRules? rules)
         {
             rules ??= FieldRules.Empty;
 
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ChangeCategory(string category)
+        public Schema ChangeCategory(string? category)
         {
             if (string.Equals(Category, category))
             {
@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetPreviewUrls(ImmutableDictionary<string, string> previewUrls)
+        public Schema SetPreviewUrls(ImmutableDictionary<string, string>? previewUrls)
         {
             previewUrls ??= ImmutableDictionary.Empty<string, string>();
 

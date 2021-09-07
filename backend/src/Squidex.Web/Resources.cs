@@ -51,6 +51,10 @@ namespace Squidex.Web
         [Lazy]
         public bool CanUpdateSettings => IsAllowed(Permissions.AppUpdateSettings);
 
+        // Asset Scripts
+        [Lazy]
+        public bool CanUpdateAssetsScripts => IsAllowed(Permissions.AppAssetsScriptsUpdate);
+
         // Contributors
         [Lazy]
         public bool CanAssignContributor => IsAllowed(Permissions.AppContributorsAssign);

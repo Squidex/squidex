@@ -20,103 +20,132 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             CanReject = true
         };
 
-        public static async Task<ContentData> ExecuteCreateScriptAsync(this OperationContext context, ContentData data, Status status)
+        private static class ScriptKeys
         {
-            var script = context.SchemaDef.Scripts.Create;
+            public const string AppId = "appId";
+            public const string AppName = "appName";
+            public const string Command = "command";
+            public const string Content = "content";
+            public const string ContentId = "contentId";
+            public const string Data = "data";
+            public const string DataOld = "dataOld";
+            public const string OldData = "oldData";
+            public const string OldStatus = "oldStatus";
+            public const string Operation = "operation";
+            public const string SchemaId = "achemaId";
+            public const string SchemaName = "achemaName";
+            public const string Status = "status";
+            public const string StatusOld = "statusOld";
+            public const string User = "user";
+        }
+
+        public static async Task<ContentData> ExecuteCreateScriptAsync(this ContentOperation operation, ContentData data, Status status)
+        {
+            var script = operation.SchemaDef.Scripts.Create;
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var vars = Enrich(context, new ScriptVars
+                var vars = Enrich(operation, new ScriptVars
                 {
-                    Operation = "Create",
-                    Data = data,
-                    DataOld = default,
-                    Status = status,
-                    StatusOld = default
+                    [ScriptKeys.Data] = data,
+                    [ScriptKeys.DataOld] = null,
+                    [ScriptKeys.OldData] = null,
+                    [ScriptKeys.OldStatus] = default(Status),
+                    [ScriptKeys.Operation] = "Create",
+                    [ScriptKeys.Status] = status,
+                    [ScriptKeys.StatusOld] = default(Status)
                 });
 
-                data = await GetScriptEngine(context).TransformAsync(vars, script, Options);
+                data = await GetScriptEngine(operation).TransformAsync(vars, script, Options);
             }
 
             return data;
         }
 
-        public static async Task<ContentData> ExecuteUpdateScriptAsync(this OperationContext context, ContentData data)
+        public static async Task<ContentData> ExecuteUpdateScriptAsync(this ContentOperation operation, ContentData data)
         {
-            var script = context.SchemaDef.Scripts.Update;
+            var script = operation.SchemaDef.Scripts.Update;
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var vars = Enrich(context, new ScriptVars
+                var vars = Enrich(operation, new ScriptVars
                 {
-                    Operation = "Update",
-                    Data = data,
-                    DataOld = context.Content.Data,
-                    Status = context.Content.EditingStatus(),
-                    StatusOld = default
+                    [ScriptKeys.Data] = data,
+                    [ScriptKeys.DataOld] = operation.Snapshot.Data,
+                    [ScriptKeys.OldData] = operation.Snapshot.Data,
+                    [ScriptKeys.OldStatus] = data,
+                    [ScriptKeys.Operation] = "Update",
+                    [ScriptKeys.Status] = operation.Snapshot.EditingStatus(),
+                    [ScriptKeys.StatusOld] = default(Status),
                 });
 
-                data = await GetScriptEngine(context).TransformAsync(vars, script, Options);
+                data = await GetScriptEngine(operation).TransformAsync(vars, script, Options);
             }
 
             return data;
         }
 
-        public static async Task<ContentData> ExecuteChangeScriptAsync(this OperationContext context, Status status, StatusChange change)
+        public static async Task<ContentData> ExecuteChangeScriptAsync(this ContentOperation operation, Status status, StatusChange change)
         {
-            var script = context.SchemaDef.Scripts.Change;
+            var script = operation.SchemaDef.Scripts.Change;
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var data = context.Content.Data.Clone();
+                var data = operation.Snapshot.Data.Clone();
 
-                var vars = Enrich(context, new ScriptVars
+                var vars = Enrich(operation, new ScriptVars
                 {
-                    Operation = change.ToString(),
-                    Data = data,
-                    DataOld = default,
-                    Status = status,
-                    StatusOld = context.Content.EditingStatus()
+                    [ScriptKeys.Data] = data,
+                    [ScriptKeys.DataOld] = null,
+                    [ScriptKeys.OldData] = null,
+                    [ScriptKeys.OldStatus] = operation.Snapshot.EditingStatus(),
+                    [ScriptKeys.Operation] = change.ToString(),
+                    [ScriptKeys.Status] = status,
+                    [ScriptKeys.StatusOld] = operation.Snapshot.EditingStatus(),
                 });
 
-                return await GetScriptEngine(context).TransformAsync(vars, script, Options);
+                return await GetScriptEngine(operation).TransformAsync(vars, script, Options);
             }
 
-            return context.Content.Data;
+            return operation.Snapshot.Data;
         }
 
-        public static async Task ExecuteDeleteScriptAsync(this OperationContext context)
+        public static async Task ExecuteDeleteScriptAsync(this ContentOperation operation)
         {
-            var script = context.SchemaDef.Scripts.Delete;
+            var script = operation.SchemaDef.Scripts.Delete;
 
             if (!string.IsNullOrWhiteSpace(script))
             {
-                var vars = Enrich(context, new ScriptVars
+                var vars = Enrich(operation, new ScriptVars
                 {
-                    Operation = "Delete",
-                    Data = context.Content.Data,
-                    DataOld = default,
-                    Status = context.Content.EditingStatus(),
-                    StatusOld = default
+                    [ScriptKeys.Data] = operation.Snapshot.Data,
+                    [ScriptKeys.DataOld] = null,
+                    [ScriptKeys.OldData] = null,
+                    [ScriptKeys.OldStatus] = operation.Snapshot.EditingStatus(),
+                    [ScriptKeys.Operation] = "Delete",
+                    [ScriptKeys.Status] = operation.Snapshot.EditingStatus(),
+                    [ScriptKeys.StatusOld] = default(Status),
                 });
 
-                await GetScriptEngine(context).ExecuteAsync(vars, script, Options);
+                await GetScriptEngine(operation).ExecuteAsync(vars, script, Options);
             }
         }
 
-        private static IScriptEngine GetScriptEngine(OperationContext context)
+        private static IScriptEngine GetScriptEngine(ContentOperation operation)
         {
-            return context.Resolve<IScriptEngine>();
+            return operation.Resolve<IScriptEngine>();
         }
 
-        private static ScriptVars Enrich(OperationContext context, ScriptVars vars)
+        private static ScriptVars Enrich(ContentOperation operation, ScriptVars vars)
         {
-            vars.ContentId = context.ContentId;
-            vars.AppId = context.App.Id;
-            vars.AppName = context.App.Name;
-            vars.SchemaId = context.Schema.Id;
-            vars.SchemaName = context.Schema.SchemaDef.Name;
-            vars.User = context.User;
+            vars[ScriptKeys.AppId] = operation.App.Id;
+            vars[ScriptKeys.AppName] = operation.App.Name;
+            vars[ScriptKeys.Command] = operation.Command;
+            vars[ScriptKeys.Content] = operation.Snapshot;
+            vars[ScriptKeys.ContentId] = operation.Id;
+            vars[ScriptKeys.SchemaId] = operation.Schema.Id;
+            vars[ScriptKeys.SchemaName] = operation.Schema.SchemaDef.Name;
+            vars[ScriptKeys.User] = operation.User;
 
             return vars;
         }
