@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             vars[ScriptKeys.AppName] = operation.App.Name;
             vars[ScriptKeys.Command] = operation.Command;
             vars[ScriptKeys.Content] = operation.Snapshot;
-            vars[ScriptKeys.ContentId] = operation.Id;
+            vars[ScriptKeys.ContentId] = operation.CommandId;
             vars[ScriptKeys.SchemaId] = operation.Schema.Id;
             vars[ScriptKeys.SchemaName] = operation.Schema.SchemaDef.Name;
             vars[ScriptKeys.User] = operation.User;

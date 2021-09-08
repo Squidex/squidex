@@ -63,11 +63,15 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public JsonObject(JsonObject obj)
         {
+            Guard.NotNull(obj, nameof(obj));
+
             inner = new Dictionary<string, IJsonValue>(obj.inner);
         }
 
-        private JsonObject(Dictionary<string, IJsonValue> source)
+        public JsonObject(Dictionary<string, IJsonValue> source)
         {
+            Guard.NotNull(source, nameof(source));
+
             inner = source;
         }
 

@@ -215,7 +215,7 @@ export class AppsService {
     }
 
     public getAssetScripts(name: string): Observable<AssetScriptsDto> {
-        const url = this.apiUrl.buildUrl(`/api/apps/${name}/asset-scripts`);
+        const url = this.apiUrl.buildUrl(`/api/apps/${name}/assets/scripts`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {

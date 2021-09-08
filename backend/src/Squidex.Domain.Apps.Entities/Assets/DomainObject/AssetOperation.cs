@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             {
                 App = app,
                 Command = command,
-                Id = id,
+                CommandId = id,
             };
         }
     }

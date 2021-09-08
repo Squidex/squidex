@@ -313,7 +313,7 @@ export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
 export type FieldRule = { field: string; action: FieldRuleAction; condition: string };
 
 export type SchemaCompletions =
-    ReadonlyArray<{ name: string; description: string; type: string }>;
+    ReadonlyArray<{ path: string; description: string; type: string }>;
 
 export type SchemasDto =
     Readonly<{ items: ReadonlyArray<SchemaDto>; canCreate: boolean } & Resource>;

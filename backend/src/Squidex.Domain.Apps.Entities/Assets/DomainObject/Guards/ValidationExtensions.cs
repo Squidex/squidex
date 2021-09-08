@@ -56,9 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                 {
                     operation.AddError(T.Get("assets.folderNotFound"), nameof(MoveAssetFolder.ParentId));
                 }
-                else if (operation.Id != DomainId.Empty)
+                else if (operation.CommandId != DomainId.Empty)
                 {
-                    var indexOfSelf = path.IndexOf(x => x.Id == operation.Id);
+                    var indexOfSelf = path.IndexOf(x => x.Id == operation.CommandId);
                     var indexOfParent = path.IndexOf(x => x.Id == parentId);
 
                     if (indexOfSelf >= 0 && indexOfParent > indexOfSelf)
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var contentRepository = operation.Resolve<IContentRepository>();
 
-            var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.Id, SearchScope.All, default);
+            var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, default);
 
             if (hasReferrer)
             {

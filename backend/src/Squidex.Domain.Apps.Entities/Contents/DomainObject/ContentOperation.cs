@@ -53,8 +53,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             {
                 App = app,
                 Command = command,
+                CommandId = command.ContentId,
                 Components = components,
-                Id = command.ContentId,
                 Schema = schema
             };
         }

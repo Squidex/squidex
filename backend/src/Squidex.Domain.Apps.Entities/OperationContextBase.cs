@@ -26,9 +26,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public IAppEntity App { get; init; }
 
-        public DomainId Id { get; init; }
-
-        public DomainId UniqueId => Command.AggregateId;
+        public DomainId CommandId { get; init; }
 
         public TCommand Command { get; init; }
 

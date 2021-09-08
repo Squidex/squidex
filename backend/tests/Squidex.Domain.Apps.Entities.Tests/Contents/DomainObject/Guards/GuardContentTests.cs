@@ -33,7 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly ISchemaEntity normalUnpublishedSchema;
         private readonly ISchemaEntity singletonSchema;
         private readonly ISchemaEntity singletonUnpublishedSchema;
-        private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly RefToken actor = RefToken.User("123");
 
         public GuardContentTests()
@@ -350,7 +349,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.Id, SearchScope.All, default))
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
@@ -361,7 +360,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.Id, SearchScope.All, default))
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
@@ -369,7 +368,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         private ContentOperation Operation(ContentEntity content, ISchemaEntity operationSchema)
         {
-            return Operation(content, operationSchema, user);
+            return Operation(content, operationSchema, Mocks.FrontendUser());
         }
 
         private ContentOperation Operation(ContentEntity content, ISchemaEntity operationSchema, ClaimsPrincipal? currentUser)
@@ -384,7 +383,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             {
                 App = Mocks.App(appId),
                 Command = new CreateContent { User = currentUser, Actor = actor },
-                Id = content.Id,
+                CommandId = content.Id,
                 Schema = operationSchema
             };
         }

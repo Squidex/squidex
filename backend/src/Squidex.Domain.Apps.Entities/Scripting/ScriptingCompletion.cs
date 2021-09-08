@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Scripting
             AddObject("metadata",
                 FieldDescriptions.AssetMetadata, () =>
             {
-                AddArray("['name']",
+                AddArray("name",
                     FieldDescriptions.AssetMetadataValue);
             });
         }
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Scripting
                 AddObject("claims",
                     FieldDescriptions.UserClaims, () =>
                 {
-                    AddArray("['name']",
+                    AddArray("name",
                         FieldDescriptions.UsersClaimsValue);
                 });
             });

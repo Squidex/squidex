@@ -24,7 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly RefToken actor = RefToken.User("123");
 
         [Fact]
@@ -107,8 +106,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity>
                 {
-                    CreateAssetFolder(operation.Id),
-                    CreateAssetFolder(parentId, operation.Id)
+                    CreateAssetFolder(operation.CommandId),
+                    CreateAssetFolder(parentId, operation.CommandId)
                 });
 
             await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId),
@@ -117,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
         private AssetFolderOperation Operation(IAssetFolderEntity assetFolder)
         {
-            return Operation(assetFolder, user);
+            return Operation(assetFolder, Mocks.FrontendUser());
         }
 
         private AssetFolderOperation Operation(IAssetFolderEntity assetFolder, ClaimsPrincipal? currentUser)
@@ -130,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             return new AssetFolderOperation(serviceProvider, () => assetFolder)
             {
                 App = Mocks.App(appId),
-                Id = assetFolder.Id,
+                CommandId = assetFolder.Id,
                 Command = new CreateAssetFolder { User = currentUser, Actor = actor }
             };
         }

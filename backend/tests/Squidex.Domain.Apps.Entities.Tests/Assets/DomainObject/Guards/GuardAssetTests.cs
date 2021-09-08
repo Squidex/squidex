@@ -26,7 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly RefToken actor = RefToken.User("123");
 
         [Fact]
@@ -87,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var operation = Operation(CreateAsset());
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.Id, SearchScope.All, default))
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
@@ -98,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var operation = Operation(CreateAsset());
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.Id, SearchScope.All, default))
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
@@ -106,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
         private AssetOperation Operation(AssetEntity asset)
         {
-            return Operation(asset, user);
+            return Operation(asset, Mocks.FrontendUser());
         }
 
         private AssetOperation Operation(AssetEntity asset, ClaimsPrincipal? currentUser)
@@ -120,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             return new AssetOperation(serviceProvider, () => asset)
             {
                 App = Mocks.App(appId),
-                Id = asset.Id,
+                CommandId = asset.Id,
                 Command = new CreateAsset { User = currentUser, Actor = actor }
             };
         }

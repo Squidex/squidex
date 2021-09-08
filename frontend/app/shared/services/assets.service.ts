@@ -138,8 +138,8 @@ type Tags = readonly string[];
 type AssetFolderScope = 'PathAndItems' | 'Path' | 'Items';
 type AssetMetadata = { [key: string]: any };
 
-export type AssetsCompletions =
-    ReadonlyArray<{ name: string; description: string; type: string }>;
+export type AssetCompletions =
+    ReadonlyArray<{ path: string; description: string; type: string }>;
 
 export type AnnotateAssetDto =
     Readonly<{ fileName?: string; isProtected?: boolean; slug?: string; tags?: Tags; metadata?: AssetMetadata }>;
@@ -415,10 +415,10 @@ export class AssetsService {
             pretifyError('i18n:assets.deleteFailed'));
     }
 
-    public getCompletions(appName: string): Observable<AssetsCompletions> {
+    public getCompletions(appName: string): Observable<AssetCompletions> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/completion`);
 
-        return this.http.get<AssetsCompletions>(url);
+        return this.http.get<AssetCompletions>(url);
     }
 }
 

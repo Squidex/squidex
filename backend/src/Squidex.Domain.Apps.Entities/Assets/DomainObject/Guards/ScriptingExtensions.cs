@@ -7,11 +7,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
@@ -54,6 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             if (!string.IsNullOrWhiteSpace(script))
             {
+                var parentPath = await GetPathAsync(operation, create.ParentId);
+
                 // Tags and metadata are mutable and can be changed from the scripts, but not replaced.
                 var vars = new ScriptVars
                 {
@@ -61,14 +66,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                     // Use a dictionary for better performance, because no reflection is involved.
                     [ScriptKeys.Command] = new Dictionary<string, object?>
                     {
+                        [ScriptKeys.Metadata] = create.Metadata.Mutable(),
                         [ScriptKeys.FileHash] = create.FileHash,
                         [ScriptKeys.FileName] = create.File.FileName,
                         [ScriptKeys.FileSize] = create.File.FileSize,
                         [ScriptKeys.FileSlug] = create.File.FileName.Slugify(),
-                        [ScriptKeys.Metadata] = create.Metadata,
                         [ScriptKeys.MimeType] = create.File.MimeType,
                         [ScriptKeys.ParentId] = create.ParentId,
-                        [ScriptKeys.ParentPath] = await GetPathAsync(operation, create.ParentId),
+                        [ScriptKeys.ParentPath] = parentPath,
                         [ScriptKeys.Tags] = create.Tags
                     }
                 };
@@ -90,10 +95,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                     // Use a dictionary for better performance, because no reflection is involved.
                     [ScriptKeys.Command] = new Dictionary<string, object?>
                     {
+                        [ScriptKeys.Metadata] = update.Metadata.Mutable(),
                         [ScriptKeys.FileHash] = update.FileHash,
                         [ScriptKeys.FileName] = update.File.FileName,
                         [ScriptKeys.FileSize] = update.File.FileSize,
-                        [ScriptKeys.Metadata] = update.Metadata,
                         [ScriptKeys.MimeType] = update.File.MimeType,
                         [ScriptKeys.Tags] = update.Tags,
                     }
@@ -116,6 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                     // Use a dictionary for better performance, because no reflection is involved.
                     [ScriptKeys.Command] = new Dictionary<string, object?>
                     {
+                        [ScriptKeys.Metadata] = annotate.Metadata?.Mutable(),
                         [ScriptKeys.FileName] = annotate.FileName,
                         [ScriptKeys.FileSlug] = annotate.Slug,
                         [ScriptKeys.Tags] = annotate.Tags,
@@ -132,6 +138,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             if (!string.IsNullOrWhiteSpace(script))
             {
+                var parentPath = await GetPathAsync(operation, move.ParentId);
+
                 var vars = new ScriptVars
                 {
                     [ScriptKeys.Operation] = "Move",
@@ -139,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                     [ScriptKeys.Command] = new Dictionary<string, object?>
                     {
                         [ScriptKeys.ParentId] = move.ParentId,
-                        [ScriptKeys.ParentPath] = await GetPathAsync(operation, move.ParentId),
+                        [ScriptKeys.ParentPath] = parentPath,
                     }
                 };
 
@@ -171,25 +179,27 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var snapshot = operation.Snapshot;
 
+            var parentPath = await GetPathAsync(operation, snapshot.ParentId);
+
             // Use a dictionary for better performance, because no reflection is involved.
             var asset = new Dictionary<string, object?>
             {
+                [ScriptKeys.Metadata] = snapshot.ReadonlyMetadata(),
                 [ScriptKeys.FileHash] = snapshot.FileHash,
                 [ScriptKeys.FileName] = snapshot.FileName,
                 [ScriptKeys.FileSize] = snapshot.FileSize,
                 [ScriptKeys.FileSlug] = snapshot.Slug,
                 [ScriptKeys.FileVersion] = snapshot.FileVersion,
                 [ScriptKeys.IsProtected] = snapshot.IsProtected,
-                [ScriptKeys.Metadata] = snapshot.Metadata,
                 [ScriptKeys.MimeType] = snapshot.MimeType,
                 [ScriptKeys.ParentId] = snapshot.ParentId,
-                [ScriptKeys.ParentPath] = await GetPathAsync(operation, snapshot.ParentId),
-                [ScriptKeys.Tags] = snapshot.Tags,
+                [ScriptKeys.ParentPath] = parentPath,
+                [ScriptKeys.Tags] = snapshot.ReadonlyTags()
             };
 
             vars[ScriptKeys.AppId] = operation.App.Id;
             vars[ScriptKeys.AppName] = operation.App.Name;
-            vars[ScriptKeys.AssetId] = operation.Id;
+            vars[ScriptKeys.AssetId] = operation.CommandId;
             vars[ScriptKeys.Asset] = asset;
             vars[ScriptKeys.User] = operation.User;
 
@@ -210,6 +220,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             var path = await assetQuery.FindAssetFolderAsync(operation.App.Id, parentId);
 
             return path.Select(x => new { id = x.Id, folderName = x.FolderName }).ToList();
+        }
+
+        private static object Mutable(this AssetMetadata metadata)
+        {
+            return new ScriptMetadataWrapper(metadata);
+        }
+
+        private static object ReadonlyMetadata(this IAssetEntity asset)
+        {
+            return new ReadOnlyDictionary<string, IJsonValue>(asset.Metadata);
+        }
+
+        private static object ReadonlyTags(this IAssetEntity asset)
+        {
+            return new ReadOnlyCollection<string>(asset.Tags.ToList());
         }
     }
 }

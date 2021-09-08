@@ -119,7 +119,7 @@ describe('AppsService', () => {
                 settings = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/asset-scripts');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/scripts');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -137,7 +137,7 @@ describe('AppsService', () => {
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {
-                    update: { method: 'PUT', href: '/api/apps/my-app/asset-scripts' },
+                    update: { method: 'PUT', href: '/api/apps/my-app/assets/scripts' },
                 },
             };
 
@@ -147,7 +147,7 @@ describe('AppsService', () => {
                 scripts = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/asset-scripts');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/scripts');
 
             expect(req.request.method).toEqual('PUT');
             expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -370,7 +370,7 @@ describe('AppsService', () => {
         return {
             update: key,
             _links: {
-                update: { method: 'PUT', href: `apps/${id}/asset-scripts` },
+                update: { method: 'PUT', href: `apps/${id}/assets/scripts` },
             },
         };
     }
@@ -428,7 +428,7 @@ export function createAssetScripts(id: number, suffix = ''): AssetScriptsPayload
             update: key,
         },
         _links: {
-            update: { method: 'PUT', href: `apps/${id}/asset-scripts` },
+            update: { method: 'PUT', href: `apps/${id}/assets/scripts` },
         },
         canUpdate: true,
     };

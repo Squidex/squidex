@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var contentRepository = operation.Resolve<IContentRepository>();
 
-            var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.Id, SearchScope.All, default);
+            var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, default);
 
             if (hasReferrer)
             {
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     operation.Schema.NamedId(),
                     operation.SchemaDef,
                     operation.Components,
-                    operation.Id)
+                    operation.CommandId)
                 .Optimized(optimize).AsPublishing(published);
 
             var validator =

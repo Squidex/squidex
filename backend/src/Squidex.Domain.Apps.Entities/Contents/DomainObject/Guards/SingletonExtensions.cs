@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
         public static void MustNotCreateSingleton(this ContentOperation operation)
         {
-            if (operation.SchemaDef.Type == SchemaType.Singleton && operation.Id != operation.Schema.Id)
+            if (operation.SchemaDef.Type == SchemaType.Singleton && operation.CommandId != operation.Schema.Id)
             {
                 throw new DomainException(T.Get("contents.singletonNotCreatable"));
             }

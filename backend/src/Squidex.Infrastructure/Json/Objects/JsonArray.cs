@@ -35,19 +35,9 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
-        private JsonArray(List<IJsonValue> source)
+        public JsonArray(List<IJsonValue> source)
             : base(source)
         {
-        }
-
-        internal JsonArray(IEnumerable<object?>? values)
-            : base(ToList(values))
-        {
-        }
-
-        private static List<IJsonValue> ToList(IEnumerable<object?>? values)
-        {
-            return values?.Select(JsonValue.Create).ToList() ?? new List<IJsonValue>();
         }
 
         protected override void InsertItem(int index, IJsonValue item)

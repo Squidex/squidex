@@ -110,6 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     return UpdateReturnAsync(validate, async c =>
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
                         await ValidateCore(operation);
 
                         return true;
