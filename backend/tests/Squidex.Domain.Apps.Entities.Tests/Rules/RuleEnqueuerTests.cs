@@ -97,6 +97,27 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
+        public async Task Should_not_insert_job_if_job_has_a_skip_reason()
+        {
+            var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+
+            var rule = CreateRule();
+
+            var job = new RuleJob
+            {
+                Created = now
+            };
+
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule.RuleDef), default))
+                .Returns(new List<JobResult> { new JobResult { Job = job, SkipReason = SkipReason.TooOld } }.ToAsyncEnumerable());
+
+            await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_update_repository_if_enqueing()
         {
             var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });

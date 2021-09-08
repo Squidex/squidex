@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
-            Assert.Equal(2, jobs.Count(x => x.Job != null && x.Exception == null));
+            Assert.Equal(2, jobs.Count(x => x.Job != null && x.EnrichmentError == null));
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
 
-            Assert.Equal(2, jobs.Count(x => x.Job == null && x.Exception != null));
+            Assert.Equal(2, jobs.Count(x => x.Job == null && x.EnrichmentError != null));
         }
 
         [Fact]
@@ -587,7 +587,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var job = await sut.CreateJobsAsync(@event, context).SingleAsync();
 
-            Assert.NotNull(job.Exception);
+            Assert.NotNull(job.EnrichmentError);
             Assert.NotNull(job.Job?.ActionData);
             Assert.NotNull(job.Job?.Description);
             Assert.Equal(enrichedEvent, job.EnrichedEvent);

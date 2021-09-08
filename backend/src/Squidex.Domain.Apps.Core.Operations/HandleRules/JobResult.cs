@@ -57,17 +57,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public EnrichedEvent? EnrichedEvent { get; init; }
 
-        public Exception? Exception { get; init; }
+        public Exception? EnrichmentError { get; init; }
 
         public SkipReason SkipReason { get; init; }
 
-        public static JobResult Failed(Exception exception, EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
+        public static JobResult Failed(Exception error, EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
         {
             return new JobResult
             {
                 Job = job,
                 EnrichedEvent = enrichedEvent,
-                Exception = exception,
+                EnrichmentError = error,
                 SkipReason = SkipReason.Failed
             };
         }

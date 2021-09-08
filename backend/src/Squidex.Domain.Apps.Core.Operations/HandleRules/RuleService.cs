@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                             jobs.Add(new JobResult
                             {
                                 EnrichedEvent = enrichedEvent,
-                                Exception = ex,
+                                EnrichmentError = ex,
                                 SkipReason = SkipReason.Failed
                             });
                         }

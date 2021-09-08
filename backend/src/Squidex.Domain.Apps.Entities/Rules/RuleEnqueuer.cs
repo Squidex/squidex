@@ -61,9 +61,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await foreach (var job in jobs)
             {
-                if (job.Job != null)
+                if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
-                    await ruleEventRepository.EnqueueAsync(job.Job, job.Exception);
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                 }
             }
         }

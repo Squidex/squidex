@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                             ActionData = result.Job?.ActionData,
                             ActionName = result.Job?.ActionName,
                             EnrichedEvent = result.EnrichedEvent,
-                            Error = result.Exception?.Message,
+                            Error = result.EnrichmentError?.Message,
                             Event = @event.Payload,
                             EventName = eventName,
                             SkipReason = result.SkipReason
