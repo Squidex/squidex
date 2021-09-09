@@ -30,5 +30,7 @@ namespace Squidex.Shared.Identity
         public const string PictureUrl = "urn:squidex:picture";
 
         public const string PictureUrlStore = "store";
+
+        public const string TotalApps = "urn:squidex:internal:totalApps";
     }
 }

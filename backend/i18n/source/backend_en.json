@@ -16,6 +16,7 @@
   "apps.languages.masterLanguageNoFallbacks": "Master language cannot have fallback languages.",
   "apps.languages.masterLanguageNotOptional": "Master language cannot be made optional.",
   "apps.languages.masterLanguageNotRemovable": "Master language cannot be removed.",
+  "apps.maximumTotalReached": "You cannot create more apps. Please contact the support to remove this restriction from your account.",
   "apps.nameAlreadyExists": "An app with the same name already exists.",
   "apps.notImage": "File is not an image",
   "apps.plans.notFound": "A plan with this id does not exist.",
