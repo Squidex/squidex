@@ -6,23 +6,34 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class SecurityExtensions
     {
-        public static void MustHavePermission(this ContentOperation operation, string permissionId)
+        public static void MustHavePermission(this OperationContext context, string permissionId)
         {
-            var content = operation.Snapshot;
+            var content = context.Content;
 
-            if (Equals(content.CreatedBy, operation.Actor) || operation.User == null)
+            if (Equals(content.CreatedBy, context.Actor) || context.User == null)
             {
                 return;
             }
 
-            if (!operation.User.Allows(permissionId, content.AppId.Name, content.SchemaId.Name))
+            var permissions = context.User?.Claims.Permissions();
+
+            if (permissions == null)
+            {
+                throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
+            }
+
+            var permission = Permissions.ForApp(permissionId, context.App.Name, context.Schema.SchemaDef.Name);
+
+            if (permissions.Allows(permission) != true)
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }

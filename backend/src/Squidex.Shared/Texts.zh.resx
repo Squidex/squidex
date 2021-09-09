@@ -133,6 +133,9 @@
   <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
     <value>无法删除主语言。</value>
   </data>
+  <data name="apps.maximumTotalReached" xml:space="preserve">
+    <value>You cannot create more apps. Please contact the support to remove this restriction from your account.</value>
+  </data>
   <data name="apps.nameAlreadyExists" xml:space="preserve">
     <value>同名应用已经存在。</value>
   </data>

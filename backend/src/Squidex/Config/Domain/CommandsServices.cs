@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
+using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
@@ -33,6 +34,9 @@ namespace Squidex.Config.Domain
         {
             services.Configure<ReadonlyOptions>(config,
                 "mode");
+
+            services.Configure<RestrictAppsOptions>(config,
+                "usage");
 
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
@@ -59,6 +63,9 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<CustomCommandMiddlewareRunner>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<RestrictAppsCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<InviteUserCommandMiddleware>()
