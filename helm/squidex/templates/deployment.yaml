@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       {{- include "squidex.selectors" . | indent 6 }}
-      orleans/serviceId: "squidex="
+      orleans/serviceId: "squidex-{{ default .Chart.AppVersion .Values.image.tag }}"
   template:
     metadata:
       labels:
