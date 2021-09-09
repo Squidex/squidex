@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         AppId = rule.AppId,
                         Rule = rule.RuleDef,
                         RuleId = rule.Id,
-                        IgnoreStale = true
+                        IncludeStale = true
                     };
 
                     if (currentState.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(context))
@@ -219,20 +219,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             await foreach (var job in ruleService.CreateSnapshotJobsAsync(context, ct))
             {
-                if (job.Job != null)
+                if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
-                    await ruleEventRepository.EnqueueAsync(job.Job, job.Exception);
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                 }
-                else if (job.Exception != null)
+                else if (job.EnrichmentError != null)
                 {
                     errors++;
 
                     if (errors >= MaxErrors)
                     {
-                        throw job.Exception;
+                        throw job.EnrichmentError;
                     }
 
-                    log.LogWarning(job.Exception, w => w
+                    log.LogWarning(job.EnrichmentError, w => w
                         .WriteProperty("action", "runRule")
                         .WriteProperty("status", "failedPartially"));
                 }
@@ -257,9 +257,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                         await foreach (var job in jobs)
                         {
-                            if (job.Job != null)
+                            if (job.Job != null && job.SkipReason == SkipReason.None)
                             {
-                                await ruleEventRepository.EnqueueAsync(job.Job, job.Exception);
+                                await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                             }
                         }
                     }

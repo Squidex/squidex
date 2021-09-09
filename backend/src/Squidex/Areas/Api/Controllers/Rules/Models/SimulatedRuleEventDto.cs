@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
@@ -50,11 +52,24 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The reason why the event has been skipped.
         /// </summary>
         [Required]
-        public SkipReason SkipReason { get; set; }
+        public List<SkipReason> SkipReasons { get; set; }
 
         public static SimulatedRuleEventDto FromSimulatedRuleEvent(SimulatedRuleEvent ruleEvent)
         {
-            return SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto());
+            var result = SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto
+            {
+                SkipReasons = new List<SkipReason>()
+            });
+
+            foreach (var reason in Enum.GetValues<SkipReason>())
+            {
+                if (reason != SkipReason.None && ruleEvent.SkipReason.HasFlag(reason))
+                {
+                    result.SkipReasons.Add(reason);
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -809,7 +809,7 @@
   "tour.step3Text": "Inhoud zijn de feitelijke gegevens in uw app die zijn gegroepeerd op basis van het schema. \n \n Selecteer eerst een gepubliceerd schema en voeg vervolgens inhoud toe voor dit schema.",
   "tour.step4Next": "Begrepen!",
   "tour.step4Text": "De mappen bevatten alle bestanden die ook aan uw inhoud kunnen worden gekoppeld. Bijvoorbeeld afbeeldingen, video's of documenten. \n \n Je kunt de bestanden hier uploaden en later gebruiken of ze direct uploaden wanneer je een nieuw contentitem met een bestandveld maakt. ",
-  "tour.step5Text": "Maar dat is niet alle ondersteuning die we kunnen bieden. \n \n Je kunt naar https://docs.squidex.io/> gaan om meer te lezen. \n \n Wil je lid worden van onze community ? ",
+  "tour.step5Text": "Maar dat is niet alle ondersteuning die we kunnen bieden. \n \n Je kunt naar https://docs.squidex.io gaan om meer te lezen. \n \n Wil je lid worden van onze community ? ",
   "tour.step5Title": "Geweldig, nu ken je de basis!",
   "tour.tooltipConfirm": "Begrepen",
   "tour.tooltipStop": "Tour stoppen",

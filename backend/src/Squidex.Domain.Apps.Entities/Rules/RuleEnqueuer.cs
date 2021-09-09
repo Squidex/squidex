@@ -54,16 +54,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 Rule = rule,
                 RuleId = ruleId,
-                IgnoreStale = false
             };
 
             var jobs = ruleService.CreateJobsAsync(@event, ruleContext);
 
             await foreach (var job in jobs)
             {
-                if (job.Job != null)
+                if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
-                    await ruleEventRepository.EnqueueAsync(job.Job, job.Exception);
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
                 }
             }
         }

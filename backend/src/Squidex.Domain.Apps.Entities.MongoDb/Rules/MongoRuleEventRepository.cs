@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public Task CancelByRuleAsync(DomainId ruleId)
         {
-            return Collection.UpdateOneAsync(x => x.RuleId == ruleId,
+            return Collection.UpdateManyAsync(x => x.RuleId == ruleId,
                 Update
                     .Set(x => x.NextAttempt, null)
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public Task CancelByAppAsync(DomainId appId)
         {
-            return Collection.UpdateOneAsync(x => x.DocumentId == appId,
+            return Collection.UpdateManyAsync(x => x.AppId == appId,
                 Update
                     .Set(x => x.NextAttempt, null)
                     .Set(x => x.JobResult, RuleJobResult.Cancelled));

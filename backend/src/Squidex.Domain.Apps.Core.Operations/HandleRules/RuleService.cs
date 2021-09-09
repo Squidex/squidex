@@ -149,12 +149,22 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             try
             {
+                var skipReason = SkipReason.None;
+
                 var rule = context.Rule;
 
                 if (!rule.IsEnabled)
                 {
-                    jobs.Add(JobResult.Disabled);
-                    return;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.Disabled;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.Disabled);
+                        return;
+                    }
                 }
 
                 if (@event.Payload is not AppEvent)
@@ -167,8 +177,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 if (typed.Payload.FromRule)
                 {
-                    jobs.Add(JobResult.FromRule);
-                    return;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.FromRule;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.FromRule);
+                        return;
+                    }
                 }
 
                 var actionType = rule.Action.GetType();
@@ -198,17 +216,32 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     @event.Headers.Timestamp() :
                     now;
 
-                if (context.IgnoreStale && eventTime.Plus(Constants.StaleTime) < now)
+                if (!context.IncludeStale && eventTime.Plus(Constants.StaleTime) < now)
                 {
-                    jobs.Add(JobResult.TooOld);
-                    return;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.TooOld;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.TooOld);
+                        return;
+                    }
                 }
-
-                var skipReason = SkipReason.None;
 
                 if (!triggerHandler.Trigger(typed, context))
                 {
-                    skipReason = SkipReason.ConditionDoesNotMatch;
+                    // For the simulation we want to proceed as much as possible.
+                    if (context.IncludeSkipped)
+                    {
+                        skipReason |= SkipReason.ConditionPrecheckDoesNotMatch;
+                    }
+                    else
+                    {
+                        jobs.Add(JobResult.ConditionPrecheckDoesNotMatch);
+                        return;
+                    }
                 }
 
                 await foreach (var enrichedEvent in triggerHandler.CreateEnrichedEventsAsync(typed, context, ct))
@@ -224,12 +257,27 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                         if (!triggerHandler.Trigger(enrichedEvent, context))
                         {
-                            skipReason = SkipReason.ConditionDoesNotMatch;
+                            // For the simulation we want to proceed as much as possible.
+                            if (context.IncludeSkipped)
+                            {
+                                skipReason |= SkipReason.ConditionDoesNotMatch;
+                            }
+                            else
+                            {
+                                jobs.Add(JobResult.ConditionDoesNotMatch);
+                                return;
+                            }
                         }
 
                         var job = await CreateJobAsync(actionHandler, enrichedEvent, context, now);
 
-                        jobs.Add(job with { SkipReason = skipReason });
+                        // If the conditions matchs, we can skip creating a new object and save a few allocation.s
+                        if (skipReason != SkipReason.None)
+                        {
+                            job = job with { SkipReason = skipReason };
+                        }
+
+                        jobs.Add(job);
                     }
                     catch (Exception ex)
                     {
@@ -238,7 +286,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                             jobs.Add(new JobResult
                             {
                                 EnrichedEvent = enrichedEvent,
-                                Exception = ex,
+                                EnrichmentError = ex,
                                 SkipReason = SkipReason.Failed
                             });
                         }

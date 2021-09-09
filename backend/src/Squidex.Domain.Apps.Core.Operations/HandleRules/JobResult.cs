@@ -18,6 +18,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             SkipReason = SkipReason.ConditionDoesNotMatch
         };
 
+        public static readonly JobResult ConditionPrecheckDoesNotMatch = new JobResult
+        {
+            SkipReason = SkipReason.ConditionPrecheckDoesNotMatch
+        };
+
         public static readonly JobResult Disabled = new JobResult
         {
             SkipReason = SkipReason.Disabled
@@ -57,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public EnrichedEvent? EnrichedEvent { get; init; }
 
-        public Exception? Exception { get; init; }
+        public Exception? EnrichmentError { get; init; }
 
         public SkipReason SkipReason { get; init; }
 
@@ -67,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 Job = job,
                 EnrichedEvent = enrichedEvent,
-                Exception = exception,
+                EnrichmentError = exception,
                 SkipReason = SkipReason.Failed
             };
         }

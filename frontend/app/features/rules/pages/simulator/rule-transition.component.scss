@@ -1,0 +1,32 @@
+.history {
+    &-transition {
+        font-size: 85%;
+        font-weight: normal;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+        position: relative;
+
+        &::before {
+            @include circle($history-dot-sm-size);
+            @include absolute(.5rem, null, null, -1.5rem);
+            background: $color-border;
+            content: '';
+            margin: 0;
+            margin-left: $history-dot-sm-offset-x;
+        }
+    }
+}
+
+:host {
+    &:first-child {
+        .history-transition {
+            margin-top: 0;
+        }
+    }
+
+    &:last-child {
+        .history-transition {
+            margin-bottom: 0;
+        }
+    }
+}

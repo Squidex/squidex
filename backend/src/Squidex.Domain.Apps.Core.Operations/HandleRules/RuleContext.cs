@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public Rule Rule { get; init; }
 
-        public bool IgnoreStale { get; init; }
+        public bool IncludeSkipped { get; init; }
+
+        public bool IncludeStale { get; init; }
     }
 }
