@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 
             var permissions = context.User?.Claims.Permissions();
 
-            if (permissions?.Allows(new Permission(permissionId)) == true)
+            if (permissions?.Allows(new Permission(permissionId)) != true)
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
