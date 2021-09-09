@@ -55,124 +55,134 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         {
             var script = operation.App.AssetScripts?.Create;
 
-            if (!string.IsNullOrWhiteSpace(script))
+            if (string.IsNullOrWhiteSpace(script))
             {
-                var parentPath = await GetPathAsync(operation, create.ParentId);
-
-                // Tags and metadata are mutable and can be changed from the scripts, but not replaced.
-                var vars = new ScriptVars
-                {
-                    [ScriptKeys.Operation] = "Create",
-                    // Use a dictionary for better performance, because no reflection is involved.
-                    [ScriptKeys.Command] = new Dictionary<string, object?>
-                    {
-                        [ScriptKeys.Metadata] = create.Metadata.Mutable(),
-                        [ScriptKeys.FileHash] = create.FileHash,
-                        [ScriptKeys.FileName] = create.File.FileName,
-                        [ScriptKeys.FileSize] = create.File.FileSize,
-                        [ScriptKeys.FileSlug] = create.File.FileName.Slugify(),
-                        [ScriptKeys.MimeType] = create.File.MimeType,
-                        [ScriptKeys.ParentId] = create.ParentId,
-                        [ScriptKeys.ParentPath] = parentPath,
-                        [ScriptKeys.Tags] = create.Tags
-                    }
-                };
-
-                await ExecuteScriptAsync(operation, script, vars);
+                return;
             }
+
+            var parentPath = await GetPathAsync(operation, create.ParentId);
+
+            // Tags and metadata are mutable and can be changed from the scripts, but not replaced.
+            var vars = new ScriptVars
+            {
+                // Use a dictionary for better performance, because no reflection is involved.
+                [ScriptKeys.Command] = new Dictionary<string, object?>
+                {
+                    [ScriptKeys.Metadata] = create.Metadata.Mutable(),
+                    [ScriptKeys.FileHash] = create.FileHash,
+                    [ScriptKeys.FileName] = create.File.FileName,
+                    [ScriptKeys.FileSize] = create.File.FileSize,
+                    [ScriptKeys.FileSlug] = create.File.FileName.Slugify(),
+                    [ScriptKeys.MimeType] = create.File.MimeType,
+                    [ScriptKeys.ParentId] = create.ParentId,
+                    [ScriptKeys.ParentPath] = parentPath,
+                    [ScriptKeys.Tags] = create.Tags
+                },
+                [ScriptKeys.Operation] = "Create"
+            };
+
+            await ExecuteScriptAsync(operation, script, vars);
         }
 
-        public static async Task ExecuteUpdateScriptAsync(this AssetOperation operation, UpdateAsset update)
+        public static Task ExecuteUpdateScriptAsync(this AssetOperation operation, UpdateAsset update)
         {
             var script = operation.App.AssetScripts?.Update;
 
-            if (!string.IsNullOrWhiteSpace(script))
+            if (string.IsNullOrWhiteSpace(script))
             {
-                // Tags and metadata are mutable and can be changed from the scripts, but not replaced.
-                var vars = new ScriptVars
-                {
-                    [ScriptKeys.Operation] = "Update",
-                    // Use a dictionary for better performance, because no reflection is involved.
-                    [ScriptKeys.Command] = new Dictionary<string, object?>
-                    {
-                        [ScriptKeys.Metadata] = update.Metadata.Mutable(),
-                        [ScriptKeys.FileHash] = update.FileHash,
-                        [ScriptKeys.FileName] = update.File.FileName,
-                        [ScriptKeys.FileSize] = update.File.FileSize,
-                        [ScriptKeys.MimeType] = update.File.MimeType,
-                        [ScriptKeys.Tags] = update.Tags,
-                    }
-                };
-
-                await ExecuteScriptAsync(operation, script, vars);
+                return Task.CompletedTask;
             }
+
+            // Tags and metadata are mutable and can be changed from the scripts, but not replaced.
+            var vars = new ScriptVars
+            {
+                // Use a dictionary for better performance, because no reflection is involved.
+                [ScriptKeys.Command] = new Dictionary<string, object?>
+                {
+                    [ScriptKeys.Metadata] = update.Metadata.Mutable(),
+                    [ScriptKeys.FileHash] = update.FileHash,
+                    [ScriptKeys.FileName] = update.File.FileName,
+                    [ScriptKeys.FileSize] = update.File.FileSize,
+                    [ScriptKeys.MimeType] = update.File.MimeType,
+                    [ScriptKeys.Tags] = update.Tags
+                },
+                [ScriptKeys.Operation] = "Update"
+            };
+
+            return ExecuteScriptAsync(operation, script, vars);
         }
 
-        public static async Task ExecuteAnnotateScriptAsync(this AssetOperation operation, AnnotateAsset annotate)
+        public static Task ExecuteAnnotateScriptAsync(this AssetOperation operation, AnnotateAsset annotate)
         {
             var script = operation.App.AssetScripts?.Annotate;
 
-            if (!string.IsNullOrWhiteSpace(script))
+            if (string.IsNullOrWhiteSpace(script))
             {
-                // Tags are mutable and can be changed from the scripts, but not replaced.
-                var vars = new ScriptVars
-                {
-                    [ScriptKeys.Operation] = "Annotate",
-                    // Use a dictionary for better performance, because no reflection is involved.
-                    [ScriptKeys.Command] = new Dictionary<string, object?>
-                    {
-                        [ScriptKeys.Metadata] = annotate.Metadata?.Mutable(),
-                        [ScriptKeys.FileName] = annotate.FileName,
-                        [ScriptKeys.FileSlug] = annotate.Slug,
-                        [ScriptKeys.Tags] = annotate.Tags,
-                    }
-                };
-
-                await ExecuteScriptAsync(operation, script, vars);
+                return Task.CompletedTask;
             }
+
+            // Tags are mutable and can be changed from the scripts, but not replaced.
+            var vars = new ScriptVars
+            {
+                // Use a dictionary for better performance, because no reflection is involved.
+                [ScriptKeys.Command] = new Dictionary<string, object?>
+                {
+                    [ScriptKeys.Metadata] = annotate.Metadata?.Mutable(),
+                    [ScriptKeys.FileName] = annotate.FileName,
+                    [ScriptKeys.FileSlug] = annotate.Slug,
+                    [ScriptKeys.Tags] = annotate.Tags
+                },
+                [ScriptKeys.Operation] = "Annotate"
+            };
+
+            return ExecuteScriptAsync(operation, script, vars);
         }
 
         public static async Task ExecuteMoveScriptAsync(this AssetOperation operation, MoveAsset move)
         {
             var script = operation.App.AssetScripts?.Move;
 
-            if (!string.IsNullOrWhiteSpace(script))
+            if (string.IsNullOrWhiteSpace(script))
             {
-                var parentPath = await GetPathAsync(operation, move.ParentId);
-
-                var vars = new ScriptVars
-                {
-                    [ScriptKeys.Operation] = "Move",
-                    // Use a dictionary for better performance, because no reflection is involved.
-                    [ScriptKeys.Command] = new Dictionary<string, object?>
-                    {
-                        [ScriptKeys.ParentId] = move.ParentId,
-                        [ScriptKeys.ParentPath] = parentPath,
-                    }
-                };
-
-                await ExecuteScriptAsync(operation, script, vars);
+                return;
             }
+
+            var parentPath = await GetPathAsync(operation, move.ParentId);
+
+            var vars = new ScriptVars
+            {
+                // Use a dictionary for better performance, because no reflection is involved.
+                [ScriptKeys.Command] = new Dictionary<string, object?>
+                {
+                    [ScriptKeys.ParentId] = move.ParentId,
+                    [ScriptKeys.ParentPath] = parentPath
+                },
+                [ScriptKeys.Operation] = "Move"
+            };
+
+            await ExecuteScriptAsync(operation, script, vars);
         }
 
-        public static async Task ExecuteDeleteScriptAsync(this AssetOperation operation, DeleteAsset delete)
+        public static Task ExecuteDeleteScriptAsync(this AssetOperation operation, DeleteAsset delete)
         {
             var script = operation.App.AssetScripts?.Delete;
 
-            if (!string.IsNullOrWhiteSpace(script))
+            if (string.IsNullOrWhiteSpace(script))
             {
-                var vars = new ScriptVars
-                {
-                    [ScriptKeys.Operation] = "Delete",
-                    // Use a dictionary for better performance, because no reflection is involved.
-                    [ScriptKeys.Command] = new Dictionary<string, object?>
-                    {
-                        [ScriptKeys.Permanent] = delete.Permanent
-                    }
-                };
-
-                await ExecuteScriptAsync(operation, script, vars);
+                return Task.CompletedTask;
             }
+
+            var vars = new ScriptVars
+            {
+                // Use a dictionary for better performance, because no reflection is involved.
+                [ScriptKeys.Command] = new Dictionary<string, object?>
+                {
+                    [ScriptKeys.Permanent] = delete.Permanent
+                },
+                [ScriptKeys.Operation] = "Delete"
+            };
+
+            return ExecuteScriptAsync(operation, script, vars);
         }
 
         private static async Task ExecuteScriptAsync(AssetOperation operation, string script, ScriptVars vars)
@@ -222,18 +232,33 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             return path.Select(x => new { id = x.Id, folderName = x.FolderName }).ToList();
         }
 
-        private static object Mutable(this AssetMetadata metadata)
+        private static object? Mutable(this AssetMetadata metadata)
         {
+            if (metadata == null)
+            {
+                return null;
+            }
+
             return new ScriptMetadataWrapper(metadata);
         }
 
-        private static object ReadonlyMetadata(this IAssetEntity asset)
+        private static object? ReadonlyMetadata(this IAssetEntity asset)
         {
+            if (asset.Metadata == null)
+            {
+                return null;
+            }
+
             return new ReadOnlyDictionary<string, IJsonValue>(asset.Metadata);
         }
 
-        private static object ReadonlyTags(this IAssetEntity asset)
+        private static object? ReadonlyTags(this IAssetEntity asset)
         {
+            if (asset.Tags == null)
+            {
+                return null;
+            }
+
             return new ReadOnlyCollection<string>(asset.Tags.ToList());
         }
     }

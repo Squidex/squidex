@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 
         public bool Duplicate { get; set; }
 
+        public bool OptimizeValidation { get; set; }
+
         public CreateAsset()
         {
             AssetId = DomainId.NewGuid();

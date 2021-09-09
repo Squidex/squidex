@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 Parent = this,
                 SchemaDisplayName = "__Shared",
                 SchemaName = "__Shared",
-                SchemaTypeName = "__Shared",
+                SchemaTypeName = "__Shared"
             };
 
             var description = "API endpoints for operations across all schemas.";

@@ -147,6 +147,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task CreateCore(CreateAsset create, AssetOperation operation)
         {
+            if (!create.OptimizeValidation)
+            {
+                await operation.MustMoveToValidFolder(create.ParentId);
+            }
+
             if (!create.DoNotScript)
             {
                 await operation.ExecuteCreateScriptAsync(create);

@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "type",
                 ResolvedType = AllTypes.NonNullAssetType,
                 Resolver = Resolve(x => x.Type),
-                Description = FieldDescriptions.AssetType,
+                Description = FieldDescriptions.AssetType
             });
 
             AddField(new FieldType
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "metadataText",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.MetadataText),
-                Description = FieldDescriptions.AssetMetadataText,
+                Description = FieldDescriptions.AssetMetadataText
             });
 
             AddField(new FieldType
@@ -216,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "tags",
                 ResolvedType = AllTypes.NonNullStrings,
                 Resolver = Resolve(x => x.TagNames),
-                Description = FieldDescriptions.AssetTags,
+                Description = FieldDescriptions.AssetTags
             });
 
             AddField(new FieldType
@@ -225,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Arguments = AssetActions.Metadata.Arguments,
                 ResolvedType = AllTypes.JsonNoop,
                 Resolver = AssetActions.Metadata.Resolver,
-                Description = FieldDescriptions.AssetMetadata,
+                Description = FieldDescriptions.AssetMetadata
             });
 
             if (canGenerateSourceUrl)
@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                     Name = "sourceUrl",
                     ResolvedType = AllTypes.NonNullString,
                     Resolver = SourceUrl,
-                    Description = FieldDescriptions.AssetSourceUrl,
+                    Description = FieldDescriptions.AssetSourceUrl
                 });
             }
 

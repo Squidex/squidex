@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 ["isClient"] = isClient,
                 ["isUser"] = !isClient,
                 ["name"] = name,
-                ["claims"] = claims,
+                ["claims"] = claims
             };
 
             return JsValue.FromObject(engine, result);

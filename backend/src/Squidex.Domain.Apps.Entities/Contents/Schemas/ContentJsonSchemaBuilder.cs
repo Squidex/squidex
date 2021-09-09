@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                     ["lastModified"] = SchemaBuilder.DateTimeProperty(FieldDescriptions.EntityLastModified, true),
                     ["lastModifiedBy"] = SchemaBuilder.StringProperty(FieldDescriptions.EntityLastModifiedBy, true),
                     ["newStatus"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentNewStatus),
-                    ["status"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentStatus, true),
+                    ["status"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentStatus, true)
                 },
                 Type = JsonObjectType.Object
             };
