@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Identity;
 
@@ -22,7 +23,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 return;
             }
 
-            if (!context.User.Allows(permissionId, content.AppId.Name, content.SchemaId.Name))
+            var permissions = context.User?.Claims.Permissions();
+
+            if (permissions?.Allows(new Permission(permissionId)) == true)
             {
                 throw new DomainForbiddenException(T.Get("common.errorNoPermission"));
             }
