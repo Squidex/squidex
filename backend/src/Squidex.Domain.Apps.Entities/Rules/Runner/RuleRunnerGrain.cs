@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         AppId = rule.AppId,
                         Rule = rule.RuleDef,
                         RuleId = rule.Id,
-                        IgnoreStale = true
+                        IncludeStale = true
                     };
 
                     if (currentState.RunFromSnapshots && ruleService.CanCreateSnapshotEvents(context))

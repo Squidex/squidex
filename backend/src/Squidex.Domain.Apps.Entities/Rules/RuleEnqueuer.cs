@@ -54,7 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 Rule = rule,
                 RuleId = ruleId,
-                IgnoreStale = false
             };
 
             var jobs = ruleService.CreateJobsAsync(@event, ruleContext);

@@ -11,6 +11,7 @@ export * from './pages/rule/rule-page.component';
 export * from './pages/rules/rule.component';
 export * from './pages/rules/rules-page.component';
 export * from './pages/simulator/rule-simulator-page.component';
+export * from './pages/simulator/rule-transition.component';
 export * from './pages/simulator/simulated-rule-event.component';
 export * from './shared/actions/formattable-input.component';
 export * from './shared/actions/generic-action.component';

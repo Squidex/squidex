@@ -41,7 +41,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             Guard.NotNull(rule, nameof(rule));
 
-            var context = GetContext(rule);
+            var context = new RuleContext
+            {
+                AppId = rule.AppId,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                IncludeSkipped = true,
+                IncludeStale = true
+            };
 
             var simulatedEvents = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
 
@@ -53,6 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                 if (@event?.Payload is AppEvent appEvent)
                 {
+                    // Also create jobs for rules with failing conditions because we want to show them in th table.
                     await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct))
                     {
                         var eventName = result.Job?.EventName;
@@ -120,8 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 AppId = rule.AppId,
                 Rule = rule.RuleDef,
-                RuleId = rule.Id,
-                IgnoreStale = false
+                RuleId = rule.Id
             };
         }
     }

@@ -421,7 +421,7 @@ describe('RulesService', () => {
             actionName: `action-name${key}`,
             actionData: `action-data${key}`,
             error: `error${key}`,
-            skipReason: `reason${key}`,
+            skipReasons: [`reason${key}`],
             _links: {},
         };
     }
@@ -486,5 +486,5 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
         `action-name${key}`,
         `action-data${key}`,
         `error${key}`,
-        `reason${key}`);
+        [`reason${key}`]);
 }

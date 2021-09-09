@@ -76,6 +76,11 @@ $panel-sidebar:             3.75rem;
 $font-small:                85%;
 $font-smallest:             80%;
 
+$history-dot-size: 10px;
+$history-dot-offset-x: -($history-dot-size * .5 + 1px);
+$history-dot-sm-size: 6px;
+$history-dot-sm-offset-x: -($history-dot-sm-size * .5 + 1px);
+
 $asset-width:               14.5rem;
 $asset-folder-height:       4rem;
 $asset-height:              19rem;
