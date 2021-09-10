@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             Guard.NotNull(rules, nameof(rules));
             Guard.NotNull(context, nameof(context));
 
-            using (Telemetry.Activities.StartMethod<RuleEnricher>())
+            using (Telemetry.Activities.StartActivity("RuleEnricher/EnrichAsync"))
             {
                 var results = new List<RuleEntity>();
 

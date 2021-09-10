@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task DeleteAppAsync(DomainId appId,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/DeleteAppAsync"))
             {
                 await Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, appId), ct);
             }
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
             {
                 if (q.Ids != null && q.Ids.Count > 0)
                 {
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IContentEntity?> FindContentAsync(ISchemaEntity schema, DomainId id,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/FindContentAsync"))
             {
                 return await queryBdId.QueryAsync(schema, id, ct);
             }
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryScheduledWithoutDataAsync"))
             {
                 await queryScheduled.QueryAsync(now, callback, ct);
             }
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, HashSet<DomainId> ids,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
             {
                 return await queryByIds.QueryIdsAsync(appId, ids, ct);
             }
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryIdsAsync"))
             {
                 return await queryByQuery.QueryIdsAsync(appId, schemaId, filterNode, ct);
             }
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<bool> HasReferrersAsync(DomainId appId, DomainId contentId,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentCollection/HasReferrersAsync"))
             {
                 return await queryReferrers.CheckExistsAsync(appId, contentId, ct);
             }

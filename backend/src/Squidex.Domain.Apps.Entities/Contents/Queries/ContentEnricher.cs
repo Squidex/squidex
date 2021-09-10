@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichInternalAsync(IEnumerable<IContentEntity> contents, bool cloneData, Context context,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<ContentEnricher>())
+            using (Telemetry.Activities.StartActivity("ContentEnricher/EnrichInternalAsync"))
             {
                 var results = new List<ContentEntity>();
 
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         {
                             ct.ThrowIfCancellationRequested();
 
-                            using (Telemetry.Activities.StartMethod(step.ToString()!))
+                            using (Telemetry.Activities.StartActivity(step.ToString()!))
                             {
                                 await step.EnrichAsync(context, results, GetSchema, ct);
                             }

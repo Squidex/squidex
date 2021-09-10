@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task<(ContentDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
             {
                 var version = await collectionAll.FindVersionAsync(key);
 
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync()
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentRepository/ClearAsync"))
             {
                 await collectionAll.ClearAsync();
                 await collectionPublished.ClearAsync();
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
             {
                 await collectionAll.RemoveAsync(key);
                 await collectionPublished.RemoveAsync(key);
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
             {
                 if (value.SchemaId.Id == DomainId.Empty)
                 {
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots)
         {
-            using (Telemetry.Activities.StartMethod<MongoContentRepository>())
+            using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
             {
                 var entitiesPublished = new List<MongoContentEntity>();
                 var entitiesAll = new List<MongoContentEntity>();

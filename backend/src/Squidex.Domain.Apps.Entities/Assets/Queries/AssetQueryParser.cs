@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
-            using (Telemetry.Activities.StartMethod<AssetQueryParser>())
+            using (Telemetry.Activities.StartActivity("AssetQueryParser/ParseAsync"))
             {
                 var query = ParseClrQuery(q);
 
