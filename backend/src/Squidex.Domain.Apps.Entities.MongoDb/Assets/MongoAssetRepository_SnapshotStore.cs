@@ -20,16 +20,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State>, IDeleter
+    public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State>
     {
-        async Task IDeleter.DeleteAppAsync(DomainId appId, CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/DeleteAppAsync"))
-            {
-                await Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, appId), ct);
-            }
-        }
-
         async Task<(AssetDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/ReadAsync"))

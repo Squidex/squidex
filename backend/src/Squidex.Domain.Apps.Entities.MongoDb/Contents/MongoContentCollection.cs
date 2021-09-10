@@ -103,15 +103,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return queryAsStream.StreamAll(appId, schemaIds, ct);
         }
 
-        public async Task DeleteAppAsync(DomainId appId,
-            CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoContentCollection/DeleteAppAsync"))
-            {
-                await Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, appId), ct);
-            }
-        }
-
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
