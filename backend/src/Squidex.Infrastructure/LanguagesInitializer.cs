@@ -23,7 +23,8 @@ namespace Squidex.Infrastructure
             this.options = options.Value;
         }
 
-        public Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct = default)
         {
             foreach (var (key, value) in options)
             {

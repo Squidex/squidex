@@ -33,7 +33,8 @@ namespace Migrations
             this.populateGrainIndexes = populateGrainIndexes;
         }
 
-        public async Task RunAsync(CancellationToken ct)
+        public async Task RunAsync(
+            CancellationToken ct)
         {
             var batchSize = rebuildOptions.CalculateBatchSize();
 

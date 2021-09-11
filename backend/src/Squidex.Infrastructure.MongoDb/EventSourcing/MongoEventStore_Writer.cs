@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -19,19 +20,22 @@ namespace Squidex.Infrastructure.EventSourcing
         private const int MaxWriteAttempts = 20;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 
-        public Task DeleteStreamAsync(string streamName)
+        public Task DeleteStreamAsync(string streamName,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
-            return Collection.DeleteManyAsync(x => x.EventStream == streamName);
+            return Collection.DeleteManyAsync(x => x.EventStream == streamName, cancellationToken: ct);
         }
 
-        public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
+        public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
+            CancellationToken ct = default)
         {
-            return AppendAsync(commitId, streamName, EtagVersion.Any, events);
+            return AppendAsync(commitId, streamName, EtagVersion.Any, events, ct);
         }
 
-        public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
+        public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
+            CancellationToken ct = default)
         {
             Guard.NotEmpty(commitId, nameof(commitId));
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
@@ -46,7 +50,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     return;
                 }
 
-                var currentVersion = await GetEventStreamOffsetAsync(streamName);
+                var currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
 
                 if (expectedVersion > EtagVersion.Any && expectedVersion != currentVersion)
                 {
@@ -59,7 +63,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 {
                     try
                     {
-                        await Collection.InsertOneAsync(commit);
+                        await Collection.InsertOneAsync(commit, cancellationToken: ct);
 
                         if (!CanUseChangeStreams)
                         {
@@ -72,7 +76,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
                         {
-                            currentVersion = await GetEventStreamOffsetAsync(streamName);
+                            currentVersion = await GetEventStreamOffsetAsync(streamName, ct);
 
                             if (expectedVersion > EtagVersion.Any)
                             {
@@ -97,7 +101,8 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits)
+        public async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits,
+            CancellationToken ct = default)
         {
             Guard.NotNull(commits, nameof(commits));
 
@@ -114,12 +119,13 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (writes.Count > 0)
                 {
-                    await Collection.BulkWriteAsync(writes, BulkUnordered);
+                    await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
                 }
             }
         }
 
-        private async Task<long> GetEventStreamOffsetAsync(string streamName)
+        private async Task<long> GetEventStreamOffsetAsync(string streamName,
+            CancellationToken ct = default)
         {
             var document =
                 await Collection.Find(Filter.Eq(EventStreamField, streamName))
@@ -127,7 +133,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         .Include(EventStreamOffsetField)
                         .Include(EventsCountField))
                     .Sort(Sort.Descending(EventStreamOffsetField)).Limit(1)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(cancellationToken: ct);
 
             if (document != null)
             {

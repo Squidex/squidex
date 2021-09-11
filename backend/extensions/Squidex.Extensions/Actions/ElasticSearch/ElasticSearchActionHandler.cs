@@ -100,7 +100,8 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             return ("Ignore", new ElasticSearchJob());
         }
 
-        protected override async Task<Result> ExecuteJobAsync(ElasticSearchJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(ElasticSearchJob job,
+            CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(job.ServerHost))
             {

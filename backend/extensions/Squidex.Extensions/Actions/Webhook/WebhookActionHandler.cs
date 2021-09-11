@@ -89,7 +89,8 @@ namespace Squidex.Extensions.Actions.Webhook
             return headersDictionary;
         }
 
-        protected override async Task<Result> ExecuteJobAsync(WebhookJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(WebhookJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

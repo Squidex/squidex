@@ -23,7 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
             this.grainFactory = grainFactory;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
             await GetGrain().CountAsync();
 

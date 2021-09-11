@@ -18,32 +18,38 @@ namespace Migrations
 {
     public static class RebuilderExtensions
     {
-        public static Task RebuildAppsAsync(this Rebuilder rebuilder, int batchSize, CancellationToken ct = default)
+        public static Task RebuildAppsAsync(this Rebuilder rebuilder, int batchSize,
+            CancellationToken ct = default)
         {
             return rebuilder.RebuildAsync<AppDomainObject, AppDomainObject.State>("^app\\-", batchSize, ct);
         }
 
-        public static Task RebuildSchemasAsync(this Rebuilder rebuilder, int batchSize, CancellationToken ct = default)
+        public static Task RebuildSchemasAsync(this Rebuilder rebuilder, int batchSize,
+            CancellationToken ct = default)
         {
             return rebuilder.RebuildAsync<SchemaDomainObject, SchemaDomainObject.State>("^schema\\-", batchSize, ct);
         }
 
-        public static Task RebuildRulesAsync(this Rebuilder rebuilder, int batchSize, CancellationToken ct = default)
+        public static Task RebuildRulesAsync(this Rebuilder rebuilder, int batchSize,
+            CancellationToken ct = default)
         {
             return rebuilder.RebuildAsync<RuleDomainObject, RuleDomainObject.State>("^rule\\-", batchSize, ct);
         }
 
-        public static Task RebuildAssetsAsync(this Rebuilder rebuilder, int batchSize, CancellationToken ct = default)
+        public static Task RebuildAssetsAsync(this Rebuilder rebuilder, int batchSize,
+            CancellationToken ct = default)
         {
             return rebuilder.RebuildAsync<AssetDomainObject, AssetDomainObject.State>("^asset\\-", batchSize, ct);
         }
 
-        public static Task RebuildAssetFoldersAsync(this Rebuilder rebuilder, int batchSize, CancellationToken ct = default)
+        public static Task RebuildAssetFoldersAsync(this Rebuilder rebuilder, int batchSize,
+            CancellationToken ct = default)
         {
             return rebuilder.RebuildAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>("^assetFolder\\-", batchSize, ct);
         }
 
-        public static Task RebuildContentAsync(this Rebuilder rebuilder, int batchSize, CancellationToken ct = default)
+        public static Task RebuildContentAsync(this Rebuilder rebuilder, int batchSize,
+            CancellationToken ct = default)
         {
             return rebuilder.RebuildAsync<ContentDomainObject, ContentDomainObject.State>("^content\\-", batchSize, ct);
         }

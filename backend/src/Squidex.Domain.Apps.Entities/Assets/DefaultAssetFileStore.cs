@@ -90,7 +90,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.CopyAsync(tempFile, fileName, ct);
         }
 
-        public Task DeleteAsync(DomainId appId, DomainId id, long fileVersion, string? suffix)
+        public Task DeleteAsync(DomainId appId, DomainId id, long fileVersion, string? suffix,
+            CancellationToken ct = default)
         {
             var fileNameOld = GetFileName(id, fileVersion, suffix);
             var fileNameNew = GetFileName(appId, id, fileVersion, suffix);
@@ -107,7 +108,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public Task DeleteAsync(string tempFile)
+        public Task DeleteAsync(string tempFile,
+            CancellationToken ct = default)
         {
             return assetStore.DeleteAsync(tempFile);
         }

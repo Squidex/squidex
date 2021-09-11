@@ -29,7 +29,8 @@ namespace Squidex.Infrastructure.Migrations
             this.log = log;
         }
 
-        public async Task MigrateAsync(CancellationToken ct = default)
+        public async Task MigrateAsync(
+            CancellationToken ct = default)
         {
             try
             {

@@ -25,7 +25,8 @@ namespace Squidex.Areas.IdentityServer.Config
         {
         }
 
-        protected override ValueTask<bool> ValidateClientSecretAsync(string secret, string comparand, CancellationToken cancellationToken = default)
+        protected override ValueTask<bool> ValidateClientSecretAsync(string secret, string comparand,
+            CancellationToken cancellationToken = default)
         {
             return new ValueTask<bool>(string.Equals(secret, comparand));
         }

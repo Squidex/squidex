@@ -64,7 +64,8 @@ namespace Squidex.Web.Pipeline
             return result;
         }
 
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        public override async Task WriteAsync(byte[] buffer, int offset, int count,
+            CancellationToken cancellationToken)
         {
             await inner.WriteAsync(buffer, offset, count, cancellationToken);
 
@@ -78,7 +79,8 @@ namespace Squidex.Web.Pipeline
             bytesWritten += count;
         }
 
-        public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async ValueTask WriteAsync(ReadOnlyMemory<byte> buffer,
+            CancellationToken cancellationToken = default)
         {
             await inner.WriteAsync(buffer, cancellationToken);
 
@@ -99,7 +101,8 @@ namespace Squidex.Web.Pipeline
             bytesWritten++;
         }
 
-        public override Task FlushAsync(CancellationToken cancellationToken)
+        public override Task FlushAsync(
+            CancellationToken cancellationToken)
         {
             return inner.FlushAsync(cancellationToken);
         }

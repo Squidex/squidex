@@ -364,7 +364,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return @event.GetType().Name;
         }
 
-        public async Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job)
+        public async Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job,
+            CancellationToken ct = default)
         {
             var actionWatch = ValueStopwatch.StartNew();
 
@@ -379,7 +380,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 using (var cts = new CancellationTokenSource(GetTimeoutInMs()))
                 {
-                    result = await actionHandler.ExecuteJobAsync(deserialized, cts.Token).WithCancellation(cts.Token);
+                    using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
+                    {
+                        result = await actionHandler.ExecuteJobAsync(deserialized, combined.Token).WithCancellation(combined.Token);
+                    }
                 }
             }
             catch (Exception ex)

@@ -210,24 +210,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<long> FindVersionAsync(DomainId documentId)
+        public async Task<long> FindVersionAsync(DomainId documentId,
+            CancellationToken ct = default)
         {
-            var result = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.Version).FirstOrDefaultAsync();
+            var result = await Collection.Find(x => x.DocumentId == documentId).Only(x => x.Version).FirstOrDefaultAsync(ct);
 
             return result?["vs"].AsInt64 ?? EtagVersion.Empty;
         }
 
-        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity entity)
+        public Task UpsertVersionedAsync(DomainId documentId, long oldVersion, MongoContentEntity entity,
+            CancellationToken ct = default)
         {
-            return Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity);
+            return Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity, ct);
         }
 
-        public Task RemoveAsync(DomainId documentId)
+        public Task RemoveAsync(DomainId documentId,
+            CancellationToken ct = default)
         {
-            return Collection.DeleteOneAsync(x => x.DocumentId == documentId);
+            return Collection.DeleteOneAsync(x => x.DocumentId == documentId, ct);
         }
 
-        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> entities)
+        public Task InsertManyAsync(IReadOnlyList<MongoContentEntity> entities,
+            CancellationToken ct = default)
         {
             if (entities.Count == 0)
             {
@@ -241,7 +245,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 IsUpsert = true
             }).ToList();
 
-            return Collection.BulkWriteAsync(writes, BulkUnordered);
+            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
         }
     }
 }

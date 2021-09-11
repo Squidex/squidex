@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Caching;
 using Squidex.Infrastructure;
@@ -25,14 +26,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             this.inner = inner;
         }
 
-        public async Task ClearAsync()
+        public async Task ClearAsync(
+            CancellationToken ct = default)
         {
-            await inner.ClearAsync();
+            await inner.ClearAsync(ct);
 
             cache.Clear();
         }
 
-        public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids)
+        public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+            CancellationToken ct = default)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -57,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
             if (missingIds.Count > 0)
             {
-                var fromInner = await inner.GetAsync(missingIds);
+                var fromInner = await inner.GetAsync(missingIds, ct);
 
                 foreach (var (id, state) in fromInner)
                 {
@@ -75,7 +78,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return result;
         }
 
-        public Task SetAsync(List<TextContentState> updates)
+        public Task SetAsync(List<TextContentState> updates,
+            CancellationToken ct = default)
         {
             Guard.NotNull(updates, nameof(updates));
 
@@ -91,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
                 }
             }
 
-            return inner.SetAsync(updates);
+            return inner.SetAsync(updates, ct);
         }
     }
 }

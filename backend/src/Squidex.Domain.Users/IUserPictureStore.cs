@@ -13,8 +13,10 @@ namespace Squidex.Domain.Users
 {
     public interface IUserPictureStore
     {
-        Task UploadAsync(string userId, Stream stream, CancellationToken ct = default);
+        Task UploadAsync(string userId, Stream stream,
+            CancellationToken ct = default);
 
-        Task DownloadAsync(string userId, Stream stream, CancellationToken ct = default);
+        Task DownloadAsync(string userId, Stream stream,
+            CancellationToken ct = default);
     }
 }

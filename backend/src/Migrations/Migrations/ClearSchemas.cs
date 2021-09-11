@@ -22,7 +22,8 @@ namespace Migrations.Migrations
             this.store = store;
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             return store.ClearSnapshotsAsync();
         }

@@ -24,7 +24,8 @@ namespace Migrations.Migrations
             this.eventStore = eventStore;
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             if (eventStore is MongoEventStore mongoEventStore)
             {

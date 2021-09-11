@@ -90,7 +90,8 @@ namespace Squidex.Extensions.Actions.Kafka
             return headersDictionary;
         }
 
-        protected override async Task<Result> ExecuteJobAsync(KafkaJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(KafkaJob job,
+            CancellationToken ct = default)
         {
             try
             {

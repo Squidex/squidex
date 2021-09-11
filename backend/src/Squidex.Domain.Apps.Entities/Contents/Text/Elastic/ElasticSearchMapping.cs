@@ -15,7 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 {
     public static class ElasticSearchMapping
     {
-        public static async Task ApplyAsync(IElasticLowLevelClient elastic, string indexName, CancellationToken ct = default)
+        public static async Task ApplyAsync(IElasticLowLevelClient elastic, string indexName,
+            CancellationToken ct = default)
         {
             var query = new
             {

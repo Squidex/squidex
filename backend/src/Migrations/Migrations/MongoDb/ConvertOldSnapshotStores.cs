@@ -23,7 +23,8 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             var collections = new[]
             {

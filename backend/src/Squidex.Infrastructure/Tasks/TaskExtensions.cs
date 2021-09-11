@@ -34,7 +34,8 @@ namespace Squidex.Infrastructure.Tasks
             }
         }
 
-        public static async Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
+        public static async Task<T> WithCancellation<T>(this Task<T> task,
+            CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
 

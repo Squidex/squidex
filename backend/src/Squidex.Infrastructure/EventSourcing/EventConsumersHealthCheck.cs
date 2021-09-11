@@ -24,7 +24,8 @@ namespace Squidex.Infrastructure.EventSourcing
             this.grainFactory = grainFactory;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
             var eventConsumers = await GetGrain().GetConsumersAsync();
 

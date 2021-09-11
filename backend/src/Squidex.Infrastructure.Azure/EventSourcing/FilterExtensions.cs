@@ -24,7 +24,8 @@ namespace Squidex.Infrastructure.EventSourcing
             EnableCrossPartitionQuery = true
         };
 
-        public static async Task<T?> FirstOrDefaultAsync<T>(this IQueryable<T> queryable, CancellationToken ct = default)
+        public static async Task<T?> FirstOrDefaultAsync<T>(this IQueryable<T> queryable,
+            CancellationToken ct = default)
         {
             var documentQuery = queryable.AsDocumentQuery();
 

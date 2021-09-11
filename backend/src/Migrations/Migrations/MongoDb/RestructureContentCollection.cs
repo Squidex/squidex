@@ -23,7 +23,8 @@ namespace Migrations.Migrations.MongoDb
             this.contentDatabase = contentDatabase;
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             if (await contentDatabase.CollectionExistsAsync("State_Content_Draft"))
             {

@@ -45,7 +45,8 @@ namespace Squidex.Extensions.Actions
             return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
         }
 
-        public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null, CancellationToken ct = default)
+        public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null,
+            CancellationToken ct = default)
         {
             HttpResponseMessage response = null;
             try

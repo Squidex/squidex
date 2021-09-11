@@ -23,7 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.jsonSerializer = jsonSerializer;
         }
 
-        public async Task WriteAsync<T>(Stream stream, T value, CancellationToken cancellationToken = default)
+        public async Task WriteAsync<T>(Stream stream, T value,
+            CancellationToken cancellationToken = default)
         {
             await using (var buffer = new FileBufferingWriteStream())
             {

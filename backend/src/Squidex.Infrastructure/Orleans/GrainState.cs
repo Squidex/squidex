@@ -37,7 +37,8 @@ namespace Squidex.Infrastructure.Orleans
             context.ObservableLifecycle.Subscribe("Persistence", GrainLifecycleStage.SetupState, SetupAsync);
         }
 
-        public Task SetupAsync(CancellationToken ct = default)
+        public Task SetupAsync(
+            CancellationToken ct = default)
         {
             if (ct.IsCancellationRequested)
             {

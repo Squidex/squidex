@@ -27,7 +27,8 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 20;

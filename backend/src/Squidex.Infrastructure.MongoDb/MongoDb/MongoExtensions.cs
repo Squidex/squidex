@@ -6,42 +6,44 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.States;
 
-#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
-
 namespace Squidex.Infrastructure.MongoDb
 {
     public static class MongoExtensions
     {
-        private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
         private static readonly ReplaceOptions UpsertReplace = new ReplaceOptions { IsUpsert = true };
 
-        public static async Task<bool> CollectionExistsAsync(this IMongoDatabase database, string collectionName)
+        public static async Task<bool> CollectionExistsAsync(this IMongoDatabase database, string collectionName,
+            CancellationToken ct = default)
         {
             var options = new ListCollectionNamesOptions
             {
                 Filter = new BsonDocument("name", collectionName)
             };
 
-            var collections = await database.ListCollectionNamesAsync(options);
+            var collections = await database.ListCollectionNamesAsync(options, ct);
 
-            return await collections.AnyAsync();
+            return await collections.AnyAsync(ct);
         }
 
-        public static Task<bool> AnyAsync<T>(this IMongoCollection<T> collection)
+        public static Task<bool> AnyAsync<T>(this IMongoCollection<T> collection,
+            CancellationToken ct = default)
         {
             var find = collection.Find(new BsonDocument()).Limit(1);
 
-            return find.AnyAsync();
+            return find.AnyAsync(ct);
         }
 
-        public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document, CancellationToken ct = default)
+        public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document,
+            CancellationToken ct = default)
         {
             try
             {
@@ -55,15 +57,19 @@ namespace Squidex.Infrastructure.MongoDb
             return true;
         }
 
-        public static async Task TryDropOneAsync<T>(this IMongoIndexManager<T> indexes, string name)
+        public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IFindFluent<T, T> find,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            try
+            var cursor = await find.ToCursorAsync(ct);
+
+            while (await cursor.MoveNextAsync(ct))
             {
-                await indexes.DropOneAsync(name);
-            }
-            catch
-            {
-                /* NOOP */
+                foreach (var item in cursor.Current)
+                {
+                    ct.ThrowIfCancellationRequested();
+
+                    yield return item;
+                }
             }
         }
 
@@ -101,42 +107,8 @@ namespace Squidex.Infrastructure.MongoDb
             return find.Project<T>(Builders<T>.Projection.Exclude(exclude1).Exclude(exclude2));
         }
 
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater)
-            where T : IVersionedEntity<TKey> where TKey : notnull
-        {
-            try
-            {
-                var update = updater(Builders<T>.Update.Set(x => x.Version, newVersion));
-
-                if (oldVersion > EtagVersion.Any)
-                {
-                    await collection.UpdateOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, update, Upsert);
-                }
-                else
-                {
-                    await collection.UpdateOneAsync(x => x.DocumentId.Equals(key), update, Upsert);
-                }
-            }
-            catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
-            {
-                var existingVersion =
-                    await collection.Find(x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
-                        .FirstOrDefaultAsync();
-
-                if (existingVersion != null)
-                {
-                    var field = Field.Of<T>(x => nameof(x.Version));
-
-                    throw new InconsistentStateException(existingVersion[field].AsInt64, oldVersion, ex);
-                }
-                else
-                {
-                    throw new InconsistentStateException(EtagVersion.Any, oldVersion, ex);
-                }
-            }
-        }
-
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T document)
+        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T document,
+            CancellationToken ct = default)
             where T : IVersionedEntity<TKey> where TKey : notnull
         {
             try
@@ -146,18 +118,18 @@ namespace Squidex.Infrastructure.MongoDb
 
                 if (oldVersion > EtagVersion.Any)
                 {
-                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, document, UpsertReplace);
+                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key) && x.Version == oldVersion, document, UpsertReplace, ct);
                 }
                 else
                 {
-                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key), document, UpsertReplace);
+                    await collection.ReplaceOneAsync(x => x.DocumentId.Equals(key), document, UpsertReplace, ct);
                 }
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
                 var existingVersion =
                     await collection.Find(x => x.DocumentId.Equals(key)).Only(x => x.DocumentId, x => x.Version)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct);
 
                 if (existingVersion != null)
                 {
@@ -172,7 +144,8 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task<Version> GetVersionAsync(this IMongoDatabase database)
+        public static async Task<Version> GetVersionAsync(this IMongoDatabase database,
+            CancellationToken ct = default)
         {
             var command =
                 new BsonDocumentCommand<BsonDocument>(new BsonDocument
@@ -180,7 +153,7 @@ namespace Squidex.Infrastructure.MongoDb
                     { "buildInfo", 1 }
                 });
 
-            var result = await database.RunCommandAsync(command);
+            var result = await database.RunCommandAsync(command, cancellationToken: ct);
 
             return Version.Parse(result["version"].AsString);
         }

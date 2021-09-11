@@ -13,6 +13,7 @@ namespace Squidex.Domain.Apps.Entities
 {
     public interface IDeleter
     {
-        Task DeleteAppAsync(DomainId appId, CancellationToken ct);
+        Task DeleteAppAsync(DomainId appId,
+            CancellationToken ct = default);
     }
 }

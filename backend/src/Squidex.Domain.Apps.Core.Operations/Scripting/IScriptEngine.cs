@@ -14,9 +14,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public interface IScriptEngine
     {
-        Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default, CancellationToken ct = default);
+        Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
+            CancellationToken ct = default);
 
-        Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default, CancellationToken ct = default);
+        Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default,
+            CancellationToken ct = default);
 
         IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default);
 

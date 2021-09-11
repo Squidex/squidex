@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/FindAsync"))
             {
-                var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
+                var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
 
                 IContentEntity? content;
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     return EmptyContents;
                 }
 
-                var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
+                var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
 
                 if (!HasPermission(context, schema, Permissions.AppContentsRead))
                 {
@@ -170,9 +170,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        public async Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName)
+        public async Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName,
+            CancellationToken ct = default)
         {
-            var schema = await GetSchemaAsync(context, schemaIdOrName);
+            var schema = await GetSchemaAsync(context, schemaIdOrName, ct);
 
             if (schema == null)
             {
@@ -182,7 +183,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return schema;
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrName)
+        public async Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrName,
+            CancellationToken ct = default)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNullOrEmpty(schemaIdOrName, nameof(schemaIdOrName));

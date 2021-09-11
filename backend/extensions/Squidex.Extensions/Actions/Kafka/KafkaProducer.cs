@@ -112,7 +112,8 @@ namespace Squidex.Extensions.Actions.Kafka
                 .WriteProperty("reason", error.Reason));
         }
 
-        public async Task SendAsync(KafkaJob job, CancellationToken ct)
+        public async Task SendAsync(KafkaJob job,
+            CancellationToken ct)
         {
             if (!string.IsNullOrWhiteSpace(job.Schema))
             {
@@ -130,7 +131,8 @@ namespace Squidex.Extensions.Actions.Kafka
             }
         }
 
-        private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job, CancellationToken ct)
+        private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job,
+            CancellationToken ct)
         {
             message.Key = job.MessageKey;
 

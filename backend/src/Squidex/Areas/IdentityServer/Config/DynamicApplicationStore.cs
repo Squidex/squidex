@@ -36,7 +36,8 @@ namespace Squidex.Areas.IdentityServer.Config
             this.serviceProvider = serviceProvider;
         }
 
-        public override async ValueTask<ImmutableApplication?> FindByIdAsync(string identifier, CancellationToken cancellationToken)
+        public override async ValueTask<ImmutableApplication?> FindByIdAsync(string identifier,
+            CancellationToken cancellationToken)
         {
             var application = await base.FindByIdAsync(identifier, cancellationToken);
 
@@ -48,7 +49,8 @@ namespace Squidex.Areas.IdentityServer.Config
             return application;
         }
 
-        public override async ValueTask<ImmutableApplication?> FindByClientIdAsync(string identifier, CancellationToken cancellationToken)
+        public override async ValueTask<ImmutableApplication?> FindByClientIdAsync(string identifier,
+            CancellationToken cancellationToken)
         {
             var application = await base.FindByClientIdAsync(identifier, cancellationToken);
 

@@ -21,7 +21,8 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             await database.DropCollectionAsync("States_Contents", ct);
             await database.DropCollectionAsync("States_Contents_Archive", ct);

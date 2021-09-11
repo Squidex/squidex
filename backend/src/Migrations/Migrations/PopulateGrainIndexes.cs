@@ -40,7 +40,8 @@ namespace Migrations.Migrations
             this.eventStore = eventStore;
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             return Task.WhenAll(
                 RebuildAppIndexes(ct),
@@ -48,7 +49,8 @@ namespace Migrations.Migrations
                 RebuildSchemaIndexes(ct));
         }
 
-        private async Task RebuildAppIndexes(CancellationToken ct)
+        private async Task RebuildAppIndexes(
+            CancellationToken ct)
         {
             var appsByName = new Dictionary<string, DomainId>();
             var appsByUser = new Dictionary<string, HashSet<DomainId>>();
@@ -120,7 +122,8 @@ namespace Migrations.Migrations
             }
         }
 
-        private async Task RebuildRuleIndexes(CancellationToken ct)
+        private async Task RebuildRuleIndexes(
+            CancellationToken ct)
         {
             var rulesByApp = new Dictionary<DomainId, HashSet<DomainId>>();
 
@@ -153,7 +156,8 @@ namespace Migrations.Migrations
             }
         }
 
-        private async Task RebuildSchemaIndexes(CancellationToken ct)
+        private async Task RebuildSchemaIndexes(
+            CancellationToken ct)
         {
             var schemasByApp = new Dictionary<DomainId, Dictionary<string, DomainId>>();
 

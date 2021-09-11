@@ -34,7 +34,8 @@ namespace Squidex.Extensions.Actions.Prerender
             return ($"Recache {url}", new PrerenderJob { RequestBody = requestBody });
         }
 
-        protected override async Task<Result> ExecuteJobAsync(PrerenderJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(PrerenderJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

@@ -56,7 +56,8 @@ namespace Migrations.Migrations.MongoDb
             return this;
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             switch (scope)
             {
@@ -71,7 +72,8 @@ namespace Migrations.Migrations.MongoDb
             }
         }
 
-        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameOld, CancellationToken ct)
+        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameOld,
+            CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 10;

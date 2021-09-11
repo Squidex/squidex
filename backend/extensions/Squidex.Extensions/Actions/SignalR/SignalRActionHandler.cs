@@ -67,7 +67,8 @@ namespace Squidex.Extensions.Actions.SignalR
             return (ruleDescription, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(SignalRJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(SignalRJob job,
+            CancellationToken ct = default)
         {
             var signalR = await clients.GetClientAsync((job.ConnectionString, job.HubName));
 

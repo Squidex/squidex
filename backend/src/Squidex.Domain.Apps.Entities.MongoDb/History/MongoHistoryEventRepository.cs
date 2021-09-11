@@ -18,7 +18,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.History
 {
-    public class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository
+    public class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository, IDeleter
     {
         static MongoHistoryEventRepository()
         {
@@ -60,19 +60,29 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             }, ct);
         }
 
-        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count)
+        async Task IDeleter.DeleteAppAsync(DomainId appId,
+            CancellationToken ct)
+        {
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, appId), ct);
+        }
+
+        public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
+            CancellationToken ct = default)
         {
             if (!string.IsNullOrWhiteSpace(channelPrefix))
             {
-                return await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix).SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync();
+                return await Collection.Find(x => x.AppId == appId && x.Channel == channelPrefix)
+                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
             }
             else
             {
-                return await Collection.Find(x => x.AppId == appId).SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync();
+                return await Collection.Find(x => x.AppId == appId)
+                    .SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
             }
         }
 
-        public Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents)
+        public Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents,
+            CancellationToken ct = default)
         {
             var writes = historyEvents
                 .Select(x =>
@@ -87,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                 return Task.CompletedTask;
             }
 
-            return Collection.BulkWriteAsync(writes, BulkUnordered);
+            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
         }
     }
 }

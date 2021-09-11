@@ -61,7 +61,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return (description, data!);
         }
 
-        async Task<Result> IRuleActionHandler.ExecuteJobAsync(object data, CancellationToken ct)
+        async Task<Result> IRuleActionHandler.ExecuteJobAsync(object data,
+            CancellationToken ct)
         {
             var typedData = (TData)data;
 
@@ -78,6 +79,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             throw new NotImplementedException();
         }
 
-        protected abstract Task<Result> ExecuteJobAsync(TData job, CancellationToken ct = default);
+        protected abstract Task<Result> ExecuteJobAsync(TData job,
+            CancellationToken ct = default);
     }
 }

@@ -14,10 +14,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public interface IBackupArchiveStore
     {
-        Task UploadAsync(DomainId backupId, Stream stream, CancellationToken ct = default);
+        Task UploadAsync(DomainId backupId, Stream stream,
+            CancellationToken ct = default);
 
-        Task DownloadAsync(DomainId backupId, Stream stream, CancellationToken ct = default);
+        Task DownloadAsync(DomainId backupId, Stream stream,
+            CancellationToken ct = default);
 
-        Task DeleteAsync(DomainId backupId);
+        Task DeleteAsync(DomainId backupId,
+            CancellationToken ct = default);
     }
 }

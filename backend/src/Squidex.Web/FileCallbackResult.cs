@@ -16,7 +16,8 @@ using Squidex.Web.Pipeline;
 
 namespace Squidex.Web
 {
-    public delegate Task FileCallback(Stream body, BytesRange range, CancellationToken ct);
+    public delegate Task FileCallback(Stream body, BytesRange range,
+            CancellationToken ct);
 
     public sealed class FileCallbackResult : FileResult
     {

@@ -22,7 +22,8 @@ namespace Migrations.Migrations.MongoDb
             collection = database.GetCollection<BsonDocument>("RuleEvents");
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             foreach (var document in collection.Find(new BsonDocument()).ToEnumerable(ct))
             {

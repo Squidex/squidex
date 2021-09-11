@@ -72,7 +72,8 @@ namespace Squidex.Extensions.Actions.CreateContent
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(Command job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(Command job,
+            CancellationToken ct = default)
         {
             var command = job;
 

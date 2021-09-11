@@ -198,7 +198,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
             };
         }
 
-        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, ResizeOptions resizeOptions, bool overwrite, CancellationToken ct)
+        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, ResizeOptions resizeOptions, bool overwrite,
+            CancellationToken ct)
         {
             var suffix = resizeOptions.ToString();
 

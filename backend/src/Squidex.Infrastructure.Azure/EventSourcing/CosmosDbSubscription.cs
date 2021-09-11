@@ -104,7 +104,8 @@ namespace Squidex.Infrastructure.EventSourcing
             return Task.CompletedTask;
         }
 
-        public async Task ProcessChangesAsync(IChangeFeedObserverContext context, IReadOnlyList<Document> docs, CancellationToken cancellationToken)
+        public async Task ProcessChangesAsync(IChangeFeedObserverContext context, IReadOnlyList<Document> docs,
+            CancellationToken cancellationToken)
         {
             if (!processorStopRequested.Task.IsCompleted)
             {

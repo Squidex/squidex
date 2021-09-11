@@ -65,7 +65,8 @@ namespace Squidex.Extensions.Actions.Discourse
             return (description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(DiscourseJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(DiscourseJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

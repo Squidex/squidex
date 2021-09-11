@@ -36,7 +36,8 @@ namespace Squidex.Areas.IdentityServer.Config
             this.identityOptions = identityOptions.Value;
         }
 
-        public async Task InitializeAsync(CancellationToken ct)
+        public async Task InitializeAsync(
+            CancellationToken ct)
         {
             IdentityModelEventSource.ShowPII = identityOptions.ShowPII;
 

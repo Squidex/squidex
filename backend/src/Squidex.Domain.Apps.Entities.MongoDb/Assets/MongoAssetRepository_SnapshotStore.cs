@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,21 +21,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : ISnapshotStore<AssetDomainObject.State>, IDeleter
     {
-        async Task IDeleter.DeleteAppAsync(DomainId appId, CancellationToken ct)
+        Task IDeleter.DeleteAppAsync(DomainId appId,
+            CancellationToken ct)
         {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/DeleteAppAsync"))
-            {
-                await Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, appId), ct);
-            }
+            return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, appId), ct);
         }
 
-        async Task<(AssetDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key)
+        IAsyncEnumerable<(AssetDomainObject.State State, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(
+            CancellationToken ct)
+        {
+            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct).Select(x => (Map(x), x.Version));
+        }
+
+        async Task<(AssetDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetDomainObject.State>.ReadAsync(DomainId key,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/ReadAsync"))
             {
                 var existing =
                     await Collection.Find(x => x.DocumentId == key)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(cancellationToken: ct);
 
                 if (existing != null)
                 {
@@ -47,17 +51,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteAsync(DomainId key, AssetDomainObject.State value, long oldVersion, long newVersion,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteAsync"))
             {
                 var entity = Map(value);
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity);
+                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct: ct);
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> snapshots)
+        async Task ISnapshotStore<AssetDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetDomainObject.State Value, long Version)> snapshots,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/WriteManyAsync"))
             {
@@ -74,24 +80,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     return;
                 }
 
-                await Collection.BulkWriteAsync(updates, BulkUnordered);
+                await Collection.BulkWriteAsync(updates, BulkUnordered, ct);
             }
         }
 
-        async Task ISnapshotStore<AssetDomainObject.State>.ReadAllAsync(Func<AssetDomainObject.State, long, Task> callback,
+        async Task ISnapshotStore<AssetDomainObject.State>.RemoveAsync(DomainId key,
             CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoAssetRepository/ReadAllAsync"))
-            {
-                await Collection.Find(new BsonDocument(), Batching.Options).ForEachAsync(x => callback(Map(x), x.Version), ct);
-            }
-        }
-
-        async Task ISnapshotStore<AssetDomainObject.State>.RemoveAsync(DomainId key)
         {
             using (Telemetry.Activities.StartActivity("MongoAssetRepository/RemoveAsync"))
             {
-                await Collection.DeleteOneAsync(x => x.DocumentId == key);
+                await Collection.DeleteOneAsync(x => x.DocumentId == key, cancellationToken: ct);
             }
         }
 

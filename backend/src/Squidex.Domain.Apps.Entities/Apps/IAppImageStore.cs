@@ -14,8 +14,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppImageStore
     {
-        Task UploadAsync(DomainId appId, Stream stream, CancellationToken ct = default);
+        Task UploadAsync(DomainId appId, Stream stream,
+            CancellationToken ct = default);
 
-        Task DownloadAsync(DomainId appId, Stream stream, CancellationToken ct = default);
+        Task DownloadAsync(DomainId appId, Stream stream,
+            CancellationToken ct = default);
     }
 }

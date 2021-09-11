@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class TextContentState
     {
+        public DomainId AppId { get; set; }
+
         public DomainId UniqueContentId { get; set; }
 
         public string DocIdCurrent { get; set; }

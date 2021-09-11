@@ -47,7 +47,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             this.appProvider = appProvider;
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct = default)
         {
             await collectionAll.InitializeAsync(ct);
             await collectionPublished.InitializeAsync(ct);

@@ -85,16 +85,17 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection,
-            CancellationToken ct)
+            CancellationToken ct = default)
         {
             return Task.CompletedTask;
         }
 
-        public virtual async Task ClearAsync()
+        public virtual async Task ClearAsync(
+            CancellationToken ct = default)
         {
             try
             {
-                await Database.DropCollectionAsync(CollectionName());
+                await Database.DropCollectionAsync(CollectionName(), ct);
             }
             catch (MongoCommandException ex)
             {
@@ -104,10 +105,11 @@ namespace Squidex.Infrastructure.MongoDb
                 }
             }
 
-            await InitializeAsync();
+            await InitializeAsync(ct);
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct = default)
         {
             try
             {

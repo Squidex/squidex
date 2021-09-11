@@ -79,7 +79,8 @@ namespace Squidex.Extensions.Actions.Medium
             }
         }
 
-        protected override async Task<Result> ExecuteJobAsync(MediumJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(MediumJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

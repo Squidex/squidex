@@ -30,7 +30,8 @@ namespace Squidex.Extensions.Actions.Script
             return Task.FromResult(($"Run a script", job));
         }
 
-        protected override async Task<Result> ExecuteJobAsync(ScriptJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(ScriptJob job,
+            CancellationToken ct = default)
         {
             var vars = new ScriptVars
             {

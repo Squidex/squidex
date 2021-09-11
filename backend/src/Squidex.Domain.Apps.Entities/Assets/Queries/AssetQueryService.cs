@@ -256,7 +256,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             }
         }
 
-        private async Task<IAssetFolderEntity?> FindFolderCoreAsync(DomainId appId, DomainId id, CancellationToken ct)
+        private async Task<IAssetFolderEntity?> FindFolderCoreAsync(DomainId appId, DomainId id,
+            CancellationToken ct)
         {
             using (var timeout = new CancellationTokenSource(options.TimeoutFind))
             {
