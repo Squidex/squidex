@@ -33,6 +33,9 @@ namespace Squidex.Infrastructure.EventSourcing
         Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
             CancellationToken ct = default);
 
+        Task DeleteAsync(string streamFilter,
+            CancellationToken ct = default);
+
         Task DeleteStreamAsync(string streamName,
             CancellationToken ct = default);
 

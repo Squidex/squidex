@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -26,7 +27,7 @@ namespace Squidex.Config.Domain
                 .As<IBackupArchiveStore>();
 
             services.AddTransientAs<BackupService>()
-                .As<IBackupService>();
+                .As<IBackupService>().As<IDeleter>();
 
             services.AddTransientAs<BackupApps>()
                 .As<IBackupHandler>();

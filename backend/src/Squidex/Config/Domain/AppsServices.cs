@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -13,9 +13,11 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
 {
@@ -29,6 +31,12 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RolePermissionsProvider>()
                 .AsSelf();
 
+            services.AddSingletonAs<AppEventDeleter>()
+                .As<IDeleter>();
+
+            services.AddSingletonAs<AppPermanentDeleter>()
+                .As<IEventConsumer>();
+
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
@@ -39,7 +47,7 @@ namespace Squidex.Config.Domain
                 .As<IAppProvider>();
 
             services.AddSingletonAs<AppUISettings>()
-                .As<IAppUISettings>();
+                .As<IAppUISettings>().As<IDeleter>();
 
             services.AddSingletonAs<AppSettingsSearchSource>()
                 .As<ISearchSource>();

@@ -7,22 +7,24 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IDeleter
+    public sealed class AssetTagsDeleter : IDeleter
     {
-        int Order => 0;
+        private readonly ITagService tagService;
 
-        Task DeleteAppAsync(IAppEntity app,
-            CancellationToken ct = default);
-
-        Task DeleteContributorAsync(DomainId appId, string contributorId,
-            CancellationToken ct = default)
+        public AssetTagsDeleter(ITagService tagService)
         {
-            return Task.CompletedTask;
+            this.tagService = tagService;
+        }
+
+        public Task DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            return tagService.ClearAsync(app.Id, TagGroups.Assets);
         }
     }
 }

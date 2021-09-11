@@ -7,22 +7,26 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public interface IDeleter
+    public sealed class CounterDeleter : IDeleter
     {
-        int Order => 0;
+        private readonly IGrainFactory grainFactory;
 
-        Task DeleteAppAsync(IAppEntity app,
-            CancellationToken ct = default);
+        public CounterDeleter(IGrainFactory grainFactory)
+        {
+            this.grainFactory = grainFactory;
+        }
 
-        Task DeleteContributorAsync(DomainId appId, string contributorId,
+        public Task DeleteAppAsync(IAppEntity app,
             CancellationToken ct = default)
         {
-            return Task.CompletedTask;
+            var grain = grainFactory.GetGrain<ICounterGrain>(app.Id.ToString());
+
+            return grain.ClearAsync();
         }
     }
 }

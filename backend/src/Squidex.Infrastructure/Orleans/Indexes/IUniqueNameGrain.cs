@@ -5,31 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans;
 
 namespace Squidex.Infrastructure.Orleans.Indexes
 {
-    public interface IUniqueNameIndexGrain<T>
+    public interface IUniqueNameGrain : IGrainWithStringKey
     {
-        Task<string?> ReserveAsync(T id, string name);
-
-        Task<bool> AddAsync(string? token);
-
-        Task<long> CountAsync();
+        Task<string?> ReserveAsync(string id, string name);
 
         Task RemoveReservationAsync(string? token);
-
-        Task RemoveAsync(T id);
-
-        Task RebuildAsync(Dictionary<string, T> values);
-
-        Task ClearAsync();
-
-        Task<T> GetIdAsync(string name);
-
-        Task<List<T>> GetIdsAsync(string[] names);
-
-        Task<List<T>> GetIdsAsync();
     }
 }

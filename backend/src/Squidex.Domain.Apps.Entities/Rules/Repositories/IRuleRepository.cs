@@ -6,11 +6,15 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
-namespace Squidex.Infrastructure.Orleans.Indexes
+namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 {
-    public class UniqueNameIndexState<T>
+    public interface IRuleRepository
     {
-        public Dictionary<string, T> Names { get; set; } = new Dictionary<string, T>();
+        Task<List<DomainId>> QueryIdsAsync(DomainId appId,
+            CancellationToken ct = default);
     }
 }

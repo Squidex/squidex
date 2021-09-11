@@ -62,10 +62,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return "TextIndex";
         }
 
-        async Task IDeleter.DeleteAppAsync(DomainId appId,
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, appId), ct);
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
         }
 
         public Task ExecuteAsync(IndexCommand[] commands,
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
             var bySchema =
                 await GetCollection(scope).Find(findFilter).Limit(limit).Only(x => x.ContentId)
-                    .ToListAsync(cancellationToken: ct);
+                    .ToListAsync(ct);
 
             var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
 
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
             var bySchema =
                 await GetCollection(scope).Find(findFilter).Limit(limit).Only(x => x.ContentId)
-                    .ToListAsync(cancellationToken: ct);
+                    .ToListAsync(ct);
 
             var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
 

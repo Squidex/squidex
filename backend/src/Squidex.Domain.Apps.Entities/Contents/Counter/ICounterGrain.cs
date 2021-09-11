@@ -15,5 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         Task<long> IncrementAsync(string name);
 
         Task<long> ResetAsync(string name, long value);
+
+        Task ClearAsync();
     }
 }

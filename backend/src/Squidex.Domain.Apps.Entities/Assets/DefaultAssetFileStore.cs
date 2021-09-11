@@ -10,21 +10,47 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class DefaultAssetFileStore : IAssetFileStore
+    public sealed class DefaultAssetFileStore : IAssetFileStore, IDeleter
     {
         private readonly IAssetStore assetStore;
+        private readonly IAssetRepository assetRepository;
         private readonly AssetOptions options;
 
-        public DefaultAssetFileStore(IAssetStore assetStore,
+        public DefaultAssetFileStore(
+            IAssetStore assetStore,
+            IAssetRepository assetRepository,
             IOptions<AssetOptions> options)
         {
             this.assetStore = assetStore;
+            this.assetRepository = assetRepository;
 
             this.options = options.Value;
+        }
+
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            if (options.FolderPerApp)
+            {
+                await assetStore.DeleteByPrefixAsync($"{app.Id}/", ct);
+                await assetStore.DeleteByPrefixAsync($"derives/{app.Id}/", ct);
+            }
+            else
+            {
+                await foreach (var asset in assetRepository.StreamAll(app.Id, ct))
+                {
+                    for (var version = 0; version < asset.FileVersion; version++)
+                    {
+                        await DeleteAsync(app.Id, asset.Id, version, null, ct);
+                    }
+                }
+            }
         }
 
         public string? GeneratePublicUrl(DomainId appId, DomainId id, long fileVersion, string? suffix)
@@ -98,20 +124,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (options.FolderPerApp)
             {
-                return assetStore.DeleteAsync(fileNameNew);
+                return assetStore.DeleteByPrefixAsync(fileNameNew, ct);
             }
             else
             {
                 return Task.WhenAll(
-                    assetStore.DeleteAsync(fileNameOld),
-                    assetStore.DeleteAsync(fileNameNew));
+                    assetStore.DeleteByPrefixAsync(fileNameOld, ct),
+                    assetStore.DeleteByPrefixAsync(fileNameNew, ct));
             }
         }
 
         public Task DeleteAsync(string tempFile,
             CancellationToken ct = default)
         {
-            return assetStore.DeleteAsync(tempFile);
+            return assetStore.DeleteAsync(tempFile, ct);
         }
 
         private static string GetFileName(DomainId id, long fileVersion, string? suffix)

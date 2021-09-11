@@ -128,12 +128,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public async Task CompleteRestoreAsync(RestoreContext context)
-        {
-            await appsIndex.AddAsync(appReservation);
-            await appsIndex.RebuildByContributorsAsync(context.AppId, contributors);
-        }
-
         private Task WriteAssetAsync(DomainId appId, IBackupWriter writer)
         {
             return writer.WriteBlobAsync(AvatarFile, async stream =>

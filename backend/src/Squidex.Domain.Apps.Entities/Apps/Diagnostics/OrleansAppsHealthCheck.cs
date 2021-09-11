@@ -26,14 +26,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
             CancellationToken cancellationToken = default)
         {
-            await GetGrain().CountAsync();
+            await GetGrain().GetAppIdsAsync(new[] { "test" });
 
             return HealthCheckResult.Healthy("Orleans must establish communication.");
         }
 
-        private IAppsByNameIndexGrain GetGrain()
+        private IAppsCacheGrain GetGrain()
         {
-            return grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id);
+            return grainFactory.GetGrain<IAppsCacheGrain>(SingleGrain.Id);
         }
     }
 }

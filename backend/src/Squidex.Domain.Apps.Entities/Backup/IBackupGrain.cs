@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         Task DeleteAsync(DomainId id);
 
+        Task ClearAsync();
+
         Task<J<List<IBackupJob>>> GetStateAsync();
     }
 }

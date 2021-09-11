@@ -49,10 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.requestLogStore = requestLogStore;
         }
 
-        Task IDeleter.DeleteAppAsync(DomainId appId,
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            return requestLogStore.DeleteAsync(appId.ToString(), ct);
+            return requestLogStore.DeleteAsync(app.Id.ToString(), ct);
         }
 
         public Task LogAsync(DomainId appId, RequestLog request,

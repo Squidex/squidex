@@ -21,5 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         Task SetAsync(J<JsonObject> settings);
 
         Task RemoveAsync(string path);
+
+        Task ClearAsync();
     }
 }

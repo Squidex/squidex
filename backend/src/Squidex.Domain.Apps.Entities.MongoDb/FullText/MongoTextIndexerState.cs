@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -59,16 +60,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return "TextIndexerState";
         }
 
-        async Task IDeleter.DeleteAppAsync(DomainId appId,
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, appId), ct);
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
         }
 
         public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
             CancellationToken ct = default)
         {
-            var entities = await Collection.Find(Filter.In(x => x.UniqueContentId, ids)).ToListAsync(cancellationToken: ct);
+            var entities = await Collection.Find(Filter.In(x => x.UniqueContentId, ids)).ToListAsync(ct);
 
             return entities.ToDictionary(x => x.UniqueContentId);
         }

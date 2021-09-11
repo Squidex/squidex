@@ -65,7 +65,7 @@ namespace Squidex.Domain.Users
 
                 if (securityKey.Rsa != null)
                 {
-                    var parameters = securityKey.Rsa.ExportParameters(includePrivateParameters: true);
+                    var parameters = securityKey.Rsa.ExportParameters(true);
 
                     state.Parameters = parameters;
                 }

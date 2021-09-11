@@ -13,6 +13,7 @@ using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
@@ -58,10 +59,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             }, ct);
         }
 
-        async Task IDeleter.DeleteAppAsync(DomainId appId,
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, appId), ct);
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
         }
 
         public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback,
@@ -112,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         {
             var entity = MongoRuleEventEntity.FromJob(job, nextAttempt);
 
-            await Collection.InsertOneIfNotExistsAsync(entity, ct: ct);
+            await Collection.InsertOneIfNotExistsAsync(entity, ct);
         }
 
         public Task CancelByEventAsync(DomainId id,

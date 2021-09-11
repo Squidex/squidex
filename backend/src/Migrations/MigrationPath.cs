@@ -130,12 +130,6 @@ namespace Migrations
                 yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
             }
 
-            // Version 19: Unify indexes.
-            if (version < 19)
-            {
-                yield return serviceProvider.GetRequiredService<PopulateGrainIndexes>();
-            }
-
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();
         }
     }

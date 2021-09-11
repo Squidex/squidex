@@ -7,22 +7,25 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IDeleter
+    public sealed class AppEventDeleter : IDeleter
     {
-        int Order => 0;
+        private readonly IEventStore eventStore;
 
-        Task DeleteAppAsync(IAppEntity app,
-            CancellationToken ct = default);
+        public int Order => int.MaxValue;
 
-        Task DeleteContributorAsync(DomainId appId, string contributorId,
+        public AppEventDeleter(IEventStore eventStore)
+        {
+            this.eventStore = eventStore;
+        }
+
+        public Task DeleteAppAsync(IAppEntity app,
             CancellationToken ct = default)
         {
-            return Task.CompletedTask;
+            return eventStore.DeleteAsync($"^([a-z]+)\\-{app.Id}", ct);
         }
     }
 }

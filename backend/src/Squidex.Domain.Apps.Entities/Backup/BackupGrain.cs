@@ -80,6 +80,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await state.WriteAsync();
         }
 
+        public async Task ClearAsync()
+        {
+            TryDeactivateOnIdle();
+
+            await state.ClearAsync();
+        }
+
         public async Task BackupAsync(RefToken actor)
         {
             if (currentJobToken != null)

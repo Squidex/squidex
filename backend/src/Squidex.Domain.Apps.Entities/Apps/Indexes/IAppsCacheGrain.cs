@@ -5,13 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public interface IAppsByNameIndexGrain : IUniqueNameIndexGrain<DomainId>, IGrainWithStringKey
+    public interface IAppsCacheGrain : IUniqueNameGrain
     {
+        Task<IReadOnlyCollection<DomainId>> GetAppIdsAsync(string[] names);
+
+        Task AddAsync(DomainId id, string name);
+
+        Task RemoveAsync(DomainId id);
     }
 }

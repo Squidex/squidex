@@ -5,13 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans.Indexes;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
+namespace Squidex.Domain.Apps.Entities.Schemas.Repositories
 {
-    public interface ISchemasByAppIndexGrain : IUniqueNameIndexGrain<DomainId>, IGrainWithStringKey
+    public interface ISchemaRepository
     {
+        Task<Dictionary<string, DomainId>> QueryIdsAsync(DomainId appId,
+            CancellationToken ct = default);
     }
 }

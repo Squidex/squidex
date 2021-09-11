@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -21,10 +22,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderDomainObject.State>, IDeleter
     {
-        Task IDeleter.DeleteAppAsync(DomainId appId,
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
-            return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, appId), ct);
+            return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
         }
 
         IAsyncEnumerable<(AssetFolderDomainObject.State State, long Version)> ISnapshotStore<AssetFolderDomainObject.State>.ReadAllAsync(
@@ -40,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 var existing =
                     await Collection.Find(x => x.DocumentId == key)
-                        .FirstOrDefaultAsync(cancellationToken: ct);
+                        .FirstOrDefaultAsync(ct);
 
                 if (existing != null)
                 {
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 var entity = Map(value);
 
-                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct: ct);
+                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct);
             }
         }
 

@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetPermanentDeleter : IEventConsumer
     {
         private readonly IAssetFileStore assetFileStore;
-        private readonly string? deletedType;
+        private readonly string? typeAssetDeleted;
 
         public string Name
         {
@@ -32,12 +32,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             this.assetFileStore = assetFileStore;
 
-            deletedType = typeNameRegistry?.GetName<AssetDeleted>();
+            // Preload the type names of the events for performance reasons. The reference can be null in tests.
+            typeAssetDeleted = typeNameRegistry?.GetName<AssetDeleted>();
         }
 
         public bool Handles(StoredEvent @event)
         {
-            return @event.Data.Type == deletedType;
+            return @event.Data.Type == typeAssetDeleted;
         }
 
         public async Task On(Envelope<IEvent> @event)

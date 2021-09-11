@@ -25,7 +25,15 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
-            return Collection.DeleteManyAsync(x => x.EventStream == streamName, cancellationToken: ct);
+            return Collection.DeleteManyAsync(x => x.EventStream == streamName, ct);
+        }
+
+        public Task DeleteAsync(string streamFilter,
+            CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
+
+            return Collection.DeleteManyAsync(FilterExtensions.ByStream(streamFilter), ct);
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
@@ -133,7 +141,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         .Include(EventStreamOffsetField)
                         .Include(EventsCountField))
                     .Sort(Sort.Descending(EventStreamOffsetField)).Limit(1)
-                    .FirstOrDefaultAsync(cancellationToken: ct);
+                    .FirstOrDefaultAsync(ct);
 
             if (document != null)
             {

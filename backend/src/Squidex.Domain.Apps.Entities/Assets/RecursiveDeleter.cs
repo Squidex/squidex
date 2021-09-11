@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository;
         private readonly IAssetFolderRepository assetFolderRepository;
         private readonly ISemanticLog log;
-        private readonly string? folderDeletedType;
+        private readonly string? typeAssetFolderDeleted;
 
         public string Name
         {
@@ -47,12 +47,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetFolderRepository = assetFolderRepository;
             this.log = log;
 
-            folderDeletedType = typeNameRegistry?.GetName<AssetFolderDeleted>();
+            // Preload the type names of the events for performance reasons. The reference can be null in tests.
+            typeAssetFolderDeleted = typeNameRegistry?.GetName<AssetFolderDeleted>();
         }
 
         public bool Handles(StoredEvent @event)
         {
-            return @event.Data.Type == folderDeletedType;
+            return @event.Data.Type == typeAssetFolderDeleted;
         }
 
         public async Task On(Envelope<IEvent> @event)
