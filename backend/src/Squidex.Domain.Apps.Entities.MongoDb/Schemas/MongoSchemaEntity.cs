@@ -19,17 +19,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         public DomainId IndexedAppId { get; set; }
 
         [BsonRequired]
-        [BsonElement("_i")]
+        [BsonElement("_si")]
         public DomainId IndexedId { get; set; }
 
         [BsonRequired]
-        [BsonElement("_n")]
+        [BsonElement("_sn")]
         public string IndexedName { get; set; }
+
+        [BsonRequired]
+        [BsonElement("_dl")]
+        public bool IndexedDeleted { get; set; }
 
         public override void Prepare()
         {
-            IndexedId = Document.Id;
             IndexedAppId = Document.AppId.Id;
+            IndexedDeleted = Document.IsDeleted;
+            IndexedId = Document.Id;
             IndexedName = Document.SchemaDef.Name;
         }
     }

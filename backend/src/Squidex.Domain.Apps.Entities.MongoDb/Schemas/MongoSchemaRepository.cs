@@ -50,16 +50,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         {
             using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryAsync"))
             {
-                var entities = await Collection.Find(x => x.IndexedAppId == appId && !x.Document.IsDeleted).Only(x => x.IndexedAppId, x => x.IndexedId).ToListAsync(ct);
+                var find = Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted);
 
-                return entities.Select(x =>
-                {
-                    var indexedId = DomainId.Create(x["_id"].AsString);
-                    var indexedName = x["_n"].AsString;
-
-                    return new { indexedName, indexedId };
-                }).ToDictionary(x => x.indexedName, x => x.indexedId);
+                return await QueryAsync(find, ct);
             }
+        }
+
+        private static async Task<Dictionary<string, DomainId>> QueryAsync(IFindFluent<MongoSchemaEntity, MongoSchemaEntity> find,
+            CancellationToken ct)
+        {
+            var entities = await find.Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
+
+            return entities.Select(x =>
+            {
+                var indexedId = DomainId.Create(x["_id"].AsString);
+                var indexedName = x["_sn"].AsString;
+
+                return new { indexedName, indexedId };
+            }).ToDictionary(x => x.indexedName, x => x.indexedId);
         }
     }
 }

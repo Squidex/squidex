@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -27,21 +28,32 @@ namespace Squidex.Infrastructure.UsageTracking
             this.cache = cache;
         }
 
-        public Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
         {
             Guard.NotNull(key, nameof(key));
 
-            return inner.QueryAsync(key, fromDate, toDate);
+            return inner.DeleteAsync(key, ct);
         }
 
-        public Task TrackAsync(DateTime date, string key, string? category, Counters counters)
+        public Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
         {
             Guard.NotNull(key, nameof(key));
 
-            return inner.TrackAsync(date, key, category, counters);
+            return inner.QueryAsync(key, fromDate, toDate, ct);
         }
 
-        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category)
+        public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(key, nameof(key));
+
+            return inner.TrackAsync(date, key, category, counters, ct);
+        }
+
+        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
+            CancellationToken ct = default)
         {
             Guard.NotNull(key, nameof(key));
 
@@ -55,7 +67,8 @@ namespace Squidex.Infrastructure.UsageTracking
             });
         }
 
-        public Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category)
+        public Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
+            CancellationToken ct = default)
         {
             Guard.NotNull(key, nameof(key));
 

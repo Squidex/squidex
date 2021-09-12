@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -25,7 +26,10 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public BackgroundUsageTrackerTests()
         {
-            sut = new BackgroundUsageTracker(usageStore, log);
+            sut = new BackgroundUsageTracker(usageStore, log)
+            {
+                ForceWrite = true
+            };
         }
 
         [Fact]
@@ -61,6 +65,15 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
+        public async Task Should_forward_delete_call()
+        {
+            await sut.DeleteAsync(key);
+
+            A.CallTo(() => usageStore.DeleteAsync(key, A<CancellationToken>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_sum_up_if_getting_monthly_calls()
         {
             var dateFrom = new DateTime(date.Year, date.Month, 1);
@@ -74,7 +87,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage("category2", date.AddDays(7), Counters(b: 22))
             };
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .Returns(originalData);
 
             var result1 = await sut.GetForMonthAsync(key, date, null);
@@ -100,7 +113,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage("category2", date.AddDays(7), Counters(b: 22))
             };
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .Returns(originalData);
 
             var result1 = await sut.GetAsync(key, dateFrom, dateTo, null);
@@ -118,7 +131,7 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(4);
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .Returns(new List<StoredUsage>());
 
             var result = await sut.QueryAsync(key, dateFrom, dateTo);
@@ -153,7 +166,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(null, dateFrom.AddDays(2), Counters(a: 11, b: 14))
             };
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .Returns(originalData);
 
             var result = await sut.QueryAsync(key, dateFrom, dateTo);
@@ -182,7 +195,7 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public async Task Should_aggregate_and_store_on_dispose()
+        public async Task Should_write_usage_in_batches()
         {
             var key1 = Guid.NewGuid().ToString();
             var key2 = Guid.NewGuid().ToString();
@@ -201,11 +214,17 @@ namespace Squidex.Infrastructure.UsageTracking
 
             UsageUpdate[]? updates = null;
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._))
-                .Invokes((UsageUpdate[] u) => updates = u);
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))
+                .Invokes(args =>
+                {
+                    updates = args.GetArgument<UsageUpdate[]>(0)!;
+                });
 
             sut.Next();
             sut.Dispose();
+
+            // Wait for the timer to trigger.
+            await Task.Delay(500);
 
             updates.Should().BeEquivalentTo(new[]
             {
@@ -215,7 +234,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new UsageUpdate(date, key3, "*", Counters(1, 8000))
             }, o => o.ComparingByMembers<UsageUpdate>());
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._))
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

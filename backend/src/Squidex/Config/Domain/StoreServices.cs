@@ -82,7 +82,7 @@ namespace Squidex.Config.Domain
                         .As<IMigration>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>().As<IDeleter>();
 
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();

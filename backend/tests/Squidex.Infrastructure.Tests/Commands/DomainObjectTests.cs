@@ -508,7 +508,10 @@ namespace Squidex.Infrastructure.Commands
             var @events = new List<Envelope<IEvent>>();
 
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
-                .Invokes(c => @events.AddRange(c.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!));
+                .Invokes(args =>
+                {
+                    @events.AddRange(args.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!);
+                });
 
             var eventsPersistence = A.Fake<IPersistence<MyDomainState>>();
 

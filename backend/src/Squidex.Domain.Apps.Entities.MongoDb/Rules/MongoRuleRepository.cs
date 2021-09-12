@@ -45,25 +45,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
         }
 
-        public async Task<IReadOnlyList<IRuleEntity>> QueryAsync(DomainId appId,
-            CancellationToken ct = default)
-        {
-            using (Telemetry.Activities.StartActivity("MongoRuleRepository/QueryAsync"))
-            {
-                var entities = await Collection.Find(x => x.IndexedAppId == appId).ToListAsync(ct);
-
-                return entities.Select(x => x.Document).ToList();
-            }
-        }
-
         public async Task<List<DomainId>> QueryIdsAsync(DomainId appId,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryIdsAsync"))
             {
-                var entities = await Collection.Find(x => x.IndexedAppId == appId && !x.Document.IsDeleted).Only(x => x.IndexedId).ToListAsync(ct);
+                var entities = await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted).Only(x => x.IndexedId).ToListAsync(ct);
 
-                return entities.Select(x => DomainId.Create(x["_i"].AsString)).ToList();
+                return entities.Select(x => DomainId.Create(x["_ri"].AsString)).ToList();
             }
         }
     }

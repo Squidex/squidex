@@ -25,10 +25,9 @@ namespace Squidex.Infrastructure.Log
         private readonly RequestLogStoreOptions options;
         private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
 
-        public bool IsEnabled
-        {
-            get => options.StoreEnabled;
-        }
+        public bool ForceWrite { get; set; }
+
+        public bool IsEnabled => options.StoreEnabled;
 
         public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
             IRequestLogRepository logRepository, ISemanticLog log)
@@ -37,9 +36,9 @@ namespace Squidex.Infrastructure.Log
 
             this.logRepository = logRepository;
 
-            this.log = log;
-
             timer = new CompletionTimer(options.Value.WriteIntervall, TrackAsync, options.Value.WriteIntervall);
+
+            this.log = log;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -77,7 +76,14 @@ namespace Squidex.Infrastructure.Log
 
                     for (var i = 0; i < pages; i++)
                     {
-                        await logRepository.InsertManyAsync(localJobs.Skip(i * batchSize).Take(batchSize), ct);
+                        var batch = localJobs.Skip(i * batchSize).Take(batchSize);
+
+                        if (ForceWrite)
+                        {
+                            ct = default;
+                        }
+
+                        await logRepository.InsertManyAsync(batch, ct);
                     }
                 }
             }
@@ -89,22 +95,32 @@ namespace Squidex.Infrastructure.Log
             }
         }
 
-        public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
-            CancellationToken ct = default)
-        {
-            return logRepository.QueryAllAsync(key, fromDate, toDate, ct);
-        }
-
         public Task DeleteAsync(string key,
             CancellationToken ct = default)
         {
             return logRepository.DeleteAsync(key, ct);
         }
 
+        public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
+        {
+            if (!IsEnabled)
+            {
+                return AsyncEnumerable.Empty<Request>();
+            }
+
+            return logRepository.QueryAllAsync(key, fromDate, toDate, ct);
+        }
+
         public Task LogAsync(Request request,
             CancellationToken ct = default)
         {
             Guard.NotNull(request, nameof(request));
+
+            if (!IsEnabled)
+            {
+                return Task.CompletedTask;
+            }
 
             jobs.Enqueue(request);
 

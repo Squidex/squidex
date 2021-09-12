@@ -48,42 +48,37 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return Collection.DeleteManyAsync(Filter.Eq(x => x.DocumentId, app.Id), ct);
         }
 
-        public async Task<Dictionary<string, DomainId>> QueryIdsAsync(string contributorId, CancellationToken ct = default)
+        public async Task<Dictionary<string, DomainId>> QueryIdsAsync(string contributorId,
+            CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryIdsAsync"))
             {
-                var filter =
-                    Filter.And(
-                        Filter.AnyEq(x => x.IndexedContributorIds, contributorId),
-                        Filter.Ne(x => x.Document.IsDeleted, true));
+                var find = Collection.Find(x => x.IndexedContributorIds.Contains(contributorId) && !x.IndexedDeleted);
 
-                var entities = await Collection.Find(filter).Only(x => x.DocumentId).ToListAsync(ct);
-
-                return CreateResult(entities);
+                return await QueryAsync(find, ct);
             }
         }
 
-        public async Task<Dictionary<string, DomainId>> QueryIdsAsync(IEnumerable<string> names, CancellationToken ct = default)
+        public async Task<Dictionary<string, DomainId>> QueryIdsAsync(IEnumerable<string> names,
+            CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAsync"))
             {
-                var filter =
-                    Filter.And(
-                        Filter.In(x => x.IndexedName, names),
-                        Filter.Ne(x => x.Document.IsDeleted, true));
+                var find = Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted);
 
-                var entities = await Collection.Find(filter).Only(x => x.DocumentId).ToListAsync(ct);
-
-                return CreateResult(entities);
+                return await QueryAsync(find, ct);
             }
         }
 
-        private static Dictionary<string, DomainId> CreateResult(IEnumerable<BsonDocument> entities)
+        private static async Task<Dictionary<string, DomainId>> QueryAsync(IFindFluent<MongoAppEntity, MongoAppEntity> find,
+            CancellationToken ct)
         {
+            var entities = await find.Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
+
             return entities.Select(x =>
             {
                 var indexedId = DomainId.Create(x["_id"].AsString);
-                var indexedName = x["_n"].AsString;
+                var indexedName = x["_an"].AsString;
 
                 return new { indexedName, indexedId };
             }).ToDictionary(x => x.indexedName, x => x.indexedId);

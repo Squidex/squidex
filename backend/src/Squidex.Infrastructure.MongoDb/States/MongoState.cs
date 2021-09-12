@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.States
         public DomainId DocumentId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("Doc")]
         [BsonJson]
         public T Document { get; set; }
 

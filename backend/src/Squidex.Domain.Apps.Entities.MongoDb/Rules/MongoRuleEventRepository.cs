@@ -62,6 +62,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
+            await statisticsCollection.DeleteAppAsync(app.Id, ct);
+
             await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
         }
 

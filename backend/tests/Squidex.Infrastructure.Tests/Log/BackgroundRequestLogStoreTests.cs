@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
@@ -25,7 +27,10 @@ namespace Squidex.Infrastructure.Log
         {
             options.StoreEnabled = true;
 
-            sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, A.Fake<ISemanticLog>());
+            sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, A.Fake<ISemanticLog>())
+            {
+                ForceWrite = true
+            };
         }
 
         [Theory]
@@ -39,7 +44,16 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
-        public async Task Should_not_if_disabled()
+        public async Task Should_forward_delete_call()
+        {
+            await sut.DeleteAsync("my-key");
+
+            A.CallTo(() => requestLogRepository.DeleteAsync("my-key", A<CancellationToken>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_log_if_disabled()
         {
             options.StoreEnabled = false;
 
@@ -51,12 +65,49 @@ namespace Squidex.Infrastructure.Log
             sut.Next();
             sut.Dispose();
 
-            A.CallTo(() => requestLogRepository.InsertManyAsync(A<IEnumerable<Request>>._))
+            // Wait for the timer to not trigger.
+            await Task.Delay(500);
+
+            A.CallTo(() => requestLogRepository.InsertManyAsync(A<IEnumerable<Request>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_log_in_batches()
+        public async Task Should_provide_results_from_repository()
+        {
+            var key = "my-key";
+
+            var dateFrom = DateTime.Today;
+            var dateTo = dateFrom.AddDays(4);
+
+            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
+                .Returns(AsyncEnumerable.Repeat(new Request { Key = key }, 1));
+
+            var results = await sut.QueryAllAsync(key, dateFrom, dateTo).ToListAsync();
+
+            Assert.NotEmpty(results);
+        }
+
+        [Fact]
+        public async Task Should_not_provide_results_from_repository_if_disabled()
+        {
+            options.StoreEnabled = false;
+
+            var key = "my-key";
+
+            var dateFrom = DateTime.Today;
+            var dateTo = dateFrom.AddDays(4);
+
+            var results = await sut.QueryAllAsync(key, dateFrom, dateTo).ToListAsync();
+
+            Assert.Empty(results);
+
+            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_write_logs_in_batches()
         {
             for (var i = 0; i < 2500; i++)
             {
@@ -66,13 +117,16 @@ namespace Squidex.Infrastructure.Log
             sut.Next();
             sut.Dispose();
 
-            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "999")))
+            // Wait for the timer to trigger.
+            await Task.Delay(500);
+
+            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "999"), A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("1000", "1999")))
+            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("1000", "1999"), A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("2000", "2499")))
+            A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("2000", "2499"), A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

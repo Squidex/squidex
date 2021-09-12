@@ -34,6 +34,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppEventDeleter>()
                 .As<IDeleter>();
 
+            services.AddSingletonAs<AppUsageDeleter>()
+                .As<IDeleter>();
+
             services.AddSingletonAs<AppPermanentDeleter>()
                 .As<IEventConsumer>();
 

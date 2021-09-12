@@ -39,6 +39,14 @@ namespace Squidex.Infrastructure.UsageTracking
                 cancellationToken: ct = default);
         }
 
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(key, nameof(key));
+
+            return Collection.DeleteManyAsync(x => x.Key == key, ct);
+        }
+
         public async Task TrackUsagesAsync(UsageUpdate update,
             CancellationToken ct = default)
         {

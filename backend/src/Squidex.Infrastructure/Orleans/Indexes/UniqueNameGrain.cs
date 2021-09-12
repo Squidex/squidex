@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.Orleans.Caching
+namespace Squidex.Infrastructure.Orleans.Indexes
 {
     public class UniqueNameGrain : GrainOfString
     {
@@ -19,7 +19,13 @@ namespace Squidex.Infrastructure.Orleans.Caching
         {
             string? token = null;
 
-            if (!IsReserved(name))
+            var reservation = reservations.FirstOrDefault(x => x.Value.Name == name);
+
+            if (reservation.Value.Id == id)
+            {
+                token = reservation.Key;
+            }
+            else if (reservation.Key == null)
             {
                 token = RandomHash.Simple();
 
@@ -34,11 +40,6 @@ namespace Squidex.Infrastructure.Orleans.Caching
             reservations.Remove(token ?? string.Empty);
 
             return Task.CompletedTask;
-        }
-
-        private bool IsReserved(string name)
-        {
-            return reservations.Values.Any(x => x.Name == name);
         }
     }
 }

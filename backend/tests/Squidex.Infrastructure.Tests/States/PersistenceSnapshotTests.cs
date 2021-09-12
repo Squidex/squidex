@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
@@ -30,7 +31,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_read_from_store()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((20, true, 10));
 
             var persistedState = Save.Snapshot(0);
@@ -45,7 +46,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_read_from_store_if_not_valid()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((20, false, 10));
 
             var persistedState = Save.Snapshot(0);
@@ -60,7 +61,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_return_empty_version_if_version_negative()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((20, true, -10));
 
             var persistedState = Save.Snapshot(0);
@@ -74,7 +75,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_set_to_empty_if_store_returns_not_found()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((20, true, EtagVersion.Empty));
 
             var persistedState = Save.Snapshot(0);
@@ -89,7 +90,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_throw_exception_if_not_found_and_version_expected()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((123, true, EtagVersion.Empty));
 
             var persistedState = Save.Snapshot(0);
@@ -101,7 +102,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_throw_exception_if_other_version_found()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((123, true, 2));
 
             var persistedState = Save.Snapshot(0);
@@ -113,7 +114,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_write_to_store_with_previous_version()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((20, true, 10));
 
             var persistedState = Save.Snapshot(0);
@@ -126,7 +127,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteSnapshotAsync(100);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -137,17 +138,17 @@ namespace Squidex.Infrastructure.States
 
             await persistence.WriteSnapshotAsync(100);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, EtagVersion.Empty, 0))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, EtagVersion.Empty, 0, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_not_wrap_exception_if_writing_to_store_with_previous_version()
         {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key, A<CancellationToken>._))
                 .Returns((20, true, 10));
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11, A<CancellationToken>._))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
             var persistedState = Save.Snapshot(0);
@@ -166,10 +167,10 @@ namespace Squidex.Infrastructure.States
 
             await persistence.DeleteAsync();
 
-            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>._))
+            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.RemoveAsync(key))
+            A.CallTo(() => snapshotStore.RemoveAsync(key, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -178,7 +179,7 @@ namespace Squidex.Infrastructure.States
         {
             await sut.ClearSnapshotsAsync();
 
-            A.CallTo(() => snapshotStore.ClearAsync())
+            A.CallTo(() => snapshotStore.ClearAsync(A<CancellationToken>._))
                 .MustHaveHappened();
         }
     }

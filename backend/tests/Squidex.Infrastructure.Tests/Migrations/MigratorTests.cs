@@ -29,12 +29,14 @@ namespace Squidex.Infrastructure.Migrations
             private int version;
             private bool isLocked;
 
-            public Task<int> GetVersionAsync()
+            public Task<int> GetVersionAsync(
+                CancellationToken ct = default)
             {
                 return Task.FromResult(version);
             }
 
-            public Task<bool> TryLockAsync()
+            public Task<bool> TryLockAsync(
+                CancellationToken ct = default)
             {
                 var lockAcquired = false;
 
@@ -51,7 +53,8 @@ namespace Squidex.Infrastructure.Migrations
                 return Task.FromResult(lockAcquired);
             }
 
-            public Task CompleteAsync(int newVersion)
+            public Task CompleteAsync(int newVersion,
+                CancellationToken ct = default)
             {
                 lock (lockObject)
                 {
@@ -61,7 +64,8 @@ namespace Squidex.Infrastructure.Migrations
                 return Task.CompletedTask;
             }
 
-            public Task UnlockAsync()
+            public Task UnlockAsync(
+                CancellationToken ct = default)
             {
                 lock (lockObject)
                 {
@@ -89,8 +93,11 @@ namespace Squidex.Infrastructure.Migrations
                     return (newVersion, migrations.Select(x => x.Migration));
                 });
 
-            A.CallTo(() => status.GetVersionAsync()).Returns(0);
-            A.CallTo(() => status.TryLockAsync()).Returns(true);
+            A.CallTo(() => status.GetVersionAsync(A<CancellationToken>._))
+                .Returns(0);
+
+            A.CallTo(() => status.TryLockAsync(A<CancellationToken>._))
+                .Returns(true);
         }
 
         [Fact]
@@ -113,16 +120,16 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(1))
+            A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(2))
+            A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(3))
+            A.CallTo(() => status.CompleteAsync(3, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync())
+            A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -146,16 +153,16 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(1))
+            A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(2))
+            A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(3))
+            A.CallTo(() => status.CompleteAsync(3, A<CancellationToken>._))
                 .MustHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync())
+            A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -181,16 +188,16 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => migrator_2_3.UpdateAsync(A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(1))
+            A.CallTo(() => status.CompleteAsync(1, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(2))
+            A.CallTo(() => status.CompleteAsync(2, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.CompleteAsync(3))
+            A.CallTo(() => status.CompleteAsync(3, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync())
+            A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

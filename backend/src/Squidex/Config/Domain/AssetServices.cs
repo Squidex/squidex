@@ -79,7 +79,7 @@ namespace Squidex.Config.Domain
                 .As<IAssetLoader>();
 
             services.AddSingletonAs<AssetUsageTracker>()
-                .As<IAssetUsageTracker>().As<IEventConsumer>();
+                .As<IAssetUsageTracker>().As<IEventConsumer>().As<IDeleter>();
 
             services.AddSingletonAs<FileTypeAssetMetadataSource>()
                 .As<IAssetMetadataSource>();

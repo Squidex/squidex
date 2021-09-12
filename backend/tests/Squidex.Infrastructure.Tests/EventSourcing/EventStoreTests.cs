@@ -360,6 +360,26 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
+        public async Task Should_delete_by_filter()
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            var events = new[]
+            {
+                CreateEventData(1),
+                CreateEventData(2)
+            };
+
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+
+            await Sut.DeleteAsync($"^{streamName.Substring(0, 10)}");
+
+            var readEvents = await QueryAsync(streamName);
+
+            Assert.Empty(readEvents);
+        }
+
+        [Fact]
         public async Task Should_delete_stream()
         {
             var streamName = $"test-{Guid.NewGuid()}";

@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -15,7 +17,7 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class AssetUsageTracker : IAssetUsageTracker
+    public partial class AssetUsageTracker : IAssetUsageTracker, IDeleter
     {
         private const string CounterTotalCount = "TotalAssets";
         private const string CounterTotalSize = "TotalSize";
@@ -25,6 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public AssetUsageTracker(IUsageTracker usageTracker)
         {
             this.usageTracker = usageTracker;
+        }
+
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            var key = GetKey(app.Id);
+
+            return usageTracker.DeleteAsync(key, ct);
         }
 
         public async Task<long> GetTotalSizeAsync(DomainId appId)

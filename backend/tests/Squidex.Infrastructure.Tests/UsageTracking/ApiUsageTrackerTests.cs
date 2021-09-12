@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -28,11 +29,20 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
+        public async Task Should_forward_delete_call()
+        {
+            await sut.DeleteAsync(key);
+
+            A.CallTo(() => usageTracker.DeleteAsync($"{key}_API", A<CancellationToken>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_track_usage()
         {
             Counters? measuredCounters = null;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, $"{key}_API", null, A<Counters>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(date, $"{key}_API", null, A<Counters>.Ignored, A<CancellationToken>._))
                 .Invokes(args =>
                 {
                     measuredCounters = args.GetArgument<Counters>(3)!;
@@ -56,7 +66,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalCalls] = 4
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, A<CancellationToken>._))
                 .Returns(counters);
 
             var result = await sut.GetMonthCallsAsync(key, date, category);
@@ -72,7 +82,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalBytes] = 14
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, A<CancellationToken>._))
                 .Returns(counters);
 
             var result = await sut.GetMonthBytesAsync(key, date, category);
@@ -112,10 +122,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalBytes] = 400
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", DateTime.Today, null))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", DateTime.Today, null, A<CancellationToken>._))
                 .Returns(forMonth);
 
-            A.CallTo(() => usageTracker.QueryAsync($"{key}_API", dateFrom, dateTo))
+            A.CallTo(() => usageTracker.QueryAsync($"{key}_API", dateFrom, dateTo, A<CancellationToken>._))
                 .Returns(counters);
 
             var (summary, stats) = await sut.QueryAsync(key, dateFrom, dateTo);

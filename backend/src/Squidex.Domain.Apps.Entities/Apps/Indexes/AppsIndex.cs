@@ -189,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private static async Task<string?> CheckAppAsync(IAppsCacheGrain index, CreateApp command)
+        private async Task<string?> CheckAppAsync(IAppsCacheGrain index, CreateApp command)
         {
             var name = command.Name;
 
@@ -200,6 +200,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 if (token == null)
                 {
                     throw new ValidationException(T.Get("apps.nameAlreadyExists"));
+                }
+
+                try
+                {
+                    var existingId = await GetAppIdAsync(name);
+
+                    if (existingId != default)
+                    {
+                        throw new ValidationException(T.Get("apps.nameAlreadyExists"));
+                    }
+                }
+                catch
+                {
+                    // Catch our own exception, juist in case something went wrong before.
+                    await index.RemoveReservationAsync(token);
+                    throw;
                 }
 
                 return token;

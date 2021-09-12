@@ -15,17 +15,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
     public sealed class MongoAppEntity : MongoState<AppDomainObject.State>
     {
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("_an")]
         public string IndexedName { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("_ci")]
         public string[] IndexedContributorIds { get; set; }
+
+        [BsonRequired]
+        [BsonElement("_dl")]
+        public bool IndexedDeleted { get; set; }
 
         public override void Prepare()
         {
-            IndexedName = Document.Name;
             IndexedContributorIds = Document.Contributors.Keys.ToArray();
+            IndexedDeleted = Document.IsDeleted;
+            IndexedName = Document.Name;
         }
     }
 }

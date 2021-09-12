@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -29,13 +30,22 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
+        public async Task Should_forward_delete_call()
+        {
+            await sut.DeleteAsync(key);
+
+            A.CallTo(() => inner.DeleteAsync(key, A<CancellationToken>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_forward_track_call()
         {
             var counters = new Counters();
 
             await sut.TrackAsync(date, key, "my-category", counters);
 
-            A.CallTo(() => inner.TrackAsync(date, key, "my-category", counters))
+            A.CallTo(() => inner.TrackAsync(date, key, "my-category", counters, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -47,7 +57,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             await sut.QueryAsync(key, dateFrom, dateTo);
 
-            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -56,7 +66,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var counters = new Counters();
 
-            A.CallTo(() => inner.GetForMonthAsync(key, date, category))
+            A.CallTo(() => inner.GetForMonthAsync(key, date, category, A<CancellationToken>._))
                 .Returns(counters);
 
             var result1 = await sut.GetForMonthAsync(key, date, category);
@@ -65,7 +75,7 @@ namespace Squidex.Infrastructure.UsageTracking
             Assert.Same(counters, result1);
             Assert.Same(counters, result2);
 
-            A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today, category))
+            A.CallTo(() => inner.GetForMonthAsync(key, DateTime.Today, category, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -77,7 +87,7 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(10);
 
-            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category))
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category, A<CancellationToken>._))
                 .Returns(counters);
 
             var result1 = await sut.GetAsync(key, dateFrom, dateTo, category);
@@ -86,7 +96,7 @@ namespace Squidex.Infrastructure.UsageTracking
             Assert.Same(counters, result1);
             Assert.Same(counters, result2);
 
-            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category))
+            A.CallTo(() => inner.GetAsync(key, dateFrom, dateTo, category, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -101,7 +111,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             Assert.NotSame(result2, result1);
 
-            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => inner.QueryAsync(key, dateFrom, dateTo, A<CancellationToken>._))
                 .MustHaveHappenedTwiceOrMore();
         }
     }

@@ -31,12 +31,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public string EventsFilter
         {
-            get => "^asset-";
+            get => "^app-";
         }
 
         public AppPermanentDeleter(IEnumerable<IDeleter> deleters, IGrainFactory grainFactory, TypeNameRegistry typeNameRegistry)
         {
-            this.deleters = deleters;
+            this.deleters = deleters.OrderBy(x => x.Order).ToList();
 
             this.grainFactory = grainFactory;
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 var appId = appContributorRemoved.AppId.Id;
 
-                foreach (var deleter in deleters.OrderBy(x => x.Order))
+                foreach (var deleter in deleters)
                 {
                     using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
                     {
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task OnArchiveAsync(AppArchived appArchived)
         {
-            using (Telemetry.Activities.StartActivity("RemoveContributorFromSystem"))
+            using (Telemetry.Activities.StartActivity("RemoveAppFromSystem"))
             {
                 // Bypass our normal app resolve process, so that we can also retrieve the deleted app.
                 var appGrain = grainFactory.GetGrain<IAppGrain>(appArchived.AppId.Id.ToString());
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     return;
                 }
 
-                foreach (var deleter in deleters.OrderBy(x => x.Order))
+                foreach (var deleter in deleters)
                 {
                     using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
                     {

@@ -22,5 +22,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
             CancellationToken ct = default);
+
+        Task DeleteAsync(string key,
+            CancellationToken ct = default);
     }
 }
