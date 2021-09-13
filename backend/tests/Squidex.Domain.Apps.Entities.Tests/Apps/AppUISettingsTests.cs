@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
@@ -70,6 +71,28 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await sut.RemoveAsync(DomainId.NewGuid(), "user", "the.path");
 
             A.CallTo(() => grain.RemoveAsync("the.path"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_clear_grain_when_app_deleted()
+        {
+            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+
+            await ((IDeleter)sut).DeleteAppAsync(app, default);
+
+            A.CallTo(() => grain.ClearAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_clear_grain_when_contributor_removed()
+        {
+            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+
+            await ((IDeleter)sut).DeleteContributorAsync(app.Id, "user1", default);
+
+            A.CallTo(() => grain.ClearAsync())
                 .MustHaveHappened();
         }
     }

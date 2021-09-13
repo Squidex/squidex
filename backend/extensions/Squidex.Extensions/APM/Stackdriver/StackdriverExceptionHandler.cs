@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Globalization;
 using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;

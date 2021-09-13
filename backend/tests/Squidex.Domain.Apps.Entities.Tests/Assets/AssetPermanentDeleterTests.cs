@@ -21,11 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IAssetFileStore assetFiletore = A.Fake<IAssetFileStore>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly TypeNameRegistry typeNameRegistry;
         private readonly AssetPermanentDeleter sut;
 
         public AssetPermanentDeleterTests()
         {
-            var typeNameRegistry = new TypeNameRegistry().Map(typeof(AssetDeleted));
+            typeNameRegistry =
+                new TypeNameRegistry()
+                    .Map(typeof(AssetCreated))
+                    .Map(typeof(AssetDeleted));
 
             sut = new AssetPermanentDeleter(assetFiletore, typeNameRegistry);
         }
@@ -52,6 +56,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IEventConsumer consumer = sut;
 
             Assert.Equal(nameof(AssetPermanentDeleter), consumer.Name);
+        }
+
+        [Fact]
+        public void Should_handle_deletion_event()
+        {
+            var storedEvent =
+                new StoredEvent("stream", "1", 1,
+                    new EventData(typeNameRegistry.GetName<AssetDeleted>(), new EnvelopeHeaders(), "payload"));
+
+            Assert.True(sut.Handles(storedEvent));
+        }
+
+        [Fact]
+        public void Should_not_handle_creation_event()
+        {
+            var storedEvent =
+                new StoredEvent("stream", "1", 1,
+                    new EventData(typeNameRegistry.GetName<AssetCreated>(), new EnvelopeHeaders(), "payload"));
+
+            Assert.False(sut.Handles(storedEvent));
         }
 
         [Fact]

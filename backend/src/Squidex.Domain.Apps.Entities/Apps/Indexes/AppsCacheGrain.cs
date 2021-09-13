@@ -8,16 +8,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
+    [Reentrant]
     public sealed class AppsCacheGrain : UniqueNameGrain<DomainId>, IAppsCacheGrain
     {
         private readonly IAppRepository appRepository;
-        private readonly Dictionary<string, DomainId?> appIds = new Dictionary<string, DomainId?>();
+        private readonly Dictionary<string, DomainId> appIds = new Dictionary<string, DomainId>();
 
         public AppsCacheGrain(IAppRepository appRepository)
         {
@@ -32,16 +34,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             foreach (var name in names)
             {
-                appIds.TryGetValue(name, out var cachedId);
-
-                if (cachedId == null)
+                if (!appIds.TryGetValue(name, out var cachedId))
                 {
                     pendingNames ??= new List<string>();
                     pendingNames.Add(name);
                 }
                 else if (cachedId != DomainId.Empty)
                 {
-                    result.Add(cachedId.Value);
+                    result.Add(cachedId);
                 }
             }
 
@@ -49,11 +49,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 var foundIds = await appRepository.QueryIdsAsync(pendingNames);
 
-                foreach (var (name, id) in foundIds)
+                foreach (var name in pendingNames)
                 {
-                    appIds[name] = id;
+                    if (foundIds.TryGetValue(name, out var id))
+                    {
+                        appIds[name] = id;
 
-                    result.Add(id);
+                        result.Add(id);
+                    }
+                    else
+                    {
+                        appIds[name] = default;
+                    }
                 }
             }
 

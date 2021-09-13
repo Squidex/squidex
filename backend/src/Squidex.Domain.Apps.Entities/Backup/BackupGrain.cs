@@ -82,6 +82,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task ClearAsync()
         {
+            foreach (var backup in state.Value.Jobs)
+            {
+                await backupArchiveStore.DeleteAsync(backup.Id);
+            }
+
             TryDeactivateOnIdle();
 
             await state.ClearAsync();

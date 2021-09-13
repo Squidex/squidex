@@ -15,13 +15,13 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppPermanentDeleter : IEventConsumer
     {
+        private readonly IEnumerable<IDeleter> deleters;
         private readonly string? typeAppContributorRemoved;
         private readonly string? typeAppArchived;
-        private readonly IEnumerable<IDeleter> deleters;
         private readonly IGrainFactory grainFactory;
 
         public string Name

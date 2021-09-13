@@ -8,12 +8,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
+    [Reentrant]
     public sealed class SchemasCacheGrain : UniqueNameGrain<DomainId>, ISchemasCacheGrain
     {
         private readonly ISchemaRepository schemaRepository;

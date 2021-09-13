@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Xunit;
@@ -24,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
         private readonly IRequestLogStore requestLogStore = A.Fake<IRequestLogStore>();
+        private readonly DomainId appId = DomainId.NewGuid();
         private readonly DefaultAppLogStore sut;
 
         public DefaultAppLogStoreTests()
@@ -34,12 +36,31 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
+        public void Should_run_deletion_in_default_order()
+        {
+            var order = ((IDeleter)sut).Order;
+
+            Assert.Equal(0, order);
+        }
+
+        [Fact]
+        public async Task Should_remove_events_from_streams()
+        {
+            var app = Mocks.App(NamedId.Of(appId, "my-app"));
+
+            await ((IDeleter)sut).DeleteAppAsync(app, ct);
+
+            A.CallTo(() => requestLogStore.DeleteAsync($"^[a-z]-{app.Id}", ct))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_forward_request_if_disabled()
         {
             A.CallTo(() => requestLogStore.IsEnabled)
                 .Returns(false);
 
-            await sut.LogAsync(DomainId.NewGuid(), default, ct);
+            await sut.LogAsync(appId, default, ct);
 
             A.CallTo(() => requestLogStore.LogAsync(A<Request>._, ct))
                 .MustNotHaveHappened();
@@ -71,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             request.UserClientId = "frontend";
             request.UserId = "user1";
 
-            await sut.LogAsync(DomainId.NewGuid(), request, ct);
+            await sut.LogAsync(appId, request, ct);
 
             Assert.NotNull(recordedRequest);
 
@@ -86,6 +107,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Contains(request.StatusCode, recordedRequest);
             Contains(request.UserClientId, recordedRequest);
             Contains(request.UserId, recordedRequest);
+
+            Assert.Equal(appId.ToString(), recordedRequest?.Key);
         }
 
         [Fact]
@@ -93,8 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var dateFrom = DateTime.UtcNow.Date.AddDays(-30);
             var dateTo = DateTime.UtcNow.Date;
-
-            var appId = DomainId.NewGuid();
 
             A.CallTo(() => requestLogStore.QueryAllAsync(appId.ToString(), dateFrom, dateTo, ct))
                 .Returns(new[]

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Cryptography;
-using System.Threading;
 using FakeItEasy;
 using IdentityModel;
 using Microsoft.IdentityModel.Tokens;

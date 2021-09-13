@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
