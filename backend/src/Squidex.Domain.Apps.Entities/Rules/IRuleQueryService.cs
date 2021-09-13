@@ -6,12 +6,14 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
     public interface IRuleQueryService
     {
-        Task<IReadOnlyList<IEnrichedRuleEntity>> QueryAsync(Context context);
+        Task<IReadOnlyList<IEnrichedRuleEntity>> QueryAsync(Context context,
+            CancellationToken ct = default);
     }
 }

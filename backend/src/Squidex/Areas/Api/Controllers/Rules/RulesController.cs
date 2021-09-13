@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var rules = await ruleQuery.QueryAsync(Context);
+            var rules = await ruleQuery.QueryAsync(Context, HttpContext.RequestAborted);
 
             var response = Deferred.AsyncResponse(() =>
             {

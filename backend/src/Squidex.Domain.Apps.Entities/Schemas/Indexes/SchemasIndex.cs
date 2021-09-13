@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaIdAsync"))
             {
-                return await Index(appId).GetSchemaIdAsync(name);
+                return await Cache(appId).GetSchemaIdAsync(name);
             }
         }
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaIdsAsync"))
             {
-                return await Index(appId).GetSchemaIdsAsync();
+                return await Cache(appId).GetSchemaIdsAsync();
             }
         }
 
@@ -123,16 +123,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             if (command is CreateSchema createSchema)
             {
-                var index = Index(createSchema.AppId.Id);
+                var cache = Cache(createSchema.AppId.Id);
 
-                var token = await CheckSchemaAsync(index, createSchema);
+                var token = await CheckSchemaAsync(cache, createSchema);
                 try
                 {
                     await next(context);
                 }
                 finally
                 {
-                    await index.RemoveReservationAsync(token);
+                    await cache.RemoveReservationAsync(token);
                 }
             }
             else
@@ -161,14 +161,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             await InvalidateItAsync(create.AppId.Id, create.SchemaId, create.Name);
 
-            await Index(create.AppId.Id).AddAsync(create.SchemaId, create.Name);
+            await Cache(create.AppId.Id).AddAsync(create.SchemaId, create.Name);
         }
 
         private async Task OnDeleteAsync(DeleteSchema delete)
         {
             await InvalidateItAsync(delete.AppId.Id, delete.SchemaId.Id, delete.SchemaId.Name);
 
-            await Index(delete.AppId.Id).RemoveAsync(delete.SchemaId.Id);
+            await Cache(delete.AppId.Id).RemoveAsync(delete.SchemaId.Id);
         }
 
         private async Task OnUpdateAsync(SchemaUpdateCommand update)
@@ -176,13 +176,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             await InvalidateItAsync(update.AppId.Id, update.SchemaId.Id, update.SchemaId.Name);
         }
 
-        private async Task<string?> CheckSchemaAsync(ISchemasCacheGrain index, CreateSchema command)
+        private async Task<string?> CheckSchemaAsync(ISchemasCacheGrain cache, CreateSchema command)
         {
             var name = command.Name;
 
             if (name.IsSlug())
             {
-                var token = await index.ReserveAsync(command.SchemaId.ToString(), name);
+                var token = await cache.ReserveAsync(command.SchemaId, name);
 
                 if (token == null)
                 {
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 catch
                 {
                     // Catch our own exception, juist in case something went wrong before.
-                    await index.RemoveReservationAsync(token);
+                    await cache.RemoveReservationAsync(token);
                     throw;
                 }
 
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return null;
         }
 
-        private ISchemasCacheGrain Index(DomainId appId)
+        private ISchemasCacheGrain Cache(DomainId appId)
         {
             return grainFactory.GetGrain<ISchemasCacheGrain>(appId.ToString());
         }

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public interface ISchemasCacheGrain : IUniqueNameGrain
+    public interface ISchemasCacheGrain : IUniqueNameGrain<DomainId>
     {
         Task<IReadOnlyCollection<DomainId>> GetSchemaIdsAsync();
 

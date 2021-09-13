@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
@@ -29,26 +31,28 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.rebuilder = rebuilder;
         }
 
-        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
-                case SchemaCreated schemaCreated:
-                    schemaIds.Add(schemaCreated.SchemaId.Id);
+                case SchemaCreated:
+                    schemaIds.Add(@event.Headers.AggregateId());
                     break;
-                case SchemaDeleted schemaDeleted:
-                    schemaIds.Remove(schemaDeleted.SchemaId.Id);
+                case SchemaDeleted:
+                    schemaIds.Remove(@event.Headers.AggregateId());
                     break;
             }
 
             return Task.FromResult(true);
         }
 
-        public async Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
             if (schemaIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(schemaIds, BatchSize);
+                await rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(schemaIds, BatchSize, ct);
             }
         }
     }

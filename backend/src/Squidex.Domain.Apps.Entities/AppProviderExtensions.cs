@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -16,7 +17,8 @@ namespace Squidex.Domain.Apps.Entities
 {
     public static class AppProviderExtensions
     {
-        public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, ISchemaEntity schema)
+        public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, ISchemaEntity schema,
+            CancellationToken ct = default)
         {
             Dictionary<DomainId, Schema>? result = null;
 
@@ -35,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities
                         }
                         else if (result == null || !result.TryGetValue(schemaId, out _))
                         {
-                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false);
+                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
 
                             if (resolvedEntity != null)
                             {

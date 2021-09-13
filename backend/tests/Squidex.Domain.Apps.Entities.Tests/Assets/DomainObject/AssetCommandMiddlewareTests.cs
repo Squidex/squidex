@@ -190,11 +190,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private void AssertAssetHasBeenUploaded(long fileVersion)
         {
-            A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, CancellationToken.None))
+            A.CallTo(() => assetFileStore.UploadAsync(A<string>._, A<HasherStream>._, default))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, null, CancellationToken.None))
+            A.CallTo(() => assetFileStore.CopyAsync(A<string>._, AppId, assetId, fileVersion, null, default))
                 .MustHaveHappened();
-            A.CallTo(() => assetFileStore.DeleteAsync(A<string>._))
+            A.CallTo(() => assetFileStore.DeleteAsync(A<string>._, default))
                 .MustHaveHappened();
         }
 

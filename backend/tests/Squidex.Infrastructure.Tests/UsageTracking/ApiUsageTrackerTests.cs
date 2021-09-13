@@ -17,6 +17,8 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public class ApiUsageTrackerTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
         private readonly string key = Guid.NewGuid().ToString();
         private readonly string category = Guid.NewGuid().ToString();
@@ -25,13 +27,15 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public ApiUsageTrackerTests()
         {
+            ct = cts.Token;
+
             sut = new ApiUsageTracker(usageTracker);
         }
 
         [Fact]
         public async Task Should_forward_delete_call()
         {
-            await sut.DeleteAsync(key);
+            await sut.DeleteAsync(key, ct);
 
             A.CallTo(() => usageTracker.DeleteAsync($"{key}_API", A<CancellationToken>._))
                 .MustHaveHappened();
@@ -42,13 +46,13 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             Counters? measuredCounters = null;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, $"{key}_API", null, A<Counters>.Ignored, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, $"{key}_API", null, A<Counters>.Ignored, ct))
                 .Invokes(args =>
                 {
                     measuredCounters = args.GetArgument<Counters>(3)!;
                 });
 
-            await sut.TrackAsync(date, key, null, 4, 120, 1024);
+            await sut.TrackAsync(date, key, null, 4, 120, 1024, ct);
 
             measuredCounters.Should().BeEquivalentTo(new Counters
             {
@@ -66,10 +70,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalCalls] = 4
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, ct))
                 .Returns(counters);
 
-            var result = await sut.GetMonthCallsAsync(key, date, category);
+            var result = await sut.GetMonthCallsAsync(key, date, category, ct);
 
             Assert.Equal(4, result);
         }
@@ -82,10 +86,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalBytes] = 14
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, ct))
                 .Returns(counters);
 
-            var result = await sut.GetMonthBytesAsync(key, date, category);
+            var result = await sut.GetMonthBytesAsync(key, date, category, ct);
 
             Assert.Equal(14, result);
         }
@@ -122,13 +126,13 @@ namespace Squidex.Infrastructure.UsageTracking
                 [ApiUsageTracker.CounterTotalBytes] = 400
             };
 
-            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", DateTime.Today, null, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", DateTime.Today, null, ct))
                 .Returns(forMonth);
 
-            A.CallTo(() => usageTracker.QueryAsync($"{key}_API", dateFrom, dateTo, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.QueryAsync($"{key}_API", dateFrom, dateTo, ct))
                 .Returns(counters);
 
-            var (summary, stats) = await sut.QueryAsync(key, dateFrom, dateTo);
+            var (summary, stats) = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
             stats.Should().BeEquivalentTo(new Dictionary<string, List<ApiStats>>
             {

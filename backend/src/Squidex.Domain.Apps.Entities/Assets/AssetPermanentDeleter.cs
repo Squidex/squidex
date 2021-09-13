@@ -50,16 +50,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (@event.Payload is AssetDeleted assetDeleted)
             {
-                for (var version = 0; version < @event.Headers.EventStreamNumber(); version++)
+                try
                 {
-                    try
-                    {
-                        await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId, version, null);
-                    }
-                    catch (AssetNotFoundException)
-                    {
-                        continue;
-                    }
+                    await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId);
+                }
+                catch (AssetNotFoundException)
+                {
+                    return;
                 }
             }
         }

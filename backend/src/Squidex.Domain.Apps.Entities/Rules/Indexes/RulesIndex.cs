@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             using (Telemetry.Activities.StartActivity("RulesIndex/GetRuleIdsAsync"))
             {
-                return await Index(appId).GetRuleIdsAsync();
+                return await Cache(appId).GetRuleIdsAsync();
             }
         }
 
@@ -69,15 +69,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private async Task OnCreateAsync(CreateRule create)
         {
-            await Index(create.AppId.Id).AddAsync(create.RuleId);
+            await Cache(create.AppId.Id).AddAsync(create.RuleId);
         }
 
         private async Task OnDeleteAsync(DeleteRule delete)
         {
-            await Index(delete.AppId.Id).RemoveAsync(delete.RuleId);
+            await Cache(delete.AppId.Id).RemoveAsync(delete.RuleId);
         }
 
-        private IRulesCacheGrain Index(DomainId appId)
+        private IRulesCacheGrain Cache(DomainId appId)
         {
             return grainFactory.GetGrain<IRulesCacheGrain>(appId.ToString());
         }

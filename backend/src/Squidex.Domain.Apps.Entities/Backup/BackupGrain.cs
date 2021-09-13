@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                             foreach (var handler in handlers)
                             {
-                                await handler.BackupEventAsync(@event, context);
+                                await handler.BackupEventAsync(@event, context, ct);
                             }
 
                             writer.WriteEvent(storedEvent);
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             ct.ThrowIfCancellationRequested();
 
-                            await handler.BackupAsync(context);
+                            await handler.BackupAsync(context, ct);
                         }
 
                         foreach (var handler in handlers)

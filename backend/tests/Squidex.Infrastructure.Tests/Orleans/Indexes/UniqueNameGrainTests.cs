@@ -12,11 +12,11 @@ namespace Squidex.Infrastructure.Orleans.Indexes
 {
     public class UniqueNameGrainTests
     {
-        private readonly UniqueNameGrain sut;
+        private readonly UniqueNameGrain<string> sut;
 
         public UniqueNameGrainTests()
         {
-            sut = new UniqueNameGrain();
+            sut = new UniqueNameGrain<string>();
         }
 
         [Fact]

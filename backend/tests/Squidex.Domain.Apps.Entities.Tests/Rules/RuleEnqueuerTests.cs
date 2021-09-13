@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null))
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null, default))
                 .MustNotHaveHappened();
         }
 
@@ -113,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null))
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null, default))
                 .MustNotHaveHappened();
         }
 
@@ -134,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null))
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(job, (Exception?)null, default))
                 .MustHaveHappened();
         }
 
@@ -152,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.On(@event);
 
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, (Exception?)null))
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, (Exception?)null, default))
                 .MustHaveHappened();
         }
 
@@ -167,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.On(@event.SetRestored(true));
 
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, A<Exception?>._))
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, A<Exception?>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -176,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var rule1 = CreateRule();
             var rule2 = CreateRule();
 
-            A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
+            A.CallTo(() => appProvider.GetRulesAsync(appId.Id, A<CancellationToken>._))
                 .Returns(new List<IRuleEntity> { rule1, rule2 });
 
             A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule1), default))

@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
@@ -37,7 +38,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.appUISettings = appUISettings;
         }
 
-        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
+        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
@@ -50,20 +52,22 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public async Task BackupAsync(BackupContext context)
+        public async Task BackupAsync(BackupContext context,
+            CancellationToken ct)
         {
             var json = await appUISettings.GetAsync(context.AppId, null);
 
             await context.Writer.WriteJsonAsync(SettingsFile, json);
         }
 
-        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
                 case AppCreated appCreated:
                     {
-                        await ReserveAppAsync(context.AppId, appCreated.Name);
+                        await ReserveAppAsync(context.AppId, appCreated.Name, ct);
 
                         break;
                     }
@@ -103,16 +107,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return true;
         }
 
-        public async Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
             var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile);
 
             await appUISettings.SetAsync(context.AppId, null, json);
         }
 
-        private async Task ReserveAppAsync(DomainId appId, string appName)
+        private async Task ReserveAppAsync(DomainId appId, string appName,
+            CancellationToken ct)
         {
-            appReservation = await appsIndex.ReserveAsync(appId, appName);
+            appReservation = await appsIndex.ReserveAsync(appId, appName, ct);
 
             if (appReservation == null)
             {
@@ -122,10 +128,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public async Task CleanupRestoreErrorAsync(DomainId appId)
         {
-            if (appReservation != null)
-            {
-                await appsIndex.RemoveReservationAsync(appReservation);
-            }
+            await appsIndex.RemoveReservationAsync(appReservation);
+        }
+
+        public async Task CompleteRestoreAsync(RestoreContext context)
+        {
+            await appsIndex.RemoveReservationAsync(appReservation);
         }
 
         private Task WriteAssetAsync(DomainId appId, IBackupWriter writer)

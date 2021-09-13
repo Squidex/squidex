@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.DependencyInjection;
@@ -138,6 +139,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 jobUrl: CurrentJob.Url.ToString()
             );
 
+            var ct = default(CancellationToken);
+
             using (Telemetry.Activities.StartActivity("RestoreBackup"))
             {
                 try
@@ -167,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
                             {
-                                await handler.RestoreAsync(runningContext);
+                                await handler.RestoreAsync(runningContext, ct);
                             }
 
                             Log($"Restored {handler.Name}");
@@ -366,7 +369,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await writeBlock.Completion;
         }
 
-        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
+        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event,
+            CancellationToken ct = default)
         {
             if (@event.Payload is AppCreated appCreated)
             {
@@ -406,7 +410,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             foreach (var handler in handlers)
             {
-                if (!await handler.RestoreEventAsync(@event, runningContext))
+                if (!await handler.RestoreEventAsync(@event, runningContext, ct))
                 {
                     return null;
                 }

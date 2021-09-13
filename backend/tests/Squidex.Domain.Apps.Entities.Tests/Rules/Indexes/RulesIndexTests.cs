@@ -22,14 +22,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly IRulesByAppIndexGrain index = A.Fake<IRulesByAppIndexGrain>();
+        private readonly IRulesCacheGrain cache = A.Fake<IRulesCacheGrain>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly RulesIndex sut;
 
         public RulesIndexTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.Id.ToString(), null))
-                .Returns(index);
+            A.CallTo(() => grainFactory.GetGrain<IRulesCacheGrain>(appId.Id.ToString(), null))
+                .Returns(cache);
 
             sut = new RulesIndex(grainFactory);
         }
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(0);
 
-            A.CallTo(() => index.GetIdsAsync())
+            A.CallTo(() => cache.GetRuleIdsAsync())
                 .Returns(new List<DomainId> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(-1);
 
-            A.CallTo(() => index.GetIdsAsync())
+            A.CallTo(() => cache.GetRuleIdsAsync())
                 .Returns(new List<DomainId> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(0, true);
 
-            A.CallTo(() => index.GetIdsAsync())
+            A.CallTo(() => cache.GetRuleIdsAsync())
                 .Returns(new List<DomainId> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.AddAsync(ruleId))
+            A.CallTo(() => cache.AddAsync(ruleId))
                 .MustHaveHappened();
         }
 
@@ -103,18 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.RemoveAsync(rule.Id))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_forward_call_if_rebuilding()
-        {
-            var rules = new HashSet<DomainId>();
-
-            await sut.RebuildAsync(appId.Id, rules);
-
-            A.CallTo(() => index.RebuildAsync(rules))
+            A.CallTo(() => cache.RemoveAsync(rule.Id))
                 .MustHaveHappened();
         }
 

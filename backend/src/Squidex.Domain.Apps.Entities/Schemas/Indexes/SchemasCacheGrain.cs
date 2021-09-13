@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public sealed class SchemasCacheGrain : UniqueNameGrain, ISchemasCacheGrain
+    public sealed class SchemasCacheGrain : UniqueNameGrain<DomainId>, ISchemasCacheGrain
     {
         private readonly ISchemaRepository schemaRepository;
         private Dictionary<string, DomainId>? schemaIds;

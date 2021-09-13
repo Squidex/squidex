@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Tags;
@@ -38,12 +39,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public Task BackupAsync(BackupContext context)
+        public Task BackupAsync(BackupContext context,
+            CancellationToken ct)
         {
             return BackupTagsAsync(context);
         }
 
-        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
+        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
@@ -52,19 +55,22 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         assetCreated.AppId.Id,
                         assetCreated.AssetId,
                         assetCreated.FileVersion,
-                        context.Writer);
+                        context.Writer,
+                        ct);
                 case AssetUpdated assetUpdated:
                     return WriteAssetAsync(
                         assetUpdated.AppId.Id,
                         assetUpdated.AssetId,
                         assetUpdated.FileVersion,
-                        context.Writer);
+                        context.Writer,
+                        ct);
             }
 
             return Task.CompletedTask;
         }
 
-        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
@@ -78,32 +84,35 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         assetCreated.AppId.Id,
                         assetCreated.AssetId,
                         assetCreated.FileVersion,
-                        context.Reader);
+                        context.Reader,
+                        ct);
                     break;
                 case AssetUpdated assetUpdated:
                     await ReadAssetAsync(
                         assetUpdated.AppId.Id,
                         assetUpdated.AssetId,
                         assetUpdated.FileVersion,
-                        context.Reader);
+                        context.Reader,
+                        ct);
                     break;
             }
 
             return true;
         }
 
-        public async Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
             await RestoreTagsAsync(context);
 
             if (assetIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize);
+                await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize, ct);
             }
 
             if (assetFolderIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds, BatchSize);
+                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds, BatchSize, ct);
             }
         }
 
@@ -121,13 +130,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await context.Writer.WriteJsonAsync(TagsFile, tags);
         }
 
-        private async Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer)
+        private async Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer,
+            CancellationToken ct)
         {
             try
             {
                 await writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream);
+                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream, default, ct);
                 });
             }
             catch (AssetNotFoundException)
@@ -136,13 +146,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader)
+        private async Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader,
+            CancellationToken ct)
         {
             try
             {
                 await reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
                 {
-                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream);
+                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream, true, ct);
                 });
             }
             catch (FileNotFoundException)

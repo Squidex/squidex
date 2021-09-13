@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
@@ -29,26 +31,28 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.rebuilder = rebuilder;
         }
 
-        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
-                case RuleCreated ruleCreated:
-                    ruleIds.Add(ruleCreated.RuleId);
+                case RuleCreated:
+                    ruleIds.Add(@event.Headers.AggregateId());
                     break;
-                case RuleDeleted ruleDeleted:
-                    ruleIds.Remove(ruleDeleted.RuleId);
+                case RuleDeleted:
+                    ruleIds.Remove(@event.Headers.AggregateId());
                     break;
             }
 
             return Task.FromResult(true);
         }
 
-        public async Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
             if (ruleIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<RuleDomainObject, RuleDomainObject.State>(ruleIds, BatchSize);
+                await rebuilder.InsertManyAsync<RuleDomainObject, RuleDomainObject.State>(ruleIds, BatchSize, ct);
             }
         }
     }

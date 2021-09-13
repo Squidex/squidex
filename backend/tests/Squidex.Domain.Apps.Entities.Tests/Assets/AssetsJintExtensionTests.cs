@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 new AssetsJintExtension(services)
             };
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
                 .Returns(Mocks.App(appId));
 
             sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())), extensions)

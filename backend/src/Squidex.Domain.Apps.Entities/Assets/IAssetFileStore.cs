@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         Task DeleteAsync(string tempFile,
             CancellationToken ct = default);
 
-        Task DeleteAsync(DomainId appId, DomainId id, long fileVersion, string? suffix,
+        Task DeleteAsync(DomainId appId, DomainId id,
             CancellationToken ct = default);
     }
 }

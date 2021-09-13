@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
@@ -17,6 +18,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 {
     public class RuleQueryServiceTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IRulesIndex rulesIndex = A.Fake<IRulesIndex>();
         private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
@@ -25,6 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public RuleQueryServiceTests()
         {
+            ct = cts.Token;
+
             requestContext = Context.Anonymous(Mocks.App(appId));
 
             sut = new RuleQueryService(rulesIndex, ruleEnricher);
@@ -43,13 +48,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
                 new RuleEntity()
             };
 
-            A.CallTo(() => rulesIndex.GetRulesAsync(appId.Id))
+            A.CallTo(() => rulesIndex.GetRulesAsync(appId.Id, ct))
                 .Returns(original);
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(original, requestContext))
+            A.CallTo(() => ruleEnricher.EnrichAsync(original, requestContext, ct))
                 .Returns(enriched);
 
-            var result = await sut.QueryAsync(requestContext);
+            var result = await sut.QueryAsync(requestContext, ct);
 
             Assert.Same(enriched, result);
         }

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var result = new SearchResults();
 
-            var searchFilter = await CreateSearchFilterAsync(context);
+            var searchFilter = await CreateSearchFilterAsync(context, ct);
 
             if (searchFilter == null)
             {
@@ -78,11 +78,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result;
         }
 
-        private async Task<TextFilter?> CreateSearchFilterAsync(Context context)
+        private async Task<TextFilter?> CreateSearchFilterAsync(Context context,
+            CancellationToken ct)
         {
             var allowedSchemas = new List<DomainId>();
 
-            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
             foreach (var schema in schemas)
             {

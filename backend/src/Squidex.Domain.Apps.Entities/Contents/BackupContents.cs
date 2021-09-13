@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -62,7 +63,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
+        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+            CancellationToken ct)
         {
             if (@event.Payload is AppCreated appCreated)
             {
@@ -72,7 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
@@ -209,13 +212,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
             var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
 
             if (ids.Any())
             {
-                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize);
+                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize, ct);
             }
         }
 

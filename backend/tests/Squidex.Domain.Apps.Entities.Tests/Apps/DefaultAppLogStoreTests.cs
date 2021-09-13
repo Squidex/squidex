@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure;
@@ -19,11 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class DefaultAppLogStoreTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IRequestLogStore requestLogStore = A.Fake<IRequestLogStore>();
         private readonly DefaultAppLogStore sut;
 
         public DefaultAppLogStoreTests()
         {
+            ct = cts.Token;
+
             sut = new DefaultAppLogStore(requestLogStore);
         }
 
@@ -33,9 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => requestLogStore.IsEnabled)
                 .Returns(false);
 
-            await sut.LogAsync(DomainId.NewGuid(), default);
+            await sut.LogAsync(DomainId.NewGuid(), default, ct);
 
-            A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
+            A.CallTo(() => requestLogStore.LogAsync(A<Request>._, ct))
                 .MustNotHaveHappened();
         }
 
@@ -47,8 +53,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => requestLogStore.IsEnabled)
                 .Returns(true);
 
-            A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
-                .Invokes((Request request) => recordedRequest = request);
+            A.CallTo(() => requestLogStore.LogAsync(A<Request>._, ct))
+                .Invokes(x => recordedRequest = x.GetArgument<Request>(0)!);
 
             var request = default(RequestLog);
             request.Bytes = 1024;
@@ -65,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             request.UserClientId = "frontend";
             request.UserId = "user1";
 
-            await sut.LogAsync(DomainId.NewGuid(), request);
+            await sut.LogAsync(DomainId.NewGuid(), request, ct);
 
             Assert.NotNull(recordedRequest);
 
@@ -90,20 +96,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var appId = DomainId.NewGuid();
 
-            A.CallTo(() => requestLogStore.QueryAllAsync(A<Func<Request, Task>>._, appId.ToString(), dateFrom, dateTo, default))
-                .Invokes(x =>
+            A.CallTo(() => requestLogStore.QueryAllAsync(appId.ToString(), dateFrom, dateTo, ct))
+                .Returns(new[]
                 {
-                    var callback = x.GetArgument<Func<Request, Task>>(0)!;
-
-                    callback(CreateRecord());
-                    callback(CreateRecord());
-                    callback(CreateRecord());
-                    callback(CreateRecord());
-                });
+                    CreateRecord(),
+                    CreateRecord(),
+                    CreateRecord(),
+                    CreateRecord()
+                }.ToAsyncEnumerable());
 
             var stream = new MemoryStream();
 
-            await sut.ReadLogAsync(appId, dateFrom, dateTo, stream);
+            await sut.ReadLogAsync(appId, dateFrom, dateTo, stream, ct);
 
             stream.Position = 0;
 

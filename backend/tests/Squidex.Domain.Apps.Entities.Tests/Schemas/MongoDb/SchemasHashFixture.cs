@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb
 
             Task.Run(async () =>
             {
-                await schemasHash.InitializeAsync();
+                await schemasHash.InitializeAsync(default);
             }).Wait();
 
             SchemasHash = schemasHash;

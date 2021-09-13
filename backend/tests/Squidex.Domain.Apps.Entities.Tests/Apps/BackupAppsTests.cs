@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class BackupAppsTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IAppsIndex index = A.Fake<IAppsIndex>();
         private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
@@ -32,6 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public BackupAppsTests()
         {
+            ct = cts.Token;
+
             sut = new BackupApps(appImageStore, index,  appUISettings);
         }
 
@@ -48,15 +52,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName))
+            A.CallTo(() => index.ReserveAsync(appId, appName, A<CancellationToken>._))
                 .Returns("Reservation");
 
             await sut.RestoreEventAsync(Envelope.Create(new AppCreated
             {
                 Name = appName
-            }), context);
+            }), context, ct);
 
-            A.CallTo(() => index.ReserveAsync(appId, appName))
+            A.CallTo(() => index.ReserveAsync(appId, appName, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -67,17 +71,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName))
+            A.CallTo(() => index.ReserveAsync(appId, appName, ct))
                 .Returns("Reservation");
 
             await sut.RestoreEventAsync(Envelope.Create(new AppCreated
             {
                 Name = appName
-            }), context);
+            }), context, ct);
 
             await sut.CompleteRestoreAsync(context);
 
-            A.CallTo(() => index.AddAsync("Reservation"))
+            A.CallTo(() => index.RemoveReservationAsync("Reservation", default))
                 .MustHaveHappened();
         }
 
@@ -88,17 +92,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName))
+            A.CallTo(() => index.ReserveAsync(appId, appName, ct))
                 .Returns("Reservation");
 
             await sut.RestoreEventAsync(Envelope.Create(new AppCreated
             {
                 Name = appName
-            }), context);
+            }), context, ct);
 
             await sut.CleanupRestoreErrorAsync(appId);
 
-            A.CallTo(() => index.RemoveReservationAsync("Reservation"))
+            A.CallTo(() => index.RemoveReservationAsync("Reservation", default))
                 .MustHaveHappened();
         }
 
@@ -109,16 +113,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName))
+            A.CallTo(() => index.ReserveAsync(appId, appName, ct))
                 .Returns(Task.FromResult<string?>(null));
 
-            await Assert.ThrowsAsync<BackupRestoreException>(() =>
+            var @event = Envelope.Create(new AppCreated
             {
-                return sut.RestoreEventAsync(Envelope.Create(new AppCreated
-                {
-                    Name = appName
-                }), context);
+                Name = appName
             });
+
+            await Assert.ThrowsAsync<BackupRestoreException>(() => sut.RestoreEventAsync(@event, context, ct));
         }
 
         [Fact]
@@ -126,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.CleanupRestoreErrorAsync(appId);
 
-            A.CallTo(() => index.RemoveReservationAsync("Reservation"))
+            A.CallTo(() => index.RemoveReservationAsync("Reservation", ct))
                 .MustNotHaveHappened();
         }
 
@@ -140,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => appUISettings.GetAsync(appId, null))
                 .Returns(settings);
 
-            await sut.BackupAsync(context);
+            await sut.BackupAsync(context, ct);
 
             A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, settings))
                 .MustHaveHappened();
@@ -156,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => context.Reader.ReadJsonAsync<JsonObject>(A<string>._))
                 .Returns(settings);
 
-            await sut.RestoreAsync(context);
+            await sut.RestoreAsync(context, ct);
 
             A.CallTo(() => appUISettings.SetAsync(appId, null, settings))
                 .MustHaveHappened();
@@ -172,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "found"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context);
+            var result = await sut.RestoreEventAsync(@event, context, ct);
 
             Assert.True(result);
             Assert.Equal("found_mapped", @event.Payload.ContributorId);
@@ -188,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "unknown"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context);
+            var result = await sut.RestoreEventAsync(@event, context, ct);
 
             Assert.False(result);
             Assert.Equal("unknown", @event.Payload.ContributorId);
@@ -204,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "found"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context);
+            var result = await sut.RestoreEventAsync(@event, context, ct);
 
             Assert.True(result);
             Assert.Equal("found_mapped", @event.Payload.ContributorId);
@@ -220,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 ContributorId = "unknown"
             });
 
-            var result = await sut.RestoreEventAsync(@event, context);
+            var result = await sut.RestoreEventAsync(@event, context, ct);
 
             Assert.False(result);
             Assert.Equal("unknown", @event.Payload.ContributorId);
@@ -239,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, default))
                 .Throws(new AssetNotFoundException("Image"));
 
-            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context);
+            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
         }
 
         [Fact]
@@ -252,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => context.Writer.WriteBlobAsync(A<string>._, A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
 
-            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context);
+            await sut.BackupEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
 
             A.CallTo(() => appImageStore.DownloadAsync(appId, imageStream, default))
                 .MustHaveHappened();
@@ -268,7 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => context.Reader.ReadBlobAsync(A<string>._, A<Func<Stream, Task>>._))
                 .Invokes((string _, Func<Stream, Task> handler) => handler(imageStream));
 
-            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context);
+            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
 
             A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, default))
                 .MustHaveHappened();
@@ -287,49 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => appImageStore.UploadAsync(appId, imageStream, default))
                 .Throws(new AssetAlreadyExistsException("Image"));
 
-            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context);
-        }
-
-        [Fact]
-        public async Task Should_restore_indices_for_all_non_deleted_schemas()
-        {
-            var userId1 = "found1";
-            var userId2 = "found2";
-            var userId3 = "found3";
-            var context = CreateRestoreContext();
-
-            await sut.RestoreEventAsync(Envelope.Create(new AppContributorAssigned
-            {
-                ContributorId = userId1
-            }), context);
-
-            await sut.RestoreEventAsync(Envelope.Create(new AppContributorAssigned
-            {
-                ContributorId = userId2
-            }), context);
-
-            await sut.RestoreEventAsync(Envelope.Create(new AppContributorAssigned
-            {
-                ContributorId = userId3
-            }), context);
-
-            await sut.RestoreEventAsync(Envelope.Create(new AppContributorRemoved
-            {
-                ContributorId = userId3
-            }), context);
-
-            HashSet<string>? newIndex = null;
-
-            A.CallTo(() => index.RebuildByContributorsAsync(appId, A<HashSet<string>>._))
-                .Invokes(new Action<DomainId, HashSet<string>>((_, i) => newIndex = i));
-
-            await sut.CompleteRestoreAsync(context);
-
-            Assert.Equal(new HashSet<string>
-            {
-                "found1_mapped",
-                "found2_mapped"
-            }, newIndex);
+            await sut.RestoreEventAsync(Envelope.Create(new AppImageUploaded()), context, ct);
         }
 
         private BackupContext CreateBackupContext()

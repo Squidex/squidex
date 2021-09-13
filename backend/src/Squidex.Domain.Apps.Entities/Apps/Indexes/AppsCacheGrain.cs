@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsCacheGrain : UniqueNameGrain, IAppsCacheGrain
+    public sealed class AppsCacheGrain : UniqueNameGrain<DomainId>, IAppsCacheGrain
     {
         private readonly IAppRepository appRepository;
         private readonly Dictionary<string, DomainId?> appIds = new Dictionary<string, DomainId?>();

@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Tasks
                 }
 
                 await TrySendAsync();
-            }, ct).ContinueWith(x => target.Writer.TryComplete(x.Exception), ct);
+            }, ct).ContinueWith(x => target.Writer.TryComplete(x.Exception));
         }
     }
 }

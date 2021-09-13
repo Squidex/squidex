@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     return EmptyContents;
                 }
 
-                var schemas = await GetSchemasAsync(context);
+                var schemas = await GetSchemasAsync(context, ct);
 
                 if (schemas.Count == 0)
                 {
@@ -213,9 +213,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return schema;
         }
 
-        private async Task<List<ISchemaEntity>> GetSchemasAsync(Context context)
+        private async Task<List<ISchemaEntity>> GetSchemasAsync(Context context,
+            CancellationToken ct)
         {
-            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
             return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, Permissions.AppContentsReadOwn)).ToList();
         }

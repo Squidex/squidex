@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Orleans.Indexes
 {
-    public class UniqueNameGrain : GrainOfString
+    public class UniqueNameGrain<T> : GrainOfString, IUniqueNameGrain<T>
     {
-        private readonly Dictionary<string, (string Name, string Id)> reservations = new Dictionary<string, (string Name, string Id)>();
+        private readonly Dictionary<string, (string Name, T Id)> reservations = new Dictionary<string, (string Name, T Id)>();
 
-        public Task<string?> ReserveAsync(string id, string name)
+        public Task<string?> ReserveAsync(T id, string name)
         {
             string? token = null;
 
             var reservation = reservations.FirstOrDefault(x => x.Value.Name == name);
 
-            if (reservation.Value.Id == id)
+            if (Equals(reservation.Value.Id, id))
             {
                 token = reservation.Key;
             }

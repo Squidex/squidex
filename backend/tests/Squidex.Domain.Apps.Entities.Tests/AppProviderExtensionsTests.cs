@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities
 
             Assert.Empty(components);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities
             Assert.Single(components);
             Assert.Same(schema.SchemaDef, components[schemaId.Id]);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, false, default))
                 .MustNotHaveHappened();
         }
 
@@ -61,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var component = Mocks.Schema(appId, componentId1);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
                 .Returns(component);
 
             var schema =
@@ -83,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var component = Mocks.Schema(appId, componentId1);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
                 .Returns(component);
 
             var schema =
@@ -105,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var component = Mocks.Schema(appId, componentId1);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
                 .Returns(component);
 
             var schema =
@@ -134,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities
                             SchemaId = componentId1.Id
                         }));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
                 .Returns(component);
 
             var schema =
@@ -170,10 +171,10 @@ namespace Squidex.Domain.Apps.Entities
                             SchemaId = componentId2.Id
                         }));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId1.Id, false, default))
                 .Returns(component1);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId2.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, componentId2.Id, false, default))
                 .Returns(component2);
 
             var schema =

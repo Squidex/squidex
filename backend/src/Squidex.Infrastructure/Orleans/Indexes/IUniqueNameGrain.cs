@@ -10,9 +10,9 @@ using Orleans;
 
 namespace Squidex.Infrastructure.Orleans.Indexes
 {
-    public interface IUniqueNameGrain : IGrainWithStringKey
+    public interface IUniqueNameGrain<T> : IGrainWithStringKey
     {
-        Task<string?> ReserveAsync(string id, string name);
+        Task<string?> ReserveAsync(T id, string name);
 
         Task RemoveReservationAsync(string? token);
     }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 
@@ -23,13 +24,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             this.ruleEnricher = ruleEnricher;
         }
 
-        public async Task<IReadOnlyList<IEnrichedRuleEntity>> QueryAsync(Context context)
+        public async Task<IReadOnlyList<IEnrichedRuleEntity>> QueryAsync(Context context,
+            CancellationToken ct = default)
         {
-            var rules = await rulesIndex.GetRulesAsync(context.App.Id);
+            var rules = await rulesIndex.GetRulesAsync(context.App.Id, ct);
 
             if (rules.Count > 0)
             {
-                var enriched = await ruleEnricher.EnrichAsync(rules, context);
+                var enriched = await ruleEnricher.EnrichAsync(rules, context, ct);
 
                 return enriched;
             }

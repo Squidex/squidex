@@ -19,13 +19,20 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         private readonly Regex regex;
         private readonly string? errorMessage;
 
-        public PatternValidator(string pattern, string? errorMessage = null)
+        public PatternValidator(string pattern, string? errorMessage = null, bool capture = false)
         {
             Guard.NotNullOrEmpty(pattern, nameof(pattern));
 
             this.errorMessage = errorMessage;
 
-            regex = new Regex($"^{pattern}$", RegexOptions.None | RegexOptions.ExplicitCapture, Timeout);
+            var options = RegexOptions.None;
+
+            if (!capture)
+            {
+                options |= RegexOptions.ExplicitCapture;
+            }
+
+            regex = new Regex($"^{pattern}$", options, Timeout);
         }
 
         public Task ValidateAsync(object? value, ValidationContext context, AddError addError)

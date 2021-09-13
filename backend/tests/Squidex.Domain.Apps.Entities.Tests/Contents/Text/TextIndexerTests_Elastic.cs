@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var index = new ElasticSearchTextIndex("http://localhost:9200", "squidex", true);
 
-                await index.InitializeAsync();
+                await index.InitializeAsync(default);
 
                 return index;
             }

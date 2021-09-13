@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             foreach (var schema in validSchemas)
             {
-                var components = await appProvider.GetComponentsAsync(schema);
+                var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
 
                 GenerateSchemaOperations(builder.Schema(schema.SchemaDef, components, flat));
             }

@@ -20,12 +20,16 @@ namespace Squidex.Infrastructure.Log
 {
     public class BackgroundRequestLogStoreTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IRequestLogRepository requestLogRepository = A.Fake<IRequestLogRepository>();
         private readonly RequestLogStoreOptions options = new RequestLogStoreOptions();
         private readonly BackgroundRequestLogStore sut;
 
         public BackgroundRequestLogStoreTests()
         {
+            ct = cts.Token;
+
             options.StoreEnabled = true;
 
             sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, A.Fake<ISemanticLog>())
@@ -47,9 +51,9 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public async Task Should_forward_delete_call()
         {
-            await sut.DeleteAsync("my-key");
+            await sut.DeleteAsync("my-key", ct);
 
-            A.CallTo(() => requestLogRepository.DeleteAsync("my-key", A<CancellationToken>._))
+            A.CallTo(() => requestLogRepository.DeleteAsync("my-key", ct))
                 .MustHaveHappened();
         }
 
@@ -60,14 +64,14 @@ namespace Squidex.Infrastructure.Log
 
             for (var i = 0; i < 2500; i++)
             {
-                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) });
+                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
             }
 
             sut.Next();
             sut.Dispose();
 
             // Wait for the timer to not trigger.
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
 
             A.CallTo(() => requestLogRepository.InsertManyAsync(A<IEnumerable<Request>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -81,10 +85,10 @@ namespace Squidex.Infrastructure.Log
             var dateFrom = DateTime.Today;
             var dateTo = dateFrom.AddDays(4);
 
-            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
+            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, ct))
                 .Returns(AsyncEnumerable.Repeat(new Request { Key = key }, 1));
 
-            var results = await sut.QueryAllAsync(key, dateFrom, dateTo).ToListAsync();
+            var results = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
 
             Assert.NotEmpty(results);
         }
@@ -99,11 +103,11 @@ namespace Squidex.Infrastructure.Log
             var dateFrom = DateTime.Today;
             var dateTo = dateFrom.AddDays(4);
 
-            var results = await sut.QueryAllAsync(key, dateFrom, dateTo).ToListAsync();
+            var results = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
 
             Assert.Empty(results);
 
-            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
+            A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, ct))
                 .MustNotHaveHappened();
         }
 
@@ -112,14 +116,14 @@ namespace Squidex.Infrastructure.Log
         {
             for (var i = 0; i < 2500; i++)
             {
-                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) });
+                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
             }
 
             sut.Next();
             sut.Dispose();
 
             // Wait for the timer to trigger.
-            await Task.Delay(500);
+            await Task.Delay(500, ct);
 
             A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "999"), A<CancellationToken>._))
                 .MustHaveHappened();

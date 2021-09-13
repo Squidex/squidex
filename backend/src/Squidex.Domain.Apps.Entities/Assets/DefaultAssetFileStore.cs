@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -39,16 +40,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
             if (options.FolderPerApp)
             {
                 await assetStore.DeleteByPrefixAsync($"{app.Id}/", ct);
-                await assetStore.DeleteByPrefixAsync($"derives/{app.Id}/", ct);
             }
             else
             {
                 await foreach (var asset in assetRepository.StreamAll(app.Id, ct))
                 {
-                    for (var version = 0; version < asset.FileVersion; version++)
-                    {
-                        await DeleteAsync(app.Id, asset.Id, version, null, ct);
-                    }
+                    await DeleteAsync(app.Id, asset.Id, ct);
                 }
             }
         }
@@ -116,18 +113,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.CopyAsync(tempFile, fileName, ct);
         }
 
-        public Task DeleteAsync(DomainId appId, DomainId id, long fileVersion, string? suffix,
+        public Task DeleteAsync(DomainId appId, DomainId id,
             CancellationToken ct = default)
         {
-            var fileNameOld = GetFileName(id, fileVersion, suffix);
-            var fileNameNew = GetFileName(appId, id, fileVersion, suffix);
-
             if (options.FolderPerApp)
             {
-                return assetStore.DeleteByPrefixAsync(fileNameNew, ct);
+                return assetStore.DeleteByPrefixAsync($"{appId}/", ct);
             }
             else
             {
+                var fileNameOld = GetFileName(id);
+                var fileNameNew = GetFileName(appId, id);
+
                 return Task.WhenAll(
                     assetStore.DeleteByPrefixAsync(fileNameOld, ct),
                     assetStore.DeleteByPrefixAsync(fileNameNew, ct));
@@ -140,42 +137,44 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.DeleteAsync(tempFile, ct);
         }
 
-        private static string GetFileName(DomainId id, long fileVersion, string? suffix)
+        private string GetFileName(DomainId id, long fileVersion = -1, string? suffix = null)
         {
-            if (!string.IsNullOrWhiteSpace(suffix))
-            {
-                return $"{id}_{fileVersion}_{suffix}";
-            }
-            else
-            {
-                return $"{id}_{fileVersion}";
-            }
+            return GetFileName(default, id, fileVersion, suffix);
         }
 
-        private string GetFileName(DomainId appId, DomainId id, long fileVersion, string? suffix)
+        private string GetFileName(DomainId appId, DomainId id, long fileVersion = -1, string? suffix = null)
         {
-            if (options.FolderPerApp)
+            var sb = new StringBuilder(20);
+
+            if (appId != default)
             {
-                if (!string.IsNullOrWhiteSpace(suffix))
+                sb.Append(appId);
+
+                if (options.FolderPerApp)
                 {
-                    return $"derived/{appId}/{id}_{fileVersion}_{suffix}";
+                    sb.Append('/');
                 }
                 else
                 {
-                    return $"{appId}/{id}_{fileVersion}";
+                    sb.Append('_');
                 }
             }
-            else
+
+            sb.Append(id);
+
+            if (fileVersion >= 0)
             {
-                if (!string.IsNullOrWhiteSpace(suffix))
-                {
-                    return $"{appId}_{id}_{fileVersion}_{suffix}";
-                }
-                else
-                {
-                    return $"{appId}_{id}_{fileVersion}";
-                }
+                sb.Append('_');
+                sb.Append(fileVersion);
             }
+
+            if (!string.IsNullOrWhiteSpace(suffix))
+            {
+                sb.Append('_');
+                sb.Append(suffix);
+            }
+
+            return sb.ToString();
         }
     }
 }

@@ -7,7 +7,6 @@
 
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
@@ -56,7 +55,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -74,7 +73,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -90,7 +89,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, A<long>._, default))
                 .MustHaveHappened();
         }
 
@@ -107,7 +106,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 1024, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 1024, default))
                 .MustHaveHappened();
         }
 
@@ -128,7 +127,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -149,7 +148,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -180,7 +179,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -196,7 +195,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, A<CancellationToken>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -217,7 +216,7 @@ namespace Squidex.Web.Pipeline
                     x.RequestMethod == "GET" &&
                     x.RequestPath == "/my-path" &&
                     x.Costs == 0),
-                A<CancellationToken>._))
+                default))
                 .MustHaveHappened();
         }
     }
