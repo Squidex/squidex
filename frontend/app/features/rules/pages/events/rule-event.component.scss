@@ -18,21 +18,21 @@ td {
 }
 
 .event {
-    &-stats {
-        font-size: $font-smallest;
-    }
-
     &-header,
     &-dump,
     &-stats {
         padding: .75rem 1.25rem;
     }
 
+    &-stats {
+        font-size: $font-smallest;
+        font-weight: normal;
+    }
+
     &-header {
         background: $color-border-light;
         border: 0;
         border-bottom: 2px solid $color-border;
-        padding: .75rem 1.25rem;
         position: relative;
 
         h4 {

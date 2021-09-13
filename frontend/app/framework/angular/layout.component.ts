@@ -42,7 +42,10 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public width = -1;
 
     @Input()
-    public widthPadding = 3;
+    public innerWidth = -1;
+
+    @Input()
+    public innerWidthPadding = 3;
 
     @Input()
     public white = false;
@@ -66,11 +69,11 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public panel: ElementRef<HTMLElement>;
 
     public get desiredWidth() {
-        return this.layout === 'main' ? 0 : (this.isCollapsed ? 3 : this.width);
+        return this.isCollapsed ? 3 : this.width;
     }
 
-    public get innerWidth() {
-        return this.width > 0 ? `${this.width}rem` : '100%';
+    public get desiredInnerWidth() {
+        return this.innerWidth <= 0 ? '100%' : `${this.innerWidth}rem`;
     }
 
     public get isViewInit() {
@@ -124,7 +127,7 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.renderer.setStyle(element, 'width', size);
 
                 if (this.layout === 'main') {
-                    this.renderer.setStyle(element, 'minWidth', `${this.width + this.widthPadding}rem`);
+                    this.renderer.setStyle(element, 'minWidth', `${this.innerWidth + this.innerWidthPadding}rem`);
                 }
 
                 this.widthToRender = element.offsetWidth;

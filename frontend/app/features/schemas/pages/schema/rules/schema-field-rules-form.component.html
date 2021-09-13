@@ -8,7 +8,7 @@
                     {{ 'schemas.rules.empty' | sqxTranslate }}
                 </div>
 
-                <div class="form-group row" *ngFor="let form of editForm.rulesControls; let i = index" [formGroup]="form">
+                <div class="form-group row gx-2" *ngFor="let form of editForm.rulesControls; let i = index" [formGroup]="form">
                     <div class="col col-action">
                         <sqx-control-errors for="action"></sqx-control-errors>
 

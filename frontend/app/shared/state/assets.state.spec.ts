@@ -48,7 +48,7 @@ describe('AssetsState', () => {
 
     describe('Loading', () => {
         beforeEach(() => {
-            assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID))
+            assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID, 'PathAndItems'))
                 .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], []))).verifiable(Times.atLeastOnce());
         });
 
@@ -111,7 +111,7 @@ describe('AssetsState', () => {
 
     describe('Navigating', () => {
         it('should load with parent id', () => {
-            assetsService.setup(x => x.getAssetFolders(app, '123'))
+            assetsService.setup(x => x.getAssetFolders(app, '123', 'PathAndItems'))
                 .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], []))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: '123' }))
@@ -156,7 +156,7 @@ describe('AssetsState', () => {
 
     describe('Updates', () => {
         beforeEach(() => {
-            assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID))
+            assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID, 'PathAndItems'))
                 .returns(() => of(new AssetFoldersDto(2, [assetFolder1, assetFolder2], [])));
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID }))

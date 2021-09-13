@@ -110,7 +110,7 @@ const DEFAULT_OPTIONS: GridsterConfig = {
     fixedColWidth: 254,
     fixedRowHeight: 254,
     gridType: GridType.Fixed,
-    margin: 0,
+    margin: 10,
     maxItemCols: 3,
     maxItemRows: 2,
     outerMargin: true,

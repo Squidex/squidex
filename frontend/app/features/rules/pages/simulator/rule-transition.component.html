@@ -1,0 +1,9 @@
+<div class="history-transition" *ngIf="text">
+    {{ text | sqxTranslate }}
+</div>
+
+<ng-container *ngIf="filteredErrors; let errors">
+    <div class="history-transition text-danger" *ngFor="let error of errors">
+        {{ error | sqxTranslate }}
+    </div>
+</ng-container>

@@ -120,7 +120,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         }
     }
 
-    private updateOSMDisabled(isDisabled: boolean): void {
+    private updateOSMDisabled(isDisabled: boolean) {
         const update: (t: any) => any =
             isDisabled ?
             x => x.disable() :
@@ -139,7 +139,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
         }
     }
 
-    private updateGoogleDisabled(isDisabled: boolean): void {
+    private updateGoogleDisabled(isDisabled: boolean) {
         const enabled = !isDisabled;
 
         if (this.map) {

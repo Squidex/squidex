@@ -71,7 +71,7 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
         this.isChecked = obj;
     }
 
-    public setDisabledState(isDisabled: boolean): void {
+    public setDisabledState(isDisabled: boolean) {
         this.renderer.setProperty(this.element.nativeElement, 'disabled', isDisabled);
     }
 

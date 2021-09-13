@@ -133,6 +133,9 @@
   <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
     <value>La lingua master non può essere rimossa.</value>
   </data>
+  <data name="apps.maximumTotalReached" xml:space="preserve">
+    <value>You cannot create more apps. Please contact the support to remove this restriction from your account.</value>
+  </data>
   <data name="apps.nameAlreadyExists" xml:space="preserve">
     <value>Esiste già un'app con lo stesso nome.</value>
   </data>

@@ -339,7 +339,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             var context = CreateContext(CreateContent(Status.Draft), normalSchema);
 
-            ((ContentEntity)(ContentEntity)context.Content).CreatedBy = RefToken.User("456");
+            ((ContentEntity)context.Content).CreatedBy = RefToken.User("456");
 
             Assert.Throws<DomainForbiddenException>(() => context.MustHavePermission(Permissions.AppContentsDelete));
         }

@@ -82,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
             if (NextAttempt != null)
             {
-                AddDeleteLink("delete", resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
+                AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
             }
 
             return this;

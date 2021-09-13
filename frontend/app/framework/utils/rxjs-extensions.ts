@@ -6,7 +6,7 @@
  */
 
 import { EMPTY, Observable, ReplaySubject, throwError } from 'rxjs';
-import { catchError, distinctUntilChanged, filter, map, onErrorResumeNext, share, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, onErrorResumeNext, share, switchMap } from 'rxjs/operators';
 import { DialogService } from './../services/dialog.service';
 import { Version, versioned, Versioned } from './version';
 
@@ -48,6 +48,16 @@ export function shareMapSubscribed<T, R = T>(dialogs: DialogService, project: (v
             .subscribe();
 
         return shared.pipe(map(project));
+    };
+}
+
+export function debounceTimeSafe<T>(duration: number) {
+    return function mapOperation(source: Observable<T>) {
+        if (duration > 0) {
+            return source.pipe(debounceTime(duration), onErrorResumeNext());
+        } else {
+            return source.pipe(onErrorResumeNext());
+        }
     };
 }
 

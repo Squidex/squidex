@@ -41,9 +41,16 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         {
             Guard.NotNull(rule, nameof(rule));
 
-            var context = GetContext(rule);
+            var context = new RuleContext
+            {
+                AppId = rule.AppId,
+                Rule = rule.RuleDef,
+                RuleId = rule.Id,
+                IncludeSkipped = true,
+                IncludeStale = true
+            };
 
-            var result = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
+            var simulatedEvents = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
 
             var fromNow = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
 
@@ -53,28 +60,31 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
                 if (@event?.Payload is AppEvent appEvent)
                 {
-                    await foreach (var (job, exception, skip) in ruleService.CreateJobsAsync(@event, context, ct))
+                    // Also create jobs for rules with failing conditions because we want to show them in th table.
+                    await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct))
                     {
-                        var name = job?.EventName;
+                        var eventName = result.Job?.EventName;
 
-                        if (string.IsNullOrWhiteSpace(name))
+                        if (string.IsNullOrWhiteSpace(eventName))
                         {
-                            name = ruleService.GetName(appEvent);
+                            eventName = ruleService.GetName(appEvent);
                         }
 
-                        var simulationResult = new SimulatedRuleEvent(
-                            name,
-                            job?.ActionName,
-                            job?.ActionData,
-                            exception?.Message,
-                            skip);
-
-                        result.Add(simulationResult);
+                        simulatedEvents.Add(new SimulatedRuleEvent
+                        {
+                            ActionData = result.Job?.ActionData,
+                            ActionName = result.Job?.ActionName,
+                            EnrichedEvent = result.EnrichedEvent,
+                            Error = result.EnrichmentError?.Message,
+                            Event = @event.Payload,
+                            EventName = eventName,
+                            SkipReason = result.SkipReason
+                        });
                     }
                 }
             }
 
-            return result;
+            return simulatedEvents;
         }
 
         public Task CancelAsync(DomainId appId)
@@ -118,8 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 AppId = rule.AppId,
                 Rule = rule.RuleDef,
-                RuleId = rule.Id,
-                IgnoreStale = false
+                RuleId = rule.Id
             };
         }
     }

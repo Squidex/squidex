@@ -199,10 +199,12 @@ export class SimulatedRuleEventDto {
 
     constructor(links: ResourceLinks,
         public readonly eventName: string,
+        public readonly event: any,
+        public readonly enrichedEvent: any | undefined,
         public readonly actionName: string | undefined,
         public readonly actionData: string | undefined,
         public readonly error: string | undefined,
-        public readonly skipReason: string,
+        public readonly skipReasons: ReadonlyArray<string>,
     ) {
         this._links = links;
     }
@@ -375,14 +377,14 @@ export class RulesService {
             pretifyError('i18n:rules.ruleEvents.enqueueFailed'));
     }
 
-    public cancelEvent(appName: string, resource: Resource): Observable<any> {
-        const link = resource._links['delete'];
+    public cancelEvents(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['cancel'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url).pipe(
             tap(() => {
-                this.analytics.trackEvent('Rule', 'EventDequeued', appName);
+                this.analytics.trackEvent('Rule', 'EventsCancelled', appName);
             }),
             pretifyError('i18n:rules.ruleEvents.cancelFailed'));
     }
@@ -451,8 +453,10 @@ function parseRuleEvent(response: any) {
 function parseSimulatedRuleEvent(response: any) {
     return new SimulatedRuleEventDto(response._links,
         response.eventName,
+        response.event,
+        response.enrichedEvent,
         response.actionName,
         response.actionData,
         response.error,
-        response.skipReason);
+        response.skipReasons);
 }

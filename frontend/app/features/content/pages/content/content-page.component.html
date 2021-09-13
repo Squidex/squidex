@@ -3,24 +3,22 @@
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
     <sqx-layout layout="main" [hideSidebar]="!content">
         <ng-container title>
-            <a class="btn btn-text-secondary" (click)="back()" *ngIf="schema.type === 'Default'">
-                <i class="icon-angle-left"></i>
-            </a>
+            <div class="d-flex align-items-center">
+                <a class="btn btn-text-secondary" (click)="back()" *ngIf="schema.type !== 'Singleton'">
+                    <i class="icon-angle-left"></i>
+                </a>
 
-            <ng-container *ngIf="content; noContentTitle">
-                <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
-            </ng-container>
+                <ng-container *ngIf="content; else noContentTitle">
+                    <sqx-title message="i18n:contents.editPageTitle"></sqx-title>
+                </ng-container>
 
-            <ng-template #noContentTitle>
-                {{ 'contents.createTitle' | sqxTranslate }}
+                <ng-template #noContentTitle>
+                    <h3>{{ 'contents.createTitle' | sqxTranslate }}</h3>
 
-                <sqx-title message="i18n:contents.createPageTitle"></sqx-title>
-            </ng-template>
-        </ng-container>
-        
-        <ng-container menu>
-            <ng-container *ngIf="content">
-                <ul class="nav nav-tabs2" *ngIf="contentTab | async; let tab">
+                    <sqx-title message="i18n:contents.createPageTitle"></sqx-title>
+                </ng-template>
+
+                <ul class="nav nav-tabs2" *ngIf="content && contentTab | async; let tab">
                     <li class="nav-item">
                         <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'editor' }" [class.active]="tab === 'editor'">
                             {{ 'contents.contentTab.editor' | sqxTranslate }}
@@ -36,71 +34,91 @@
                             {{ 'contents.contentTab.referencing' | sqxTranslate }}
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'inspect' }" [class.active]="tab === 'inspect'">
+                            {{ 'contents.contentTab.inspect' | sqxTranslate }}
+                        </a>
+                    </li>
                     <li *ngIf="schema.properties.contentEditorUrl">
                         <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'extension' }" [class.active]="tab === 'extension'">
                             {{ 'common.extension' | sqxTranslate }}
                         </a>
                     </li>
                 </ul>
-            </ng-container>
+            </div>
         </ng-container>
- 
+        
         <ng-container menu>
-            <ng-container *ngIf="content; else noContentMenu">
-                <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
-
-                <ng-container *ngIf="contentTab | async; let tab">
-                    <ng-container *ngIf="tab === 'references' || tab === 'referencing'; else defaultHeader">
-                        <button type="button" class="btn btn-primary ms-2" (click)="publish()">
-                            {{ 'contents.publishAll' | sqxTranslate }}
-                        </button>
-    
-                        <button type="button" class="btn btn-primary ms-2" (click)="validate()">
-                            {{ 'contents.validate' | sqxTranslate }}
-                        </button>
+            <div class="menu">
+                <ng-container *ngIf="content; else noContentMenu">
+                    <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
+        
+                    <ng-container *ngIf="languages.length > 1">
+                        <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
                     </ng-container>
 
-                    <ng-template #defaultHeader>
-                        <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
-
-                        <ng-container *ngIf="content?.canDelete">
-                            <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
-                                <i class="icon-dots"></i>
-                            </button>
-
-                            <ng-container *sqxModal="dropdown;closeAlways:true">
-                                <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
-                                    <a class="dropdown-item dropdown-item-delete"
-                                        (sqxConfirmClick)="delete()"
-                                        confirmTitle="i18n:contents.deleteConfirmTitle"
-                                        confirmText="i18n:contents.deleteConfirmText"
-                                        confirmRememberKey="deleteContent">
-                                        {{ 'common.delete' | sqxTranslate }}
-                                    </a>
-                                </div>
+                    <ng-container *ngIf="contentTab | async; let tab">
+                        <ng-container *ngIf="tab === 'references' || tab === 'referencing'; else defaultHeader">
+                            <ng-container *ngIf="content?.canDelete">
+                                <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
+                                    <i class="icon-dots"></i>
+                                </button>
+        
+                                <ng-container *sqxModal="dropdown;closeAlways:true">
+                                    <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                                        <a class="dropdown-item" (click)="publish()">
+                                            {{ 'contents.publishAll' | sqxTranslate }}
+                                        </a>
+                                        <a class="dropdown-item" (click)="validate()">
+                                            {{ 'contents.validate' | sqxTranslate }}
+                                        </a>
+                                    </div>
+                                </ng-container>
                             </ng-container>
                         </ng-container>
 
-                        <ng-container *ngIf="content?.canUpdate">
-                            <button type="submit" class="btn btn-primary ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S">
-                                {{ 'common.save' | sqxTranslate }}
-                            </button>
-                        </ng-container>
-                    </ng-template>
+                        <ng-template #defaultHeader>
+                            <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>
+
+                            <ng-container *ngIf="content?.canDelete">
+                                <button type="button" class="btn btn-outline-secondary ms-2" (click)="dropdown.toggle()" #buttonOptions>
+                                    <i class="icon-dots"></i>
+                                </button>
+
+                                <ng-container *sqxModal="dropdown;closeAlways:true">
+                                    <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                                        <a class="dropdown-item dropdown-item-delete"
+                                            (sqxConfirmClick)="delete()"
+                                            confirmTitle="i18n:contents.deleteConfirmTitle"
+                                            confirmText="i18n:contents.deleteConfirmText"
+                                            confirmRememberKey="deleteContent">
+                                            {{ 'common.delete' | sqxTranslate }}
+                                        </a>
+                                    </div>
+                                </ng-container>
+                            </ng-container>
+
+                            <ng-container *ngIf="content?.canUpdate">
+                                <button type="submit" class="btn btn-primary ms-2" shortcut="CTRL + SHIFT + S">
+                                    {{ 'common.save' | sqxTranslate }}
+                                </button>
+                            </ng-container>
+                        </ng-template>
+                    </ng-container>
                 </ng-container>
-            </ng-container>
 
-            <ng-template #noContentMenu>
-                <button type="button" class="btn btn-primary" (click)="save()" *ngIf="contentsState.canCreate | async">
-                    {{ 'common.save' | sqxTranslate }}
-                </button>
+                <ng-template #noContentMenu>
+                    <button type="button" class="btn btn-primary ms-2" (click)="save()" *ngIf="contentsState.canCreate | async">
+                        {{ 'common.save' | sqxTranslate }}
+                    </button>
 
-                <button type="submit" class="btn btn-success ms-2" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
-                    {{ 'contents.saveAndPublish' | sqxTranslate }}
-                </button>
-            </ng-template>
+                    <button type="submit" class="btn btn-success ms-2" shortcut="CTRL + SHIFT + S" *ngIf="contentsState.canCreateAndPublish | async">
+                        {{ 'contents.saveAndPublish' | sqxTranslate }}
+                    </button>
+                </ng-template>
 
-            <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>
+                <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>
+            </div>
         </ng-container>
 
         <ng-container>
@@ -120,6 +138,14 @@
                             [languages]="languages">
                         </sqx-content-references>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'inspect'">
+                        <sqx-content-inspection
+                            [content]="content"
+                            [language]="language"
+                            [languages]="languages"
+                            [appName]="contentsState.appName">
+                        </sqx-content-inspection>
+                    </ng-container>
                     <ng-container *ngSwitchCase="'extension'">
                         <sqx-content-extension mode="referencing" *ngIf="schema.properties.contentEditorUrl && content"
                             [content]="content" 
@@ -130,10 +156,11 @@
                     <ng-container *ngSwitchDefault>
                         <sqx-content-editor
                             [(language)]="language"
+                            [formContext]="formContext"
+                            [contentId]="contentId"
                             [contentForm]="contentForm"
                             [contentFormCompare]="contentFormCompare"
                             [contentVersion]="contentVersion"
-                            [formContext]="formContext"
                             [languages]="languages"
                             [schema]="schema">
                         </sqx-content-editor>
@@ -144,12 +171,14 @@
             <ng-template #noContentEditor>
                 <sqx-content-editor
                     [(language)]="language"
+                    [isNew]="!content"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
                     [contentVersion]="contentVersion"
                     [formContext]="formContext"
                     [languages]="languages"
-                    [schema]="schema">
+                    [schema]="schema"
+                    [(contentId)]="contentId">
                 </sqx-content-editor>
             </ng-template>
         </ng-container>

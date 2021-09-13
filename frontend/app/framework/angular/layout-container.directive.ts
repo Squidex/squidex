@@ -77,11 +77,11 @@ export class LayoutContainerDirective implements AfterViewInit {
             }
         }
 
+        const spreadWidth = (this.containerWidth - currentSize) / layoutsWidthSpread;
+
         for (const layout of layouts) {
             if (layout.desiredWidth <= 0) {
-                const layoutWidth = (this.containerWidth - currentSize) / layoutsWidthSpread;
-
-                layout.measure(`${layoutWidth}px`);
+                layout.measure(`${spreadWidth}px`);
 
                 currentSize += layout.renderWidth;
             }

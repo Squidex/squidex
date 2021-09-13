@@ -87,8 +87,29 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Created = now
             };
 
-            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule.RuleDef), default))
-                .Returns(new List<JobResult> { new JobResult(null) }.ToAsyncEnumerable());
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+                .Returns(new List<JobResult> { new JobResult() }.ToAsyncEnumerable());
+
+            await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
+
+            A.CallTo(() => ruleEventRepository.EnqueueAsync(A<RuleJob>._, (Exception?)null))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_insert_job_if_job_has_a_skip_reason()
+        {
+            var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
+
+            var rule = CreateRule();
+
+            var job = new RuleJob
+            {
+                Created = now
+            };
+
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+                .Returns(new List<JobResult> { new JobResult { Job = job, SkipReason = SkipReason.TooOld } }.ToAsyncEnumerable());
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
@@ -108,8 +129,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Created = now
             };
 
-            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule.RuleDef), default))
-                .Returns(new List<JobResult> { new JobResult(job) }.ToAsyncEnumerable());
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+                .Returns(new List<JobResult> { new JobResult { Job = job } }.ToAsyncEnumerable());
 
             await sut.EnqueueAsync(rule.RuleDef, rule.Id, @event);
 
@@ -158,10 +179,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { rule1, rule2 });
 
-            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule1.RuleDef), default))
-                .Returns(new List<JobResult> { new JobResult(job1) }.ToAsyncEnumerable());
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule1), default))
+                .Returns(new List<JobResult> { new JobResult { Job = job1 } }.ToAsyncEnumerable());
 
-            A.CallTo(() => ruleService.CreateJobsAsync(@event, A<RuleContext>.That.Matches(x => x.Rule == rule2.RuleDef), default))
+            A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule2), default))
                 .Returns(new List<JobResult>().ToAsyncEnumerable());
         }
 
@@ -170,6 +191,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var rule = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
 
             return new RuleEntity { RuleDef = rule, Id = DomainId.NewGuid() };
+        }
+
+        private static RuleContext MatchingContext(RuleEntity rule)
+        {
+            // These two properties must not be set to true for performance reasons.
+            return A<RuleContext>.That.Matches(x =>
+                x.Rule == rule.RuleDef &&
+               !x.IncludeSkipped &&
+               !x.IncludeStale);
         }
     }
 }

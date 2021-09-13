@@ -9,6 +9,7 @@ export * from './components/app-form.component';
 export * from './components/assets/asset-dialog.component';
 export * from './components/assets/asset-folder-dialog.component';
 export * from './components/assets/asset-folder-dropdown.component';
+export * from './components/assets/asset-folder-dropdown-item.component';
 export * from './components/assets/asset-folder.component';
 export * from './components/assets/asset-history.component';
 export * from './components/assets/asset-path.component';

@@ -30,17 +30,17 @@ namespace Squidex.Extensions.APM.Stackdriver
 
             public string GetHttpMethod()
             {
-                return httpContextAccessor.HttpContext?.Request?.Method?.ToString();
+                return httpContextAccessor.HttpContext?.Request?.Method?.ToString() ?? string.Empty;
             }
 
             public string GetUri()
             {
-                return httpContextAccessor.HttpContext?.Request?.GetDisplayUrl();
+                return httpContextAccessor.HttpContext?.Request?.GetDisplayUrl() ?? string.Empty;
             }
 
             public string GetUserAgent()
             {
-                return httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString();
+                return httpContextAccessor.HttpContext?.Request?.Headers["User-Agent"].ToString() ?? string.Empty;
             }
         }
 

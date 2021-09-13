@@ -103,6 +103,18 @@ export module Types {
         return Types.isUndefined(value) === true || Types.isNull(value) === true;
     }
 
+    export function fastMerge<T>(lhs: ReadonlyArray<T>, rhs: ReadonlyArray<T>) {
+        if (rhs.length === 0) {
+            return lhs;
+        }
+
+        if (lhs.length === 0) {
+            return rhs;
+        }
+
+        return [...lhs, ...rhs];
+    }
+
     export function clone<T>(lhs: T): T {
         const any: any = lhs;
 

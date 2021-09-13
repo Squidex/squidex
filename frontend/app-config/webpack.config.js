@@ -53,7 +53,7 @@ module.exports = function calculateConfig(env) {
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 
     // eslint-disable-next-line no-console
-    console.log(`Use ${configFile}, Production: ${isProduction}`);
+    console.log(`Use ${configFile}, Production: ${!!isProduction}`);
 
     const config = {
         mode: isProduction ? 'production' : 'development',

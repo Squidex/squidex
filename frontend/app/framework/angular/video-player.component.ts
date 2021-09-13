@@ -48,7 +48,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
         }
     }
 
-    public ngAfterViewInit(): void {
+    public ngAfterViewInit() {
         Promise.all([
             this.resourceLoader.loadLocalScript('dependencies/videojs/video.min.js'),
             this.resourceLoader.loadLocalStyle('dependencies/videojs/video-js.min.css'),

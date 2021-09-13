@@ -19,13 +19,13 @@
 
         <ng-container menu>
             <ng-container *ngIf="usersState.selectedUser | async; let user; else noUserMenu">
-                <button type="submit" class="btn btn-primary" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S" *ngIf="isEditable">
+                <button type="submit" class="btn btn-primary" shortcut="CTRL + SHIFT + S" *ngIf="isEditable">
                     {{ 'common.save' | sqxTranslate }}
                 </button>
             </ng-container>
 
             <ng-template #noUserMenu>
-                <button type="submit" class="btn btn-primary" title="i18n:common.saveShortcut" shortcut="CTRL + SHIFT + S">
+                <button type="submit" class="btn btn-primary" shortcut="CTRL + SHIFT + S">
                     {{ 'common.save' | sqxTranslate }}
                 </button>
             </ng-template>

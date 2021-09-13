@@ -1,5 +1,23 @@
-<sqx-dropdown [formControl]="control" [items]="snapshot.assetFolders" valueProperty="id" searchProperty="folderName">
-    <ng-template let-assetFolder="$implicit" let-context="context">
-        <span class="truncate">{{assetFolder.folderName | sqxTranslate | sqxHighlight:context}}</span>
-    </ng-template>
-</sqx-dropdown>
+<div class="selection">
+    <div class="form-select" #input (click)="dropdown.show()">
+        <div class="truncate">{{selection.item.folderName | sqxTranslate}}
+
+            <span *ngIf="selectionPath">
+                {{ 'common.in' | sqxTranslate }}&nbsp;./{{selectionPath}}
+            </span>
+        </div>
+    </div>
+</div> 
+
+<div class="items-container">
+    <ng-container *sqxModal="dropdown">
+        <div class="control-dropdown" [sqxAnchoredTo]="input" position="bottom-left">
+            <sqx-asset-folder-dropdown-item 
+                [appName]="appName"
+                [node]="root"
+                [nodeLevel]="0"
+                (selectNode)="select($event)">
+            </sqx-asset-folder-dropdown-item>
+        </div>
+    </ng-container>
+</div>

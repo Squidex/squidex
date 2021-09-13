@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using Squidex.Infrastructure.Security;
@@ -19,12 +20,9 @@ namespace Squidex.Shared.Identity
 
         public static PermissionSet Permissions(this IEnumerable<Claim> user)
         {
-            return new PermissionSet(user.GetClaims(SquidexClaimTypes.Permissions).Select(x => new Permission(x.Value)));
-        }
+            var permissions = user.GetClaims(SquidexClaimTypes.Permissions).Select(x => x.Value);
 
-        public static bool Allows(this ClaimsPrincipal user, string id, string app = Permission.Any, string schema = Permission.Any)
-        {
-            return user.Claims.Permissions().Allows(id, app, schema);
+            return new PermissionSet(permissions);
         }
 
         public static bool IsHidden(this IEnumerable<Claim> user)
@@ -70,6 +68,15 @@ namespace Squidex.Shared.Identity
         public static string? DisplayName(this IEnumerable<Claim> user)
         {
             return user.GetClaimValue(SquidexClaimTypes.DisplayName);
+        }
+
+        public static int GetTotalApps(this IEnumerable<Claim> user)
+        {
+            var value = user.GetClaimValue(SquidexClaimTypes.TotalApps);
+
+            int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result);
+
+            return result;
         }
 
         public static bool HasClaim(this IEnumerable<Claim> user, string type)

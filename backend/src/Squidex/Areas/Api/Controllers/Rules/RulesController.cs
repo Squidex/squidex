@@ -265,6 +265,26 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
+        /// Cancels all rule events.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the rule to cancel.</param>
+        /// <returns>
+        /// 204 => Rule events cancelled.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/rules/{id}/events/")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DeleteRuleEvents(string app, DomainId id)
+        {
+            await ruleEventsRepository.CancelByRuleAsync(id);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Simulate a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -334,7 +354,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
 
-            var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources);
+            var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources, ruleId);
 
             return Ok(response);
         }
@@ -367,6 +387,25 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
+        /// Cancels all events.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 204 => Events cancelled.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/rules/events/")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DeleteEvents(string app)
+        {
+            await ruleEventsRepository.CancelByAppAsync(App.Id);
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Cancels an event.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -388,7 +427,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
                 return NotFound();
             }
 
-            await ruleEventsRepository.CancelAsync(id);
+            await ruleEventsRepository.CancelByRuleAsync(id);
 
             return NoContent();
         }

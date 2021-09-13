@@ -9,7 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
+using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
@@ -645,6 +647,50 @@ namespace TestSuite.ApiTests
             var contents_4 = await _.Contents.GetAsync(new ContentQuery { Filter = $"id eq '{content_1.Id}'" });
 
             Assert.NotNull(contents_4.Items.FirstOrDefault(x => x.Id == content_1.Id));
+        }
+
+        [Fact]
+        public async Task Should_update_singleton_content_with_special_id()
+        {
+            var schemaName = $"schema-{Guid.NewGuid()}";
+
+            // STEP 1: Create singleton.
+            var createRequest = new CreateSchemaDto
+            {
+                Name = schemaName,
+                IsPublished = true,
+                IsSingleton = true,
+                Fields = new List<UpsertSchemaFieldDto>
+                {
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = "my-field",
+                        Properties = new StringFieldPropertiesDto()
+                    }
+                }
+            };
+
+            await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+
+
+            var client = _.ClientManager.CreateDynamicContentsClient(schemaName);
+
+            // STEP 2: Get content.
+            var content_1 = await client.GetAsync("_schemaId_");
+
+            Assert.NotNull(content_1);
+
+
+            // STEP 3: Update content.
+            var content_2 = await client.UpdateAsync("_schemaId_", new DynamicData
+            {
+                ["my-field"] = new JObject
+                {
+                    ["iv"] = "singleton"
+                }
+            });
+
+            Assert.Equal("singleton", content_2.Data["my-field"]["iv"]);
         }
     }
 }
