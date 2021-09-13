@@ -24,6 +24,6 @@ entries:
     - https://github.com/Squidex/squidex
     type: application
     urls:
-    - squidex-1.0.0.tgz
+    - https://squidex.github.io/squidex/helm/squidex-1.0.0.tgz
     version: 1.0.0
 generated: "2021-09-13T13:02:07.441734+02:00"
