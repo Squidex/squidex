@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_app_with_schema_from_indexes()
+        public async Task Should_get_app_with_schema_from_index()
         {
             var schema = Mocks.Schema(app.NamedId(), schemaId);
 
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_apps_from_indexes()
+        public async Task Should_get_apps_from_index()
         {
             var permissions = new PermissionSet("*");
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_app_from_indexes()
+        public async Task Should_get_app_from_index()
         {
             A.CallTo(() => indexForApps.GetAppAsync(app.Id, false, ct))
                 .Returns(app);
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_app_by_name_from_indexes()
+        public async Task Should_get_app_by_name_from_index()
         {
             A.CallTo(() => indexForApps.GetAppAsync(app.Name, false, ct))
                 .Returns(app);
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_schema_from_indexes()
+        public async Task Should_get_schema_from_index()
         {
             var schema = Mocks.Schema(app.NamedId(), schemaId);
 
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_schema_by_name_from_indexes()
+        public async Task Should_get_schema_by_name_from_index()
         {
             var schema = Mocks.Schema(app.NamedId(), schemaId);
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_schemas_from_indexes()
+        public async Task Should_get_schemas_from_index()
         {
             var schema = Mocks.Schema(app.NamedId(), schemaId);
 
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_rules_from_indexes()
+        public async Task Should_get_rules_from_index()
         {
             var rule = new RuleEntity();
 
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
-        public async Task Should_get_rule_from_indexes()
+        public async Task Should_get_rule_from_index()
         {
             var rule = new RuleEntity { Id = DomainId.NewGuid() };
 

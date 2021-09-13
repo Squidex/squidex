@@ -6,15 +6,19 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
@@ -25,7 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
-        private readonly IAppsIndex index = A.Fake<IAppsIndex>();
+        private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
+        private readonly IAppsIndex appsIndex = A.Fake<IAppsIndex>();
         private readonly IAppUISettings appUISettings = A.Fake<IAppUISettings>();
         private readonly IAppImageStore appImageStore = A.Fake<IAppImageStore>();
         private readonly DomainId appId = DomainId.NewGuid();
@@ -36,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             ct = cts.Token;
 
-            sut = new BackupApps(appImageStore, index,  appUISettings);
+            sut = new BackupApps(rebuilder, appImageStore, appsIndex,  appUISettings);
         }
 
         [Fact]
@@ -52,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName, A<CancellationToken>._))
+            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, A<CancellationToken>._))
                 .Returns("Reservation");
 
             await sut.RestoreEventAsync(Envelope.Create(new AppCreated
@@ -60,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 Name = appName
             }), context, ct);
 
-            A.CallTo(() => index.ReserveAsync(appId, appName, A<CancellationToken>._))
+            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 
@@ -71,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName, ct))
+            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
                 .Returns("Reservation");
 
             await sut.RestoreEventAsync(Envelope.Create(new AppCreated
@@ -81,7 +86,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.CompleteRestoreAsync(context);
 
-            A.CallTo(() => index.RemoveReservationAsync("Reservation", default))
+            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
+                .MustHaveHappened();
+
+            A.CallTo(() => rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(A<IEnumerable<DomainId>>.That.Is(appId), 1, default))
                 .MustHaveHappened();
         }
 
@@ -92,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName, ct))
+            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
                 .Returns("Reservation");
 
             await sut.RestoreEventAsync(Envelope.Create(new AppCreated
@@ -102,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.CleanupRestoreErrorAsync(appId);
 
-            A.CallTo(() => index.RemoveReservationAsync("Reservation", default))
+            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", default))
                 .MustHaveHappened();
         }
 
@@ -113,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => index.ReserveAsync(appId, appName, ct))
+            A.CallTo(() => appsIndex.ReserveAsync(appId, appName, ct))
                 .Returns(Task.FromResult<string?>(null));
 
             var @event = Envelope.Create(new AppCreated
@@ -129,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await sut.CleanupRestoreErrorAsync(appId);
 
-            A.CallTo(() => index.RemoveReservationAsync("Reservation", ct))
+            A.CallTo(() => appsIndex.RemoveReservationAsync("Reservation", ct))
                 .MustNotHaveHappened();
         }
 

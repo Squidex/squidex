@@ -7,13 +7,16 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -23,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         private const string SettingsFile = "Settings.json";
         private const string AvatarFile = "Avatar.image";
+        private readonly Rebuilder rebuilder;
         private readonly IAppImageStore appImageStore;
         private readonly IAppsIndex appsIndex;
         private readonly IAppUISettings appUISettings;
@@ -31,9 +35,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public string Name { get; } = "Apps";
 
-        public BackupApps(IAppImageStore appImageStore, IAppsIndex appsIndex, IAppUISettings appUISettings)
+        public BackupApps(
+            Rebuilder rebuilder,
+            IAppImageStore appImageStore,
+            IAppsIndex appsIndex,
+            IAppUISettings appUISettings)
         {
             this.appsIndex = appsIndex;
+            this.rebuilder = rebuilder;
             this.appImageStore = appImageStore;
             this.appUISettings = appUISettings;
         }
@@ -133,6 +142,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public async Task CompleteRestoreAsync(RestoreContext context)
         {
+            await rebuilder.InsertManyAsync<AppDomainObject, AppDomainObject.State>(Enumerable.Repeat(context.AppId, 1), 1, default);
+
             await appsIndex.RemoveReservationAsync(appReservation);
         }
 
