@@ -84,7 +84,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             foreach (var backup in state.Value.Jobs)
             {
+#pragma warning disable MA0040 // Flow the cancellation token
                 await backupArchiveStore.DeleteAsync(backup.Id);
+#pragma warning restore MA0040 // Flow the cancellation token
             }
 
             TryDeactivateOnIdle();

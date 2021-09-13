@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             user = UserMocks.User(contributorId);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, default))
                 .Returns(user);
 
             A.CallTo(() => appPlansProvider.GetFreePlan())

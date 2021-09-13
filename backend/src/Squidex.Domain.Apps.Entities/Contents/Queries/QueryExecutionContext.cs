@@ -34,19 +34,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.contentQuery = contentQuery;
         }
 
-        public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version)
+        public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version,
+            CancellationToken ct)
         {
-            return contentQuery.FindAsync(Context, schemaIdOrName, id, version);
+            return contentQuery.FindAsync(Context, schemaIdOrName, id, version, ct);
         }
 
-        public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(Q q)
+        public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(Q q,
+            CancellationToken ct)
         {
             IResultList<IEnrichedAssetEntity> assets;
 
-            await maxRequests.WaitAsync();
+            await maxRequests.WaitAsync(ct);
             try
             {
-                assets = await assetQuery.QueryAsync(Context, null, q);
+                assets = await assetQuery.QueryAsync(Context, null, q, ct);
             }
             finally
             {
@@ -61,14 +63,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return assets;
         }
 
-        public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, Q q)
+        public virtual async Task<IResultList<IEnrichedContentEntity>> QueryContentsAsync(string schemaIdOrName, Q q,
+            CancellationToken ct)
         {
             IResultList<IEnrichedContentEntity> contents;
 
-            await maxRequests.WaitAsync();
+            await maxRequests.WaitAsync(ct);
             try
             {
-                contents = await contentQuery.QueryAsync(Context, schemaIdOrName, q);
+                contents = await contentQuery.QueryAsync(Context, schemaIdOrName, q, ct);
             }
             finally
             {
@@ -83,7 +86,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return contents;
         }
 
-        public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(ICollection<DomainId> ids)
+        public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(ICollection<DomainId> ids,
+            CancellationToken ct)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -93,10 +97,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 IResultList<IEnrichedAssetEntity> assets;
 
-                await maxRequests.WaitAsync();
+                await maxRequests.WaitAsync(ct);
                 try
                 {
-                    assets = await assetQuery.QueryAsync(Context, null, Q.Empty.WithIds(notLoadedAssets).WithoutTotal());
+                    assets = await assetQuery.QueryAsync(Context, null, Q.Empty.WithIds(notLoadedAssets).WithoutTotal(), ct);
                 }
                 finally
                 {
@@ -112,7 +116,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return ids.Select(cachedAssets.GetOrDefault).NotNull().ToList();
         }
 
-        public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(ICollection<DomainId> ids)
+        public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(ICollection<DomainId> ids,
+            CancellationToken ct)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -122,10 +127,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 IResultList<IEnrichedContentEntity> contents;
 
-                await maxRequests.WaitAsync();
+                await maxRequests.WaitAsync(ct);
                 try
                 {
-                    contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(notLoadedContents).WithoutTotal());
+                    contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(notLoadedContents).WithoutTotal(), ct);
                 }
                 finally
                 {

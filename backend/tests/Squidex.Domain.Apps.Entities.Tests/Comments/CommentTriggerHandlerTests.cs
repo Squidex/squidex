@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             var @event = new CommentCreated { Mentions = userIds };
 
-            A.CallTo(() => userResolver.QueryManyAsync(userIds))
+            A.CallTo(() => userResolver.QueryManyAsync(userIds, default))
                 .Returns(users.ToDictionary(x => x.Id));
 
             var result = await sut.CreateEnrichedEventsAsync(Envelope.Create<AppEvent>(@event), ctx, default).ToListAsync();
@@ -127,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -142,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             Assert.Empty(result);
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 

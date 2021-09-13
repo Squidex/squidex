@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var userResolver = A.Fake<IUserResolver>();
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.That.Is(user1.Id, user2.Id)))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.That.Is(user1.Id, user2.Id), default))
                 .Returns(users);
 
             var writer = A.Fake<IBackupWriter>();
@@ -74,10 +74,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var userResolver = A.Fake<IUserResolver>();
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user1.Email, false))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user1.Email, false, default))
                 .Returns((user1, false));
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user2.Email, false))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user2.Email, false, default))
                 .Returns((user2, true));
 
             await sut.RestoreAsync(reader, userResolver);

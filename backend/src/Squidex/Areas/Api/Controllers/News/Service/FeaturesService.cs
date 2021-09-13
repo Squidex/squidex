@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.News.Models;
@@ -42,7 +43,8 @@ namespace Squidex.Areas.Api.Controllers.News.Service
             }
         }
 
-        public async Task<FeaturesDto> GetFeaturesAsync(int version = 0)
+        public async Task<FeaturesDto> GetFeaturesAsync(int version = 0,
+            CancellationToken ct = default)
         {
             var result = new FeaturesDto
             {
@@ -58,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.News.Service
                         Filter = $"data/version/iv ge {FeatureVersion}"
                     };
 
-                    var features = await client.GetAsync(query, flatten);
+                    var features = await client.GetAsync(query, flatten, ct);
 
                     result.Features = features.Items.Select(x => x.Data).ToList();
                 }

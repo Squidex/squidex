@@ -144,12 +144,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
         }
 
-        private void Process(State job, CancellationToken ct)
+        private void Process(State job,
+            CancellationToken ct)
         {
             TaskExtensions.Forget(ProcessAsync(job, ct));
         }
 
-        private async Task ProcessAsync(State currentState, CancellationToken ct)
+        private async Task ProcessAsync(State currentState,
+            CancellationToken ct)
         {
             try
             {
@@ -215,7 +217,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
         }
 
-        private async Task EnqueueFromSnapshotsAsync(RuleContext context, CancellationToken ct)
+        private async Task EnqueueFromSnapshotsAsync(RuleContext context,
+            CancellationToken ct)
         {
             var errors = 0;
 
@@ -241,7 +244,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
         }
 
-        private async Task EnqueueFromEventsAsync(State currentState, RuleContext context, CancellationToken ct)
+        private async Task EnqueueFromEventsAsync(State currentState, RuleContext context,
+            CancellationToken ct)
         {
             var errors = 0;
 

@@ -37,10 +37,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             A.CallTo(() => notificatíonSender.IsActive)
                 .Returns(true);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assignerId))
+            A.CallTo(() => userResolver.FindByIdAsync(assignerId, default))
                 .Returns(assigner);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assigneeId))
+            A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
                 .Returns(assignee);
 
             sut = new InvitationEventConsumer(notificatíonSender, userResolver, log);
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         {
             var @event = CreateEvent(RefTokenType.Subject, true);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assignerId))
+            A.CallTo(() => userResolver.FindByIdAsync(assignerId, default))
                 .Returns(Task.FromResult<IUser?>(null));
 
             await sut.On(@event);
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         {
             var @event = CreateEvent(RefTokenType.Subject, true);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assigneeId))
+            A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
                 .Returns(Task.FromResult<IUser?>(null));
 
             await sut.On(@event);
@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         private void MustNotResolveUser()
         {
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustNotHaveHappened();
         }
 

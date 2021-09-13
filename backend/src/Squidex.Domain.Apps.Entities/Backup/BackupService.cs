@@ -25,7 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.grainFactory = grainFactory;
         }
 
-        Task IDeleter.DeleteAppAsync(IAppEntity app, CancellationToken ct)
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
         {
             return BackupGrain(app.Id).ClearAsync();
         }
@@ -40,26 +41,30 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return RestoreGrain().RestoreAsync(url, actor, newAppName);
         }
 
-        public Task DeleteBackupAsync(DomainId appId, DomainId backupId)
+        public Task DeleteBackupAsync(DomainId appId, DomainId backupId,
+            CancellationToken ct = default)
         {
             return BackupGrain(appId).DeleteAsync(backupId);
         }
 
-        public async Task<IRestoreJob?> GetRestoreAsync()
+        public async Task<IRestoreJob?> GetRestoreAsync(
+            CancellationToken ct = default)
         {
             var state = await RestoreGrain().GetStateAsync();
 
             return state.Value;
         }
 
-        public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId)
+        public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
+            CancellationToken ct = default)
         {
             var state = await BackupGrain(appId).GetStateAsync();
 
             return state.Value;
         }
 
-        public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId)
+        public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
+            CancellationToken ct = default)
         {
             var state = await BackupGrain(appId).GetStateAsync();
 

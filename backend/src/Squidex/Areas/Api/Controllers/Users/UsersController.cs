@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var users = await userResolver.QueryByEmailAsync(query);
+                var users = await userResolver.QueryByEmailAsync(query, HttpContext.RequestAborted);
 
                 var response = users.Where(x => !x.Claims.IsHidden()).Select(x => UserDto.FromUser(x, Resources)).ToArray();
 
@@ -129,7 +129,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdAsync(id);
+                var entity = await userResolver.FindByIdAsync(id, HttpContext.RequestAborted);
 
                 if (entity != null)
                 {
@@ -164,7 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdAsync(id);
+                var entity = await userResolver.FindByIdAsync(id, HttpContext.RequestAborted);
 
                 if (entity != null)
                 {

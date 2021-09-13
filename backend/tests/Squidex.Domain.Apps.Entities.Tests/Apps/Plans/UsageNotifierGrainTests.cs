@@ -160,14 +160,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             {
                 var user = UserMocks.User(id, email);
 
-                A.CallTo(() => userResolver.FindByIdOrEmailAsync(id))
+                A.CallTo(() => userResolver.FindByIdOrEmailAsync(id, default))
                     .Returns(user);
 
                 return user;
             }
             else
             {
-                A.CallTo(() => userResolver.FindByIdOrEmailAsync(id))
+                A.CallTo(() => userResolver.FindByIdOrEmailAsync(id, default))
                     .Returns(Task.FromResult<IUser?>(null));
 
                 return null;

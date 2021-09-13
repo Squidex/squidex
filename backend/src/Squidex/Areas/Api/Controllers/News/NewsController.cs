@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.News
         [ApiPermission]
         public async Task<IActionResult> GetNews([FromQuery] int version = 0)
         {
-            var features = await featuresService.GetFeaturesAsync(version);
+            var features = await featuresService.GetFeaturesAsync(version, HttpContext.RequestAborted);
 
             return Ok(features);
         }
