@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         }
 
         public Task DeleteAppAsync(IAppEntity app,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             var grain = grainFactory.GetGrain<ICounterGrain>(app.Id.ToString());
 

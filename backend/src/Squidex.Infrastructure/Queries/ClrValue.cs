@@ -131,7 +131,7 @@ namespace Squidex.Infrastructure.Queries
 
             if (value is string s)
             {
-                return $"'{s.Replace("'", "\\'")}'";
+                return $"'{s.Replace("'", "\\'", StringComparison.Ordinal)}'";
             }
 
             return string.Format(CultureInfo.InvariantCulture, "{0}", value);

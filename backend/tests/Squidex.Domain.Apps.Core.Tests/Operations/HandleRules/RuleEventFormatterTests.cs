@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly RuleEventFormatter sut;
 
-        private class FakeContentResolver : IRuleEventFormatter
+        private sealed class FakeContentResolver : IRuleEventFormatter
         {
             public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
             {
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.ToEnvelope(@event);
 
-            Assert.Contains("MyEventName", result);
+            Assert.Contains("MyEventName", result, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -295,7 +295,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("{'categories':['ref1','ref2','ref3']}", result?.Replace(" ", string.Empty).Replace("\"", "'"));
+            Assert.Equal("{'categories':['ref1','ref2','ref3']}", result?
+                .Replace(" ", string.Empty, StringComparison.Ordinal)
+                .Replace("\"", "'", StringComparison.Ordinal));
         }
     }
 }

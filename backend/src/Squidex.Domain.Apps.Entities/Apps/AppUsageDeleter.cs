@@ -21,7 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.apiUsageTracker = apiUsageTracker;
         }
 
-        public Task DeleteAppAsync(IAppEntity app, CancellationToken ct = default)
+        public Task DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
         {
             return apiUsageTracker.DeleteAsync(app.Id.ToString(), ct);
         }

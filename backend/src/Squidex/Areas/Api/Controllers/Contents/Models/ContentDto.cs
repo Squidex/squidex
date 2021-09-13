@@ -186,7 +186,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddDeleteLink($"cancel", resources.Url<ContentsController>(x => nameof(x.DeleteContentStatus), values));
             }
 
-            if (content.IsSingleton == false && resources.CanDeleteContent(schema))
+            if (!content.IsSingleton && resources.CanDeleteContent(schema))
             {
                 AddDeleteLink("delete", resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }

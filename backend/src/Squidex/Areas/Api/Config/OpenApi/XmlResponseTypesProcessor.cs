@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                     var description = match.Groups["Description"].Value;
 
-                    if (description.Contains("=&gt;"))
+                    if (description.Contains("=&gt;", StringComparison.Ordinal))
                     {
                         throw new InvalidOperationException("Description not formatted correcly.");
                     }

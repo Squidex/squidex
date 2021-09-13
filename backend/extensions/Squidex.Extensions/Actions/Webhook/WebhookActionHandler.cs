@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -73,7 +74,7 @@ namespace Squidex.Extensions.Actions.Webhook
 
             foreach (var line in lines)
             {
-                var indexEqual = line.IndexOf('=');
+                var indexEqual = line.IndexOf('=', StringComparison.Ordinal);
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {

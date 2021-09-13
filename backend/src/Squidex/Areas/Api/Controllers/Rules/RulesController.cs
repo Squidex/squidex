@@ -145,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRuleRun(string app)
         {
-            await ruleRunnerService.CancelAsync(App.Id);
+            await ruleRunnerService.CancelAsync(App.Id, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -259,7 +259,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> PutRuleRun(string app, DomainId id, [FromQuery] bool fromSnapshots = false)
         {
-            await ruleRunnerService.RunAsync(App.Id, id, fromSnapshots);
+            await ruleRunnerService.RunAsync(App.Id, id, fromSnapshots, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -279,7 +279,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRuleEvents(string app, DomainId id)
         {
-            await ruleEventsRepository.CancelByRuleAsync(id);
+            await ruleEventsRepository.CancelByRuleAsync(id, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -300,7 +300,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(5)]
         public async Task<IActionResult> Simulate(string app, DomainId id)
         {
-            var rule = await appProvider.GetRuleAsync(AppId, id);
+            var rule = await appProvider.GetRuleAsync(AppId, id, HttpContext.RequestAborted);
 
             if (rule == null)
             {
@@ -352,7 +352,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> GetEvents(string app, [FromQuery] DomainId? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take);
+            var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take, HttpContext.RequestAborted);
 
             var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources, ruleId);
 
@@ -374,14 +374,14 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> PutEvent(string app, DomainId id)
         {
-            var ruleEvent = await ruleEventsRepository.FindAsync(id);
+            var ruleEvent = await ruleEventsRepository.FindAsync(id, HttpContext.RequestAborted);
 
             if (ruleEvent == null)
             {
                 return NotFound();
             }
 
-            await ruleEventsRepository.EnqueueAsync(id, SystemClock.Instance.GetCurrentInstant());
+            await ruleEventsRepository.EnqueueAsync(id, SystemClock.Instance.GetCurrentInstant(), HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -400,7 +400,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteEvents(string app)
         {
-            await ruleEventsRepository.CancelByAppAsync(App.Id);
+            await ruleEventsRepository.CancelByAppAsync(App.Id, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -420,14 +420,14 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteEvent(string app, DomainId id)
         {
-            var ruleEvent = await ruleEventsRepository.FindAsync(id);
+            var ruleEvent = await ruleEventsRepository.FindAsync(id, HttpContext.RequestAborted);
 
             if (ruleEvent == null)
             {
                 return NotFound();
             }
 
-            await ruleEventsRepository.CancelByRuleAsync(id);
+            await ruleEventsRepository.CancelByRuleAsync(id, HttpContext.RequestAborted);
 
             return NoContent();
         }
@@ -477,7 +477,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id);
+            var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id, HttpContext.RequestAborted);
 
             var result = context.Result<IEnrichedRuleEntity>();
             var response = RuleDto.FromRule(result, runningRuleId == null, ruleRunnerService, Resources);

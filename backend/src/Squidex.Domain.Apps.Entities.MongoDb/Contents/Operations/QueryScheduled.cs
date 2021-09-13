@@ -53,7 +53,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         {
             Guard.NotNull(callback, nameof(callback));
 
+#pragma warning disable MA0073 // Avoid comparison with bool constant
             return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true).Not(x => x.Data)
+#pragma warning restore MA0073 // Avoid comparison with bool constant
                 .ForEachAsync(c =>
                 {
                     callback(c);

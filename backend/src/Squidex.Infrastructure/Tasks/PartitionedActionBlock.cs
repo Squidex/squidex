@@ -78,8 +78,9 @@ namespace Squidex.Infrastructure.Tasks
                     // Dataflow swallows operation cancelled exception.
                     throw new AggregateException(ex);
                 }
-        }, distributorOption);
+            }, distributorOption);
 
+#pragma warning disable MA0040 // Flow the cancellation token
             distributor.Completion.ContinueWith(x =>
             {
                 foreach (var worker in workers)
@@ -87,6 +88,7 @@ namespace Squidex.Infrastructure.Tasks
                     worker.Complete();
                 }
             });
+#pragma warning restore MA0040 // Flow the cancellation token
         }
 
         public DataflowMessageStatus OfferMessage(DataflowMessageHeader messageHeader, TInput messageValue, ISourceBlock<TInput>? source, bool consumeToAccept)

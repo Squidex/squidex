@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Orleans
         [Fact]
         public async Task Should_activate_grain_on_run()
         {
-            await sut.StartAsync();
+            await sut.StartAsync(default);
 
             A.CallTo(() => grain.ActivateAsync())
                 .MustHaveHappened();
@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => grain.ActivateAsync())
                 .Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.StartAsync());
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.StartAsync(default));
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => grain.ActivateAsync())
                 .Throws(new OrleansException()).Once();
 
-            await sut.StartAsync();
+            await sut.StartAsync(default);
 
             A.CallTo(() => grain.ActivateAsync())
                 .MustHaveHappened(2, Times.Exactly);
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => grain.ActivateAsync())
                 .Throws(new OrleansException());
 
-            await Assert.ThrowsAsync<OrleansException>(() => sut.StartAsync());
+            await Assert.ThrowsAsync<OrleansException>(() => sut.StartAsync(default));
 
             A.CallTo(() => grain.ActivateAsync())
                 .MustHaveHappened(10, Times.Exactly);

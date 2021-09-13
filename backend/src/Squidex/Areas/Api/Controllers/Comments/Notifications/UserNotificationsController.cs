@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
                 return CommentsDto.FromResult(result);
             });
 
-            Response.Headers[HeaderNames.ETag] = result.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = result.Version.ToString(CultureInfo.InvariantCulture);
 
             return Ok(response);
         }
@@ -96,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
 
         private void CheckPermissions(DomainId userId)
         {
-            if (!string.Equals(userId.ToString(), User.OpenIdSubject()))
+            if (!string.Equals(userId.ToString(), User.OpenIdSubject(), StringComparison.Ordinal))
             {
                 throw new DomainForbiddenException(T.Get("comments.noPermissions"));
             }

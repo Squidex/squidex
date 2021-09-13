@@ -354,7 +354,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         private static string Cleanup(string filter, object? arg = null)
         {
-            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString());
+            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString(), StringComparison.Ordinal);
         }
     }
 }

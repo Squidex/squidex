@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         }
 
         public async Task InitializeAsync(
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             await collectionAll.InitializeAsync(ct);
             await collectionPublished.InitializeAsync(ct);

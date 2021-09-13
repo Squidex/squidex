@@ -18,7 +18,7 @@ namespace Squidex.Extensions.APM.Stackdriver
 {
     public sealed class StackdriverPlugin : IPlugin
     {
-        private class Configurator : ITelemetryConfigurator
+        private sealed class Configurator : ITelemetryConfigurator
         {
             private readonly string projectId;
 

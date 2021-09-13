@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Cryptography;
+using System.Threading;
 using FakeItEasy;
 using IdentityModel;
 using Microsoft.IdentityModel.Tokens;
@@ -29,7 +30,7 @@ namespace Squidex.Domain.Users
         [Fact]
         public void Should_configure_new_keys()
         {
-            A.CallTo(() => store.ReadAsync(A<DomainId>._))
+            A.CallTo(() => store.ReadAsync(A<DomainId>._, A<CancellationToken>._))
                 .Returns((null!, true, 0));
 
             var options = new OpenIddictServerOptions();
@@ -39,14 +40,14 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
         [Fact]
         public void Should_configure_existing_keys()
         {
-            A.CallTo(() => store.ReadAsync(A<DomainId>._))
+            A.CallTo(() => store.ReadAsync(A<DomainId>._, A<CancellationToken>._))
                 .Returns((ExistingKey(), true, 0));
 
             var options = new OpenIddictServerOptions();
@@ -56,19 +57,19 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public void Should_configure_existing_keys_when_initial_setup_failed()
         {
-            A.CallTo(() => store.ReadAsync(A<DomainId>._))
+            A.CallTo(() => store.ReadAsync(A<DomainId>._, A<CancellationToken>._))
                 .Returns((null!, true, 0)).Once()
                 .Then
                 .Returns((ExistingKey(), true, 0));
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, A<CancellationToken>._))
                 .Throws(new InconsistentStateException(0, 0));
 
             var options = new OpenIddictServerOptions();
@@ -78,7 +79,7 @@ namespace Squidex.Domain.Users
             Assert.NotEmpty(options.SigningCredentials);
             Assert.NotEmpty(options.EncryptionCredentials);
 
-            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0))
+            A.CallTo(() => store.WriteAsync(A<DomainId>._, A<DefaultKeyStore.State>._, 0, 0, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

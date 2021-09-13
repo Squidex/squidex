@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName)
+        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null)
         {
             Guard.NotNull(url, nameof(url));
             Guard.NotNull(actor, nameof(actor));
@@ -119,7 +119,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             await state.WriteAsync();
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             Process();
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         }
 
         private void Process()

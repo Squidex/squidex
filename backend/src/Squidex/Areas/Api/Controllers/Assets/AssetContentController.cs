@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,8 +22,6 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
-
-#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
 
 namespace Squidex.Areas.Api.Controllers.Assets
 {
@@ -145,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             FileCallback callback;
 
-            Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString();
+            Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString(CultureInfo.InvariantCulture);
 
             if (request.CacheDuration > 0)
             {
@@ -201,51 +200,59 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, ResizeOptions resizeOptions, bool overwrite,
             CancellationToken ct)
         {
-            var suffix = resizeOptions.ToString();
-
             using (Telemetry.Activities.StartActivity("Resize"))
             {
-                using (var sourceStream = GetTempStream())
+                await using (var destinationStream = GetTempStream())
                 {
-                    using (var destinationStream = GetTempStream())
-                    {
-                        using (Telemetry.Activities.StartActivity("ResizeDownload"))
-                        {
-                            await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, null, sourceStream);
-                            sourceStream.Position = 0;
-                        }
+                    // Do not use cancellation for the resize process because it is valuable to complete it.
+                    await ResizeAsync(asset, resizeOptions, destinationStream, overwrite);
 
-                        using (Telemetry.Activities.StartActivity("ResizeImage"))
-                        {
-                            try
-                            {
-                                await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, resizeOptions);
-                                destinationStream.Position = 0;
-                            }
-                            catch
-                            {
-                                sourceStream.Position = 0;
-                                await sourceStream.CopyToAsync(destinationStream);
-                            }
-                        }
-
-                        try
-                        {
-                            using (Telemetry.Activities.StartActivity("ResizeUpload"))
-                            {
-                                await assetFileStore.UploadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, suffix, destinationStream, overwrite);
-                                destinationStream.Position = 0;
-                            }
-                        }
-                        catch (AssetAlreadyExistsException)
-                        {
-                            destinationStream.Position = 0;
-                        }
-
-                        await destinationStream.CopyToAsync(bodyStream, ct);
-                    }
+                    await destinationStream.CopyToAsync(bodyStream, ct);
                 }
             }
+        }
+
+        private async Task ResizeAsync(IAssetEntity asset, ResizeOptions resizeOptions, FileStream stream,  bool overwrite)
+        {
+#pragma warning disable MA0040 // Flow the cancellation token
+            var suffix = resizeOptions.ToString();
+
+            await using (var sourceStream = GetTempStream())
+            {
+                using (Telemetry.Activities.StartActivity("ResizeDownload"))
+                {
+                    await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, null, sourceStream);
+                    sourceStream.Position = 0;
+                }
+
+                using (Telemetry.Activities.StartActivity("ResizeImage"))
+                {
+                    try
+                    {
+                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, stream, resizeOptions);
+                        stream.Position = 0;
+                    }
+                    catch
+                    {
+                        sourceStream.Position = 0;
+                        await sourceStream.CopyToAsync(stream);
+                    }
+                }
+
+                try
+                {
+                    using (Telemetry.Activities.StartActivity("ResizeUpload"))
+                    {
+                        await assetFileStore.UploadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, suffix, stream, overwrite);
+                        stream.Position = 0;
+                    }
+                }
+                catch (AssetAlreadyExistsException)
+                {
+                    stream.Position = 0;
+                }
+            }
+#pragma warning restore MA0040 // Flow the cancellation token
         }
 
         private static FileStream GetTempStream()

@@ -615,16 +615,16 @@ namespace Squidex.Infrastructure.Queries
                 $"{field}"
             };
 
-            foreach (var f in fields)
+            foreach (var fieldName in fields)
             {
                 foreach (var (_, op, output) in AllOps.Where(x => opFilter(x.Operator)))
                 {
                     var expected =
                         output
-                            .Replace("$FIELD", f)
-                            .Replace("$VALUE", valueString);
+                            .Replace("$FIELD", fieldName, StringComparison.Ordinal)
+                            .Replace("$VALUE", valueString, StringComparison.Ordinal);
 
-                    yield return new[] { f, op, value, expected };
+                    yield return new[] { fieldName, op, value, expected };
                 }
             }
         }
@@ -638,16 +638,16 @@ namespace Squidex.Infrastructure.Queries
                 $"json.nested.{field}"
             };
 
-            foreach (var f in fields)
+            foreach (var fieldName in fields)
             {
                 foreach (var (_, op, output) in AllOps.Where(x => opFilter(x.Operator)))
                 {
                     var expected =
                         output
-                            .Replace("$FIELD", f)
-                            .Replace("$VALUE", valueString);
+                            .Replace("$FIELD", fieldName, StringComparison.Ordinal)
+                            .Replace("$VALUE", valueString, StringComparison.Ordinal);
 
-                    yield return new[] { f, op, value, expected };
+                    yield return new[] { fieldName, op, value, expected };
                 }
             }
         }

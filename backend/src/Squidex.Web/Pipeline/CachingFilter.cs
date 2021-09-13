@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
 
+#pragma warning disable MA0073 // Avoid comparison with bool constant
+
 namespace Squidex.Web.Pipeline
 {
     public sealed class CachingFilter : IAsyncActionFilter

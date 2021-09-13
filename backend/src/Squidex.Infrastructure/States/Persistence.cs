@@ -15,7 +15,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    internal class Persistence<T> : IPersistence<T>
+    internal sealed class Persistence<T> : IPersistence<T>
     {
         private readonly DomainId ownerKey;
         private readonly ISnapshotStore<T> snapshotStore;

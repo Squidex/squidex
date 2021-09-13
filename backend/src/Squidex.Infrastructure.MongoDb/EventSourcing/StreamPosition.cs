@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using MongoDB.Bson;
 using NodaTime;
 using Squidex.Infrastructure.ObjectPool;
@@ -62,10 +63,14 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (parts.Length == 4)
                 {
+                    var culture = CultureInfo.InvariantCulture;
+
                     return new StreamPosition(
-                        new BsonTimestamp(int.Parse(parts[0]), int.Parse(parts[1])),
-                        long.Parse(parts[2]),
-                        long.Parse(parts[3]));
+                        new BsonTimestamp(
+                            int.Parse(parts[0], NumberStyles.Integer, culture),
+                            int.Parse(parts[1], NumberStyles.Integer, culture)),
+                        long.Parse(parts[2], NumberStyles.Integer, culture),
+                        long.Parse(parts[3], NumberStyles.Integer, culture));
                 }
             }
 

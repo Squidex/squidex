@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -127,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             var newValue = s.Value;
 
-                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp);
+                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {
@@ -136,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 break;
                             }
 
-                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets);
+                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {
@@ -179,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             var newValue = s.Value;
 
-                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp);
+                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {
@@ -187,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 break;
                             }
 
-                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets);
+                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {

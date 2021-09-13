@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         public Task DeleteAppAsync(IAppEntity app,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return eventStore.DeleteAsync($"^([a-z]+)\\-{app.Id}", ct);
         }

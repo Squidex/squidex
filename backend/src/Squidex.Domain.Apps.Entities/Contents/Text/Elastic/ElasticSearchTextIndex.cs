@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
         }
 
         public Task InitializeAsync(
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return ElasticSearchMapping.ApplyAsync(client, indexName, ct);
         }

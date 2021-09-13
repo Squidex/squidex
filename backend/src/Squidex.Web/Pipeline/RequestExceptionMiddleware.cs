@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -76,7 +77,7 @@ namespace Squidex.Web.Pipeline
         {
             statusCode = 0;
 
-            return context.Request.Query.TryGetValue("error", out var header) && int.TryParse(header, out statusCode);
+            return context.Request.Query.TryGetValue("error", out var header) && int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out statusCode);
         }
 
         private static bool IsErrorStatusCode(int statusCode)

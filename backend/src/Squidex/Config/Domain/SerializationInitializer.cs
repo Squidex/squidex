@@ -35,7 +35,7 @@ namespace Squidex.Config.Domain
         }
 
         public Task InitializeAsync(
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             SetupBson();
             SetupOrleans();

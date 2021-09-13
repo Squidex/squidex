@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var textQuery = new TextQuery($"{query}~", searchFilter);
 
-            var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope());
+            var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope(), ct);
 
             if (ids == null || ids.Count == 0)
             {

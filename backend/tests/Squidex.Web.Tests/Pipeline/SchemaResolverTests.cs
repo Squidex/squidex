@@ -70,7 +70,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(false);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -85,7 +85,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(false);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -98,7 +98,7 @@ namespace Squidex.Web.Pipeline
         {
             actionContext.RouteData.Values["schema"] = schemaId.Id.ToString();
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -113,7 +113,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -130,7 +130,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -145,7 +145,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, true, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -162,7 +162,7 @@ namespace Squidex.Web.Pipeline
 
             var schema = CreateSchema(true);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name, false, httpContext.RequestAborted))
                 .Returns(schema);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -180,7 +180,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
                 .MustNotHaveHappened();
         }
 
@@ -191,7 +191,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
                 .MustNotHaveHappened();
         }
 

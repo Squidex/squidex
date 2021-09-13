@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private const int FileSizeLimit = 2 * 1024 * 1024; // 2MB
 
-        public Task EnhanceAsync(UploadAssetCommand command)
+        public async Task EnhanceAsync(UploadAssetCommand command)
         {
             var isSvg =
                 command.File.MimeType == "image/svg+xml" ||
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         using (var reader = new StreamReader(command.File.OpenRead()))
                         {
-                            var text = reader.ReadToEnd();
+                            var text = await reader.ReadToEndAsync();
 
                             if (!text.IsValidSvg())
                             {
@@ -50,12 +50,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     }
                     catch
                     {
-                        return Task.CompletedTask;
+                        return;
                     }
                 }
             }
-
-            return Task.CompletedTask;
         }
 
         public IEnumerable<string> Format(IAssetEntity asset)

@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 var apps =
                     await Task.WhenAll(ids
                         .SelectMany(x => x).Distinct()
-                        .Select(id => GetAppAsync(id, false)));
+                        .Select(id => GetAppAsync(id, false, ct)));
 
                 return apps.NotNull().ToList();
             }
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache,
+        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("AppProvider/GetAppAsync"))

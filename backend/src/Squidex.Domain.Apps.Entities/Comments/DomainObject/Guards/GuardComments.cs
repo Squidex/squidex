@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Events.Comments;
@@ -36,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
 
             var comment = FindComment(events, command.CommentId);
 
-            if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
+            if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
             {
                 throw new DomainException(T.Get("comments.notUserComment"));
             }
@@ -56,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
 
             var comment = FindComment(events, command.CommentId);
 
-            if (!string.Equals(commentsId, command.Actor.Identifier) && !comment.Payload.Actor.Equals(command.Actor))
+            if (!string.Equals(commentsId, command.Actor.Identifier, StringComparison.Ordinal) && !comment.Payload.Actor.Equals(command.Actor))
             {
                 throw new DomainException(T.Get("comments.notUserComment"));
             }

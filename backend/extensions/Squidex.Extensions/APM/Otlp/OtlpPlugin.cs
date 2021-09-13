@@ -16,7 +16,7 @@ namespace Squidex.Extensions.APM.Datadog
 {
     public sealed class OtlpPlugin : IPlugin
     {
-        private class Configurator : ITelemetryConfigurator
+        private sealed class Configurator : ITelemetryConfigurator
         {
             private readonly IConfiguration config;
 

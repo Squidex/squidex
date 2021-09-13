@@ -27,7 +27,7 @@ namespace Squidex.Domain.Users
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited)
+        public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false)
         {
             Guard.NotNullOrEmpty(email, nameof(email));
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public async Task SetClaimAsync(string id, string type, string value, bool silent)
+        public async Task SetClaimAsync(string id, string type, string value, bool silent = false)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNullOrEmpty(type, nameof(type));
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Users
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                if (idOrEmail.Contains("@"))
+                if (idOrEmail.Contains("@", StringComparison.Ordinal))
                 {
                     return await userService.FindByEmailAsync(idOrEmail);
                 }

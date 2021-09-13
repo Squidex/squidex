@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppId);
+            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -353,11 +353,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             {
                 var schemaId = DomainId.Create(guid);
 
-                return appProvider.GetSchemaAsync(AppId, schemaId);
+                return appProvider.GetSchemaAsync(AppId, schemaId, ct: HttpContext.RequestAborted);
             }
             else
             {
-                return appProvider.GetSchemaAsync(AppId, schema);
+                return appProvider.GetSchemaAsync(AppId, schema, ct: HttpContext.RequestAborted);
             }
         }
 

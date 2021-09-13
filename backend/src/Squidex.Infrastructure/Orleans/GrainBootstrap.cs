@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Orleans
         }
 
         public async Task StartAsync(
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             for (var i = 1; i <= NumTries; i++)
             {

@@ -60,7 +60,7 @@ namespace Migrations.Migrations.MongoDb
                         {
                             if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
                             {
-                                var indexOfType = eventStream.IndexOf('-');
+                                var indexOfType = eventStream.IndexOf('-', StringComparison.Ordinal);
                                 var indexOfId = indexOfType + 1;
 
                                 var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
@@ -104,7 +104,7 @@ namespace Migrations.Migrations.MongoDb
 
                     if (writes.Count > 0)
                     {
-                        await collectionNew.BulkWriteAsync(writes, writeOptions);
+                        await collectionNew.BulkWriteAsync(writes, writeOptions, ct);
                     }
                 }
                 catch (OperationCanceledException ex)

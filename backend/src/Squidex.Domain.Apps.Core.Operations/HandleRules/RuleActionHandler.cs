@@ -71,7 +71,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected virtual Task<(string Description, TData Data)> CreateJobAsync(EnrichedEvent @event, TAction action)
         {
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             return Task.FromResult(CreateJob(@event, action));
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         }
 
         protected virtual (string Description, TData Data) CreateJob(EnrichedEvent @event, TAction action)

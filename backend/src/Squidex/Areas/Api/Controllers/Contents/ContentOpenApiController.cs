@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [AllowAnonymous]
         public async Task<IActionResult> GetOpenApi(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppId);
+            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
             var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas);
 
@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [AllowAnonymous]
         public async Task<IActionResult> GetFlatOpenApi(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppId);
+            var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
             var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, true);
 

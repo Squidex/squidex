@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         {
                             return schemaCache.GetOrAdd(id, async x =>
                             {
-                                var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false);
+                                var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct);
 
                                 if (schema == null)
                                 {

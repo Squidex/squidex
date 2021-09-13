@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -73,17 +74,17 @@ namespace Squidex.Pipeline.Squid
 
             var (l1, l2, l3) = SplitText(text);
 
-            svg = svg.Replace("{{TITLE}}", title.ToUpperInvariant());
-            svg = svg.Replace("{{TEXT1}}", l1);
-            svg = svg.Replace("{{TEXT2}}", l2);
-            svg = svg.Replace("{{TEXT3}}", l3);
-            svg = svg.Replace("[COLOR]", background);
+            svg = svg.Replace("{{TITLE}}", title.ToUpperInvariant(), StringComparison.Ordinal);
+            svg = svg.Replace("{{TEXT1}}", l1, StringComparison.Ordinal);
+            svg = svg.Replace("{{TEXT2}}", l2, StringComparison.Ordinal);
+            svg = svg.Replace("{{TEXT3}}", l3, StringComparison.Ordinal);
+            svg = svg.Replace("[COLOR]", background, StringComparison.Ordinal);
 
             context.Response.StatusCode = 200;
             context.Response.ContentType = "image/svg+xml";
             context.Response.Headers["Cache-Control"] = "public, max-age=604800";
 
-            await context.Response.WriteAsync(svg);
+            await context.Response.WriteAsync(svg, context.RequestAborted);
         }
 
         private static (string, string, string) SplitText(string text)

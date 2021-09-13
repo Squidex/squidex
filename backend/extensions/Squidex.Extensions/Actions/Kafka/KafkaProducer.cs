@@ -148,7 +148,7 @@ namespace Squidex.Extensions.Actions.Kafka
 
             if (!string.IsNullOrWhiteSpace(job.PartitionKey) && job.PartitionCount > 0)
             {
-                var partition = Math.Abs(job.PartitionKey.GetHashCode()) % job.PartitionCount;
+                var partition = Math.Abs(job.PartitionKey.GetHashCode(StringComparison.Ordinal)) % job.PartitionCount;
 
                 await producer.ProduceAsync(new TopicPartition(job.TopicName, partition), message, ct);
             }

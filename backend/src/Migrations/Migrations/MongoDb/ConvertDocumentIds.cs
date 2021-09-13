@@ -81,12 +81,12 @@ namespace Migrations.Migrations.MongoDb
             string collectionNameNew;
 
             collectionNameNew = $"{collectionNameOld}2";
-            collectionNameNew = collectionNameNew.Replace("State_", "States_");
+            collectionNameNew = collectionNameNew.Replace("State_", "States_", StringComparison.Ordinal);
 
             var collectionOld = database.GetCollection<BsonDocument>(collectionNameOld);
             var collectionNew = database.GetCollection<BsonDocument>(collectionNameNew);
 
-            if (!await collectionOld.AnyAsync())
+            if (!await collectionOld.AnyAsync(ct: ct))
             {
                 return;
             }
@@ -139,7 +139,7 @@ namespace Migrations.Migrations.MongoDb
 
                     if (writes.Count > 0)
                     {
-                        await collectionNew.BulkWriteAsync(writes, writeOptions);
+                        await collectionNew.BulkWriteAsync(writes, writeOptions, ct);
                     }
                 }
                 catch (OperationCanceledException ex)

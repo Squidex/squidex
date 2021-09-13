@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 {
                     var tcs = new TaskCompletionSource<IJsonValue>();
 
-                    using (combined.Token.Register(() => tcs.TrySetCanceled()))
+                    await using (combined.Token.Register(() => tcs.TrySetCanceled(combined.Token)))
                     {
                         var context =
                             CreateEngine(options)
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 {
                     var tcs = new TaskCompletionSource<ContentData>();
 
-                    using (combined.Token.Register(() => tcs.TrySetCanceled()))
+                    await using (combined.Token.Register(() => tcs.TrySetCanceled(combined.Token)))
                     {
                         var context =
                             CreateEngine(options)

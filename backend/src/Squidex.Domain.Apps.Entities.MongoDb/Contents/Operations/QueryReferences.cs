@@ -16,7 +16,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
-    internal class QueryReferences : OperationBase
+    internal sealed class QueryReferences : OperationBase
     {
         private static readonly IResultList<IContentEntity> EmptyIds = ResultList.CreateFrom<IContentEntity>(0);
         private readonly QueryByIds queryByIds;

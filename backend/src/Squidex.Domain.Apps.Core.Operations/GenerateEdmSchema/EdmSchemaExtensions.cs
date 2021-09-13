@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -18,12 +19,12 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
     {
         public static string EscapeEdmField(this string field)
         {
-            return field.Replace("-", "_");
+            return field.Replace("-", "_", StringComparison.Ordinal);
         }
 
         public static string UnescapeEdmField(this string field)
         {
-            return field.Replace("_", "-");
+            return field.Replace("_", "-", StringComparison.Ordinal);
         }
 
         public static EdmComplexType BuildEdmType(this Schema schema, bool withHidden, PartitionResolver partitionResolver, EdmTypeFactory typeFactory,

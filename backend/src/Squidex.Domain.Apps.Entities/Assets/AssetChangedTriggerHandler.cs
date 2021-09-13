@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct = default)
+            [EnumeratorCancellation] CancellationToken ct)
         {
             await foreach (var asset in assetRepository.StreamAll(context.AppId.Id, ct))
             {
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct = default)
+            [EnumeratorCancellation] CancellationToken ct)
         {
             var assetEvent = (AssetEvent)@event.Payload;
 

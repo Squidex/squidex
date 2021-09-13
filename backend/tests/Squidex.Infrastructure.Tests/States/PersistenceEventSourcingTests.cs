@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -373,7 +374,7 @@ namespace Squidex.Infrastructure.States
             foreach (var @event in events)
             {
                 var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
-                var eventStored = new StoredEvent(key.ToString(), i.ToString(), i, eventData);
+                var eventStored = new StoredEvent(key.ToString(), i.ToString(CultureInfo.InvariantCulture), i, eventData);
 
                 eventsStored.Add(eventStored);
 

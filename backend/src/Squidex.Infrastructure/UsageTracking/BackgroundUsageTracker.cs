@@ -143,7 +143,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
                 for (var date = fromDate; date <= toDate; date = date.AddDays(1))
                 {
-                    var counters = value.FirstOrDefault(x => x.Date == date)?.Counters;
+                    var counters = value.Find(x => x.Date == date)?.Counters;
 
                     enriched.Add((date, counters ?? new Counters()));
                 }

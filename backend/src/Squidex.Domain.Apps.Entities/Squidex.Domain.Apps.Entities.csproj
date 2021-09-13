@@ -26,6 +26,10 @@
     </PackageReference>
     <PackageReference Include="GraphQL" Version="4.5.0" />
     <PackageReference Include="GraphQL.DataLoader" Version="4.5.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.670">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
     <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.4.3">
       <PrivateAssets>all</PrivateAssets>

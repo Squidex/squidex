@@ -33,17 +33,17 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 using (var client = new HttpClient(handler))
                 {
-                    var result = await client.GetAsync(WebpackUrl);
+                    var result = await client.GetAsync(WebpackUrl, context.RequestAborted);
 
                     context.Response.StatusCode = (int)result.StatusCode;
 
                     if (result.IsSuccessStatusCode)
                     {
-                        var html = await result.Content.ReadAsStringAsync();
+                        var html = await result.Content.ReadAsStringAsync(context.RequestAborted);
 
                         html = html.AdjustBase(context);
 
-                        await context.Response.WriteAsync(html);
+                        await context.Response.WriteAsync(html, context.RequestAborted);
                     }
                 }
             }

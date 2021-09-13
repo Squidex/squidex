@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Log
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {

@@ -175,7 +175,8 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(status, path, log);
 
-            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._)).Throws(new ArgumentException());
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<CancellationToken>._))
+                .Throws(new InvalidOperationException());
 
             await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
 

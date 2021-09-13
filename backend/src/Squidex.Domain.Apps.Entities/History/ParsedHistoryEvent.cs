@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
                     foreach (var (key, value) in item.Parameters)
                     {
-                        result = result.Replace("[" + key + "]", value);
+                        result = result.Replace("[" + key + "]", value, StringComparison.Ordinal);
                     }
 
                     return result;

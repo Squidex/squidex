@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
@@ -107,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                 for (var i = 0; i < arr.Length; i++)
                 {
-                    result.Add(Map(arr.Get(i.ToString())));
+                    result.Add(Map(arr.Get(i.ToString(CultureInfo.InvariantCulture))));
                 }
 
                 return result;

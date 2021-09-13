@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             {
                 AvatarBytes = new byte[resourceStream!.Length];
 
-                resourceStream.Read(AvatarBytes, 0, AvatarBytes.Length);
+                _ = resourceStream.Read(AvatarBytes, 0, AvatarBytes.Length);
             }
         }
 
@@ -191,7 +191,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                         if (!string.IsNullOrWhiteSpace(url))
                         {
-                            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, HttpContext.RequestAborted);
 
                             if (response.IsSuccessStatusCode)
                             {
@@ -199,7 +199,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                                 var etag = response.Headers.ETag;
 
-                                var result = new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
+                                var result = new FileStreamResult(await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted), contentType);
 
                                 if (!string.IsNullOrWhiteSpace(etag?.Tag))
                                 {

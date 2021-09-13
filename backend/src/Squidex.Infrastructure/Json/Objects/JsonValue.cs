@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.Json.Objects
                     return Create(i);
             }
 
-            throw new ArgumentException("Invalid json type");
+            throw new ArgumentException("Invalid json type", nameof(value));
         }
 
         public static IJsonValue Create(Guid value)

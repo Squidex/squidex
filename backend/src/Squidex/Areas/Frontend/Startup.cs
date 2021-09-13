@@ -52,7 +52,7 @@ namespace Squidex.Areas.Frontend
                 return next();
             });
 
-            app.UseWhen(x => x.Request.Path.StartsWithSegments(indexFile), builder =>
+            app.UseWhen(x => x.Request.Path.StartsWithSegments(indexFile, StringComparison.Ordinal), builder =>
             {
                 builder.UseMiddleware<SetupMiddleware>();
             });

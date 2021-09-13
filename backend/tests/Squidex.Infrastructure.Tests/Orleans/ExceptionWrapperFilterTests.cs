@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Orleans
             var ex = await Assert.ThrowsAnyAsync<OrleansWrapperException>(() => sut.Invoke(context));
 
             Assert.Equal(original.GetType(), ex.ExceptionType);
-            Assert.Contains(original.Message, ex.Message);
+            Assert.Contains(original.Message, ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]

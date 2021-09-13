@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             this.errorMessage = errorMessage;
 
-            regex = new Regex($"^{pattern}$", RegexOptions.None, Timeout);
+            regex = new Regex($"^{pattern}$", RegexOptions.None | RegexOptions.ExplicitCapture, Timeout);
         }
 
         public Task ValidateAsync(object? value, ValidationContext context, AddError addError)

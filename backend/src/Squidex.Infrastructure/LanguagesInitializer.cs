@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure
         }
 
         public Task InitializeAsync(
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             foreach (var (key, value) in options)
             {

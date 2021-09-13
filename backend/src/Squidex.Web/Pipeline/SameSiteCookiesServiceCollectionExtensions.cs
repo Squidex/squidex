@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -100,8 +101,8 @@ namespace Squidex.Web.Pipeline
             // than 12 are not supporting SameSite at all. Starting with version 13
             // unknown values are NOT treated as strict anymore. Therefore we only
             // need to check version 12.
-            if (userAgent.Contains("CPU iPhone OS 12") ||
-                userAgent.Contains("iPad; CPU OS 12"))
+            if (userAgent.Contains("CPU iPhone OS 12", StringComparison.Ordinal) ||
+                userAgent.Contains("iPad; CPU OS 12", StringComparison.Ordinal))
             {
                 return true;
             }
@@ -117,9 +118,9 @@ namespace Squidex.Web.Pipeline
             // than 10.14 are not supporting SameSite at all. Starting with version
             // 10.15 unknown values are NOT treated as strict anymore. Therefore we
             // only need to check version 10.14.
-            if (userAgent.Contains("Safari") &&
-                userAgent.Contains("Macintosh; Intel Mac OS X 10_14") &&
-                userAgent.Contains("Version/"))
+            if (userAgent.Contains("Safari", StringComparison.Ordinal) &&
+                userAgent.Contains("Macintosh; Intel Mac OS X 10_14", StringComparison.Ordinal) &&
+                userAgent.Contains("Version/", StringComparison.Ordinal))
             {
                 return true;
             }
@@ -132,7 +133,8 @@ namespace Squidex.Web.Pipeline
             // We can not validate this assumption, but we trust Microsofts
             // evaluation. And overall not sending a SameSite value equals to the same
             // behavior as SameSite=None for these old versions anyways.
-            if (userAgent.Contains("Chrome/5") || userAgent.Contains("Chrome/6"))
+            if (userAgent.Contains("Chrome/5", StringComparison.Ordinal) ||
+                userAgent.Contains("Chrome/6", StringComparison.Ordinal))
             {
                 return true;
             }

@@ -71,24 +71,23 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots,
+        public async Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("ContentQueryService/WriteManyAsync"))
             {
-                var writes = snapshots.Select(x => new ReplaceOneModel<TState>(
-                    Filter.Eq(y => y.DocumentId, x.Key),
-                    CreateDocument(x.Key, x.Value, x.Version))
-                {
-                    IsUpsert = true
-                }).ToList();
+                var writes = snapshots.Select(x =>
+                    new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.Version))
+                    {
+                        IsUpsert = true
+                    }).ToList();
 
                 if (writes.Count == 0)
                 {
-                    return Task.CompletedTask;
+                    return;
                 }
 
-                return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
+                await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
             }
         }
 

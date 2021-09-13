@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 IContentEntity? content;
 
-                if (id.ToString().Equals(SingletonId))
+                if (id.ToString().Equals(SingletonId, StringComparison.Ordinal))
                 {
                     id = schema.Id;
                 }
@@ -197,12 +197,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 var schemaId = DomainId.Create(guid);
 
-                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaId, canCache);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaId, canCache, ct);
             }
 
             if (schema == null)
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName, canCache, ct);
             }
 
             if (schema != null && !HasPermission(context, schema, Permissions.AppContentsReadOwn))

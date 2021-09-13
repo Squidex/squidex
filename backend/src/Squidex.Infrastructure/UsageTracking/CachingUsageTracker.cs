@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.UsageTracking
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-                return inner.GetForMonthAsync(key, date, category);
+                return inner.GetForMonthAsync(key, date, category, ct);
             });
         }
 
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.UsageTracking
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-                return inner.GetAsync(key, fromDate, toDate, category);
+                return inner.GetAsync(key, fromDate, toDate, category, ct);
             });
         }
     }

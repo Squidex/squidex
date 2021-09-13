@@ -57,20 +57,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Task WriteJsonAsync(string name, object value)
+        public async Task WriteJsonAsync(string name, object value)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
             var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
 
-            using (var stream = attachmentEntry.Open())
+            await using (var stream = attachmentEntry.Open())
             {
                 serializer.Serialize(value, stream);
             }
 
             writtenAttachments++;
-
-            return Task.CompletedTask;
         }
 
         public async Task WriteBlobAsync(string name, Func<Stream, Task> handler)
@@ -80,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
 
-            using (var stream = attachmentEntry.Open())
+            await using (var stream = attachmentEntry.Open())
             {
                 await handler(stream);
             }

@@ -93,12 +93,12 @@ namespace Squidex.Infrastructure.Security
 
         public bool Equals(Permission? other)
         {
-            return other != null && other.Id.Equals(Id);
+            return other != null && other.Id.Equals(Id, StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return Id.GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

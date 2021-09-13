@@ -74,7 +74,7 @@ namespace Squidex.Extensions.Actions.Kafka
 
             foreach (var line in lines)
             {
-                var indexEqual = line.IndexOf('=');
+                var indexEqual = line.IndexOf('=', StringComparison.Ordinal);
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {

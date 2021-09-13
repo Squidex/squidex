@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,7 +60,7 @@ namespace Squidex.Infrastructure.Log
 
             for (var i = 0; i < 2500; i++)
             {
-                await sut.LogAsync(new Request { Key = i.ToString() });
+                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) });
             }
 
             sut.Next();
@@ -111,7 +112,7 @@ namespace Squidex.Infrastructure.Log
         {
             for (var i = 0; i < 2500; i++)
             {
-                await sut.LogAsync(new Request { Key = i.ToString() });
+                await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) });
             }
 
             sut.Next();

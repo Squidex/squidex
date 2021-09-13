@@ -147,13 +147,13 @@ namespace Squidex.Web
 
                 var builder = new StringBuilder(property.Length);
 
-                builder.Append(char.ToLower(property[0]));
+                builder.Append(char.ToLowerInvariant(property[0]));
 
                 foreach (var character in property.Skip(1))
                 {
                     if (prevChar == '.')
                     {
-                        builder.Append(char.ToLower(character));
+                        builder.Append(char.ToLowerInvariant(character));
                     }
                     else
                     {

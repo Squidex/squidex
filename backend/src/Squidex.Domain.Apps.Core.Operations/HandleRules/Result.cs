@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             dumpBuilder.AppendLine();
-            dumpBuilder.AppendFormat("Elapsed {0}.", elapsed);
+            dumpBuilder.AppendFormat(CultureInfo.InvariantCulture, "Elapsed {0}.", elapsed);
             dumpBuilder.AppendLine();
 
             Dump = dumpBuilder.ToString();

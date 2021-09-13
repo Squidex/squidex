@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -37,7 +38,7 @@ namespace Squidex.Infrastructure
 
                 for (var i = 0; i < hashBytes.Length; i++)
                 {
-                    hashBuilder.Append(hashBytes[i].ToString("x2"));
+                    hashBuilder.Append(hashBytes[i].ToString("x2", CultureInfo.InvariantCulture));
                 }
 
                 return hashBuilder.ToString();

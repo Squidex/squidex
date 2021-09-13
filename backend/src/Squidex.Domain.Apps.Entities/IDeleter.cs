@@ -17,10 +17,10 @@ namespace Squidex.Domain.Apps.Entities
         int Order => 0;
 
         Task DeleteAppAsync(IAppEntity app,
-            CancellationToken ct = default);
+            CancellationToken ct);
 
         Task DeleteContributorAsync(DomainId appId, string contributorId,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }

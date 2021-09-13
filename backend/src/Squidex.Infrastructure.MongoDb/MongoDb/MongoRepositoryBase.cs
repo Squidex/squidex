@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return Task.CompletedTask;
         }
@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         public async Task InitializeAsync(
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             try
             {

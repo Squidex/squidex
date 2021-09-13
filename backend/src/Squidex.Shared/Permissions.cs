@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -166,7 +167,9 @@ namespace Squidex.Shared
         {
             Guard.NotNull(id, nameof(id));
 
-            return new Permission(id.Replace("{app}", app ?? Permission.Any).Replace("{schema}", schema ?? Permission.Any));
+            return new Permission(id
+                .Replace("{app}", app ?? Permission.Any, StringComparison.Ordinal)
+                .Replace("{schema}", schema ?? Permission.Any, StringComparison.Ordinal));
         }
     }
 }

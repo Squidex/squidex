@@ -113,7 +113,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             await state.WriteAsync();
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             Process(job, actor, currentJobToken.Token);
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         }
 
         private void Process(BackupJob job, RefToken actor,
@@ -133,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var appId = DomainId.Create(Key);
 
-                using (var stream = backupArchiveLocation.OpenStream(job.Id))
+                await using (var stream = backupArchiveLocation.OpenStream(job.Id))
                 {
                     using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
                     {
@@ -237,7 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task DeleteAsync(DomainId id)
         {
-            var job = state.Value.Jobs.FirstOrDefault(x => x.Id == id);
+            var job = state.Value.Jobs.Find(x => x.Id == id);
 
             if (job == null)
             {
@@ -265,7 +267,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             try
             {
+#pragma warning disable MA0040 // Flow the cancellation token
                 await backupArchiveStore.DeleteAsync(job.Id);
+#pragma warning restore MA0040 // Flow the cancellation token
             }
             catch (Exception ex)
             {

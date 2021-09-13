@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 SingleWriter = true
             });
 
-            batchQueue.Batch<BatchItem, object>(taskQueue, x => new BatchJob(x.ToArray()), batchSize, batchDelay);
+            batchQueue.Batch<BatchItem, object>(taskQueue, x => new BatchJob(x.ToArray()), batchSize, batchDelay, completed.Token);
 
             Task.Run(async () =>
             {
@@ -90,14 +90,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                         await taskQueue.Writer.WriteAsync(new ErrorJob(ex, sender), completed.Token);
                     }
                 }
-            }).ContinueWith(x => batchQueue.Writer.TryComplete(x.Exception));
+            }, completed.Token).ContinueWith(x => batchQueue.Writer.TryComplete(x.Exception));
 
             handleTask = Run(grain);
         }
 
         private async Task Run(EventConsumerGrain grain)
         {
-            await foreach (var task in taskQueue.Reader.ReadAllAsync())
+            await foreach (var task in taskQueue.Reader.ReadAllAsync(completed.Token))
             {
                 var sender = eventSubscription?.Sender;
 

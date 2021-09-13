@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 ImageInfo? imageInfo = null;
 
-                using (var uploadStream = command.File.OpenRead())
+                await using (var uploadStream = command.File.OpenRead())
                 {
                     imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
                 }
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         var tempFile = new TempAssetFile(command.File);
 
-                        using (var uploadStream = command.File.OpenRead())
+                        await using (var uploadStream = command.File.OpenRead())
                         {
                             imageInfo = await assetThumbnailGenerator.FixOrientationAsync(uploadStream, tempFile.Stream);
                         }

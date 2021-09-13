@@ -137,7 +137,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                 {
                     currentJobToken = new CancellationTokenSource();
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
                     Process(state.Value, currentJobToken.Token);
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
                 }
             }
         }
@@ -153,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 currentReminder = await RegisterOrUpdateReminder("KeepAlive", TimeSpan.Zero, TimeSpan.FromMinutes(2));
 
-                var rule = await appProvider.GetRuleAsync(DomainId.Create(Key), currentState.RuleId!.Value);
+                var rule = await appProvider.GetRuleAsync(DomainId.Create(Key), currentState.RuleId!.Value, ct);
 
                 if (rule == null)
                 {
@@ -221,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             {
                 if (job.Job != null && job.SkipReason == SkipReason.None)
                 {
-                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
                 }
                 else if (job.EnrichmentError != null)
                 {
@@ -255,11 +257,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                     {
                         var jobs = ruleService.CreateJobsAsync(@event, context, ct);
 
-                        await foreach (var job in jobs)
+                        await foreach (var job in jobs.WithCancellation(ct))
                         {
                             if (job.Job != null && job.SkipReason == SkipReason.None)
                             {
-                                await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
+                                await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError, ct);
                             }
                         }
                     }

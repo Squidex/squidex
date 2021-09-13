@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             await statisticsCollection.InitializeAsync(ct);
 

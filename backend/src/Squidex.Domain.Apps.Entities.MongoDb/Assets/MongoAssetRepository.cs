@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
@@ -142,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         return ResultList.Create<IAssetEntity>(assetTotal, assetEntities);
                     }
                 }
-                catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+                catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
                 {
                     throw new DomainException(T.Get("common.resultTooLarge"));
                 }

@@ -29,7 +29,7 @@ namespace Squidex.Pipeline.Robots
                 context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = 200;
 
-                await context.Response.WriteAsync(text);
+                await context.Response.WriteAsync(text, context.RequestAborted);
             }
             else
             {

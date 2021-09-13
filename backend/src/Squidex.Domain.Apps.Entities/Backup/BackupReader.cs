@@ -52,15 +52,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Task<T> ReadJsonAsync<T>(string name)
+        public async Task<T> ReadJsonAsync<T>(string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
             var entry = GetEntry(name);
 
-            using (var stream = entry.Open())
+            await using (var stream = entry.Open())
             {
-                return Task.FromResult(serializer.Deserialize<T>(stream, null));
+                return serializer.Deserialize<T>(stream, null);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var entry = GetEntry(name);
 
-            using (var stream = entry.Open())
+            await using (var stream = entry.Open())
             {
                 await handler(stream);
             }
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     break;
                 }
 
-                using (var stream = entry.Open())
+                await using (var stream = entry.Open())
                 {
                     var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
 

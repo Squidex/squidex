@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 var schemas =
                     await Task.WhenAll(
-                        ids.Select(id => GetSchemaAsync(appId, id, false)));
+                        ids.Select(id => GetSchemaAsync(appId, id, false, ct)));
 
                 return schemas.NotNull().ToList();
             }

@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure
 
             value = value.Trim();
 
-            var idx = value.IndexOf(':');
+            var idx = value.IndexOf(':', StringComparison.Ordinal);
 
             if (idx > 0 && idx < value.Length - 1)
             {

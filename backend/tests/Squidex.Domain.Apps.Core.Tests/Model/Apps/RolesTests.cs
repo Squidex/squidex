@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -166,8 +167,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             foreach (var permission in result.Permissions)
             {
-                Assert.StartsWith("squidex.apps.app.", permission.Id);
-                Assert.DoesNotContain("{app}", permission.Id);
+                Assert.StartsWith("squidex.apps.app.", permission.Id, StringComparison.Ordinal);
+                Assert.DoesNotContain("{app}", permission.Id, StringComparison.Ordinal);
             }
 
             Assert.Equal(permissionCount, result!.Permissions.Count);

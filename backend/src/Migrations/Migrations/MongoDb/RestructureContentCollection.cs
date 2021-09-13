@@ -26,14 +26,14 @@ namespace Migrations.Migrations.MongoDb
         public async Task UpdateAsync(
             CancellationToken ct)
         {
-            if (await contentDatabase.CollectionExistsAsync("State_Content_Draft"))
+            if (await contentDatabase.CollectionExistsAsync("State_Content_Draft", ct))
             {
                 await contentDatabase.DropCollectionAsync("State_Contents", ct);
                 await contentDatabase.DropCollectionAsync("State_Content_Published", ct);
                 await contentDatabase.RenameCollectionAsync("State_Content_Draft", "State_Contents", cancellationToken: ct);
             }
 
-            if (await contentDatabase.CollectionExistsAsync("State_Contents"))
+            if (await contentDatabase.CollectionExistsAsync("State_Contents", ct))
             {
                 var collection = contentDatabase.GetCollection<BsonDocument>("State_Contents");
 

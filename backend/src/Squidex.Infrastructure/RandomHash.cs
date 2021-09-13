@@ -18,14 +18,14 @@ namespace Squidex.Infrastructure
             return Guid.NewGuid()
                 .ToString().ToSha256Base64()
                 .ToLowerInvariant()
-                .Replace("+", "x")
-                .Replace("=", "x")
-                .Replace("/", "x");
+                .Replace("+", "x", StringComparison.Ordinal)
+                .Replace("=", "x", StringComparison.Ordinal)
+                .Replace("/", "x", StringComparison.Ordinal);
         }
 
         public static string Simple()
         {
-            return Guid.NewGuid().ToString().Replace("-", string.Empty);
+            return Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal);
         }
 
         public static string ToSha256Base64(this string value)

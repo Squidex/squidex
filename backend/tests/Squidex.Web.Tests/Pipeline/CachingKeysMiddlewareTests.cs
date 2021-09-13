@@ -55,7 +55,7 @@ namespace Squidex.Web.Pipeline
                 {
                     foreach (var (state, callback) in callbacks)
                     {
-                        callback(state).Wait();
+                        callback(state).Wait(httpContext.RequestAborted);
                     }
                 });
 
@@ -322,7 +322,7 @@ namespace Squidex.Web.Pipeline
 
             action?.Invoke();
 
-            await httpContext.Response.StartAsync();
+            await httpContext.Response.StartAsync(httpContext.RequestAborted);
         }
     }
 }

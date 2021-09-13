@@ -69,7 +69,7 @@ namespace Squidex.Domain.Users
             return ResultList.Create(users.Count, resolved);
         }
 
-        public async Task<IResultList<IUser>> QueryAsync(string? query, int take, int skip)
+        public async Task<IResultList<IUser>> QueryAsync(string? query = null, int take = 10, int skip = 0)
         {
             Guard.GreaterThan(take, 0, nameof(take));
             Guard.GreaterEquals(skip, 0, nameof(skip));
@@ -226,7 +226,7 @@ namespace Squidex.Domain.Users
             return resolved;
         }
 
-        public Task<IUser> SetPasswordAsync(string id, string password, string? oldPassword)
+        public Task<IUser> SetPasswordAsync(string id, string password, string? oldPassword = null)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 

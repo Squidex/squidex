@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -201,7 +202,7 @@ namespace Squidex.Infrastructure.States
                 foreach (var @event in stream)
                 {
                     var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
-                    var eventStored = new StoredEvent(id.ToString(), i.ToString(), i, eventData);
+                    var eventStored = new StoredEvent(id.ToString(), i.ToString(CultureInfo.InvariantCulture), i, eventData);
 
                     storedStream.Add(eventStored);
 

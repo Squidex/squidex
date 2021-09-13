@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -54,8 +55,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             if (context.IsCompleted && user != null)
             {
                 var newApps = totalApps + 1;
+                var newAppsValue = newApps.ToString(CultureInfo.InvariantCulture);
 
-                await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.TotalApps, newApps.ToString(), true);
+                await userResolver.SetClaimAsync(user.Id, SquidexClaimTypes.TotalApps, newAppsValue, true);
             }
         }
     }

@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Commands
 
         public T Current
         {
-            get => items.Last()!;
+            get => items[^1]!;
         }
 
         public SnapshotList()

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using Google.Cloud.Diagnostics.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -30,7 +31,7 @@ namespace Squidex.Extensions.APM.Stackdriver
 
             public string GetHttpMethod()
             {
-                return httpContextAccessor.HttpContext?.Request?.Method?.ToString() ?? string.Empty;
+                return httpContextAccessor.HttpContext?.Request?.Method ?? string.Empty;
             }
 
             public string GetUri()

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -583,7 +584,7 @@ namespace Squidex.Domain.Users
 
             for (var i = 0; i < numCurrentUsers; i++)
             {
-                users.Add(CreatePendingUser(i.ToString()));
+                users.Add(CreatePendingUser(i.ToString(CultureInfo.InvariantCulture)));
             }
 
             A.CallTo(() => userManager.Users)

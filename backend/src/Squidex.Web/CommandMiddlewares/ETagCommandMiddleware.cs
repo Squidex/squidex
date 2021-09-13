@@ -64,7 +64,7 @@ namespace Squidex.Web.CommandMiddlewares
 
         private static void SetResponsEtag(HttpContext httpContext, long version)
         {
-            httpContext.Response.Headers[HeaderNames.ETag] = version.ToString();
+            httpContext.Response.Headers[HeaderNames.ETag] = version.ToString(CultureInfo.InvariantCulture);
         }
 
         private static bool TryParseEtag(HttpContext httpContext, out long version)

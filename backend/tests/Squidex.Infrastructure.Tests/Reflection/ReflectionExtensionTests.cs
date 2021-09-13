@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Reflection
             string Sub2Prop { get; set; }
         }
 
-        private class MyMain
+        private sealed class MyMain
         {
             public string MainProp { get; set; }
         }

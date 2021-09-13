@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
                     {
-                        await deleter.DeleteContributorAsync(appId, appContributorRemoved.ContributorId);
+                        await deleter.DeleteContributorAsync(appId, appContributorRemoved.ContributorId, default);
                     }
                 }
             }
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 {
                     using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
                     {
-                        await deleter.DeleteAppAsync(app.Value);
+                        await deleter.DeleteAppAsync(app.Value, default);
                     }
                 }
             }
