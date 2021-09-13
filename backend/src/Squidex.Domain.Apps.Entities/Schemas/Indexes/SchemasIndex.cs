@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        public async Task<ISchemaEntity?> GetSchemaByNameAsync(DomainId appId, string name, bool canCache,
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaByNameAsync"))

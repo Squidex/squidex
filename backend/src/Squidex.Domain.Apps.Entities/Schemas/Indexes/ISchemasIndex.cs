@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache,
             CancellationToken ct = default);
 
-        Task<ISchemaEntity?> GetSchemaByNameAsync(DomainId appId, string name, bool canCache,
+        Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache,
             CancellationToken ct = default);
 
         Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,

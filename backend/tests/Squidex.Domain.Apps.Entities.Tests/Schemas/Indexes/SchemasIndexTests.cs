@@ -53,8 +53,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => cache.GetSchemaIdAsync(schemaId.Name))
                 .Returns(schemaId.Id);
 
-            var actual1 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, false);
-            var actual2 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, false);
+            var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, false);
+            var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, false);
 
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);
@@ -74,8 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => cache.GetSchemaIdAsync(schemaId.Name))
                 .Returns(schemaId.Id);
 
-            var actual1 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
-            var actual2 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
+            var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true);
+            var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true);
             var actual3 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
 
             Assert.Same(expected, actual1);
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
             var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
-            var actual3 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
+            var actual3 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true);
 
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);

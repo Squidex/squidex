@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        public async Task<IAppEntity?> GetAppByNameAsync(string name, bool canCache = false,
+        public async Task<IAppEntity?> GetAppAsync(string name, bool canCache = false,
             CancellationToken ct = default)
         {
             using (Telemetry.Activities.StartActivity("AppProvider/GetAppByNameAsync"))

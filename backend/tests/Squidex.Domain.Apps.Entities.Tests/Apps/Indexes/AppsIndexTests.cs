@@ -101,8 +101,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => cache.GetAppIdsAsync(A<string[]>.That.Is(appId.Name)))
                 .Returns(new List<DomainId> { appId.Id });
 
-            var actual1 = await sut.GetAppByNameAsync(appId.Name, false);
-            var actual2 = await sut.GetAppByNameAsync(appId.Name, false);
+            var actual1 = await sut.GetAppAsync(appId.Name, false);
+            var actual2 = await sut.GetAppAsync(appId.Name, false);
 
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);
@@ -122,8 +122,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             A.CallTo(() => cache.GetAppIdsAsync(A<string[]>.That.Is(appId.Name)))
                 .Returns(new List<DomainId> { appId.Id });
 
-            var actual1 = await sut.GetAppByNameAsync(appId.Name, true);
-            var actual2 = await sut.GetAppByNameAsync(appId.Name, true);
+            var actual1 = await sut.GetAppAsync(appId.Name, true);
+            var actual2 = await sut.GetAppAsync(appId.Name, true);
             var actual3 = await sut.GetAppAsync(appId.Id, true);
 
             Assert.Same(expected, actual1);
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             var actual1 = await sut.GetAppAsync(appId.Id, true);
             var actual2 = await sut.GetAppAsync(appId.Id, true);
-            var actual3 = await sut.GetAppByNameAsync(appId.Name, true);
+            var actual3 = await sut.GetAppAsync(appId.Name, true);
 
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);

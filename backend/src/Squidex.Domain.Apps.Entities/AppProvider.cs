@@ -25,15 +25,16 @@ namespace Squidex.Domain.Apps.Entities
     {
         private readonly ILocalCache localCache;
         private readonly IAppsIndex indexForApps;
-        private readonly IRulesIndex indexRules;
-        private readonly ISchemasIndex indexSchemas;
+        private readonly IRulesIndex indexForRules;
+        private readonly ISchemasIndex indexForSchemas;
 
-        public AppProvider(ILocalCache localCache, IAppsIndex indexForApps, IRulesIndex indexRules, ISchemasIndex indexSchemas)
+        public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas,
+            ILocalCache localCache)
         {
             this.localCache = localCache;
             this.indexForApps = indexForApps;
-            this.indexRules = indexRules;
-            this.indexSchemas = indexSchemas;
+            this.indexForRules = indexForRules;
+            this.indexForSchemas = indexForSchemas;
         }
 
         public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
@@ -87,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities
                 return found;
             }
 
-            var app = await indexForApps.GetAppByNameAsync(appName, canCache, ct);
+            var app = await indexForApps.GetAppAsync(appName, canCache, ct);
 
             if (app != null)
             {
@@ -108,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities
                 return found;
             }
 
-            var schema = await indexSchemas.GetSchemaByNameAsync(appId, name, canCache, ct);
+            var schema = await indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
 
             if (schema != null)
             {
@@ -129,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities
                 return found;
             }
 
-            var schema = await indexSchemas.GetSchemaAsync(appId, id, canCache, ct);
+            var schema = await indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
 
             if (schema != null)
             {
@@ -156,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var schemas = await localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", () =>
             {
-                return indexSchemas.GetSchemasAsync(appId, ct);
+                return indexForSchemas.GetSchemasAsync(appId, ct);
             });
 
             foreach (var schema in schemas)
@@ -173,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var rules = await localCache.GetOrCreateAsync($"GetRulesAsync({appId})", () =>
             {
-                return indexRules.GetRulesAsync(appId, ct);
+                return indexForRules.GetRulesAsync(appId, ct);
             });
 
             return rules.ToList();
