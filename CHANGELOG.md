@@ -3,6 +3,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.9.0]
+
+### Fixed
+
+* **Contents**: Fixed field rules to also work with components.
+* **Notifo**: Improved error handling for Notifo integration.
+* **Hosting**: Several fixes to improve URL resolution when Squidex is hosted in a subfolder.
+
+### Changed
+
+* **Assets**: Improved asset folder dropdown.
+* **Assets**: Improved and optimized queries for asset folders.
+* **Event Processing**: Migration to channels.
+* **Contents**: Improved workflow handling for `Save and Publish`.
+* **Contents**: Resolve component types with `schemaName` field in the component object.
+* **Contents**: Added markdown support to all field hints.
+* **Monitoring**: Migration to Open Telemetry traces.
+* **Rules**: Improved rule simulator.
+* **UI**: New and better design.
+
+### Added
+
+* **Assets**: New metadata provider for azure image recognition.
+* **Clustering**: Added support for Kubernetes.
+* **Contents**: New tab to inspect the content item and view the structure as pure JSON.
+* **Contents**: New calendar view for scheduled content items.
+* **Contents**: Added a button to the UI to cancel content scheduling.
+* **Contents**: New validation properties for videos.
+* **Contents**: Added a text field to the content editor to define a custom ID when creating content items.
+* **GraphQL**: Exposed the `newStatus` field in GraphQL.
+* **GraphQL**: Exposed the `newStatusColor` field in GraphQL.
+* **Logging**: Added more information to the request log.
+* **Rules**: New action to trigger SignalR.
+* **Rules**: Enable or disable rules over the context menu.
+* **Scripting**: New method to make HTTP methods using POST, PUT, PATCH and DELETE verbs.
+
+
 ## [5.8.2] - 2021-07-18
 
 ### Fixed
