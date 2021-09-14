@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public async Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version)
         {
-            using (Telemetry.Activities.StartMethod<ContentLoader>())
+            using (Telemetry.Activities.StartActivity("ContentLoader/GetAsync"))
             {
                 var key = DomainId.Combine(appId, id).ToString();
 

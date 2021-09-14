@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Log;
 using Squidex.Web;
 
 #pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one

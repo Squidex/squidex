@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task<IResultList<IAssetFolderEntity>> QueryAsync(DomainId appId, DomainId parentId,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartMethod<MongoAssetFolderRepository>("QueryAsyncByQuery"))
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/QueryAsync"))
             {
                 var filter = BuildFilter(appId, parentId);
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task<IReadOnlyList<DomainId>> QueryChildIdsAsync(DomainId appId, DomainId parentId,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartMethod<MongoAssetRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/QueryChildIdsAsync"))
             {
                 var filter = BuildFilter(appId, parentId);
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task<IAssetFolderEntity?> FindAssetFolderAsync(DomainId appId, DomainId id,
             CancellationToken ct = default)
         {
-            using (Telemetry.Activities.StartMethod<MongoAssetFolderRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/FindAssetFolderAsync"))
             {
                 var documentId = DomainId.Combine(appId, id);
 

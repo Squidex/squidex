@@ -17,7 +17,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
@@ -53,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
-            using (Telemetry.Activities.StartMethod<ContentQueryService>())
+            using (Telemetry.Activities.StartActivity("ContentQueryService/FindAsync"))
             {
                 var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
@@ -87,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
-            using (Telemetry.Activities.StartMethod<ContentQueryService>())
+            using (Telemetry.Activities.StartActivity("ContentQueryService/QueryAsync"))
             {
                 if (q == null)
                 {
@@ -119,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(context, nameof(context));
 
-            using (Telemetry.Activities.StartMethod<ContentQueryService>())
+            using (Telemetry.Activities.StartActivity("ContentQueryService/QueryAsync"))
             {
                 if (q == null)
                 {
@@ -165,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private async Task<IReadOnlyList<IEnrichedContentEntity>> TransformCoreAsync(Context context, IEnumerable<IContentEntity> contents,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartMethod<ContentQueryService>())
+            using (Telemetry.Activities.StartActivity("ContentQueryService/TransformCoreAsync"))
             {
                 return await contentEnricher.EnrichAsync(contents, context, ct);
             }

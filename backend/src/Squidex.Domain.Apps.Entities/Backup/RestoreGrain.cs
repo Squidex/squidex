@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         foreach (var handler in handlers)
                         {
-                            using (Telemetry.Activities.StartMethod(handler.GetType(), nameof(IBackupHandler.RestoreAsync)))
+                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
                             {
                                 await handler.RestoreAsync(runningContext);
                             }
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         foreach (var handler in handlers)
                         {
-                            using (Telemetry.Activities.StartMethod(handler.GetType(), nameof(IBackupHandler.CompleteRestoreAsync)))
+                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/CompleteRestoreAsync"))
                             {
                                 await handler.CompleteRestoreAsync(runningContext);
                             }
