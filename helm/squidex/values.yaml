@@ -20,10 +20,15 @@ affinity: { }
 
 clusterSuffix: cluster.local
 
-ingress:
-  annotations: { }
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
+ingress:  
+  ## If true, Squidex Ingress will be created.
+  ##
+  enabled: true
+
+  ## Squidex Ingress annotations
+  # annotations:
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: "true"
   hostName: squidex.local
 
   tls: [ ]
