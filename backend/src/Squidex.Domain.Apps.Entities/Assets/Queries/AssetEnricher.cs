@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Guard.NotNull(assets, nameof(assets));
             Guard.NotNull(context, nameof(context));
 
-            using (Telemetry.Activities.StartMethod<AssetEnricher>())
+            using (Telemetry.Activities.StartActivity("ContentQueryService/EnrichAsync"))
             {
                 var results = assets.Select(x => SimpleMapper.Map(x, new AssetEntity())).ToList();
 

@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Orleans
         [SerializerMethod]
         public static void Serialize(object? input, ISerializationContext context, Type? expected)
         {
-            using (Telemetry.Activities.StartMethod(nameof(J)))
+            using (Telemetry.Activities.StartActivity("JsonSerializer/Serialize"))
             {
                 var jsonSerializer = GetSerializer(context);
 
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.Orleans
         [DeserializerMethod]
         public static object? Deserialize(Type expected, IDeserializationContext context)
         {
-            using (Telemetry.Activities.StartMethod(nameof(J)))
+            using (Telemetry.Activities.StartActivity("JsonSerializer/Deserialize"))
             {
                 var jsonSerializer = GetSerializer(context);
 
