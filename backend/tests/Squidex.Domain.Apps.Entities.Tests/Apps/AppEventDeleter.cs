@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.DeleteAppAsync(app, ct);
 
-            A.CallTo(() => eventStore.DeleteAsync($"^[a-z]-{app.Id}", ct))
+            A.CallTo(() => eventStore.DeleteAsync($"^[a-zA-Z0-9]-{app.Id}", ct))
                 .MustNotHaveHappened();
         }
     }

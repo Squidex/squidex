@@ -103,6 +103,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return queryAsStream.StreamAll(appId, schemaIds, ct);
         }
 
+        public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
+            CancellationToken ct)
+        {
+            return queryScheduled.QueryAsync(now, ct);
+        }
+
         public async Task DeleteAppAsync(DomainId appId,
             CancellationToken ct)
         {
@@ -171,15 +177,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             using (Telemetry.Activities.StartActivity("MongoContentCollection/FindContentAsync"))
             {
                 return await queryBdId.QueryAsync(schema, id, ct);
-            }
-        }
-
-        public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
-            CancellationToken ct)
-        {
-            using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryScheduledWithoutDataAsync"))
-            {
-                await queryScheduled.QueryAsync(now, callback, ct);
             }
         }
 

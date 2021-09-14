@@ -60,6 +60,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionAll.StreamAll(appId, schemaIds, ct);
         }
 
+        public IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
+            CancellationToken ct = default)
+        {
+            return collectionAll.QueryScheduledWithoutDataAsync(now, ct);
+        }
+
         public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q, SearchScope scope,
             CancellationToken ct = default)
         {
@@ -129,12 +135,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             CancellationToken ct = default)
         {
             return collectionAll.ResetScheduledAsync(documentId, ct);
-        }
-
-        public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
-            CancellationToken ct = default)
-        {
-            return collectionAll.QueryScheduledWithoutDataAsync(now, callback, ct);
         }
 
         public Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,

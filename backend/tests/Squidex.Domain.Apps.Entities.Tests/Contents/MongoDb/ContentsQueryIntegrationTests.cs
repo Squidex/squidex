@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var time = SystemClock.Instance.GetCurrentInstant();
 
-            await _.ContentRepository.QueryScheduledWithoutDataAsync(time, _ => Task.CompletedTask);
+            await _.ContentRepository.QueryScheduledWithoutDataAsync(time).ToListAsync();
         }
 
         [Fact]

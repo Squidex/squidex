@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             var fromNow = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
 
-            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-z]+)\\-{rule.AppId.Id}", fromNow, MaxSimulatedEvents, ct))
+            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-zA-Z0-9]+)\\-{rule.AppId.Id}", fromNow, MaxSimulatedEvents, ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 

@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
         Task ResetScheduledAsync(DomainId documentId,
             CancellationToken ct = default);
 
-        Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback,
+        IAsyncEnumerable<IContentEntity> QueryScheduledWithoutDataAsync(Instant now,
             CancellationToken ct = default);
     }
 }
