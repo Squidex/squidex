@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -15,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class SecurityExtensions
     {
-        public static void MustHavePermission(this OperationContext context, string permissionId)
+        public static void MustHavePermission(this ContentOperation context, string permissionId)
         {
-            var content = context.Content;
+            var content = context.Snapshot;
 
             if (Equals(content.CreatedBy, context.Actor) || context.User == null)
             {
