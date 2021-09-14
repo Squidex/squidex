@@ -3,7 +3,7 @@
         <h3>{{separator!.displayName}}</h3>
 
         <sqx-form-hint *ngIf="separator.properties.hints && separator.properties.hints.length > 0">
-            {{separator!.properties.hints}}
+            <span [innerHTML]="separator.properties.hints | sqxMarkdownInline"></span>
         </sqx-form-hint>
     </div>
     
