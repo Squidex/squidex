@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   squidex:
   - apiVersion: v2
-    appVersion: 5.8.0
+    appVersion: 5.9.0
     created: "2021-09-14T12:45:07.461676+02:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
@@ -25,5 +25,5 @@ entries:
     type: application
     urls:
     - https://squidex.github.io/squidex/helm/squidex-1.0.0.tgz
-    version: 1.0.0
+    version: 1.1.0
 generated: "2021-09-14T12:45:07.458758+02:00"

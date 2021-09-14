@@ -75,8 +75,8 @@ env:
 
   # LOGGING SETTINGS
   LOGGING__LEVEL: INFORMATION # Trace, Debug, Information, Warning, Error, Fatal
-  LOGGING__HUMAN: true # Setting the flag to true, enables well formatteds json logs
-  LOGGING__COLORS: true # Set to true, to use colors
+  LOGGING__HUMAN: false # Setting the flag to true, enables well formatteds json logs
+  LOGGING__COLORS: false # Set to true, to use colors
   LOGGING__LOGREQUESTS: true # Set to false to disable logging of http requests
   LOGGING__STOREENABLED: true # False to disable the log store
   LOGGING__STORERETENTIONINDAYS: 90 # The number of days request log items will be stored
