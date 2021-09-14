@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         public override void Prepare()
         {
             IndexedContributorIds = Document.Contributors.Keys.ToArray();
-            IndexedDeleted = Document.IsDeleted;
+            IndexedDeleted = Document.IsArchived;
             IndexedName = Document.Name;
         }
     }

@@ -191,37 +191,30 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task<string?> CheckAppAsync(IAppsCacheGrain cache, CreateApp command)
         {
-            var name = command.Name;
+            var token = await cache.ReserveAsync(command.AppId, command.Name);
 
-            if (name.IsSlug())
+            if (token == null)
             {
-                var token = await cache.ReserveAsync(command.AppId, name);
+                throw new ValidationException(T.Get("apps.nameAlreadyExists"));
+            }
 
-                if (token == null)
+            try
+            {
+                var existingId = await GetAppIdAsync(command.Name);
+
+                if (existingId != default)
                 {
                     throw new ValidationException(T.Get("apps.nameAlreadyExists"));
                 }
-
-                try
-                {
-                    var existingId = await GetAppIdAsync(name);
-
-                    if (existingId != default)
-                    {
-                        throw new ValidationException(T.Get("apps.nameAlreadyExists"));
-                    }
-                }
-                catch
-                {
-                    // Catch our own exception, juist in case something went wrong before.
-                    await cache.RemoveReservationAsync(token);
-                    throw;
-                }
-
-                return token;
+            }
+            catch
+            {
+                // Catch our own exception, juist in case something went wrong before.
+                await cache.RemoveReservationAsync(token);
+                throw;
             }
 
-            return null;
+            return token;
         }
 
         private async Task OnCreateAsync(CreateApp create)

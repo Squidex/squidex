@@ -178,37 +178,30 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task<string?> CheckSchemaAsync(ISchemasCacheGrain cache, CreateSchema command)
         {
-            var name = command.Name;
+            var token = await cache.ReserveAsync(command.SchemaId, command.Name);
 
-            if (name.IsSlug())
+            if (token == null)
             {
-                var token = await cache.ReserveAsync(command.SchemaId, name);
-
-                if (token == null)
-                {
-                    throw new ValidationException(T.Get("schemas.nameAlreadyExists"));
-                }
-
-                try
-                {
-                    var existingId = await GetSchemaIdAsync(command.AppId.Id, name);
-
-                    if (existingId != default)
-                    {
-                        throw new ValidationException(T.Get("apps.nameAlreadyExists"));
-                    }
-                }
-                catch
-                {
-                    // Catch our own exception, juist in case something went wrong before.
-                    await cache.RemoveReservationAsync(token);
-                    throw;
-                }
-
-                return token;
+                throw new ValidationException(T.Get("schemas.nameAlreadyExists"));
             }
 
-            return null;
+            try
+            {
+                var existingId = await GetSchemaIdAsync(command.AppId.Id, command.Name);
+
+                if (existingId != default)
+                {
+                    throw new ValidationException(T.Get("apps.nameAlreadyExists"));
+                }
+            }
+            catch
+            {
+                // Catch our own exception, juist in case something went wrong before.
+                await cache.RemoveReservationAsync(token);
+                throw;
+            }
+
+            return token;
         }
 
         private ISchemasCacheGrain Cache(DomainId appId)

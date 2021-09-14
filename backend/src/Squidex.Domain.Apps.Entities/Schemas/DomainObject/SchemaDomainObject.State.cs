@@ -28,6 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             public long SchemaFieldsTotal { get; set; }
 
+            public bool IsDeleted { get; set; }
+
             [IgnoreDataMember]
             public DomainId UniqueId
             {

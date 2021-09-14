@@ -28,6 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             public ScheduleJob? ScheduleJob { get; set; }
 
+            public bool IsDeleted { get; set; }
+
             [IgnoreDataMember]
             public DomainId UniqueId
             {

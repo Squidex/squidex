@@ -40,6 +40,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             public bool IsProtected { get; set; }
 
+            public bool IsDeleted { get; set; }
+
             public HashSet<string> Tags { get; set; }
 
             public AssetMetadata Metadata { get; set; }
