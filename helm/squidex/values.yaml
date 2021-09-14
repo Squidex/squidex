@@ -32,29 +32,71 @@ ingress:
   #      - chart-example.local
 
 env:
-  URLS__BASEURL: null
+  URLS__BASEURL: null # https://squidex.local/
   URLS__ENFORCEHTTPS: false
   EVENTSTORE__CONSUME: true
   EVENTSTORE__TYPE: MongoDb
-  IDENTITY__ADMINEMAIL: null
-  IDENTITY__ADMINPASSWORD: null
-  IDENTITY__SHOWPII: true
   LETSENCRYPT_HOST: null
   LETSENCRYPT_EMAIL: null
-  LOGGING__HUMAN: "false"
+  LOGGING__LEVEL: INFORMATION #Trace, Debug, Information, Warning, Error, Fatal
+  LOGGING__HUMAN: true #Setting the flag to true, enables well formatteds json logs.
+  LOGGING__APPLICATIONINSIGHTS__ENABLED: false
+  LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING: null # "instrumentationkey=keyvalue"
   EVENTSTORE__MONGODB__DATABASE: "Squidex"
+  STORE__TYPE: MongoDb
   STORE__MONGODB__DATABASE: "Squidex"
   STORE__MONGODB__CONTENTDATABASE: "SquidexContent"
+  IDENTITY__ADMINEMAIL: ""
+  IDENTITY__ADMINPASSWORD: ""
+  IDENTITY__SHOWPII: true
   IDENTITY__GOOGLECLIENT: null
   IDENTITY__GOOGLESECRET: null
   IDENTITY__MICROSOFTCLIENT: null
   IDENTITY__MICROSOFTSECRET: null
   IDENTITY__GITHUBCLIENT: null
   IDENTITY__GITHUBSECRET: null
+  IDENTITY__OIDCNAME: null
+  IDENTITY__OIDCAUTHORITY: null
+  IDENTITY__OIDCCLIENT: null
+  IDENTITY__OIDCSECRET: null
+  IDENTITY__OIDCMETADATAADDRESS: null
+  IDENTITY__OIDCSCOPES: [] # ["email"]
+  IDENTITY__OIDCRESPONSETYPE: null # id_token or code
+  IDENTITY__OIDCGETCLAIMSFROMUSERINFOENDPOINT: false
+  IDENTITY__OIDCSINGOUTREDIRECTURL: null
   IDENTITY__ALLOWPASSWORDAUTH: "true"
   IDENTITY__LOCKAUTOMATICALLY: "false"
+  IDENTITY__RECREATE: false
   ORLEANS__CLUSTERING: MongoDB
+  ORLEANS__KUBERNETES: true
 
 mongodb-replicaset:
   enabled: true
   replicas: 3
+  
+  auth:
+    enabled: false
+    existingKeySecret: ""
+    existingAdminSecret: ""
+    existingMetricsSecret: ""
+    # adminUser: username
+    # adminPassword: password
+    # metricsUser: metrics
+    # metricsPassword: password
+    # key: keycontent
+  
+  persistentVolume:
+    enabled: true
+    ## mongodb-replicaset data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+
+  nodeSelector: {}

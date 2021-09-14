@@ -3,14 +3,14 @@ entries:
   squidex:
   - apiVersion: v2
     appVersion: 5.8.0
-    created: "2021-08-27T10:25:24.213478+02:00"
+    created: "2021-09-14T10:58:41.630417+02:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
       repository: https://kubernetes-charts.storage.googleapis.com/
       version: 3.9.6
     description: Squidex CMS
-    digest: 5361ff43139714e97147eb1e667d2c64bddbec23511b8bed1f264bf2e9758d07
+    digest: d54f61d347bc0f2c01fab8da35ab4c7e7ca889750017bfe943cac273c8660292
     home: https://squidex.io/
     keywords:
     - cms
@@ -26,4 +26,4 @@ entries:
     urls:
     - https://squidex.github.io/squidex/helm/squidex-1.0.0.tgz
     version: 1.0.0
-generated: "2021-08-27T10:25:24.208859+02:00"
+generated: "2021-09-14T10:58:41.628472+02:00"
