@@ -1,4 +1,4 @@
-<sqx-dropdown [formControl]="control" [items]="snapshot.contentNames">
+<sqx-dropdown [formControl]="control" [items]="snapshot.contentNames" valueProperty="id">
     <ng-template let-content="$implicit" let-context="context">
         <span class="truncate" [innerHTML]="content.name | sqxHighlight:context"></span>
     </ng-template>
