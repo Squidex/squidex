@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
                         .Ascending(x => x.IndexedName)),
                 new CreateIndexModel<MongoAppEntity>(
                     Index
-                        .Ascending(x => x.IndexedContributorIds))
+                        .Ascending(x => x.IndexedUserIds))
             }, ct);
         }
 
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryIdsAsync"))
             {
-                var find = Collection.Find(x => x.IndexedContributorIds.Contains(contributorId) && !x.IndexedDeleted);
+                var find = Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted);
 
                 return await QueryAsync(find, ct);
             }

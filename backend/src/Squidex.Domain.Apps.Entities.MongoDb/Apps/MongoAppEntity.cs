@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
@@ -19,8 +21,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         public string IndexedName { get; set; }
 
         [BsonRequired]
-        [BsonElement("_ci")]
-        public string[] IndexedContributorIds { get; set; }
+        [BsonElement("_ui")]
+        public string[] IndexedUserIds { get; set; }
 
         [BsonRequired]
         [BsonElement("_dl")]
@@ -28,7 +30,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 
         public override void Prepare()
         {
-            IndexedContributorIds = Document.Contributors.Keys.ToArray();
+            var users = new HashSet<string>
+            {
+                Document.CreatedBy.Identifier
+            };
+
+            users.AddRange(Document.Contributors.Keys);
+            users.AddRange(Document.Clients.Keys);
+
+            IndexedUserIds = users.ToArray();
             IndexedDeleted = Document.IsArchived;
             IndexedName = Document.Name;
         }
