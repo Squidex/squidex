@@ -20,9 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public sealed class AppPermanentDeleter : IEventConsumer
     {
         private readonly IEnumerable<IDeleter> deleters;
-        private readonly string? typeAppContributorRemoved;
-        private readonly string? typeAppArchived;
         private readonly IGrainFactory grainFactory;
+        private readonly HashSet<string> consumingTypes;
 
         public string Name
         {
@@ -40,14 +39,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             this.grainFactory = grainFactory;
 
-            // Preload the type names of the events for performance reasons.  The reference can be null in tests.
-            typeAppArchived = typeNameRegistry?.GetName<AppArchived>();
-            typeAppContributorRemoved = typeNameRegistry?.GetName<AppContributorRemoved>();
+            // Compute the event types names once for performance reasons and use hashset for extensibility.
+            consumingTypes = new HashSet<string>
+            {
+                typeNameRegistry.GetName<AppArchived>(),
+                typeNameRegistry.GetName<AppContributorRemoved>()
+            };
         }
 
         public bool Handles(StoredEvent @event)
         {
-            return @event.Data.Type == typeAppArchived || @event.Data.Type == typeAppContributorRemoved;
+            return consumingTypes.Contains(@event.Data.Type);
         }
 
         public async Task On(Envelope<IEvent> @event)

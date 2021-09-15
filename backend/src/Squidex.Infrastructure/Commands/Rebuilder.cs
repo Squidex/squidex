@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -49,19 +50,11 @@ namespace Squidex.Infrastructure.Commands
             CancellationToken ct = default)
             where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            var store = serviceProvider.GetRequiredService<IStore<TState>>();
+            await ClearAsync<TState>();
 
-            await store.ClearSnapshotsAsync();
+            var ids = eventStore.QueryAllAsync(filter, ct: ct).Select(x => x.Data.Headers.AggregateId());
 
-            await InsertManyAsync<T, TState>(store, async target =>
-            {
-                await foreach (var storedEvent in eventStore.QueryAllAsync(filter, ct: ct))
-                {
-                    var id = storedEvent.Data.Headers.AggregateId();
-
-                    await target(id);
-                }
-            }, batchSize, ct);
+            await InsertManyAsync<T, TState>(ids, batchSize, ct);
         }
 
         public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize,
@@ -69,23 +62,18 @@ namespace Squidex.Infrastructure.Commands
             where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             Guard.NotNull(source, nameof(source));
-            Guard.Between(batchSize, 1, 1000, nameof(batchSize));
 
-            var store = serviceProvider.GetRequiredService<IStore<TState>>();
+            var ids = source.ToAsyncEnumerable();
 
-            await InsertManyAsync<T, TState>(store, async target =>
-            {
-                foreach (var id in source)
-                {
-                    await target(id);
-                }
-            }, batchSize, ct);
+            await InsertManyAsync<T, TState>(ids, batchSize, ct);
         }
 
-        private async Task InsertManyAsync<T, TState>(IStore<TState> store, Func<Func<DomainId, Task>, Task> source, int batchSize,
+        private async Task InsertManyAsync<T, TState>(IAsyncEnumerable<DomainId> source, int batchSize,
             CancellationToken ct = default)
             where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
+            var store = serviceProvider.GetRequiredService<IStore<TState>>();
+
             var parallelism = Environment.ProcessorCount;
 
             var workerBlock = new ActionBlock<DomainId[]>(async ids =>
@@ -138,22 +126,33 @@ namespace Squidex.Infrastructure.Commands
 
             var handledIds = new HashSet<DomainId>();
 
-            using (localCache.StartContext())
+            Task.Run(async () =>
             {
-                await source(id =>
+                using (localCache.StartContext())
                 {
-                    if (handledIds.Add(id))
+                    await foreach (var id in source.WithCancellation(ct))
                     {
-                        return batchBlock.SendAsync(id, ct);
+                        if (handledIds.Add(id))
+                        {
+                            if (!await batchBlock.SendAsync(id, ct))
+                            {
+                                break;
+                            }
+                        }
                     }
 
-                    return Task.CompletedTask;
-                });
+                    batchBlock.Complete();
+                }
+            }, ct).Forget();
 
-                batchBlock.Complete();
+            await workerBlock.Completion;
+        }
 
-                await workerBlock.Completion;
-            }
+        private async Task ClearAsync<TState>() where TState : class, IDomainState<TState>, new()
+        {
+            var store = serviceProvider.GetRequiredService<IStore<TState>>();
+
+            await store.ClearSnapshotsAsync();
         }
     }
 }

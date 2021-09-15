@@ -18,7 +18,7 @@ namespace Migrations
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 25;
+        private const int CurrentVersion = 26;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -75,17 +75,12 @@ namespace Migrations
 
                 // Version 12: Introduce roles.
                 // Version 24: Improve a naming in the languages config.
-                if (version < 24)
+                // Version 26: Introduce full deletion.
+                if (version < 26)
                 {
-                    yield return serviceProvider.GetRequiredService<RebuildApps>();
-                }
-
-                // Version 14: Schema refactoring
-                // Version 22: Introduce domain id.
-                if (version < 22)
-                {
-                    yield return serviceProvider.GetRequiredService<ClearSchemas>();
-                    yield return serviceProvider.GetRequiredService<ClearRules>();
+                    // yield return serviceProvider.GetRequiredService<RebuildApps>();
+                    // yield return serviceProvider.GetRequiredService<RebuildSchemas>();
+                    yield return serviceProvider.GetRequiredService<RebuildRules>();
                 }
 
                 // Version 18: Rebuild assets.

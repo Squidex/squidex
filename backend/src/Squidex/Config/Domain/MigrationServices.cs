@@ -53,6 +53,12 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<RebuildApps>()
                 .As<IMigration>();
 
+            services.AddTransientAs<RebuildSchemas>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildRules>()
+                .As<IMigration>();
+
             services.AddTransientAs<RebuildAssets>()
                 .As<IMigration>();
 

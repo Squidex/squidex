@@ -75,8 +75,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 {
                     try
                     {
-                        var shouldHandle = eventConsumer.Handles(storedEvent);
-
                         Envelope<IEvent>? @event = null;
 
                         if (eventConsumer.Handles(storedEvent))
