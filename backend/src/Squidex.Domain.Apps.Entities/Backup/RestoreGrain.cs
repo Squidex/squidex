@@ -354,6 +354,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 PropagateCompletion = true
             });
 
+            await foreach (var job in reader.ReadEventsAsync(streamNameResolver, eventDataFormatter))
+                {
+
+            }
             await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
             {
                 var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);

@@ -6,8 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.Model;
@@ -52,7 +55,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task<T> ReadJsonAsync<T>(string name)
+        public async Task<T> ReadJsonAsync<T>(string name,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
@@ -64,7 +68,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task ReadBlobAsync(string name, Func<Stream, Task> handler)
+        public async Task ReadBlobAsync(string name, Func<Stream, Task> handler,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(handler, nameof(handler));
@@ -91,13 +96,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return attachmentEntry;
         }
 
-        public async Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler)
+        public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
-            while (true)
+            while (!ct.IsCancellationRequested)
             {
                 var entry = archive.GetEntry(ArchiveHelper.GetEventPath(readEvents));
 
@@ -113,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     var eventStream = storedEvent.StreamName;
                     var eventEnvelope = formatter.Parse(storedEvent);
 
-                    await handler((eventStream, eventEnvelope));
+                    yield return (eventStream, eventEnvelope);
                 }
 
                 readEvents++;
