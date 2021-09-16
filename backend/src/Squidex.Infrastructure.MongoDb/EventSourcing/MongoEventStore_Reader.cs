@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return EmptyEvents;
             }
 
-            using (Telemetry.Activities.StartMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartActivity("MongoEventStore/QueryLatestAsync"))
             {
                 var commits =
                     await Collection.Find(
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
-            using (Telemetry.Activities.StartMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartActivity("MongoEventStore/QueryAsync"))
             {
                 var commits =
                     await Collection.Find(
@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(streamNames, nameof(streamNames));
 
-            using (Telemetry.Activities.StartMethod<MongoEventStore>())
+            using (Telemetry.Activities.StartActivity("MongoEventStore/QueryManyAsync"))
             {
                 var position = EtagVersion.Empty;
 

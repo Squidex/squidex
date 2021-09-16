@@ -44,6 +44,9 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public items: ReadonlyArray<any> | undefined | null = [];
 
     @Input()
+    public itemsBordered?: boolean | null;
+
+    @Input()
     public searchProperty = 'name';
 
     @Input()
@@ -51,9 +54,6 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     @Input()
     public canSearch?: boolean | null = true;
-
-    @Input()
-    public separated?: boolean | null;
 
     @Input()
     public set disabled(value: boolean | undefined | null) {

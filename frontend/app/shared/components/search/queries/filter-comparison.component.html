@@ -48,8 +48,9 @@
             </sqx-reference-input>
         </ng-container>
         <ng-container *ngSwitchCase="'status'">
-            <sqx-dropdown [items]="fieldModel.extra"
+            <sqx-dropdown 
                 valueProperty="status"
+                [items]="fieldModel.extra"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)"
                 [canSearch]="false">
@@ -60,8 +61,9 @@
         </ng-container>
         <ng-container *ngSwitchCase="'user'">
             <ng-container *ngIf="contributorsState.isLoaded | async; else noPermission">
-                <sqx-dropdown [items]="contributorsState.contributors | async"
+                <sqx-dropdown
                     valueProperty="token"
+                    [items]="contributorsState.contributors | async"
                     [ngModel]="filter.value"
                     (ngModelChange)="changeValue($event)"
                     searchProperty="contributorName">

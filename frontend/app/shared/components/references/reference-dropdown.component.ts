@@ -39,7 +39,6 @@ const NO_EMIT = { emitEvent: false };
 })
 export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
     private readonly itemCount: number;
-    private selectedId: string | undefined;
 
     @Input()
     public language: LanguageDto;
@@ -75,13 +74,13 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
 
         this.own(
             value$(this.control)
-                .subscribe((value: ContentName) => {
+                .subscribe((id: string) => {
                     if (this.control.enabled) {
-                        if (value && value.id) {
+                        if (id) {
                             if (this.mode === 'Single') {
-                                this.callChange(value.id);
+                                this.callChange(id);
                             } else {
-                                this.callChange([value.id]);
+                                this.callChange([id]);
                             }
                         } else if (this.mode === 'Single') {
                             this.callChange(null);
@@ -105,8 +104,6 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
                             const contentNames = this.createContentNames(contents);
 
                             this.next({ contents, contentNames });
-
-                            this.selectContent();
                         },
                         error: () => {
                             this.control.disable(NO_EMIT);
@@ -135,26 +132,16 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
 
     public writeValue(obj: any) {
         if (Types.isString(obj)) {
-            this.selectedId = obj;
-
-            this.selectContent();
+            this.selectContent(obj);
         } else if (Types.isArrayOfString(obj)) {
-            this.selectedId = obj[0];
-
-            this.selectContent();
+            this.selectContent(obj[0]);
         } else {
-            this.selectedId = undefined;
-
-            this.unselectContent();
+            this.selectContent(undefined);
         }
     }
 
-    private selectContent() {
-        this.control.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), NO_EMIT);
-    }
-
-    private unselectContent() {
-        this.control.setValue(undefined, NO_EMIT);
+    private selectContent(value: any) {
+        this.control.setValue(value, NO_EMIT);
     }
 
     private createContentNames(contents: ReadonlyArray<ContentDto>): ReadonlyArray<ContentName> {

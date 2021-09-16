@@ -23,7 +23,7 @@
             <div class="control-dropdown-items" #container>
                 <div *ngFor="let item of snapshot.suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable"
                     [class.active]="i === snapshot.suggestedIndex"
-                    [class.separated]="separated" 
+                    [class.separated]="itemsBordered" 
                     (mousedown)="selectIndexAndClose(i)" 
                     [sqxScrollActive]="i === snapshot.suggestedIndex"
                     [sqxScrollContainer]="container">

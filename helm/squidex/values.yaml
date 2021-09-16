@@ -20,10 +20,15 @@ affinity: { }
 
 clusterSuffix: cluster.local
 
-ingress:
-  annotations: { }
-  # kubernetes.io/ingress.class: nginx
-  # kubernetes.io/tls-acme: "true"
+ingress:  
+  ## If true, Squidex Ingress will be created.
+  ##
+  enabled: true
+
+  ## Squidex Ingress annotations
+  # annotations:
+  #   kubernetes.io/ingress.class: nginx
+  #   kubernetes.io/tls-acme: "true"
   hostName: squidex.local
 
   tls: [ ]
@@ -32,29 +37,99 @@ ingress:
   #      - chart-example.local
 
 env:
-  URLS__BASEURL: null
-  URLS__ENFORCEHTTPS: false
-  EVENTSTORE__CONSUME: true
+  # Define the type of the event store
   EVENTSTORE__TYPE: MongoDb
-  IDENTITY__ADMINEMAIL: null
-  IDENTITY__ADMINPASSWORD: null
-  IDENTITY__SHOWPII: true
-  LETSENCRYPT_HOST: null
-  LETSENCRYPT_EMAIL: null
-  LOGGING__HUMAN: "false"
   EVENTSTORE__MONGODB__DATABASE: "Squidex"
-  STORE__MONGODB__DATABASE: "Squidex"
-  STORE__MONGODB__CONTENTDATABASE: "SquidexContent"
+
+  # CREATE LOCAL ADMIN USER
+  IDENTITY__ADMINEMAIL: ""
+  IDENTITY__ADMINPASSWORD: ""
+  IDENTITY__ADMINRECREATE: false # Recreate the admin if it does not exist or the password does not match
+  IDENTITY__ALLOWPASSWORDAUTH: "true" # Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options
+  IDENTITY__LOCKAUTOMATICALLY: "false" # Lock new users automatically, the administrator must unlock them
+  IDENTITY__SHOWPII: true # Set to true to show PII (Personally Identifiable Information) in the logs
+  IDENTITY__PRIVACYURL: "https://squidex.io/privacy" # The url to you privacy statements, if you host squidex by yourself
+
+  # Settings for Google auth (keep empty to disable)
   IDENTITY__GOOGLECLIENT: null
   IDENTITY__GOOGLESECRET: null
-  IDENTITY__MICROSOFTCLIENT: null
-  IDENTITY__MICROSOFTSECRET: null
+
+  # Settings for Github auth (keep empty to disable)
   IDENTITY__GITHUBCLIENT: null
   IDENTITY__GITHUBSECRET: null
-  IDENTITY__ALLOWPASSWORDAUTH: "true"
-  IDENTITY__LOCKAUTOMATICALLY: "false"
-  ORLEANS__CLUSTERING: MongoDB
+
+  # Settings for Microsoft auth (keep empty to disable)
+  # NOTE: Tennant is optional for using a specific AzureAD tenant
+  IDENTITY__MICROSOFTCLIENT: null
+  IDENTITY__MICROSOFTSECRET: null
+  IDENTITY__MICROSOFTTENANT: null
+
+  # Settings for your custom oidc server
+  IDENTITY__OIDCNAME: null
+  IDENTITY__OIDCAUTHORITY: null
+  IDENTITY__OIDCCLIENT: null
+  IDENTITY__OIDCSECRET: null
+  IDENTITY__OIDCMETADATAADDRESS: null
+  IDENTITY__OIDCSCOPES: [] # ["email"]
+  IDENTITY__OIDCRESPONSETYPE: null # id_token or code
+  IDENTITY__OIDCGETCLAIMSFROMUSERINFOENDPOINT: false
+  IDENTITY__OIDCSINGOUTREDIRECTURL: null
+
+  LETSENCRYPT_HOST: null
+  LETSENCRYPT_EMAIL: null
+
+  # LOGGING SETTINGS
+  LOGGING__LEVEL: INFORMATION # Trace, Debug, Information, Warning, Error, Fatal
+  LOGGING__HUMAN: false # Setting the flag to true, enables well formatteds json logs
+  LOGGING__COLORS: false # Set to true, to use colors
+  LOGGING__LOGREQUESTS: true # Set to false to disable logging of http requests
+  LOGGING__STOREENABLED: true # False to disable the log store
+  LOGGING__STORERETENTIONINDAYS: 90 # The number of days request log items will be stored
+  LOGGING__STACKDRIVER__ENABLED: false # True, to enable stackdriver integration
+  LOGGING__OTLP__ENABLED: false # True, to enable OpenTelemetry Protocol integration
+  LOGGING__OLTP__ENDPOINT: null # The endpoint to the agent
+  LOGGING__APPLICATIONINSIGHTS__ENABLED: false # True, to enable application insights integraon
+  LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING: null # "instrumentationkey=keyvalue"
+
+  # Define the clustering type
+  ORLEANS__CLUSTERING: MongoDB # SUPPORTED: MongoDB, Development
+  ORLEANS__KUBERNETES: true # Tell Orleans it is running in kubernetes
+
+  # Define the type of the read store
+  STORE__TYPE: MongoDb
+  STORE__MONGODB__DATABASE: "Squidex"
+  STORE__MONGODB__CONTENTDATABASE: "SquidexContent"
+
+  URLS__BASEURL: https://squidex.local/ # Set the base url of your application, to generate correct urls in background process
+  URLS__ENFORCEHTTPS: false # Set it to true to redirect the user from http to https permanently
 
 mongodb-replicaset:
   enabled: true
   replicas: 3
+  
+  auth:
+    enabled: false
+    existingKeySecret: ""
+    existingAdminSecret: ""
+    existingMetricsSecret: ""
+    # adminUser: username
+    # adminPassword: password
+    # metricsUser: metrics
+    # metricsPassword: password
+    # key: keycontent
+  
+  persistentVolume:
+    enabled: true
+    ## mongodb-replicaset data Persistent Volume Storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+
+  nodeSelector: {}

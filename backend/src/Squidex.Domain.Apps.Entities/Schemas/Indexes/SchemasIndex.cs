@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId)
         {
-            using (Telemetry.Activities.StartMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemasAsync"))
             {
                 var ids = await GetSchemaIdsAsync(appId);
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public async Task<ISchemaEntity?> GetSchemaByNameAsync(DomainId appId, string name, bool canCache)
         {
-            using (Telemetry.Activities.StartMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaByNameAsync"))
             {
                 var cacheKey = GetCacheKey(appId, name);
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache)
         {
-            using (Telemetry.Activities.StartMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaAsync"))
             {
                 var cacheKey = GetCacheKey(appId, id);
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task<DomainId> GetSchemaIdAsync(DomainId appId, string name)
         {
-            using (Telemetry.Activities.StartMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaIdAsync"))
             {
                 return await Index(appId).GetIdAsync(name);
             }
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task<List<DomainId>> GetSchemaIdsAsync(DomainId appId)
         {
-            using (Telemetry.Activities.StartMethod<SchemasIndex>())
+            using (Telemetry.Activities.StartActivity("SchemasIndex/GetSchemaIdsAsync"))
             {
                 return await Index(appId).GetIdsAsync();
             }

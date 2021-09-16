@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public async Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version)
         {
-            using (Telemetry.Activities.StartMethod<AssetLoader>())
+            using (Telemetry.Activities.StartActivity("AssetLoader/GetAsync"))
             {
                 var key = DomainId.Combine(appId, id);
 

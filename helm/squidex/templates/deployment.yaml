@@ -11,6 +11,7 @@ spec:
     matchLabels:
       {{- include "squidex.selectors" . | indent 6 }}
       orleans/serviceId: "squidex-{{ default .Chart.AppVersion .Values.image.tag }}"
+      orleans/clusterId: "squidex"
   template:
     metadata:
       labels:
@@ -37,6 +38,7 @@ spec:
             httpGet:
               path: /healthz
               port: http
+            initialDelaySeconds: 300
           readinessProbe:
             httpGet:
               path: /readiness

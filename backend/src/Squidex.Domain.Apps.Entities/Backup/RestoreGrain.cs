@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         foreach (var handler in handlers)
                         {
-                            using (Telemetry.Activities.StartMethod(handler.GetType(), nameof(IBackupHandler.RestoreAsync)))
+                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
                             {
                                 await handler.RestoreAsync(runningContext);
                             }
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         foreach (var handler in handlers)
                         {
-                            using (Telemetry.Activities.StartMethod(handler.GetType(), nameof(IBackupHandler.CompleteRestoreAsync)))
+                            using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/CompleteRestoreAsync"))
                             {
                                 await handler.CompleteRestoreAsync(runningContext);
                             }
@@ -344,10 +344,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 BoundedCapacity = BatchSize * 2
             });
 
-            batchBlock.LinkTo(writeBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(writeBlock);
 
             await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
             {

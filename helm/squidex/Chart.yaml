@@ -4,8 +4,8 @@ type: application
 name: squidex
 description: Squidex CMS
 
-version: 1.0.0
-appVersion: "5.8.0"
+version: 1.2.0
+appVersion: "5.9.0"
 
 home: https://squidex.io/
 

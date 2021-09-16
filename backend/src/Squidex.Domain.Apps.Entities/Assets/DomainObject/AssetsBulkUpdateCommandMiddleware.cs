@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -84,10 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         }
                     }, executionOptions);
 
-                    createCommandsBlock.LinkTo(executeCommandBlock, new DataflowLinkOptions
-                    {
-                        PropagateCompletion = true
-                    });
+                    createCommandsBlock.BidirectionalLinkTo(executeCommandBlock);
 
                     contextProvider.Context.Change(b => b
                         .WithoutAssetEnrichment()

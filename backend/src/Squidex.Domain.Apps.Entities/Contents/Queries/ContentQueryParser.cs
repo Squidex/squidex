@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(q, nameof(q));
 
-            using (Telemetry.Activities.StartMethod<ContentQueryParser>())
+            using (Telemetry.Activities.StartActivity("ContentQueryParser/ParseAsync"))
             {
                 var query = await ParseClrQueryAsync(context, q, schema);
 

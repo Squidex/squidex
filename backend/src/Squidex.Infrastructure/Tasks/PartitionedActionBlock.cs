@@ -9,11 +9,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.Tasks
 {
-    public class PartitionedActionBlock<TInput> : ITargetBlock<TInput>
+    public sealed class PartitionedActionBlock<TInput> : ITargetBlock<TInput>
     {
         private readonly ITargetBlock<TInput> distributor;
         private readonly ActionBlock<TInput>[] workers;
@@ -39,31 +38,15 @@ namespace Squidex.Infrastructure.Tasks
 
             for (var i = 0; i < dataflowBlockOptions.MaxDegreeOfParallelism; i++)
             {
-                var workerOption = SimpleMapper.Map(dataflowBlockOptions, new ExecutionDataflowBlockOptions());
-
-                workerOption.MaxDegreeOfParallelism = 1;
-                workerOption.MaxMessagesPerTask = 1;
-
-                workers[i] = new ActionBlock<TInput>(async input =>
+                workers[i] = new ActionBlock<TInput>(action, new ExecutionDataflowBlockOptions()
                 {
-                    try
-                    {
-                        await action(input);
-                    }
-                    catch (OperationCanceledException ex)
-                    {
-                        // Dataflow swallows operation cancelled exception.
-                        throw new AggregateException(ex);
-                    }
-                }, workerOption);
+                    BoundedCapacity = dataflowBlockOptions.BoundedCapacity,
+                    CancellationToken = dataflowBlockOptions.CancellationToken,
+                    MaxDegreeOfParallelism = 1,
+                    MaxMessagesPerTask = 1,
+                    TaskScheduler = dataflowBlockOptions.TaskScheduler,
+                });
             }
-
-            var distributorOption = new ExecutionDataflowBlockOptions
-            {
-                MaxDegreeOfParallelism = 1,
-                MaxMessagesPerTask = 1,
-                BoundedCapacity = 1
-            };
 
             distributor = new ActionBlock<TInput>(async input =>
             {
@@ -78,15 +61,14 @@ namespace Squidex.Infrastructure.Tasks
                     // Dataflow swallows operation cancelled exception.
                     throw new AggregateException(ex);
                 }
-        }, distributorOption);
-
-            distributor.Completion.ContinueWith(x =>
+            }, new ExecutionDataflowBlockOptions
             {
-                foreach (var worker in workers)
-                {
-                    worker.Complete();
-                }
+                BoundedCapacity = 1,
+                MaxDegreeOfParallelism = 1,
+                MaxMessagesPerTask = 1
             });
+
+            LinkCompletion();
         }
 
         public DataflowMessageStatus OfferMessage(DataflowMessageHeader messageHeader, TInput messageValue, ISourceBlock<TInput>? source, bool consumeToAccept)
@@ -102,6 +84,37 @@ namespace Squidex.Infrastructure.Tasks
         public void Fault(Exception exception)
         {
             distributor.Fault(exception);
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        private async void LinkCompletion()
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            try
+            {
+                await distributor.Completion.ConfigureAwait(false);
+            }
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+            catch
+#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
+            {
+                // we do not want to change the stacktrace of the exception.
+            }
+
+            if (distributor.Completion.IsFaulted && distributor.Completion.Exception != null)
+            {
+                foreach (var worker in workers)
+                {
+                    ((IDataflowBlock)worker).Fault(distributor.Completion.Exception);
+                }
+            }
+            else
+            {
+                foreach (var worker in workers)
+                {
+                    worker.Complete();
+                }
+            }
         }
     }
 }

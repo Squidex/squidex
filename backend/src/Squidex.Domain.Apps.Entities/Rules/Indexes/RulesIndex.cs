@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
         {
-            using (Telemetry.Activities.StartMethod<RulesIndex>())
+            using (Telemetry.Activities.StartActivity("RulesIndex/GetRulesAsync"))
             {
                 var ids = await GetRuleIdsAsync(appId);
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private async Task<List<DomainId>> GetRuleIdsAsync(DomainId appId)
         {
-            using (Telemetry.Activities.StartMethod<RulesIndex>())
+            using (Telemetry.Activities.StartActivity("RulesIndex/GetRuleIdsAsync"))
             {
                 return await Index(appId).GetIdsAsync();
             }
