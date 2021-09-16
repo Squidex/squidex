@@ -344,10 +344,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 BoundedCapacity = BatchSize * 2
             });
 
-            batchBlock.LinkTo(writeBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(writeBlock);
 
             await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
             {

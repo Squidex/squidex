@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
@@ -152,10 +153,7 @@ namespace Migrations.Migrations.MongoDb
                 BoundedCapacity = SizeOfQueue
             });
 
-            batchBlock.LinkTo(actionBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(actionBlock);
 
             await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync, ct);
 
