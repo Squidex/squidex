@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -119,31 +120,25 @@ namespace Squidex.Infrastructure.Commands
                 BoundedCapacity = batchSize
             });
 
-            batchBlock.LinkTo(workerBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(workerBlock);
 
             var handledIds = new HashSet<DomainId>();
 
-            Task.Run(async () =>
+            using (localCache.StartContext())
             {
-                using (localCache.StartContext())
+                await foreach (var id in source.WithCancellation(ct))
                 {
-                    await foreach (var id in source.WithCancellation(ct))
+                    if (handledIds.Add(id))
                     {
-                        if (handledIds.Add(id))
+                        if (!await batchBlock.SendAsync(id, ct))
                         {
-                            if (!await batchBlock.SendAsync(id, ct))
-                            {
-                                break;
-                            }
+                            break;
                         }
                     }
-
-                    batchBlock.Complete();
                 }
-            }, ct).Forget();
+
+                batchBlock.Complete();
+            }
 
             await workerBlock.Completion;
         }

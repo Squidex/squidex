@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => writer.WriteJsonAsync(A<string>._,
                 A<BackupContents.Urls>.That.Matches(x =>
                     x.Assets == assetsUrl &&
-                    x.AssetsApp == assetsUrlApp)))
+                    x.AssetsApp == assetsUrlApp), ct))
                 .MustHaveHappened();
         }
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => urlGenerator.AssetContentBase(appId.Name))
                 .Returns(newAssetsUrlApp);
 
-            A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._, ct))
                 .Returns(new BackupContents.Urls
                 {
                     Assets = oldAssetsUrl,

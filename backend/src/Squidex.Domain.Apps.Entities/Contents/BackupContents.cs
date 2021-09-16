@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var urls = GetUrls(appCreated.Name);
 
-                await context.Writer.WriteJsonAsync(UrlsFile, urls);
+                await context.Writer.WriteJsonAsync(UrlsFile, urls, ct);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 case AppCreated appCreated:
                     assetsUrlNew = GetUrls(appCreated.Name);
-                    assetsUrlOld = await ReadUrlsAsync(context.Reader);
+                    assetsUrlOld = await ReadUrlsAsync(context.Reader, ct);
                     break;
                 case SchemaDeleted schemaDeleted:
                     contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
@@ -223,11 +223,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private static async Task<Urls?> ReadUrlsAsync(IBackupReader reader)
+        private static async Task<Urls?> ReadUrlsAsync(IBackupReader reader,
+            CancellationToken ct)
         {
             try
             {
-                return await reader.ReadJsonAsync<Urls>(UrlsFile);
+                return await reader.ReadJsonAsync<Urls>(UrlsFile, ct);
             }
             catch
             {

@@ -8,6 +8,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Squidex.Infrastructure.Tasks
 {
@@ -52,6 +53,32 @@ namespace Squidex.Infrastructure.Tasks
                 }
 
                 return await task;
+            }
+        }
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public static async void BidirectionalLinkTo<T>(this ISourceBlock<T> source, ITargetBlock<T> target)
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
+        {
+            source.LinkTo(target, new DataflowLinkOptions
+            {
+                PropagateCompletion = true
+            });
+
+            try
+            {
+                await target.Completion.ConfigureAwait(false);
+            }
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+            catch
+#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
+            {
+                // we do not want to change the stacktrace of the exception.
+            }
+
+            if (target.Completion.IsFaulted && target.Completion.Exception != null)
+            {
+                source.Fault(target.Completion.Exception.Flatten());
             }
         }
     }

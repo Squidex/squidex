@@ -21,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public class BackupReader : DisposableObjectBase, IBackupReader
+    public sealed class BackupReader : DisposableObjectBase, IBackupReader
     {
         private readonly ZipArchive archive;
         private readonly IJsonSerializer serializer;
@@ -55,6 +55,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
+        public Task<Stream> OpenBlobAsync(string name,
+            CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
+
+            var entry = GetEntry(name);
+
+            return Task.FromResult(entry.Open());
+        }
+
         public async Task<T> ReadJsonAsync<T>(string name,
             CancellationToken ct = default)
         {
@@ -65,20 +75,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await using (var stream = entry.Open())
             {
                 return serializer.Deserialize<T>(stream, null);
-            }
-        }
-
-        public async Task ReadBlobAsync(string name, Func<Stream, Task> handler,
-            CancellationToken ct = default)
-        {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNull(handler, nameof(handler));
-
-            var entry = GetEntry(name);
-
-            await using (var stream = entry.Open())
-            {
-                await handler(stream);
             }
         }
 

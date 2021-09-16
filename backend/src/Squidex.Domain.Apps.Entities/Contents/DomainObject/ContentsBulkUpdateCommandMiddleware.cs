@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 
@@ -88,10 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         }
                     }, executionOptions);
 
-                    createCommandsBlock.LinkTo(executeCommandBlock, new DataflowLinkOptions
-                    {
-                        PropagateCompletion = true
-                    });
+                    createCommandsBlock.BidirectionalLinkTo(executeCommandBlock);
 
                     contextProvider.Context.Change(b => b
                         .WithoutContentEnrichment()
@@ -113,7 +111,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             bulkUpdates,
                             results);
 
-                        await createCommandsBlock.SendAsync(task);
+                        if (!await createCommandsBlock.SendAsync(task))
+                        {
+                            break;
+                        }
                     }
 
                     createCommandsBlock.Complete();

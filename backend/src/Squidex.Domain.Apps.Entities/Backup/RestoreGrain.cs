@@ -349,24 +349,20 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 BoundedCapacity = BatchSize * 2
             });
 
-            batchBlock.LinkTo(writeBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(writeBlock);
 
             await foreach (var job in reader.ReadEventsAsync(streamNameResolver, eventDataFormatter))
-                {
-
-            }
-            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
             {
                 var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
 
                 if (newStream != null)
                 {
-                    await batchBlock.SendAsync((newStream, job.Event));
+                    if (!await batchBlock.SendAsync((newStream, job.Event)))
+                    {
+                        break;
+                    }
                 }
-            });
+            }
 
             batchBlock.Complete();
 

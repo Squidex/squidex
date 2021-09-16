@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public Task BackupAsync(BackupContext context,
             CancellationToken ct)
         {
-            return BackupTagsAsync(context);
+            return BackupTagsAsync(context, ct);
         }
 
         public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public async Task RestoreAsync(RestoreContext context,
             CancellationToken ct)
         {
-            await RestoreTagsAsync(context);
+            await RestoreTagsAsync(context, ct);
 
             if (assetIds.Count > 0)
             {
@@ -116,18 +116,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task RestoreTagsAsync(RestoreContext context)
+        private async Task RestoreTagsAsync(RestoreContext context,
+            CancellationToken ct)
         {
-            var tags = await context.Reader.ReadJsonAsync<TagsExport>(TagsFile);
+            var tags = await context.Reader.ReadJsonAsync<TagsExport>(TagsFile, ct);
 
             await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, tags);
         }
 
-        private async Task BackupTagsAsync(BackupContext context)
+        private async Task BackupTagsAsync(BackupContext context,
+            CancellationToken ct)
         {
             var tags = await tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets);
 
-            await context.Writer.WriteJsonAsync(TagsFile, tags);
+            await context.Writer.WriteJsonAsync(TagsFile, tags, ct);
         }
 
         private async Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer,
@@ -135,10 +137,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             try
             {
-                await writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
+                var fileName = GetName(assetId, fileVersion);
+
+                await using (var stream = await writer.OpenBlobAsync(fileName, ct))
                 {
-                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream, default, ct);
-                });
+                    await assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream, default, ct);
+                }
             }
             catch (AssetNotFoundException)
             {
@@ -151,10 +155,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             try
             {
-                await reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
+                var fileName = GetName(assetId, fileVersion);
+
+                await using (var stream = await reader.OpenBlobAsync(fileName, ct))
                 {
-                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream, true, ct);
-                });
+                    await assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream, true, ct);
+                }
             }
             catch (FileNotFoundException)
             {

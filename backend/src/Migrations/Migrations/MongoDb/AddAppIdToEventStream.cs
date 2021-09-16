@@ -15,6 +15,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
@@ -33,8 +35,8 @@ namespace Migrations.Migrations.MongoDb
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 20;
 
-            var collectionOld = database.GetCollection<BsonDocument>("Events");
-            var collectionNew = database.GetCollection<BsonDocument>("Events2");
+            var collectionV1 = database.GetCollection<BsonDocument>("Events");
+            var collectionV2 = database.GetCollection<BsonDocument>("Events2");
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
@@ -104,7 +106,7 @@ namespace Migrations.Migrations.MongoDb
 
                     if (writes.Count > 0)
                     {
-                        await collectionNew.BulkWriteAsync(writes, writeOptions, ct);
+                        await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
                     }
                 }
                 catch (OperationCanceledException ex)
@@ -119,12 +121,15 @@ namespace Migrations.Migrations.MongoDb
                 BoundedCapacity = SizeOfQueue
             });
 
-            batchBlock.LinkTo(actionBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync, ct);
+            await foreach (var commit in collectionV1.Find(new BsonDocument()).ToAsyncEnumerable(ct: ct))
+            {
+                if (!await batchBlock.SendAsync(commit, ct))
+                {
+                    break;
+                }
+            }
 
             batchBlock.Complete();
 

@@ -21,8 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             await writer.WriteVersionAsync();
 
-            A.CallTo(() => writer.WriteJsonAsync(A<string>._,
-                    A<CompatibilityExtensions.FileVersion>.That.Matches(x => x.Major == 5)))
+            A.CallTo(() => writer.WriteJsonAsync(A<string>._, A<CompatibilityExtensions.FileVersion>.That.Matches(x => x.Major == 5), default))
                 .MustHaveHappened();
         }
 
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
                 .Returns(new CompatibilityExtensions.FileVersion { Major = 5 });
 
             await reader.CheckCompatibilityAsync();
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
                 .Returns(new CompatibilityExtensions.FileVersion { Major = 3 });
 
             await Assert.ThrowsAsync<BackupRestoreException>(() => reader.CheckCompatibilityAsync());
@@ -53,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<CompatibilityExtensions.FileVersion>(A<string>._, default))
                 .Throws(new FileNotFoundException());
 
             await reader.CheckCompatibilityAsync();

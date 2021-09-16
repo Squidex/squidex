@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.BackupAsync(context, ct);
 
-            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags))
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags, ct))
                 .MustHaveHappened();
         }
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadJsonAsync<TagsExport>(A<string>._))
+            A.CallTo(() => context.Reader.ReadJsonAsync<TagsExport>(A<string>._, ct))
                 .Returns(tags);
 
             await sut.RestoreAsync(context, ct);
@@ -118,8 +118,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => context.Writer.WriteBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
-                .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
+            A.CallTo(() => context.Writer.OpenBlobAsync($"{assetId}_{version}.asset", ct))
+                .Returns(assetStream);
 
             await sut.BackupEventAsync(AppEvent(@event), context, ct);
 
@@ -134,8 +134,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateBackupContext();
 
-            A.CallTo(() => context.Writer.WriteBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
-                .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
+            A.CallTo(() => context.Writer.OpenBlobAsync($"{assetId}_{version}.asset", ct))
+                .Returns(assetStream);
 
             A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, assetId, version, null, assetStream, default, ct))
                 .Throws(new AssetNotFoundException(assetId.ToString()));
@@ -182,8 +182,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
-                .Invokes((string _, Func<Stream, Task> handler) => handler(assetStream));
+            A.CallTo(() => context.Reader.OpenBlobAsync($"{assetId}_{version}.asset", ct))
+                .Returns(assetStream);
 
             await sut.RestoreEventAsync(AppEvent(@event), context, ct);
 
@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadBlobAsync($"{assetId}_{version}.asset", A<Func<Stream, Task>>._))
+            A.CallTo(() => context.Reader.OpenBlobAsync($"{assetId}_{version}.asset", ct))
                 .Throws(new FileNotFoundException());
 
             await sut.RestoreEventAsync(AppEvent(@event), context, ct);

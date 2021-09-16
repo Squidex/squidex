@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         int ReadEvents { get; }
 
-        Task ReadBlobAsync(string name, Func<Stream, Task> handler,
+        Task<Stream> OpenBlobAsync(string name,
             CancellationToken ct = default);
 
         Task<T> ReadJsonAsync<T>(string name,

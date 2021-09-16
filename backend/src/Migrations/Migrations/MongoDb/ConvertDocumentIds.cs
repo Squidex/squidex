@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
@@ -72,26 +73,26 @@ namespace Migrations.Migrations.MongoDb
             }
         }
 
-        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameOld,
+        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameV1,
             CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 10;
 
-            string collectionNameNew;
+            string collectionNameV2;
 
-            collectionNameNew = $"{collectionNameOld}2";
-            collectionNameNew = collectionNameNew.Replace("State_", "States_", StringComparison.Ordinal);
+            collectionNameV2 = $"{collectionNameV1}2";
+            collectionNameV2 = collectionNameV2.Replace("State_", "States_", StringComparison.Ordinal);
 
-            var collectionOld = database.GetCollection<BsonDocument>(collectionNameOld);
-            var collectionNew = database.GetCollection<BsonDocument>(collectionNameNew);
+            var collectionV1 = database.GetCollection<BsonDocument>(collectionNameV1);
+            var collectionV2 = database.GetCollection<BsonDocument>(collectionNameV2);
 
-            if (!await collectionOld.AnyAsync(ct: ct))
+            if (!await collectionV1.AnyAsync(ct: ct))
             {
                 return;
             }
 
-            await collectionNew.DeleteManyAsync(new BsonDocument(), ct);
+            await collectionV2.DeleteManyAsync(new BsonDocument(), ct);
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
@@ -139,7 +140,7 @@ namespace Migrations.Migrations.MongoDb
 
                     if (writes.Count > 0)
                     {
-                        await collectionNew.BulkWriteAsync(writes, writeOptions, ct);
+                        await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
                     }
                 }
                 catch (OperationCanceledException ex)
@@ -154,12 +155,15 @@ namespace Migrations.Migrations.MongoDb
                 BoundedCapacity = SizeOfQueue
             });
 
-            batchBlock.LinkTo(actionBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync, ct);
+            await foreach (var document in collectionV1.Find(new BsonDocument()).ToAsyncEnumerable(ct: ct))
+            {
+                if (!await batchBlock.SendAsync(document, ct))
+                {
+                    break;
+                }
+            }
 
             batchBlock.Complete();
 

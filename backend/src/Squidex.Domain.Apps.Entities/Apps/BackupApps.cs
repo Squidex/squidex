@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     context.UserMapping.Backup(appContributorAssigned.ContributorId);
                     break;
                 case AppImageUploaded:
-                    await WriteAssetAsync(context.AppId, context.Writer);
+                    await WriteAssetAsync(context.AppId, context.Writer, ct);
                     break;
             }
         }
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var json = await appUISettings.GetAsync(context.AppId, null);
 
-            await context.Writer.WriteJsonAsync(SettingsFile, json);
+            await context.Writer.WriteJsonAsync(SettingsFile, json, ct);
         }
 
         public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 case AppImageUploaded:
                     {
-                        await ReadAssetAsync(context.AppId, context.Reader);
+                        await ReadAssetAsync(context.AppId, context.Reader, ct);
 
                         break;
                     }
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task RestoreAsync(RestoreContext context,
             CancellationToken ct)
         {
-            var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile);
+            var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile, ct);
 
             await appUISettings.SetAsync(context.AppId, null, json);
         }
@@ -147,34 +147,33 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await appsIndex.RemoveReservationAsync(appReservation);
         }
 
-        private Task WriteAssetAsync(DomainId appId, IBackupWriter writer)
-        {
-            return writer.WriteBlobAsync(AvatarFile, async stream =>
-            {
-                try
-                {
-                    await appImageStore.DownloadAsync(appId, stream);
-                }
-                catch (AssetNotFoundException)
-                {
-                }
-            });
-        }
-
-        private async Task ReadAssetAsync(DomainId appId, IBackupReader reader)
+        private async Task WriteAssetAsync(DomainId appId, IBackupWriter writer,
+            CancellationToken ct)
         {
             try
             {
-                await reader.ReadBlobAsync(AvatarFile, async stream =>
+                await using (var stream = await writer.OpenBlobAsync(AvatarFile, ct))
                 {
-                    try
-                    {
-                        await appImageStore.UploadAsync(appId, stream);
-                    }
-                    catch (AssetAlreadyExistsException)
-                    {
-                    }
-                });
+                    await appImageStore.DownloadAsync(appId, stream, ct);
+                }
+            }
+            catch (AssetNotFoundException)
+            {
+            }
+        }
+
+        private async Task ReadAssetAsync(DomainId appId, IBackupReader reader,
+            CancellationToken ct)
+        {
+            try
+            {
+                await using (var stream = await reader.OpenBlobAsync(AvatarFile, ct))
+                {
+                    await appImageStore.UploadAsync(appId, stream, ct);
+                }
+            }
+            catch (AssetAlreadyExistsException)
+            {
             }
             catch (FileNotFoundException)
             {

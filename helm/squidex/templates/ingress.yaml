@@ -1,3 +1,4 @@
+{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "squidex.fullname" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -26,9 +27,10 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ $fullName }}
                 port:
                   number: {{ .Values.service.port }}
+{{- end -}}

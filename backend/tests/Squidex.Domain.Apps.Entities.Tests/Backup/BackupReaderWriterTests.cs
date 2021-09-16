@@ -49,10 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 try
                 {
-                    await writer.WriteBlobAsync(file, _ =>
+                    await using (var stream = await writer.OpenBlobAsync(file))
                     {
                         throw new InvalidOperationException();
-                    });
+                    }
                 }
                 catch
                 {
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 return Task.CompletedTask;
             }, async reader =>
             {
-                await Assert.ThrowsAsync<FileNotFoundException>(() => reader.ReadBlobAsync("404", s => Task.CompletedTask));
+                await Assert.ThrowsAsync<FileNotFoundException>(() => reader.OpenBlobAsync("404"));
             });
         }
 
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var targetEvents = new List<(string Stream, Envelope<IEvent> Event)>();
 
-                await reader.ReadEventsAsync(streamNameResolver, formatter, async @event =>
+                await foreach (var @event in reader.ReadEventsAsync(streamNameResolver, formatter))
                 {
                     var index = int.Parse(@event.Event.Headers["Index"].ToString());
 
@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     }
 
                     targetEvents.Add(@event);
-                });
+                }
 
                 for (var i = 0; i < targetEvents.Count; i++)
                 {
@@ -226,26 +226,26 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return writer.WriteJsonAsync(file, value);
         }
 
-        private static Task WriteGuidAsync(IBackupWriter writer, string file, Guid value)
+        private static async Task WriteGuidAsync(IBackupWriter writer, string file, Guid value)
         {
-            return writer.WriteBlobAsync(file, async stream =>
+            await using (var stream = await writer.OpenBlobAsync(file))
             {
                 await stream.WriteAsync(value.ToByteArray());
-            });
+            }
         }
 
         private static async Task<Guid> ReadGuidAsync(IBackupReader reader, string file)
         {
             var read = Guid.Empty;
 
-            await reader.ReadBlobAsync(file, async stream =>
+            await using (var stream = await reader.OpenBlobAsync(file))
             {
                 var buffer = new byte[16];
 
                 await stream.ReadAsync(buffer);
 
                 read = new Guid(buffer);
-            });
+            }
 
             return read;
         }
