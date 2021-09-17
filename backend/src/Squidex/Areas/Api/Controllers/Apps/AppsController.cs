@@ -166,51 +166,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Get the app settings.
-        /// </summary>
-        /// <param name="app">The name of the app to get the settings for.</param>
-        /// <returns>
-        /// 200 => App settingsd returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/settings")]
-        [ProducesResponseType(typeof(AppSettingsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous]
-        [ApiCosts(0)]
-        public IActionResult GetAppSettings(string app)
-        {
-            var response = Deferred.Response(() =>
-            {
-                return AppSettingsDto.FromApp(App, Resources);
-            });
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Update the app settings.
-        /// </summary>
-        /// <param name="app">The name of the app to update.</param>
-        /// <param name="request">The values to update.</param>
-        /// <returns>
-        /// 200 => App updated.
-        /// 400 => App request not valid.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/settings")]
-        [ProducesResponseType(typeof(AppSettingsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppUpdate)]
-        [ApiCosts(0)]
-        public async Task<IActionResult> PutAppSettings(string app, [FromBody] UpdateAppSettingsDto request)
-        {
-            var response = await InvokeCommandAsync(request.ToCommand(), x => AppSettingsDto.FromApp(x, Resources));
-
-            return Ok(response);
-        }
-
-        /// <summary>
         /// Upload the app image.
         /// </summary>
         /// <param name="app">The name of the app to update.</param>

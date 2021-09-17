@@ -32,12 +32,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public void ExtendAsync(ExecutionContext context)
         {
-            if (!context.TryGetValue<DomainId>(nameof(ScriptVars.AppId), out var appId))
+            if (!context.TryGetValue<DomainId>("appId", out var appId))
             {
                 return;
             }
 
-            if (!context.TryGetValue<ClaimsPrincipal>(nameof(ScriptVars.User), out var user))
+            if (!context.TryGetValue<ClaimsPrincipal>("user", out var user))
             {
                 return;
             }

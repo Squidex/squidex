@@ -130,7 +130,7 @@ export class AppsState extends State<Snapshot> {
     }
 
     public update(app: AppDto, request: UpdateAppDto): Observable<AppDto> {
-        return this.appsService.putApp(app, request, app.version).pipe(
+        return this.appsService.putApp(app.name, app, request, app.version).pipe(
             tap(updated => {
                 this.replaceApp(updated);
             }),
@@ -138,7 +138,7 @@ export class AppsState extends State<Snapshot> {
     }
 
     public updateSettings(settings: AppSettingsDto, request: UpdateAppSettingsDto): Observable<AppSettingsDto> {
-        return this.appsService.putSettings(settings, request, settings.version).pipe(
+        return this.appsService.putSettings(this.appName, settings, request, settings.version).pipe(
             tap(updated => {
                 this.replaceAppSettings(updated);
             }),
@@ -146,7 +146,7 @@ export class AppsState extends State<Snapshot> {
     }
 
     public removeImage(app: AppDto): Observable<AppDto> {
-        return this.appsService.deleteAppImage(app, app.version).pipe(
+        return this.appsService.deleteAppImage(app.name, app, app.version).pipe(
             tap(updated => {
                 this.replaceApp(updated);
             }),
@@ -154,7 +154,7 @@ export class AppsState extends State<Snapshot> {
     }
 
     public uploadImage(app: AppDto, file: File): Observable<number | AppDto> {
-        return this.appsService.postAppImage(app, file, app.version).pipe(
+        return this.appsService.postAppImage(app.name, app, file, app.version).pipe(
             tap(updated => {
                 if (Types.is(updated, AppDto)) {
                     this.replaceApp(updated);
@@ -164,7 +164,7 @@ export class AppsState extends State<Snapshot> {
     }
 
     public leave(app: AppDto): Observable<any> {
-        return this.appsService.leaveApp(app).pipe(
+        return this.appsService.leaveApp(app.name, app).pipe(
             tap(() => {
                 this.removeApp(app);
             }),
@@ -172,7 +172,7 @@ export class AppsState extends State<Snapshot> {
     }
 
     public delete(app: AppDto): Observable<any> {
-        return this.appsService.deleteApp(app).pipe(
+        return this.appsService.deleteApp(app.name, app).pipe(
             tap(() => {
                 this.removeApp(app);
             }),

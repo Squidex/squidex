@@ -101,9 +101,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             A.CallTo(() => scriptEngine.TransformAsync(
                     A<ScriptVars>.That.Matches(x =>
-                        ReferenceEquals(x.User, ctx.User) &&
-                        ReferenceEquals(x.Data, oldData) &&
-                        x.ContentId == content.Id),
+                        Equals(x["user"], ctx.User) &&
+                        Equals(x["data"], oldData) &&
+                        Equals(x["contentId"], content.Id)),
                     "my-query",
                     ScriptOptions(), A<CancellationToken>._))
                 .MustHaveHappened();

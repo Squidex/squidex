@@ -13,8 +13,8 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaUIFieldsConfigured))]
     public sealed class SchemaUIFieldsConfigured : SchemaEvent
     {
-        public FieldNames FieldsInLists { get; set; }
+        public FieldNames? FieldsInLists { get; set; }
 
-        public FieldNames FieldsInReferences { get; set; }
+        public FieldNames? FieldsInReferences { get; set; }
     }
 }

@@ -8,6 +8,7 @@
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 new QueryArgument(AllTypes.String)
                 {
                     Name = "path",
-                    Description = "The path to the json value",
+                    Description = FieldDescriptions.JsonPath,
                     DefaultValue = null
                 }
             };

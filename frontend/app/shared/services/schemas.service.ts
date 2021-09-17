@@ -27,6 +27,8 @@ export const MetaFields = {
 };
 
 export type SchemaType = 'Default' | 'Singleton' | 'Component';
+export type SchemaScripts = Record<string, string | null>;
+export type PreviewUrls = Record<string, string>;
 
 export class SchemaDto {
     public readonly _links: ResourceLinks;
@@ -71,8 +73,8 @@ export class SchemaDto {
         public readonly fieldsInLists: Tags = [],
         public readonly fieldsInReferences: Tags = [],
         public readonly fieldRules: ReadonlyArray<FieldRule> = [],
-        public readonly previewUrls = {},
-        public readonly scripts = {},
+        public readonly previewUrls: PreviewUrls = {},
+        public readonly scripts: SchemaScripts = {},
     ) {
         this._links = links;
 
@@ -309,7 +311,9 @@ export type TableField = RootFieldDto | string;
 
 export type FieldRuleAction = 'Disable' | 'Hide' | 'Require';
 export type FieldRule = { field: string; action: FieldRuleAction; condition: string };
-export type SchemaCompletions = ReadonlyArray<{ name: string; description: string }>;
+
+export type SchemaCompletions =
+    ReadonlyArray<{ path: string; description: string; type: string }>;
 
 export type SchemasDto =
     Readonly<{ items: ReadonlyArray<SchemaDto>; canCreate: boolean } & Resource>;

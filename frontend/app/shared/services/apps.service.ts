@@ -7,7 +7,7 @@
 
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version } from '@app/framework';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
 
@@ -110,8 +110,17 @@ export class EditorDto {
     }
 }
 
+export type AssetScriptsDto =
+    Versioned<AssetScriptsPayload>;
+
+export type AssetScriptsPayload =
+    Readonly<{ scripts: AssetScripts; canUpdate: boolean } & Resource>;
+
 export type UpdateAppSettingsDto =
     Readonly<{ patterns: ReadonlyArray<PatternDto>; editors: ReadonlyArray<EditorDto>; hideScheduler?: boolean }>;
+
+export type AssetScripts =
+    Readonly<{ [name: string]: string | null }>;
 
 export type CreateAppDto =
     Readonly<{ name: string; template?: string }>;
@@ -140,8 +149,8 @@ export class AppsService {
             pretifyError('i18n:apps.loadFailed'));
     }
 
-    public getApp(name: string): Observable<AppDto> {
-        const url = this.apiUrl.buildUrl(`/api/apps/${name}`);
+    public getApp(appName: string): Observable<AppDto> {
+        const url = this.apiUrl.buildUrl(`/api/apps/${appName}`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
@@ -165,7 +174,7 @@ export class AppsService {
             pretifyError('i18n:apps.createFailed'));
     }
 
-    public putApp(resource: Resource, dto: UpdateAppDto, version: Version): Observable<AppDto> {
+    public putApp(appName: string, resource: Resource, dto: UpdateAppDto, version: Version): Observable<AppDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -175,7 +184,7 @@ export class AppsService {
                 return parseApp(payload.body);
             }),
             tap(() => {
-                this.analytics.trackEvent('App', 'Updated');
+                this.analytics.trackEvent('App', 'Updated', appName);
             }),
             pretifyError('i18n:apps.updateFailed'));
     }
@@ -185,14 +194,12 @@ export class AppsService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const appSettings = parseAppSettings(body);
-
-                return appSettings;
+                return parseAppSettings(body);
             }),
             pretifyError('i18n:apps.loadSettingsFailed'));
     }
 
-    public putSettings(resource: Resource, dto: UpdateAppSettingsDto, version: Version): Observable<AppSettingsDto> {
+    public putSettings(appName: string, resource: Resource, dto: UpdateAppSettingsDto, version: Version): Observable<AppSettingsDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -202,12 +209,37 @@ export class AppsService {
                 return parseAppSettings(payload.body);
             }),
             tap(() => {
-                this.analytics.trackEvent('App', 'Updated');
+                this.analytics.trackEvent('App', 'Updated', appName);
             }),
             pretifyError('i18n:apps.updateSettingsFailed'));
     }
 
-    public postAppImage(resource: Resource, file: File, version: Version): Observable<number | AppDto> {
+    public getAssetScripts(name: string): Observable<AssetScriptsDto> {
+        const url = this.apiUrl.buildUrl(`/api/apps/${name}/assets/scripts`);
+
+        return HTTP.getVersioned(this.http, url).pipe(
+            mapVersioned(({ body }) => {
+                return parseAssetScripts(body);
+            }),
+            pretifyError('i18n:apps.loadAssetScriptsFailed'));
+    }
+
+    public putAssetScripts(appName: string, resource: Resource, dto: AssetScripts, version: Version): Observable<AssetScriptsDto> {
+        const link = resource._links['update'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            mapVersioned(({ body }) => {
+                return parseAssetScripts(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('App', 'Updated', appName);
+            }),
+            pretifyError('i18n:apps.updateAssetScriptsFailed'));
+    }
+
+    public postAppImage(appName: string, resource: Resource, file: File, version: Version): Observable<number | AppDto> {
         const link = resource._links['image/upload'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -236,13 +268,13 @@ export class AppsService {
             }),
             tap(value => {
                 if (!Types.isNumber(value)) {
-                    this.analytics.trackEvent('AppImage', 'Uploaded');
+                    this.analytics.trackEvent('AppImage', 'Uploaded', appName);
                 }
             }),
             pretifyError('i18n:apps.uploadImageFailed'));
     }
 
-    public deleteAppImage(resource: Resource, version: Version): Observable<any> {
+    public deleteAppImage(appName: string, resource: Resource, version: Version): Observable<any> {
         const link = resource._links['image/delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -252,31 +284,31 @@ export class AppsService {
                 return parseApp(payload.body);
             }),
             tap(() => {
-                this.analytics.trackEvent('AppImage', 'Removed');
+                this.analytics.trackEvent('AppImage', 'Removed', appName);
             }),
             pretifyError('i18n:apps.removeImageFailed'));
     }
 
-    public leaveApp(resource: Resource): Observable<any> {
+    public leaveApp(appName: string, resource: Resource): Observable<any> {
         const link = resource._links['leave'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
             tap(() => {
-                this.analytics.trackEvent('App', 'Left');
+                this.analytics.trackEvent('App', 'Left', appName);
             }),
             pretifyError('i18n:apps.leaveFailed'));
     }
 
-    public deleteApp(resource: Resource): Observable<any> {
+    public deleteApp(appName: string, resource: Resource): Observable<any> {
         const link = resource._links['delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
             tap(() => {
-                this.analytics.trackEvent('App', 'Archived');
+                this.analytics.trackEvent('App', 'Archived', appName);
             }),
             pretifyError('i18n:apps.archiveFailed'));
     }
@@ -309,4 +341,10 @@ function parseAppSettings(response: any) {
             return new EditorDto(x.name, x.url);
         }),
         new Version(response.version.toString()));
+}
+
+function parseAssetScripts(response: any) {
+    const { _links, ...scripts } = response;
+
+    return { scripts, _links, canUpdate: hasAnyLink(_links, 'update') };
 }

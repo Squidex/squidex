@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Name = "total",
                 ResolvedType = AllTypes.NonNullInt,
                 Resolver = ContentResolvers.ListTotal,
-                Description = $"The total number of {schemaInfo.DisplayName} items."
+                Description = FieldDescriptions.ContentsTotal
             });
 
             AddField(new FieldType
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 Name = "items",
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = ContentResolvers.ListItems,
-                Description = $"The {schemaInfo.DisplayName} items."
+                Description = FieldDescriptions.ContentsItems
             });
 
             Description = $"List of {schemaInfo.DisplayName} items and total count.";

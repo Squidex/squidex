@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class SecurityExtensions
     {
-        public static void MustHavePermission(this OperationContext context, string permissionId)
+        public static void MustHavePermission(this ContentOperation context, string permissionId)
         {
-            var content = context.Content;
+            var content = context.Snapshot;
 
             if (Equals(content.CreatedBy, context.Actor) || context.User == null)
             {

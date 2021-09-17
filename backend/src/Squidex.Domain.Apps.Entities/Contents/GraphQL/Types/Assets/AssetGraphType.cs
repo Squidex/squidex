@@ -9,6 +9,7 @@ using System;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
@@ -28,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "id",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = EntityResolvers.Id,
-                Description = "The id of the asset."
+                Description = FieldDescriptions.EntityId
             });
 
             AddField(new FieldType
@@ -36,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "version",
                 ResolvedType = AllTypes.NonNullInt,
                 Resolver = EntityResolvers.Version,
-                Description = "The version of the asset."
+                Description = FieldDescriptions.EntityVersion
             });
 
             AddField(new FieldType
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "created",
                 ResolvedType = AllTypes.NonNullDateTime,
                 Resolver = EntityResolvers.Created,
-                Description = "The date and time when the asset has been created."
+                Description = FieldDescriptions.EntityCreated
             });
 
             AddField(new FieldType
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "createdBy",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = EntityResolvers.CreatedBy,
-                Description = "The user that has created the asset."
+                Description = FieldDescriptions.EntityCreatedBy
             });
 
             AddField(new FieldType
@@ -60,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "createdByUser",
                 ResolvedType = UserGraphType.NonNull,
                 Resolver = EntityResolvers.CreatedByUser,
-                Description = "The full info of the user that has created the asset."
+                Description = FieldDescriptions.EntityCreatedBy
             });
 
             AddField(new FieldType
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "lastModified",
                 ResolvedType = AllTypes.NonNullDateTime,
                 Resolver = EntityResolvers.LastModified,
-                Description = "The date and time when the asset has been modified last."
+                Description = FieldDescriptions.EntityLastModified
             });
 
             AddField(new FieldType
@@ -76,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "lastModifiedBy",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = EntityResolvers.LastModifiedBy,
-                Description = "The user that has updated the asset last."
+                Description = FieldDescriptions.EntityLastModifiedBy
             });
 
             AddField(new FieldType
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "lastModifiedByUser",
                 ResolvedType = UserGraphType.NonNull,
                 Resolver = EntityResolvers.LastModifiedByUser,
-                Description = "The full info of the user that has created the asset."
+                Description = FieldDescriptions.EntityLastModifiedBy
             });
 
             AddField(new FieldType
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "mimeType",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.MimeType),
-                Description = "The mime type."
+                Description = FieldDescriptions.AssetMimeType
             });
 
             AddField(new FieldType
@@ -100,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "url",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Url,
-                Description = "The url to the asset."
+                Description = FieldDescriptions.AssetUrl
             });
 
             AddField(new FieldType
@@ -108,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "thumbnailUrl",
                 ResolvedType = AllTypes.String,
                 Resolver = ThumbnailUrl,
-                Description = "The thumbnail url to the asset."
+                Description = FieldDescriptions.AssetThumbnailUrl
             });
 
             AddField(new FieldType
@@ -116,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "fileName",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.FileName),
-                Description = "The file name."
+                Description = FieldDescriptions.AssetFileName
             });
 
             AddField(new FieldType
@@ -124,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "fileHash",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.FileHash),
-                Description = "The hash of the file. Can be null for old files."
+                Description = FieldDescriptions.AssetFileHash
             });
 
             AddField(new FieldType
@@ -132,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "fileType",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.FileName.FileType()),
-                Description = "The file type."
+                Description = FieldDescriptions.AssetFileType
             });
 
             AddField(new FieldType
@@ -140,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "fileSize",
                 ResolvedType = AllTypes.NonNullInt,
                 Resolver = Resolve(x => x.FileSize),
-                Description = "The size of the file in bytes."
+                Description = FieldDescriptions.AssetFileSize
             });
 
             AddField(new FieldType
@@ -148,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "fileVersion",
                 ResolvedType = AllTypes.NonNullInt,
                 Resolver = Resolve(x => x.FileVersion),
-                Description = "The version of the file."
+                Description = FieldDescriptions.AssetFileVersion
             });
 
             AddField(new FieldType
@@ -156,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "slug",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.Slug),
-                Description = "The file name as slug."
+                Description = FieldDescriptions.AssetSlug
             });
 
             AddField(new FieldType
@@ -164,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "isProtected",
                 ResolvedType = AllTypes.NonNullBoolean,
                 Resolver = Resolve(x => x.IsProtected),
-                Description = "True, when the asset is not public."
+                Description = FieldDescriptions.AssetIsProtected
             });
 
             AddField(new FieldType
@@ -172,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "isImage",
                 ResolvedType = AllTypes.NonNullBoolean,
                 Resolver = Resolve(x => x.Type == AssetType.Image),
-                Description = "Determines if the uploaded file is an image.",
+                Description = FieldDescriptions.AssetIsImage,
                 DeprecationReason = "Use 'type' field instead."
             });
 
@@ -181,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "pixelWidth",
                 ResolvedType = AllTypes.Int,
                 Resolver = Resolve(x => x.Metadata.GetPixelWidth()),
-                Description = "The width of the image in pixels if the asset is an image.",
+                Description = FieldDescriptions.AssetPixelWidth,
                 DeprecationReason = "Use 'metadata' field instead."
             });
 
@@ -190,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "pixelHeight",
                 ResolvedType = AllTypes.Int,
                 Resolver = Resolve(x => x.Metadata.GetPixelHeight()),
-                Description = "The height of the image in pixels if the asset is an image.",
+                Description = FieldDescriptions.AssetPixelHeight,
                 DeprecationReason = "Use 'metadata' field instead."
             });
 
@@ -199,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "type",
                 ResolvedType = AllTypes.NonNullAssetType,
                 Resolver = Resolve(x => x.Type),
-                Description = "The type of the image."
+                Description = FieldDescriptions.AssetType
             });
 
             AddField(new FieldType
@@ -207,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "metadataText",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.MetadataText),
-                Description = "The text representation of the metadata."
+                Description = FieldDescriptions.AssetMetadataText
             });
 
             AddField(new FieldType
@@ -215,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Name = "tags",
                 ResolvedType = AllTypes.NonNullStrings,
                 Resolver = Resolve(x => x.TagNames),
-                Description = "The asset tags."
+                Description = FieldDescriptions.AssetTags
             });
 
             AddField(new FieldType
@@ -224,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Arguments = AssetActions.Metadata.Arguments,
                 ResolvedType = AllTypes.JsonNoop,
                 Resolver = AssetActions.Metadata.Resolver,
-                Description = "The asset metadata."
+                Description = FieldDescriptions.AssetMetadata
             });
 
             if (canGenerateSourceUrl)
@@ -234,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                     Name = "sourceUrl",
                     ResolvedType = AllTypes.NonNullString,
                     Resolver = SourceUrl,
-                    Description = "The source url of the asset."
+                    Description = FieldDescriptions.AssetSourceUrl
                 });
             }
 

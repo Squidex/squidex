@@ -8,6 +8,7 @@
 using System;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -40,6 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             public AppSettings Settings { get; set; } = AppSettings.Empty;
 
             public AppContributors Contributors { get; set; } = AppContributors.Empty;
+
+            public AssetScripts AssetScripts { get; set; } = AssetScripts.Empty;
 
             public LanguagesConfig Languages { get; set; } = LanguagesConfig.English;
 
@@ -78,6 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                     case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
                         return UpdatePlan(e.ToPlan());
+
+                    case AppAssetsScriptsConfigured e when Is.Change(e.Scripts, AssetScripts):
+                        return UpdateAssetScripts(e.Scripts);
 
                     case AppPlanReset e when Plan != null:
                         return UpdatePlan(null);
@@ -201,6 +207,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             private bool UpdateImage(AppImage? image)
             {
                 Image = image;
+
+                return true;
+            }
+
+            private bool UpdateAssetScripts(AssetScripts? scripts)
+            {
+                AssetScripts = scripts ?? AssetScripts.Empty;
 
                 return true;
             }

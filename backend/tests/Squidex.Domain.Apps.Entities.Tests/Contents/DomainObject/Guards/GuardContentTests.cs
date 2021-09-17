@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -32,7 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private readonly ISchemaEntity normalUnpublishedSchema;
         private readonly ISchemaEntity singletonSchema;
         private readonly ISchemaEntity singletonUnpublishedSchema;
-        private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly RefToken actor = RefToken.User("123");
 
         public GuardContentTests()
@@ -53,251 +53,251 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         [Fact]
         public void Should_throw_exception_if_creating_content_for_unpublished_schema()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalUnpublishedSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalUnpublishedSchema);
 
-            Assert.Throws<DomainException>(() => context.MustNotCreateForUnpublishedSchema());
+            Assert.Throws<DomainException>(() => operation.MustNotCreateForUnpublishedSchema());
         }
 
         [Fact]
         public void Should_not_throw_exception_if_creating_content_for_unpublished_singleton()
         {
-            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), singletonUnpublishedSchema);
+            var operation = Operation(CreateContent(Status.Draft, singletonSchema.Id), singletonUnpublishedSchema);
 
-            context.MustNotCreateSingleton();
+            operation.MustNotCreateSingleton();
         }
 
         [Fact]
         public void Should_not_throw_exception_if_creating_content_for_published_schema()
         {
-            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
 
-            context.MustNotCreateSingleton();
+            operation.MustNotCreateSingleton();
         }
 
         [Fact]
         public void Should_not_throw_exception_if_creating_content_for_published_singleton_schema()
         {
-            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), singletonSchema);
+            var operation = Operation(CreateContent(Status.Draft, singletonSchema.Id), singletonSchema);
 
-            context.MustNotCreateSingleton();
+            operation.MustNotCreateSingleton();
         }
 
         [Fact]
         public void Should_throw_exception_if_creating_singleton_content()
         {
-            var context = CreateContext(CreateContent(Status.Draft), singletonSchema);
+            var operation = Operation(CreateContent(Status.Draft), singletonSchema);
 
-            Assert.Throws<DomainException>(() => context.MustNotCreateSingleton());
+            Assert.Throws<DomainException>(() => operation.MustNotCreateSingleton());
         }
 
         [Fact]
         public void Should_not_throw_exception_if_creating_singleton_content_with_schema_id()
         {
-            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), singletonSchema);
+            var operation = Operation(CreateContent(Status.Draft, singletonSchema.Id), singletonSchema);
 
-            context.MustNotCreateSingleton();
+            operation.MustNotCreateSingleton();
         }
 
         [Fact]
         public void Should_not_throw_exception_if_creating_non_singleton_content()
         {
-            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
 
-            context.MustNotCreateSingleton();
+            operation.MustNotCreateSingleton();
         }
 
         [Fact]
         public void Should_throw_exception_if_changing_singleton_content()
         {
-            var context = CreateContext(CreateContent(Status.Draft), singletonSchema);
+            var operation = Operation(CreateContent(Status.Draft), singletonSchema);
 
-            Assert.Throws<DomainException>(() => context.MustNotChangeSingleton(Status.Archived));
+            Assert.Throws<DomainException>(() => operation.MustNotChangeSingleton(Status.Archived));
         }
 
         [Fact]
         public void Should_not_throw_exception_if_changing_singleton_to_published()
         {
-            var context = CreateContext(CreateDraftContent(Status.Published, singletonSchema.Id), singletonSchema);
+            var operation = Operation(CreateDraftContent(Status.Published, singletonSchema.Id), singletonSchema);
 
-            context.MustNotChangeSingleton(Status.Published);
+            operation.MustNotChangeSingleton(Status.Published);
         }
 
         [Fact]
         public void Should_not_throw_exception_if_changing_non_singleton_content()
         {
-            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
 
-            context.MustNotChangeSingleton(Status.Archived);
+            operation.MustNotChangeSingleton(Status.Archived);
         }
 
         [Fact]
         public void Should_throw_exception_if_deleting_singleton_content()
         {
-            var context = CreateContext(CreateContent(Status.Draft), singletonSchema);
+            var operation = Operation(CreateContent(Status.Draft), singletonSchema);
 
-            Assert.Throws<DomainException>(() => context.MustNotDeleteSingleton());
+            Assert.Throws<DomainException>(() => operation.MustNotDeleteSingleton());
         }
 
         [Fact]
         public void Should_not_throw_exception_if_deleting_non_singleton_content()
         {
-            var context = CreateContext(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft, singletonSchema.Id), normalSchema);
 
-            context.MustNotDeleteSingleton();
+            operation.MustNotDeleteSingleton();
         }
 
         [Fact]
         public void Should_throw_exception_if_draft_already_created()
         {
-            var context = CreateContext(CreateDraftContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateDraftContent(Status.Draft), normalSchema);
 
-            Assert.Throws<DomainException>(() => context.MustCreateDraft());
+            Assert.Throws<DomainException>(() => operation.MustCreateDraft());
         }
 
         [Fact]
         public void Should_throw_exception_if_draft_cannot_be_created()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            Assert.Throws<DomainException>(() => context.MustCreateDraft());
+            Assert.Throws<DomainException>(() => operation.MustCreateDraft());
         }
 
         [Fact]
         public void Should_not_throw_exception_if_draft_can_be_created()
         {
-            var context = CreateContext(CreateContent(Status.Published), normalSchema);
+            var operation = Operation(CreateContent(Status.Published), normalSchema);
 
-            context.MustCreateDraft();
+            operation.MustCreateDraft();
         }
 
         [Fact]
         public void Should_throw_exception_if_draft_cannot_be_deleted()
         {
-            var context = CreateContext(CreateContent(Status.Published), normalSchema);
+            var operation = Operation(CreateContent(Status.Published), normalSchema);
 
-            Assert.Throws<DomainException>(() => context.MustDeleteDraft());
+            Assert.Throws<DomainException>(() => operation.MustDeleteDraft());
         }
 
         [Fact]
         public void Should_not_throw_exception_if_draft_can_be_deleted()
         {
-            var context = CreateContext(CreateDraftContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateDraftContent(Status.Draft), normalSchema);
 
-            context.MustDeleteDraft();
+            operation.MustDeleteDraft();
         }
 
         [Fact]
         public void Should_throw_exception_if_data_is_not_defined()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            Assert.Throws<ValidationException>(() => context.MustHaveData(null));
+            Assert.Throws<ValidationException>(() => operation.MustHaveData(null));
         }
 
         [Fact]
         public void Should_not_throw_exception_if_data_is_defined()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            context.MustHaveData(new ContentData());
+            operation.MustHaveData(new ContentData());
         }
 
         [Fact]
         public async Task Should_provide_initial_status()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.GetInitialStatusAsync(context.Schema))
+            A.CallTo(() => contentWorkflow.GetInitialStatusAsync(operation.Schema))
                 .Returns(Status.Archived);
 
-            Assert.Equal(Status.Archived, await context.GetInitialStatusAsync());
+            Assert.Equal(Status.Archived, await operation.GetInitialStatusAsync());
         }
 
         [Fact]
         public async Task Should_throw_exception_if_workflow_permits_update()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(context.Content, context.Content.EditingStatus(), context.User))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot, operation.Snapshot.EditingStatus(), operation.User))
                 .Returns(false);
 
-            await Assert.ThrowsAsync<DomainException>(() => context.CheckUpdateAsync());
+            await Assert.ThrowsAsync<DomainException>(() => operation.CheckUpdateAsync());
         }
 
         [Fact]
         public async Task Should_not_throw_exception_if_workflow_allows_update()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.CanUpdateAsync(context.Content, context.Content.EditingStatus(), context.User))
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot, operation.Snapshot.EditingStatus(), operation.User))
                 .Returns(true);
 
-            await context.CheckUpdateAsync();
+            await operation.CheckUpdateAsync();
         }
 
         [Fact]
         public async Task Should_throw_exception_if_workflow_status_not_valid()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)context.Content, Status.Archived))
+            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)operation.Snapshot, Status.Archived))
                 .Returns(Task.FromResult<StatusInfo?>(null));
 
-            await Assert.ThrowsAsync<ValidationException>(() => context.CheckStatusAsync(Status.Archived));
+            await Assert.ThrowsAsync<ValidationException>(() => operation.CheckStatusAsync(Status.Archived));
         }
 
         [Fact]
         public async Task Should_not_throw_exception_if_workflow_status_is_valid()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)context.Content, Status.Archived))
+            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)operation.Snapshot, Status.Archived))
                 .Returns(new StatusInfo(Status.Archived, StatusColors.Archived));
 
-            await context.CheckStatusAsync(Status.Archived);
+            await operation.CheckStatusAsync(Status.Archived);
         }
 
         [Fact]
         public async Task Should_not_throw_exception_if_workflow_status_is_checked_for_singleton()
         {
-            var context = CreateContext(CreateContent(Status.Draft), singletonSchema);
+            var operation = Operation(CreateContent(Status.Draft), singletonSchema);
 
-            await context.CheckStatusAsync(Status.Archived);
+            await operation.CheckStatusAsync(Status.Archived);
 
-            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)context.Content, Status.Archived))
+            A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)operation.Snapshot, Status.Archived))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_throw_exception_if_workflow_transition_not_valid()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)context.Content, Status.Draft, Status.Archived, context.User))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)operation.Snapshot, Status.Draft, Status.Archived, operation.User))
                 .Returns(false);
 
-            await Assert.ThrowsAsync<ValidationException>(() => context.CheckTransitionAsync(Status.Archived));
+            await Assert.ThrowsAsync<ValidationException>(() => operation.CheckTransitionAsync(Status.Archived));
         }
 
         [Fact]
         public async Task Should_not_throw_exception_if_workflow_transition_is_valid()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)context.Content, Status.Draft, Status.Archived, context.User))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)operation.Snapshot, Status.Draft, Status.Archived, operation.User))
                 .Returns(true);
 
-            await context.CheckTransitionAsync(Status.Archived);
+            await operation.CheckTransitionAsync(Status.Archived);
         }
 
         [Fact]
         public async Task Should_not_throw_exception_if_workflow_transition_is_checked_for_singleton()
         {
-            var context = CreateContext(CreateContent(Status.Draft), singletonSchema);
+            var operation = Operation(CreateContent(Status.Draft), singletonSchema);
 
-            await context.CheckTransitionAsync(Status.Archived);
+            await operation.CheckTransitionAsync(Status.Archived);
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)context.Content, A<Status>._, A<Status>._, A<ClaimsPrincipal>._))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync((ContentEntity)operation.Snapshot, A<Status>._, A<Status>._, A<ClaimsPrincipal>._))
                 .MustNotHaveHappened();
         }
 
@@ -307,49 +307,71 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             var userPermission = Permissions.ForApp(Permissions.AppContentsDelete, appId.Name, schemaId.Name).Id;
             var userObject = Mocks.FrontendUser(permission: userPermission);
 
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema, userObject);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema, userObject);
 
-            ((ContentEntity)context.Content).CreatedBy = RefToken.User("456");
+            ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
 
-            context.MustHavePermission(Permissions.AppContentsDelete);
+            operation.MustHavePermission(Permissions.AppContentsDelete);
         }
 
         [Fact]
         public void Should_not_throw_exception_if_content_is_from_current_user()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            ((ContentEntity)context.Content).CreatedBy = actor;
+            ((ContentEntity)operation.Snapshot).CreatedBy = actor;
 
-            context.MustHavePermission(Permissions.AppContentsDelete);
+            operation.MustHavePermission(Permissions.AppContentsDelete);
         }
 
         [Fact]
         public void Should_not_throw_exception_if_user_is_null()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema, null);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema, null);
 
-            ((ContentEntity)context.Content).CreatedBy = RefToken.User("456");
+            ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
 
-            context.MustHavePermission(Permissions.AppContentsDelete);
+            operation.MustHavePermission(Permissions.AppContentsDelete);
         }
 
         [Fact]
         public void Should_throw_exception_if_content_is_from_another_user_and_user_has_no_permission()
         {
-            var context = CreateContext(CreateContent(Status.Draft), normalSchema);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-            ((ContentEntity)context.Content).CreatedBy = RefToken.User("456");
+            ((ContentEntity)operation.Snapshot).CreatedBy = RefToken.User("456");
 
-            Assert.Throws<DomainForbiddenException>(() => context.MustHavePermission(Permissions.AppContentsDelete));
+            Assert.Throws<DomainForbiddenException>(() => operation.MustHavePermission(Permissions.AppContentsDelete));
         }
 
-        private OperationContext CreateContext(ContentEntity content, ISchemaEntity contextSchema)
+        [Fact]
+        public async Task Should_throw_exception_if_referenced()
         {
-            return CreateContext(content, contextSchema, user);
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
+                .Returns(true);
+
+            await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
         }
 
-        private OperationContext CreateContext(ContentEntity content, ISchemaEntity contextSchema, ClaimsPrincipal? currentUser)
+        [Fact]
+        public async Task Should_not_throw_exception_if_not_referenced()
+        {
+            var operation = Operation(CreateContent(Status.Draft), normalSchema);
+
+            A.CallTo(() => contentRepository.HasReferrersAsync(appId.Id, operation.CommandId, SearchScope.All, default))
+                .Returns(true);
+
+            await Assert.ThrowsAsync<DomainException>(() => operation.CheckReferrersAsync());
+        }
+
+        private ContentOperation Operation(ContentEntity content, ISchemaEntity operationSchema)
+        {
+            return Operation(content, operationSchema, Mocks.FrontendUser());
+        }
+
+        private ContentOperation Operation(ContentEntity content, ISchemaEntity operationSchema, ClaimsPrincipal? currentUser)
         {
             var serviceProvider =
                 new ServiceCollection()
@@ -357,14 +379,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                     .AddSingleton(contentWorkflow)
                     .BuildServiceProvider();
 
-            return new OperationContext(serviceProvider)
+            return new ContentOperation(serviceProvider, () => content)
             {
-                Actor = actor,
                 App = Mocks.App(appId),
-                ContentProvider = () => content,
-                ContentId = content.Id,
-                Schema = contextSchema,
-                User = currentUser
+                Command = new CreateContent { User = currentUser, Actor = actor },
+                CommandId = content.Id,
+                Schema = operationSchema
             };
         }
 

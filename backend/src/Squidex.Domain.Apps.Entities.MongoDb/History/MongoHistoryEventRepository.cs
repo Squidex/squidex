@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                     Index
                         .Ascending(x => x.AppId)
                         .Descending(x => x.Created)
-                        .Descending(x => x.Version)),
+                        .Descending(x => x.Version))
             }, ct);
         }
 

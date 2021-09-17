@@ -35,17 +35,28 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public static JsonArray Array<T>(IEnumerable<T> values)
         {
-            return new JsonArray(values?.OfType<object>());
+            var source = values?.OfType<object?>().Select(Create).ToList() ?? new List<IJsonValue>();
+
+            return new JsonArray(source);
         }
 
         public static JsonArray Array<T>(params T?[] values)
         {
-            return new JsonArray(values?.OfType<object>());
+            var source = values?.OfType<object?>().Select(Create).ToList() ?? new List<IJsonValue>();
+
+            return new JsonArray(source);
         }
 
         public static JsonObject Object()
         {
             return new JsonObject();
+        }
+
+        public static JsonObject Object<T>(IReadOnlyDictionary<string, T> values)
+        {
+            var source = values?.ToDictionary(x => x.Key, x => Create(x.Value)) ?? new Dictionary<string, IJsonValue>();
+
+            return new JsonObject(source);
         }
 
         public static IJsonValue Create(object? value)
@@ -80,6 +91,10 @@ namespace Squidex.Infrastructure.Json.Objects
                     return Create(i);
                 case Instant i:
                     return Create(i);
+                case object[] array:
+                    return Array(array);
+                case IReadOnlyDictionary<string, object?> obj:
+                    return Object(obj);
             }
 
             throw new ArgumentException("Invalid json type");

@@ -11,6 +11,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class ConfigurePreviewUrls : SchemaUpdateCommand
     {
-        public ImmutableDictionary<string, string> PreviewUrls { get; set; }
+        public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
     }
 }

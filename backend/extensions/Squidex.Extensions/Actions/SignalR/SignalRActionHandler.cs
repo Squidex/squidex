@@ -61,7 +61,7 @@ namespace Squidex.Extensions.Actions.SignalR
                 HubName = hubName,
                 MethodName = action.MethodName,
                 MethodPayload = requestBody,
-                Targets = target.Split("\n"),
+                Targets = target.Split("\n")
             };
 
             return (ruleDescription, ruleJob);

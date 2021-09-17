@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { AnalyticsService, ApiUrlConfig, AppDto, AppsService, DateTime, ErrorDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
-import { AppSettingsDto, EditorDto, PatternDto } from './apps.service';
+import { AppSettingsDto, AssetScriptsDto, AssetScriptsPayload, EditorDto, PatternDto } from './apps.service';
 
 describe('AppsService', () => {
     const version = new Version('1');
@@ -71,10 +71,10 @@ describe('AppsService', () => {
 
     it('should make get request to get app settings',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
-            let app: AppSettingsDto;
+            let settings: AppSettingsDto;
 
             appsService.getSettings('my-app').subscribe(result => {
-                app = result;
+                settings = result;
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
@@ -84,7 +84,7 @@ describe('AppsService', () => {
 
             req.flush(appSettingsResponse(12));
 
-            expect(app!).toEqual(createAppSettings(12));
+            expect(settings!).toEqual(createAppSettings(12));
         }));
 
     it('should make put request to update app settings',
@@ -95,10 +95,10 @@ describe('AppsService', () => {
                 },
             };
 
-            let app: AppSettingsDto;
+            let settings: AppSettingsDto;
 
-            appsService.putSettings(resource, {} as any, version).subscribe(result => {
-                app = result;
+            appsService.putSettings('my-app', resource, {} as any, version).subscribe(result => {
+                settings = result;
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/settings');
@@ -108,7 +108,57 @@ describe('AppsService', () => {
 
             req.flush(appSettingsResponse(12));
 
-            expect(app!).toEqual(createAppSettings(12));
+            expect(settings!).toEqual(createAppSettings(12));
+        }));
+
+    it('should make get request to get asset scripts',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            let settings: AssetScriptsDto;
+
+            appsService.getAssetScripts('my-app').subscribe(result => {
+                settings = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/scripts');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush(assetScriptsResponse(12), {
+                headers: {
+                    etag: '2',
+                },
+            });
+
+            expect(settings!).toEqual({ payload: createAssetScripts(12), version: new Version('2') });
+        }));
+
+    it('should make put request to update asset scripts',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const resource: Resource = {
+                _links: {
+                    update: { method: 'PUT', href: '/api/apps/my-app/assets/scripts' },
+                },
+            };
+
+            let scripts: AssetScriptsDto;
+
+            appsService.putAssetScripts('my-app', resource, {} as any, version).subscribe(result => {
+                scripts = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/scripts');
+
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+            req.flush(assetScriptsResponse(12), {
+                headers: {
+                    etag: '2',
+                },
+            });
+
+            expect(scripts!).toEqual({ payload: createAssetScripts(12), version: new Version('2') });
         }));
 
     it('should make post request to create app',
@@ -141,7 +191,7 @@ describe('AppsService', () => {
 
             let app: AppDto;
 
-            appsService.putApp(resource, { }, version).subscribe(result => {
+            appsService.putApp('my-app', resource, { }, version).subscribe(result => {
                 app = result;
             });
 
@@ -165,7 +215,7 @@ describe('AppsService', () => {
 
             let app: AppDto;
 
-            appsService.postAppImage(resource, null!, version).subscribe(result => {
+            appsService.postAppImage('my-app', resource, null!, version).subscribe(result => {
                 app = <AppDto>result;
             });
 
@@ -190,7 +240,7 @@ describe('AppsService', () => {
             let app: AppDto;
             let error: ErrorDto;
 
-            appsService.postAppImage(resource, null!, version).subscribe(result => {
+            appsService.postAppImage('my-app', resource, null!, version).subscribe(result => {
                 app = <AppDto>result;
             }, e => {
                 error = e;
@@ -217,7 +267,7 @@ describe('AppsService', () => {
 
             let app: AppDto;
 
-            appsService.deleteAppImage(resource, version).subscribe(result => {
+            appsService.deleteAppImage('my-app', resource, version).subscribe(result => {
                 app = result;
             });
 
@@ -239,7 +289,7 @@ describe('AppsService', () => {
                 },
             };
 
-            appsService.deleteApp(resource).subscribe();
+            appsService.deleteApp('my-app', resource).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/me');
 
@@ -257,7 +307,7 @@ describe('AppsService', () => {
                 },
             };
 
-            appsService.deleteApp(resource).subscribe();
+            appsService.deleteApp('my-app', resource).subscribe();
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app');
 
@@ -313,6 +363,17 @@ describe('AppsService', () => {
             },
         };
     }
+
+    function assetScriptsResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
+
+        return {
+            update: key,
+            _links: {
+                update: { method: 'PUT', href: `apps/${id}/assets/scripts` },
+            },
+        };
+    }
 });
 
 export function createApp(id: number, suffix = '') {
@@ -357,6 +418,20 @@ export function createAppSettings(id: number, suffix = '') {
             return new EditorDto(name, `${name}_url`);
         }),
         new Version(key));
+}
+
+export function createAssetScripts(id: number, suffix = ''): AssetScriptsPayload {
+    const key = `${id}${suffix}`;
+
+    return {
+        scripts: {
+            update: key,
+        },
+        _links: {
+            update: { method: 'PUT', href: `apps/${id}/assets/scripts` },
+        },
+        canUpdate: true,
+    };
 }
 
 function createProperties(id: number) {

@@ -184,6 +184,15 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
+        public void Should_create_array_from_object_source()
+        {
+            var json = JsonValue.Create(new object[] { 1, "2" });
+
+            Assert.Equal("[1, \"2\"]", json.ToJsonString());
+            Assert.Equal("[1, \"2\"]", json.ToString());
+        }
+
+        [Fact]
         public void Should_create_array_from_source()
         {
             var json = JsonValue.Array<object>(1, "2");
@@ -203,6 +212,15 @@ namespace Squidex.Infrastructure.Json.Objects
         public void Should_create_object()
         {
             var json = JsonValue.Object().Add("key1", 1).Add("key2", "2");
+
+            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToJsonString());
+            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToString());
+        }
+
+        [Fact]
+        public void Should_create_object_from_clr_source()
+        {
+            var json = JsonValue.Create(new Dictionary<string, object> { ["key1"] = 1, ["key2"] = "2" });
 
             Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToJsonString());
             Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToString());

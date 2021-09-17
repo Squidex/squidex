@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Queries.Json
         private static readonly CompareOperator[] GeoOperators =
         {
             CompareOperator.LessThan,
-            CompareOperator.Exists,
+            CompareOperator.Exists
         };
 
         public static bool IsAllowedOperator(JsonSchema schema, CompareOperator compareOperator)

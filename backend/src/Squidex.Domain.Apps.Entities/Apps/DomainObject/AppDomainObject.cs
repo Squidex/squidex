@@ -113,6 +113,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return Snapshot;
                     });
 
+                case ConfigureAssetScripts configureAssetScripts:
+                    return UpdateReturn(configureAssetScripts, c =>
+                    {
+                        GuardApp.CanUpdateAssetScripts(c);
+
+                        ConfigureAssetScripts(c);
+
+                        return Snapshot;
+                    });
+
                 case AssignContributor assignContributor:
                     return UpdateReturnAsync(assignContributor, async c =>
                     {
@@ -343,6 +353,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private void UpdateSettings(UpdateAppSettings command)
         {
             Raise(command, new AppSettingsUpdated());
+        }
+
+        private void ConfigureAssetScripts(ConfigureAssetScripts command)
+        {
+            Raise(command, new AppAssetsScriptsConfigured());
         }
 
         private void UpdateClient(UpdateClient command)

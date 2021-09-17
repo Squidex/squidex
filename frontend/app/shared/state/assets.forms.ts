@@ -194,6 +194,18 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
     }
 }
 
+export class EditAssetScriptsForm extends Form<FormGroup, {}, object> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            annotate: '',
+            create: '',
+            delete: '',
+            move: '',
+            update: '',
+        }));
+    }
+}
+
 export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto, AssetFolderDto> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

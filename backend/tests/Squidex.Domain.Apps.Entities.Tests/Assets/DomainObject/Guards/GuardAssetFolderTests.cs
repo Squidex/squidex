@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -22,136 +24,138 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly RefToken actor = RefToken.User("123");
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_folder_name_not_defined()
+        public void Should_throw_exception_if_folder_name_not_defined()
         {
-            var command = new CreateAssetFolder { AppId = appId };
+            var operation = Operation(CreateAssetFolder());
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
-                .Returns(new List<IAssetFolderEntity>());
-
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanCreate(command, assetQuery),
+            ValidationAssert.Throws(() => operation.MustHaveName(null!),
                 new ValidationError("Folder name is required.", "FolderName"));
         }
 
         [Fact]
-        public async Task CanCreate_should_throw_exception_if_folder_not_found()
+        public void Should_not_throw_exception_if_folder_name_defined()
         {
-            var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder", ParentId = DomainId.NewGuid() };
+            var operation = Operation(CreateAssetFolder());
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
+            operation.MustHaveName("Folder");
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_moving_to_invalid_folder()
+        {
+            var parentId = DomainId.NewGuid();
+
+            var operation = Operation(CreateAssetFolder());
+
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity>());
 
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanCreate(command, assetQuery),
+            await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId),
                 new ValidationError("Asset folder does not exist.", "ParentId"));
         }
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_folder_found()
+        public async Task Should_not_throw_exception_if_moving_to_valid_folder()
         {
-            var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder", ParentId = DomainId.NewGuid() };
+            var parentId = DomainId.NewGuid();
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
-                .Returns(new List<IAssetFolderEntity> { AssetFolder() });
+            var operation = Operation(CreateAssetFolder());
 
-            await GuardAssetFolder.CanCreate(command, assetQuery);
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
+                .Returns(new List<IAssetFolderEntity> { CreateAssetFolder() });
+
+            await operation.MustMoveToValidFolder(parentId);
         }
 
         [Fact]
-        public async Task CanCreate_should_not_throw_exception_if_added_to_root()
+        public async Task Should_not_throw_exception_if_moving_to_same_folder()
         {
-            var command = new CreateAssetFolder { AppId = appId, FolderName = "My Folder" };
+            var parentId = DomainId.NewGuid();
 
-            await GuardAssetFolder.CanCreate(command, assetQuery);
+            var operation = Operation(CreateAssetFolder(default, parentId));
+
+            await operation.MustMoveToValidFolder(parentId);
+
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, default))
+                .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task CanMove_should_throw_exception_if_adding_to_its_own_child()
+        public async Task Should_not_throw_exception_if_moving_to_root()
         {
-            var id = DomainId.NewGuid();
+            var parentId = DomainId.Empty;
 
-            var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
+            var operation = Operation(CreateAssetFolder());
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
+            await operation.MustMoveToValidFolder(parentId);
+
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, A<DomainId>._, A<CancellationToken>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_moving_its_own_child()
+        {
+            var parentId = DomainId.NewGuid();
+
+            var operation = Operation(CreateAssetFolder());
+
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity>
                 {
-                    AssetFolder(id),
-                    AssetFolder(command.ParentId)
+                    CreateAssetFolder(operation.CommandId),
+                    CreateAssetFolder(parentId, operation.CommandId)
                 });
 
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, AssetFolder(id), assetQuery),
+            await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId),
                 new ValidationError("Cannot add folder to its own child.", "ParentId"));
         }
 
-        [Fact]
-        public async Task CanMove_should_throw_exception_if_folder_not_found()
+        private AssetFolderOperation Operation(IAssetFolderEntity assetFolder)
         {
-            var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
-
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
-                .Returns(new List<IAssetFolderEntity>());
-
-            await ValidationAssert.ThrowsAsync(() => GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery),
-                new ValidationError("Asset folder does not exist.", "ParentId"));
+            return Operation(assetFolder, Mocks.FrontendUser());
         }
 
-        [Fact]
-        public async Task CanMove_should_not_throw_exception_if_folder_found()
+        private AssetFolderOperation Operation(IAssetFolderEntity assetFolder, ClaimsPrincipal? currentUser)
         {
-            var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
+            var serviceProvider =
+                new ServiceCollection()
+                    .AddSingleton(assetQuery)
+                    .BuildServiceProvider();
 
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(appId.Id, command.ParentId, A<CancellationToken>._))
-                .Returns(new List<IAssetFolderEntity> { AssetFolder() });
-
-            await GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery);
+            return new AssetFolderOperation(serviceProvider, () => assetFolder)
+            {
+                App = Mocks.App(appId),
+                CommandId = assetFolder.Id,
+                Command = new CreateAssetFolder { User = currentUser, Actor = actor }
+            };
         }
 
-        [Fact]
-        public async Task CanMove_should_not_throw_exception_if_folder_has_not_changed()
-        {
-            var command = new MoveAssetFolder { AppId = appId, ParentId = DomainId.NewGuid() };
-
-            await GuardAssetFolder.CanMove(command, AssetFolder(parentId: command.ParentId), assetQuery);
-        }
-
-        [Fact]
-        public async Task CanMove_should_not_throw_exception_if_added_to_root()
-        {
-            var command = new MoveAssetFolder { AppId = appId };
-
-            await GuardAssetFolder.CanMove(command, AssetFolder(), assetQuery);
-        }
-
-        [Fact]
-        public void CanRename_should_throw_exception_if_folder_name_is_empty()
-        {
-            var command = new RenameAssetFolder { AppId = appId };
-
-            ValidationAssert.Throws(() => GuardAssetFolder.CanRename(command),
-                new ValidationError("Folder name is required.", "FolderName"));
-        }
-
-        [Fact]
-        public void CanRename_should_not_throw_exception_if_names_are_different()
-        {
-            var command = new RenameAssetFolder { AppId = appId, FolderName = "New Folder Name" };
-
-            GuardAssetFolder.CanRename(command);
-        }
-
-        private IAssetFolderEntity AssetFolder(DomainId id = default, DomainId parentId = default)
+        private IAssetFolderEntity CreateAssetFolder(DomainId id = default, DomainId parentId = default)
         {
             var assetFolder = A.Fake<IAssetFolderEntity>();
 
             A.CallTo(() => assetFolder.Id)
-                .Returns(id == default ? DomainId.NewGuid() : id);
+                .Returns(OrNew(id));
             A.CallTo(() => assetFolder.AppId)
                 .Returns(appId);
             A.CallTo(() => assetFolder.ParentId)
-                .Returns(parentId == default ? DomainId.NewGuid() : parentId);
+                .Returns(OrNew(parentId));
 
             return assetFolder;
+        }
+
+        private static DomainId OrNew(DomainId parentId)
+        {
+            if (parentId == default)
+            {
+                parentId = DomainId.NewGuid();
+            }
+
+            return parentId;
         }
     }
 }

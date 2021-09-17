@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -48,6 +48,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
         }
 
         public static void CanRemoveImage(RemoveAppImage command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
+        public static void CanUpdateAssetScripts(ConfigureAssetScripts command)
         {
             Guard.NotNull(command, nameof(command));
         }
