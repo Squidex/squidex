@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     case CreateApp create:
                         await OnCreateAsync(create);
                         break;
-                    case ArchiveApp delete:
+                    case DeleteApp delete:
                         await OnDeleteAsync(delete);
                         break;
                     case AppUpdateCommand update:
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             await Cache().AddAsync(create.AppId, create.Name);
         }
 
-        private async Task OnDeleteAsync(ArchiveApp delete)
+        private async Task OnDeleteAsync(DeleteApp delete)
         {
             await InvalidateItAsync(delete.AppId.Id, delete.AppId.Name);
 
@@ -245,7 +245,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var app = (await grainFactory.GetGrain<IAppGrain>(id.ToString()).GetStateAsync()).Value;
 
-            if (app.Version <= EtagVersion.Empty || (app.IsArchived && !allowArchived))
+            if (app.Version <= EtagVersion.Empty || (app.IsDeleted && !allowArchived))
             {
                 return null;
             }

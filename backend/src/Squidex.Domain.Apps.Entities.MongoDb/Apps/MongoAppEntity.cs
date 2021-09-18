@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             users.AddRange(Document.Clients.Keys);
 
             IndexedUserIds = users.ToArray();
-            IndexedDeleted = Document.IsArchived;
+            IndexedDeleted = Document.IsDeleted;
             IndexedName = Document.Name;
         }
     }

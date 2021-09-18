@@ -329,11 +329,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Archive the app.
+        /// Delete the app.
         /// </summary>
-        /// <param name="app">The name of the app to archive.</param>
+        /// <param name="app">The name of the app to delete.</param>
         /// <returns>
-        /// 204 => App archived.
+        /// 204 => App deleted.
         /// 404 => App not found.
         /// </returns>
         [HttpDelete]
@@ -342,7 +342,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {
-            await CommandBus.PublishAsync(new ArchiveApp());
+            await CommandBus.PublishAsync(new DeleteApp());
 
             return NoContent();
         }

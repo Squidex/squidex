@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 new TypeNameRegistry()
                     .Map(typeof(AppCreated))
                     .Map(typeof(AppContributorRemoved))
-                    .Map(typeof(AppArchived));
+                    .Map(typeof(AppDeleted));
 
             sut = new AppPermanentDeleter(new[] { deleter1, deleter2 }, grainFactory, typeNameRegistry);
         }
@@ -63,11 +63,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public void Should_handle_archive_event()
+        public void Should_handle_delete_event()
         {
             var storedEvent =
                 new StoredEvent("stream", "1", 1,
-                    new EventData(typeNameRegistry.GetName<AppArchived>(), new EnvelopeHeaders(), "payload"));
+                    new EventData(typeNameRegistry.GetName<AppDeleted>(), new EnvelopeHeaders(), "payload"));
 
             Assert.True(sut.Handles(storedEvent));
         }
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_deleters_when_app_archive()
+        public async Task Should_call_deleters_when_app_deleted()
         {
             var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => grainFactory.GetGrain<IAppGrain>(app.Id.ToString(), null))
                 .Returns(grain);
 
-            await sut.On(Envelope.Create(new AppArchived
+            await sut.On(Envelope.Create(new AppDeleted
             {
                 AppId = app.NamedId()
             }));

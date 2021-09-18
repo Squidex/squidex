@@ -87,18 +87,16 @@
                 <div class="card card-body">
                     <div class="row">
                         <div class="col">
-                            <h5>{{ 'apps.archive' | sqxTranslate }}</h5>
+                            <h5>{{ 'apps.delete' | sqxTranslate }}</h5>
         
-                            <sqx-form-hint>
-                                {{ 'apps.archiveWarning' | sqxTranslate }}
-                            </sqx-form-hint>
+                            <small>{{ 'apps.deleteWarning' | sqxTranslate }}</small>
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
-                                (sqxConfirmClick)="archiveApp()"
-                                confirmTitle="i18n:apps.archiveConfirmTitle"
-                                confirmText="i18n:apps.archiveConfirmText">
-                                {{ 'apps.archive' | sqxTranslate }}
+                                (sqxConfirmClick)="deleteApp()"
+                                confirmTitle="i18n:apps.deleteConfirmTitle"
+                                confirmText="i18n:apps.deleteConfirmText">
+                                {{ 'apps.delete' | sqxTranslate }}
                             </button>
                         </div>
                     </div>

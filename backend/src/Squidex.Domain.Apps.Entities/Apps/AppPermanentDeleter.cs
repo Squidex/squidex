@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             // Compute the event types names once for performance reasons and use hashset for extensibility.
             consumingTypes = new HashSet<string>
             {
-                typeNameRegistry.GetName<AppArchived>(),
+                typeNameRegistry.GetName<AppDeleted>(),
                 typeNameRegistry.GetName<AppContributorRemoved>()
             };
         }
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             switch (@event.Payload)
             {
-                case AppArchived appArchived:
+                case AppDeleted appArchived:
                     await OnArchiveAsync(appArchived);
                     break;
                 case AppContributorRemoved appContributorRemoved:
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private async Task OnArchiveAsync(AppArchived appArchived)
+        private async Task OnArchiveAsync(AppDeleted appArchived)
         {
             using (Telemetry.Activities.StartActivity("RemoveAppFromSystem"))
             {

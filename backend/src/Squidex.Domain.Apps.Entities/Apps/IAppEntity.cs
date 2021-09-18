@@ -38,6 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         Workflows Workflows { get; }
 
-        bool IsArchived { get; }
+        bool IsDeleted { get; }
     }
 }

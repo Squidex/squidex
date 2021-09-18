@@ -176,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_return_null_if_app_archived()
+        public async Task Should_return_null_if_app_deleted()
         {
             CreateApp(isArchived: true);
 
@@ -309,11 +309,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_remove_app_from_indexes_if_app_gets_archived()
+        public async Task Should_remove_app_from_indexes_if_app_gets_deleted()
         {
             CreateApp(isArchived: true);
 
-            var command = new ArchiveApp { AppId = appId };
+            var command = new DeleteApp { AppId = appId };
 
             var context =
                 new CommandContext(command, commandBus)
@@ -353,7 +353,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .Returns(appId.Name);
             A.CallTo(() => app.Version)
                 .Returns(version);
-            A.CallTo(() => app.IsArchived)
+            A.CallTo(() => app.IsDeleted)
                 .Returns(isArchived);
             A.CallTo(() => app.Contributors)
                 .Returns(AppContributors.Empty.Assign(userId, Role.Owner));
