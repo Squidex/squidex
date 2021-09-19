@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             A.CallTo(() => app.AssetScripts)
                 .Returns(scripts);
 
-            A.CallTo(() => appProvider.GetAppAsync(AppId, false))
+            A.CallTo(() => appProvider.GetAppAsync(AppId, false, default))
                 .Returns(app);
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
