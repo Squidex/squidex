@@ -14,6 +14,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Assets;
 using Squidex.Assets.ImageSharp;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
@@ -56,6 +57,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RebuildFiles>()
                 .AsSelf();
 
+            services.AddTransientAs<AssetTagsDeleter>()
+                .As<IDeleter>();
+
             services.AddTransientAs<AssetHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
@@ -63,7 +67,7 @@ namespace Squidex.Config.Domain
                 .As<ISearchSource>();
 
             services.AddSingletonAs<DefaultAssetFileStore>()
-                .As<IAssetFileStore>();
+                .As<IAssetFileStore>().As<IDeleter>();
 
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
@@ -75,7 +79,7 @@ namespace Squidex.Config.Domain
                 .As<IAssetLoader>();
 
             services.AddSingletonAs<AssetUsageTracker>()
-                .As<IAssetUsageTracker>().As<IEventConsumer>();
+                .As<IAssetUsageTracker>().As<IEventConsumer>().As<IDeleter>();
 
             services.AddSingletonAs<FileTypeAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
@@ -108,22 +112,28 @@ namespace Squidex.Config.Domain
                 },
                 ["GoogleCloud"] = () =>
                 {
-                    var bucketName = config.GetRequiredValue("assetStore:googleCloud:bucket");
+                    var options = new GoogleCloudAssetOptions
+                    {
+                        BucketName = config.GetRequiredValue("assetStore:googleCloud:bucket")
+                    };
 
-                    services.AddSingletonAs(c => new GoogleCloudAssetStore(bucketName))
+                    services.AddSingletonAs(c => new GoogleCloudAssetStore(options))
                         .As<IAssetStore>();
                 },
                 ["AzureBlob"] = () =>
                 {
-                    var connectionString = config.GetRequiredValue("assetStore:azureBlob:connectionString");
-                    var containerName = config.GetRequiredValue("assetStore:azureBlob:containerName");
+                    var options = new AzureBlobAssetOptions
+                    {
+                        ConnectionString = config.GetRequiredValue("assetStore:azureBlob:connectionString"),
+                        ContainerName = config.GetRequiredValue("assetStore:azureBlob:containerName")
+                    };
 
-                    services.AddSingletonAs(c => new AzureBlobAssetStore(connectionString, containerName))
+                    services.AddSingletonAs(c => new AzureBlobAssetStore(options))
                         .As<IAssetStore>();
                 },
                 ["AmazonS3"] = () =>
                 {
-                    var amazonS3Options = config.GetSection("assetStore:amazonS3").Get<AmazonS3Options>() ?? new ();
+                    var amazonS3Options = config.GetSection("assetStore:amazonS3").Get<AmazonS3AssetOptions>() ?? new ();
 
                     services.AddSingletonAs(c => new AmazonS3AssetStore(amazonS3Options))
                         .As<IAssetStore>();
@@ -156,13 +166,16 @@ namespace Squidex.Config.Domain
                     var username = config.GetRequiredValue("assetStore:ftp:username");
                     var password = config.GetRequiredValue("assetStore:ftp:password");
 
-                    var path = config.GetOptionalValue("assetStore:ftp:path", "/");
+                    var options = new FTPAssetOptions
+                    {
+                        Path = config.GetOptionalValue("assetStore:ftp:path", "/")
+                    };
 
                     services.AddSingletonAs(c =>
                         {
                             var factory = new Func<FtpClient>(() => new FtpClient(serverHost, serverPort, username, password));
 
-                            return new FTPAssetStore(factory, path, c.GetRequiredService<ILogger<FTPAssetStore>>());
+                            return new FTPAssetStore(factory, options, c.GetRequiredService<ILogger<FTPAssetStore>>());
                         })
                         .As<IAssetStore>();
                 }

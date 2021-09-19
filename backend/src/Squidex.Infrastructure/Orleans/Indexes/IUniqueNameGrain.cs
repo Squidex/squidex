@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using System.Threading.Tasks;
+using Orleans;
 
-namespace Squidex.Domain.Apps.Events.Apps
+namespace Squidex.Infrastructure.Orleans.Indexes
 {
-    [EventType(nameof(AppArchived))]
-    public sealed class AppArchived : AppEvent
+    public interface IUniqueNameGrain<T> : IGrainWithStringKey
     {
+        Task<string?> ReserveAsync(T id, string name);
+
+        Task RemoveReservationAsync(string? token);
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Commands;
@@ -19,7 +20,7 @@ namespace Squidex.Web.CommandMiddlewares
         {
             if (context.Command is ContentCommand contentCommand && contentCommand is not CreateContent)
             {
-                if (contentCommand.ContentId.ToString().Equals(SingletonId))
+                if (contentCommand.ContentId.ToString().Equals(SingletonId, StringComparison.Ordinal))
                 {
                     contentCommand.ContentId = contentCommand.SchemaId.Id;
                 }

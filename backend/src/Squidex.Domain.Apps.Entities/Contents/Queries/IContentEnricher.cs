@@ -13,8 +13,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public interface IContentEnricher
     {
-        Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context, CancellationToken ct = default);
+        Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context,
+            CancellationToken ct);
 
-        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context, CancellationToken ct = default);
+        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context,
+            CancellationToken ct);
     }
 }

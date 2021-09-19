@@ -42,7 +42,7 @@ namespace Squidex.Web.Pipeline
             {
                 var isFrontend = user.IsInClient(DefaultClients.Frontend);
 
-                var app = await appProvider.GetAppAsync(appName, !isFrontend);
+                var app = await appProvider.GetAppAsync(appName, !isFrontend, context.HttpContext.RequestAborted);
 
                 if (app == null)
                 {

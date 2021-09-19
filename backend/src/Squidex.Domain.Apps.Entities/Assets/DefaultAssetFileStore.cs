@@ -6,25 +6,48 @@
 // ==========================================================================
 
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class DefaultAssetFileStore : IAssetFileStore
+    public sealed class DefaultAssetFileStore : IAssetFileStore, IDeleter
     {
         private readonly IAssetStore assetStore;
+        private readonly IAssetRepository assetRepository;
         private readonly AssetOptions options;
 
-        public DefaultAssetFileStore(IAssetStore assetStore,
+        public DefaultAssetFileStore(
+            IAssetStore assetStore,
+            IAssetRepository assetRepository,
             IOptions<AssetOptions> options)
         {
             this.assetStore = assetStore;
+            this.assetRepository = assetRepository;
 
             this.options = options.Value;
+        }
+
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            if (options.FolderPerApp)
+            {
+                await assetStore.DeleteByPrefixAsync($"{app.Id}/", ct);
+            }
+            else
+            {
+                await foreach (var asset in assetRepository.StreamAll(app.Id, ct))
+                {
+                    await DeleteAsync(app.Id, asset.Id, ct);
+                }
+            }
         }
 
         public string? GeneratePublicUrl(DomainId appId, DomainId id, long fileVersion, string? suffix)
@@ -90,64 +113,68 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assetStore.CopyAsync(tempFile, fileName, ct);
         }
 
-        public Task DeleteAsync(DomainId appId, DomainId id, long fileVersion, string? suffix)
+        public Task DeleteAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
-            var fileNameOld = GetFileName(id, fileVersion, suffix);
-            var fileNameNew = GetFileName(appId, id, fileVersion, suffix);
-
             if (options.FolderPerApp)
             {
-                return assetStore.DeleteAsync(fileNameNew);
+                return assetStore.DeleteByPrefixAsync($"{appId}/", ct);
             }
             else
             {
+                var fileNameOld = GetFileName(id);
+                var fileNameNew = GetFileName(appId, id);
+
                 return Task.WhenAll(
-                    assetStore.DeleteAsync(fileNameOld),
-                    assetStore.DeleteAsync(fileNameNew));
+                    assetStore.DeleteByPrefixAsync(fileNameOld, ct),
+                    assetStore.DeleteByPrefixAsync(fileNameNew, ct));
             }
         }
 
-        public Task DeleteAsync(string tempFile)
+        public Task DeleteAsync(string tempFile,
+            CancellationToken ct = default)
         {
-            return assetStore.DeleteAsync(tempFile);
+            return assetStore.DeleteAsync(tempFile, ct);
         }
 
-        private static string GetFileName(DomainId id, long fileVersion, string? suffix)
+        private string GetFileName(DomainId id, long fileVersion = -1, string? suffix = null)
         {
+            return GetFileName(default, id, fileVersion, suffix);
+        }
+
+        private string GetFileName(DomainId appId, DomainId id, long fileVersion = -1, string? suffix = null)
+        {
+            var sb = new StringBuilder(20);
+
+            if (appId != default)
+            {
+                sb.Append(appId);
+
+                if (options.FolderPerApp)
+                {
+                    sb.Append('/');
+                }
+                else
+                {
+                    sb.Append('_');
+                }
+            }
+
+            sb.Append(id);
+
+            if (fileVersion >= 0)
+            {
+                sb.Append('_');
+                sb.Append(fileVersion);
+            }
+
             if (!string.IsNullOrWhiteSpace(suffix))
             {
-                return $"{id}_{fileVersion}_{suffix}";
+                sb.Append('_');
+                sb.Append(suffix);
             }
-            else
-            {
-                return $"{id}_{fileVersion}";
-            }
-        }
 
-        private string GetFileName(DomainId appId, DomainId id, long fileVersion, string? suffix)
-        {
-            if (options.FolderPerApp)
-            {
-                if (!string.IsNullOrWhiteSpace(suffix))
-                {
-                    return $"derived/{appId}/{id}_{fileVersion}_{suffix}";
-                }
-                else
-                {
-                    return $"{appId}/{id}_{fileVersion}";
-                }
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(suffix))
-                {
-                    return $"{appId}_{id}_{fileVersion}_{suffix}";
-                }
-                else
-                {
-                    return $"{appId}_{id}_{fileVersion}";
-                }
-            }
+            return sb.ToString();
         }
     }
 }

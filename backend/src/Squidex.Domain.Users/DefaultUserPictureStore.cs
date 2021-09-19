@@ -21,14 +21,16 @@ namespace Squidex.Domain.Users
             this.assetStore = assetStore;
         }
 
-        public Task UploadAsync(string userId, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string userId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(userId);
 
             return assetStore.UploadAsync(fileName, stream, true, ct);
         }
 
-        public Task DownloadAsync(string userId, Stream stream, CancellationToken ct = default)
+        public Task DownloadAsync(string userId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(userId);
 

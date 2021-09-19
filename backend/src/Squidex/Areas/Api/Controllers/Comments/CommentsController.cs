@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
                 return CommentsDto.FromResult(result);
             });
 
-            Response.Headers[HeaderNames.ETag] = result.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = result.Version.ToString(CultureInfo.InvariantCulture);
 
             return Ok(response);
         }

@@ -50,6 +50,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 cancellationToken: ct);
         }
 
+        public async Task DeleteAppAsync(DomainId appId,
+            CancellationToken ct)
+        {
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, appId), ct);
+        }
+
         public async Task<IReadOnlyList<RuleStatistics>> QueryByAppAsync(DomainId appId,
             CancellationToken ct)
         {
@@ -58,7 +64,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return statistics;
         }
 
-        public Task IncrementSuccess(DomainId appId, DomainId ruleId, Instant now)
+        public Task IncrementSuccessAsync(DomainId appId, DomainId ruleId, Instant now,
+            CancellationToken ct)
         {
             return Collection.UpdateOneAsync(
                 x => x.AppId == appId && x.RuleId == ruleId,
@@ -67,10 +74,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Set(x => x.LastExecuted, now)
                     .SetOnInsert(x => x.AppId, appId)
                     .SetOnInsert(x => x.RuleId, ruleId),
-                Upsert);
+                Upsert, ct);
         }
 
-        public Task IncrementFailed(DomainId appId, DomainId ruleId, Instant now)
+        public Task IncrementFailedAsync(DomainId appId, DomainId ruleId, Instant now,
+            CancellationToken ct)
         {
             return Collection.UpdateOneAsync(
                 x => x.AppId == appId && x.RuleId == ruleId,
@@ -79,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                     .Set(x => x.LastExecuted, now)
                     .SetOnInsert(x => x.AppId, appId)
                     .SetOnInsert(x => x.RuleId, ruleId),
-                Upsert);
+                Upsert, ct);
         }
     }
 }

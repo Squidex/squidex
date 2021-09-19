@@ -56,7 +56,7 @@ namespace Squidex.Extensions.Assets.Azure
             {
                 if (command.Type == AssetType.Image && command.File.FileSize <= MaxSize)
                 {
-                    using (var stream = command.File.OpenRead())
+                    await using (var stream = command.File.OpenRead())
                     {
                         var result = await client.AnalyzeImageInStreamAsync(stream, features);
 

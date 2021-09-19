@@ -7,22 +7,27 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
-    public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState>, ITextIndexerState
+    public sealed class MongoTextIndexerState : MongoRepositoryBase<TextContentState>, ITextIndexerState, IDeleter
     {
         static MongoTextIndexerState()
         {
             BsonClassMap.RegisterClassMap<TextContentState>(cm =>
             {
                 cm.MapIdField(x => x.UniqueContentId);
+
+                cm.MapProperty(x => x.AppId)
+                    .SetElementName("a");
 
                 cm.MapProperty(x => x.DocIdCurrent)
                     .SetElementName("c");
@@ -40,19 +45,37 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         {
         }
 
+        protected override Task SetupCollectionAsync(IMongoCollection<TextContentState> collection,
+            CancellationToken ct)
+        {
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<TextContentState>(
+                    Index.Ascending(x => x.AppId))
+            }, ct);
+        }
+
         protected override string CollectionName()
         {
             return "TextIndexerState";
         }
 
-        public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids)
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
         {
-            var entities = await Collection.Find(Filter.In(x => x.UniqueContentId, ids)).ToListAsync();
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+        }
+
+        public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+            CancellationToken ct = default)
+        {
+            var entities = await Collection.Find(Filter.In(x => x.UniqueContentId, ids)).ToListAsync(ct);
 
             return entities.ToDictionary(x => x.UniqueContentId);
         }
 
-        public Task SetAsync(List<TextContentState> updates)
+        public Task SetAsync(List<TextContentState> updates,
+            CancellationToken ct = default)
         {
             var writes = new List<WriteModel<TextContentState>>();
 
@@ -80,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 return Task.CompletedTask;
             }
 
-            return Collection.BulkWriteAsync(writes, BulkUnordered);
+            return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
         }
     }
 }

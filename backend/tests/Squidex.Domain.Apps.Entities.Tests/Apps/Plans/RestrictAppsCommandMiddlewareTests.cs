@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => user.Claims)
                 .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
 
-            A.CallTo(() => userResolver.FindByIdAsync(userId))
+            A.CallTo(() => userResolver.FindByIdAsync(userId, default))
                 .Returns(user);
 
             var isNextCalled = false;
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
             A.CallTo(() => user.Claims)
                 .Returns(Enumerable.Repeat(new Claim(SquidexClaimTypes.TotalApps, "5"), 1).ToList());
 
-            A.CallTo(() => userResolver.FindByIdAsync(userId))
+            A.CallTo(() => userResolver.FindByIdAsync(userId, default))
                 .Returns(user);
 
             await sut.HandleAsync(commandContext, x =>
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 return Task.CompletedTask;
             });
 
-            A.CallTo(() => userResolver.SetClaimAsync(userId, SquidexClaimTypes.TotalApps, "6", true))
+            A.CallTo(() => userResolver.SetClaimAsync(userId, SquidexClaimTypes.TotalApps, "6", true, default))
                 .MustHaveHappened();
         }
 
@@ -125,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 return Task.CompletedTask;
             });
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -148,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 return Task.CompletedTask;
             });
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -171,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 return Task.CompletedTask;
             });
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
     }

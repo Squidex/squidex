@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository;
         private readonly IAssetFolderRepository assetFolderRepository;
         private readonly ISemanticLog log;
-        private readonly string? folderDeletedType;
+        private readonly HashSet<string> consumingTypes;
 
         public string Name
         {
@@ -47,12 +48,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetFolderRepository = assetFolderRepository;
             this.log = log;
 
-            folderDeletedType = typeNameRegistry?.GetName<AssetFolderDeleted>();
+            // Compute the event types names once for performance reasons and use hashset for extensibility.
+            consumingTypes = new HashSet<string>
+            {
+                typeNameRegistry.GetName<AssetFolderDeleted>()
+            };
         }
 
         public bool Handles(StoredEvent @event)
         {
-            return @event.Data.Type == folderDeletedType;
+            return consumingTypes.Contains(@event.Data.Type);
         }
 
         public async Task On(Envelope<IEvent> @event)

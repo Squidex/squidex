@@ -22,25 +22,28 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.assetStore = assetStore;
         }
 
-        public Task DownloadAsync(DomainId backupId, Stream stream, CancellationToken ct = default)
+        public Task DownloadAsync(DomainId backupId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(backupId);
 
             return assetStore.DownloadAsync(fileName, stream, default, ct);
         }
 
-        public Task UploadAsync(DomainId backupId, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(DomainId backupId, Stream stream,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(backupId);
 
             return assetStore.UploadAsync(fileName, stream, true, ct);
         }
 
-        public Task DeleteAsync(DomainId backupId)
+        public Task DeleteAsync(DomainId backupId,
+            CancellationToken ct = default)
         {
             var fileName = GetFileName(backupId);
 
-            return assetStore.DeleteAsync(fileName);
+            return assetStore.DeleteAsync(fileName, ct);
         }
 
         private static string GetFileName(DomainId backupId)

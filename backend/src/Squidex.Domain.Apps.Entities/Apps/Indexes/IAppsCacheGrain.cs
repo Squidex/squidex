@@ -5,23 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Orleans.Indexes;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByNameIndexGrain : UniqueNameIndexGrain<AppsByNameIndexState, DomainId>, IAppsByNameIndexGrain
+    public interface IAppsCacheGrain : IUniqueNameGrain<DomainId>
     {
-        public AppsByNameIndexGrain(IGrainState<AppsByNameIndexState> state)
-            : base(state)
-        {
-        }
-    }
+        Task<IReadOnlyCollection<DomainId>> GetAppIdsAsync(string[] names);
 
-    [CollectionName("Index_AppsByName")]
-    public sealed class AppsByNameIndexState : UniqueNameIndexState<DomainId>
-    {
+        Task AddAsync(DomainId id, string name);
+
+        Task RemoveAsync(DomainId id);
     }
 }

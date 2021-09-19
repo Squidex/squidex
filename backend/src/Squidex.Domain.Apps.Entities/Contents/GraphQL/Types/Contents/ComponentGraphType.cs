@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             return value =>
             {
-                return Component.IsValid(value as IJsonValue, out var discrimiator) && discrimiator == schemaId.ToString();
+                return Component.IsValid(value as IJsonValue, out var discrimiator) && discrimiator == schemaId;
             };
         }
     }

@@ -6,22 +6,18 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
-namespace Squidex.Infrastructure.Orleans.Indexes
+namespace Squidex.Domain.Apps.Entities.Apps.Repositories
 {
-    public interface IIdsIndexGrain<T>
+    public interface IAppRepository
     {
-        Task<long> CountAsync();
+        Task<Dictionary<string, DomainId>> QueryIdsAsync(string contributorId,
+            CancellationToken ct = default);
 
-        Task RebuildAsync(HashSet<T> ids);
-
-        Task AddAsync(T id);
-
-        Task RemoveAsync(T id);
-
-        Task ClearAsync();
-
-        Task<List<T>> GetIdsAsync();
+        Task<Dictionary<string, DomainId>> QueryIdsAsync(IEnumerable<string> names,
+            CancellationToken ct = default);
     }
 }

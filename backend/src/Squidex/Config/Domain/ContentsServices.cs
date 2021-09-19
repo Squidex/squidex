@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -9,7 +9,9 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
@@ -38,6 +40,9 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<ContentDomainObject>()
                 .AsSelf();
+
+            services.AddTransientAs<CounterDeleter>()
+                .As<IDeleter>();
 
             services.AddSingletonAs<DefaultValidatorsFactory>()
                 .As<IValidatorsFactory>();

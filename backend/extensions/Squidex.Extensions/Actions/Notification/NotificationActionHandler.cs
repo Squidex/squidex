@@ -72,7 +72,8 @@ namespace Squidex.Extensions.Actions.Notification
             return ("Ignore", new CreateComment());
         }
 
-        protected override async Task<Result> ExecuteJobAsync(CreateComment job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+            CancellationToken ct = default)
         {
             if (job.CommentsId == default)
             {

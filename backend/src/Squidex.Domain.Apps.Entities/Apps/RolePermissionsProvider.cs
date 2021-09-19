@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 foreach (var schema in schemaNames)
                 {
-                    var replaced = trimmed.Replace("{schema}", schema);
+                    var replaced = trimmed.Replace("{schema}", schema, StringComparison.Ordinal);
 
                     result.Add(replaced);
                 }

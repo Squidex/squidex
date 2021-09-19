@@ -46,7 +46,8 @@ namespace Squidex.Extensions.Actions.Fastly
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(FastlyJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(FastlyJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

@@ -44,9 +44,6 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<CreateAssetSlugs>()
                 .As<IMigration>();
 
-            services.AddTransientAs<PopulateGrainIndexes>()
-                .As<IMigration>();
-
             services.AddTransientAs<RebuildContents>()
                 .As<IMigration>();
 
@@ -54,6 +51,12 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildApps>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildSchemas>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildRules>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildAssets>()

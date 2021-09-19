@@ -16,7 +16,9 @@ namespace Squidex.Infrastructure
     [TypeConverter(typeof(LanguageTypeConverter))]
     public partial record Language
     {
+#pragma warning disable MA0023 // Add RegexOptions.ExplicitCapture
         private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
+#pragma warning restore MA0023 // Add RegexOptions.ExplicitCapture
 
         public static Language GetLanguage(string iso2Code)
         {

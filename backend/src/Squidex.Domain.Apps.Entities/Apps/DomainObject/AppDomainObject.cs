@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         protected override bool IsDeleted()
         {
-            return Snapshot.IsArchived;
+            return Snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -291,12 +291,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                     });
 
-                case ArchiveApp archive:
-                    return UpdateAsync(archive, async c =>
+                case DeleteApp delete:
+                    return UpdateAsync(delete, async c =>
                     {
                         await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 
-                        ArchiveApp(c);
+                        DeleteApp(c);
                     });
 
                 default:
@@ -335,7 +335,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private void ChangePlan(ChangePlan command)
         {
-            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
+            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId, StringComparison.Ordinal))
             {
                 Raise(command, new AppPlanReset());
             }
@@ -440,9 +440,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppRoleUpdated());
         }
 
-        private void ArchiveApp(ArchiveApp command)
+        private void DeleteApp(DeleteApp command)
         {
-            Raise(command, new AppArchived());
+            Raise(command, new AppDeleted());
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent

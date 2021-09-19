@@ -48,16 +48,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return ResultList.Create(contentTotal, contentEntities);
         }
 
-        public Task QueryAsync(Instant now, Func<IContentEntity, Task> callback,
+        public IAsyncEnumerable<IContentEntity> QueryAsync(Instant now,
             CancellationToken ct)
         {
-            Guard.NotNull(callback, nameof(callback));
-
-            return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true).Not(x => x.Data)
-                .ForEachAsync(c =>
-                {
-                    callback(c);
-                }, ct);
+#pragma warning disable MA0073 // Avoid comparison with bool constant
+            return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true).Not(x => x.Data).ToAsyncEnumerable(ct);
+#pragma warning restore MA0073 // Avoid comparison with bool constant
         }
 
         private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, Instant scheduledFrom, Instant scheduledTo)

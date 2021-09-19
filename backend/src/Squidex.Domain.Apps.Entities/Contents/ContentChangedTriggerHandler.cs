@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct = default)
+            [EnumeratorCancellation] CancellationToken ct)
         {
             var trigger = (ContentChangedTriggerV2)context.Rule.Trigger;
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         public async IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
-            [EnumeratorCancellation] CancellationToken ct = default)
+            [EnumeratorCancellation] CancellationToken ct)
         {
             var contentEvent = (ContentEvent)@event.Payload;
 

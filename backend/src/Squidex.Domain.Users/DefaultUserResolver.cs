@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
@@ -27,7 +28,8 @@ namespace Squidex.Domain.Users
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited)
+        public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(email, nameof(email));
 
@@ -40,7 +42,7 @@ namespace Squidex.Domain.Users
                     var user = await userService.CreateAsync(email, new UserValues
                     {
                         Invited = invited
-                    });
+                    }, ct: ct);
 
                     return (user, true);
                 }
@@ -48,13 +50,14 @@ namespace Squidex.Domain.Users
                 {
                 }
 
-                var found = await FindByIdOrEmailAsync(email);
+                var found = await FindByIdOrEmailAsync(email, ct);
 
                 return (found, false);
             }
         }
 
-        public async Task SetClaimAsync(string id, string type, string value, bool silent)
+        public async Task SetClaimAsync(string id, string type, string value, bool silent = false,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNullOrEmpty(type, nameof(type));
@@ -72,11 +75,12 @@ namespace Squidex.Domain.Users
                     }
                 };
 
-                await userService.UpdateAsync(id, values, silent);
+                await userService.UpdateAsync(id, values, silent, ct);
             }
         }
 
-        public async Task<IUser?> FindByIdAsync(string id)
+        public async Task<IUser?> FindByIdAsync(string id,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
@@ -84,11 +88,12 @@ namespace Squidex.Domain.Users
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                return await userService.FindByIdAsync(id);
+                return await userService.FindByIdAsync(id, ct);
             }
         }
 
-        public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail)
+        public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(idOrEmail, nameof(idOrEmail));
 
@@ -96,30 +101,32 @@ namespace Squidex.Domain.Users
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                if (idOrEmail.Contains("@"))
+                if (idOrEmail.Contains("@", StringComparison.Ordinal))
                 {
-                    return await userService.FindByEmailAsync(idOrEmail);
+                    return await userService.FindByEmailAsync(idOrEmail, ct);
                 }
                 else
                 {
-                    return await userService.FindByIdAsync(idOrEmail);
+                    return await userService.FindByIdAsync(idOrEmail, ct);
                 }
             }
         }
 
-        public async Task<List<IUser>> QueryAllAsync()
+        public async Task<List<IUser>> QueryAllAsync(
+            CancellationToken ct = default)
         {
             using (var scope = serviceProvider.CreateScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userService.QueryAsync(take: int.MaxValue);
+                var result = await userService.QueryAsync(take: int.MaxValue, ct: ct);
 
                 return result.ToList();
             }
         }
 
-        public async Task<List<IUser>> QueryByEmailAsync(string email)
+        public async Task<List<IUser>> QueryByEmailAsync(string email,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(email, nameof(email));
 
@@ -127,13 +134,14 @@ namespace Squidex.Domain.Users
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userService.QueryAsync(email);
+                var result = await userService.QueryAsync(email, ct: ct);
 
                 return result.ToList();
             }
         }
 
-        public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids)
+        public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids,
+            CancellationToken ct = default)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -141,7 +149,7 @@ namespace Squidex.Domain.Users
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userService.QueryAsync(ids);
+                var result = await userService.QueryAsync(ids, ct);
 
                 return result.OfType<IUser>().ToDictionary(x => x.Id);
             }

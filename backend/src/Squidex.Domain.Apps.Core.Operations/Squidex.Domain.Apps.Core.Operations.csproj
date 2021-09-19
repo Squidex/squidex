@@ -18,6 +18,10 @@
   <ItemGroup>
     <PackageReference Include="Fluid.Core.Squidex" Version="1.0.0-beta" />
 	  <PackageReference Include="GeoJSON.Net" Version="1.2.19" />
+	  <PackageReference Include="Meziantou.Analyzer" Version="1.0.670">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.9.0" />
     <PackageReference Include="NJsonSchema" Version="10.5.2" />

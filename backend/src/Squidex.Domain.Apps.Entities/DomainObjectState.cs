@@ -25,8 +25,6 @@ namespace Squidex.Domain.Apps.Entities
 
         public Instant LastModified { get; set; }
 
-        public bool IsDeleted { get; set; }
-
         public long Version { get; set; }
 
         protected DomainObjectState()

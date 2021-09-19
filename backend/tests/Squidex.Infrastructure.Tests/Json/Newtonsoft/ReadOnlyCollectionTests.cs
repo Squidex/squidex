@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Xunit;
@@ -39,7 +40,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyDictionary<int, int>>>(json)!;
 
-            Assert.DoesNotContain("$type", json);
+            Assert.DoesNotContain("$type", json, StringComparison.Ordinal);
             Assert.Equal(2, serialized.Values.Count);
         }
 
@@ -64,7 +65,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             var serialized = JsonConvert.DeserializeObject<MyClass<IReadOnlyList<int>>>(json)!;
 
-            Assert.DoesNotContain("$type", json);
+            Assert.DoesNotContain("$type", json, StringComparison.Ordinal);
             Assert.Equal(2, serialized.Values.Count);
         }
     }

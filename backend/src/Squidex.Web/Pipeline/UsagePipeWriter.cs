@@ -44,7 +44,8 @@ namespace Squidex.Web.Pipeline
             inner.Complete();
         }
 
-        public override ValueTask<FlushResult> FlushAsync(CancellationToken cancellationToken = default)
+        public override ValueTask<FlushResult> FlushAsync(
+            CancellationToken cancellationToken = default)
         {
             return inner.FlushAsync(cancellationToken);
         }

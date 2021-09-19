@@ -12,7 +12,7 @@ using Squidex.Infrastructure.MongoDb;
 namespace Squidex.Infrastructure.States
 {
     [BsonIgnoreExtraElements]
-    public sealed class MongoState<T> : IVersionedEntity<DomainId>
+    public class MongoState<T> : IVersionedEntity<DomainId>
     {
         [BsonId]
         [BsonElement]
@@ -20,12 +20,16 @@ namespace Squidex.Infrastructure.States
         public DomainId DocumentId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("Doc")]
         [BsonJson]
-        public T Doc { get; set; }
+        public T Document { get; set; }
 
         [BsonRequired]
         [BsonElement]
         public long Version { get; set; }
+
+        public virtual void Prepare()
+        {
+        }
     }
 }

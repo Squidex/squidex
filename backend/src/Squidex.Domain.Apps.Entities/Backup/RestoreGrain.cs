@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName)
+        public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null)
         {
             Guard.NotNull(url, nameof(url));
             Guard.NotNull(actor, nameof(actor));
@@ -119,7 +120,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             await state.WriteAsync();
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             Process();
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         }
 
         private void Process()
@@ -135,6 +138,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 jobId: CurrentJob.Id.ToString(),
                 jobUrl: CurrentJob.Url.ToString()
             );
+
+            var ct = default(CancellationToken);
 
             using (Telemetry.Activities.StartActivity("RestoreBackup"))
             {
@@ -165,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/RestoreAsync"))
                             {
-                                await handler.RestoreAsync(runningContext);
+                                await handler.RestoreAsync(runningContext, ct);
                             }
 
                             Log($"Restored {handler.Name}");
@@ -346,22 +351,26 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             batchBlock.BidirectionalLinkTo(writeBlock);
 
-            await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async job =>
+            await foreach (var job in reader.ReadEventsAsync(streamNameResolver, eventDataFormatter))
             {
                 var newStream = await HandleEventAsync(reader, handlers, job.Stream, job.Event);
 
                 if (newStream != null)
                 {
-                    await batchBlock.SendAsync((newStream, job.Event));
+                    if (!await batchBlock.SendAsync((newStream, job.Event)))
+                    {
+                        break;
+                    }
                 }
-            });
+            }
 
             batchBlock.Complete();
 
             await writeBlock.Completion;
         }
 
-        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event)
+        private async Task<string?> HandleEventAsync(IBackupReader reader, IEnumerable<IBackupHandler> handlers, string stream, Envelope<IEvent> @event,
+            CancellationToken ct = default)
         {
             if (@event.Payload is AppCreated appCreated)
             {
@@ -401,7 +410,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             foreach (var handler in handlers)
             {
-                if (!await handler.RestoreEventAsync(@event, runningContext))
+                if (!await handler.RestoreEventAsync(@event, runningContext, ct))
                 {
                     return null;
                 }

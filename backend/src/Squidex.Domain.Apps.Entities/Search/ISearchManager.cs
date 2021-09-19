@@ -12,6 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Search
 {
     public interface ISearchManager
     {
-        Task<SearchResults> SearchAsync(string? query, Context context, CancellationToken ct = default);
+        Task<SearchResults> SearchAsync(string? query, Context context,
+            CancellationToken ct = default);
     }
 }

@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Null(enrichedEvent.User);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var user = A.Dummy<IUser>();
 
-            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier))
+            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
                 .Returns(user);
 
             var @event =
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal(user, enrichedEvent.User);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var user = A.Dummy<IUser>();
 
-            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier))
+            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
                 .Returns(user);
 
             var event1 =
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(user, enrichedEvent1.User);
             Assert.Equal(user, enrichedEvent2.User);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustHaveHappenedOnceExactly();
         }
     }

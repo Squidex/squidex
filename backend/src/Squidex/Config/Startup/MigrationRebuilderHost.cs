@@ -21,12 +21,14 @@ namespace Squidex.Config.Startup
             this.rebuildRunner = rebuildRunner;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(
+            CancellationToken cancellationToken)
         {
             return rebuildRunner.RunAsync(cancellationToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(
+            CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

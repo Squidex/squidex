@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsGrainTests()
         {
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._, default))
                 .Invokes(x => LastEvents = sut!.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
 
             sut = new CommentsGrain(eventStore, eventDataFormatter);

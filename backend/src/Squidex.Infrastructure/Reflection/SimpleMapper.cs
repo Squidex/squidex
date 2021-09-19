@@ -116,7 +116,7 @@ namespace Squidex.Infrastructure.Reflection
 
                 foreach (var sourceProperty in sourceProperties)
                 {
-                    var targetProperty = targetProperties.FirstOrDefault(x => x.Name == sourceProperty.Name);
+                    var targetProperty = targetProperties.Find(x => x.Name == sourceProperty.Name);
 
                     if (targetProperty == null)
                     {

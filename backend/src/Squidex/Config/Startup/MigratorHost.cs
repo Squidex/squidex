@@ -21,12 +21,14 @@ namespace Squidex.Config.Startup
             this.migrator = migrator;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(
+            CancellationToken cancellationToken)
         {
             return migrator.MigrateAsync(cancellationToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(
+            CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

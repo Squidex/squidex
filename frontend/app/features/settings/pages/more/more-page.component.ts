@@ -104,7 +104,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
         this.appsState.removeImage(this.app);
     }
 
-    public archiveApp() {
+    public deleteApp() {
         if (!this.isDeletable) {
             return;
         }

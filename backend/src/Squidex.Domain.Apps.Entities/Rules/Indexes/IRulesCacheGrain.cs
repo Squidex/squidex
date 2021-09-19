@@ -5,13 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans.Indexes;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Indexes
+namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public interface IAppsByUserIndexGrain : IIdsIndexGrain<DomainId>, IGrainWithStringKey
+    public interface IRulesCacheGrain : IGrainWithStringKey
     {
+        Task<IReadOnlyCollection<DomainId>> GetRuleIdsAsync();
+
+        Task AddAsync(DomainId id);
+
+        Task RemoveAsync(DomainId id);
     }
 }

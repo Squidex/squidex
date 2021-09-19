@@ -5,13 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans.Indexes;
-
-namespace Squidex.Domain.Apps.Entities.Rules.Indexes
+namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public interface IRulesByAppIndexGrain : IIdsIndexGrain<DomainId>, IGrainWithStringKey
+    public sealed class DeleteApp : AppUpdateCommand
     {
     }
 }

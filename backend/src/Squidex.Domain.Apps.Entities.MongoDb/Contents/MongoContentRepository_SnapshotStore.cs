@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -18,43 +19,57 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>
+    public partial class MongoContentRepository : ISnapshotStore<ContentDomainObject.State>, IDeleter
     {
-        Task ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(Func<ContentDomainObject.State, long, Task> callback,
+        IAsyncEnumerable<(ContentDomainObject.State State, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAllAsync(
             CancellationToken ct)
         {
-            return Task.CompletedTask;
+            return AsyncEnumerable.Empty<(ContentDomainObject.State State, long Version)>();
         }
 
-        async Task<(ContentDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key)
+        async Task<(ContentDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<ContentDomainObject.State>.ReadAsync(DomainId key,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
             {
-                var version = await collectionAll.FindVersionAsync(key);
+                var version = await collectionAll.FindVersionAsync(key, ct);
 
                 return (null!, false, version);
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync()
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            using (Telemetry.Activities.StartActivity("MongoContentRepository/DeleteAppAsync"))
+            {
+                await collectionAll.DeleteAppAsync(app.Id, ct);
+                await collectionPublished.DeleteAppAsync(app.Id, ct);
+            }
+        }
+
+        async Task ISnapshotStore<ContentDomainObject.State>.ClearAsync(
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/ClearAsync"))
             {
-                await collectionAll.ClearAsync();
-                await collectionPublished.ClearAsync();
+                await collectionAll.ClearAsync(ct);
+                await collectionPublished.ClearAsync(ct);
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key)
+        async Task ISnapshotStore<ContentDomainObject.State>.RemoveAsync(DomainId key,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
             {
-                await collectionAll.RemoveAsync(key);
-                await collectionPublished.RemoveAsync(key);
+                await collectionAll.RemoveAsync(key, ct);
+                await collectionPublished.RemoveAsync(key, ct);
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteAsync(DomainId key, ContentDomainObject.State value, long oldVersion, long newVersion,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
             {
@@ -64,12 +79,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 }
 
                 await Task.WhenAll(
-                    UpsertDraftContentAsync(value, oldVersion, newVersion),
-                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion));
+                    UpsertDraftContentAsync(value, oldVersion, newVersion, ct),
+                    UpsertOrDeletePublishedAsync(value, oldVersion, newVersion, ct));
             }
         }
 
-        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots)
+        async Task ISnapshotStore<ContentDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, ContentDomainObject.State Value, long Version)> snapshots,
+            CancellationToken ct)
         {
             using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
             {
@@ -87,42 +103,46 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 }
 
                 await Task.WhenAll(
-                    collectionPublished.InsertManyAsync(entitiesPublished),
-                    collectionAll.InsertManyAsync(entitiesAll));
+                    collectionPublished.InsertManyAsync(entitiesPublished, ct),
+                    collectionAll.InsertManyAsync(entitiesAll, ct));
             }
         }
 
-        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
+        private async Task UpsertOrDeletePublishedAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+            CancellationToken ct = default)
         {
             if (ShouldWritePublished(value))
             {
-                await UpsertPublishedContentAsync(value, oldVersion, newVersion);
+                await UpsertPublishedContentAsync(value, oldVersion, newVersion, ct);
             }
             else
             {
-                await DeletePublishedContentAsync(value.AppId.Id, value.Id);
+                await DeletePublishedContentAsync(value.AppId.Id, value.Id, ct);
             }
         }
 
-        private Task DeletePublishedContentAsync(DomainId appId, DomainId id)
+        private Task DeletePublishedContentAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
             var documentId = DomainId.Combine(appId, id);
 
-            return collectionPublished.RemoveAsync(documentId);
+            return collectionPublished.RemoveAsync(documentId, ct);
         }
 
-        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
+        private async Task UpsertDraftContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+            CancellationToken ct = default)
         {
             var entity = await CreateDraftContentAsync(value, newVersion);
 
-            await collectionAll.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity);
+            await collectionAll.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, ct);
         }
 
-        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion)
+        private async Task UpsertPublishedContentAsync(ContentDomainObject.State value, long oldVersion, long newVersion,
+            CancellationToken ct = default)
         {
             var entity = await CreatePublishedContentAsync(value, newVersion);
 
-            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity);
+            await collectionPublished.UpsertVersionedAsync(entity.DocumentId, oldVersion, entity, ct);
         }
 
         private async Task<MongoContentEntity> CreatePublishedContentAsync(ContentDomainObject.State value, long newVersion)

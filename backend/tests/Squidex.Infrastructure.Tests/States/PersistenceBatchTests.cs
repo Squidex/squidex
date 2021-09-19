@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
@@ -113,16 +115,16 @@ namespace Squidex.Infrastructure.States
             await persistence1.WriteSnapshotAsync(12);
             await persistence2.WriteSnapshotAsync(12);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 2)))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 2), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -145,16 +147,16 @@ namespace Squidex.Infrastructure.States
             await persistence1_1.WriteSnapshotAsync(12);
             await persistence1_2.WriteSnapshotAsync(12);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1)))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -174,16 +176,16 @@ namespace Squidex.Infrastructure.States
             await persistence1.WriteSnapshotAsync(12);
             await persistence1.WriteSnapshotAsync(13);
 
-            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._))
+            A.CallTo(() => snapshotStore.WriteAsync(A<DomainId>._, A<int>._, A<long>._, A<long>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
             await bulk.CommitAsync();
             await bulk.DisposeAsync();
 
-            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1)))
+            A.CallTo(() => snapshotStore.WriteManyAsync(A<IEnumerable<(DomainId, int, long)>>.That.Matches(x => x.Count() == 1), A<CancellationToken>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -200,7 +202,7 @@ namespace Squidex.Infrastructure.States
                 foreach (var @event in stream)
                 {
                     var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
-                    var eventStored = new StoredEvent(id.ToString(), i.ToString(), i, eventData);
+                    var eventStored = new StoredEvent(id.ToString(), i.ToString(CultureInfo.InvariantCulture), i, eventData);
 
                     storedStream.Add(eventStored);
 
@@ -218,7 +220,7 @@ namespace Squidex.Infrastructure.States
 
             var streamNames = streams.Keys.Select(x => x.ToString()).ToArray();
 
-            A.CallTo(() => eventStore.QueryManyAsync(A<IEnumerable<string>>.That.IsSameSequenceAs(streamNames)))
+            A.CallTo(() => eventStore.QueryManyAsync(A<IEnumerable<string>>.That.IsSameSequenceAs(streamNames), A<CancellationToken>._))
                 .Returns(storedStreams);
         }
     }

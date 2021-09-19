@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -13,8 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
     public interface IRulesIndex
     {
-        Task<List<IRuleEntity>> GetRulesAsync(DomainId appId);
-
-        Task RebuildAsync(DomainId appId, HashSet<DomainId> rules);
+        Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+            CancellationToken ct = default);
     }
 }

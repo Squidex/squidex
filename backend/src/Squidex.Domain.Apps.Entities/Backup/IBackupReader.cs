@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
@@ -19,10 +21,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         int ReadEvents { get; }
 
-        Task ReadBlobAsync(string name, Func<Stream, Task> handler);
+        Task<Stream> OpenBlobAsync(string name,
+            CancellationToken ct = default);
 
-        Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler);
+        Task<T> ReadJsonAsync<T>(string name,
+            CancellationToken ct = default);
 
-        Task<T> ReadJsonAsync<T>(string name);
+        IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter,
+            CancellationToken ct = default);
     }
 }

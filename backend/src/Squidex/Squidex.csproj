@@ -37,6 +37,10 @@
     <PackageReference Include="GraphQL.Server.Core" Version="5.0.2" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.2" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.670">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.9" />
@@ -64,14 +68,14 @@
     <PackageReference Include="OrleansDashboard.EmbeddedAssets" Version="3.5.2" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="4.8.12" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="1.8.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="1.8.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="1.8.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="1.8.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="1.8.0" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="1.10.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="1.10.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="1.10.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="1.10.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="1.10.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="7.4.0" />
-    <PackageReference Include="Squidex.Hosting" Version="2.0.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="7.5.0" />
+    <PackageReference Include="Squidex.Hosting" Version="2.2.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />

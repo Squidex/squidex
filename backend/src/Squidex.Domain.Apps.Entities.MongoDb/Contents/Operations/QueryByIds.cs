@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             }
             else
             {
-                var first = documentIds.First();
+                var first = documentIds[0];
 
                 filters.Add(
                     Filter.Or(

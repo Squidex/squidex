@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema ChangeCategory(string? category)
         {
-            if (string.Equals(Category, category))
+            if (string.Equals(Category, category, StringComparison.Ordinal))
             {
                 return this;
             }

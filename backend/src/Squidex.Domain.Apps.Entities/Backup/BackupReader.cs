@@ -6,8 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.Model;
@@ -18,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public class BackupReader : DisposableObjectBase, IBackupReader
+    public sealed class BackupReader : DisposableObjectBase, IBackupReader
     {
         private readonly ZipArchive archive;
         private readonly IJsonSerializer serializer;
@@ -52,28 +55,26 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Task<T> ReadJsonAsync<T>(string name)
+        public Task<Stream> OpenBlobAsync(string name,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
             var entry = GetEntry(name);
 
-            using (var stream = entry.Open())
-            {
-                return Task.FromResult(serializer.Deserialize<T>(stream, null));
-            }
+            return Task.FromResult(entry.Open());
         }
 
-        public async Task ReadBlobAsync(string name, Func<Stream, Task> handler)
+        public async Task<T> ReadJsonAsync<T>(string name,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNull(handler, nameof(handler));
 
             var entry = GetEntry(name);
 
-            using (var stream = entry.Open())
+            await using (var stream = entry.Open())
             {
-                await handler(stream);
+                return serializer.Deserialize<T>(stream, null);
             }
         }
 
@@ -91,13 +92,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return attachmentEntry;
         }
 
-        public async Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler)
+        public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
-            Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
-            while (true)
+            while (!ct.IsCancellationRequested)
             {
                 var entry = archive.GetEntry(ArchiveHelper.GetEventPath(readEvents));
 
@@ -106,14 +107,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     break;
                 }
 
-                using (var stream = entry.Open())
+                await using (var stream = entry.Open())
                 {
                     var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
 
                     var eventStream = storedEvent.StreamName;
                     var eventEnvelope = formatter.Parse(storedEvent);
 
-                    await handler((eventStream, eventEnvelope));
+                    yield return (eventStream, eventEnvelope);
                 }
 
                 readEvents++;

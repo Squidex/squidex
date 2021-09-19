@@ -19,7 +19,7 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class DefaultAppLogStore : IAppLogStore
+    public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
     {
         private const string FieldAuthClientId = "AuthClientId";
         private const string FieldAuthUserId = "AuthUserId";
@@ -49,7 +49,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.requestLogStore = requestLogStore;
         }
 
-        public Task LogAsync(DomainId appId, RequestLog request)
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            return requestLogStore.DeleteAsync(app.Id.ToString(), ct);
+        }
+
+        public Task LogAsync(DomainId appId, RequestLog request,
+            CancellationToken ct = default)
         {
             if (!requestLogStore.IsEnabled)
             {
@@ -75,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Append(storedRequest, FieldRequestPath, request.RequestPath);
             Append(storedRequest, FieldStatusCode, request.StatusCode);
 
-            return requestLogStore.LogAsync(storedRequest);
+            return requestLogStore.LogAsync(storedRequest, ct);
         }
 
         public async Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream,
@@ -104,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                     await csv.NextRecordAsync();
 
-                    await requestLogStore.QueryAllAsync(async request =>
+                    await foreach (var request in requestLogStore.QueryAllAsync(appId.ToString(), fromDate, toDate, ct))
                     {
                         csv.WriteField(request.Timestamp.ToString());
                         csv.WriteField(GetString(request, FieldRequestPath));
@@ -121,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         csv.WriteField(GetLong(request, FieldStatusCode));
 
                         await csv.NextRecordAsync();
-                    }, appId.ToString(), fromDate, toDate, ct);
+                    }
                 }
             }
             finally

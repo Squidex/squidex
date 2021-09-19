@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,21 +19,24 @@ namespace Squidex.Domain.Users
 {
     public class DefaultUserResolverTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IUserService userService = A.Fake<IUserService>();
         private readonly DefaultUserResolver sut;
 
         public DefaultUserResolverTests()
         {
+            ct = cts.Token;
+
             var serviceProvider = A.Fake<IServiceProvider>();
 
-            var scope = A.Fake<IServiceScope>();
-
+            var scopeObject = A.Fake<IServiceScope>();
             var scopeFactory = A.Fake<IServiceScopeFactory>();
 
             A.CallTo(() => scopeFactory.CreateScope())
-                .Returns(scope);
+                .Returns(scopeObject);
 
-            A.CallTo(() => scope.ServiceProvider)
+            A.CallTo(() => scopeObject.ServiceProvider)
                 .Returns(serviceProvider);
 
             A.CallTo(() => serviceProvider.GetService(typeof(IServiceScopeFactory)))
@@ -51,10 +55,10 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.CreateAsync(email, A<UserValues>.That.Matches(x => x.Invited == true), false))
+            A.CallTo(() => userService.CreateAsync(email, A<UserValues>.That.Matches(x => x.Invited == true), false, ct))
                 .Returns(user);
 
-            var result = await sut.CreateUserIfNotExistsAsync(email, true);
+            var result = await sut.CreateUserIfNotExistsAsync(email, true, ct);
 
             Assert.Equal((user, true), result);
         }
@@ -66,13 +70,13 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.CreateAsync(email, A<UserValues>._, false))
+            A.CallTo(() => userService.CreateAsync(email, A<UserValues>._, false, ct))
                 .Throws(new InvalidOperationException());
 
-            A.CallTo(() => userService.FindByEmailAsync(email))
+            A.CallTo(() => userService.FindByEmailAsync(email, ct))
                 .Returns(user);
 
-            var result = await sut.CreateUserIfNotExistsAsync(email, true);
+            var result = await sut.CreateUserIfNotExistsAsync(email, true, ct);
 
             Assert.Equal((user, false), result);
         }
@@ -82,10 +86,10 @@ namespace Squidex.Domain.Users
         {
             var id = "123";
 
-            await sut.SetClaimAsync(id, "my-claim", "my-value", false);
+            await sut.SetClaimAsync(id, "my-claim", "my-value", false, ct);
 
             A.CallTo(() => userService.UpdateAsync(id,
-                    A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), false))
+                    A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), false, ct))
                 .MustHaveHappened();
         }
 
@@ -94,10 +98,10 @@ namespace Squidex.Domain.Users
         {
             var id = "123";
 
-            await sut.SetClaimAsync(id, "my-claim", "my-value", true);
+            await sut.SetClaimAsync(id, "my-claim", "my-value", true, ct);
 
             A.CallTo(() => userService.UpdateAsync(id,
-                    A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), true))
+                    A<UserValues>.That.Matches(x => x.CustomClaims!.Any(y => y.Type == "my-claim" && y.Value == "my-value")), true, ct))
                 .MustHaveHappened();
         }
 
@@ -108,10 +112,10 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.FindByEmailAsync(id))
+            A.CallTo(() => userService.FindByEmailAsync(id, ct))
                 .Returns(user);
 
-            var result = await sut.FindByIdOrEmailAsync(id);
+            var result = await sut.FindByIdOrEmailAsync(id, ct);
 
             Assert.Equal(user, result);
         }
@@ -123,10 +127,10 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.FindByIdAsync(id))
+            A.CallTo(() => userService.FindByIdAsync(id, ct))
                 .Returns(user);
 
-            var result = await sut.FindByIdOrEmailAsync(id);
+            var result = await sut.FindByIdOrEmailAsync(id, ct);
 
             Assert.Equal(user, result);
         }
@@ -138,10 +142,10 @@ namespace Squidex.Domain.Users
 
             var user = A.Fake<IUser>();
 
-            A.CallTo(() => userService.FindByIdAsync(id))
+            A.CallTo(() => userService.FindByIdAsync(id, ct))
                 .Returns(user);
 
-            var result = await sut.FindByIdOrEmailAsync(id);
+            var result = await sut.FindByIdOrEmailAsync(id, ct);
 
             Assert.Equal(user, result);
         }
@@ -153,10 +157,10 @@ namespace Squidex.Domain.Users
 
             var users = ResultList.CreateFrom(0, A.Fake<IUser>());
 
-            A.CallTo(() => userService.QueryAsync(email, 10, 0))
+            A.CallTo(() => userService.QueryAsync(email, 10, 0, ct))
                 .Returns(users);
 
-            var result = await sut.QueryByEmailAsync(email);
+            var result = await sut.QueryByEmailAsync(email, ct);
 
             Assert.Single(result);
         }
@@ -168,10 +172,10 @@ namespace Squidex.Domain.Users
 
             var users = ResultList.CreateFrom(0, A.Fake<IUser>());
 
-            A.CallTo(() => userService.QueryAsync(ids))
+            A.CallTo(() => userService.QueryAsync(ids, ct))
                 .Returns(users);
 
-            var result = await sut.QueryManyAsync(ids);
+            var result = await sut.QueryManyAsync(ids, ct);
 
             Assert.Single(result);
         }
@@ -181,10 +185,10 @@ namespace Squidex.Domain.Users
         {
             var users = ResultList.CreateFrom(0, A.Fake<IUser>());
 
-            A.CallTo(() => userService.QueryAsync(null, int.MaxValue, 0))
+            A.CallTo(() => userService.QueryAsync(null, int.MaxValue, 0, ct))
                 .Returns(users);
 
-            var result = await sut.QueryAllAsync();
+            var result = await sut.QueryAllAsync(ct);
 
             Assert.Single(result);
         }

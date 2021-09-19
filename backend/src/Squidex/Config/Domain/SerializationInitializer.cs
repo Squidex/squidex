@@ -34,7 +34,8 @@ namespace Squidex.Config.Domain
             this.ruleRegistry = ruleRegistry;
         }
 
-        public Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
             SetupBson();
             SetupOrleans();

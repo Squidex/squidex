@@ -21,7 +21,8 @@ namespace Squidex.Infrastructure.Diagnostics
             this.mongoDatabase = mongoDatabase;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
             var collectionNames = await mongoDatabase.ListCollectionNamesAsync(cancellationToken: cancellationToken);
 

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version)
+        public async Task<IContentEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any)
         {
             using (Telemetry.Activities.StartActivity("ContentLoader/GetAsync"))
             {

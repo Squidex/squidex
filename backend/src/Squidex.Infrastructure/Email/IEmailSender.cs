@@ -12,6 +12,7 @@ namespace Squidex.Infrastructure.Email
 {
     public interface IEmailSender
     {
-        Task SendAsync(string recipient, string subject, string body, CancellationToken ct = default);
+        Task SendAsync(string recipient, string subject, string body,
+            CancellationToken ct = default);
     }
 }

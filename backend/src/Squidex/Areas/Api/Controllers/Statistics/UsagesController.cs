@@ -104,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
+            var (summary, details) = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date, HttpContext.RequestAborted);
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 

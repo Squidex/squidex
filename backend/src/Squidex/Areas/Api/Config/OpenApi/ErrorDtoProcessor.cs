@@ -55,8 +55,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
             foreach (var (code, response) in operation.Responses.ToList())
             {
                 if (string.IsNullOrWhiteSpace(response.Description) ||
-                    response.Description?.Contains("=&gt;") == true ||
-                    response.Description?.Contains("=>") == true)
+                    response.Description?.Contains("=&gt;", StringComparison.Ordinal) == true ||
+                    response.Description?.Contains("=>", StringComparison.Ordinal) == true)
                 {
                     operation.Responses.Remove(code);
                 }

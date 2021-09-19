@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans.Indexes;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Indexes
+namespace Squidex.Domain.Apps.Events.Apps
 {
-    public interface IAppsByNameIndexGrain : IUniqueNameIndexGrain<DomainId>, IGrainWithStringKey
+    [EventType(nameof(AppDeleted))]
+    public sealed class AppDeleted : AppEvent
     {
     }
 }

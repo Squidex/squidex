@@ -71,6 +71,7 @@ namespace Squidex.Web.Pipeline
                         request.UserId = context.User.OpenIdSubject();
                         request.UserClientId = clientId;
 
+#pragma warning disable MA0040 // Flow the cancellation token
                         await usageLog.LogAsync(appId.Value, request);
 
                         if (request.Costs > 0)
@@ -83,6 +84,7 @@ namespace Squidex.Web.Pipeline
                                 request.ElapsedMs,
                                 request.Bytes);
                         }
+#pragma warning restore MA0040 // Flow the cancellation token
                     }
                 }
             }

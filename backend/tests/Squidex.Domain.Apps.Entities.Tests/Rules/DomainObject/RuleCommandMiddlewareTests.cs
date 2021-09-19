@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         {
             await HandleAsync(new EnableRule(), 12);
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext))
+            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext, default))
                 .MustNotHaveHappened();
         }
 
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             Assert.Same(result, context.Result<IEnrichedRuleEntity>());
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext))
+            A.CallTo(() => ruleEnricher.EnrichAsync(A<IEnrichedRuleEntity>._, requestContext, default))
                 .MustNotHaveHappened();
         }
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
             var enriched = new RuleEntity();
 
-            A.CallTo(() => ruleEnricher.EnrichAsync(result, requestContext))
+            A.CallTo(() => ruleEnricher.EnrichAsync(result, requestContext, default))
                 .Returns(enriched);
 
             var context =

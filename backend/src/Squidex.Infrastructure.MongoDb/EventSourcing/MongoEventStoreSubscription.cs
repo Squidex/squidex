@@ -100,7 +100,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                     if (!isRead)
                     {
-                        await Task.Delay(1000);
+                        await Task.Delay(1000, stopToken.Token);
                     }
                 }
             }

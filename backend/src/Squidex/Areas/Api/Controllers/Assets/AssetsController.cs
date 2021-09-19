@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -74,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var tags = await tagService.GetTagsAsync(AppId, TagGroups.Assets);
 
-            Response.Headers[HeaderNames.ETag] = tags.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = tags.Version.ToString(CultureInfo.InvariantCulture);
 
             return Ok(tags);
         }

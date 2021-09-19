@@ -6,45 +6,53 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public sealed class BackupSchemas : IBackupHandler
     {
-        private readonly Dictionary<string, DomainId> schemasByName = new Dictionary<string, DomainId>();
-        private readonly ISchemasIndex indexSchemas;
+        private const int BatchSize = 100;
+        private readonly HashSet<DomainId> schemaIds = new HashSet<DomainId>();
+        private readonly Rebuilder rebuilder;
 
         public string Name { get; } = "Schemas";
 
-        public BackupSchemas(ISchemasIndex indexSchemas)
+        public BackupSchemas(Rebuilder rebuilder)
         {
-            this.indexSchemas = indexSchemas;
+            this.rebuilder = rebuilder;
         }
 
-        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
-                case SchemaCreated schemaCreated:
-                    schemasByName[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
+                case SchemaCreated:
+                    schemaIds.Add(@event.Headers.AggregateId());
                     break;
-                case SchemaDeleted schemaDeleted:
-                    schemasByName.Remove(schemaDeleted.SchemaId.Name);
+                case SchemaDeleted:
+                    schemaIds.Remove(@event.Headers.AggregateId());
                     break;
             }
 
             return Task.FromResult(true);
         }
 
-        public Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
-            return indexSchemas.RebuildAsync(context.AppId, schemasByName);
+            if (schemaIds.Count > 0)
+            {
+                await rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(schemaIds, BatchSize, ct);
+            }
         }
     }
 }

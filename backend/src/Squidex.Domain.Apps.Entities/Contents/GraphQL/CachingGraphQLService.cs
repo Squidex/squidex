@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using GraphQL;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return CreateModelAsync(app);
             }
 
-            var cacheKey = CreateCacheKey(app.Id, app.Version.ToString());
+            var cacheKey = CreateCacheKey(app.Id, app.Version.ToString(CultureInfo.InvariantCulture));
 
             return cache.GetOrCreateAsync(cacheKey, CacheDuration, async entry =>
             {

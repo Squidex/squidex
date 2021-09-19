@@ -35,6 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return Task.FromResult(state.Value.Settings.AsJ());
         }
 
+        public Task ClearAsync()
+        {
+            TryDeactivateOnIdle();
+
+            return state.ClearAsync();
+        }
+
         public Task SetAsync(J<JsonObject> settings)
         {
             state.Value.Settings = settings;

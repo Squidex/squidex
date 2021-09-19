@@ -58,7 +58,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
             try
             {

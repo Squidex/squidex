@@ -24,12 +24,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get => false;
         }
 
-        IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context, CancellationToken ct)
+        IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,
+            CancellationToken ct)
         {
             return AsyncEnumerable.Empty<EnrichedEvent>();
         }
 
-        IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context, CancellationToken ct);
+        IAsyncEnumerable<EnrichedEvent> CreateEnrichedEventsAsync(Envelope<AppEvent> @event, RuleContext context,
+            CancellationToken ct);
 
         string? GetName(AppEvent @event)
         {

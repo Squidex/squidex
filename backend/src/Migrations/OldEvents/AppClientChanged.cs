@@ -23,7 +23,10 @@ namespace Migrations.OldEvents
 
         public IEvent Migrate()
         {
-            var permission = IsReader ? AppClientPermission.Reader : AppClientPermission.Editor;
+            var permission =
+                IsReader ?
+                AppClientPermission.Reader :
+                AppClientPermission.Editor;
 
             return SimpleMapper.Map(this, new AppClientUpdated { Permission = permission });
         }

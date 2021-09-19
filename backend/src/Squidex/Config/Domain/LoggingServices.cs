@@ -11,6 +11,7 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Log;
 using Squidex.Log;
@@ -48,7 +49,7 @@ namespace Squidex.Config.Domain
                 .As<ILogAppender>();
 
             services.AddSingletonAs<DefaultAppLogStore>()
-                .As<IAppLogStore>();
+                .As<IAppLogStore>().As<IDeleter>();
 
             services.AddSingletonAs<BackgroundRequestLogStore>()
                 .AsOptional<IRequestLogStore>();

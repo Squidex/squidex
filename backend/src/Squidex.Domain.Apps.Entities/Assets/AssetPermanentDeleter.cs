@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetPermanentDeleter : IEventConsumer
     {
         private readonly IAssetFileStore assetFileStore;
-        private readonly string? deletedType;
+        private readonly HashSet<string> consumingTypes;
 
         public string Name
         {
@@ -32,12 +33,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             this.assetFileStore = assetFileStore;
 
-            deletedType = typeNameRegistry?.GetName<AssetDeleted>();
+            // Compute the event types names once for performance reasons and use hashset for extensibility.
+            consumingTypes = new HashSet<string>
+            {
+                typeNameRegistry.GetName<AssetDeleted>()
+            };
         }
 
         public bool Handles(StoredEvent @event)
         {
-            return @event.Data.Type == deletedType;
+            return consumingTypes.Contains(@event.Data.Type);
         }
 
         public async Task On(Envelope<IEvent> @event)
@@ -49,16 +54,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (@event.Payload is AssetDeleted assetDeleted)
             {
-                for (var version = 0; version < @event.Headers.EventStreamNumber(); version++)
+                try
                 {
-                    try
-                    {
-                        await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId, version, null);
-                    }
-                    catch (AssetNotFoundException)
-                    {
-                        continue;
-                    }
+                    await assetFileStore.DeleteAsync(assetDeleted.AppId.Id, assetDeleted.AssetId);
+                }
+                catch (AssetNotFoundException)
+                {
+                    return;
                 }
             }
         }

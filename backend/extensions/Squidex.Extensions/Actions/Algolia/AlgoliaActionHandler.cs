@@ -94,7 +94,8 @@ namespace Squidex.Extensions.Actions.Algolia
             return ("Ignore", new AlgoliaJob());
         }
 
-        protected override async Task<Result> ExecuteJobAsync(AlgoliaJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(AlgoliaJob job,
+            CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(job.AppId))
             {

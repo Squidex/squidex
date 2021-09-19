@@ -6,45 +6,53 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Entities.Rules.Indexes;
+using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
     public sealed class BackupRules : IBackupHandler
     {
+        private const int BatchSize = 100;
         private readonly HashSet<DomainId> ruleIds = new HashSet<DomainId>();
-        private readonly IRulesIndex indexForRules;
+        private readonly Rebuilder rebuilder;
 
         public string Name { get; } = "Rules";
 
-        public BackupRules(IRulesIndex indexForRules)
+        public BackupRules(Rebuilder rebuilder)
         {
-            this.indexForRules = indexForRules;
+            this.rebuilder = rebuilder;
         }
 
-        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
-                case RuleCreated ruleCreated:
-                    ruleIds.Add(ruleCreated.RuleId);
+                case RuleCreated:
+                    ruleIds.Add(@event.Headers.AggregateId());
                     break;
-                case RuleDeleted ruleDeleted:
-                    ruleIds.Remove(ruleDeleted.RuleId);
+                case RuleDeleted:
+                    ruleIds.Remove(@event.Headers.AggregateId());
                     break;
             }
 
             return Task.FromResult(true);
         }
 
-        public Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
-            return indexForRules.RebuildAsync(context.AppId, ruleIds);
+            if (ruleIds.Count > 0)
+            {
+                await rebuilder.InsertManyAsync<RuleDomainObject, RuleDomainObject.State>(ruleIds, BatchSize, ct);
+            }
         }
     }
 }

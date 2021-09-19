@@ -102,7 +102,7 @@ namespace Notifo.Areas.Account.Controllers
                     throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
                 }
 
-                var application = await applicationManager.FindByClientIdAsync(request.ClientId);
+                var application = await applicationManager.FindByClientIdAsync(request.ClientId, HttpContext.RequestAborted);
 
                 if (application == null)
                 {
@@ -191,7 +191,7 @@ namespace Notifo.Areas.Account.Controllers
                     Destinations.IdentityToken);
             }
 
-            var properties = await applicationManager.GetPropertiesAsync(application);
+            var properties = await applicationManager.GetPropertiesAsync(application, HttpContext.RequestAborted);
 
             foreach (var claim in properties.Claims())
             {
@@ -208,7 +208,7 @@ namespace Notifo.Areas.Account.Controllers
             var scopes = request.GetScopes();
 
             principal.SetScopes(scopes);
-            principal.SetResources(await scopeManager.ListResourcesAsync(scopes).ToListAsync());
+            principal.SetResources(await scopeManager.ListResourcesAsync(scopes, HttpContext.RequestAborted).ToListAsync(HttpContext.RequestAborted));
 
             foreach (var claim in principal.Claims)
             {

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -12,6 +12,7 @@ using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public sealed class AbsoluteUrlAttribute : ValidationAttribute
     {
         public override string FormatErrorMessage(string name)

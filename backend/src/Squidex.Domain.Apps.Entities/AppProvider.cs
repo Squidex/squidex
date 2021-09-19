@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -24,27 +25,29 @@ namespace Squidex.Domain.Apps.Entities
     {
         private readonly ILocalCache localCache;
         private readonly IAppsIndex indexForApps;
-        private readonly IRulesIndex indexRules;
-        private readonly ISchemasIndex indexSchemas;
+        private readonly IRulesIndex indexForRules;
+        private readonly ISchemasIndex indexForSchemas;
 
-        public AppProvider(ILocalCache localCache, IAppsIndex indexForApps, IRulesIndex indexRules, ISchemasIndex indexSchemas)
+        public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas,
+            ILocalCache localCache)
         {
             this.localCache = localCache;
             this.indexForApps = indexForApps;
-            this.indexRules = indexRules;
-            this.indexSchemas = indexSchemas;
+            this.indexForRules = indexForRules;
+            this.indexForSchemas = indexForSchemas;
         }
 
-        public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false)
+        public async Task<(IAppEntity?, ISchemaEntity?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+            CancellationToken ct = default)
         {
-            var app = await GetAppAsync(appId, canCache);
+            var app = await GetAppAsync(appId, canCache, ct);
 
             if (app == null)
             {
                 return (null, null);
             }
 
-            var schema = await GetSchemaAsync(appId, id, canCache);
+            var schema = await GetSchemaAsync(appId, id, canCache, ct);
 
             if (schema == null)
             {
@@ -54,7 +57,8 @@ namespace Squidex.Domain.Apps.Entities
             return (app, schema);
         }
 
-        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false)
+        public async Task<IAppEntity?> GetAppAsync(DomainId appId, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = AppCacheKey(appId);
 
@@ -63,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities
                 return found;
             }
 
-            var app = await indexForApps.GetAppAsync(appId, canCache);
+            var app = await indexForApps.GetAppAsync(appId, canCache, ct);
 
             if (app != null)
             {
@@ -74,7 +78,8 @@ namespace Squidex.Domain.Apps.Entities
             return app;
         }
 
-        public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false)
+        public async Task<IAppEntity?> GetAppAsync(string appName, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = AppCacheKey(appName);
 
@@ -83,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities
                 return found;
             }
 
-            var app = await indexForApps.GetAppByNameAsync(appName, canCache);
+            var app = await indexForApps.GetAppAsync(appName, canCache, ct);
 
             if (app != null)
             {
@@ -94,7 +99,8 @@ namespace Squidex.Domain.Apps.Entities
             return app;
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, string name, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = SchemaCacheKey(appId, name);
 
@@ -103,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities
                 return found;
             }
 
-            var schema = await indexSchemas.GetSchemaByNameAsync(appId, name, canCache);
+            var schema = await indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
 
             if (schema != null)
             {
@@ -114,7 +120,8 @@ namespace Squidex.Domain.Apps.Entities
             return schema;
         }
 
-        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false)
+        public async Task<ISchemaEntity?> GetSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
+            CancellationToken ct = default)
         {
             var cacheKey = SchemaCacheKey(appId, id);
 
@@ -123,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities
                 return found;
             }
 
-            var schema = await indexSchemas.GetSchemaAsync(appId, id, canCache);
+            var schema = await indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
 
             if (schema != null)
             {
@@ -134,21 +141,23 @@ namespace Squidex.Domain.Apps.Entities
             return schema;
         }
 
-        public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions)
+        public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
+            CancellationToken ct = default)
         {
             var apps = await localCache.GetOrCreateAsync($"GetUserApps({userId})", () =>
             {
-                return indexForApps.GetAppsForUserAsync(userId, permissions);
+                return indexForApps.GetAppsForUserAsync(userId, permissions, ct);
             });
 
             return apps;
         }
 
-        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId)
+        public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
+            CancellationToken ct = default)
         {
             var schemas = await localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", () =>
             {
-                return indexSchemas.GetSchemasAsync(appId);
+                return indexForSchemas.GetSchemasAsync(appId, ct);
             });
 
             foreach (var schema in schemas)
@@ -160,19 +169,21 @@ namespace Squidex.Domain.Apps.Entities
             return schemas;
         }
 
-        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
+        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+            CancellationToken ct = default)
         {
             var rules = await localCache.GetOrCreateAsync($"GetRulesAsync({appId})", () =>
             {
-                return indexRules.GetRulesAsync(appId);
+                return indexForRules.GetRulesAsync(appId, ct);
             });
 
             return rules.ToList();
         }
 
-        public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id)
+        public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,
+            CancellationToken ct = default)
         {
-            var rules = await GetRulesAsync(appId);
+            var rules = await GetRulesAsync(appId, ct);
 
             return rules.Find(x => x.Id == id);
         }

@@ -7,16 +7,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
     public interface IUsageRepository
     {
-        Task TrackUsagesAsync(UsageUpdate update);
+        Task TrackUsagesAsync(UsageUpdate update,
+            CancellationToken ct = default);
 
-        Task TrackUsagesAsync(params UsageUpdate[] updates);
+        Task TrackUsagesAsync(UsageUpdate[] updates,
+            CancellationToken ct = default);
 
-        Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
+        Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default);
+
+        Task DeleteAsync(string key,
+            CancellationToken ct = default);
     }
 }

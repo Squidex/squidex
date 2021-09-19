@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Orleans
             var ex = await Assert.ThrowsAnyAsync<OrleansWrapperException>(() => sut.Invoke(context));
 
             Assert.Equal(original.GetType(), ex.ExceptionType);
-            Assert.Contains(original.Message, ex.Message);
+            Assert.Contains(original.Message, ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
@@ -104,10 +104,10 @@ namespace Squidex.Infrastructure.Orleans
             var original = new InvalidException("My Message");
 
             var source = new OrleansWrapperException(original, original.GetType());
-            var result = source.SerializeAndDeserializeBinary();
+            var serialized = source.SerializeAndDeserializeBinary();
 
-            Assert.Equal(result.ExceptionType, source.ExceptionType);
-            Assert.Equal(result.Message, source.Message);
+            Assert.Equal(serialized.ExceptionType, source.ExceptionType);
+            Assert.Equal(serialized.Message, source.Message);
         }
 
         [Fact, Trait("Category", "Dependencies")]

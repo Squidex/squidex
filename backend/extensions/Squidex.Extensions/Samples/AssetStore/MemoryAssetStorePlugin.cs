@@ -24,7 +24,7 @@ namespace Squidex.Extensions.Samples.AssetStore
             {
                 builder.Use(async (context, next) =>
                 {
-                    if (context.Request.Path.StartsWithSegments("/api/assets/memory"))
+                    if (context.Request.Path.StartsWithSegments("/api/assets/memory", StringComparison.Ordinal))
                     {
                         context.Response.StatusCode = 200;
 

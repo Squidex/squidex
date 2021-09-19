@@ -24,16 +24,17 @@ namespace Migrations.Migrations
             this.stateForAssets = stateForAssets;
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
-            return stateForAssets.ReadAllAsync(async (state, version) =>
+            await foreach (var (state, version) in stateForAssets.ReadAllAsync(ct))
             {
                 state.Slug = state.FileName.ToAssetSlug();
 
                 var key = DomainId.Combine(state.AppId.Id, state.Id);
 
-                await stateForAssets.WriteAsync(key, state, version, version);
-            }, ct);
+                await stateForAssets.WriteAsync(key, state, version, version, ct);
+            }
         }
     }
 }

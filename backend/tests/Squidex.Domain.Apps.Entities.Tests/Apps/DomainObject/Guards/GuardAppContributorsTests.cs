@@ -33,15 +33,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public GuardAppContributorsTests()
         {
-            A.CallTo(() => user1.Id).Returns("1");
-            A.CallTo(() => user2.Id).Returns("2");
-            A.CallTo(() => user3.Id).Returns("3");
+            A.CallTo(() => user1.Id)
+                .Returns("1");
 
-            A.CallTo(() => users.FindByIdAsync("1")).Returns(user1);
-            A.CallTo(() => users.FindByIdAsync("2")).Returns(user2);
-            A.CallTo(() => users.FindByIdAsync("3")).Returns(user3);
+            A.CallTo(() => user2.Id)
+                .Returns("2");
 
-            A.CallTo(() => users.FindByIdAsync("notfound"))
+            A.CallTo(() => user3.Id)
+                .Returns("3");
+
+            A.CallTo(() => users.FindByIdAsync("1", default))
+                .Returns(user1);
+
+            A.CallTo(() => users.FindByIdAsync("2", default))
+                .Returns(user2);
+
+            A.CallTo(() => users.FindByIdAsync("3", default))
+                .Returns(user3);
+
+            A.CallTo(() => users.FindByIdAsync("notfound", default))
                 .Returns(Task.FromResult<IUser?>(null));
 
             A.CallTo(() => appPlan.MaxContributors)

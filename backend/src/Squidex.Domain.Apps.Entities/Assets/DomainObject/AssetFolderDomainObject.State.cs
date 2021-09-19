@@ -24,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             public DomainId ParentId { get; set; }
 
+            public bool IsDeleted { get; set; }
+
             [IgnoreDataMember]
             public DomainId UniqueId
             {

@@ -39,7 +39,8 @@ namespace Squidex.Extensions.Actions.Twitter
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(TweetJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(TweetJob job,
+            CancellationToken ct = default)
         {
             var tokens = Tokens.Create(
                 twitterOptions.ClientId,

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
@@ -14,12 +15,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public interface ITextIndex
     {
-        Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope);
+        Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+            CancellationToken ct = default);
 
-        Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope);
+        Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+            CancellationToken ct = default);
 
-        Task ClearAsync();
+        Task ClearAsync(
+            CancellationToken ct = default);
 
-        Task ExecuteAsync(params IndexCommand[] commands);
+        Task ExecuteAsync(IndexCommand[] commands,
+            CancellationToken ct = default);
     }
 }

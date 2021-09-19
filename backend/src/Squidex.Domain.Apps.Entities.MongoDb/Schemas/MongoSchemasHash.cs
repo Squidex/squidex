@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
@@ -20,7 +21,7 @@ using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
-    public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntity>, ISchemasHash, IEventConsumer
+    public sealed class MongoSchemasHash : MongoRepositoryBase<MongoSchemasHashEntity>, ISchemasHash, IEventConsumer, IDeleter
     {
         public int BatchSize
         {
@@ -52,6 +53,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return "SchemasHash";
         }
 
+        async Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+        }
+
         public Task On(IEnumerable<Envelope<IEvent>> events)
         {
             var writes = new List<WriteModel<MongoSchemasHashEntity>>();
@@ -67,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
                 {
                     writes.Add(
                         new UpdateOneModel<MongoSchemasHashEntity>(
-                            Filter.Eq(x => x.AppId, schemaEvent.AppId.Id.ToString()),
+                            Filter.Eq(x => x.AppId, schemaEvent.AppId.Id),
                             Update
                                 .Set($"s.{schemaEvent.SchemaId.Id}", @event.Headers.EventStreamNumber())
                                 .Set(x => x.Updated, @event.Headers.Timestamp()))
@@ -85,11 +92,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return Collection.BulkWriteAsync(writes, BulkUnordered);
         }
 
-        public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app)
+        public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app,
+            CancellationToken ct = default)
         {
             Guard.NotNull(app, nameof(app));
 
-            var entity = await Collection.Find(x => x.AppId == app.Id.ToString()).FirstOrDefaultAsync();
+            var entity = await Collection.Find(x => x.AppId == app.Id).FirstOrDefaultAsync(ct);
 
             if (entity == null)
             {
@@ -105,7 +113,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return (entity.Updated, hash);
         }
 
-        public ValueTask<string> ComputeHashAsync(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
+        public ValueTask<string> ComputeHashAsync(IAppEntity app, IEnumerable<ISchemaEntity> schemas,
+            CancellationToken ct = default)
         {
             var ids =
                 schemas.Select(x => (x.Id.ToString(), x.Version))

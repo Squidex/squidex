@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [AllowAnonymous]
         public async Task<IActionResult> GetBackupContent(string app, DomainId id)
         {
-            var backup = await backupservice.GetBackupAsync(AppId, id);
+            var backup = await backupservice.GetBackupAsync(AppId, id, HttpContext.RequestAborted);
 
             if (backup == null || backup.Status != JobStatus.Completed)
             {

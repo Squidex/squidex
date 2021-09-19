@@ -16,6 +16,10 @@
     <PackageReference Include="Elasticsearch.Net" Version="7.14.1" />
     <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="4.0.0" />
     <PackageReference Include="Google.Cloud.Logging.V2" Version="3.3.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.670">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.0" />
     <PackageReference Include="Microsoft.Azure.SignalR.Management" Version="1.9.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />

@@ -43,7 +43,7 @@ namespace Squidex.Areas.Frontend.Middlewares
         {
             if (httpContext.Request.PathBase != null)
             {
-                html = html.Replace("<base href=\"/\">", $"<base href=\"{httpContext.Request.PathBase}/\">");
+                html = html.Replace("<base href=\"/\">", $"<base href=\"{httpContext.Request.PathBase}/\">", StringComparison.OrdinalIgnoreCase);
             }
 
             return html;
@@ -76,7 +76,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 var texts = GetText(CultureInfo.CurrentUICulture.Name);
 
-                html = html.Replace("<body>", $"<body>\n<script>\nvar options = {jsonOptions};\nvar texts = {texts};</script>");
+                html = html.Replace("<body>", $"<body>\n<script>\nvar options = {jsonOptions};\nvar texts = {texts};</script>", StringComparison.OrdinalIgnoreCase);
             }
 
             return html;

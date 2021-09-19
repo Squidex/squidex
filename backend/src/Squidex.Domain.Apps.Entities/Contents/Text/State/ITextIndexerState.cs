@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -13,10 +14,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public interface ITextIndexerState
     {
-        Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids);
+        Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+            CancellationToken ct = default);
 
-        Task SetAsync(List<TextContentState> updates);
+        Task SetAsync(List<TextContentState> updates,
+            CancellationToken ct = default);
 
-        Task ClearAsync();
+        Task ClearAsync(
+            CancellationToken ct = default);
     }
 }

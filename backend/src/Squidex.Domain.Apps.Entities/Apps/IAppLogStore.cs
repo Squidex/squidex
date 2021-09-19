@@ -15,8 +15,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppLogStore
     {
-        Task LogAsync(DomainId appId, RequestLog request);
+        Task LogAsync(DomainId appId, RequestLog request,
+            CancellationToken ct = default);
 
-        Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream, CancellationToken ct = default);
+        Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream,
+            CancellationToken ct = default);
     }
 }

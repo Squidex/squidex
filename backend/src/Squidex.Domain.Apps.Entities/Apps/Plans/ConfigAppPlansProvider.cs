@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 }
             }
 
-            freePlan = plansList.FirstOrDefault(x => x.IsFree) ?? Infinite;
+            freePlan = plansList.Find(x => x.IsFree) ?? Infinite;
         }
 
         public IEnumerable<IAppLimitsPlan> GetAvailablePlans()

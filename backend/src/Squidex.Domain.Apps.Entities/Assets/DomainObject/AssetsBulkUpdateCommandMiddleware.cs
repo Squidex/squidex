@@ -104,7 +104,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             bulkUpdates,
                             results);
 
-                        await createCommandsBlock.SendAsync(task);
+                        if (!await createCommandsBlock.SendAsync(task))
+                        {
+                            break;
+                        }
                     }
 
                     createCommandsBlock.Complete();

@@ -27,6 +27,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             this.state = state;
         }
 
+        public Task ClearAsync()
+        {
+            TryDeactivateOnIdle();
+
+            return state.ClearAsync();
+        }
+
         public Task<long> IncrementAsync(string name)
         {
             state.Value.Counters.TryGetValue(name, out var value);

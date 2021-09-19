@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -17,12 +18,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public class CachingTextIndexerStateTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly ITextIndexerState inner = A.Fake<ITextIndexerState>();
         private readonly DomainId contentId = DomainId.NewGuid();
         private readonly CachingTextIndexerState sut;
 
         public CachingTextIndexerStateTests()
         {
+            ct = cts.Token;
+
             sut = new CachingTextIndexerState(inner);
         }
 
@@ -38,16 +43,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 [contentId] = state
             };
 
-            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds)))
+            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), ct))
                 .Returns(states);
 
-            var found1 = await sut.GetAsync(HashSet.Of(contentId));
-            var found2 = await sut.GetAsync(HashSet.Of(contentId));
+            var found1 = await sut.GetAsync(HashSet.Of(contentId), ct);
+            var found2 = await sut.GetAsync(HashSet.Of(contentId), ct);
 
             Assert.Same(state, found1[contentId]);
             Assert.Same(state, found2[contentId]);
 
-            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds)))
+            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -56,16 +61,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var contentIds = HashSet.Of(contentId);
 
-            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds)))
+            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), ct))
                 .Returns(new Dictionary<DomainId, TextContentState>());
 
-            var found1 = await sut.GetAsync(HashSet.Of(contentId));
-            var found2 = await sut.GetAsync(HashSet.Of(contentId));
+            var found1 = await sut.GetAsync(HashSet.Of(contentId), ct);
+            var found2 = await sut.GetAsync(HashSet.Of(contentId), ct);
 
             Assert.Empty(found1);
             Assert.Empty(found2);
 
-            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds)))
+            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>.That.Is(contentIds), ct))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -76,21 +81,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var state = new TextContentState { UniqueContentId = contentId };
 
-            await sut.SetAsync(new List<TextContentState>
-            {
-                state
-            });
+            await sut.SetAsync(new List<TextContentState> { state }, ct);
 
-            var found1 = await sut.GetAsync(contentIds);
-            var found2 = await sut.GetAsync(contentIds);
+            var found1 = await sut.GetAsync(contentIds, ct);
+            var found2 = await sut.GetAsync(contentIds, ct);
 
             Assert.Same(state, found1[contentId]);
             Assert.Same(state, found2[contentId]);
 
-            A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.IsSameSequenceAs(state)))
+            A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.IsSameSequenceAs(state), ct))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._))
+            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -104,23 +106,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await sut.SetAsync(new List<TextContentState>
             {
                 state
-            });
+            }, ct);
 
             await sut.SetAsync(new List<TextContentState>
             {
                 new TextContentState { UniqueContentId = contentId, IsDeleted = true }
-            });
+            }, ct);
 
-            var found1 = await sut.GetAsync(contentIds);
-            var found2 = await sut.GetAsync(contentIds);
+            var found1 = await sut.GetAsync(contentIds, ct);
+            var found2 = await sut.GetAsync(contentIds, ct);
 
             Assert.Empty(found1);
             Assert.Empty(found2);
 
-            A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.Matches(x => x.Count == 1 && x[0].IsDeleted)))
+            A.CallTo(() => inner.SetAsync(A<List<TextContentState>>.That.Matches(x => x.Count == 1 && x[0].IsDeleted), ct))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._))
+            A.CallTo(() => inner.GetAsync(A<HashSet<DomainId>>._, ct))
                 .MustNotHaveHappened();
         }
     }

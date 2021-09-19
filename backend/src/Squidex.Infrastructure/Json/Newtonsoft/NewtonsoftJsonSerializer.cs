@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             serializer = JsonSerializer.Create(settings);
         }
 
-        public string Serialize<T>(T value, bool intented)
+        public string Serialize<T>(T value, bool intented = false)
         {
             var formatting = intented ? Formatting.Indented : Formatting.None;
 

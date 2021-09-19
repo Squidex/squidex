@@ -83,11 +83,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (version >= 0)
                 {
-                    return await context.FindContentAsync(fieldContext.FieldDefinition.SchemaId(), contentId, version.Value);
+                    return await context.FindContentAsync(fieldContext.FieldDefinition.SchemaId(), contentId, version.Value,
+                        fieldContext.CancellationToken);
                 }
                 else
                 {
-                    return await context.FindContentAsync(contentId);
+                    return await context.FindContentAsync(contentId,
+                        fieldContext.CancellationToken);
                 }
             });
         }
@@ -134,7 +136,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 var q = Q.Empty.WithODataQuery(query).WithoutTotal();
 
-                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q);
+                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+                    fieldContext.CancellationToken);
             });
 
             public static readonly IFieldResolver QueryWithTotal = Resolvers.Async<object, object>(async (_, fieldContext, context) =>
@@ -143,7 +146,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 var q = Q.Empty.WithODataQuery(query);
 
-                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q);
+                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+                    fieldContext.CancellationToken);
             });
 
             public static readonly IFieldResolver Referencing = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
@@ -152,7 +156,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 var q = Q.Empty.WithODataQuery(query).WithReference(source.Id).WithoutTotal();
 
-                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q);
+                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+                    fieldContext.CancellationToken);
             });
 
             public static readonly IFieldResolver ReferencingWithTotal = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
@@ -161,7 +166,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 var q = Q.Empty.WithODataQuery(query).WithReference(source.Id);
 
-                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q);
+                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+                    fieldContext.CancellationToken);
             });
         }
 

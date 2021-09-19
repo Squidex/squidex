@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             foreach (var schema in validSchemas)
             {
-                var components = await appProvider.GetComponentsAsync(schema);
+                var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
 
                 GenerateSchemaOperations(builder.Schema(schema.SchemaDef, components, flat));
             }
@@ -224,8 +224,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                     Title = $"Squidex Content API for '{appName}' App",
                     Description =
                         Resources.OpenApiContentDescription
-                            .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"))
-                            .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"))
+                            .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"), StringComparison.Ordinal)
+                            .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"), StringComparison.Ordinal)
                 },
                 SchemaType = SchemaType.OpenApi3
             };

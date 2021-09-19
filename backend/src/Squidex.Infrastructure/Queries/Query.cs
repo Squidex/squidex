@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Queries
@@ -54,7 +55,7 @@ namespace Squidex.Infrastructure.Queries
 
             if (FullText != null)
             {
-                parts.Add($"FullText: '{FullText.Replace("'", "\'")}'");
+                parts.Add($"FullText: '{FullText.Replace("'", "\'", StringComparison.Ordinal)}'");
             }
 
             if (Skip > 0)

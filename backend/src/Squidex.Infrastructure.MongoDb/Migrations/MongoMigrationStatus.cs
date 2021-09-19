@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
@@ -26,37 +27,44 @@ namespace Squidex.Infrastructure.Migrations
             return "Migration";
         }
 
-        public async Task<int> GetVersionAsync()
+        public async Task<int> GetVersionAsync(
+            CancellationToken ct = default)
         {
-            var entity = await Collection.Find(x => x.Id == DefaultId).FirstOrDefaultAsync();
+            var entity = await Collection.Find(x => x.Id == DefaultId).FirstOrDefaultAsync(ct);
 
             return entity.Version;
         }
 
-        public async Task<bool> TryLockAsync()
+        public async Task<bool> TryLockAsync(
+            CancellationToken ct = default)
         {
             var entity =
                 await Collection.FindOneAndUpdateAsync<MongoMigrationEntity>(x => x.Id == DefaultId,
                     Update
                         .Set(x => x.IsLocked, true)
                         .SetOnInsert(x => x.Version, 0),
-                    UpsertFind);
+                    UpsertFind,
+                    ct);
 
-            return entity == null || entity.IsLocked == false;
+            return entity == null || !entity.IsLocked;
         }
 
-        public Task CompleteAsync(int newVersion)
+        public Task CompleteAsync(int newVersion,
+            CancellationToken ct = default)
         {
             return Collection.UpdateOneAsync(x => x.Id == DefaultId,
                 Update
-                    .Set(x => x.Version, newVersion));
+                    .Set(x => x.Version, newVersion),
+                cancellationToken: ct);
         }
 
-        public Task UnlockAsync()
+        public Task UnlockAsync(
+            CancellationToken ct = default)
         {
             return Collection.UpdateOneAsync(x => x.Id == DefaultId,
                 Update
-                    .Set(x => x.IsLocked, false));
+                    .Set(x => x.IsLocked, false),
+                cancellationToken: ct);
         }
     }
 }

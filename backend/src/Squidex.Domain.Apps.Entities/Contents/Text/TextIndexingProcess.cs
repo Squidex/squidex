@@ -118,6 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 var state = new TextContentState
                 {
+                    AppId = @event.AppId.Id,
                     UniqueContentId = uniqueId
                 };
 

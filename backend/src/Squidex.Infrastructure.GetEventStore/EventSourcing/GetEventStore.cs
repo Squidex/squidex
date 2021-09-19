@@ -43,7 +43,8 @@ namespace Squidex.Infrastructure.EventSourcing
             projectionClient = new ProjectionClient(connection, this.prefix, projectionHost);
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct = default)
         {
             try
             {

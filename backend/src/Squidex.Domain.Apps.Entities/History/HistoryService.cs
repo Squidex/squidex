@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Events;
@@ -98,9 +99,10 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        public async Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count)
+        public async Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
+            CancellationToken ct = default)
         {
-            var items = await repository.QueryByChannelAsync(appId, channelPrefix, count);
+            var items = await repository.QueryByChannelAsync(appId, channelPrefix, count, ct);
 
             return items.Select(x => new ParsedHistoryEvent(x, texts)).ToList();
         }

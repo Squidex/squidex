@@ -299,7 +299,7 @@ describe('AppsService', () => {
             req.flush({});
         }));
 
-    it('should make delete request to archive app',
+    it('should make delete request to delete app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             const resource: Resource = {
                 _links: {

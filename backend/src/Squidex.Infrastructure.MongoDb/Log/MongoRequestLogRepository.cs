@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Log
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection,
-            CancellationToken ct = default)
+            CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
@@ -53,34 +53,40 @@ namespace Squidex.Infrastructure.Log
             }, ct);
         }
 
-        public Task InsertManyAsync(IEnumerable<Request> items)
+        public Task InsertManyAsync(IEnumerable<Request> items,
+            CancellationToken ct = default)
         {
             Guard.NotNull(items, nameof(items));
 
-            var entities = items.Select(x => new MongoRequest { Key = x.Key, Timestamp = x.Timestamp, Properties = x.Properties }).ToList();
+            var entities = items.Select(MongoRequest.FromRequest).ToList();
 
             if (entities.Count == 0)
             {
                 return Task.CompletedTask;
             }
 
-            return Collection.InsertManyAsync(entities, InsertUnordered);
+            return Collection.InsertManyAsync(entities, InsertUnordered, ct);
         }
 
-        public Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(key, nameof(key));
+
+            return Collection.DeleteManyAsync(Filter.Eq(x => x.Key, key), ct);
+        }
+
+        public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
+        {
             Guard.NotNullOrEmpty(key, nameof(key));
 
             var timestampStart = Instant.FromDateTimeUtc(fromDate);
             var timestampEnd = Instant.FromDateTimeUtc(toDate.AddDays(1));
 
-            return Collection.Find(x => x.Key == key && x.Timestamp >= timestampStart && x.Timestamp < timestampEnd).ForEachAsync(x =>
-            {
-                var request = new Request { Key = x.Key, Timestamp = x.Timestamp, Properties = x.Properties };
+            var find = Collection.Find(x => x.Key == key && x.Timestamp >= timestampStart && x.Timestamp < timestampEnd);
 
-                return callback(request);
-            }, ct);
+            return find.ToAsyncEnumerable(ct).Select(x => x.ToRequest());
         }
     }
 }

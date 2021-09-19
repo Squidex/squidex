@@ -253,7 +253,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
                 if (user != null)
                 {
-                    var update = CreateUserValues(externalLogin, email, user: user);
+                    var update = CreateUserValues(externalLogin, email, user);
 
                     await userService.UpdateAsync(user.Id, update);
                 }

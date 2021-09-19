@@ -144,31 +144,31 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         private static string Format(string text, TemplatesVars vars)
         {
-            text = text.Replace("$APP_NAME", vars.AppName);
+            text = text.Replace("$APP_NAME", vars.AppName, StringComparison.Ordinal);
 
             if (vars.Assigner != null)
             {
-                text = text.Replace("$ASSIGNER_EMAIL", vars.Assigner.Email);
-                text = text.Replace("$ASSIGNER_NAME", vars.Assigner.Claims.DisplayName());
+                text = text.Replace("$ASSIGNER_EMAIL", vars.Assigner.Email, StringComparison.Ordinal);
+                text = text.Replace("$ASSIGNER_NAME", vars.Assigner.Claims.DisplayName(), StringComparison.Ordinal);
             }
 
             if (vars.User != null)
             {
-                text = text.Replace("$USER_EMAIL", vars.User.Email);
-                text = text.Replace("$USER_NAME", vars.User.Claims.DisplayName());
+                text = text.Replace("$USER_EMAIL", vars.User.Email, StringComparison.Ordinal);
+                text = text.Replace("$USER_NAME", vars.User.Claims.DisplayName(), StringComparison.Ordinal);
             }
 
             if (vars.ApiCallsLimit != null)
             {
-                text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.ToString());
+                text = text.Replace("$API_CALLS_LIMIT", vars.ApiCallsLimit.ToString(), StringComparison.Ordinal);
             }
 
             if (vars.ApiCalls != null)
             {
-                text = text.Replace("$API_CALLS", vars.ApiCalls.ToString());
+                text = text.Replace("$API_CALLS", vars.ApiCalls.ToString(), StringComparison.Ordinal);
             }
 
-            text = text.Replace("$UI_URL", vars.URL);
+            text = text.Replace("$UI_URL", vars.URL, StringComparison.Ordinal);
 
             return text;
         }

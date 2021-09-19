@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,10 +25,9 @@ namespace Squidex.Infrastructure.Log
         private readonly RequestLogStoreOptions options;
         private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
 
-        public bool IsEnabled
-        {
-            get => options.StoreEnabled;
-        }
+        public bool ForceWrite { get; set; }
+
+        public bool IsEnabled => options.StoreEnabled;
 
         public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
             IRequestLogRepository logRepository, ISemanticLog log)
@@ -35,9 +35,10 @@ namespace Squidex.Infrastructure.Log
             this.options = options.Value;
 
             this.logRepository = logRepository;
-            this.log = log;
 
-            timer = new CompletionTimer(options.Value.WriteIntervall, ct => TrackAsync(), options.Value.WriteIntervall);
+            timer = new CompletionTimer(options.Value.WriteIntervall, TrackAsync, options.Value.WriteIntervall);
+
+            this.log = log;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -55,7 +56,8 @@ namespace Squidex.Infrastructure.Log
             timer.SkipCurrentDelay();
         }
 
-        private async Task TrackAsync()
+        private async Task TrackAsync(
+            CancellationToken ct)
         {
             if (!IsEnabled)
             {
@@ -74,7 +76,14 @@ namespace Squidex.Infrastructure.Log
 
                     for (var i = 0; i < pages; i++)
                     {
-                        await logRepository.InsertManyAsync(localJobs.Skip(i * batchSize).Take(batchSize));
+                        var batch = localJobs.Skip(i * batchSize).Take(batchSize);
+
+                        if (ForceWrite)
+                        {
+                            ct = default;
+                        }
+
+                        await logRepository.InsertManyAsync(batch, ct);
                     }
                 }
             }
@@ -86,14 +95,32 @@ namespace Squidex.Infrastructure.Log
             }
         }
 
-        public Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
         {
-            return logRepository.QueryAllAsync(callback, key, fromDate, toDate, ct);
+            return logRepository.DeleteAsync(key, ct);
         }
 
-        public Task LogAsync(Request request)
+        public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
+        {
+            if (!IsEnabled)
+            {
+                return AsyncEnumerable.Empty<Request>();
+            }
+
+            return logRepository.QueryAllAsync(key, fromDate, toDate, ct);
+        }
+
+        public Task LogAsync(Request request,
+            CancellationToken ct = default)
         {
             Guard.NotNull(request, nameof(request));
+
+            if (!IsEnabled)
+            {
+                return Task.CompletedTask;
+            }
 
             jobs.Enqueue(request);
 

@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
     {
         [BsonId]
         [BsonElement]
-        public string AppId { get; set; }
+        public DomainId AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("s")]

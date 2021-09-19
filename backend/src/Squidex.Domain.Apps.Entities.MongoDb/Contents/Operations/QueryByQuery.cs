@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -64,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             try
             {
-                var schema = await appProvider.GetSchemaAsync(appId, schemaId);
+                var schema = await appProvider.GetSchemaAsync(appId, schemaId, ct: ct);
 
                 if (schema == null)
                 {
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
@@ -117,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
@@ -154,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406"))
+            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
             {
                 throw new DomainException(T.Get("common.resultTooLarge"));
             }

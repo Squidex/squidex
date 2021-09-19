@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Commands
             Task InvokeAsync(CommandContext context);
         }
 
-        private class NoopStep : IStep
+        private sealed class NoopStep : IStep
         {
             public Task InvokeAsync(CommandContext context)
             {
@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        private class DefaultStep : IStep
+        private sealed class DefaultStep : IStep
         {
             private readonly IStep next;
             private readonly ICommandMiddleware middleware;

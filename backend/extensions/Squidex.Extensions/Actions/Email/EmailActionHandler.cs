@@ -41,7 +41,8 @@ namespace Squidex.Extensions.Actions.Email
             return (description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(EmailJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(EmailJob job,
+            CancellationToken ct = default)
         {
             using (var smtpClient = new SmtpClient())
             {

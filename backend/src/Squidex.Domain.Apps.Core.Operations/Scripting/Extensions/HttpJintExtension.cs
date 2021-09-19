@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         private static async Task<JsValue> ParseResponse(ExecutionContext context, HttpResponseMessage response)
         {
-            var responseString = await response.Content.ReadAsStringAsync();
+            var responseString = await response.Content.ReadAsStringAsync(context.CancellationToken);
 
             context.CancellationToken.ThrowIfCancellationRequested();
 

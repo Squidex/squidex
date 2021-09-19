@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             // Dataflow swallows operation cancelled exception.
                             throw new AggregateException(ex);
                         }
-                }, executionOptions);
+                    }, executionOptions);
 
                     var executeCommandBlock = new ActionBlock<BulkTaskCommand>(async command =>
                     {
@@ -111,7 +111,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             bulkUpdates,
                             results);
 
-                        await createCommandsBlock.SendAsync(task);
+                        if (!await createCommandsBlock.SendAsync(task))
+                        {
+                            break;
+                        }
                     }
 
                     createCommandsBlock.Complete();

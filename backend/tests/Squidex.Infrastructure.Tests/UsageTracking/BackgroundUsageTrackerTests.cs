@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
@@ -17,6 +18,8 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public class BackgroundUsageTrackerTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IUsageRepository usageStore = A.Fake<IUsageRepository>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly string key = Guid.NewGuid().ToString();
@@ -25,7 +28,12 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public BackgroundUsageTrackerTests()
         {
-            sut = new BackgroundUsageTracker(usageStore, log);
+            ct = cts.Token;
+
+            sut = new BackgroundUsageTracker(usageStore, log)
+            {
+                ForceWrite = true
+            };
         }
 
         [Fact]
@@ -33,7 +41,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(date, key, "category1", new Counters()));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(date, key, "category1", new Counters(), ct));
         }
 
         [Fact]
@@ -41,7 +49,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync(key, date, date.AddDays(1)));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync(key, date, date.AddDays(1), ct));
         }
 
         [Fact]
@@ -49,7 +57,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetForMonthAsync(key, date, null));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetForMonthAsync(key, date, null, ct));
         }
 
         [Fact]
@@ -57,7 +65,16 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetAsync(key, date, date, null));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetAsync(key, date, date, null, ct));
+        }
+
+        [Fact]
+        public async Task Should_forward_delete_call()
+        {
+            await sut.DeleteAsync(key, ct);
+
+            A.CallTo(() => usageStore.DeleteAsync(key, ct))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -74,11 +91,11 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage("category2", date.AddDays(7), Counters(b: 22))
             };
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(originalData);
 
-            var result1 = await sut.GetForMonthAsync(key, date, null);
-            var result2 = await sut.GetForMonthAsync(key, date, "category2");
+            var result1 = await sut.GetForMonthAsync(key, date, null, ct);
+            var result2 = await sut.GetForMonthAsync(key, date, "category2", ct);
 
             Assert.Equal(38, result1["A"]);
             Assert.Equal(55, result1["B"]);
@@ -100,11 +117,11 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage("category2", date.AddDays(7), Counters(b: 22))
             };
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(originalData);
 
-            var result1 = await sut.GetAsync(key, dateFrom, dateTo, null);
-            var result2 = await sut.GetAsync(key, dateFrom, dateTo, "category2");
+            var result1 = await sut.GetAsync(key, dateFrom, dateTo, null, ct);
+            var result2 = await sut.GetAsync(key, dateFrom, dateTo, "category2", ct);
 
             Assert.Equal(38, result1["A"]);
             Assert.Equal(55, result1["B"]);
@@ -118,10 +135,10 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = date;
             var dateTo = dateFrom.AddDays(4);
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(new List<StoredUsage>());
 
-            var result = await sut.QueryAsync(key, dateFrom, dateTo);
+            var result = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
             var expected = new Dictionary<string, List<(DateTime Date, Counters Counters)>>
             {
@@ -153,10 +170,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(null, dateFrom.AddDays(2), Counters(a: 11, b: 14))
             };
 
-            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
                 .Returns(originalData);
 
-            var result = await sut.QueryAsync(key, dateFrom, dateTo);
+            var result = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 
             var expected = new Dictionary<string, List<(DateTime Date, Counters Counters)>>
             {
@@ -182,30 +199,36 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public async Task Should_aggregate_and_store_on_dispose()
+        public async Task Should_write_usage_in_batches()
         {
             var key1 = Guid.NewGuid().ToString();
             var key2 = Guid.NewGuid().ToString();
             var key3 = Guid.NewGuid().ToString();
 
-            await sut.TrackAsync(date, key1, "my-category", Counters(a: 1, b: 1000));
+            await sut.TrackAsync(date, key1, "my-category", Counters(a: 1, b: 1000), ct);
 
-            await sut.TrackAsync(date, key2, "my-category", Counters(a: 1.0, b: 2000));
-            await sut.TrackAsync(date, key2, "my-category", Counters(a: 0.5, b: 3000));
+            await sut.TrackAsync(date, key2, "my-category", Counters(a: 1.0, b: 2000), ct);
+            await sut.TrackAsync(date, key2, "my-category", Counters(a: 0.5, b: 3000), ct);
 
-            await sut.TrackAsync(date, key3, "my-category", Counters(a: 0.3, b: 4000));
-            await sut.TrackAsync(date, key3, "my-category", Counters(a: 0.1, b: 5000));
+            await sut.TrackAsync(date, key3, "my-category", Counters(a: 0.3, b: 4000), ct);
+            await sut.TrackAsync(date, key3, "my-category", Counters(a: 0.1, b: 5000), ct);
 
-            await sut.TrackAsync(date, key3, null, Counters(a: 0.5, b: 2000));
-            await sut.TrackAsync(date, key3, null, Counters(a: 0.5, b: 6000));
+            await sut.TrackAsync(date, key3, null, Counters(a: 0.5, b: 2000), ct);
+            await sut.TrackAsync(date, key3, null, Counters(a: 0.5, b: 6000), ct);
 
             UsageUpdate[]? updates = null;
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._))
-                .Invokes((UsageUpdate[] u) => updates = u);
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))
+                .Invokes(args =>
+                {
+                    updates = args.GetArgument<UsageUpdate[]>(0)!;
+                });
 
             sut.Next();
             sut.Dispose();
+
+            // Wait for the timer to trigger.
+            await Task.Delay(500, ct);
 
             updates.Should().BeEquivalentTo(new[]
             {
@@ -215,7 +238,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new UsageUpdate(date, key3, "*", Counters(1, 8000))
             }, o => o.ComparingByMembers<UsageUpdate>());
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._))
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

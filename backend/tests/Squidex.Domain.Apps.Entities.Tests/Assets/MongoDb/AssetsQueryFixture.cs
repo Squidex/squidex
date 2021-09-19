@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             Task.Run(async () =>
             {
-                await assetRepository.InitializeAsync();
+                await assetRepository.InitializeAsync(default);
 
                 await mongoDatabase.RunCommandAsync<BsonDocument>("{ profile : 0 }");
                 await mongoDatabase.DropCollectionAsync("system.profile");

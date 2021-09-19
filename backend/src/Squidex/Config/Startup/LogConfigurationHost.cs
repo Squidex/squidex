@@ -28,7 +28,8 @@ namespace Squidex.Config.Startup
             this.log = log;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(
+            CancellationToken cancellationToken)
         {
             log.LogInformation(w => w
                 .WriteProperty("message", "Application started")
@@ -50,7 +51,8 @@ namespace Squidex.Config.Startup
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(
+            CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

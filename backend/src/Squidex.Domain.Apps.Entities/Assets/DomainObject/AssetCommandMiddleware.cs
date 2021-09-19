@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, string tempFile)
         {
-            using (var uploadStream = command.File.OpenRead())
+            await using (var uploadStream = command.File.OpenRead())
             {
                 using (var hashStream = new HasherStream(uploadStream, HashAlgorithmName.SHA256))
                 {

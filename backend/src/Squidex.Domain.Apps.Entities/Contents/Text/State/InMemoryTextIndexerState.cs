@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -15,14 +16,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
     {
         private readonly Dictionary<DomainId, TextContentState> states = new Dictionary<DomainId, TextContentState>();
 
-        public Task ClearAsync()
+        public Task ClearAsync(
+            CancellationToken ct = default)
         {
             states.Clear();
 
             return Task.CompletedTask;
         }
 
-        public Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids)
+        public Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
+            CancellationToken ct = default)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -39,7 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
             return Task.FromResult(result);
         }
 
-        public Task SetAsync(List<TextContentState> updates)
+        public Task SetAsync(List<TextContentState> updates,
+            CancellationToken ct = default)
         {
             Guard.NotNull(updates, nameof(updates));
 

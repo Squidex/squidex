@@ -23,7 +23,8 @@ namespace Migrations.Migrations
             eventConsumerManager = grainFactory.GetGrain<IEventConsumerManagerGrain>(SingleGrain.Id);
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             return eventConsumerManager.StartAllAsync();
         }

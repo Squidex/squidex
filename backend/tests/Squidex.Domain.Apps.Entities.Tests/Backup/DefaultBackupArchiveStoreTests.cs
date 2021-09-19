@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public class DefaultBackupArchiveStoreTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
         private readonly DomainId backupId = DomainId.NewGuid();
         private readonly string fileName;
@@ -24,6 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public DefaultBackupArchiveStoreTests()
         {
+            ct = cts.Token;
+
             fileName = $"{backupId}_0";
 
             sut = new DefaultBackupArchiveStore(assetStore);
@@ -34,9 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var stream = new MemoryStream();
 
-            await sut.UploadAsync(backupId, stream);
+            await sut.UploadAsync(backupId, stream, ct);
 
-            A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, CancellationToken.None))
+            A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, ct))
                 .MustHaveHappened();
         }
 
@@ -45,18 +49,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var stream = new MemoryStream();
 
-            await sut.DownloadAsync(backupId, stream);
+            await sut.DownloadAsync(backupId, stream, ct);
 
-            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, ct))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_invoke_asset_store_to_delete_archive_using_suffix_for_compatibility()
         {
-            await sut.DeleteAsync(backupId);
+            await sut.DeleteAsync(backupId, ct);
 
-            A.CallTo(() => assetStore.DeleteAsync(fileName))
+            A.CallTo(() => assetStore.DeleteAsync(fileName, ct))
                 .MustHaveHappened();
         }
     }

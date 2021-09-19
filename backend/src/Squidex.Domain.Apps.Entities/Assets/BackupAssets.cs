@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Tags;
@@ -38,12 +39,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public Task BackupAsync(BackupContext context)
+        public Task BackupAsync(BackupContext context,
+            CancellationToken ct)
         {
-            return BackupTagsAsync(context);
+            return BackupTagsAsync(context, ct);
         }
 
-        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
+        public Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
@@ -52,19 +55,22 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         assetCreated.AppId.Id,
                         assetCreated.AssetId,
                         assetCreated.FileVersion,
-                        context.Writer);
+                        context.Writer,
+                        ct);
                 case AssetUpdated assetUpdated:
                     return WriteAssetAsync(
                         assetUpdated.AppId.Id,
                         assetUpdated.AssetId,
                         assetUpdated.FileVersion,
-                        context.Writer);
+                        context.Writer,
+                        ct);
             }
 
             return Task.CompletedTask;
         }
 
-        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
@@ -78,57 +84,65 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         assetCreated.AppId.Id,
                         assetCreated.AssetId,
                         assetCreated.FileVersion,
-                        context.Reader);
+                        context.Reader,
+                        ct);
                     break;
                 case AssetUpdated assetUpdated:
                     await ReadAssetAsync(
                         assetUpdated.AppId.Id,
                         assetUpdated.AssetId,
                         assetUpdated.FileVersion,
-                        context.Reader);
+                        context.Reader,
+                        ct);
                     break;
             }
 
             return true;
         }
 
-        public async Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
-            await RestoreTagsAsync(context);
+            await RestoreTagsAsync(context, ct);
 
             if (assetIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize);
+                await rebuilder.InsertManyAsync<AssetDomainObject, AssetDomainObject.State>(assetIds, BatchSize, ct);
             }
 
             if (assetFolderIds.Count > 0)
             {
-                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds, BatchSize);
+                await rebuilder.InsertManyAsync<AssetFolderDomainObject, AssetFolderDomainObject.State>(assetFolderIds, BatchSize, ct);
             }
         }
 
-        private async Task RestoreTagsAsync(RestoreContext context)
+        private async Task RestoreTagsAsync(RestoreContext context,
+            CancellationToken ct)
         {
-            var tags = await context.Reader.ReadJsonAsync<TagsExport>(TagsFile);
+            var tags = await context.Reader.ReadJsonAsync<TagsExport>(TagsFile, ct);
 
             await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, tags);
         }
 
-        private async Task BackupTagsAsync(BackupContext context)
+        private async Task BackupTagsAsync(BackupContext context,
+            CancellationToken ct)
         {
             var tags = await tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets);
 
-            await context.Writer.WriteJsonAsync(TagsFile, tags);
+            await context.Writer.WriteJsonAsync(TagsFile, tags, ct);
         }
 
-        private async Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer)
+        private async Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer,
+            CancellationToken ct)
         {
             try
             {
-                await writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
+                var fileName = GetName(assetId, fileVersion);
+
+                await using (var stream = await writer.OpenBlobAsync(fileName, ct))
                 {
-                    return assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream);
-                });
+                    await assetFileStore.DownloadAsync(appId, assetId, fileVersion, null, stream, default, ct);
+                }
             }
             catch (AssetNotFoundException)
             {
@@ -136,14 +150,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private async Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader)
+        private async Task ReadAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupReader reader,
+            CancellationToken ct)
         {
             try
             {
-                await reader.ReadBlobAsync(GetName(assetId, fileVersion), stream =>
+                var fileName = GetName(assetId, fileVersion);
+
+                await using (var stream = await reader.OpenBlobAsync(fileName, ct))
                 {
-                    return assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream);
-                });
+                    await assetFileStore.UploadAsync(appId, assetId, fileVersion, null, stream, true, ct);
+                }
             }
             catch (FileNotFoundException)
             {

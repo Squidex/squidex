@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             app = Mocks.App(AppNamedId, Language.DE);
 
-            A.CallTo(() => appProvider.GetAppAsync(AppId, false))
+            A.CallTo(() => appProvider.GetAppAsync(AppId, false, default))
                 .Returns(app);
 
             A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))

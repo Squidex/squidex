@@ -29,11 +29,12 @@ namespace Squidex.Infrastructure.Migrations
             this.log = log;
         }
 
-        public async Task MigrateAsync(CancellationToken ct = default)
+        public async Task MigrateAsync(
+            CancellationToken ct = default)
         {
             try
             {
-                while (!await migrationStatus.TryLockAsync())
+                while (!await migrationStatus.TryLockAsync(ct))
                 {
                     log.LogInformation(w => w
                         .WriteProperty("action", "Migrate")
@@ -42,7 +43,7 @@ namespace Squidex.Infrastructure.Migrations
                     await Task.Delay(LockWaitMs, ct);
                 }
 
-                var version = await migrationStatus.GetVersionAsync();
+                var version = await migrationStatus.GetVersionAsync(ct);
 
                 while (!ct.IsCancellationRequested)
                 {
@@ -85,12 +86,16 @@ namespace Squidex.Infrastructure.Migrations
 
                     version = newVersion;
 
-                    await migrationStatus.CompleteAsync(newVersion);
+                    await migrationStatus.CompleteAsync(newVersion, ct);
                 }
             }
             finally
             {
+#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
+#pragma warning disable MA0040 // Flow the cancellation token
                 await migrationStatus.UnlockAsync();
+#pragma warning restore MA0040 // Flow the cancellation token
+#pragma warning restore CA2016 // Forward the 'CancellationToken' parameter to methods that take one
             }
         }
     }

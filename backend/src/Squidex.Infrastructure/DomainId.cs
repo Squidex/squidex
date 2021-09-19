@@ -61,12 +61,12 @@ namespace Squidex.Infrastructure
 
         public bool Equals(DomainId other)
         {
-            return string.Equals(ToString(), other.ToString());
+            return string.Equals(ToString(), other.ToString(), StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return ToString().GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

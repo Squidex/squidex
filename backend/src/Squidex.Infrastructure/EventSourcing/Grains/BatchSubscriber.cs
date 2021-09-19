@@ -66,6 +66,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 SingleWriter = true
             });
 
+#pragma warning disable MA0040 // Flow the cancellation token
             batchQueue.Batch<BatchItem, object>(taskQueue, x => new BatchJob(x.ToArray()), batchSize, batchDelay);
 
             Task.Run(async () =>
@@ -74,8 +75,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 {
                     try
                     {
-                        var shouldHandle = eventConsumer.Handles(storedEvent);
-
                         Envelope<IEvent>? @event = null;
 
                         if (eventConsumer.Handles(storedEvent))
@@ -91,48 +90,56 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     }
                 }
             }).ContinueWith(x => batchQueue.Writer.TryComplete(x.Exception));
+#pragma warning restore MA0040 // Flow the cancellation token
 
             handleTask = Run(grain);
         }
 
         private async Task Run(EventConsumerGrain grain)
         {
-            await foreach (var task in taskQueue.Reader.ReadAllAsync())
+            try
             {
-                var sender = eventSubscription?.Sender;
-
-                if (sender == null)
+                await foreach (var task in taskQueue.Reader.ReadAllAsync(completed.Token))
                 {
-                    continue;
-                }
+                    var sender = eventSubscription?.Sender;
 
-                switch (task)
-                {
-                    case ErrorJob error when error.Exception is not OperationCanceledException:
-                        {
-                            if (ReferenceEquals(error.Sender, sender))
+                    if (sender == null)
+                    {
+                        continue;
+                    }
+
+                    switch (task)
+                    {
+                        case ErrorJob error when error.Exception is not OperationCanceledException:
                             {
-                                await grain.OnErrorAsync(sender, error.Exception);
-                            }
-
-                            break;
-                        }
-
-                    case BatchJob batch:
-                        {
-                            foreach (var itemsBySender in batch.Items.GroupBy(x => x.Sender))
-                            {
-                                if (ReferenceEquals(itemsBySender.Key, sender))
+                                if (ReferenceEquals(error.Sender, sender))
                                 {
-                                    var position = itemsBySender.Last().Position;
-
-                                    await grain.OnEventsAsync(sender, itemsBySender.Select(x => x.Event).NotNull().ToList(), position);
+                                    await grain.OnErrorAsync(sender, error.Exception);
                                 }
+
+                                break;
                             }
 
-                            break;
-                        }
+                        case BatchJob batch:
+                            {
+                                foreach (var itemsBySender in batch.Items.GroupBy(x => x.Sender))
+                                {
+                                    if (ReferenceEquals(itemsBySender.Key, sender))
+                                    {
+                                        var position = itemsBySender.Last().Position;
+
+                                        await grain.OnEventsAsync(sender, itemsBySender.Select(x => x.Event).NotNull().ToList(), position);
+                                    }
+                                }
+
+                                break;
+                            }
+                    }
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                return;
             }
         }
 

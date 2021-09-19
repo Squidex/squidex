@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var file = uploadImage.File;
 
-            using (var uploadStream = file.OpenRead())
+            await using (var uploadStream = file.OpenRead())
             {
                 var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 }
             }
 
-            using (var uploadStream = file.OpenRead())
+            await using (var uploadStream = file.OpenRead())
             {
                 await appImageStore.UploadAsync(uploadImage.AppId.Id, uploadStream);
             }

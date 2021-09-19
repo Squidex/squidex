@@ -37,7 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             this.ruleService = ruleService;
         }
 
-        public async Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule, CancellationToken ct)
+        public async Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
+            CancellationToken ct = default)
         {
             Guard.NotNull(rule, nameof(rule));
 
@@ -54,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             var fromNow = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
 
-            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-z]+)\\-{rule.AppId.Id}", fromNow, MaxSimulatedEvents, ct))
+            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-zA-Z0-9]+)\\-{rule.AppId.Id}", fromNow, MaxSimulatedEvents, ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -87,13 +88,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             return simulatedEvents;
         }
 
-        public Task CancelAsync(DomainId appId)
-        {
-            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
-
-            return grain.CancelAsync();
-        }
-
         public bool CanRunRule(IRuleEntity rule)
         {
             var context = GetContext(rule);
@@ -108,14 +102,24 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             return CanRunRule(rule) && ruleService.CanCreateSnapshotEvents(context);
         }
 
-        public Task<DomainId?> GetRunningRuleIdAsync(DomainId appId)
+        public Task CancelAsync(DomainId appId,
+            CancellationToken ct = default)
+        {
+            var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
+
+            return grain.CancelAsync();
+        }
+
+        public Task<DomainId?> GetRunningRuleIdAsync(DomainId appId,
+            CancellationToken ct = default)
         {
             var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 
             return grain.GetRunningRuleIdAsync();
         }
 
-        public Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false)
+        public Task RunAsync(DomainId appId, DomainId ruleId, bool fromSnapshots = false,
+            CancellationToken ct = default)
         {
             var grain = grainFactory.GetGrain<IRuleRunnerGrain>(appId.ToString());
 

@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure
                 }
                 else
                 {
-                    var index = value.IndexOf(',');
+                    var index = value.IndexOf(',', StringComparison.Ordinal);
 
                     if (index > 0 && index < value.Length - 1)
                     {

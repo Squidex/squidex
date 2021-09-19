@@ -162,10 +162,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         .WithoutTotal());
 
                 var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
+                var assetItems = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), context.CancellationToken);
 
-                var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), context.CancellationToken);
-
-                callback(JsValue.FromObject(context.Engine, assets.ToArray()));
+                callback(JsValue.FromObject(context.Engine, assetItems.ToArray()));
             }
             catch (Exception ex)
             {

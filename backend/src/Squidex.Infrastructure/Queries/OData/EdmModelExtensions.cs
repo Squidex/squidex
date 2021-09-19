@@ -49,9 +49,9 @@ namespace Squidex.Infrastructure.Queries.OData
 
             query ??= string.Empty;
 
-            var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.').Last();
+            var path = model.EntityContainer.EntitySets().First().Path.Path.Split('.')[^1];
 
-            if (query.StartsWith("?", StringComparison.Ordinal))
+            if (query.StartsWith('?'))
             {
                 query = query[1..];
             }

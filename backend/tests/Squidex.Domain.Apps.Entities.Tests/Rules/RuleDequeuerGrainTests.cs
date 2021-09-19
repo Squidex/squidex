@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -60,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var @event = CreateEvent(1, "MyAction", "{}");
 
-            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
                 .Throws(new InvalidOperationException());
 
             await sut.HandleAsync(@event);
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var event1 = CreateEvent(1, "MyAction", "{}", id);
             var event2 = CreateEvent(1, "MyAction", "{}", id);
 
-            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
                 .ReturnsLazily(async () =>
                 {
                     await Task.Delay(500);
@@ -89,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 sut.HandleAsync(event1),
                 sut.HandleAsync(event2));
 
-            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._))
+            A.CallTo(() => ruleService.InvokeAsync(A<string>._, A<string>._, default))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -110,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var requestElapsed = TimeSpan.FromMinutes(1);
             var requestDump = "Dump";
 
-            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
+            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData, default))
                 .Returns((Result.Create(requestDump, result), requestElapsed));
 
             var now = clock.GetCurrentInstant();
@@ -142,7 +143,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
                         x.ExecutionResult == result &&
                         x.Finished == now &&
                         x.JobNext == nextCall &&
-                        x.JobResult == jobResult)))
+                        x.JobResult == jobResult),
+                    A<CancellationToken>._))
                 .MustHaveHappened();
         }
 

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -58,7 +58,8 @@ namespace Squidex.Extensions.Actions.AzureQueue
             return (ruleDescription, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job,
+            CancellationToken ct = default)
         {
             var queue = await clients.GetClientAsync((job.QueueConnectionString, job.QueueName));
 

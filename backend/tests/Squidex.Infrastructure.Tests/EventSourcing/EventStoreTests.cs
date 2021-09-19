@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +51,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
         protected EventStoreTests()
         {
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut = new Lazy<T>(CreateStore);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         public abstract T CreateStore();
@@ -360,6 +363,26 @@ namespace Squidex.Infrastructure.EventSourcing
         }
 
         [Fact]
+        public async Task Should_delete_by_filter()
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            var events = new[]
+            {
+                CreateEventData(1),
+                CreateEventData(2)
+            };
+
+            await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+
+            await Sut.DeleteAsync($"^{streamName.Substring(0, 10)}");
+
+            var readEvents = await QueryAsync(streamName);
+
+            Assert.Empty(readEvents);
+        }
+
+        [Fact]
         public async Task Should_delete_stream()
         {
             var streamName = $"test-{Guid.NewGuid()}";
@@ -386,7 +409,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static EventData CreateEventData(int i)
         {
-            return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString());
+            return new EventData($"Type{i}", new EnvelopeHeaders(), i.ToString(CultureInfo.InvariantCulture));
         }
 
         private async Task<IReadOnlyList<StoredEvent>?> QueryAllAsync(string? streamFilter = null, string? position = null)

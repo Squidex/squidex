@@ -74,13 +74,13 @@ namespace Squidex.Infrastructure.Translations
 
                     if (variable.Length > 0)
                     {
-                        if (variable.EndsWith("|lower"))
+                        if (variable.EndsWith("|lower", StringComparison.OrdinalIgnoreCase))
                         {
                             variable = variable[..^6];
                             shouldLower = true;
                         }
 
-                        if (variable.EndsWith("|upper"))
+                        if (variable.EndsWith("|upper", StringComparison.OrdinalIgnoreCase))
                         {
                             variable = variable[..^6];
                             shouldUpper = true;
@@ -115,13 +115,13 @@ namespace Squidex.Infrastructure.Translations
                     {
                         if (shouldLower && !char.IsLower(variableValue[0]))
                         {
-                            sb.Append(char.ToLower(variableValue[0]));
+                            sb.Append(char.ToLower(variableValue[0], CultureInfo.InvariantCulture));
 
                             sb.Append(variableValue.AsSpan()[1..]);
                         }
                         else if (shouldUpper && !char.IsUpper(variableValue[0]))
                         {
-                            sb.Append(char.ToUpper(variableValue[0]));
+                            sb.Append(char.ToUpper(variableValue[0], CultureInfo.InvariantCulture));
 
                             sb.Append(variableValue.AsSpan()[1..]);
                         }

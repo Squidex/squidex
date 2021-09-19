@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 var index = new MongoTextIndex(database, false);
 
-                await index.InitializeAsync();
+                await index.InitializeAsync(default);
 
                 return index;
             }

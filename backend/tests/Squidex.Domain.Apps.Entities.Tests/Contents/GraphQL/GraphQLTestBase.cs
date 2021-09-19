@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public GraphQLTestBase()
         {
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>._, default))
                 .ReturnsLazily(x =>
                 {
                     var ids = x.GetArgument<string[]>(0)!;
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemasAsync(TestApp.Default.Id))
+            A.CallTo(() => appProvider.GetSchemasAsync(TestApp.Default.Id, default))
                 .Returns(schemas.ToList());
 
             var dataLoaderContext = (IDataLoaderContextAccessor)new DataLoaderContextAccessor();

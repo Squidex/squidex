@@ -11,6 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
@@ -18,14 +21,18 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.History.Repositories;
+using Squidex.Domain.Apps.Entities.MongoDb.Apps;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Domain.Apps.Entities.MongoDb.History;
 using Squidex.Domain.Apps.Entities.MongoDb.Rules;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
+using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Domain.Users.MongoDb;
@@ -75,7 +82,7 @@ namespace Squidex.Config.Domain
                         .As<IMigration>();
 
                     services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, GetDatabase(c, mongoContentDatabaseName)))
-                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>();
+                        .As<IContentRepository>().As<ISnapshotStore<ContentDomainObject.State>>().As<IDeleter>();
 
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();
@@ -99,10 +106,10 @@ namespace Squidex.Config.Domain
                         .As<IUsageRepository>();
 
                     services.AddSingletonAs<MongoRuleEventRepository>()
-                        .As<IRuleEventRepository>();
+                        .As<IRuleEventRepository>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoHistoryEventRepository>()
-                        .As<IHistoryEventRepository>();
+                        .As<IHistoryEventRepository>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoRoleStore>()
                         .As<IRoleStore<IdentityRole>>();
@@ -111,19 +118,28 @@ namespace Squidex.Config.Domain
                         .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>();
+                        .As<IAssetRepository>().As<ISnapshotStore<AssetDomainObject.State>>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoAssetFolderRepository>()
-                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>();
+                        .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolderDomainObject.State>>().As<IDeleter>();
+
+                    services.AddSingletonAs<MongoAppRepository>()
+                        .As<IAppRepository>().As<ISnapshotStore<AppDomainObject.State>>().As<IDeleter>();
+
+                    services.AddSingletonAs<MongoRuleRepository>()
+                        .As<IRuleRepository>().As<ISnapshotStore<RuleDomainObject.State>>().As<IDeleter>();
+
+                    services.AddSingletonAs<MongoSchemaRepository>()
+                        .As<ISchemaRepository>().As<ISnapshotStore<SchemaDomainObject.State>>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoSchemasHash>()
-                        .AsOptional<ISchemasHash>().As<IEventConsumer>();
+                        .AsOptional<ISchemasHash>().As<IEventConsumer>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoTextIndex>()
-                        .AsOptional<ITextIndex>();
+                        .AsOptional<ITextIndex>().As<IDeleter>();
 
                     services.AddSingletonAs<MongoTextIndexerState>()
-                        .As<ITextIndexerState>();
+                        .As<ITextIndexerState>().As<IDeleter>();
 
                     services.AddOpenIddict()
                         .AddCore(builder =>

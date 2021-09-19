@@ -7,14 +7,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class BackupService : IBackupService
+    public sealed class BackupService : IBackupService, IDeleter
     {
         private readonly IGrainFactory grainFactory;
 
@@ -23,52 +25,60 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.grainFactory = grainFactory;
         }
 
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
+        {
+            return BackupGrain(app.Id).ClearAsync();
+        }
+
         public Task StartBackupAsync(DomainId appId, RefToken actor)
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
-
-            return grain.BackupAsync(actor);
+            return BackupGrain(appId).BackupAsync(actor);
         }
 
         public Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName)
         {
-            var grain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
-
-            return grain.RestoreAsync(url, actor, newAppName);
+            return RestoreGrain().RestoreAsync(url, actor, newAppName);
         }
 
-        public async Task<IRestoreJob?> GetRestoreAsync()
+        public Task DeleteBackupAsync(DomainId appId, DomainId backupId,
+            CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
+            return BackupGrain(appId).DeleteAsync(backupId);
+        }
 
-            var state = await grain.GetStateAsync();
+        public async Task<IRestoreJob?> GetRestoreAsync(
+            CancellationToken ct = default)
+        {
+            var state = await RestoreGrain().GetStateAsync();
 
             return state.Value;
         }
 
-        public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId)
+        public async Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
+            CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
-
-            var state = await grain.GetStateAsync();
+            var state = await BackupGrain(appId).GetStateAsync();
 
             return state.Value;
         }
 
-        public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId)
+        public async Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
+            CancellationToken ct = default)
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
-
-            var state = await grain.GetStateAsync();
+            var state = await BackupGrain(appId).GetStateAsync();
 
             return state.Value.Find(x => x.Id == backupId);
         }
 
-        public Task DeleteBackupAsync(DomainId appId, DomainId backupId)
+        private IRestoreGrain RestoreGrain()
         {
-            var grain = grainFactory.GetGrain<IBackupGrain>(appId.ToString());
+            return grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
+        }
 
-            return grain.DeleteAsync(backupId);
+        private IBackupGrain BackupGrain(DomainId appId)
+        {
+            return grainFactory.GetGrain<IBackupGrain>(appId.ToString());
         }
     }
 }

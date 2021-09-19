@@ -61,7 +61,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return (description, data!);
         }
 
-        async Task<Result> IRuleActionHandler.ExecuteJobAsync(object data, CancellationToken ct)
+        async Task<Result> IRuleActionHandler.ExecuteJobAsync(object data,
+            CancellationToken ct)
         {
             var typedData = (TData)data;
 
@@ -70,7 +71,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected virtual Task<(string Description, TData Data)> CreateJobAsync(EnrichedEvent @event, TAction action)
         {
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             return Task.FromResult(CreateJob(@event, action));
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         }
 
         protected virtual (string Description, TData Data) CreateJob(EnrichedEvent @event, TAction action)
@@ -78,6 +81,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             throw new NotImplementedException();
         }
 
-        protected abstract Task<Result> ExecuteJobAsync(TData job, CancellationToken ct = default);
+        protected abstract Task<Result> ExecuteJobAsync(TData job,
+            CancellationToken ct = default);
     }
 }

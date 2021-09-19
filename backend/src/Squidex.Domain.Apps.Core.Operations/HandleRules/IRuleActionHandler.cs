@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         Task<(string Description, object Data)> CreateJobAsync(EnrichedEvent @event, RuleAction action);
 
-        Task<Result> ExecuteJobAsync(object data, CancellationToken ct = default);
+        Task<Result> ExecuteJobAsync(object data,
+            CancellationToken ct = default);
     }
 }

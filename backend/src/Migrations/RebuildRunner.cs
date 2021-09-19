@@ -8,7 +8,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Migrations.Migrations;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Commands;
 
@@ -18,22 +17,20 @@ namespace Migrations
     {
         private readonly RebuildFiles rebuildFiles;
         private readonly Rebuilder rebuilder;
-        private readonly PopulateGrainIndexes populateGrainIndexes;
         private readonly RebuildOptions rebuildOptions;
 
         public RebuildRunner(
             IOptions<RebuildOptions> rebuildOptions,
             Rebuilder rebuilder,
-            RebuildFiles rebuildFiles,
-            PopulateGrainIndexes populateGrainIndexes)
+            RebuildFiles rebuildFiles)
         {
             this.rebuildFiles = rebuildFiles;
             this.rebuilder = rebuilder;
             this.rebuildOptions = rebuildOptions.Value;
-            this.populateGrainIndexes = populateGrainIndexes;
         }
 
-        public async Task RunAsync(CancellationToken ct)
+        public async Task RunAsync(
+            CancellationToken ct)
         {
             var batchSize = rebuildOptions.CalculateBatchSize();
 
@@ -66,11 +63,6 @@ namespace Migrations
             if (rebuildOptions.Contents)
             {
                 await rebuilder.RebuildContentAsync(batchSize, ct);
-            }
-
-            if (rebuildOptions.Indexes)
-            {
-                await populateGrainIndexes.UpdateAsync(ct);
             }
         }
     }

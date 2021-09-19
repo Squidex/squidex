@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -101,7 +102,7 @@ namespace Squidex.Web.Pipeline
                     using (Telemetry.Activities.StartActivity("CalculateEtag"))
                     {
                         var cacheBuffer = hasher.GetHashAndReset();
-                        var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty).ToUpperInvariant();
+                        var cacheString = BitConverter.ToString(cacheBuffer).Replace("-", string.Empty, StringComparison.Ordinal).ToUpperInvariant();
 
                         response.Headers.Add(HeaderNames.ETag, cacheString);
                     }
@@ -194,7 +195,7 @@ namespace Squidex.Web.Pipeline
         {
             var headers = httpContext.Request.Headers;
 
-            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || !int.TryParse(header, out var size))
+            if (!headers.TryGetValue(SurrogateKeySizeHeader, out var header) || !int.TryParse(header, NumberStyles.Integer, CultureInfo.InvariantCulture, out var size))
             {
                 size = cachingOptions.MaxSurrogateKeysSize;
             }

@@ -36,17 +36,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             this.waitForTesting = waitForTesting;
         }
 
-        public Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
             return ElasticSearchMapping.ApplyAsync(client, indexName, ct);
         }
 
-        public Task ClearAsync()
+        public Task ClearAsync(
+            CancellationToken ct = default)
         {
             return Task.CompletedTask;
         }
 
-        public async Task ExecuteAsync(params IndexCommand[] commands)
+        public async Task ExecuteAsync(IndexCommand[] commands,
+            CancellationToken ct = default)
         {
             var args = new List<object>();
 
@@ -57,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
             if (args.Count > 0)
             {
-                var result = await client.BulkAsync<StringResponse>(PostData.MultiJson(args));
+                var result = await client.BulkAsync<StringResponse>(PostData.MultiJson(args), ctx: ct);
 
                 if (!result.Success)
                 {
@@ -67,16 +70,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
 
             if (waitForTesting)
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, ct);
             }
         }
 
-        public Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope)
+        public Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+            CancellationToken ct = default)
         {
             return Task.FromResult<List<DomainId>?>(null);
         }
 
-        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope)
+        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+            CancellationToken ct = default)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
@@ -176,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 }
             }
 
-            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(elasticQuery));
+            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(elasticQuery), ctx: ct);
 
             if (!result.Success)
             {

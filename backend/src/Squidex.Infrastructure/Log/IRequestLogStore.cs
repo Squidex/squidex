@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +16,13 @@ namespace Squidex.Infrastructure.Log
     {
         bool IsEnabled { get; }
 
-        Task LogAsync(Request request);
+        Task LogAsync(Request request,
+            CancellationToken ct = default);
 
-        Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default);
+        Task DeleteAsync(string key,
+            CancellationToken ct = default);
+
+        IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default);
     }
 }

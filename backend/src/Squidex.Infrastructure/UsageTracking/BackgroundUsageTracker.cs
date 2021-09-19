@@ -25,13 +25,15 @@ namespace Squidex.Infrastructure.UsageTracking
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
 
+        public bool ForceWrite { get; set; }
+
         public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
         {
             this.usageRepository = usageRepository;
 
             this.log = log;
 
-            timer = new CompletionTimer(Intervall, ct => TrackAsync(), Intervall);
+            timer = new CompletionTimer(Intervall, TrackAsync, Intervall);
         }
 
         protected override void DisposeObject(bool disposing)
@@ -49,7 +51,8 @@ namespace Squidex.Infrastructure.UsageTracking
             timer.SkipCurrentDelay();
         }
 
-        private async Task TrackAsync()
+        private async Task TrackAsync(
+            CancellationToken ct)
         {
             try
             {
@@ -70,7 +73,12 @@ namespace Squidex.Infrastructure.UsageTracking
                         updateIndex++;
                     }
 
-                    await usageRepository.TrackUsagesAsync(updates);
+                    if (ForceWrite)
+                    {
+                        ct = default;
+                    }
+
+                    await usageRepository.TrackUsagesAsync(updates, ct);
                 }
             }
             catch (Exception ex)
@@ -81,7 +89,16 @@ namespace Squidex.Infrastructure.UsageTracking
             }
         }
 
-        public Task TrackAsync(DateTime date, string key, string? category, Counters counters)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(key, nameof(key));
+
+            return usageRepository.DeleteAsync(key, ct);
+        }
+
+        public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
             Guard.NotNull(counters, nameof(counters));
@@ -95,13 +112,14 @@ namespace Squidex.Infrastructure.UsageTracking
             return Task.CompletedTask;
         }
 
-        public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
             ThrowIfDisposed();
 
-            var usages = await usageRepository.QueryAsync(key, fromDate, toDate);
+            var usages = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
 
             var result = new Dictionary<string, List<(DateTime Date, Counters Counters)>>();
 
@@ -125,7 +143,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
                 for (var date = fromDate; date <= toDate; date = date.AddDays(1))
                 {
-                    var counters = value.FirstOrDefault(x => x.Date == date)?.Counters;
+                    var counters = value.Find(x => x.Date == date)?.Counters;
 
                     enriched.Add((date, counters ?? new Counters()));
                 }
@@ -136,21 +154,23 @@ namespace Squidex.Infrastructure.UsageTracking
             return result;
         }
 
-        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category)
+        public Task<Counters> GetForMonthAsync(string key, DateTime date, string? category,
+            CancellationToken ct = default)
         {
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
-            return GetAsync(key, dateFrom, dateTo, category);
+            return GetAsync(key, dateFrom, dateTo, category, ct);
         }
 
-        public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category)
+        public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
+            CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
             ThrowIfDisposed();
 
-            var queried = await usageRepository.QueryAsync(key, fromDate, toDate);
+            var queried = await usageRepository.QueryAsync(key, fromDate, toDate, ct);
 
             if (category != null)
             {

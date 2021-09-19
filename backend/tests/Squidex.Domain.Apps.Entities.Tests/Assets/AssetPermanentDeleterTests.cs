@@ -21,11 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IAssetFileStore assetFiletore = A.Fake<IAssetFileStore>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+        private readonly TypeNameRegistry typeNameRegistry;
         private readonly AssetPermanentDeleter sut;
 
         public AssetPermanentDeleterTests()
         {
-            var typeNameRegistry = new TypeNameRegistry().Map(typeof(AssetDeleted));
+            typeNameRegistry =
+                new TypeNameRegistry()
+                    .Map(typeof(AssetCreated))
+                    .Map(typeof(AssetDeleted));
 
             sut = new AssetPermanentDeleter(assetFiletore, typeNameRegistry);
         }
@@ -55,27 +59,44 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public void Should_handle_deletion_event()
+        {
+            var storedEvent =
+                new StoredEvent("stream", "1", 1,
+                    new EventData(typeNameRegistry.GetName<AssetDeleted>(), new EnvelopeHeaders(), "payload"));
+
+            Assert.True(sut.Handles(storedEvent));
+        }
+
+        [Fact]
+        public void Should_not_handle_creation_event()
+        {
+            var storedEvent =
+                new StoredEvent("stream", "1", 1,
+                    new EventData(typeNameRegistry.GetName<AssetCreated>(), new EnvelopeHeaders(), "payload"));
+
+            Assert.False(sut.Handles(storedEvent));
+        }
+
+        [Fact]
         public async Task Should_not_delete_assets_if_event_restored()
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
 
             await sut.On(Envelope.Create(@event).SetRestored());
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, A<long>._, null))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_delete_assets_for_all_versions()
+        public async Task Should_delete_asset()
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
 
-            await sut.On(Envelope.Create(@event).SetEventStreamNumber(2));
+            await sut.On(Envelope.Create(@event));
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0, null))
-                .MustHaveHappened();
-
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1, null))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
                 .MustHaveHappened();
         }
 
@@ -84,13 +105,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0, null))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
                 .Throws(new AssetNotFoundException("fileName"));
 
-            await sut.On(Envelope.Create(@event).SetEventStreamNumber(2));
-
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1, null))
-                .MustHaveHappened();
+            await sut.On(Envelope.Create(@event));
         }
 
         [Fact]
@@ -98,13 +116,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = new AssetDeleted { AppId = appId, AssetId = DomainId.NewGuid() };
 
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 0, null))
+            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, default))
                 .Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.On(Envelope.Create(@event).SetEventStreamNumber(2)));
-
-            A.CallTo(() => assetFiletore.DeleteAsync(appId.Id, @event.AssetId, 1, null))
-                .MustNotHaveHappened();
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.On(Envelope.Create(@event)));
         }
     }
 }

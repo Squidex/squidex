@@ -12,6 +12,7 @@ namespace Squidex.Infrastructure.Migrations
 {
     public interface IMigration
     {
-        Task UpdateAsync(CancellationToken ct);
+        Task UpdateAsync(
+            CancellationToken ct);
     }
 }

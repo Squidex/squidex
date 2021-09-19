@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private readonly DomainId ref2 = DomainId.NewGuid();
         private readonly IValidatorsFactory factory;
 
-        private class CustomFactory : IValidatorsFactory
+        private sealed class CustomFactory : IValidatorsFactory
         {
             private readonly DomainId schemaId;
 

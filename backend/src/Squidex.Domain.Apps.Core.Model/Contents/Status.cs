@@ -36,12 +36,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public bool Equals(Status other)
         {
-            return string.Equals(Name, other.Name);
+            return string.Equals(Name, other.Name, StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode();
+            return Name.GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

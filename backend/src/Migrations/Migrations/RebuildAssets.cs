@@ -25,7 +25,8 @@ namespace Migrations.Migrations
             this.rebuildOptions = rebuildOptions.Value;
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             return rebuilder.RebuildAssetsAsync(rebuildOptions.BatchSize, ct);
         }

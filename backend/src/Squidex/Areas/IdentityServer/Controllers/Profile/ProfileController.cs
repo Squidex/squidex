@@ -170,7 +170,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                     throw new ValidationException(T.Get("validation.notAnImage"));
                 }
 
-                await userPictureStore.UploadAsync(id, thumbnailStream);
+                await userPictureStore.UploadAsync(id, thumbnailStream, HttpContext.RequestAborted);
             }
 
             var update = new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore };

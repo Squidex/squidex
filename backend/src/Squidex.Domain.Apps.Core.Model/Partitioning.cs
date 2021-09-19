@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core
 
         public override int GetHashCode()
         {
-            return Key.GetHashCode();
+            return Key.GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

@@ -29,5 +29,15 @@ namespace Squidex.Infrastructure.Log
         [BsonElement]
         [BsonRequired]
         public Dictionary<string, string> Properties { get; set; }
+
+        public static MongoRequest FromRequest(Request request)
+        {
+            return new MongoRequest { Key = request.Key, Timestamp = request.Timestamp, Properties = request.Properties };
+        }
+
+        public Request ToRequest()
+        {
+            return new Request { Key = Key, Timestamp = Timestamp, Properties = Properties };
+        }
     }
 }

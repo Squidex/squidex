@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Rules
         [Pure]
         public Rule Rename(string newName)
         {
-            if (string.Equals(Name, newName))
+            if (string.Equals(Name, newName, StringComparison.Ordinal))
             {
                 return this;
             }

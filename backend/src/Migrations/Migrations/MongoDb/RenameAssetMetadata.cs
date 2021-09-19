@@ -22,7 +22,8 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync(CancellationToken ct)
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             var collection = database.GetCollection<BsonDocument>("States_Assets");
 

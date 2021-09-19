@@ -9,8 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Xunit;
@@ -19,12 +22,36 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class DefaultAppLogStoreTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IRequestLogStore requestLogStore = A.Fake<IRequestLogStore>();
+        private readonly DomainId appId = DomainId.NewGuid();
         private readonly DefaultAppLogStore sut;
 
         public DefaultAppLogStoreTests()
         {
+            ct = cts.Token;
+
             sut = new DefaultAppLogStore(requestLogStore);
+        }
+
+        [Fact]
+        public void Should_run_deletion_in_default_order()
+        {
+            var order = ((IDeleter)sut).Order;
+
+            Assert.Equal(0, order);
+        }
+
+        [Fact]
+        public async Task Should_remove_events_from_streams()
+        {
+            var app = Mocks.App(NamedId.Of(appId, "my-app"));
+
+            await ((IDeleter)sut).DeleteAppAsync(app, ct);
+
+            A.CallTo(() => requestLogStore.DeleteAsync($"^[a-z]-{app.Id}", ct))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -33,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => requestLogStore.IsEnabled)
                 .Returns(false);
 
-            await sut.LogAsync(DomainId.NewGuid(), default);
+            await sut.LogAsync(appId, default, ct);
 
-            A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
+            A.CallTo(() => requestLogStore.LogAsync(A<Request>._, ct))
                 .MustNotHaveHappened();
         }
 
@@ -47,8 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => requestLogStore.IsEnabled)
                 .Returns(true);
 
-            A.CallTo(() => requestLogStore.LogAsync(A<Request>._))
-                .Invokes((Request request) => recordedRequest = request);
+            A.CallTo(() => requestLogStore.LogAsync(A<Request>._, ct))
+                .Invokes(x => recordedRequest = x.GetArgument<Request>(0)!);
 
             var request = default(RequestLog);
             request.Bytes = 1024;
@@ -65,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             request.UserClientId = "frontend";
             request.UserId = "user1";
 
-            await sut.LogAsync(DomainId.NewGuid(), request);
+            await sut.LogAsync(appId, request, ct);
 
             Assert.NotNull(recordedRequest);
 
@@ -80,6 +107,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Contains(request.StatusCode, recordedRequest);
             Contains(request.UserClientId, recordedRequest);
             Contains(request.UserId, recordedRequest);
+
+            Assert.Equal(appId.ToString(), recordedRequest?.Key);
         }
 
         [Fact]
@@ -88,22 +117,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var dateFrom = DateTime.UtcNow.Date.AddDays(-30);
             var dateTo = DateTime.UtcNow.Date;
 
-            var appId = DomainId.NewGuid();
-
-            A.CallTo(() => requestLogStore.QueryAllAsync(A<Func<Request, Task>>._, appId.ToString(), dateFrom, dateTo, default))
-                .Invokes(x =>
+            A.CallTo(() => requestLogStore.QueryAllAsync(appId.ToString(), dateFrom, dateTo, ct))
+                .Returns(new[]
                 {
-                    var callback = x.GetArgument<Func<Request, Task>>(0)!;
-
-                    callback(CreateRecord());
-                    callback(CreateRecord());
-                    callback(CreateRecord());
-                    callback(CreateRecord());
-                });
+                    CreateRecord(),
+                    CreateRecord(),
+                    CreateRecord(),
+                    CreateRecord()
+                }.ToAsyncEnumerable());
 
             var stream = new MemoryStream();
 
-            await sut.ReadLogAsync(appId, dateFrom, dateTo, stream);
+            await sut.ReadLogAsync(appId, dateFrom, dateTo, stream, ct);
 
             stream.Position = 0;
 

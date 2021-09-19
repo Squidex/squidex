@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             public Workflows Workflows { get; set; } = Workflows.Empty;
 
-            public bool IsArchived { get; set; }
+            public bool IsDeleted { get; set; }
 
             [IgnoreDataMember]
             public DomainId UniqueId
@@ -146,11 +146,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             return l;
                         });
 
-                    case AppArchived:
+                    case AppDeleted:
                         {
                             Plan = null;
 
-                            IsArchived = true;
+                            IsDeleted = true;
 
                             return true;
                         }

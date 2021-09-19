@@ -5,14 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -20,12 +22,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public class BackupSchemasTests
     {
-        private readonly ISchemasIndex index = A.Fake<ISchemasIndex>();
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly Rebuilder rebuilder = A.Fake<Rebuilder>();
+        private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly BackupSchemas sut;
 
         public BackupSchemasTests()
         {
-            sut = new BackupSchemas(index);
+            ct = cts.Token;
+
+            sut = new BackupSchemas(rebuilder);
         }
 
         [Fact]
@@ -37,46 +44,51 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         [Fact]
         public async Task Should_restore_indices_for_all_non_deleted_schemas()
         {
-            var appId = DomainId.NewGuid();
-
             var schemaId1 = NamedId.Of(DomainId.NewGuid(), "my-schema1");
             var schemaId2 = NamedId.Of(DomainId.NewGuid(), "my-schema2");
             var schemaId3 = NamedId.Of(DomainId.NewGuid(), "my-schema3");
 
-            var context = new RestoreContext(appId, new UserMapping(RefToken.User("123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
+            var context = new RestoreContext(appId.Id, new UserMapping(RefToken.User("123")), A.Fake<IBackupReader>(), DomainId.NewGuid());
 
-            await sut.RestoreEventAsync(Envelope.Create(new SchemaCreated
+            await sut.RestoreEventAsync(AppEvent(new SchemaCreated
             {
                 SchemaId = schemaId1
-            }), context);
+            }), context, ct);
 
-            await sut.RestoreEventAsync(Envelope.Create(new SchemaCreated
+            await sut.RestoreEventAsync(AppEvent(new SchemaCreated
             {
                 SchemaId = schemaId2
-            }), context);
+            }), context, ct);
 
-            await sut.RestoreEventAsync(Envelope.Create(new SchemaCreated
+            await sut.RestoreEventAsync(AppEvent(new SchemaCreated
             {
                 SchemaId = schemaId3
-            }), context);
+            }), context, ct);
 
-            await sut.RestoreEventAsync(Envelope.Create(new SchemaDeleted
+            await sut.RestoreEventAsync(AppEvent(new SchemaDeleted
             {
                 SchemaId = schemaId3
-            }), context);
+            }), context, ct);
 
-            Dictionary<string, DomainId>? newIndex = null;
+            var rebuildContents = new HashSet<DomainId>();
 
-            A.CallTo(() => index.RebuildAsync(appId, A<Dictionary<string, DomainId>>._))
-                .Invokes(new Action<DomainId, Dictionary<string, DomainId>>((_, i) => newIndex = i));
+            A.CallTo(() => rebuilder.InsertManyAsync<SchemaDomainObject, SchemaDomainObject.State>(A<IEnumerable<DomainId>>._, A<int>._, ct))
+                .Invokes(x => rebuildContents.AddRange(x.GetArgument<IEnumerable<DomainId>>(0)!));
 
-            await sut.RestoreAsync(context);
+            await sut.RestoreAsync(context, ct);
 
-            Assert.Equal(new Dictionary<string, DomainId>
+            Assert.Equal(new HashSet<DomainId>
             {
-                [schemaId1.Name] = schemaId1.Id,
-                [schemaId2.Name] = schemaId2.Id
-            }, newIndex);
+                DomainId.Combine(appId, schemaId1.Id),
+                DomainId.Combine(appId, schemaId2.Id)
+            }, rebuildContents);
+        }
+
+        private Envelope<SchemaEvent> AppEvent(SchemaEvent @event)
+        {
+            @event.AppId = appId;
+
+            return Envelope.Create(@event).SetAggregateId(DomainId.Combine(appId.Id, @event.SchemaId.Id));
         }
     }
 }

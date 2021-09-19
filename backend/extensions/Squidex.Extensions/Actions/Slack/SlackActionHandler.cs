@@ -40,7 +40,8 @@ namespace Squidex.Extensions.Actions.Slack
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(SlackJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(SlackJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

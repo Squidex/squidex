@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Xml.Linq;
 using FakeItEasy;
 using Squidex.Infrastructure;
@@ -29,19 +27,18 @@ namespace Squidex.Domain.Users
         [Fact]
         public void Should_read_from_store()
         {
-            A.CallTo(() => store.ReadAllAsync(A<Func<DefaultXmlRepository.State, long, Task>>._, A<CancellationToken>._))
-                .Invokes((Func<DefaultXmlRepository.State, long, Task> callback, CancellationToken _) =>
+            A.CallTo(() => store.ReadAllAsync(default))
+                .Returns(new[]
                 {
-                    callback(new DefaultXmlRepository.State
+                    (new DefaultXmlRepository.State
                     {
                         Xml = new XElement("xml").ToString()
-                    }, 0);
-
-                    callback(new DefaultXmlRepository.State
+                    }, 0L),
+                    (new DefaultXmlRepository.State
                     {
                         Xml = new XElement("xml").ToString()
-                    }, 0);
-                });
+                    }, 0L)
+                }.ToAsyncEnumerable());
 
             var xml = sut.GetAllElements();
 
@@ -55,7 +52,7 @@ namespace Squidex.Domain.Users
 
             sut.StoreElement(xml, "name");
 
-            A.CallTo(() => store.WriteAsync(DomainId.Create("name"), A<DefaultXmlRepository.State>._, A<long>._, 0))
+            A.CallTo(() => store.WriteAsync(DomainId.Create("name"), A<DefaultXmlRepository.State>._, A<long>._, 0, default))
                 .MustHaveHappened();
         }
     }

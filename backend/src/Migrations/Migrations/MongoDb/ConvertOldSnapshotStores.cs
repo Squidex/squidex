@@ -23,7 +23,8 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public Task UpdateAsync(CancellationToken ct)
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             var collections = new[]
             {
@@ -39,7 +40,7 @@ namespace Migrations.Migrations.MongoDb
             return Task.WhenAll(
                 collections
                     .Select(x => database.GetCollection<BsonDocument>(x))
-                    .Select(x => x.UpdateManyAsync(filter, update)));
+                    .Select(x => x.UpdateManyAsync(filter, update, cancellationToken: ct)));
         }
     }
 }

@@ -90,11 +90,12 @@ namespace Squidex.Infrastructure.MongoDb
             return Task.CompletedTask;
         }
 
-        public virtual async Task ClearAsync()
+        public virtual async Task ClearAsync(
+            CancellationToken ct = default)
         {
             try
             {
-                await Database.DropCollectionAsync(CollectionName());
+                await Database.DropCollectionAsync(CollectionName(), ct);
             }
             catch (MongoCommandException ex)
             {
@@ -104,10 +105,11 @@ namespace Squidex.Infrastructure.MongoDb
                 }
             }
 
-            await InitializeAsync();
+            await InitializeAsync(ct);
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct)
         {
             try
             {

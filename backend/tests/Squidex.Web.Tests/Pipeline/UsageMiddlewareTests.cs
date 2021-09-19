@@ -55,7 +55,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -73,7 +73,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -89,7 +89,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, A<long>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, A<long>._, default))
                 .MustHaveHappened();
         }
 
@@ -106,7 +106,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 1024))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 1024, default))
                 .MustHaveHappened();
         }
 
@@ -118,7 +118,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.InvokeAsync(httpContext, async x =>
             {
-                await x.Response.BodyWriter.WriteAsync(Encoding.Default.GetBytes("Hello World"));
+                await x.Response.BodyWriter.WriteAsync(Encoding.Default.GetBytes("Hello World"), httpContext.RequestAborted);
 
                 await next(x);
             });
@@ -127,7 +127,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -139,7 +139,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.InvokeAsync(httpContext, async x =>
             {
-                await x.Response.Body.WriteAsync(Encoding.Default.GetBytes("Hello World"));
+                await x.Response.Body.WriteAsync(Encoding.Default.GetBytes("Hello World"), httpContext.RequestAborted);
 
                 await next(x);
             });
@@ -148,7 +148,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -161,11 +161,11 @@ namespace Squidex.Web.Pipeline
             var tempFileName = Path.GetTempFileName();
             try
             {
-                await File.WriteAllTextAsync(tempFileName, "Hello World");
+                await File.WriteAllTextAsync(tempFileName, "Hello World", httpContext.RequestAborted);
 
                 await sut.InvokeAsync(httpContext, async x =>
                 {
-                    await x.Response.SendFileAsync(tempFileName, 0, new FileInfo(tempFileName).Length);
+                    await x.Response.SendFileAsync(tempFileName, 0, new FileInfo(tempFileName).Length, httpContext.RequestAborted);
 
                     await next(x);
                 });
@@ -179,7 +179,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, 13, A<long>._, 11, default))
                 .MustHaveHappened();
         }
 
@@ -195,7 +195,7 @@ namespace Squidex.Web.Pipeline
 
             var date = instant.ToDateTimeUtc().Date;
 
-            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._))
+            A.CallTo(() => usageTracker.TrackAsync(date, A<string>._, A<string>._, A<double>._, A<long>._, A<long>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -215,7 +215,8 @@ namespace Squidex.Web.Pipeline
                     x.Timestamp == instant &&
                     x.RequestMethod == "GET" &&
                     x.RequestPath == "/my-path" &&
-                    x.Costs == 0)))
+                    x.Costs == 0),
+                default))
                 .MustHaveHappened();
         }
     }

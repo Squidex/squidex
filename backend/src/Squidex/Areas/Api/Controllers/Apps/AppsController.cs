@@ -26,8 +26,6 @@ using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
-#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
-
 namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>
@@ -75,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var userOrClientId = HttpContext.User.UserOrClientId()!;
             var userPermissions = Resources.Context.UserPermissions;
 
-            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
+            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
@@ -223,30 +221,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 {
                     using (Telemetry.Activities.StartActivity("Resize"))
                     {
-                        using (var sourceStream = GetTempStream())
+                        await using (var destinationStream = GetTempStream())
                         {
-                            using (var destinationStream = GetTempStream())
-                            {
-                                using (Telemetry.Activities.StartActivity("ResizeDownload"))
-                                {
-                                    await appImageStore.DownloadAsync(App.Id, sourceStream);
-                                    sourceStream.Position = 0;
-                                }
+                            await ResizeAsync(resizedAsset, destinationStream);
 
-                                using (Telemetry.Activities.StartActivity("ResizeImage"))
-                                {
-                                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, ResizeOptions);
-                                    destinationStream.Position = 0;
-                                }
-
-                                using (Telemetry.Activities.StartActivity("ResizeUpload"))
-                                {
-                                    await assetStore.UploadAsync(resizedAsset, destinationStream);
-                                    destinationStream.Position = 0;
-                                }
-
-                                await destinationStream.CopyToAsync(body, ct);
-                            }
+                            await destinationStream.CopyToAsync(body, ct);
                         }
                     }
                 }
@@ -256,6 +235,32 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 ErrorAs404 = true
             };
+        }
+
+        private async Task ResizeAsync(string resizedAsset, FileStream destinationStream)
+        {
+#pragma warning disable MA0040 // Flow the cancellation token
+            await using (var sourceStream = GetTempStream())
+            {
+                using (Telemetry.Activities.StartActivity("ResizeDownload"))
+                {
+                    await appImageStore.DownloadAsync(App.Id, sourceStream);
+                    sourceStream.Position = 0;
+                }
+
+                using (Telemetry.Activities.StartActivity("ResizeImage"))
+                {
+                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, ResizeOptions);
+                    destinationStream.Position = 0;
+                }
+
+                using (Telemetry.Activities.StartActivity("ResizeUpload"))
+                {
+                    await assetStore.UploadAsync(resizedAsset, destinationStream);
+                    destinationStream.Position = 0;
+                }
+            }
+#pragma warning restore MA0040 // Flow the cancellation token
         }
 
         /// <summary>
@@ -279,11 +284,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Archive the app.
+        /// Delete the app.
         /// </summary>
-        /// <param name="app">The name of the app to archive.</param>
+        /// <param name="app">The name of the app to delete.</param>
         /// <returns>
-        /// 204 => App archived.
+        /// 204 => App deleted.
         /// 404 => App not found.
         /// </returns>
         [HttpDelete]
@@ -292,7 +297,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {
-            await CommandBus.PublishAsync(new ArchiveApp());
+            await CommandBus.PublishAsync(new DeleteApp());
 
             return NoContent();
         }

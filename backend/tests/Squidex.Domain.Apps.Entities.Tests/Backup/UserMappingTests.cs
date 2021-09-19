@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -18,11 +19,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public class UserMappingTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly RefToken initiator = Subject("me");
         private readonly UserMapping sut;
 
         public UserMappingTests()
         {
+            ct = cts.Token;
+
             sut = new UserMapping(initiator);
         }
 
@@ -45,17 +50,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var userResolver = A.Fake<IUserResolver>();
 
-            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.That.Is(user1.Id, user2.Id)))
+            A.CallTo(() => userResolver.QueryManyAsync(A<string[]>.That.Is(user1.Id, user2.Id), ct))
                 .Returns(users);
 
             var writer = A.Fake<IBackupWriter>();
 
             Dictionary<string, string>? storedUsers = null;
 
-            A.CallTo(() => writer.WriteJsonAsync(A<string>._, A<object>._))
-                .Invokes((string _, object json) => storedUsers = (Dictionary<string, string>)json);
+            A.CallTo(() => writer.WriteJsonAsync(A<string>._, A<object>._, ct))
+                .Invokes(x => storedUsers = x.GetArgument<Dictionary<string, string>>(1));
 
-            await sut.StoreAsync(writer, userResolver);
+            await sut.StoreAsync(writer, userResolver, ct);
 
             Assert.Equal(new Dictionary<string, string>
             {
@@ -74,13 +79,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var userResolver = A.Fake<IUserResolver>();
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user1.Email, false))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user1.Email, false, ct))
                 .Returns((user1, false));
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user2.Email, false))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user2.Email, false, ct))
                 .Returns((user2, true));
 
-            await sut.RestoreAsync(reader, userResolver);
+            await sut.RestoreAsync(reader, userResolver, ct);
 
             Assert.True(sut.TryMap("1_old", out var mapped1));
             Assert.True(sut.TryMap(Subject("2_old"), out var mapped2));
@@ -107,13 +112,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Assert.Same(client, mapped);
         }
 
-        private static IBackupReader SetupReader(params IUser[] users)
+        private IBackupReader SetupReader(params IUser[] users)
         {
             var storedUsers = users.ToDictionary(x => $"{x.Id}_old", x => x.Email);
 
             var reader = A.Fake<IBackupReader>();
 
-            A.CallTo(() => reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._))
+            A.CallTo(() => reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
                 .Returns(storedUsers);
 
             return reader;

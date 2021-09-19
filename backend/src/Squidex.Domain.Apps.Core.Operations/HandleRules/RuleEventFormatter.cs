@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -25,8 +26,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public class RuleEventFormatter
     {
         private const string GlobalFallback = "null";
-        private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled);
-        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private readonly IJsonSerializer jsonSerializer;
         private readonly IEnumerable<IRuleEventFormatter> formatters;
         private readonly ITemplateEngine templateEngine;
@@ -111,7 +112,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     ["event"] = @event
                 };
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
                 var result = scriptEngine.Execute(vars, script).ToString();
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
 
                 if (result == "undefined")
                 {
@@ -285,7 +288,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                                 if (instant.Success)
                                 {
-                                    text = instant.Value.ToUnixTimeMilliseconds().ToString();
+                                    text = instant.Value.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture);
                                 }
 
                                 break;
@@ -297,7 +300,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                                 if (instant.Success)
                                 {
-                                    text = instant.Value.ToUnixTimeSeconds().ToString();
+                                    text = instant.Value.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
                                 }
 
                                 break;
