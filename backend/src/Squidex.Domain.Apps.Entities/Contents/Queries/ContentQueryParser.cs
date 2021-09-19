@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
         private readonly EdmModel genericEdmModel = BuildEdmModel("Generic", "Content", new EdmModel(), null);
-        private readonly JsonSchema genericJsonSchema = ContentJsonSchemaBuilder.BuildSchema("Content", null, false, true);
+        private readonly JsonSchema genericJsonSchema = ContentJsonSchemaBuilder.BuildSchema(null, false, true);
         private readonly IMemoryCache cache;
         private readonly IJsonSerializer jsonSerializer;
         private readonly IAppProvider appprovider;
@@ -232,6 +232,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             return result;
         }
 
+        private static JsonSchema BuildJsonSchema(Schema schema, IAppEntity app,
+            ResolvedComponents components, bool withHiddenFields)
+        {
+            var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), components, withHiddenFields);
+
+            return ContentJsonSchemaBuilder.BuildSchema(dataSchema, false, true);
+        }
+
         private IEdmModel BuildEdmModel(Context context, ISchemaEntity? schema,
             ResolvedComponents components)
         {
@@ -250,14 +258,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             });
 
             return result;
-        }
-
-        private static JsonSchema BuildJsonSchema(Schema schema, IAppEntity app,
-            ResolvedComponents components, bool withHiddenFields)
-        {
-            var dataSchema = schema.BuildJsonSchema(app.PartitionResolver(), components, withHiddenFields);
-
-            return ContentJsonSchemaBuilder.BuildSchema(schema.DisplayName(), dataSchema, false, true);
         }
 
         private static EdmModel BuildEdmModel(Schema schema, IAppEntity app,

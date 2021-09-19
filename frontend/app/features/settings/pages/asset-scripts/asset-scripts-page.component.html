@@ -1,0 +1,48 @@
+
+
+<sqx-title message="i18n:common.assetScripts"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.assetScripts" titleIcon="assets">
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:backups.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        </button>
+    </ng-container>
+
+    <ng-container>
+        <form class="inner-form" [formGroup]="editForm.form" (ngSubmit)="saveScripts()">
+            <div class="inner-header">
+                <ul class="nav nav-tabs2">
+                    <li class="nav-item" *ngFor="let script of editForm.form.controls | sqxKeys">
+                        <a class="nav-link" [class.active]="assetScript === script" (click)="selectField(script)">
+                            {{script | titlecase}}
+                        </a>
+                    </li>
+                </ul>
+                
+                <button type="submit" class="float-end btn btn-primary" [class.invisible]="!isEditable">
+                    {{ 'common.save' | sqxTranslate }}
+                </button>
+            </div>
+        
+            <div class="inner-main">
+                <ng-container *ngFor="let script of editForm.form.controls | sqxKeys">
+                    <ng-container *ngIf="assetScript === script">
+                        <sqx-code-editor [borderless]="true" [formControlName]="script" [completion]="assetCompletions | async"></sqx-code-editor>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </form>
+    </ng-container>
+
+    <ng-container sidebarMenu>
+        <div class="panel-nav">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.help" titlePosition="left">
+                <i class="icon-help2"></i>
+            </a>
+        </div>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>
+

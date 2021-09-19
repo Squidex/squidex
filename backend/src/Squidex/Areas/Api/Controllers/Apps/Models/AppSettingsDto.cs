@@ -61,11 +61,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var values = new { app = resources.App };
 
-            AddSelfLink(resources.Url<AppsController>(x => nameof(x.GetAppSettings), values));
+            AddSelfLink(resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));
 
             if (resources.CanUpdateSettings)
             {
-                AddPutLink("update", resources.Url<AppsController>(x => nameof(x.PutAppSettings), values));
+                AddPutLink("update", resources.Url<AppSettingsController>(x => nameof(x.PutSettings), values));
             }
 
             return this;

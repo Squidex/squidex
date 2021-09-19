@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 Filter.Exists(x => x.LastModified),
                 Filter.Exists(x => x.Id),
                 Filter.Eq(x => x.IndexedAppId, appId),
-                Filter.In(x => x.IndexedSchemaId, schemaIds),
+                Filter.In(x => x.IndexedSchemaId, schemaIds)
             };
 
             if (query?.HasFilterField("dl") != true)

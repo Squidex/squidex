@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     [Flags]
     public enum SkipReason
     {
-        None,
+        None = 0,
         ConditionDoesNotMatch = 1 << 0,
         ConditionPrecheckDoesNotMatch = 1 << 1,
         Disabled = 1 << 2,

@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     Editors = Editors?.Select(x => x.ToEditor()).ToImmutableList()!,
                     HideScheduler = HideScheduler,
                     HideDateTimeModeButton = HideDateTimeModeButton,
-                    Patterns = Patterns?.Select(x => x.ToPattern()).ToImmutableList()!,
+                    Patterns = Patterns?.Select(x => x.ToPattern()).ToImmutableList()!
                 }
             };
         }

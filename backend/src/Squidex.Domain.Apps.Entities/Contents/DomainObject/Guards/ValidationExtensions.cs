@@ -24,58 +24,60 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class ValidationExtensions
     {
-        public static void MustDeleteDraft(this OperationContext context)
+        public static void MustDeleteDraft(this ContentOperation operation)
         {
-            if (context.Content.NewStatus == null)
+            if (operation.Snapshot.NewStatus == null)
             {
                 throw new DomainException(T.Get("contents.draftToDeleteNotFound"));
             }
         }
 
-        public static void MustCreateDraft(this OperationContext context)
+        public static void MustCreateDraft(this ContentOperation operation)
         {
-            if (context.Content.EditingStatus() != Status.Published)
+            if (operation.Snapshot.EditingStatus() != Status.Published)
             {
                 throw new DomainException(T.Get("contents.draftNotCreateForUnpublished"));
             }
         }
 
-        public static void MustHaveData(this OperationContext context, ContentData? data)
+        public static void MustHaveData(this ContentOperation operation, ContentData? data)
         {
             if (data == null)
             {
-                context.AddError(Not.Defined(nameof(data)), nameof(data)).ThrowOnErrors();
+                operation.AddError(Not.Defined(nameof(data)), nameof(data));
             }
+
+            operation.ThrowOnErrors();
         }
 
-        public static async Task ValidateInputAsync(this OperationContext context, ContentData data, bool optimize, bool published)
+        public static async Task ValidateInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
         {
-            var validator = GetValidator(context, optimize, published);
+            var validator = GetValidator(operation, optimize, published);
 
             await validator.ValidateInputAsync(data);
 
-            context.AddErrors(validator.Errors).ThrowOnErrors();
+            operation.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
-        public static async Task ValidateInputPartialAsync(this OperationContext context, ContentData data, bool optimize, bool published)
+        public static async Task ValidateInputPartialAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
         {
-            var validator = GetValidator(context, optimize, published);
+            var validator = GetValidator(operation, optimize, published);
 
             await validator.ValidateInputPartialAsync(data);
 
-            context.AddErrors(validator.Errors).ThrowOnErrors();
+            operation.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
-        public static async Task ValidateContentAsync(this OperationContext context, ContentData data, bool optimize, bool published)
+        public static async Task ValidateContentAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
         {
-            var validator = GetValidator(context, optimize, published);
+            var validator = GetValidator(operation, optimize, published);
 
             await validator.ValidateContentAsync(data);
 
-            context.AddErrors(validator.Errors).ThrowOnErrors();
+            operation.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
-        public static async Task ValidateContentAndInputAsync(this OperationContext operation, ContentData data, bool optimize, bool published)
+        public static async Task ValidateContentAndInputAsync(this ContentOperation operation, ContentData data, bool optimize, bool published)
         {
             var validator = GetValidator(operation, optimize, published);
 
@@ -85,16 +87,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             operation.AddErrors(validator.Errors).ThrowOnErrors();
         }
 
-        public static void GenerateDefaultValues(this OperationContext context, ContentData data)
+        public static void GenerateDefaultValues(this ContentOperation operation, ContentData data)
         {
-            data.GenerateDefaultValues(context.Schema.SchemaDef, context.Partition());
+            data.GenerateDefaultValues(operation.Schema.SchemaDef, operation.Partition());
         }
 
-        public static async Task CheckReferrersAsync(this OperationContext context)
+        public static async Task CheckReferrersAsync(this ContentOperation operation)
         {
-            var contentRepository = context.Resolve<IContentRepository>();
+            var contentRepository = operation.Resolve<IContentRepository>();
 
-            var hasReferrer = await contentRepository.HasReferrersAsync(context.App.Id, context.ContentId, SearchScope.All, default);
+            var hasReferrer = await contentRepository.HasReferrersAsync(operation.App.Id, operation.CommandId, SearchScope.All, default);
 
             if (hasReferrer)
             {
@@ -102,29 +104,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             }
         }
 
-        private static ContentValidator GetValidator(this OperationContext context, bool optimize, bool published)
+        private static ContentValidator GetValidator(this ContentOperation operation, bool optimize, bool published)
         {
             var validationContext =
-                new ValidationContext(context.Resolve<IJsonSerializer>(),
-                    context.App.NamedId(),
-                    context.Schema.NamedId(),
-                    context.SchemaDef,
-                    context.Components,
-                    context.ContentId)
+                new ValidationContext(operation.Resolve<IJsonSerializer>(),
+                    operation.App.NamedId(),
+                    operation.Schema.NamedId(),
+                    operation.SchemaDef,
+                    operation.Components,
+                    operation.CommandId)
                 .Optimized(optimize).AsPublishing(published);
 
             var validator =
-                new ContentValidator(context.Partition(),
+                new ContentValidator(operation.Partition(),
                     validationContext,
-                    context.Resolve<IEnumerable<IValidatorsFactory>>(),
-                    context.Resolve<ISemanticLog>());
+                    operation.Resolve<IEnumerable<IValidatorsFactory>>(),
+                    operation.Resolve<ISemanticLog>());
 
             return validator;
         }
 
-        private static PartitionResolver Partition(this OperationContext context)
+        private static PartitionResolver Partition(this ContentOperation operation)
         {
-            return context.App.PartitionResolver();
+            return operation.App.PartitionResolver();
         }
     }
 }

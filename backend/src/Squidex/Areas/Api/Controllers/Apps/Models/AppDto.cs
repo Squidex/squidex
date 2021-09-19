@@ -211,7 +211,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 AddDeleteLink("image/delete", resources.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
-            AddGetLink("settings", resources.Url<AppsController>(x => nameof(x.GetAppSettings), values));
+            if (resources.IsAllowed(Shared.Permissions.AppAssetsScriptsUpdate, Name, additional: permissions))
+            {
+                AddDeleteLink("assets/scripts", resources.Url<AppAssetsController>(x => nameof(x.GetScripts), values));
+            }
+
+            AddGetLink("settings", resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));
 
             return this;
         }

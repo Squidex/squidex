@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Jint;
+using Jint.Native;
 using Jint.Runtime.Interop;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -20,32 +22,33 @@ namespace Squidex.Domain.Apps.Core.Scripting
     {
         private static readonly char[] ClaimSeparators = { '/', '.', ':' };
 
-        public static ObjectWrapper Create(Engine engine, IUser user)
+        public static JsValue Create(Engine engine, IUser user)
         {
-            var clientId = user.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.ClientId)?.Value;
+            var isClient = user.Claims.Any(x => x.Type == OpenIdClaims.ClientId);
 
-            var isClient = !string.IsNullOrWhiteSpace(clientId);
-
-            return CreateUser(engine, user.Id, isClient, user.Email, user.Claims.DisplayName(), user.Claims);
+            return CreateUser(
+                engine,
+                user.Id,
+                isClient,
+                user.Email,
+                user.Claims.DisplayName(),
+                user.Claims);
         }
 
-        public static ObjectWrapper Create(Engine engine, ClaimsPrincipal principal)
+        public static JsValue Create(Engine engine, ClaimsPrincipal principal)
         {
-            var id = principal.OpenIdSubject()!;
+            var token = principal.Token();
 
-            var isClient = string.IsNullOrWhiteSpace(id);
-
-            if (isClient)
-            {
-                id = principal.OpenIdClientId()!;
-            }
-
-            var name = principal.FindFirst(SquidexClaimTypes.DisplayName)?.Value;
-
-            return CreateUser(engine, id, isClient, principal.OpenIdEmail()!, name, principal.Claims);
+            return CreateUser(
+                engine,
+                token?.Identifier ?? string.Empty,
+                token?.Type != RefTokenType.Subject,
+                principal.OpenIdEmail()!,
+                principal.Claims.DisplayName(),
+                principal.Claims);
         }
 
-        private static ObjectWrapper CreateUser(Engine engine, string id, bool isClient, string email, string? name, IEnumerable<Claim> allClaims)
+        private static JsValue CreateUser(Engine engine, string id, bool isClient, string email, string? name, IEnumerable<Claim> allClaims)
         {
             var claims =
                 allClaims.GroupBy(x => x.Type.Split(ClaimSeparators)[^1])
@@ -53,7 +56,17 @@ namespace Squidex.Domain.Apps.Core.Scripting
                         x => x.Key,
                         x => x.Select(y => y.Value).ToArray());
 
-            return new ObjectWrapper(engine, new { id, isClient, email, name, claims });
+            var result = new Dictionary<string, object?>
+            {
+                ["id"] = id,
+                ["email"] = email,
+                ["isClient"] = isClient,
+                ["isUser"] = !isClient,
+                ["name"] = name,
+                ["claims"] = claims
+            };
+
+            return JsValue.FromObject(engine, result);
         }
     }
 }

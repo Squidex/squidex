@@ -30,6 +30,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public bool OptimizeValidation { get; set; } = true;
 
+        /// <summary>
+        /// True to turn off scripting for faster inserts. Default: true.
+        /// </summary>
+        public bool DoNotScript { get; set; } = true;
+
         public BulkUpdateAssets ToCommand()
         {
             var result = SimpleMapper.Map(this, new BulkUpdateAssets());

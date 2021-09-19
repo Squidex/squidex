@@ -10,6 +10,7 @@ using System.Globalization;
 using NJsonSchema;
 using NSwag;
 using Squidex.Areas.Api.Config.OpenApi;
+using Squidex.Domain.Apps.Core;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -55,7 +56,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public OperationBuilder HasId()
         {
-            HasPath("id", JsonObjectType.String, $"The id of the schema content item.");
+            HasPath("id", JsonObjectType.String, FieldDescriptions.EntityId);
 
             Responds(404, "Content item not found.");
 

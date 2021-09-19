@@ -214,6 +214,7 @@
   "common.apps": "App",
   "common.aspectRatio": "Proporzioni",
   "common.assets": "Risorse",
+  "common.assetScripts": "Asset Scripts",
   "common.back": "Indietro",
   "common.backendError": "Errore nel Backend",
   "common.backups": "Backup",

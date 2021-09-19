@@ -8,6 +8,7 @@
 using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -29,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = "id",
                 Resolver = Resolve(x => x.Id),
                 ResolvedType = AllTypes.NonNullString,
-                Description = "The id of the user."
+                Description = FieldDescriptions.UserId
             });
 
             AddField(new FieldType
@@ -37,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = "displayName",
                 Resolver = Resolve(x => x.Claims.DisplayName()),
                 ResolvedType = AllTypes.String,
-                Description = "The display name of the user."
+                Description = FieldDescriptions.UserDisplayName
             });
 
             AddField(new FieldType
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = "email",
                 Resolver = Resolve(x => x.Email),
                 ResolvedType = AllTypes.String,
-                Description = "The email of the user."
+                Description = FieldDescriptions.UserEmail
             });
 
             Description = "A user that created or modified a content or asset.";

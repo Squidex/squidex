@@ -981,11 +981,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         private bool Matches(ScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
         {
             return
-                Equals(x.Data, newData) &&
-                Equals(x.DataOld, oldData) &&
-                Equals(x.Status, newStatus) &&
-                Equals(x.StatusOld, oldStatus) &&
-                x.ContentId == contentId && x.User == User;
+                Equals(x["contentId"], contentId) &&
+                Equals(x["data"], newData) &&
+                Equals(x["dataOld"], oldData) &&
+                Equals(x["status"], newStatus) &&
+                Equals(x["statusOld"], oldStatus) &&
+                Equals(x["user"], User);
         }
 
         private T CreateContentEvent<T>(T @event) where T : ContentEvent

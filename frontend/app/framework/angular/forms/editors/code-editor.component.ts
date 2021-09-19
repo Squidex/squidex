@@ -64,9 +64,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     @Input()
-    public set completion(value: ReadonlyArray<{ name: string; description: string }> | undefined | null) {
+    public set completion(value: ReadonlyArray<{ path: string; description: string }> | undefined | null) {
         if (value) {
-            this.completions = value.map(({ name, description }) => ({ value: name, name, meta: 'context', description }));
+            this.completions = value.map(({ path, description }) => ({ value: path, name: path, meta: 'context', description }));
         } else {
             this.completions = [];
         }

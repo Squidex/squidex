@@ -17,6 +17,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
     {
         private readonly IScriptEngine scriptEngine;
 
+        private static class ScriptKeys
+        {
+            public const string AppId = "appId";
+            public const string AppName = "appName";
+            public const string ContentId = "contentId";
+            public const string Data = "data";
+            public const string Operation = "operation";
+            public const string User = "user";
+        }
+
         public ScriptContent(IScriptEngine scriptEngine)
         {
             this.scriptEngine = scriptEngine;
@@ -46,11 +56,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             var vars = new ScriptVars
             {
-                ContentId = content.Id,
-                Data = content.Data,
-                AppId = context.App.Id,
-                AppName = context.App.Name,
-                User = context.User
+                [ScriptKeys.AppId] = context.App.Id,
+                [ScriptKeys.AppName] = context.App.Name,
+                [ScriptKeys.ContentId] = content.Id,
+                [ScriptKeys.Data] = content.Data,
+                [ScriptKeys.User] = context.User
             };
 
             var options = new ScriptOptions

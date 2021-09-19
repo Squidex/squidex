@@ -136,7 +136,7 @@ describe('AppsState', () => {
 
         const updated = createApp(2, '_new');
 
-        appsService.setup(x => x.putApp(app2, request, app2.version))
+        appsService.setup(x => x.putApp(app2.name, app2, request, app2.version))
             .returns(() => of(updated)).verifiable();
 
         appsState.update(app2, request).subscribe();
@@ -149,7 +149,7 @@ describe('AppsState', () => {
 
         const file = <File>{};
 
-        appsService.setup(x => x.postAppImage(app2, file, app2.version))
+        appsService.setup(x => x.postAppImage(app2.name, app2, file, app2.version))
             .returns(() => of(50, 60, updated)).verifiable();
 
         appsState.uploadImage(app2, file).subscribe();
@@ -160,7 +160,7 @@ describe('AppsState', () => {
     it('should update app if image removed', () => {
         const updated = createApp(2, '_new');
 
-        appsService.setup(x => x.deleteAppImage(app2, app2.version))
+        appsService.setup(x => x.deleteAppImage(app2.name, app2, app2.version))
             .returns(() => of(updated)).verifiable();
 
         appsState.removeImage(app2).subscribe();
@@ -169,7 +169,7 @@ describe('AppsState', () => {
     });
 
     it('should remove app from snapshot if left', () => {
-        appsService.setup(x => x.leaveApp(app2))
+        appsService.setup(x => x.leaveApp(app2.name, app2))
             .returns(() => of({})).verifiable();
 
         appsState.leave(app2).subscribe();
@@ -178,7 +178,7 @@ describe('AppsState', () => {
     });
 
     it('should remove app from snapshot if archived', () => {
-        appsService.setup(x => x.deleteApp(app2))
+        appsService.setup(x => x.deleteApp(app2.name, app2))
             .returns(() => of({})).verifiable();
 
         appsState.delete(app2).subscribe();
@@ -208,7 +208,7 @@ describe('AppsState', () => {
         it('should update selected app settings if updated', () => {
             const updated = createAppSettings(1, '_new');
 
-            appsService.setup(x => x.putSettings(app1Settings, {} as any, app1Settings.version))
+            appsService.setup(x => x.putSettings(app1.name, app1Settings, {} as any, app1Settings.version))
                 .returns(() => of(updated)).verifiable();
 
             appsState.updateSettings(app1Settings, {} as any).subscribe();
@@ -221,7 +221,7 @@ describe('AppsState', () => {
 
             const updated = createApp(1, '_new');
 
-            appsService.setup(x => x.putApp(app1, request, app1.version))
+            appsService.setup(x => x.putApp(app1.name, app1, request, app1.version))
                 .returns(() => of(updated)).verifiable();
 
             appsState.update(app1, request).subscribe();
@@ -230,7 +230,7 @@ describe('AppsState', () => {
         });
 
         it('should remove selected app from snapshot if archived', () => {
-            appsService.setup(x => x.deleteApp(app1))
+            appsService.setup(x => x.deleteApp(app1.name, app1))
                 .returns(() => of(true)).verifiable();
 
             appsState.delete(app1).subscribe();

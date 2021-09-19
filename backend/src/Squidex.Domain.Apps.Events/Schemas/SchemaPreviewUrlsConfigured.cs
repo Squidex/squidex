@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaPreviewUrlsConfigured))]
     public sealed class SchemaPreviewUrlsConfigured : SchemaEvent
     {
-        public ImmutableDictionary<string, string> PreviewUrls { get; set; }
+        public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
     }
 }
