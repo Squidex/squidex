@@ -40,7 +40,7 @@ namespace Squidex
 
             services.AddSquidexMvcWithPlugins(config);
 
-            services.AddSquidexApps();
+            services.AddSquidexApps(config);
             services.AddSquidexAssetInfrastructure(config);
             services.AddSquidexAssets(config);
             services.AddSquidexAuthentication(config);

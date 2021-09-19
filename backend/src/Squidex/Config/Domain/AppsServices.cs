@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
@@ -23,8 +24,14 @@ namespace Squidex.Config.Domain
 {
     public static class AppsServices
     {
-        public static void AddSquidexApps(this IServiceCollection services)
+        public static void AddSquidexApps(this IServiceCollection services, IConfiguration config)
         {
+            if (config.GetValue<bool>("apps:deletePermanent"))
+            {
+                services.AddSingletonAs<AppPermanentDeleter>()
+                    .As<IEventConsumer>();
+            }
+
             services.AddTransientAs<AppDomainObject>()
                 .AsSelf();
 
@@ -36,9 +43,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AppUsageDeleter>()
                 .As<IDeleter>();
-
-            services.AddSingletonAs<AppPermanentDeleter>()
-                .As<IEventConsumer>();
 
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
