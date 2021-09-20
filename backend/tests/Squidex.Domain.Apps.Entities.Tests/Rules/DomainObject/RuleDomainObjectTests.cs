@@ -39,7 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         public RuleDomainObjectTests()
         {
             sut = new RuleDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), appProvider, ruleEnqueuer);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]

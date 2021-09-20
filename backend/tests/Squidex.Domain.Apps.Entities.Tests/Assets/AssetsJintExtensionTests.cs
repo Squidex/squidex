@@ -406,9 +406,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private static string Cleanup(string text)
         {
             return text
-                .Replace("\r", string.Empty)
-                .Replace("\n", string.Empty)
-                .Replace(" ", string.Empty);
+                .Replace("\r", string.Empty, StringComparison.Ordinal)
+                .Replace("\n", string.Empty, StringComparison.Ordinal)
+                .Replace(" ", string.Empty, StringComparison.Ordinal);
         }
     }
 }

@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         private static string Cleanup(string filter, object? arg = null)
         {
-            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString());
+            return filter.Replace('\'', '"').Replace("[value]", arg?.ToString(), StringComparison.Ordinal);
         }
     }
 }

@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                                 await handler.BackupEventAsync(@event, context, ct);
                             }
 
-                            writer.WriteEvent(storedEvent);
+                            writer.WriteEvent(storedEvent, ct);
 
                             job.HandledEvents = writer.WrittenEvents;
                             job.HandledAssets = writer.WrittenAttachments;
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             await handler.CompleteBackupAsync(context);
                         }
 
-                        await userMapping.StoreAsync(writer, userResolver);
+                        await userMapping.StoreAsync(writer, userResolver, ct);
                     }
 
                     stream.Position = 0;

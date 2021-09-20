@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         public static Q HasIdsWithoutTotal(this INegatableArgumentConstraintManager<Q> that, params DomainId[] ids)
         {
-            return that.Matches(x => x.Ids != null && x.Ids.SetEquals(ids) && x.NoTotal == true);
+            return that.Matches(x => x.Ids != null && x.Ids.SetEquals(ids) && x.NoTotal);
         }
 
         public static Q HasIds(this INegatableArgumentConstraintManager<Q> that, params DomainId[] ids)

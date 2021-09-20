@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
         public ICollection<object?> Values
         {
-            get => metadata.Values.Select(x => (object?)x).ToList();
+            get => metadata.Values.Cast<object?>().ToList();
         }
 
         public object? this[string key]

@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Contains(request.CacheServer, recordedRequest);
             Contains(request.CacheStatus, recordedRequest);
             Contains(request.CacheTTL, recordedRequest);
-            Contains(request.ElapsedMs.ToString(), recordedRequest);
+            Contains(request.ElapsedMs.ToString(CultureInfo.InvariantCulture), recordedRequest);
             Contains(request.RequestMethod, recordedRequest);
             Contains(request.RequestPath, recordedRequest);
             Contains(request.StatusCode, recordedRequest);

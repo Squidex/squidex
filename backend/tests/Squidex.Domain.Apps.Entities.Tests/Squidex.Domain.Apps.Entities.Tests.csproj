@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Squidex.Domain.Apps.Entities</RootNamespace>
     <LangVersion>9.0</LangVersion>
+    <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -22,6 +23,10 @@
     <PackageReference Include="GraphQL" Version="4.5.0" />
     <PackageReference Include="GraphQL.NewtonsoftJson" Version="4.5.0" />
     <PackageReference Include="Lorem.Universal.Net" Version="4.0.80" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.670">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />

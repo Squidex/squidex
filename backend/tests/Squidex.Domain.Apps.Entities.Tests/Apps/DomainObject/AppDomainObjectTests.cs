@@ -70,7 +70,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             };
 
             sut = new AppDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), initialSettings, appPlansProvider, appPlansBillingManager, userResolver);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]

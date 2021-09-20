@@ -40,7 +40,9 @@ namespace Squidex.Infrastructure.Reflection
 
         public class Writeonly<T>
         {
+#pragma warning disable MA0041 // Make property static
             public T P1
+#pragma warning restore MA0041 // Make property static
             {
                 set => Debug.WriteLine(value);
             }

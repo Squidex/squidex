@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -163,15 +164,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     var eventData = formatter.ToEventData(envelope, Guid.NewGuid(), true);
                     var eventStored = new StoredEvent(stream, "1", 2, eventData);
 
-                    var index = int.Parse(envelope.Headers["Index"].ToString());
+                    var index = int.Parse(envelope.Headers["Index"].ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture);
 
                     if (index % 17 == 0)
                     {
-                        await WriteGuidAsync(writer, index.ToString(), envelope.Payload.Id);
+                        await WriteGuidAsync(writer, index.ToString(CultureInfo.InvariantCulture), envelope.Payload.Id);
                     }
                     else if (index % 37 == 0)
                     {
-                        await WriteJsonGuidAsync(writer, index.ToString(), envelope.Payload.Id);
+                        await WriteJsonGuidAsync(writer, index.ToString(CultureInfo.InvariantCulture), envelope.Payload.Id);
                     }
 
                     writer.WriteEvent(eventStored);
@@ -182,19 +183,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 await foreach (var @event in reader.ReadEventsAsync(streamNameResolver, formatter))
                 {
-                    var index = int.Parse(@event.Event.Headers["Index"].ToString());
+                    var index = int.Parse(@event.Event.Headers["Index"].ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture);
 
                     var id = Guid.Parse(@event.Event.Headers["Id"].ToString());
 
                     if (index % 17 == 0)
                     {
-                        var guid = await ReadGuidAsync(reader, index.ToString());
+                        var guid = await ReadGuidAsync(reader, index.ToString(CultureInfo.InvariantCulture));
 
                         Assert.Equal(id, guid);
                     }
                     else if (index % 37 == 0)
                     {
-                        var guid = await ReadJsonGuidAsync(reader, index.ToString());
+                        var guid = await ReadJsonGuidAsync(reader, index.ToString(CultureInfo.InvariantCulture));
 
                         Assert.Equal(id, guid);
                     }
@@ -242,7 +243,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var buffer = new byte[16];
 
-                await stream.ReadAsync(buffer);
+                _ = await stream.ReadAsync(buffer);
 
                 read = new Guid(buffer);
             }

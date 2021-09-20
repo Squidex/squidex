@@ -38,7 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public TextIndexerTests_Elastic()
         {
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             SupportsQuerySyntax = true;
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]

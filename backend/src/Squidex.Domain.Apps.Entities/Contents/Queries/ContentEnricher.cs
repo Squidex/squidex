@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     throw new DomainObjectNotFoundException(x.ToString());
                                 }
 
-                                var components = await appProvider.GetComponentsAsync(schema);
+                                var components = await appProvider.GetComponentsAsync(schema, ct);
 
                                 return (schema, components);
                             });

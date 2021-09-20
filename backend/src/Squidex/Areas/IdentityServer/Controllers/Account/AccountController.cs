@@ -98,7 +98,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 return View(vm);
             }
 
-            var user = await userService.GetAsync(User);
+            var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
             if (user == null)
             {
@@ -111,7 +111,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 ConsentForEmails = model.ConsentToAutomatedEmails
             };
 
-            await userService.UpdateAsync(user.Id, update);
+            await userService.UpdateAsync(user.Id, update, ct: HttpContext.RequestAborted);
 
             return RedirectToReturnUrl(returnUrl);
         }
@@ -238,7 +238,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             if (isLoggedIn)
             {
-                user = await userService.FindByLoginAsync(externalLogin.LoginProvider, externalLogin.ProviderKey);
+                user = await userService.FindByLoginAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, HttpContext.RequestAborted);
             }
             else
             {
@@ -249,22 +249,22 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                     throw new DomainException("User has no exposed email address.");
                 }
 
-                user = await userService.FindByEmailAsync(email);
+                user = await userService.FindByEmailAsync(email, HttpContext.RequestAborted);
 
                 if (user != null)
                 {
                     var update = CreateUserValues(externalLogin, email, user);
 
-                    await userService.UpdateAsync(user.Id, update);
+                    await userService.UpdateAsync(user.Id, update, ct: HttpContext.RequestAborted);
                 }
                 else
                 {
                     var update = CreateUserValues(externalLogin, email);
 
-                    user = await userService.CreateAsync(email, update, identityOptions.LockAutomatically);
+                    user = await userService.CreateAsync(email, update, identityOptions.LockAutomatically, HttpContext.RequestAborted);
                 }
 
-                await userService.AddLoginAsync(user.Id, externalLogin);
+                await userService.AddLoginAsync(user.Id, externalLogin, HttpContext.RequestAborted);
 
                 var (success, locked) = await LoginAsync(externalLogin);
 

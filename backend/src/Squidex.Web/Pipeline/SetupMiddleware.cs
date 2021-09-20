@@ -23,7 +23,7 @@ namespace Squidex.Web.Pipeline
 
         public async Task InvokeAsync(HttpContext context, IUserService userService)
         {
-            if (!isUserFound && await userService.IsEmptyAsync())
+            if (!isUserFound && await userService.IsEmptyAsync(context.RequestAborted))
             {
                 var url = context.Request.PathBase.Add("/identity-server/setup");
 

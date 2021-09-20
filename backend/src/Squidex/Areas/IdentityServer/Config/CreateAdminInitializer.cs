@@ -56,7 +56,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     {
                         try
                         {
-                            var user = await userService.FindByEmailAsync(adminEmail);
+                            var user = await userService.FindByEmailAsync(adminEmail, ct);
 
                             if (user != null)
                             {
@@ -70,7 +70,7 @@ namespace Squidex.Areas.IdentityServer.Config
                                         Permissions = permissions
                                     };
 
-                                    await userService.UpdateAsync(user.Id, values);
+                                    await userService.UpdateAsync(user.Id, values, ct: ct);
                                 }
                             }
                             else
@@ -84,7 +84,7 @@ namespace Squidex.Areas.IdentityServer.Config
                                     DisplayName = adminEmail
                                 };
 
-                                await userService.CreateAsync(adminEmail, values);
+                                await userService.CreateAsync(adminEmail, values, ct: ct);
                             }
                         }
                         catch (Exception ex)

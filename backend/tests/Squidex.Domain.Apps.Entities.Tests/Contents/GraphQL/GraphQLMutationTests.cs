@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -730,19 +731,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private string CreateQuery(string query)
         {
             query = query
-                .Replace("<ID>", contentId.ToString())
-                .Replace("'", "\"")
-                .Replace("`", "\"")
-                .Replace("<FIELDS>", TestContent.AllFields);
+                .Replace("<ID>", contentId.ToString(), StringComparison.Ordinal)
+                .Replace("'", "\"", StringComparison.Ordinal)
+                .Replace("`", "\"", StringComparison.Ordinal)
+                .Replace("<FIELDS>", TestContent.AllFields, StringComparison.Ordinal);
 
-            if (query.Contains("<DATA>"))
+            if (query.Contains("<DATA>", StringComparison.Ordinal))
             {
                 var data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id);
 
                 var dataJson = JsonConvert.SerializeObject(data, Formatting.Indented);
-                var dataString = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty);
+                var dataString = Regex.Replace(dataJson, "\"([^\"]+)\":", x => x.Groups[1].Value + ":").Replace(".0", string.Empty, StringComparison.Ordinal);
 
-                query = query.Replace("<DATA>", dataString);
+                query = query.Replace("<DATA>", dataString, StringComparison.Ordinal);
             }
 
             return query;

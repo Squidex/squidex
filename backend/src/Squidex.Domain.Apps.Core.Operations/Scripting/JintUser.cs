@@ -10,7 +10,6 @@ using System.Linq;
 using System.Security.Claims;
 using Jint;
 using Jint.Native;
-using Jint.Runtime.Interop;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;

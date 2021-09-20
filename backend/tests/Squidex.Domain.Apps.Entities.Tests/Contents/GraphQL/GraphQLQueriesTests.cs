@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -61,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var asset = TestAsset.Create(DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
-                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, asset));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var asset = TestAsset.Create(DomainId.NewGuid());
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
-                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && x.NoTotal == false), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5&$filter=my-query" && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, asset));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -190,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = TestContent.Create(contentId);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
-                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -223,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = TestContent.Create(contentId);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
-                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -259,7 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = TestContent.Create(contentId);
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
-                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.NoTotal == false), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(10, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -466,7 +467,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 .Returns(ResultList.CreateFrom(1, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
-                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal == true), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -530,7 +531,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 .Returns(ResultList.CreateFrom(1, contentRef));
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), content.SchemaId.Id.ToString(),
-                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && x.NoTotal == false), A<CancellationToken>._))
+                    A<Q>.That.Matches(x => x.QueryAsOdata == "?$top=30&$skip=5" && x.Reference == contentRefId && !x.NoTotal), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
@@ -732,17 +733,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var json = serializer.Serialize(result);
 
-            Assert.Contains("\"errors\"", json);
+            Assert.Contains("\"errors\"", json, StringComparison.Ordinal);
         }
 
         private static string CreateQuery(string query, DomainId id = default)
         {
             return query
-                .Replace("'", "\"")
-                .Replace("<ID>", id.ToString())
-                .Replace("<FIELDS_ASSET>", TestAsset.AllFields)
-                .Replace("<FIELDS_CONTENT>", TestContent.AllFields)
-                .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields);
+                .Replace("'", "\"", StringComparison.Ordinal)
+                .Replace("<ID>", id.ToString(), StringComparison.Ordinal)
+                .Replace("<FIELDS_ASSET>", TestAsset.AllFields, StringComparison.Ordinal)
+                .Replace("<FIELDS_CONTENT>", TestContent.AllFields, StringComparison.Ordinal)
+                .Replace("<FIELDS_CONTENT_FLAT>", TestContent.AllFlatFields, StringComparison.Ordinal);
         }
 
         private Context MatchsAssetContext()

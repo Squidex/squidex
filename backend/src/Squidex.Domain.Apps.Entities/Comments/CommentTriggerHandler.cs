@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
             if (commentCreated.Mentions?.Length > 0)
             {
-                var users = await userResolver.QueryManyAsync(commentCreated.Mentions);
+                var users = await userResolver.QueryManyAsync(commentCreated.Mentions, ct);
 
                 if (users.Count > 0)
                 {

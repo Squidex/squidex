@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiPermission(Permissions.AdminRestore)]
         public async Task<IActionResult> GetRestoreJob()
         {
-            var job = await backupService.GetRestoreAsync();
+            var job = await backupService.GetRestoreAsync(HttpContext.RequestAborted);
 
             if (job == null)
             {

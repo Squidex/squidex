@@ -63,7 +63,7 @@ namespace Notifo.Areas.Account.Controllers
                     throw new InvalidOperationException("The user details cannot be retrieved.");
                 }
 
-                var user = await userService.GetAsync(principal);
+                var user = await userService.GetAsync(principal, HttpContext.RequestAborted);
 
                 if (user == null)
                 {
@@ -153,7 +153,7 @@ namespace Notifo.Areas.Account.Controllers
                    });
             }
 
-            var user = await userService.GetAsync(User);
+            var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
             if (user == null)
             {

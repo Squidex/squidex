@@ -50,7 +50,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         [Route("setup/")]
         public async Task<IActionResult> Setup()
         {
-            if (!await userService.IsEmptyAsync())
+            if (!await userService.IsEmptyAsync(HttpContext.RequestAborted))
             {
                 return RedirectToReturnUrl(null);
             }
@@ -62,7 +62,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         [Route("setup/")]
         public async Task<IActionResult> Setup(CreateUserModel model)
         {
-            if (!await userService.IsEmptyAsync())
+            if (!await userService.IsEmptyAsync(HttpContext.RequestAborted))
             {
                 return RedirectToReturnUrl(null);
             }
@@ -78,7 +78,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
                 var user = await userService.CreateAsync(model.Email, new UserValues
                 {
                     Password = model.Password
-                });
+                }, ct: HttpContext.RequestAborted);
 
                 await SignInManager.SignInAsync((IdentityUser)user.Identity, true);
 

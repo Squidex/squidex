@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -81,10 +83,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var size = 1024L;
 
-            A.CallTo(() => assetStore.GetSizeAsync(fullName, default))
+            A.CallTo(() => assetStore.GetSizeAsync(fullName, ct))
                 .Returns(size);
 
-            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix);
+            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
 
             Assert.Equal(size, result);
         }
@@ -97,13 +99,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var size = 1024L;
 
-            A.CallTo(() => assetStore.GetSizeAsync(A<string>._, default))
+            A.CallTo(() => assetStore.GetSizeAsync(A<string>._, ct))
                 .Throws(new AssetNotFoundException(assetId.ToString()));
 
-            A.CallTo(() => assetStore.GetSizeAsync(fullName, default))
+            A.CallTo(() => assetStore.GetSizeAsync(fullName, ct))
                 .Returns(size);
 
-            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix);
+            var result = await sut.GetFileSizeAsync(appId, assetId, assetFileVersion, suffix, ct);
 
             Assert.Equal(size, result);
         }
@@ -272,9 +274,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private string GetFullName(string fileName)
         {
             return fileName
-                .Replace("{appId}", appId.ToString())
-                .Replace("{assetId}", assetId.ToString())
-                .Replace("{assetFileVersion}", assetFileVersion.ToString());
+                .Replace("{appId}", appId.ToString(), StringComparison.Ordinal)
+                .Replace("{assetId}", assetId.ToString(), StringComparison.Ordinal)
+                .Replace("{assetFileVersion}", assetFileVersion.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
         }
     }
 }

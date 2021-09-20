@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -54,7 +54,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/")]
         public async Task<IActionResult> Profile(string? successMessage = null)
         {
-            var user = await userService.GetAsync(User);
+            var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
             return View(await GetVM<None>(user, successMessage: successMessage));
         }
@@ -67,7 +67,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
             var properties =
                 SignInManager.ConfigureExternalAuthenticationProperties(provider,
-                    Url.Action(nameof(AddLoginCallback)), userService.GetUserId(User));
+                    Url.Action(nameof(AddLoginCallback)), userService.GetUserId(User, HttpContext.RequestAborted));
 
             return Challenge(properties, provider);
         }
@@ -84,7 +84,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/update/")]
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
-            return MakeChangeAsync(id => userService.UpdateAsync(id, model.ToValues()),
+            return MakeChangeAsync(id => userService.UpdateAsync(id, model.ToValues(), ct: HttpContext.RequestAborted),
                 T.Get("users.profile.updateProfileDone"), model);
         }
 
@@ -92,7 +92,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/properties/")]
         public Task<IActionResult> UpdateProperties(ChangePropertiesModel model)
         {
-            return MakeChangeAsync(id => userService.UpdateAsync(id, model.ToValues()),
+            return MakeChangeAsync(id => userService.UpdateAsync(id, model.ToValues(), ct: HttpContext.RequestAborted),
                 T.Get("users.profile.updatePropertiesDone"), model);
         }
 
@@ -100,7 +100,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/login-remove/")]
         public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
         {
-            return MakeChangeAsync(id => userService.RemoveLoginAsync(id, model.LoginProvider, model.ProviderKey),
+            return MakeChangeAsync(id => userService.RemoveLoginAsync(id, model.LoginProvider, model.ProviderKey, HttpContext.RequestAborted),
                 T.Get("users.profile.removeLoginDone"), model);
         }
 
@@ -108,7 +108,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/password-set/")]
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
-            return MakeChangeAsync(id => userService.SetPasswordAsync(id, model.Password),
+            return MakeChangeAsync(id => userService.SetPasswordAsync(id, model.Password, ct: HttpContext.RequestAborted),
                 T.Get("users.profile.setPasswordDone"), model);
         }
 
@@ -116,7 +116,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/password-change/")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
-            return MakeChangeAsync(id => userService.SetPasswordAsync(id, model.Password, model.OldPassword),
+            return MakeChangeAsync(id => userService.SetPasswordAsync(id, model.Password, model.OldPassword, HttpContext.RequestAborted),
                 T.Get("users.profile.changePasswordDone"), model);
         }
 
@@ -140,14 +140,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         {
             var update = new UserValues { ClientSecret = RandomHash.New() };
 
-            await userService.UpdateAsync(id, update);
+            await userService.UpdateAsync(id, update, ct: HttpContext.RequestAborted);
         }
 
         private async Task AddLoginAsync(string id)
         {
             var externalLogin = await SignInManager.GetExternalLoginInfoWithDisplayNameAsync(id);
 
-            await userService.AddLoginAsync(id, externalLogin);
+            await userService.AddLoginAsync(id, externalLogin, HttpContext.RequestAborted);
         }
 
         private async Task UpdatePictureAsync(List<IFormFile> file, string id)
@@ -175,12 +175,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
             var update = new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore };
 
-            await userService.UpdateAsync(id, update);
+            await userService.UpdateAsync(id, update, ct: HttpContext.RequestAborted);
         }
 
         private async Task<IActionResult> MakeChangeAsync<TModel>(Func<string, Task> action, string successMessage, TModel? model = null) where TModel : class
         {
-            var user = await userService.GetAsync(User);
+            var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
             if (user == null)
             {
@@ -222,8 +222,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
             var (providers, hasPassword, logins) = await AsyncHelper.WhenAll(
                 SignInManager.GetExternalProvidersAsync(),
-                userService.HasPasswordAsync(user),
-                userService.GetLoginsAsync(user));
+                userService.HasPasswordAsync(user, HttpContext.RequestAborted),
+                userService.GetLoginsAsync(user, HttpContext.RequestAborted));
 
             var vm = new ProfileVM
             {

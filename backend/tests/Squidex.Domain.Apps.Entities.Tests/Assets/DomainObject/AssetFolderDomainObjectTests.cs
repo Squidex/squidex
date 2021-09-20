@@ -57,7 +57,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     .BuildServiceProvider();
 
             sut = new AssetFolderDomainObject(PersistenceFactory, log, serviceProvider);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]

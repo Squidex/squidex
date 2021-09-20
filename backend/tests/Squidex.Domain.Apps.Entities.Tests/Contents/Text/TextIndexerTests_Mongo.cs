@@ -51,8 +51,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             DomainIdSerializer.Register();
 
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             SupportsQuerySyntax = false;
             SupportsGeo = true;
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]

@@ -38,11 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => grainFactory.GetGrain<ISchemasCacheGrain>(appId.Id.ToString(), null))
                 .Returns(this.cache);
 
-            var cache =
+            var localCache =
                 new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub(A.Fake<ILogger<SimplePubSub>>()),
                     Options.Create(new ReplicatedCacheOptions { Enable = true }));
 
-            sut = new SchemasIndex(grainFactory, cache);
+            sut = new SchemasIndex(grainFactory, localCache);
         }
 
         [Fact]

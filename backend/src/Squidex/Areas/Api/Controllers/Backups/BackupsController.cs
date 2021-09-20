@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> GetBackups(string app)
         {
-            var jobs = await backupService.GetBackupsAsync(AppId);
+            var jobs = await backupService.GetBackupsAsync(AppId, HttpContext.RequestAborted);
 
             var response = BackupJobsDto.FromBackups(jobs, Resources);
 
@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteBackup(string app, DomainId id)
         {
-            await backupService.DeleteBackupAsync(AppId, id);
+            await backupService.DeleteBackupAsync(AppId, id, HttpContext.RequestAborted);
 
             return NoContent();
         }

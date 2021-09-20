@@ -61,6 +61,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected HandlerTestBase()
         {
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(A<Type>._, Id, A<HandleSnapshot<TState>>._, A<HandleEvent>._))
                 .Returns(persistence);
 
@@ -72,6 +73,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
             A.CallTo(() => persistence.DeleteAsync())
                 .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         protected CommandContext CreateCommandContext<TCommand>(TCommand command) where TCommand : SquidexCommand

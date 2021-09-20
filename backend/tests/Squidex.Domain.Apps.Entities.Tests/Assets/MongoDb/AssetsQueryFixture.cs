@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -77,11 +78,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
                     {
                         for (var i = 0; i < numValues; i++)
                         {
-                            var fileName = i.ToString();
+                            var fileName = i.ToString(CultureInfo.InvariantCulture);
 
                             for (var j = 0; j < numValues; j++)
                             {
-                                var tag = j.ToString();
+                                var tag = j.ToString(CultureInfo.InvariantCulture);
 
                                 var asset = new MongoAssetEntity
                                 {
@@ -129,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public string RandomValue()
         {
-            return random.Next(0, numValues).ToString();
+            return random.Next(0, numValues).ToString(CultureInfo.InvariantCulture);
         }
     }
 }

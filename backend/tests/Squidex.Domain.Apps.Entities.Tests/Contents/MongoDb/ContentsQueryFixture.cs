@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -182,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public string RandomValue()
         {
-            return random.Next(0, numValues).ToString();
+            return random.Next(0, numValues).ToString(CultureInfo.InvariantCulture);
         }
 
         private static IAppEntity CreateApp(DomainId appId)

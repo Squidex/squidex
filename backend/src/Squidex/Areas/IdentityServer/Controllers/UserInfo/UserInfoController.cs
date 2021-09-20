@@ -33,7 +33,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.UserInfo
         [Produces("application/json")]
         public async Task<IActionResult> UserInfo()
         {
-            var user = await userService.GetAsync(User);
+            var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
             if (user == null)
             {
