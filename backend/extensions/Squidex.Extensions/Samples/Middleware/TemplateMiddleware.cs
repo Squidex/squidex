@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
@@ -35,16 +36,26 @@ namespace Squidex.Extensions.Samples.Middleware
                 var schema =
                     SchemaBuilder.Create("Pages")
                         .AddString("Title", f => f
-                            .Length(100)
+                            .Properties(p => p with
+                            {
+                                MaxLength = 100
+                            })
                             .Required())
                         .AddString("Slug", f => f
-                            .Length(100)
+                            .Properties(p => p with
+                            {
+                                MaxLength = 100
+                            })
                             .Required()
                             .Disabled())
                         .AddString("Text", f => f
-                            .Length(1000)
-                            .Required()
-                            .AsRichText())
+                            .Properties(p => p with
+                            {
+                                Editor = StringFieldEditor.RichText,
+                                MaxLength = 1000,
+                                MinLength = 200
+                            })
+                            .Required())
                         .Build();
 
                 await publish(schema);

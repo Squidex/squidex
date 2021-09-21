@@ -7,26 +7,14 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public class ReferencesFieldBuilder : FieldBuilder<ReferencesFieldBuilder>
+    public sealed class ReferencesFieldBuilder : FieldBuilder<ReferencesFieldBuilder, ReferencesFieldProperties>
     {
-        public ReferencesFieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
-            : base(field, schema)
+        public ReferencesFieldBuilder(UpsertSchemaFieldBase field, ReferencesFieldProperties properties, CreateSchema schema)
+            : base(field, properties, schema)
         {
-        }
-
-        public ReferencesFieldBuilder WithSchemaId(DomainId id)
-        {
-            Properties<ReferencesFieldProperties>(p => p with
-            {
-                SchemaIds = ImmutableList.Create(id)
-            });
-
-            return this;
         }
     }
 }

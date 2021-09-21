@@ -15,30 +15,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
     public abstract class FieldBuilder
     {
         protected UpsertSchemaFieldBase Field { get; init; }
+
         protected CreateSchema Schema { get; init; }
     }
 
-    public abstract class FieldBuilder<T> : FieldBuilder
-        where T : FieldBuilder
+    public abstract class FieldBuilder<T, TProperties> : FieldBuilder where T : FieldBuilder where TProperties : FieldProperties
     {
-        protected FieldBuilder(UpsertSchemaFieldBase field, CreateSchema schema)
+        private TProperties properties;
+
+        protected FieldBuilder(UpsertSchemaFieldBase field, TProperties properties, CreateSchema schema)
         {
+            this.properties = properties;
+
             Field = field;
             Schema = schema;
-        }
-
-        public T Label(string? label)
-        {
-            Field.Properties = Field.Properties with { Label = label };
-
-            return (T)(object)this;
-        }
-
-        public T Hints(string? hints)
-        {
-            Field.Properties = Field.Properties with { Hints = hints };
-
-            return (T)(object)this;
         }
 
         public T Localizable()
@@ -51,23 +41,42 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return (T)(object)this;
         }
 
-        public T Disabled()
+        public T Disabled(bool isDisabled = true)
         {
-            Field.IsDisabled = true;
+            Field.IsDisabled = isDisabled;
 
             return (T)(object)this;
         }
 
-        public T Required()
+        public T Hidden(bool isHidden = true)
         {
-            Field.Properties = Field.Properties with { IsRequired = true };
+            Field.IsHidden = isHidden;
 
             return (T)(object)this;
         }
 
-        protected void Properties<TProperties>(Func<TProperties, TProperties> updater) where TProperties : FieldProperties
+        public T Label(string? label)
         {
-            Field.Properties = updater((TProperties)Field.Properties);
+            return Properties(x => x with { Label = label });
+        }
+
+        public T Hints(string? hints)
+        {
+            return Properties(x => x with { Hints = hints });
+        }
+
+        public T Required(bool isRequired = true)
+        {
+            return Properties(x => x with { IsRequired = isRequired });
+        }
+
+        public T Properties(Func<TProperties, TProperties> updater)
+        {
+            properties = updater(properties);
+
+            Field.Properties = properties;
+
+            return (T)(object)this;
         }
 
         public T ShowInList()

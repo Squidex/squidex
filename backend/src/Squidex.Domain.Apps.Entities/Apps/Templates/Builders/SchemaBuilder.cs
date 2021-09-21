@@ -67,96 +67,122 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return this;
         }
 
+        public SchemaBuilder AddArray(string name, Action<ArrayFieldBuilder> configure)
+        {
+            var (field, properties) = AddField<ArrayFieldProperties>(name);
+
+            configure(new ArrayFieldBuilder(field, properties, command));
+
+            return this;
+        }
+
         public SchemaBuilder AddAssets(string name, Action<AssetFieldBuilder> configure)
         {
-            var field = AddField<AssetsFieldProperties>(name);
+            var (field, properties) = AddField<AssetsFieldProperties>(name);
 
-            configure(new AssetFieldBuilder(field, command));
+            configure(new AssetFieldBuilder(field, properties, command));
 
             return this;
         }
 
         public SchemaBuilder AddBoolean(string name, Action<BooleanFieldBuilder> configure)
         {
-            var field = AddField<BooleanFieldProperties>(name);
+            var (field, properties) = AddField<BooleanFieldProperties>(name);
 
-            configure(new BooleanFieldBuilder(field, command));
+            configure(new BooleanFieldBuilder(field, properties, command));
+
+            return this;
+        }
+
+        public SchemaBuilder AddComponent(string name, Action<ComponentFieldBuilder> configure)
+        {
+            var (field, properties) = AddField<ComponentFieldProperties>(name);
+
+            configure(new ComponentFieldBuilder(field, properties, command));
+
+            return this;
+        }
+
+        public SchemaBuilder AddComponents(string name, Action<ComponentsFieldBuilder> configure)
+        {
+            var (field, properties) = AddField<ComponentsFieldProperties>(name);
+
+            configure(new ComponentsFieldBuilder(field, properties, command));
 
             return this;
         }
 
         public SchemaBuilder AddDateTime(string name, Action<DateTimeFieldBuilder> configure)
         {
-            var field = AddField<DateTimeFieldProperties>(name);
+            var (field, properties) = AddField<DateTimeFieldProperties>(name);
 
-            configure(new DateTimeFieldBuilder(field, command));
+            configure(new DateTimeFieldBuilder(field, properties, command));
 
             return this;
         }
 
         public SchemaBuilder AddJson(string name, Action<JsonFieldBuilder> configure)
         {
-            var field = AddField<JsonFieldProperties>(name);
+            var (field, properties) = AddField<JsonFieldProperties>(name);
 
-            configure(new JsonFieldBuilder(field, command));
+            configure(new JsonFieldBuilder(field, properties, command));
 
             return this;
         }
 
         public SchemaBuilder AddNumber(string name, Action<NumberFieldBuilder> configure)
         {
-            var field = AddField<NumberFieldProperties>(name);
+            var (field, properties) = AddField<NumberFieldProperties>(name);
 
-            configure(new NumberFieldBuilder(field, command));
+            configure(new NumberFieldBuilder(field, properties, command));
 
             return this;
         }
 
         public SchemaBuilder AddReferences(string name, Action<ReferencesFieldBuilder> configure)
         {
-            var field = AddField<ReferencesFieldProperties>(name);
+            var (field, properties) = AddField<ReferencesFieldProperties>(name);
 
-            configure(new ReferencesFieldBuilder(field, command));
+            configure(new ReferencesFieldBuilder(field, properties, command));
 
             return this;
         }
 
         public SchemaBuilder AddString(string name, Action<StringFieldBuilder> configure)
         {
-            var field = AddField<StringFieldProperties>(name);
+            var (field, properties) = AddField<StringFieldProperties>(name);
 
-            configure(new StringFieldBuilder(field, command));
+            configure(new StringFieldBuilder(field, properties, command));
 
             return this;
         }
 
         public SchemaBuilder AddTags(string name, Action<TagsFieldBuilder> configure)
         {
-            var field = AddField<TagsFieldProperties>(name);
+            var (field, properties) = AddField<TagsFieldProperties>(name);
 
-            configure(new TagsFieldBuilder(field, command));
-
-            return this;
-        }
-
-        public SchemaBuilder AddArray(string name, Action<ArrayFieldBuilder> configure)
-        {
-            var field = AddField<ArrayFieldProperties>(name);
-
-            configure(new ArrayFieldBuilder(field, command));
+            configure(new TagsFieldBuilder(field, properties, command));
 
             return this;
         }
 
-        private UpsertSchemaField AddField<T>(string name) where T : FieldProperties, new()
+        public SchemaBuilder AddUI(string name, Action<UIFieldBuilder> configure)
         {
+            var (field, properties) = AddField<UIFieldProperties>(name);
+
+            configure(new UIFieldBuilder(field, properties, command));
+
+            return this;
+        }
+
+        private (UpsertSchemaField, T) AddField<T>(string name) where T : FieldProperties, new()
+        {
+            var properties = new T { Label = name };
+
             var field = new UpsertSchemaField
             {
                 Name = name.ToCamelCase(),
-                Properties = new T
-                {
-                    Label = name
-                }
+                Properties = properties,
             };
 
             if (command.Fields == null)
@@ -168,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
                 command.Fields = command.Fields.Union(Enumerable.Repeat(field, 1)).ToArray();
             }
 
-            return field;
+            return (field, properties);
         }
 
         public CreateSchema Build()

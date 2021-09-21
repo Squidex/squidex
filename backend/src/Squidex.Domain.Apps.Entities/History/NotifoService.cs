@@ -24,6 +24,8 @@ using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
+#pragma warning disable MA0073 // Avoid comparison with bool constant
+
 namespace Squidex.Domain.Apps.Entities.History
 {
     public class NotifoService : IUserEvents
@@ -167,32 +169,16 @@ namespace Squidex.Domain.Apps.Entities.History
                 var maxAge = now - MaxAge;
 
                 var batches = events
-                    .Where(x => !x.AppEvent.Headers.Restored())
-                    .Where(x => IsNewer(x.AppEvent.Headers, maxAge))
-                    .Where(x => IsComment(x.AppEvent.Payload) || x.HistoryEvent != null)
+                    .Where(x => x.AppEvent.Headers.Restored() == false)
+                    .Where(x => x.AppEvent.Headers.Timestamp() > maxAge)
+                    .SelectMany(x => CreateRequests(x.AppEvent, x.HistoryEvent))
                     .Batch(50);
 
                 foreach (var batch in batches)
                 {
-                    var requests = new List<PublishDto>();
-
-                    foreach (var @event in batch)
-                    {
-                        var payload = @event.AppEvent.Payload;
-
-                        if (payload is CommentCreated comment && IsComment(payload))
-                        {
-                            AddMentions(requests, comment);
-                        }
-                        else if (@event.HistoryEvent != null)
-                        {
-                            AddHistoryEvent(requests, @event.HistoryEvent, payload);
-                        }
-                    }
-
                     var request = new PublishManyDto
                     {
-                        Requests = requests
+                        Requests = batch.ToList()
                     };
 
                     await client.Events.PostEventsAsync(options.AppId, request);
@@ -269,7 +255,22 @@ namespace Squidex.Domain.Apps.Entities.History
             }
         }
 
-        private void AddHistoryEvent(List<PublishDto> requests, HistoryEvent historyEvent, AppEvent payload)
+        private IEnumerable<PublishDto> CreateRequests(Envelope<AppEvent> appEvent, HistoryEvent? historyEvent)
+        {
+            if (appEvent.Payload is CommentCreated comment && comment.Mentions?.Length > 0)
+            {
+                foreach (var userId in comment.Mentions)
+                {
+                    yield return CreateMentionRequest(comment, userId);
+                }
+            }
+            else if (historyEvent != null)
+            {
+                yield return CreateHistoryRequest(historyEvent, appEvent.Payload);
+            }
+        }
+
+        private PublishDto CreateHistoryRequest(HistoryEvent historyEvent, AppEvent payload)
         {
             var publishRequest = new PublishDto
             {
@@ -295,47 +296,34 @@ namespace Squidex.Domain.Apps.Entities.History
             SetUser(payload, publishRequest);
             SetTopic(payload, publishRequest, historyEvent);
 
-            requests.Add(publishRequest);
+            return publishRequest;
         }
 
-        private static void AddMentions(List<PublishDto> requests, CommentCreated comment)
+        private static PublishDto CreateMentionRequest(CommentCreated comment, string userId)
         {
-            foreach (var userId in comment.Mentions!)
+            var publishRequest = new PublishDto
             {
-                var publishRequest = new PublishDto
-                {
-                    Topic = $"users/{userId}"
-                };
+                Topic = $"users/{userId}"
+            };
 
-                publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
+            publishRequest.Properties["SquidexApp"] = comment.AppId.Name;
 
-                publishRequest.Preformatted = new NotificationFormattingDto
+            publishRequest.Preformatted = new NotificationFormattingDto
+            {
+                Subject =
                 {
-                    Subject =
-                    {
-                        ["en"] = comment.Text
-                    }
-                };
-
-                if (comment.Url?.IsAbsoluteUri == true)
-                {
-                    publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
+                    ["en"] = comment.Text
                 }
+            };
 
-                SetUser(comment, publishRequest);
-
-                requests.Add(publishRequest);
+            if (comment.Url?.IsAbsoluteUri == true)
+            {
+                publishRequest.Preformatted.LinkUrl["en"] = comment.Url.ToString();
             }
-        }
 
-        private static bool IsNewer(EnvelopeHeaders headers, Instant maxAge)
-        {
-            return headers.Timestamp() > maxAge;
-        }
+            SetUser(comment, publishRequest);
 
-        private static bool IsComment(AppEvent appEvent)
-        {
-            return appEvent is CommentCreated comment && comment.Mentions?.Length > 0;
+            return publishRequest;
         }
 
         private static void SetUser(AppEvent appEvent, PublishDto publishRequest)

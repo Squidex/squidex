@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -67,12 +68,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             var schema =
                 SchemaBuilder.Create("Posts")
                     .AddString("Title", f => f
-                        .Length(100)
+                        .Properties(p => p with
+                        {
+                            MaxLength = 100
+                        })
                         .Required()
                         .ShowInList()
                         .Hints("The title of the post."))
                     .AddString("Text", f => f
-                        .AsRichText()
+                        .Properties(p => p with
+                        {
+                            Editor = StringFieldEditor.RichText
+                        })
                         .Required()
                         .Hints("The text of the post."))
                     .AddString("Slug", f => f
@@ -92,12 +99,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             var schema =
                 SchemaBuilder.Create("Pages")
                     .AddString("Title", f => f
-                        .Length(100)
+                        .Properties(p => p with
+                        {
+                            MaxLength = 100
+                        })
                         .Required()
                         .ShowInList()
                         .Hints("The title of the page."))
                     .AddString("Text", f => f
-                        .AsRichText()
+                        .Properties(p => p with
+                        {
+                            Editor = StringFieldEditor.RichText
+                        })
                         .Required()
                         .Hints("The text of the page."))
                     .AddString("Slug", f => f

@@ -10,9 +10,9 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
-    public sealed class BooleanFieldBuilder : FieldBuilder<BooleanFieldBuilder, BooleanFieldProperties>
+    public sealed class ComponentFieldBuilder : FieldBuilder<ComponentFieldBuilder, ComponentFieldProperties>
     {
-        public BooleanFieldBuilder(UpsertSchemaFieldBase field, BooleanFieldProperties properties, CreateSchema schema)
+        public ComponentFieldBuilder(UpsertSchemaFieldBase field, ComponentFieldProperties properties, CreateSchema schema)
             : base(field, properties, schema)
         {
         }

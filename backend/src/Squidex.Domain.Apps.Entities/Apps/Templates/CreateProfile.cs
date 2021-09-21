@@ -6,10 +6,13 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
@@ -64,17 +67,31 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .ShowInList()
                         .Hints("Your last name."))
                     .AddAssets("Image", f => f
-                        .MustBeImage()
+                        .Properties(p => p with
+                        {
+                            ExpectedType = AssetType.Image,
+                            MaxItems = 1,
+                            MinItems = 1
+                        })
                         .Hints("Your profile image."))
                     .AddString("Profession", f => f
-                        .AsTextArea()
+                        .Properties(p => p with
+                        {
+                            Editor = StringFieldEditor.TextArea
+                        })
                         .Required()
                         .Hints("Describe your profession."))
                     .AddString("Summary", f => f
-                        .AsTextArea()
+                        .Properties(p => p with
+                        {
+                            Editor = StringFieldEditor.TextArea
+                        })
                         .Hints("Write a short summary about yourself."))
                     .AddString("Legal Terms", f => f
-                        .AsTextArea()
+                        .Properties(p => p with
+                        {
+                            Editor = StringFieldEditor.TextArea
+                        })
                         .Hints("The terms to fulfill legal requirements."))
                     .AddString("Github Link", f => f
                         .Hints("An optional link to your Github account."))
@@ -102,15 +119,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .ShowInList()
                         .Hints("The name of your project."))
                     .AddString("Description", f => f
-                        .AsTextArea()
+                        .Properties(p => p with
+                        {
+                            Editor = StringFieldEditor.TextArea
+                        })
                         .Required()
                         .Hints("Describe your project."))
                     .AddAssets("Image", f => f
-                        .MustBeImage()
+                        .Properties(p => p with
+                        {
+                            ExpectedType = AssetType.Image,
+                            MaxItems = 1,
+                            MinItems = 1
+                        })
                         .Required()
                         .Hints("An image or screenshot for your project."))
                     .AddString("Label", f => f
-                        .AsTextArea()
+                        .Properties(p => p with { Editor = StringFieldEditor.TextArea })
                         .Hints("An optional label to categorize your project, e.g. 'Open Source'."))
                     .AddString("Link", f => f
                         .Hints("An optional link to your project."))
@@ -136,7 +161,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .ShowInList()
                         .Hints("The company or organization you worked for."))
                     .AddAssets("Logo", f => f
-                        .MustBeImage()
+                        .Properties(p => p with
+                        {
+                            ExpectedType = AssetType.Image,
+                            MaxItems = 1,
+                            MinItems = 1
+                        })
                         .Hints("The logo of the company or organization you worked for."))
                     .AddDateTime("From", f => f
                         .Required()
@@ -163,7 +193,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .ShowInList()
                         .Hints("The school or university."))
                     .AddAssets("Logo", f => f
-                        .MustBeImage()
+                        .Properties(p => p with
+                        {
+                            ExpectedType = AssetType.Image,
+                            MaxItems = 1,
+                            MinItems = 1
+                        })
                         .Hints("The logo of the school or university."))
                     .AddDateTime("From", f => f
                         .Required()
@@ -186,7 +221,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .ShowInList()
                         .Hints("The name or title of your publication."))
                     .AddAssets("Cover", f => f
-                        .MustBeImage()
+                        .Properties(p => p with
+                        {
+                            ExpectedType = AssetType.Image,
+                            MaxItems = 1,
+                            MinItems = 1
+                        })
                         .Hints("The cover of your publication."))
                     .AddString("Description", f => f
                         .Hints("Describe the content of your publication."))
@@ -208,7 +248,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .ShowInList()
                         .Hints("The name of the skill."))
                     .AddString("Experience", f => f
-                        .AsDropDown("Beginner", "Advanced", "Professional", "Expert")
+                        .Properties(p => p with
+                        {
+                            AllowedValues = ImmutableList.Create(
+                                "Beginner",
+                                "Advanced",
+                                "Professional",
+                                "Expert"),
+                            Editor = StringFieldEditor.Dropdown,
+                        })
                         .Required()
                         .ShowInList()
                         .Hints("The level of experience."))
