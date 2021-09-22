@@ -77,10 +77,10 @@ namespace Squidex.Infrastructure.EventSourcing
                     })
             }, ct);
 
-            var clusterVersion = await Database.GetVersionAsync(ct);
+            var clusterVersion = await Database.GetMajorVersionAsync(ct);
             var clusteredAsReplica = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
 
-            CanUseChangeStreams = clusteredAsReplica && clusterVersion >= new Version("4.0");
+            CanUseChangeStreams = clusteredAsReplica && clusterVersion >= 4;
         }
     }
 }

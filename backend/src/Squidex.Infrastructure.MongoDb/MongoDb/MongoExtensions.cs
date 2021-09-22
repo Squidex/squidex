@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -144,7 +145,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task<Version> GetVersionAsync(this IMongoDatabase database,
+        public static async Task<int> GetMajorVersionAsync(this IMongoDatabase database,
             CancellationToken ct = default)
         {
             var command =
@@ -153,9 +154,14 @@ namespace Squidex.Infrastructure.MongoDb
                     { "buildInfo", 1 }
                 });
 
-            var result = await database.RunCommandAsync(command, cancellationToken: ct);
+            var document = await database.RunCommandAsync(command, cancellationToken: ct);
 
-            return Version.Parse(result["version"].AsString);
+            var versionString = document["version"].AsString;
+            var versionMajor = versionString.Split('.')[0];
+
+            int.TryParse(versionMajor, NumberStyles.Integer, CultureInfo.InvariantCulture, out int result);
+
+            return result;
         }
     }
 }
