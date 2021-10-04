@@ -163,7 +163,7 @@ namespace Squidex.Web
 
         // Backups
         [Lazy]
-        public bool CanRestoreBackup => IsAllowed(Permissions.AdminEventsRead);
+        public bool CanRestoreBackup => IsAllowed(Permissions.AdminRestore);
 
         [Lazy]
         public bool CanCreateBackup => IsAllowed(Permissions.AppBackupsCreate);
