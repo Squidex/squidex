@@ -26,7 +26,9 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public static bool IsIndex(this HttpContext context)
         {
-            return context.Request.Path.Value?.EndsWith("/index.html", StringComparison.OrdinalIgnoreCase) == true;
+            var path = context.Request.Path.Value;
+
+            return path == "/" || path?.EndsWith("/index.html", StringComparison.OrdinalIgnoreCase) == true;
         }
 
         public static bool IsHtmlPath(this HttpContext context)

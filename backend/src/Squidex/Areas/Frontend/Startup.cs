@@ -59,10 +59,7 @@ namespace Squidex.Areas.Frontend
 
             app.UseMiddleware<IndexMiddleware>();
 
-            if (environment.IsDevelopment())
-            {
-                app.UseMiddleware<WebpackMiddleware>();
-            }
+            app.ConfigureDev();
 
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -87,6 +84,16 @@ namespace Squidex.Areas.Frontend
                     }
                 }
             });
+        }
+
+        public static void ConfigureDev(this IApplicationBuilder app)
+        {
+            var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
+
+            if (environment.IsDevelopment())
+            {
+                app.UseMiddleware<WebpackMiddleware>();
+            }
         }
     }
 }

@@ -95,7 +95,7 @@ namespace Squidex.Pipeline.Squid
 
             foreach (var word in text.Split(' '))
             {
-                if (line.Length + word.Length > 17 && line.Length > 0)
+                if (line.Length + word.Length > 16 && line.Length > 0)
                 {
                     result.Add(line.ToString());
 

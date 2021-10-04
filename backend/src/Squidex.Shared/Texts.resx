@@ -229,6 +229,9 @@
   <data name="common.displayName" xml:space="preserve">
     <value>Display name</value>
   </data>
+  <data name="common.documentation" xml:space="preserve">
+    <value>Documentation</value>
+  </data>
   <data name="common.editor" xml:space="preserve">
     <value>Editor</value>
   </data>
@@ -972,6 +975,15 @@
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
+  </data>
+  <data name="setup.webpack.headline" xml:space="preserve">
+    <value>webpack error</value>
+  </data>
+  <data name="setup.webpack.text" xml:space="preserve">
+    <value>You have to run webpack dev server to run the frontend in Development mode. More information in the documenation: </value>
+  </data>
+  <data name="setup.webpack.title" xml:space="preserve">
+    <value>webpack error</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>This operation is not allowed, your account might be locked.</value>

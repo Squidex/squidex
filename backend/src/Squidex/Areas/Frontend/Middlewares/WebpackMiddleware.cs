@@ -26,25 +26,34 @@ namespace Squidex.Areas.Frontend.Middlewares
         {
             if (context.IsIndex() && !context.Response.IsNotModified())
             {
-                var handler = new HttpClientHandler
+                try
                 {
-                    ServerCertificateCustomValidationCallback = (message, cert, chain, error) => true
-                };
-
-                using (var client = new HttpClient(handler))
-                {
-                    var result = await client.GetAsync(WebpackUrl, context.RequestAborted);
-
-                    context.Response.StatusCode = (int)result.StatusCode;
-
-                    if (result.IsSuccessStatusCode)
+                    var handler = new HttpClientHandler
                     {
-                        var html = await result.Content.ReadAsStringAsync(context.RequestAborted);
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, error) => true
+                    };
 
-                        html = html.AdjustBase(context);
+                    using (var client = new HttpClient(handler))
+                    {
+                        var result = await client.GetAsync(WebpackUrl, context.RequestAborted);
 
-                        await context.Response.WriteAsync(html, context.RequestAborted);
+                        context.Response.StatusCode = (int)result.StatusCode;
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            var html = await result.Content.ReadAsStringAsync(context.RequestAborted);
+
+                            html = html.AdjustBase(context);
+
+                            await context.Response.WriteAsync(html, context.RequestAborted);
+                        }
                     }
+                }
+                catch
+                {
+                    context.Request.Path = "/identity-server/webpack";
+
+                    await next(context);
                 }
             }
             else
