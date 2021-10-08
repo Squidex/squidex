@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -98,10 +99,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
-        [Fact]
-        public async Task Should_apply_default_page_size()
+        [Theory]
+        [InlineData(0L)]
+        [InlineData(-1L)]
+        [InlineData(long.MaxValue)]
+        [InlineData(long.MinValue)]
+        public async Task Should_apply_default_take_size_if_not_defined(long take)
         {
-            var query = Q.Empty;
+            var query = Q.Empty.WithQuery(new ClrQuery { Take = take });
 
             var q = await sut.ParseAsync(requestContext, query);
 
@@ -109,7 +114,27 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_apply_default_limit()
+        public async Task Should_set_take_to_ids_count_if_take_not_defined()
+        {
+            var query = Q.Empty.WithIds("1, 2, 3");
+
+            var q = await sut.ParseAsync(requestContext, query);
+
+            Assert.Equal("Take: 3; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_not_set_take_to_ids_count_if_take_defined()
+        {
+            var query = Q.Empty.WithIds("1, 2, 3").WithQuery(new ClrQuery { Take = 20 });
+
+            var q = await sut.ParseAsync(requestContext, query);
+
+            Assert.Equal("Take: 20; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_apply_default_take_limit()
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
