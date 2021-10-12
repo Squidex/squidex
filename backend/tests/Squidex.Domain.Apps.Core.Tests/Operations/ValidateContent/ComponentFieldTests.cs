@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (_, sut, _) = Field(new ComponentFieldProperties());
 
-            Assert.Equal("my-component", sut.Name);
+            Assert.Equal("myComponent", sut.Name);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (id, sut, components) = Field(new ComponentFieldProperties { SchemaId = schemaId1 });
 
-            await sut.ValidateAsync(CreateValue(id.ToString(), "component-field", 1), errors, components: components);
+            await sut.ValidateAsync(CreateValue(id.ToString(), "componentField", 1), errors, components: components);
 
             Assert.Empty(errors);
         }
@@ -68,10 +68,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (id, sut, components) = Field(new ComponentFieldProperties { SchemaId = schemaId1, IsRequired = true }, true);
 
-            await sut.ValidateAsync(CreateValue(id.ToString(), "component-field", null), errors, components: components);
+            await sut.ValidateAsync(CreateValue(id.ToString(), "componentField", null), errors, components: components);
 
             errors.Should().BeEquivalentTo(
-                new[] { "component-field: Field is required." });
+                new[] { "componentField: Field is required." });
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (_, sut, components) = Field(new ComponentFieldProperties { SchemaId = schemaId1 });
 
-            var value = CreateValue("my-component", "component-field", 1, "schemaName");
+            var value = CreateValue("my-component", "componentField", 1, "schemaName");
 
             await sut.ValidateAsync(value, errors, components: components);
 
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (_, sut, components) = Field(new ComponentFieldProperties { SchemaId = schemaId1 });
 
-            var value = CreateValue(null, "component-field", 1);
+            var value = CreateValue(null, "componentField", 1);
 
             await sut.ValidateAsync(value, errors, components: components);
 
@@ -164,10 +164,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var schema =
                 new Schema("my-component")
-                    .AddNumber(1, "component-field", Partitioning.Invariant,
+                    .AddNumber(1, "componentField", Partitioning.Invariant,
                         new NumberFieldProperties { IsRequired = isRequired });
 
-            var field = Fields.Component(1, "my-component", Partitioning.Invariant, properties);
+            var field = Fields.Component(1, "myComponent", Partitioning.Invariant, properties);
 
             var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
             {

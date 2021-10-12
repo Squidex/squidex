@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ArrayFieldProperties());
 
-            Assert.Equal("my-array", sut.Name);
+            Assert.Equal("myArray", sut.Name);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ArrayFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(JsonValue.Object()), errors);
+            await sut.ValidateAsync(CreateValue(Object()), errors);
 
             Assert.Empty(errors);
         }
@@ -53,7 +53,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ArrayFieldProperties { MinItems = 2, MaxItems = 2 });
 
-            await sut.ValidateAsync(CreateValue(JsonValue.Object(), JsonValue.Object()), errors);
+            await sut.ValidateAsync(CreateValue(Object(), Object()), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_value_has_not_duplicates()
+        {
+            var sut = Field(new ArrayFieldProperties { UniqueFields = ImmutableList.Create("myString") });
+
+            await sut.ValidateAsync(CreateValue(Object("myString", "1"), Object("myString", "2")), errors);
 
             Assert.Empty(errors);
         }
@@ -96,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ArrayFieldProperties { MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(JsonValue.Object(), JsonValue.Object()), errors);
+            await sut.ValidateAsync(CreateValue(Object(), Object()), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
@@ -107,20 +117,41 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ArrayFieldProperties { MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(JsonValue.Object(), JsonValue.Object()), errors);
+            await sut.ValidateAsync(CreateValue(Object(), Object()), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must not have more than 1 item(s)." });
         }
 
-        private static IJsonValue CreateValue(params JsonObject[]? ids)
+        [Fact]
+        public async Task Should_add_error_if_value_has_duplicates()
         {
-            return ids == null ? JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
+            var sut = Field(new ArrayFieldProperties { UniqueFields = ImmutableList.Create("myString") });
+
+            await sut.ValidateAsync(CreateValue(Object("myString", "1"), Object("myString", "1")), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not contain items with duplicate 'myString' fields." });
+        }
+
+        private static IJsonValue CreateValue(params JsonObject[]? objects)
+        {
+            return objects == null ? JsonValue.Null : JsonValue.Array(objects);
+        }
+
+        private static JsonObject Object()
+        {
+            return JsonValue.Object();
+        }
+
+        private static JsonObject Object(string key, object value)
+        {
+            return JsonValue.Object().Add(key, value);
         }
 
         private static RootField<ArrayFieldProperties> Field(ArrayFieldProperties properties)
         {
-            return Fields.Array(1, "my-array", Partitioning.Invariant, properties);
+            return Fields.Array(1, "myArray", Partitioning.Invariant, properties, null, Fields.String(2, "myString"));
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new NumberFieldProperties());
 
-            Assert.Equal("my-number", sut.Name);
+            Assert.Equal("myNumber", sut.Name);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<NumberFieldProperties> Field(NumberFieldProperties properties)
         {
-            return Fields.Number(1, "my-number", Partitioning.Invariant, properties);
+            return Fields.Number(1, "myNumber", Partitioning.Invariant, properties);
         }
     }
 }

@@ -29,13 +29,13 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             schema =
                 new Schema("my-schema")
-                    .AddString(1, "my-string", Partitioning.Language,
+                    .AddString(1, "myString", Partitioning.Language,
                         new StringFieldProperties { DefaultValue = "en-string" })
-                    .AddNumber(2, "my-number", Partitioning.Invariant,
+                    .AddNumber(2, "myNumber", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .AddDateTime(3, "my-datetime", Partitioning.Invariant,
+                    .AddDateTime(3, "myDatetime", Partitioning.Invariant,
                         new DateTimeFieldProperties { DefaultValue = now })
-                    .AddBoolean(4, "my-boolean", Partitioning.Invariant,
+                    .AddBoolean(4, "myBoolean", Partitioning.Invariant,
                         new BooleanFieldProperties { DefaultValue = true });
         }
 
@@ -44,23 +44,23 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var data =
                 new ContentData()
-                    .AddField("my-string",
+                    .AddField("myString",
                         new ContentFieldData()
                             .AddLocalized("de", "de-string"))
-                    .AddField("my-number",
+                    .AddField("myNumber",
                         new ContentFieldData()
                             .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(456, ((JsonNumber)data["my-number"]!["iv"]).Value);
+            Assert.Equal(456, ((JsonNumber)data["myNumber"]!["iv"]).Value);
 
-            Assert.Equal("de-string", data["my-string"]!["de"].ToString());
-            Assert.Equal("en-string", data["my-string"]!["en"].ToString());
+            Assert.Equal("de-string", data["myString"]!["de"].ToString());
+            Assert.Equal("en-string", data["myString"]!["en"].ToString());
 
-            Assert.Equal(now.ToString(), data["my-datetime"]!["iv"].ToString());
+            Assert.Equal(now.ToString(), data["myDatetime"]!["iv"].ToString());
 
-            Assert.True(((JsonBoolean)data["my-boolean"]!["iv"]).Value);
+            Assert.True(((JsonBoolean)data["myBoolean"]!["iv"]).Value);
         }
 
         [Fact]
@@ -68,17 +68,17 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var data =
                 new ContentData()
-                    .AddField("my-string",
+                    .AddField("myString",
                         new ContentFieldData()
                             .AddLocalized("de", string.Empty))
-                    .AddField("my-number",
+                    .AddField("myNumber",
                         new ContentFieldData()
                             .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(string.Empty, data["my-string"]!["de"].ToString());
-            Assert.Equal("en-string", data["my-string"]!["en"].ToString());
+            Assert.Equal(string.Empty, data["myString"]!["de"].ToString());
+            Assert.Equal("en-string", data["myString"]!["en"].ToString());
         }
 
         [Fact]

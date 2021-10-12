@@ -7,7 +7,7 @@
 
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl } from '@angular/forms';
-import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types } from '@app/shared';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -68,7 +68,7 @@ export class FieldEditorComponent implements OnChanges {
                 previousControl.form['_clearChangeFns']();
             }
 
-            this.isEmpty = this.formModel.form.valueChanges.pipe(map(x => Types.isUndefined(x) || Types.isNull(x)));
+            this.isEmpty = value$(this.formModel.form).pipe(map(x => Types.isUndefined(x) || Types.isNull(x)));
         }
     }
 

@@ -634,6 +634,9 @@
   <data name="contents.validation.unique" xml:space="preserve">
     <value>存在另一个具有相同值的内容。</value>
   </data>
+  <data name="contents.validation.uniqueObjectValues" xml:space="preserve">
+    <value>Must not contain items with duplicate '{field}' fields.</value>
+  </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
     <value>不是已知的 {fieldType}。</value>
   </data>

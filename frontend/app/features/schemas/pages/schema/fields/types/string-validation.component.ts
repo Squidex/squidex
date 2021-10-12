@@ -7,11 +7,11 @@
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
+import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-string-validation[field][fieldForm][properties]',
+    selector: 'sqx-string-validation[field][fieldForm][properties][schema]',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
     animations: [
@@ -26,6 +26,9 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
 
     @Input()
     public field: FieldDto;
+
+    @Input()
+    public schema: SchemaDto;
 
     @Input()
     public properties: StringFieldPropertiesDto;
@@ -46,7 +49,7 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     public patternsModal = new ModalModel();
 
     public get showUnique() {
-        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
+        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable && this.schema.type !== 'Component';
     }
 
     public ngOnChanges(changes: SimpleChanges) {

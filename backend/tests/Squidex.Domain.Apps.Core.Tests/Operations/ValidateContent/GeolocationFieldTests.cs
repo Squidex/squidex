@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new GeolocationFieldProperties());
 
-            Assert.Equal("my-geolocation", sut.Name);
+            Assert.Equal("myGeolocation", sut.Name);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<GeolocationFieldProperties> Field(GeolocationFieldProperties properties)
         {
-            return Fields.Geolocation(1, "my-geolocation", Partitioning.Invariant, properties);
+            return Fields.Geolocation(1, "myGeolocation", Partitioning.Invariant, properties);
         }
     }
 }

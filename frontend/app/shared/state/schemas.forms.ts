@@ -256,6 +256,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     public visitArray() {
         this.config['maxItems'] = undefined;
         this.config['minItems'] = undefined;
+        this.config['uniqueFields'] = undefined;
     }
 
     public visitAssets() {
@@ -294,6 +295,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['schemaIds'] = undefined;
         this.config['maxItems'] = undefined;
         this.config['minItems'] = undefined;
+        this.config['uniqueFields'] = undefined;
     }
 
     public visitDateTime() {

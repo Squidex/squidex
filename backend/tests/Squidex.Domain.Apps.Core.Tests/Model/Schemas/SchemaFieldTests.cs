@@ -24,12 +24,12 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 .Select(x => new[] { x })
                 .ToList()!;
 
-        private readonly RootField<NumberFieldProperties> field_0 = Fields.Number(1, "my-field", Partitioning.Invariant);
+        private readonly RootField<NumberFieldProperties> field_0 = Fields.Number(1, "myField", Partitioning.Invariant);
 
         [Fact]
         public void Should_instantiate_field()
         {
-            Assert.Equal("my-field", field_0.Name);
+            Assert.Equal("myField", field_0.Name);
         }
 
         [Fact]

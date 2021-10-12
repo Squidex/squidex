@@ -9,7 +9,7 @@ import { AbstractControl, ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types } from '@app/framework/internal';
 
 function isEmptyInputValue(value: any): boolean {
-    return value == null || value.length === 0;
+    return value == null || value === undefined || value.length === 0;
 }
 
 export module ValidatorsEx {
@@ -186,6 +186,45 @@ export module ValidatorsEx {
                 } else {
                     valuesUnique[value] = true;
                 }
+            }
+
+            return null;
+        };
+    }
+
+    export function uniqueObjectValues(fields: ReadonlyArray<string>): ValidatorFn {
+        return (control: AbstractControl) => {
+            if (isEmptyInputValue(control.value) || !Types.isArrayOfObject(control.value)) {
+                return null;
+            }
+
+            const items: any[] = control.value;
+
+            const duplicateKeys: object = {};
+
+            for (const field of fields) {
+                const values: any[] = [];
+
+                for (const item of items) {
+                    if (item.hasOwnProperty(field)) {
+                        const fieldValue = item[field];
+
+                        for (const other of values) {
+                            if (Types.equals(other, fieldValue)) {
+                                duplicateKeys[field] = true;
+                                break;
+                            }
+                        }
+
+                        values.push(fieldValue);
+                    }
+                }
+            }
+
+            const keys = Object.keys(duplicateKeys);
+
+            if (keys.length > 0) {
+                return { uniqueobjectvalues: { fields: keys.join(', ') } };
             }
 
             return null;

@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [InlineData("*")]
         public void Should_convert_nested_asset_ids_to_urls(string path)
         {
-            var field = Fields.Array(1, "parent", Partitioning.Invariant, Fields.Assets(11, "assets"));
+            var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
 
             var source = JsonValue.Array(id1, id2);
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [InlineData("other.assets")]
         public void Should_not_convert_nested_asset_ids_if_field_name_does_not_match(string path)
         {
-            var field = Fields.Array(1, "parent", Partitioning.Invariant, Fields.Assets(11, "assets"));
+            var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
 
             var source = JsonValue.Array(id1, id2);
 

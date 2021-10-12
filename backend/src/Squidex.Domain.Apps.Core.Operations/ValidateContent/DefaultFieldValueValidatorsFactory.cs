@@ -45,6 +45,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
             }
 
+            if (properties.UniqueFields?.Count > 0)
+            {
+                yield return new UniqueObjectValuesValidator(properties.UniqueFields);
+            }
+
             var nestedValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(field.Fields.Count);
 
             foreach (var nestedField in field.Fields)
@@ -95,6 +100,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (isRequired || properties.MinItems != null || properties.MaxItems != null)
             {
                 yield return new CollectionValidator(isRequired, properties.MinItems, properties.MaxItems);
+            }
+
+            if (properties.UniqueFields?.Count > 0)
+            {
+                yield return new UniqueObjectValuesValidator(properties.UniqueFields);
             }
 
             yield return new CollectionItemValidator(ComponentValidator(args.Factory));

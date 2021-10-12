@@ -7,10 +7,10 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, Types } from '@app/shared';
+import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, SchemaDto, Types } from '@app/shared';
 
 @Component({
-    selector: 'sqx-number-validation[field][fieldForm][properties]',
+    selector: 'sqx-number-validation[field][fieldForm][properties][schema]',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
 })
@@ -22,6 +22,9 @@ export class NumberValidationComponent {
     public field: FieldDto;
 
     @Input()
+    public schema: SchemaDto;
+
+    @Input()
     public properties: NumberFieldPropertiesDto;
 
     @Input()
@@ -31,6 +34,6 @@ export class NumberValidationComponent {
     public isLocalizable?: boolean | null;
 
     public get showUnique() {
-        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
+        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable && this.schema.type !== 'Component';
     }
 }

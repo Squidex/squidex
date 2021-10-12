@@ -634,6 +634,9 @@
   <data name="contents.validation.unique" xml:space="preserve">
     <value>Er bestaat een andere inhoud met dezelfde waarde.</value>
   </data>
+  <data name="contents.validation.uniqueObjectValues" xml:space="preserve">
+    <value>Must not contain items with duplicate '{field}' fields.</value>
+  </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
     <value>Onbekend {fieldType}.</value>
   </data>

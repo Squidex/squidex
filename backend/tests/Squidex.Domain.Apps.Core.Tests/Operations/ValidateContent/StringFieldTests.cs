@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new StringFieldProperties());
 
-            Assert.Equal("my-string", sut.Name);
+            Assert.Equal("myString", sut.Name);
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<StringFieldProperties> Field(StringFieldProperties properties)
         {
-            return Fields.String(1, "my-string", Partitioning.Invariant, properties);
+            return Fields.String(1, "myString", Partitioning.Invariant, properties);
         }
     }
 }

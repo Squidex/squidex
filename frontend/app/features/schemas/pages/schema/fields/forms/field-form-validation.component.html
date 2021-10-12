@@ -91,7 +91,8 @@
             [isLocalizable]="isLocalizable"
             [fieldForm]="fieldForm"
             [field]="field"
-            [properties]="field.rawProperties">
+            [properties]="field.rawProperties"
+            [schema]="schema">
         </sqx-number-validation>
     </ng-container>
     <ng-container *ngSwitchCase="'References'">
@@ -110,6 +111,7 @@
             [fieldForm]="fieldForm"
             [field]="field"
             [properties]="field.rawProperties"
+            [schema]="schema"
             [settings]="settings">
         </sqx-string-validation>
     </ng-container>

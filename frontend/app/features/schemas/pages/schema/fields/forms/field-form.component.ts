@@ -7,10 +7,10 @@
 
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { AppSettingsDto, FieldDto, LanguageDto } from '@app/shared';
+import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-form[field][fieldForm][languages][settings]',
+    selector: 'sqx-field-form[field][fieldForm][languages][schema][settings]',
     styleUrls: ['./field-form.component.scss'],
     templateUrl: './field-form.component.html',
 })
@@ -26,6 +26,9 @@ export class FieldFormComponent implements AfterViewInit {
 
     @Input()
     public field: FieldDto;
+
+    @Input()
+    public schema: SchemaDto;
 
     @Input()
     public settings: AppSettingsDto;
