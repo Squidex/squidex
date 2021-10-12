@@ -31,7 +31,8 @@
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
     <sqx-field-form-common
         [fieldForm]="fieldForm"
-        [field]="field">
+        [field]="field"
+        [schema]="schema">
     </sqx-field-form-common>
 </div>
 
@@ -40,6 +41,7 @@
         [languages]="languages"
         [fieldForm]="fieldForm"
         [field]="field"
+        [schema]="schema"
         [isLocalizable]="isLocalizable"
         [settings]="settings" >
     </sqx-field-form-validation>
@@ -48,6 +50,7 @@
 <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
     <sqx-field-form-ui
         [fieldForm]="fieldForm"
-        [field]="field">
+        [field]="field"
+        [schema]="schema">
     </sqx-field-form-ui>
 </div>

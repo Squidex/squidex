@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new DateTimeFieldProperties());
 
-            Assert.Equal("my-datetime", sut.Name);
+            Assert.Equal("myDatetime", sut.Name);
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<DateTimeFieldProperties> Field(DateTimeFieldProperties properties)
         {
-            return Fields.DateTime(1, "my-datetime", Partitioning.Invariant, properties);
+            return Fields.DateTime(1, "myDatetime", Partitioning.Invariant, properties);
         }
     }
 }

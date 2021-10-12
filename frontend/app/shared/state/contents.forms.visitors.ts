@@ -246,6 +246,10 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
 
+        if (properties.uniqueFields && properties.uniqueFields.length > 0) {
+            validators.push(ValidatorsEx.uniqueObjectValues(properties.uniqueFields));
+        }
+
         return validators;
     }
 
@@ -273,6 +277,10 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         const validators: ValidatorFn[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
         ];
+
+        if (properties.uniqueFields && properties.uniqueFields.length > 0) {
+            validators.push(ValidatorsEx.uniqueObjectValues(properties.uniqueFields));
+        }
 
         return validators;
     }

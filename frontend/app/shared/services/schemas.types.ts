@@ -181,6 +181,7 @@ export class ArrayFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly maxItems?: number;
     public readonly minItems?: number;
+    public readonly uniqueFields?: ReadonlyArray<string>;
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
         return visitor.visitArray(this);
@@ -270,6 +271,7 @@ export class ComponentsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly schemaIds?: ReadonlyArray<string>;
     public readonly maxItems?: number;
     public readonly minItems?: number;
+    public readonly uniqueFields?: ReadonlyArray<string>;
 
     public get isComplexUI() {
         return true;

@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [Fact]
         public void Should_return_empty_list_from_non_references_field()
         {
-            var sut = Fields.String(1, "my-string", Partitioning.Invariant);
+            var sut = Fields.String(1, "myString", Partitioning.Invariant);
 
             var result = sut.GetReferencedIds(JsonValue.Create("invalid"), components).ToArray();
 
@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var id1 = DomainId.NewGuid();
             var id2 = DomainId.NewGuid();
 
-            var arrayField = Fields.Array(1, "my-array", Partitioning.Invariant, field);
+            var arrayField = Fields.Array(1, "myArray", Partitioning.Invariant, null, null, field);
 
             var value =
                 JsonValue.Array(
@@ -305,14 +305,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
         public static IEnumerable<object[]> ReferencingNestedFields()
         {
-            yield return new object[] { Fields.References(1, "my-refs") };
-            yield return new object[] { Fields.Assets(1, "my-assets") };
+            yield return new object[] { Fields.References(1, "myRefs") };
+            yield return new object[] { Fields.Assets(1, "myAssets") };
         }
 
         public static IEnumerable<object[]> ReferencingFields()
         {
-            yield return new object[] { Fields.References(1, "my-refs", Partitioning.Invariant) };
-            yield return new object[] { Fields.Assets(1, "my-assets", Partitioning.Invariant) };
+            yield return new object[] { Fields.References(1, "myRefs", Partitioning.Invariant) };
+            yield return new object[] { Fields.Assets(1, "myAssets", Partitioning.Invariant) };
         }
 
         private static HashSet<DomainId> RandomIds()

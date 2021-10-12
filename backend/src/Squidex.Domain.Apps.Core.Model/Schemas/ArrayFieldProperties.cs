@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -14,6 +15,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public int? MinItems { get; init; }
 
         public int? MaxItems { get; init; }
+
+        public ImmutableList<string>? UniqueFields { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

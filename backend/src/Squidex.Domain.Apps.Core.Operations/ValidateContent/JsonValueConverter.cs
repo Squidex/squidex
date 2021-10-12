@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (value is JsonArray array)
             {
-                var result = new List<object>(array.Count);
+                var result = new List<Component>(array.Count);
 
                 for (var i = 0; i < array.Count; i++)
                 {
@@ -245,7 +245,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfObjects")));
         }
 
-        private static (object? Result, JsonError? Error) ConvertToComponent(IJsonValue value,
+        private static (Component? Result, JsonError? Error) ConvertToComponent(IJsonValue value,
             ResolvedComponents components, ImmutableList<DomainId>? allowedIds)
         {
             if (value is not JsonObject obj)

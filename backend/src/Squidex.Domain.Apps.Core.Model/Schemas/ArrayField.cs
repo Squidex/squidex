@@ -30,13 +30,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public FieldCollection<NestedField> FieldCollection { get; private set;  } = FieldCollection<NestedField>.Empty;
 
-        public ArrayField(long id, string name, Partitioning partitioning, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
-            : base(id, name, partitioning, properties, settings)
-        {
-        }
-
         public ArrayField(long id, string name, Partitioning partitioning, NestedField[] fields, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
-            : this(id, name, partitioning, properties, settings)
+            : base(id, name, partitioning, properties, settings)
         {
             FieldCollection = new FieldCollection<NestedField>(fields);
         }

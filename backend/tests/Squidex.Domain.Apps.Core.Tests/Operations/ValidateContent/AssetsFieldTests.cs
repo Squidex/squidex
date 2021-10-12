@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties());
 
-            Assert.Equal("my-assets", sut.Name);
+            Assert.Equal("myAssets", sut.Name);
         }
 
         [Fact]
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<AssetsFieldProperties> Field(AssetsFieldProperties properties)
         {
-            return Fields.Assets(1, "my-assets", Partitioning.Invariant, properties);
+            return Fields.Assets(1, "myAssets", Partitioning.Invariant, properties);
         }
     }
 }

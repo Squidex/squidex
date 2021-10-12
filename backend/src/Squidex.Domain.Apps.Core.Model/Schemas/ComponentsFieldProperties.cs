@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxItems { get; init; }
 
+        public ImmutableList<string>? UniqueFields { get; init; }
+
         public DomainId SchemaId
         {
             init

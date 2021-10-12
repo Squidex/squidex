@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new JsonFieldProperties());
 
-            Assert.Equal("my-json", sut.Name);
+            Assert.Equal("myJson", sut.Name);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<JsonFieldProperties> Field(JsonFieldProperties properties)
         {
-            return Fields.Json(1, "my-json", Partitioning.Invariant, properties);
+            return Fields.Json(1, "myJson", Partitioning.Invariant, properties);
         }
     }
 }

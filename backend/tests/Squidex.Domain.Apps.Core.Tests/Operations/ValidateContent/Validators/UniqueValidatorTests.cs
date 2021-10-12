@@ -22,36 +22,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         private readonly List<string> errors = new List<string>();
 
         [Fact]
-        public async Task Should_add_error_if_other_content_with_string_value_found()
-        {
-            var filter = string.Empty;
-
-            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
-
-            await sut.ValidateAsync("hi", errors, updater: c => c.Nested("property").Nested("iv"));
-
-            errors.Should().BeEquivalentTo(
-                new[] { "property.iv: Another content with the same value exists." });
-
-            Assert.Equal("Data.property.iv == 'hi'", filter);
-        }
-
-        [Fact]
-        public async Task Should_add_error_if_other_content_with_double_value_found()
-        {
-            var filter = string.Empty;
-
-            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
-
-            await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("iv"));
-
-            errors.Should().BeEquivalentTo(
-                new[] { "property.iv: Another content with the same value exists." });
-
-            Assert.Equal("Data.property.iv == 12.5", filter);
-        }
-
-        [Fact]
         public async Task Should_not_check_uniqueness_if_localized_string()
         {
             var filter = string.Empty;
@@ -97,6 +67,36 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(12.5, ctx, ValidationTestExtensions.CreateFormatter(errors));
 
             Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_other_content_with_string_value_found()
+        {
+            var filter = string.Empty;
+
+            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
+
+            await sut.ValidateAsync("hi", errors, updater: c => c.Nested("property").Nested("iv"));
+
+            errors.Should().BeEquivalentTo(
+                new[] { "property.iv: Another content with the same value exists." });
+
+            Assert.Equal("Data.property.iv == 'hi'", filter);
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_other_content_with_double_value_found()
+        {
+            var filter = string.Empty;
+
+            var sut = new UniqueValidator(FoundDuplicates(DomainId.NewGuid(), f => filter = f));
+
+            await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("iv"));
+
+            errors.Should().BeEquivalentTo(
+                new[] { "property.iv: Another content with the same value exists." });
+
+            Assert.Equal("Data.property.iv == 12.5", filter);
         }
 
         private static CheckUniqueness FoundDuplicates(DomainId id, Action<string>? filter = null)

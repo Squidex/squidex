@@ -8,12 +8,12 @@
                     {{ 'schemas.tabFields' | sqxTranslate }}
                 </a>
             </li>
-            <li>
+            <li *ngIf="schema.type !== 'Component'">
                 <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'ui' }" [class.active]="tab === 'ui'">
                     {{ 'schemas.tabUI' | sqxTranslate }}
                 </a>
             </li>
-            <li>
+            <li *ngIf="schema.type !== 'Component'">
                 <a class="nav-link" [routerLink]="[]" [queryParams]="{ tab: 'scripts' }" [class.active]="tab === 'scripts'">
                     {{ 'schemas.tabScripts' | sqxTranslate }}
                 </a>
@@ -92,9 +92,17 @@
             <ng-container *ngSwitchCase="'more'">
                 <sqx-list-view innerWidth="50rem">
                     <div>
-                        <sqx-schema-preview-urls-form [schema]="schema"> </sqx-schema-preview-urls-form>
-                        <sqx-schema-field-rules-form [schema]="schema"> </sqx-schema-field-rules-form>
-                        <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
+                        <sqx-schema-preview-urls-form *ngIf="schema.type !== 'Component'"
+                            [schema]="schema">
+                        </sqx-schema-preview-urls-form>
+
+                        <sqx-schema-field-rules-form
+                            [schema]="schema">
+                        </sqx-schema-field-rules-form>
+
+                        <sqx-schema-edit-form
+                            [schema]="schema">
+                        </sqx-schema-edit-form>
                     </div>
                 </sqx-list-view>
             </ng-container>

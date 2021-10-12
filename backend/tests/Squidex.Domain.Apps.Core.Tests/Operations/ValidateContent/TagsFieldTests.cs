@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties());
 
-            Assert.Equal("my-tags", sut.Name);
+            Assert.Equal("myTags", sut.Name);
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)
         {
-            return Fields.Tags(1, "my-tags", Partitioning.Invariant, properties);
+            return Fields.Tags(1, "myTags", Partitioning.Invariant, properties);
         }
     }
 }

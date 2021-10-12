@@ -7,10 +7,10 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto } from '@app/shared';
+import { FieldDto, SchemaDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-form-ui[field][fieldForm]',
+    selector: 'sqx-field-form-ui[field][fieldForm][schema]',
     styleUrls: ['./field-form-ui.component.scss'],
     templateUrl: './field-form-ui.component.html',
 })
@@ -20,4 +20,7 @@ export class FieldFormUIComponent {
 
     @Input()
     public field: FieldDto;
+
+    @Input()
+    public schema: SchemaDto;
 }

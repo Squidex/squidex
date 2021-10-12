@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var parent_1 = parent_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => parent_1.AddNumber(2, "my-field-1"));
+            Assert.Throws<ArgumentException>(() => parent_1.AddNumber(2, "myField1"));
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var parent_1 = parent_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => parent_1.AddNumber(1, "my-field-2"));
+            Assert.Throws<ArgumentException>(() => parent_1.AddNumber(1, "myField2"));
         }
 
         [Fact]
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 
         private static NestedField<NumberFieldProperties> CreateField(int id)
         {
-            return Fields.Number(id, $"my-field-{id}");
+            return Fields.Number(id, $"myField{id}");
         }
     }
 }

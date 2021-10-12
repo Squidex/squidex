@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
     public class SchemaSynchronizerTests
     {
         private readonly Func<long> idGenerator;
-        private readonly NamedId<long> stringId = NamedId.Of(13L, "my-value");
-        private readonly NamedId<long> nestedId = NamedId.Of(141L, "my-value");
-        private readonly NamedId<long> arrayId = NamedId.Of(14L, "11-array");
+        private readonly NamedId<long> stringId = NamedId.Of(13L, "myValue");
+        private readonly NamedId<long> nestedId = NamedId.Of(141L, "myValue");
+        private readonly NamedId<long> arrayId = NamedId.Of(14L, "11Array");
         private int fields = 50;
 
         public SchemaSynchronizerTests()

@@ -29,6 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// </summary>
         public ImmutableList<DomainId>? SchemaIds { get; set; }
 
+        /// <summary>
+        /// The fields that must be unique.
+        /// </summary>
+        public ImmutableList<string>? UniqueFields { get; set; }
+
         public override FieldProperties ToProperties()
         {
             var result = SimpleMapper.Map(this, new ComponentsFieldProperties());

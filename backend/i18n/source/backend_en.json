@@ -183,6 +183,7 @@
   "contents.validation.regexTooSlow": "Regex is too slow.",
   "contents.validation.required": "Field is required.",
   "contents.validation.unique": "Another content with the same value exists.",
+  "contents.validation.uniqueObjectValues": "Must not contain items with duplicate '{field}' fields.",
   "contents.validation.unknownField": "Not a known {fieldType}.",
   "contents.validation.wordCount": "Must have exactly {count} word(s).",
   "contents.validation.wordsBetween": "Must have between {min} and {max} word(s).",
