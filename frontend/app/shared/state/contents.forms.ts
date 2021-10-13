@@ -86,8 +86,11 @@ export class EditContentForm extends Form<FormGroup, any> {
         return this.valueChange$.value;
     }
 
-    constructor(languages: ReadonlyArray<AppLanguageDto>, schema: SchemaDto, schemas: { [id: string ]: SchemaDto },
-        private context: any, debounce = 100,
+    constructor(
+        public readonly languages: ReadonlyArray<AppLanguageDto>,
+        public readonly schema: SchemaDto, schemas: { [id: string ]: SchemaDto },
+        public context: any,
+        debounce = 100,
     ) {
         super(new FormGroup({}));
 

@@ -56,14 +56,14 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
 
         this.changes.subscribe(state => {
             if (this.formSection?.separator && this.schema) {
-                this.localStore.setBoolean(this.configKey(), state.isCollapsed);
+                this.localStore.setBoolean(this.expandedKey(), state.isCollapsed);
             }
         });
     }
 
     public ngOnChanges() {
         if (this.formSection?.separator && this.schema) {
-            const isCollapsed = this.localStore.getBoolean(this.configKey());
+            const isCollapsed = this.localStore.getBoolean(this.expandedKey());
 
             this.next({ isCollapsed });
         }
@@ -84,7 +84,7 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
         return formState.field.fieldId;
     }
 
-    private configKey(): string {
+    private expandedKey(): string {
         return Settings.Local.FIELD_COLLAPSED(this.schema?.id, this.formSection?.separator?.fieldId);
     }
 }

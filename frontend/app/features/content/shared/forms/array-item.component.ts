@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectForm, RootFieldDto, StatefulComponent, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -22,7 +22,7 @@ interface State {
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArrayItemComponent extends StatefulComponent<State> implements OnChanges {
+export class ArrayItemComponent extends StatefulComponent<State> implements OnChanges, OnInit {
     @Output()
     public itemRemove = new EventEmitter();
 
@@ -43,6 +43,9 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
 
     @Input()
     public canUnset?: boolean | null;
+
+    @Input()
+    public isCollapsedInitial = false;
 
     @Input()
     public isFirst?: boolean | null;
@@ -75,6 +78,10 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
         super(changeDetector, {
             isCollapsed: false,
         });
+    }
+
+    public ngOnInit() {
+        this.next({ isCollapsed: this.isCollapsedInitial });
     }
 
     public ngOnChanges(changes: SimpleChanges) {

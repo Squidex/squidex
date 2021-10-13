@@ -7,7 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, fadeAnimation, FieldArrayForm, ModalModel, ObjectForm, SchemaDto, sorted, Types } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, fadeAnimation, FieldArrayForm, LocalStoreService, ModalModel, ObjectForm, SchemaDto, Settings, sorted, Types } from '@app/shared';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
@@ -49,11 +49,17 @@ export class ArrayEditorComponent implements OnChanges {
     public schemasList: ReadonlyArray<SchemaDto>;
 
     public isDisabled: Observable<boolean>;
+    public isCollapsedInitial = false;
 
     public isFull: Observable<boolean>;
 
     public get hasField() {
         return this.formModel.field['nested']?.length > 0;
+    }
+
+    constructor(
+        private readonly localStore: LocalStoreService,
+    ) {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -74,6 +80,8 @@ export class ArrayEditorComponent implements OnChanges {
             ]).pipe(map(([disabled, items]) => {
                 return disabled || items.length >= maxItems;
             }));
+
+            this.isCollapsedInitial = this.localStore.getBoolean(this.expandedKey());
         }
     }
 
@@ -113,17 +121,25 @@ export class ArrayEditorComponent implements OnChanges {
         this.children.forEach(child => {
             child.collapse();
         });
+
+        this.localStore.setBoolean(this.expandedKey(), true);
     }
 
     public expandAll() {
         this.children.forEach(child => {
             child.expand();
         });
+
+        this.localStore.setBoolean(this.expandedKey(), false);
     }
 
     private reset() {
         this.children.forEach(child => {
             child.reset();
         });
+    }
+
+    private expandedKey(): string {
+        return Settings.Local.FIELD_COLLAPSED(this.form.schema?.id, this.formModel.field?.fieldId);
     }
 }
