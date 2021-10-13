@@ -78,17 +78,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             public static readonly IFieldResolver Resolver = Resolvers.Async<object, object?>(async (_, fieldContext, context) =>
             {
                 var contentId = fieldContext.GetArgument<DomainId>("id");
+                var contentSchema = fieldContext.FieldDefinition.SchemaId();
 
                 var version = fieldContext.GetArgument<int?>("version");
 
                 if (version >= 0)
                 {
-                    return await context.FindContentAsync(fieldContext.FieldDefinition.SchemaId(), contentId, version.Value,
+                    return await context.FindContentAsync(contentSchema, contentId, version.Value,
                         fieldContext.CancellationToken);
                 }
                 else
                 {
-                    return await context.FindContentAsync(contentId,
+                    return await context.FindContentAsync(DomainId.Create(contentSchema), contentId,
                         fieldContext.CancellationToken);
                 }
             });

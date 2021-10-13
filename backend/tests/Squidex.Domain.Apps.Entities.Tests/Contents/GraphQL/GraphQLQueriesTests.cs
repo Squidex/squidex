@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_asset_if_not_found()
+        public async Task Should_return_null_if_single_asset_not_found()
         {
             var assetId = DomainId.NewGuid();
 
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
-        public async Task Should_return_null_single_content_if_not_found()
+        public async Task Should_return_null_if_single_content_not_found()
         {
             var contentId = DomainId.NewGuid();
 
@@ -297,6 +297,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = (object?)null
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_null_if_single_content_from_another_schema()
+        {
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.CreateRef(TestSchemas.Ref1Id, contentId, "ref1-field", "ref1");
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(10, content));
 
             var result = await ExecuteAsync(new ExecutionOptions { Query = query });
 

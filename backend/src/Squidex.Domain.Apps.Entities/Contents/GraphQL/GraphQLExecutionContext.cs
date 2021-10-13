@@ -80,12 +80,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await dataLoader.LoadAsync(id).GetResultAsync(ct);
         }
 
-        public async Task<IContentEntity?> FindContentAsync(DomainId id,
+        public async Task<IContentEntity?> FindContentAsync(DomainId schemaId, DomainId id,
             CancellationToken ct)
         {
             var dataLoader = GetContentsLoader();
 
-            return await dataLoader.LoadAsync(id).GetResultAsync(ct);
+            var content = await dataLoader.LoadAsync(id).GetResultAsync(ct);
+
+            if (content?.SchemaId.Id != schemaId)
+            {
+                content = null;
+            }
+
+            return content;
         }
 
         public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value,
