@@ -7,7 +7,7 @@
 
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { debounceTimeSafe, Form, getRawValue, Types, UndefinableFormArray, UndefinableFormGroup, valueAll$ } from '@app/framework';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, Observable } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 import { FieldDto, RootFieldDto, SchemaDto, TableField } from './../services/schemas.service';
@@ -121,7 +121,7 @@ export class EditContentForm extends Form<FormGroup, any> {
             return new FieldSection<RootFieldDto, FieldForm>(separator, forms);
         });
 
-        valueAll$(this.form).pipe(debounceTimeSafe(debounce)).subscribe(value => {
+        valueAll$(this.form).pipe(debounceTimeSafe(debounce), distinctUntilChanged(Types.equals)).subscribe(value => {
             this.valueChange$.next(value);
 
             this.updateState(value);

@@ -55,14 +55,18 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
         });
 
         this.changes.subscribe(state => {
-            this.localStore.setBoolean(this.configKey(), state.isCollapsed);
+            if (this.formSection?.separator && this.schema) {
+                this.localStore.setBoolean(this.configKey(), state.isCollapsed);
+            }
         });
     }
 
     public ngOnChanges() {
-        const isCollapsed = this.localStore.getBoolean(this.configKey());
+        if (this.formSection?.separator && this.schema) {
+            const isCollapsed = this.localStore.getBoolean(this.configKey());
 
-        this.next({ isCollapsed });
+            this.next({ isCollapsed });
+        }
     }
 
     public toggle() {

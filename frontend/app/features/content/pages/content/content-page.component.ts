@@ -7,7 +7,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, Types, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 import { ContentReferencesComponent } from './references/content-references.component';
@@ -21,7 +21,6 @@ import { ContentReferencesComponent } from './references/content-references.comp
     ],
 })
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
-    private isLoadingContent: boolean;
     private autoSaveKey: AutoSaveKey;
 
     @ViewChild(ContentReferencesComponent)
@@ -126,9 +125,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }));
 
         this.own(
-            this.contentForm.valueChanges.pipe(filter(_ => !this.isLoadingContent && this.contentForm.form.enabled))
+            this.contentForm.valueChanges.pipe(filter(_ => this.contentForm.form.enabled))
                 .subscribe(value => {
-                    this.autoSaveService.set(this.autoSaveKey, value);
+                    if (!Types.equals(value, this.content?.data)) {
+                        this.autoSaveService.set(this.autoSaveKey, value);
+                    } else {
+                        this.autoSaveService.remove(this.autoSaveKey);
+                    }
                 }));
     }
 
@@ -279,15 +282,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private loadContent(data: any, isInitial: boolean) {
-        this.isLoadingContent = true;
-        try {
-            this.autoSaveService.remove(this.autoSaveKey);
+        this.autoSaveService.remove(this.autoSaveKey);
 
-            this.contentForm.load(data, isInitial);
-            this.contentForm.setEnabled(!this.content || this.content.canUpdate);
-        } finally {
-            this.isLoadingContent = false;
-        }
+        this.contentForm.load(data, isInitial);
+        this.contentForm.setEnabled(!this.content || this.content.canUpdate);
     }
 }
 
