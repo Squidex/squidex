@@ -3,7 +3,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.9.0]
+## [5.10.0] - 2021-10-14
+
+### Fixed
+
+* **UI**: Improve autosave feature.
+* **UI**: Correct styling of content compare view.
+* **UI**: Fix for reference dropdown.
+* **MongoDB**: Fixed parsing of MongoDB versions for release candidates or beta versions.
+
+### Changed
+
+* **GraphQL**: Do not apply page size when retrieving references to get rid of limitation.
+* **API**: New content structure to allow full app deletion.
+* **Schemas**: Simplify schema builder.
+
+### Added
+
+* **Assets**: Asset scripts.
+* **GraphQL**: Do not return error when content to query is from another schema.
+* **Contents**: Uniqueness validation for components and array fields.
+* **UI**: Persist collapsed status for array fields in UI.
+* **UI**: Hint to run webpack for development mode.
+
+## [5.9.0] - 2021-09-14
 
 ### Fixed
 
@@ -38,7 +61,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * **Rules**: New action to trigger SignalR.
 * **Rules**: Enable or disable rules over the context menu.
 * **Scripting**: New method to make HTTP methods using POST, PUT, PATCH and DELETE verbs.
-
 
 ## [5.8.2] - 2021-07-18
 
