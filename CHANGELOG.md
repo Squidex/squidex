@@ -3,123 +3,129 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.1] - 2021-10-15
+
+### Fixed
+
+- **MongoDB**: Critical bugfix for the migration to 6.0.0
+
 ## [6.0.0] - 2021-10-14
 
 ### Fixed
 
-* **UI**: Improve autosave feature.
-* **UI**: Correct styling of content compare view.
-* **UI**: Fix for reference dropdown.
-* **MongoDB**: Fixed parsing of MongoDB versions for release candidates or beta versions.
+- **UI**: Improve autosave feature.
+- **UI**: Correct styling of content compare view.
+- **UI**: Fix for reference dropdown.
+- **MongoDB**: Fixed parsing of MongoDB versions for release candidates or beta versions.
 
 ### Changed
 
-* **GraphQL**: Do not apply page size when retrieving references to get rid of limitation.
-* **API**: New content structure to allow full app deletion.
-* **Schemas**: Simplify schema builder.
+- **GraphQL**: Do not apply page size when retrieving references to get rid of limitation.
+- **API**: New content structure to allow full app deletion.
+- **Schemas**: Simplify schema builder.
 
 ### Added
 
-* **Assets**: Asset scripts.
-* **GraphQL**: Do not return error when content to query is from another schema.
-* **Contents**: Uniqueness validation for components and array fields.
-* **UI**: Persist collapsed status for array fields in UI.
-* **UI**: Hint to run webpack for development mode.
+- **Assets**: Asset scripts.
+- **GraphQL**: Do not return error when content to query is from another schema.
+- **Contents**: Uniqueness validation for components and array fields.
+- **UI**: Persist collapsed status for array fields in UI.
+- **UI**: Hint to run webpack for development mode.
 
 ## [5.9.0] - 2021-09-14
 
 ### Fixed
 
-* **Contents**: Fixed field rules to also work with components.
-* **Notifo**: Improved error handling for Notifo integration.
-* **Hosting**: Several fixes to improve URL resolution when Squidex is hosted in a subfolder.
+- **Contents**: Fixed field rules to also work with components.
+- **Notifo**: Improved error handling for Notifo integration.
+- **Hosting**: Several fixes to improve URL resolution when Squidex is hosted in a subfolder.
 
 ### Changed
 
-* **Assets**: Improved asset folder dropdown.
-* **Assets**: Improved and optimized queries for asset folders.
-* **Event Processing**: Migration to channels.
-* **Contents**: Improved workflow handling for `Save and Publish`.
-* **Contents**: Resolve component types with `schemaName` field in the component object.
-* **Contents**: Added markdown support to all field hints.
-* **Monitoring**: Migration to Open Telemetry traces.
-* **Rules**: Improved rule simulator.
-* **UI**: New and better design.
+- **Assets**: Improved asset folder dropdown.
+- **Assets**: Improved and optimized queries for asset folders.
+- **Event Processing**: Migration to channels.
+- **Contents**: Improved workflow handling for `Save and Publish`.
+- **Contents**: Resolve component types with `schemaName` field in the component object.
+- **Contents**: Added markdown support to all field hints.
+- **Monitoring**: Migration to Open Telemetry traces.
+- **Rules**: Improved rule simulator.
+- **UI**: New and better design.
 
 ### Added
 
-* **Assets**: New metadata provider for azure image recognition.
-* **Clustering**: Added support for Kubernetes.
-* **Contents**: New tab to inspect the content item and view the structure as pure JSON.
-* **Contents**: New calendar view for scheduled content items.
-* **Contents**: Added a button to the UI to cancel content scheduling.
-* **Contents**: New validation properties for videos.
-* **Contents**: Added a text field to the content editor to define a custom ID when creating content items.
-* **GraphQL**: Exposed the `newStatus` field in GraphQL.
-* **GraphQL**: Exposed the `newStatusColor` field in GraphQL.
-* **Logging**: Added more information to the request log.
-* **Rules**: New action to trigger SignalR.
-* **Rules**: Enable or disable rules over the context menu.
-* **Scripting**: New method to make HTTP methods using POST, PUT, PATCH and DELETE verbs.
+- **Assets**: New metadata provider for azure image recognition.
+- **Clustering**: Added support for Kubernetes.
+- **Contents**: New tab to inspect the content item and view the structure as pure JSON.
+- **Contents**: New calendar view for scheduled content items.
+- **Contents**: Added a button to the UI to cancel content scheduling.
+- **Contents**: New validation properties for videos.
+- **Contents**: Added a text field to the content editor to define a custom ID when creating content items.
+- **GraphQL**: Exposed the `newStatus` field in GraphQL.
+- **GraphQL**: Exposed the `newStatusColor` field in GraphQL.
+- **Logging**: Added more information to the request log.
+- **Rules**: New action to trigger SignalR.
+- **Rules**: Enable or disable rules over the context menu.
+- **Scripting**: New method to make HTTP methods using POST, PUT, PATCH and DELETE verbs.
 
 ## [5.8.2] - 2021-07-18
 
 ### Fixed
 
-* **GraphQL**: Urgent bugfix for references and components. Please upgrade immediately from 5.8.1.
+- **GraphQL**: Urgent bugfix for references and components. Please upgrade immediately from 5.8.1.
 
 ## [5.8.1] - 2021-07-17
 
 ### Fixed
 
-* **API**: Several bugfixes for components, especially around caching of components.
-* **GraphQL**: Several bufixes for components.
-* **UI**: Several bugfixes for components.
-* **UI**: Several fixes to fontsize.
-* **UI**: Virtual scrolling for nested fields with a lot of items (> 50) to improve performance.
+- **API**: Several bugfixes for components, especially around caching of components.
+- **GraphQL**: Several bufixes for components.
+- **UI**: Several bugfixes for components.
+- **UI**: Several fixes to fontsize.
+- **UI**: Virtual scrolling for nested fields with a lot of items (> 50) to improve performance.
 
 ### Added
 
-* **Assets**: Check SVG files for embedded scripts and block uploads.
-* **Assets**: Option to create one folder per app for uploaded assets.
-* **Rules**: Add `newStatus` to content changed event.
-* **UI**: Define your custom date or date-time format for Date fields.
+- **Assets**: Check SVG files for embedded scripts and block uploads.
+- **Assets**: Option to create one folder per app for uploaded assets.
+- **Rules**: Add `newStatus` to content changed event.
+- **UI**: Define your custom date or date-time format for Date fields.
 
 ### Changed
 
-* **API**: Support hosting without https (not recommended).
-* **UI**: Load outdated-browser from local files instead of CDN.
-* **UI**: Load leaflet from local files instead of CDN.
-* **UI**: Load leaflet geocoder from local files instead of CDN.
-* **UI**: Load Orleans Dashboard assets from local files instead of CDN.
+- **API**: Support hosting without https (not recommended).
+- **UI**: Load outdated-browser from local files instead of CDN.
+- **UI**: Load leaflet from local files instead of CDN.
+- **UI**: Load leaflet geocoder from local files instead of CDN.
+- **UI**: Load Orleans Dashboard assets from local files instead of CDN.
 
 ## [5.8.0] - 2021-06-28
 
 ### Fixed
 
-* **API**: Fixes for anonymous write access.
-* **API**: Fixes for client access when creating apps.
-* **Schemas**: Correct sync of field rules, especially for CLI.
-* **UserManagement**: Fix pagination
-* **UI**: Encode IDs to allow custom content IDs with slash.
-* **UI**: Fixes typos for italian translation.
-* **UI**: Allow scrolling when content is disabled.
-* **UI**: Fixes references/referencing view for localized content.
-* **UI**: Fix confirm click.
+- **API**: Fixes for anonymous write access.
+- **API**: Fixes for client access when creating apps.
+- **Schemas**: Correct sync of field rules, especially for CLI.
+- **UserManagement**: Fix pagination
+- **UI**: Encode IDs to allow custom content IDs with slash.
+- **UI**: Fixes typos for italian translation.
+- **UI**: Allow scrolling when content is disabled.
+- **UI**: Fixes references/referencing view for localized content.
+- **UI**: Fix confirm click.
 
 ### Added
 
-* **API**: Better timeout and cancellation handling.
-* **API**: Default timeouts for most important MongoDB calls.
-* **API**: Better API tests to improve stability.
-* **Assets**: Additional configuration flag to allow one folder per asset.
-* **Contents**: Read published contents from secondary MongodB instances for better load distribution.
-* **Contents**: Better indexes for improved performance.
-* **Rules**: New liquid and javascript extensions to read the asset as text in rules.
-* **Rules**: Simpler syntax to resolve assets and contents in liquid templates.
-* **Contents**: Array builder when building custom code extension.
-* **UI**: Show SVG as images when in contnet overview.
-* **UI**: Chinese translation.
+- **API**: Better timeout and cancellation handling.
+- **API**: Default timeouts for most important MongoDB calls.
+- **API**: Better API tests to improve stability.
+- **Assets**: Additional configuration flag to allow one folder per asset.
+- **Contents**: Read published contents from secondary MongodB instances for better load distribution.
+- **Contents**: Better indexes for improved performance.
+- **Rules**: New liquid and javascript extensions to read the asset as text in rules.
+- **Rules**: Simpler syntax to resolve assets and contents in liquid templates.
+- **Contents**: Array builder when building custom code extension.
+- **UI**: Show SVG as images when in contnet overview.
+- **UI**: Chinese translation.
 
 ## [5.7.1] - 2021-05-21
 
