@@ -98,7 +98,7 @@
                                 </ng-container>
                             </ng-container>
 
-                            <ng-container *ngIf="content?.canUpdate">
+                            <ng-container *ngIf="content?.canUpdate && (!inspection || inspection.mode.value === 'Data')">
                                 <button type="submit" class="btn btn-primary ms-2" shortcut="CTRL + SHIFT + S">
                                     {{ 'common.save' | sqxTranslate }}
                                 </button>
@@ -117,7 +117,7 @@
                     </button>
                 </ng-template>
 
-                <sqx-form-error [bubble]="true" [closeable]="true" [error]="contentForm.error | async"></sqx-form-error>
+                <sqx-form-error [bubble]="true" [closeable]="true" [error]="inspection?.contentError || (contentForm.error | async)"></sqx-form-error>
             </div>
         </ng-container>
 

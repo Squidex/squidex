@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentsService } from '@app/shared';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto } from '@app/shared';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 
@@ -16,7 +16,6 @@ type Mode = 'Content' | 'Data' | 'FlatData';
     selector: 'sqx-content-inspection[appName][content][language][languages]',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentInspectionComponent implements OnChanges {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);
@@ -34,6 +33,9 @@ export class ContentInspectionComponent implements OnChanges {
     public content: ContentDto;
 
     public mode = new BehaviorSubject<Mode>('Content');
+
+    public contentError?: ErrorDto | null;
+    public contentData: any;
 
     public actualData =
         combineLatest([
@@ -57,6 +59,7 @@ export class ContentInspectionComponent implements OnChanges {
 
     constructor(
         private readonly contentsService: ContentsService,
+        private readonly contentsState: ContentsState,
     ) {
     }
 
@@ -66,7 +69,27 @@ export class ContentInspectionComponent implements OnChanges {
         }
     }
 
+    public setData(data: any) {
+        this.contentData = data;
+    }
+
     public setMode(mode: Mode) {
         this.mode.next(mode);
+    }
+
+    public save() {
+        if (!this.contentData || this.mode.value !== 'Data') {
+            return;
+        }
+
+        this.contentsState.update(this.content, this.contentData)
+            .subscribe({
+                next: () => {
+                    this.contentError = null;
+                },
+                error: error => {
+                    this.contentError = error;
+                },
+            });
     }
 }

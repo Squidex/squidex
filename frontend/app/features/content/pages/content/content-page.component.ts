@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, Types, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
+import { ContentInspectionComponent } from './inspecting/content-inspection.component';
 import { ContentReferencesComponent } from './references/content-references.component';
 
 @Component({
@@ -25,6 +26,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     @ViewChild(ContentReferencesComponent)
     public references: ContentReferencesComponent;
+
+    @ViewChild(ContentInspectionComponent)
+    public inspection: ContentInspectionComponent;
 
     public schema: SchemaDto;
 
@@ -162,6 +166,11 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private saveContent(publish: boolean) {
+        if (this.inspection) {
+            this.inspection.save();
+            return;
+        }
+
         const value = this.contentForm.submit();
 
         if (value) {

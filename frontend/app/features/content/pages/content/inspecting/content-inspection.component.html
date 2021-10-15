@@ -19,5 +19,10 @@
 </div>
 
 <div class="inner-main">
-    <sqx-code-editor [borderless]="true" [ngModel]="actualData | async" valueMode="Json"></sqx-code-editor>
+    <sqx-code-editor
+        [borderless]="true" 
+        [ngModel]="actualData | async"
+        (ngModelChange)="setData($event)"
+        valueMode="Json">
+    </sqx-code-editor>
 </div>
