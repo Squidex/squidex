@@ -78,8 +78,8 @@ namespace Migrations
                 // Version 26: Introduce full deletion.
                 if (version < 26)
                 {
-                    // yield return serviceProvider.GetRequiredService<RebuildApps>();
-                    // yield return serviceProvider.GetRequiredService<RebuildSchemas>();
+                    yield return serviceProvider.GetRequiredService<RebuildApps>();
+                    yield return serviceProvider.GetRequiredService<RebuildSchemas>();
                     yield return serviceProvider.GetRequiredService<RebuildRules>();
                 }
 
