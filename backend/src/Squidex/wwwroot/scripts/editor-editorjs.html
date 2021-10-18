@@ -59,8 +59,6 @@
                 editor.save().then(function (data) {
                     // Notify the UI that the value has been changed. Will be used to trigger validation.
                     field.valueChanged(data);
-
-                    console.log(JSON.stringify(data, null, 2));
                 });
             }
         });
