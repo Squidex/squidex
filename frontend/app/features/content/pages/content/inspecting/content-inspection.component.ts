@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto } from '@app/shared';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
+import { ContentPageComponent } from './../content-page.component';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 
@@ -17,7 +18,7 @@ type Mode = 'Content' | 'Data' | 'FlatData';
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
 })
-export class ContentInspectionComponent implements OnChanges {
+export class ContentInspectionComponent implements OnChanges, OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);
 
     @Input()
@@ -60,25 +61,48 @@ export class ContentInspectionComponent implements OnChanges {
     constructor(
         private readonly contentsService: ContentsService,
         private readonly contentsState: ContentsState,
+        private parent: ContentPageComponent,
     ) {
+    }
+
+    public ngOnDestroy() {
+        this.parent.clearActions();
     }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['language']) {
             this.languageChanges$.next(this.language);
         }
+
+        if (changes['content']) {
+            this.updateActions();
+        }
+    }
+
+    private updateActions() {
+        if (this.mode.value === 'Data' && this.content.canUpdate) {
+            this.parent.addAction('common.save', () => {
+                this.save();
+            });
+        } else {
+            this.parent.clearActions();
+        }
     }
 
     public setData(data: any) {
         this.contentData = data;
+
+        this.updateActions();
     }
 
     public setMode(mode: Mode) {
         this.mode.next(mode);
+
+        this.updateActions();
     }
 
-    public save() {
-        if (!this.contentData || this.mode.value !== 'Data') {
+    private save() {
+        if (!this.contentData) {
             return;
         }
 

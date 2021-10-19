@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State } from '@app/shared';
+import { ContentPageComponent } from './../content-page.component';
 
 @Component({
     selector: 'sqx-content-references[content][language][languages]',
@@ -17,7 +18,7 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, 
         Router2State, ComponentContentsState,
     ],
 })
-export class ContentReferencesComponent implements OnChanges {
+export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy {
     @Input()
     public content: ContentDto;
 
@@ -33,7 +34,22 @@ export class ContentReferencesComponent implements OnChanges {
     constructor(
         public readonly contentsRoute: Router2State,
         public readonly contentsState: ComponentContentsState,
+        private readonly parent: ContentPageComponent,
     ) {
+    }
+
+    public ngOnInit() {
+        this.parent.addAction('contents.validate', () => {
+            this.contentsState.validate(this.contentsState.snapshot.contents);
+        });
+
+        this.parent.addAction('contents.publishAll', () => {
+            this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
+        });
+    }
+
+    public ngOnDestroy() {
+        this.parent.clearActions();
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -54,14 +70,6 @@ export class ContentReferencesComponent implements OnChanges {
 
             this.contentsRoute.listen();
         }
-    }
-
-    public validate() {
-        this.contentsState.validate(this.contentsState.snapshot.contents);
-    }
-
-    public publish() {
-        this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
     }
 
     public trackByContent(_index: number, content: ContentDto) {

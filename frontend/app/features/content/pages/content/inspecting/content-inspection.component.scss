@@ -10,6 +10,12 @@
     .editor {
         @include absolute(0, 0, 0, 0);
     }
+
+    .form-bubble {
+        .form-alert {
+            @include absolute(0, 2rem, auto, auto);
+        }
+    }
 }
 
 .inner-menu,

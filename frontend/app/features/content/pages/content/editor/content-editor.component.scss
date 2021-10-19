@@ -6,6 +6,14 @@
     padding: 0;
 }
 
+:host ::ng-deep {
+    .form-bubble {
+        .form-alert {
+            @include absolute(0, 2rem, auto, auto);
+        }
+    }
+}
+
 .alert {
     border: 0;
     border-radius: 0;
