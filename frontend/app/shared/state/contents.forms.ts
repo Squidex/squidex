@@ -230,27 +230,6 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
         this.isRequired = field.properties.isRequired;
     }
 
-    public copyFrom(source: FieldForm, key: string) {
-        const target = this.get(key);
-
-        if (!target) {
-            return;
-        }
-
-        const value = source.get(key)?.form.value;
-
-        target.prepareLoad(value);
-        target.form.reset(source.get(key)?.form.value);
-    }
-
-    public copyAllFrom(source: FieldForm) {
-        const value = source.form.getRawValue();
-
-        this.prepareLoad(value);
-
-        this.form.reset(value);
-    }
-
     public get(language: string | LanguageDto) {
         if (this.field.isLocalizable) {
             return this.partitions[language['iso2Code'] || language];

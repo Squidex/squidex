@@ -1,7 +1,7 @@
 <div #container (sqxResized)="updateContainerWidth($event.width)">
-    <div class="form-check" *ngFor="let value of valuesSorted"
-        [class.form-check-block]="!snapshot.isSingleLine"
-        [class.form-check-inline]="snapshot.isSingleLine">
+    <div class="form-check" *ngFor="let value of valuesSorted; trackBy: trackByValue"
+        [class.form-check-block]="!snapshot.isSingleline"
+        [class.form-check-inline]="snapshot.isSingleline">
         <input class="form-check-input" type="checkbox" id="{{controlId}}_{{value}}"
             (blur)="callTouched()"
             (change)="check($event!.target!.checked!, value)" 

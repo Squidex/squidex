@@ -138,6 +138,7 @@
                     </ng-container>
                     <ng-container *ngSwitchDefault>
                         <sqx-content-editor
+                            (loadLatest)="loadLatest()"
                             [(language)]="language"
                             [formContext]="formContext"
                             [contentId]="contentId"
@@ -154,7 +155,7 @@
             <ng-template #noContentEditor>
                 <sqx-content-editor
                     [(language)]="language"
-                    [isNew]="!content"
+                    [isNew]="true"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
                     [contentVersion]="contentVersion"

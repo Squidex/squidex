@@ -50,6 +50,10 @@ export class ContentEditorComponent {
     @Input()
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    public loadLatestVersion() {
+        this.loadLatest.emit();
+    }
+
     public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
         return section.separator?.fieldId;
     }
