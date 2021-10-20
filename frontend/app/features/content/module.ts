@@ -10,7 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CanDeactivateGuard, ContentMustExistGuard, LoadLanguagesGuard, LoadSchemasGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ScrollingModuleExperimental } from '@angular/cdk-experimental/scrolling';
-import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CalendarPageComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentInspectionComponent, ContentPageComponent, ContentReferencesComponent, ContentSectionComponent, ContentsFiltersPageComponent, ContentsPageComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
+import { ArrayEditorComponent, ArrayItemComponent, AssetsEditorComponent, CalendarPageComponent, CommentsPageComponent, ComponentComponent, ComponentSectionComponent, ContentComponent, ContentCreatorComponent, ContentEditorComponent, ContentEventComponent, ContentExtensionComponent, ContentFieldComponent, ContentHistoryPageComponent, ContentInspectionComponent, ContentPageComponent, ContentReferencesComponent, ContentSectionComponent, ContentsFiltersPageComponent, ContentsPageComponent, CustomViewEditorComponent, DueTimeSelectorComponent, FieldCopyButtonComponent, FieldEditorComponent, FieldLanguagesComponent, IFrameEditorComponent, PreviewButtonComponent, ReferenceItemComponent, ReferencesEditorComponent, SchemasPageComponent, SidebarPageComponent, StockPhotoEditorComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -50,12 +50,18 @@ const routes: Routes = [
                         component: ContentPageComponent,
                         canActivate: [SchemaMustNotBeSingletonGuard, ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
+                        data: {
+                            reuseId: 'contentPage',
+                        },
                     },
                     {
                         path: ':contentId',
                         component: ContentPageComponent,
                         canActivate: [ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
+                        data: {
+                            reuseId: 'contentPage',
+                        },
                         children: [
                             {
                                 path: 'history',
@@ -110,6 +116,7 @@ const routes: Routes = [
         ContentsPageComponent,
         CustomViewEditorComponent,
         DueTimeSelectorComponent,
+        FieldCopyButtonComponent,
         FieldEditorComponent,
         FieldLanguagesComponent,
         IFrameEditorComponent,

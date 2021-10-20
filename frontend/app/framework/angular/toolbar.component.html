@@ -1,0 +1,5 @@
+<ng-container *ngIf="toolbar.buttonsChanges | async; let buttons">
+    <button type="submit" class="btn btn-{{button.color}} ms-2" *ngFor="let button of buttons" (click)="button.method()" [disabled]="button.disabled">
+        {{ button.name| sqxTranslate }}
+    </button>
+</ng-container>

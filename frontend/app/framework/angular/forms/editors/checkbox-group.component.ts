@@ -20,7 +20,7 @@ interface State {
     checkedValues: ReadonlyArray<TagValue>;
 
     // True when all checkboxes can be shown as single line.
-    isSingleLine?: boolean;
+    isSingleline?: boolean;
 }
 
 @Component({
@@ -42,6 +42,9 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
     @ViewChild('container', { static: false })
     public containerElement: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public layout: 'Auto' | 'Singletine' | 'Multiline' = 'Auto';
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
@@ -87,6 +90,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
         this.calculateStyle();
 
         if (this.labelsMeasured) {
+            this.calculateSingleLine();
             return;
         }
 
@@ -123,9 +127,15 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     }
 
     private calculateSingleLine() {
-        const isSingleLine = this.childrenWidth < this.containerWidth;
+        let isSingleline = false;
 
-        this.next({ isSingleLine });
+        if (this.layout !== 'Auto') {
+            isSingleline = this.layout === 'Singletine';
+        } else {
+            isSingleline = this.childrenWidth < this.containerWidth;
+        }
+
+        this.next({ isSingleline });
     }
 
     private calculateStyle() {
@@ -175,6 +185,10 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
 
     public isChecked(value: TagValue) {
         return this.snapshot.checkedValues.indexOf(value) >= 0;
+    }
+
+    public trackByValue(_index: number, tag: TagValue) {
+        return tag.id;
     }
 }
 

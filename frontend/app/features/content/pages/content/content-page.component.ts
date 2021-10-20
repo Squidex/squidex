@@ -5,13 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, Types, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { ContentInspectionComponent } from './inspecting/content-inspection.component';
-import { ContentReferencesComponent } from './references/content-references.component';
 
 @Component({
     selector: 'sqx-content-page',
@@ -20,15 +18,12 @@ import { ContentReferencesComponent } from './references/content-references.comp
     animations: [
         fadeAnimation,
     ],
+    providers: [
+        ToolbarService,
+    ],
 })
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
     private autoSaveKey: AutoSaveKey;
-
-    @ViewChild(ContentReferencesComponent)
-    public references: ContentReferencesComponent;
-
-    @ViewChild(ContentInspectionComponent)
-    public inspection: ContentInspectionComponent;
 
     public schema: SchemaDto;
 
@@ -149,14 +144,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         );
     }
 
-    public validate() {
-        this.references?.validate();
-    }
-
-    public publish() {
-        this.references?.publish();
-    }
-
     public saveAndPublish() {
         this.saveContent(true);
     }
@@ -166,11 +153,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private saveContent(publish: boolean) {
-        if (this.inspection) {
-            this.inspection.save();
-            return;
-        }
-
         const value = this.contentForm.submit();
 
         if (value) {
@@ -230,10 +212,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 this.back();
             });
         }
-    }
-
-    public setContentId(id: string) {
-        this.contentId = id;
     }
 
     public checkPendingChangesBeforePreview() {

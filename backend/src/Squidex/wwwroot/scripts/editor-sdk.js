@@ -454,14 +454,14 @@ function SquidexFormField() {
          *
          * @param {Function} callback: The callback to invoke. Argument 1: New position (number).
          */
-        onInit: function (callback) {
+        onMoved: function (callback) {
             if (!isFunction(callback)) {
                 return;
             }
 
-            initHandler = callback;
+            movedHandler = callback;
 
-            raiseInit();
+            raisedMoved();
         },
 
         /**

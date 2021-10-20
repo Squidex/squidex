@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State } from '@app/shared';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State, ToolbarService } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-references[content][language][languages]',
@@ -17,7 +17,7 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, 
         Router2State, ComponentContentsState,
     ],
 })
-export class ContentReferencesComponent implements OnChanges {
+export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy {
     @Input()
     public content: ContentDto;
 
@@ -33,7 +33,27 @@ export class ContentReferencesComponent implements OnChanges {
     constructor(
         public readonly contentsRoute: Router2State,
         public readonly contentsState: ComponentContentsState,
+        private readonly changeDetector: ChangeDetectorRef,
+        private readonly toolbar: ToolbarService,
     ) {
+    }
+
+    public ngOnDestroy() {
+        this.toolbar.remove(this);
+    }
+
+    public ngOnInit() {
+        this.toolbar.addButton(this, 'contents.validate', () => {
+            this.validate();
+
+            this.changeDetector.detectChanges();
+        });
+
+        this.toolbar.addButton(this, 'contents.publishAll', () => {
+            this.publishAll();
+
+            this.changeDetector.detectChanges();
+        });
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -56,11 +76,11 @@ export class ContentReferencesComponent implements OnChanges {
         }
     }
 
-    public validate() {
+    private validate() {
         this.contentsState.validate(this.contentsState.snapshot.contents);
     }
 
-    public publish() {
+    private publishAll() {
         this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
     }
 

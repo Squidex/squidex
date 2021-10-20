@@ -10,11 +10,13 @@
 
     &-buttons {
         @include absolute(-.6rem, 2rem);
+        background: $color-white;
         z-index: 1000;
     }
 
     &-buttons-compare {
         @include absolute(-.6rem, 0);
+        background: $color-white;
         z-index: 1000;
     }
 }

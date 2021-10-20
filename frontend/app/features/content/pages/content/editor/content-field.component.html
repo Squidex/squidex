@@ -3,11 +3,9 @@
         <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async" *ngIf="!(formModel.hiddenChanges | async)">
             <div class="languages-container">
                 <div class="languages-buttons">
-                    <ng-container *ngIf="!formModel.field.isDisabled">
-                        <button *ngIf="isTranslatable" type="button" class="btn btn-text-secondary btn-sm me-1" title="i18n:contents.autotranslate" (click)="translate()">
-                            <i class="icon-translate"></i>
-                        </button>
-                    </ng-container>
+                    <button *ngIf="!formModel.field.isDisabled && isTranslatable" type="button" class="btn btn-text-secondary btn-sm me-1" title="i18n:contents.autotranslate" (click)="translate()" tabindex="-1">
+                        <i class="icon-translate"></i>
+                    </button>
     
                     <sqx-field-languages 
                         [field]="formModel.field"
@@ -17,6 +15,8 @@
                         [showAllControls]="showAllControls"
                         (showAllControlsChange)="changeShowAllControls($event)">
                     </sqx-field-languages>
+
+                    <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
                 </div>
             </div>
             
