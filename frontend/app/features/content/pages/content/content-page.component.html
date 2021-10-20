@@ -103,7 +103,7 @@
         </ng-container>
 
         <ng-container>
-            <ng-container *ngIf="content; else noContentEditor">
+            <ng-container *ngIf="content">
                 <ng-container [ngSwitch]="contentTab | async">
                     <ng-container *ngSwitchCase="'references'">
                         <sqx-content-references mode="references"
@@ -134,26 +134,14 @@
                             [url]="schema.properties.contentEditorUrl">
                         </sqx-content-extension>
                     </ng-container>
-                    <ng-container *ngSwitchDefault>
-                        <sqx-content-editor
-                            (loadLatest)="loadLatest()"
-                            [(language)]="language"
-                            [formContext]="formContext"
-                            [contentId]="contentId"
-                            [contentForm]="contentForm"
-                            [contentFormCompare]="contentFormCompare"
-                            [contentVersion]="contentVersion"
-                            [languages]="languages"
-                            [schema]="schema">
-                        </sqx-content-editor>
-                    </ng-container>
                 </ng-container>
             </ng-container>
 
-            <ng-template #noContentEditor>
+            <ng-container *ngIf="!content || (contentTab | async) === 'editor'">
                 <sqx-content-editor
+                    (loadLatest)="loadLatest()"
                     [(language)]="language"
-                    [isNew]="true"
+                    [isNew]="!content"
                     [contentForm]="contentForm"
                     [contentFormCompare]="contentFormCompare"
                     [contentVersion]="contentVersion"
@@ -162,7 +150,7 @@
                     [schema]="schema"
                     [(contentId)]="contentId">
                 </sqx-content-editor>
-            </ng-template>
+            </ng-container>
         </ng-container>
 
         <ng-container sidebarMenu>

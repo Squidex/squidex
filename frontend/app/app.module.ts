@@ -14,7 +14,7 @@ import { ApplicationRef, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
 import { ApiUrlConfig, CurrencyConfig, DateHelper, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
@@ -68,6 +68,12 @@ function configLocalizerService() {
     }
 }
 
+export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
+    public shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot) {
+       return (future.routeConfig === curr.routeConfig) || (future.data.reuseId && future.data.reuseId === curr.data.reuseId);
+    }
+}
+
 @NgModule({
     imports: [
         BrowserAnimationsModule,
@@ -90,6 +96,7 @@ function configLocalizerService() {
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
         { provide: LocalizerService, useFactory: configLocalizerService },
+        { provide: RouteReuseStrategy, useClass: AppRouteReuseStrategy },
         { provide: TitlesConfig, useFactory: configTitles },
         { provide: UIOptions, useFactory: configUIOptions },
     ],

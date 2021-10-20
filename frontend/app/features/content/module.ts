@@ -50,12 +50,18 @@ const routes: Routes = [
                         component: ContentPageComponent,
                         canActivate: [SchemaMustNotBeSingletonGuard, ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
+                        data: {
+                            reuseId: 'contentPage',
+                        },
                     },
                     {
                         path: ':contentId',
                         component: ContentPageComponent,
                         canActivate: [ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
+                        data: {
+                            reuseId: 'contentPage',
+                        },
                         children: [
                             {
                                 path: 'history',
