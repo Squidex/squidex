@@ -21,7 +21,7 @@ export class ToolbarService {
     }
 
     public addButton(owner: any, name: string, method: () => void, options?: ButtonOptions) {
-        const newButton = { owner, name, method, ...options };
+        const newButton = { owner, name, method, disabled: options?.disabled, color: options?.color || 'primary' };
 
         const buttons = this.buttons$.value;
         const button = buttons.find(x => x.name === name);
@@ -29,7 +29,7 @@ export class ToolbarService {
         if (!button || !Types.equals(newButton, button)) {
             const newButtons = this.buttons$.value.filter(x => x.name !== name);
 
-            newButtons.push({ owner, name, method, disabled: options?.disabled, color: options?.color || 'primary' });
+            newButtons.push(newButton);
 
             this.buttons$.next(newButtons);
         }
