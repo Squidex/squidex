@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State } from '@app/shared';
-import { ContentPageComponent } from './../content-page.component';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, Router2State, ToolbarService } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-references[content][language][languages]',
@@ -34,22 +33,27 @@ export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy 
     constructor(
         public readonly contentsRoute: Router2State,
         public readonly contentsState: ComponentContentsState,
-        private readonly parent: ContentPageComponent,
+        private readonly changeDetector: ChangeDetectorRef,
+        private readonly toolbar: ToolbarService,
     ) {
     }
 
-    public ngOnInit() {
-        this.parent.addAction('contents.validate', () => {
-            this.contentsState.validate(this.contentsState.snapshot.contents);
-        });
-
-        this.parent.addAction('contents.publishAll', () => {
-            this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
-        });
+    public ngOnDestroy() {
+        this.toolbar.remove(this);
     }
 
-    public ngOnDestroy() {
-        this.parent.clearActions();
+    public ngOnInit() {
+        this.toolbar.addButton(this, 'contents.validate', () => {
+            this.validate();
+
+            this.changeDetector.detectChanges();
+        });
+
+        this.toolbar.addButton(this, 'contents.publishAll', () => {
+            this.publishAll();
+
+            this.changeDetector.detectChanges();
+        });
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -70,6 +74,14 @@ export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy 
 
             this.contentsRoute.listen();
         }
+    }
+
+    private validate() {
+        this.contentsState.validate(this.contentsState.snapshot.contents);
+    }
+
+    private publishAll() {
+        this.contentsState.changeManyStatus(this.contentsState.snapshot.contents.filter(x => x.canPublish), 'Published');
     }
 
     public trackByContent(_index: number, content: ContentDto) {

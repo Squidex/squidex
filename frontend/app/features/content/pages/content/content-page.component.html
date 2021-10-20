@@ -76,9 +76,7 @@
                     </ng-container>
 
                     <ng-container *ngIf="contentTab | async; let tab">
-                        <button type="submit" class="btn btn-primary ms-2" *ngFor="let action of actions" (click)="action.method()">
-                            {{ action.name| sqxTranslate }}
-                        </button>
+                        <sqx-toolbar></sqx-toolbar>
 
                         <ng-container *ngIf="tab === 'editor'">
                             <sqx-preview-button [schema]="schema" [content]="content" [confirm]="confirmPreview"></sqx-preview-button>

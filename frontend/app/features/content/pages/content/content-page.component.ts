@@ -7,11 +7,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, Types, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-
-type Action = { name: string; method: () => void };
 
 @Component({
     selector: 'sqx-content-page',
@@ -19,6 +17,9 @@ type Action = { name: string; method: () => void };
     templateUrl: './content-page.component.html',
     animations: [
         fadeAnimation,
+    ],
+    providers: [
+        ToolbarService,
     ],
 })
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
@@ -39,8 +40,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
-
-    public actions: Action[] = [];
 
     public confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();
@@ -143,18 +142,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }
             }),
         );
-    }
-
-    public addAction(name: string, method: () => void) {
-        if (!this.actions.find(x => x.name === name)) {
-            this.actions.push({ name, method });
-        }
-    }
-
-    public clearActions() {
-        if (this.actions.length > 0) {
-            this.actions = [];
-        }
     }
 
     public saveAndPublish() {

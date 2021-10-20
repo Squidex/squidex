@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto } from '@app/shared';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService } from '@app/shared';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
-import { ContentPageComponent } from './../content-page.component';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 
@@ -59,14 +58,15 @@ export class ContentInspectionComponent implements OnChanges, OnDestroy {
             }));
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsService: ContentsService,
         private readonly contentsState: ContentsState,
-        private parent: ContentPageComponent,
+        private toolbar: ToolbarService,
     ) {
     }
 
     public ngOnDestroy() {
-        this.parent.clearActions();
+        this.toolbar.remove(this);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -81,11 +81,13 @@ export class ContentInspectionComponent implements OnChanges, OnDestroy {
 
     private updateActions() {
         if (this.mode.value === 'Data' && this.content.canUpdate) {
-            this.parent.addAction('common.save', () => {
+            this.toolbar.addButton(this, 'common.save', () => {
                 this.save();
+
+                this.changeDetector.detectChanges();
             });
         } else {
-            this.parent.clearActions();
+            this.toolbar.remove(this);
         }
     }
 
