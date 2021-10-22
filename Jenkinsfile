@@ -37,7 +37,13 @@ pipeline {
               full_image_name = "${homer_image_name}:${tag}"
             }
             cluster = params.cluster
-            namespace = params.namespace
+            /* in production the 'content-v1' namespace is named 'squidex',
+               so we are overriding it here                                 */
+            if (params.namespace == 'content-v1' && cluster == 'production') {
+              namespace = 'squidex'
+            } else {
+              namespace = params.namespace
+            }
             helm_data_file = "${cluster}/${namespace}.yaml"
           }
       }
