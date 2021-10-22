@@ -149,7 +149,7 @@ export class ContentsService {
         const body: any = {};
 
         if (odataParts.length > 0) {
-            body.odataQuery = odataParts.join('&');
+            body.odata = odataParts.join('&');
         } else if (queryObj) {
             body.q = queryObj;
         }

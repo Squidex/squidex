@@ -78,7 +78,7 @@ describe('ContentsService', () => {
 
             expect(req.request.method).toEqual('POST');
             expect(req.request.headers.get('If-Match')).toBeNull();
-            expect(req.request.body).toEqual({ odataQuery: '$filter=my-filter&$top=17&$skip=13' });
+            expect(req.request.body).toEqual({ odata: '$filter=my-filter&$top=17&$skip=13' });
 
             req.flush({ total: 10, items: [] });
         }));
