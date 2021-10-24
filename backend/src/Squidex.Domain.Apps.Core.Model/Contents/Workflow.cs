@@ -21,16 +21,16 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public Status Initial { get; }
 
-        public ImmutableDictionary<Status, WorkflowStep> Steps { get; } = ImmutableDictionary.Empty<Status, WorkflowStep>();
+        public ReadonlyDictionary<Status, WorkflowStep> Steps { get; } = ReadonlyDictionary.Empty<Status, WorkflowStep>();
 
-        public ImmutableList<DomainId> SchemaIds { get; } = ImmutableList.Empty<DomainId>();
+        public ReadonlyList<DomainId> SchemaIds { get; } = ReadonlyList.Empty<DomainId>();
 
         public string Name { get; }
 
         public Workflow(
             Status initial,
-            ImmutableDictionary<Status, WorkflowStep>? steps = null,
-            ImmutableList<DomainId>? schemaIds = null,
+            ReadonlyDictionary<Status, WorkflowStep>? steps = null,
+            ReadonlyList<DomainId>? schemaIds = null,
             string? name = null)
         {
             Initial = initial;
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Draft] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Archived, NoUpdate.Always),
                     [Status.Draft] =
                         new WorkflowStep(
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                             {
                                 [Status.Archived] = WorkflowTransition.Always,
                                 [Status.Published] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
@@ -75,9 +75,9 @@ namespace Squidex.Domain.Apps.Core.Contents
                             {
                                 [Status.Archived] = WorkflowTransition.Always,
                                 [Status.Draft] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Published)
-                }.ToImmutableDictionary(), null, name);
+                }.ToReadonlyDictionary(), null, name);
         }
 
         public IEnumerable<(Status Status, WorkflowStep Step, WorkflowTransition Transition)> GetTransitions(Status status)

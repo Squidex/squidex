@@ -80,7 +80,7 @@ namespace Squidex.Config.Domain
                 {
                     Settings = new AppSettings
                     {
-                        Patterns = ImmutableList.ToImmutableList(patterns)
+                        Patterns = ReadonlyList.ToReadonlyList(patterns)
                     }
                 };
             });

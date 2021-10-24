@@ -11,13 +11,13 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed record WorkflowStep
     {
-        public ImmutableDictionary<Status, WorkflowTransition> Transitions { get; } = ImmutableDictionary.Empty<Status, WorkflowTransition>();
+        public ReadonlyDictionary<Status, WorkflowTransition> Transitions { get; } = ReadonlyDictionary.Empty<Status, WorkflowTransition>();
 
         public string? Color { get; }
 
         public NoUpdate? NoUpdate { get; }
 
-        public WorkflowStep(ImmutableDictionary<Status, WorkflowTransition>? transitions = null, string? color = null, NoUpdate? noUpdate = null)
+        public WorkflowStep(ReadonlyDictionary<Status, WorkflowTransition>? transitions = null, string? color = null, NoUpdate? noUpdate = null)
         {
             Color = color;
 

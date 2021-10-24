@@ -11,40 +11,40 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Collections
 {
-    public class ImmutableListTests
+    public class ReadonlyListTests
     {
         [Fact]
         public void Should_return_empty_instance_for_empty_array()
         {
-            var result = ImmutableList.Create<int>();
+            var result = ReadonlyList.Create<int>();
 
-            Assert.Same(ImmutableList.Empty<int>(), result);
+            Assert.Same(ReadonlyList.Empty<int>(), result);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_null_array()
         {
-            var result = ImmutableList.Create((int[]?)null);
+            var result = ReadonlyList.Create((int[]?)null);
 
-            Assert.Same(ImmutableList.Empty<int>(), result);
+            Assert.Same(ReadonlyList.Empty<int>(), result);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_empty_enumerable()
         {
-            var result = Enumerable.Empty<int>().ToImmutableList();
+            var result = Enumerable.Empty<int>().ToReadonlyList();
 
-            Assert.Same(ImmutableList.Empty<int>(), result);
+            Assert.Same(ReadonlyList.Empty<int>(), result);
         }
 
         [Fact]
         public void Should_make_correct_equal_comparisons()
         {
-            var list1a = ImmutableList.Create(1);
-            var list1b = ImmutableList.Create(1);
+            var list1a = ReadonlyList.Create(1);
+            var list1b = ReadonlyList.Create(1);
 
-            var listOtherValue = ImmutableList.Create(2);
-            var listOtherSize = ImmutableList.Create(1, 2);
+            var listOtherValue = ReadonlyList.Create(2);
+            var listOtherSize = ReadonlyList.Create(1, 2);
 
             Assert.Equal(list1a, list1b);
             Assert.Equal(list1a.GetHashCode(), list1b.GetHashCode());
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.Collections
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var sut = ImmutableList.Create(1, 2, 3);
+            var sut = ReadonlyList.Create(1, 2, 3);
 
             var serialized = sut.SerializeAndDeserialize();
 

@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var previewUrls = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var sourceSchema =
                 new Schema("source");

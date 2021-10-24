@@ -29,11 +29,11 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Published] = WorkflowTransition.When("Expression", "Role1", "Role2")
-                        }.ToImmutableDictionary(),
+                        }.ToReadonlyDictionary(),
                         "#00ff00",
                         NoUpdate.When("Expression", "Role1", "Role2"))
-                }.ToImmutableDictionary(),
-                ImmutableList.Create(DomainId.NewGuid()), "MyName");
+                }.ToReadonlyDictionary(),
+                ReadonlyList.Create(DomainId.NewGuid()), "MyName");
 
             var serialized = workflow.SerializeAndDeserialize();
 

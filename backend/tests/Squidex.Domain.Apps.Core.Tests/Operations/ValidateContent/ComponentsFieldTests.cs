@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_component_has_no_discriminator()
         {
-            var (_, sut, components) = Field(new ComponentsFieldProperties { SchemaIds = ImmutableList.Create(schemaId1, schemaId2) });
+            var (_, sut, components) = Field(new ComponentsFieldProperties { SchemaIds = ReadonlyList.Create(schemaId1, schemaId2) });
 
             await sut.ValidateAsync(CreateValue(1, null, "field", 1), errors, components: components);
 
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_duplicates()
         {
-            var (id, sut, components) = Field(new ComponentsFieldProperties { UniqueFields = ImmutableList.Create("componentField") });
+            var (id, sut, components) = Field(new ComponentsFieldProperties { UniqueFields = ReadonlyList.Create("componentField") });
 
             await sut.ValidateAsync(CreateValue(2, id.ToString(), "componentField", 1), errors, components: components);
 

@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public SchemaProperties Properties { get; set; }
 
-        public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
+        public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
 
         [IgnoreDataMember]
         public override DomainId AggregateId

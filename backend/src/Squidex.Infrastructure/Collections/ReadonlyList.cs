@@ -10,31 +10,31 @@ using System.Linq;
 
 namespace Squidex.Infrastructure.Collections
 {
-    public static class ImmutableList
+    public static class ReadonlyList
     {
         private static class Empties<T>
         {
 #pragma warning disable SA1401 // Fields should be private
-            public static ImmutableList<T> Instance = new ImmutableList<T>();
+            public static ReadonlyList<T> Instance = new ReadonlyList<T>();
 #pragma warning restore SA1401 // Fields should be private
         }
 
-        public static ImmutableList<T> Empty<T>()
+        public static ReadonlyList<T> Empty<T>()
         {
             return Empties<T>.Instance;
         }
 
-        public static ImmutableList<T> Create<T>(params T[]? items)
+        public static ReadonlyList<T> Create<T>(params T[]? items)
         {
             if (items == null || items.Length == 0)
             {
                 return Empty<T>();
             }
 
-            return new ImmutableList<T>(items.ToList());
+            return new ReadonlyList<T>(items.ToList());
         }
 
-        public static ImmutableList<T> ToImmutableList<T>(this IEnumerable<T> source)
+        public static ReadonlyList<T> ToReadonlyList<T>(this IEnumerable<T> source)
         {
             var inner = source.ToList();
 
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Collections
                 return Empty<T>();
             }
 
-            return new ImmutableList<T>(inner);
+            return new ReadonlyList<T>(inner);
         }
     }
 }

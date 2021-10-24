@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
             }
 
             var transitions =
-                Transitions?.ToImmutableDictionary(
+                Transitions?.ToReadonlyDictionary(
                     x => x.Key,
                     x => x.Value.ToSource());
 

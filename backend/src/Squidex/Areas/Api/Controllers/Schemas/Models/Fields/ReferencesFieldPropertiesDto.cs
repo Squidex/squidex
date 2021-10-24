@@ -17,12 +17,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value as a list of content ids.
         /// </summary>
-        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; set; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; set; }
 
         /// <summary>
         /// The default value as a list of content ids.
         /// </summary>
-        public ImmutableList<string>? DefaultValue { get; set; }
+        public ReadonlyList<string>? DefaultValue { get; set; }
 
         /// <summary>
         /// The minimum allowed items for the field value.
@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The id of the referenced schemas.
         /// </summary>
-        public ImmutableList<DomainId>? SchemaIds { get; set; }
+        public ReadonlyList<DomainId>? SchemaIds { get; set; }
 
         public override FieldProperties ToProperties()
         {

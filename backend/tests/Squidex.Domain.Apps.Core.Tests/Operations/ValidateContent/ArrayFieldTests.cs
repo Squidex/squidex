@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_value_has_not_duplicates()
         {
-            var sut = Field(new ArrayFieldProperties { UniqueFields = ImmutableList.Create("myString") });
+            var sut = Field(new ArrayFieldProperties { UniqueFields = ReadonlyList.Create("myString") });
 
             await sut.ValidateAsync(CreateValue(Object("myString", "1"), Object("myString", "2")), errors);
 
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_duplicates()
         {
-            var sut = Field(new ArrayFieldProperties { UniqueFields = ImmutableList.Create("myString") });
+            var sut = Field(new ArrayFieldProperties { UniqueFields = ReadonlyList.Create("myString") });
 
             await sut.ValidateAsync(CreateValue(Object("myString", "1"), Object("myString", "1")), errors);
 

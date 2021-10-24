@@ -438,11 +438,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var urls1 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
             var urls2 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var schema_1 = schema_0.SetPreviewUrls(urls1);
             var schema_2 = schema_1.SetPreviewUrls(urls2);
@@ -470,7 +470,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                     .SetPreviewUrls(new Dictionary<string, string>
                     {
                         ["web"] = "Url"
-                    }.ToImmutableDictionary());
+                    }.ToReadonlyDictionary());
 
             var schemaTarget = schemaSource.SerializeAndDeserialize();
 

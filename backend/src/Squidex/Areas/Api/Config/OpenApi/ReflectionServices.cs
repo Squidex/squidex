@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
         protected override bool IsArrayType(ContextualType contextualType)
         {
             if (contextualType.Type.IsGenericType &&
-                contextualType.Type.GetGenericTypeDefinition() == typeof(ImmutableList<>))
+                contextualType.Type.GetGenericTypeDefinition() == typeof(ReadonlyList<>))
             {
                 return true;
             }
@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
         protected override bool IsDictionaryType(ContextualType contextualType)
         {
             if (contextualType.Type.IsGenericType &&
-                contextualType.Type.GetGenericTypeDefinition() == typeof(ImmutableDictionary<,>))
+                contextualType.Type.GetGenericTypeDefinition() == typeof(ReadonlyDictionary<,>))
             {
                 return true;
             }

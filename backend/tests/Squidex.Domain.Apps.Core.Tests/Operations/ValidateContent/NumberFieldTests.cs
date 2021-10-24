@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_number_is_not_allowed()
         {
-            var sut = Field(new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
+            var sut = Field(new NumberFieldProperties { AllowedValues = ReadonlyList.Create(10d) });
 
             await sut.ValidateAsync(CreateValue(20), errors);
 

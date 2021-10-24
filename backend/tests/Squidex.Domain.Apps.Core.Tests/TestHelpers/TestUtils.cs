@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 .AddReferences(109, "root-references", Partitioning.Invariant,
                     new ReferencesFieldProperties())
                 .AddString(110, "root-string1", Partitioning.Invariant,
-                    new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") })
+                    new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ReadonlyList.Create("a", "b") })
                 .AddString(111, "root-string2", Partitioning.Invariant,
                     new StringFieldProperties { Hints = "My String1" })
                 .AddTags(112, "root-tags", Partitioning.Language,

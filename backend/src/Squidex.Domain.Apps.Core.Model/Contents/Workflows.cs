@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class Workflows : ImmutableDictionary<DomainId, Workflow>
+    public sealed class Workflows : ReadonlyDictionary<DomainId, Workflow>
     {
         public static readonly Workflows Empty = new Workflows();
 

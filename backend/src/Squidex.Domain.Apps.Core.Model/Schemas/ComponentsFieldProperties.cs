@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxItems { get; init; }
 
-        public ImmutableList<string>? UniqueFields { get; init; }
+        public ReadonlyList<string>? UniqueFields { get; init; }
 
         public DomainId SchemaId
         {
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 if (value != default)
                 {
-                    SchemaIds = ImmutableList.Create(value);
+                    SchemaIds = ReadonlyList.Create(value);
                 }
                 else
                 {
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
         }
 
-        public ImmutableList<DomainId>? SchemaIds { get; init; }
+        public ReadonlyList<DomainId>? SchemaIds { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

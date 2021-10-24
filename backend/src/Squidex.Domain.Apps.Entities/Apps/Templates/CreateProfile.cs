@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     .AddString("Experience", f => f
                         .Properties(p => p with
                         {
-                            AllowedValues = ImmutableList.Create(
+                            AllowedValues = ReadonlyList.Create(
                                 "Beginner",
                                 "Advanced",
                                 "Professional",

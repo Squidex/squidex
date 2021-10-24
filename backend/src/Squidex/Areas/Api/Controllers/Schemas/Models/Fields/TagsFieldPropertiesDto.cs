@@ -16,12 +16,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value for the field value.
         /// </summary>
-        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; set; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; set; }
 
         /// <summary>
         /// The default value.
         /// </summary>
-        public ImmutableList<string>? DefaultValue { get; set; }
+        public ReadonlyList<string>? DefaultValue { get; set; }
 
         /// <summary>
         /// The minimum allowed items for the field value.
@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public ImmutableList<string>? AllowedValues { get; set; }
+        public ReadonlyList<string>? AllowedValues { get; set; }
 
         /// <summary>
         /// The editor that is used to manage this field.

@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.Assets(1, "1", Partitioning.Invariant,
-                    new AssetsFieldProperties { DefaultValue = ImmutableList.Create("1", "2" ) });
+                    new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("1", "2" ) });
 
             Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
@@ -108,11 +108,11 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.Assets(1, "1", Partitioning.Invariant,
                     new AssetsFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
+                        DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                         {
                             [language.Iso2Code] = null
                         }),
-                        DefaultValue = ImmutableList.Create("1", "2")
+                        DefaultValue = ReadonlyList.Create("1", "2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -254,7 +254,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.References(1, "1", Partitioning.Invariant,
-                    new ReferencesFieldProperties { DefaultValue = ImmutableList.Create("1", "2") });
+                    new ReferencesFieldProperties { DefaultValue = ReadonlyList.Create("1", "2") });
 
             Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
@@ -266,11 +266,11 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.References(1, "1", Partitioning.Invariant,
                     new ReferencesFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
+                        DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                         {
                             [language.Iso2Code] = null
                         }),
-                        DefaultValue = ImmutableList.Create("1", "2")
+                        DefaultValue = ReadonlyList.Create("1", "2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -308,7 +308,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.Tags(1, "1", Partitioning.Invariant,
-                    new TagsFieldProperties { DefaultValue = ImmutableList.Create("tag1", "tag2") });
+                    new TagsFieldProperties { DefaultValue = ReadonlyList.Create("tag1", "tag2") });
 
             Assert.Equal(JsonValue.Array("tag1", "tag2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
@@ -320,11 +320,11 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.Tags(1, "1", Partitioning.Invariant,
                     new TagsFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
+                        DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                         {
                             [language.Iso2Code] = null
                         }),
-                        DefaultValue = ImmutableList.Create("tag1", "tag2")
+                        DefaultValue = ReadonlyList.Create("tag1", "tag2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));

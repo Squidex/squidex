@@ -12,30 +12,30 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Collections
 {
-    public class ImmutableDictionaryTests
+    public class ReadonlyDictionaryTests
     {
         [Fact]
         public void Should_return_empty_instance_for_empty_source()
         {
-            var result = new Dictionary<int, int>().ToImmutableDictionary();
+            var result = new Dictionary<int, int>().ToReadonlyDictionary();
 
-            Assert.Same(ImmutableDictionary.Empty<int, int>(), result);
+            Assert.Same(ReadonlyDictionary.Empty<int, int>(), result);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_empty_source_and_key_selector()
         {
-            var result = Enumerable.Empty<int>().ToImmutableDictionary(x => x);
+            var result = Enumerable.Empty<int>().ToReadonlyDictionary(x => x);
 
-            Assert.Same(ImmutableDictionary.Empty<int, int>(), result);
+            Assert.Same(ReadonlyDictionary.Empty<int, int>(), result);
         }
 
         [Fact]
         public void Should_return_empty_instance_for_empty_source_and_value_selector()
         {
-            var result = Enumerable.Empty<int>().ToImmutableDictionary(x => x, x => x);
+            var result = Enumerable.Empty<int>().ToReadonlyDictionary(x => x, x => x);
 
-            Assert.Same(ImmutableDictionary.Empty<int, int>(), result);
+            Assert.Same(ReadonlyDictionary.Empty<int, int>(), result);
         }
 
         [Fact]
@@ -44,28 +44,28 @@ namespace Squidex.Infrastructure.Collections
             var obj1a = new Dictionary<int, int>
             {
                 [1] = 1
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var obj1b = new Dictionary<int, int>
             {
                 [1] = 1
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var dictionaryOtherValue = new Dictionary<int, int>
             {
                 [1] = 2
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var dictionaryOtherKey = new Dictionary<int, int>
             {
                 [2] = 1
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var dictionaryOtherCount = new Dictionary<int, int>
             {
                 [1] = 1,
                 [2] = 2
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             Assert.Equal(obj1a, obj1b);
             Assert.Equal(obj1a.GetHashCode(), obj1b.GetHashCode());
@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.Collections
                 [11] = 1,
                 [12] = 2,
                 [13] = 3
-            }.ToImmutableDictionary();
+            }.ToReadonlyDictionary();
 
             var serialized = sut.SerializeAndDeserialize();
 

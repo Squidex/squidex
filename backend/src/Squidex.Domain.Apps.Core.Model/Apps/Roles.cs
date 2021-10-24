@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class Roles
     {
-        private readonly ImmutableDictionary<string, Role> inner;
+        private readonly ReadonlyDictionary<string, Role> inner;
 
         public static readonly IReadOnlyDictionary<string, Role> Defaults = new Dictionary<string, Role>
         {
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                     JsonValue.Object())
         };
 
-        public static readonly Roles Empty = new Roles(new ImmutableDictionary<string, Role>());
+        public static readonly Roles Empty = new Roles(new ReadonlyDictionary<string, Role>());
 
         public int CustomCount
         {
@@ -79,14 +79,14 @@ namespace Squidex.Domain.Apps.Core.Apps
             get => inner.Values.Union(Defaults.Values);
         }
 
-        private Roles(ImmutableDictionary<string, Role> roles)
+        private Roles(ReadonlyDictionary<string, Role> roles)
         {
             inner = roles;
         }
 
         public Roles(Dictionary<string, Role> roles)
         {
-            inner = new ImmutableDictionary<string, Role>(Cleaned(roles));
+            inner = new ReadonlyDictionary<string, Role>(Cleaned(roles));
         }
 
         [Pure]
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return Create(new ImmutableDictionary<string, Role>(updated));
+            return Create(new ReadonlyDictionary<string, Role>(updated));
         }
 
         [Pure]
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return Create(new ImmutableDictionary<string, Role>(updated));
+            return Create(new ReadonlyDictionary<string, Role>(updated));
         }
 
         [Pure]
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return Create(new ImmutableDictionary<string, Role>(updated));
+            return Create(new ReadonlyDictionary<string, Role>(updated));
         }
 
         public static bool IsDefault(string role)
@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return inner.Where(x => !Defaults.ContainsKey(x.Key)).ToDictionary(x => x.Key, x => x.Value);
         }
 
-        private Roles Create(ImmutableDictionary<string, Role> newRoles)
+        private Roles Create(ReadonlyDictionary<string, Role> newRoles)
         {
             return ReferenceEquals(inner, newRoles) ? this : new Roles(newRoles);
         }

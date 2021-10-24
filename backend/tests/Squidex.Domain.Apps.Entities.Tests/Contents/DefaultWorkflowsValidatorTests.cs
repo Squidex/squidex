@@ -60,8 +60,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, null, ImmutableList.Create(schemaId.Id)))
-                .Update(id2, new Workflow(default, null, ImmutableList.Create(schemaId.Id)));
+                .Update(id1, new Workflow(default, null, ReadonlyList.Create(schemaId.Id)))
+                .Update(id2, new Workflow(default, null, ReadonlyList.Create(schemaId.Id)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
@@ -79,8 +79,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, null, ImmutableList.Create(oldSchemaId)))
-                .Update(id2, new Workflow(default, null, ImmutableList.Create(oldSchemaId)));
+                .Update(id1, new Workflow(default, null, ReadonlyList.Create(oldSchemaId)))
+                .Update(id2, new Workflow(default, null, ReadonlyList.Create(oldSchemaId)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, null, ImmutableList.Create(schemaId.Id)));
+                .Update(id1, new Workflow(default, null, ReadonlyList.Create(schemaId.Id)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 

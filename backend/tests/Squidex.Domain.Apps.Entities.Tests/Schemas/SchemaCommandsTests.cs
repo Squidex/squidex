@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["mobile"] = "http://mobile"
-                }.ToImmutableDictionary(),
+                }.ToReadonlyDictionary(),
                 Category = "myCategory"
             };
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     .SetPreviewUrls(new Dictionary<string, string>
                     {
                         ["mobile"] = "http://mobile"
-                    }.ToImmutableDictionary())
+                    }.ToReadonlyDictionary())
                     .Publish();
 
             var actual = command.BuildSchema("my-schema", SchemaType.Default);

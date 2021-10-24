@@ -13,9 +13,9 @@ namespace Squidex.Domain.Apps.Core.Apps
     {
         public static readonly AppSettings Empty = new AppSettings();
 
-        public ImmutableList<Pattern> Patterns { get; init; } = ImmutableList.Empty<Pattern>();
+        public ReadonlyList<Pattern> Patterns { get; init; } = ReadonlyList.Empty<Pattern>();
 
-        public ImmutableList<Editor> Editors { get; init; } = ImmutableList.Empty<Editor>();
+        public ReadonlyList<Editor> Editors { get; init; } = ReadonlyList.Empty<Editor>();
 
         public bool HideScheduler { get; init; }
 

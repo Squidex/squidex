@@ -15,9 +15,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public AssetPreviewMode PreviewMode { get; init; }
 
-        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; init; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
 
-        public ImmutableList<string>? DefaultValue { get; init; }
+        public ReadonlyList<string>? DefaultValue { get; init; }
 
         public string? FolderId { get; init; }
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             init => ResolveFirst = value;
         }
 
-        public ImmutableList<string>? AllowedExtensions { get; set; }
+        public ReadonlyList<string>? AllowedExtensions { get; set; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

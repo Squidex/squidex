@@ -11,11 +11,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed record TagsFieldProperties : FieldProperties
     {
-        public ImmutableList<string>? AllowedValues { get; init; }
+        public ReadonlyList<string>? AllowedValues { get; init; }
 
-        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; init; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
 
-        public ImmutableList<string>? DefaultValue { get; init; }
+        public ReadonlyList<string>? DefaultValue { get; init; }
 
         public int? MinItems { get; init; }
 

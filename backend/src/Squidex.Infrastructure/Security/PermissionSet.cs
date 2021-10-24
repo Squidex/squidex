@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Security
 {
-    public sealed class PermissionSet : ImmutableList<Permission>
+    public sealed class PermissionSet : ReadonlyList<Permission>
     {
         public static readonly PermissionSet Empty = new PermissionSet(Array.Empty<string>());
 

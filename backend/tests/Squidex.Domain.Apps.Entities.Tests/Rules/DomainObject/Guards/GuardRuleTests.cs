@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = null!,
             });
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {

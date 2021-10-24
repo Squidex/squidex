@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newLanguages = new Dictionary<string, LanguageConfig>(languages)
             {
-                [language] = new LanguageConfig(isOptional, ImmutableList.Create(fallbacks))
+                [language] = new LanguageConfig(isOptional, ReadonlyList.Create(fallbacks))
             };
 
             return Build(newLanguages, master);

@@ -178,7 +178,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             if (scope == AssetFolderScope.Items)
             {
-                return Task.FromResult<IReadOnlyList<IAssetFolderEntity>>(ImmutableList.Empty<IAssetFolderEntity>());
+                return Task.FromResult<IReadOnlyList<IAssetFolderEntity>>(ReadonlyList.Empty<IAssetFolderEntity>());
             }
 
             return assetQuery.FindAssetFolderAsync(Context.App.Id, parentId, HttpContext.RequestAborted);

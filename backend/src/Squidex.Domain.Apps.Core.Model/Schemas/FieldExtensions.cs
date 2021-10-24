@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return fields.Where(x => IsForApi(x, withHidden));
         }
 
-        public static IEnumerable<IRootField> GetSharedFields(this ResolvedComponents components, ImmutableList<DomainId>? schemaIds, bool withHidden)
+        public static IEnumerable<IRootField> GetSharedFields(this ResolvedComponents components, ReadonlyList<DomainId>? schemaIds, bool withHidden)
         {
             if (schemaIds == null || schemaIds.Count == 0)
             {

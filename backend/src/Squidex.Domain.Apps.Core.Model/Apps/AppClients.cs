@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppClients : ImmutableDictionary<string, AppClient>
+    public sealed class AppClients : ReadonlyDictionary<string, AppClient>
     {
         public static readonly AppClients Empty = new AppClients();
 

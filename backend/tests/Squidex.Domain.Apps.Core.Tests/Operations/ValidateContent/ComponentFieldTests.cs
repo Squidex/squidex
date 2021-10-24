@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_has_no_discriminator()
         {
-            var (_, sut, components) = Field(new ComponentFieldProperties { SchemaIds = ImmutableList.Create(schemaId1, schemaId2) });
+            var (_, sut, components) = Field(new ComponentFieldProperties { SchemaIds = ReadonlyList.Create(schemaId1, schemaId2) });
 
             await sut.ValidateAsync(CreateValue(null, "field", 1), errors, components: components);
 

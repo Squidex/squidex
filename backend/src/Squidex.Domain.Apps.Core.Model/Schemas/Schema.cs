@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public SchemaProperties Properties { get; private set; } = new SchemaProperties();
 
-        public ImmutableDictionary<string, string> PreviewUrls { get; private set; } = ImmutableDictionary.Empty<string, string>();
+        public ReadonlyDictionary<string, string> PreviewUrls { get; private set; } = ReadonlyDictionary.Empty<string, string>();
 
         public IReadOnlyList<RootField> Fields
         {
@@ -218,9 +218,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema SetPreviewUrls(ImmutableDictionary<string, string>? previewUrls)
+        public Schema SetPreviewUrls(ReadonlyDictionary<string, string>? previewUrls)
         {
-            previewUrls ??= ImmutableDictionary.Empty<string, string>();
+            previewUrls ??= ReadonlyDictionary.Empty<string, string>();
 
             if (PreviewUrls.Equals(previewUrls))
             {

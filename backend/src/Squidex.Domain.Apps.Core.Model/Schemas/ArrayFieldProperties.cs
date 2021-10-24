@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxItems { get; init; }
 
-        public ImmutableList<string>? UniqueFields { get; init; }
+        public ReadonlyList<string>? UniqueFields { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

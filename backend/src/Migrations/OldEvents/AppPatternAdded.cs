@@ -36,7 +36,7 @@ namespace Migrations.OldEvents
         {
             var newSettings = new AppSettings
             {
-                Patterns = ImmutableList.ToImmutableList(new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
+                Patterns = ReadonlyList.ToReadonlyList(new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
                 {
                     new Pattern(Name, Pattern)
                     {

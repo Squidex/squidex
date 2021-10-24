@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddComponent(11, "my-component", Partitioning.Invariant,
                         new ComponentFieldProperties { SchemaId = Ref1Id.Id })
                     .AddComponents(12, "my-components", Partitioning.Invariant,
-                        new ComponentsFieldProperties { SchemaIds = ImmutableList.Create(Ref1.Id, Ref2.Id) })
+                        new ComponentsFieldProperties { SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
                     .AddTags(13, "my-tags", Partitioning.Invariant,
                         new TagsFieldProperties())
                     .AddArray(100, "my-array", Partitioning.Invariant, f => f

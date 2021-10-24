@@ -18,9 +18,9 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public bool IsOptional { get; }
 
-        public ImmutableList<Language> Fallbacks { get; } = ImmutableList.Empty<Language>();
+        public ReadonlyList<Language> Fallbacks { get; } = ReadonlyList.Empty<Language>();
 
-        public LanguageConfig(bool isOptional = false, ImmutableList<Language>? fallbacks = null)
+        public LanguageConfig(bool isOptional = false, ReadonlyList<Language>? fallbacks = null)
         {
             IsOptional = isOptional;
 
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             if (Fallbacks.Any(x => x.Iso2Code == self) || Fallbacks.Any(x => !allowed.ContainsKey(x)))
             {
-                var cleaned = Fallbacks.Where(x => x.Iso2Code != self && allowed.ContainsKey(x.Iso2Code)).ToImmutableList();
+                var cleaned = Fallbacks.Where(x => x.Iso2Code != self && allowed.ContainsKey(x.Iso2Code)).ToReadonlyList();
 
                 return new LanguageConfig(IsOptional, cleaned);
             }

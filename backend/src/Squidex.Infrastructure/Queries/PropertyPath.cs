@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class PropertyPath : ImmutableList<string>
+    public sealed class PropertyPath : ReadonlyList<string>
     {
         private static readonly char[] Separators = { '.', '/' };
 

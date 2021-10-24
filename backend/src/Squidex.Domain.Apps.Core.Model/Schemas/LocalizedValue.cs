@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class LocalizedValue<T> : ImmutableDictionary<string, T>
+    public sealed class LocalizedValue<T> : ReadonlyDictionary<string, T>
     {
         public LocalizedValue()
         {

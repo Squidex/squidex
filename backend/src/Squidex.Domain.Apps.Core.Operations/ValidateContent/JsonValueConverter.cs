@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         }
 
         private static (object? Result, JsonError? Error) ConvertToComponentList(IJsonValue value,
-            ResolvedComponents components, ImmutableList<DomainId>? allowedIds)
+            ResolvedComponents components, ReadonlyList<DomainId>? allowedIds)
         {
             if (value is JsonArray array)
             {
@@ -246,7 +246,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         }
 
         private static (Component? Result, JsonError? Error) ConvertToComponent(IJsonValue value,
-            ResolvedComponents components, ImmutableList<DomainId>? allowedIds)
+            ResolvedComponents components, ReadonlyList<DomainId>? allowedIds)
         {
             if (value is not JsonObject obj)
             {

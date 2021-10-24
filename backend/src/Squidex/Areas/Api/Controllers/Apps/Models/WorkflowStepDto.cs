@@ -65,7 +65,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public WorkflowStep ToWorkflowStep()
         {
             return new WorkflowStep(
-                Transitions?.ToImmutableDictionary(
+                Transitions?.ToReadonlyDictionary(
                     y => y.Key,
                     y => y.Value?.ToWorkflowTransition()!),
                 Color,

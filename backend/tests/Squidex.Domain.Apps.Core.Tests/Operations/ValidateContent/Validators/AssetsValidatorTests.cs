@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         [Fact]
         public async Task Should_add_error_if_image_has_invalid_extension()
         {
-            var sut = Validator(new AssetsFieldProperties { AllowedExtensions = ImmutableList.Create("mp4") });
+            var sut = Validator(new AssetsFieldProperties { AllowedExtensions = ReadonlyList.Create("mp4") });
 
             await sut.ValidateAsync(CreateValue(Document.AssetId, Image1.AssetId), errors);
 

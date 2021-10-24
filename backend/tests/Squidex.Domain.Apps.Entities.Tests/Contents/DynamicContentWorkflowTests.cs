@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Draft] = WorkflowTransition.Always
-                        }.ToImmutableDictionary(),
+                        }.ToReadonlyDictionary(),
                         StatusColors.Archived, NoUpdate.Always),
                 [Status.Draft] =
                     new WorkflowStep(
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Published] = WorkflowTransition.When("data.field.iv === 2", "Editor")
-                        }.ToImmutableDictionary(),
+                        }.ToReadonlyDictionary(),
                         StatusColors.Draft),
                 [Status.Published] =
                     new WorkflowStep(
@@ -56,9 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Draft] = WorkflowTransition.Always
-                        }.ToImmutableDictionary(),
+                        }.ToReadonlyDictionary(),
                         StatusColors.Published, NoUpdate.When("data.field.iv === 2", "Owner", "Editor"))
-            }.ToImmutableDictionary());
+            }.ToReadonlyDictionary());
 
         public DynamicContentWorkflowTests()
         {
@@ -73,17 +73,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Published] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Draft] = WorkflowTransition.Always
-                            }.ToImmutableDictionary(),
+                            }.ToReadonlyDictionary(),
                             StatusColors.Published)
-                }.ToImmutableDictionary(),
-                ImmutableList.Create(simpleSchemaId.Id));
+                }.ToReadonlyDictionary(),
+                ReadonlyList.Create(simpleSchemaId.Id));
 
             var workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow);
 

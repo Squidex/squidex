@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             {
                 Settings = new AppSettings
                 {
-                    Patterns = ImmutableList.Create(
+                    Patterns = ReadonlyList.Create(
                         new Pattern(null!, "[a-z]"))
                 }
             };
@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             {
                 Settings = new AppSettings
                 {
-                    Patterns = ImmutableList.Create(
+                    Patterns = ReadonlyList.Create(
                         new Pattern("name", null!))
                 }
             };
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             {
                 Settings = new AppSettings
                 {
-                    Editors = ImmutableList.Create(
+                    Editors = ReadonlyList.Create(
                         new Editor(null!, "[a-z]"))
                 }
             };
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             {
                 Settings = new AppSettings
                 {
-                    Editors = ImmutableList.Create(
+                    Editors = ReadonlyList.Create(
                         new Editor("name", null!))
                 }
             };
@@ -238,9 +238,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
             {
                 Settings = new AppSettings
                 {
-                    Patterns = ImmutableList.Create(
+                    Patterns = ReadonlyList.Create(
                         new Pattern("name", "[a-z]")),
-                    Editors = ImmutableList.Create(
+                    Editors = ReadonlyList.Create(
                         new Editor("name", "url/to/editor"))
                 }
             };

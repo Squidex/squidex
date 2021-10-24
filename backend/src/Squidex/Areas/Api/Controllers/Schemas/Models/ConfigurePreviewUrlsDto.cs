@@ -17,7 +17,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         {
             return new ConfigurePreviewUrls
             {
-                PreviewUrls = new Dictionary<string, string>(this).ToImmutableDictionary()
+                PreviewUrls = new Dictionary<string, string>(this).ToReadonlyDictionary()
             };
         }
     }

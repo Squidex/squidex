@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The fields that must be unique.
         /// </summary>
-        public ImmutableList<string>? UniqueFields { get; set; }
+        public ReadonlyList<string>? UniqueFields { get; set; }
 
         public override FieldProperties ToProperties()
         {

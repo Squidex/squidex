@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return default;
         }
 
-        private IGraphType? ResolveReferences(FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        private IGraphType? ResolveReferences(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
         {
             IGraphType? contentType = null;
 
@@ -219,7 +219,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return contentType;
         }
 
-        private IGraphType? ResolveComponent(FieldInfo fieldInfo, ImmutableList<DomainId>? schemaIds)
+        private IGraphType? ResolveComponent(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
         {
             IGraphType? componentType = null;
 

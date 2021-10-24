@@ -43,10 +43,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Settings = new AppSettings
                 {
-                    Editors = Editors?.Select(x => x.ToEditor()).ToImmutableList()!,
+                    Editors = Editors?.Select(x => x.ToEditor()).ToReadonlyList()!,
                     HideScheduler = HideScheduler,
                     HideDateTimeModeButton = HideDateTimeModeButton,
-                    Patterns = Patterns?.Select(x => x.ToPattern()).ToImmutableList()!
+                    Patterns = Patterns?.Select(x => x.ToPattern()).ToReadonlyList()!
                 }
             };
         }

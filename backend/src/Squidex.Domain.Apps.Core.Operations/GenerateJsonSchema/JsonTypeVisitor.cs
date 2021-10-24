@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return null;
         }
 
-        private void BuildComponent(JsonSchema jsonSchema, ImmutableList<DomainId>? schemaIds, Args args)
+        private void BuildComponent(JsonSchema jsonSchema, ReadonlyList<DomainId>? schemaIds, Args args)
         {
             jsonSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
 

@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public ImmutableList<double>? AllowedValues { get; set; }
+        public ReadonlyList<double>? AllowedValues { get; set; }
 
         /// <summary>
         /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.

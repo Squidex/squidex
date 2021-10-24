@@ -293,7 +293,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["Web"] = "web-url"
-                }.ToImmutableDictionary()
+                }.ToReadonlyDictionary()
             };
 
             await ExecuteCreateAsync();

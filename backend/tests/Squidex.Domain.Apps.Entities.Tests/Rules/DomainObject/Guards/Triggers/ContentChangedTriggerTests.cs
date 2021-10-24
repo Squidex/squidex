@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
         {
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(new ContentChangedTriggerSchemaV2())
+                Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2())
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
 
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
+                Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
         {
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Empty<ContentChangedTriggerSchemaV2>()
+                Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers
 
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
+                Schemas = ReadonlyList.Create(new ContentChangedTriggerSchemaV2 { SchemaId = schemaId.Id })
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId.Id, trigger, appProvider);

@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public FieldSurrogate[] Fields { get; set; }
 
-        public ImmutableDictionary<string, string>? PreviewUrls { get; set; }
+        public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
 
         public bool IsSingleton
         {

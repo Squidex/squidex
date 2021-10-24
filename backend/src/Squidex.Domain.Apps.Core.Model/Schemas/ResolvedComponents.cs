@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class ResolvedComponents : ImmutableDictionary<DomainId, Schema>
+    public sealed class ResolvedComponents : ReadonlyDictionary<DomainId, Schema>
     {
         public static readonly ResolvedComponents Empty = new ResolvedComponents();
 

@@ -13,9 +13,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed record ReferencesFieldProperties : FieldProperties
     {
-        public LocalizedValue<ImmutableList<string>?> DefaultValues { get; init; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
 
-        public ImmutableList<string>? DefaultValue { get; init; }
+        public ReadonlyList<string>? DefaultValue { get; init; }
 
         public int? MinItems { get; init; }
 
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 if (value != default)
                 {
-                    SchemaIds = ImmutableList.Create(value);
+                    SchemaIds = ReadonlyList.Create(value);
                 }
                 else
                 {
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
         }
 
-        public ImmutableList<DomainId>? SchemaIds { get; init; }
+        public ReadonlyList<DomainId>? SchemaIds { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

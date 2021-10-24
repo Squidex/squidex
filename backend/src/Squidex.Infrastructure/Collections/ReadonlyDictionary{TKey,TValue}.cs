@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Collections
 {
-    public class ImmutableDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ImmutableDictionary<TKey, TValue>> where TKey : notnull
+    public class ReadonlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ReadonlyDictionary<TKey, TValue>> where TKey : notnull
     {
         private static readonly Dictionary<TKey, TValue> EmptyInner = new Dictionary<TKey, TValue>();
         private readonly IDictionary<TKey, TValue> inner;
@@ -45,12 +45,12 @@ namespace Squidex.Infrastructure.Collections
             get => inner.Count;
         }
 
-        public ImmutableDictionary()
+        public ReadonlyDictionary()
             : this(EmptyInner)
         {
         }
 
-        public ImmutableDictionary(IDictionary<TKey, TValue> inner)
+        public ReadonlyDictionary(IDictionary<TKey, TValue> inner)
         {
             Guard.NotNull(inner, nameof(inner));
 
@@ -84,10 +84,10 @@ namespace Squidex.Infrastructure.Collections
 
         public override bool Equals(object? obj)
         {
-            return Equals(obj as ImmutableDictionary<TKey, TValue>);
+            return Equals(obj as ReadonlyDictionary<TKey, TValue>);
         }
 
-        public bool Equals(ImmutableDictionary<TKey, TValue>? other)
+        public bool Equals(ReadonlyDictionary<TKey, TValue>? other)
         {
             return this.EqualsDictionary(other);
         }

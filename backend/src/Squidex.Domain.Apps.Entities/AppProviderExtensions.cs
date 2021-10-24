@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities
 
             var appId = schema.AppId.Id;
 
-            async Task ResolveWithIdsAsync(IField field, ImmutableList<DomainId>? schemaIds)
+            async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
             {
                 if (schemaIds != null)
                 {

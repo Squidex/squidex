@@ -41,17 +41,17 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var lhs = new TagsFieldProperties
             {
-                DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
+                DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                 {
-                    ["iv"] = ImmutableList.Create("A", "B", "C")
+                    ["iv"] = ReadonlyList.Create("A", "B", "C")
                 })
             };
 
             var rhs = new TagsFieldProperties
             {
-                DefaultValues = new LocalizedValue<ImmutableList<string>?>(new Dictionary<string, ImmutableList<string>?>
+                DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                 {
-                    ["iv"] = ImmutableList.Create("A", "B", "C")
+                    ["iv"] = ReadonlyList.Create("A", "B", "C")
                 })
             };
 

@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         public string? Expression { get; init; }
 
-        public ImmutableList<string>? Roles { get; init; }
+        public ReadonlyList<string>? Roles { get; init; }
     }
 }

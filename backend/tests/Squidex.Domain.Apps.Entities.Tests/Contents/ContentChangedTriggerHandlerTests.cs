@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ImmutableList.Create(
+                Schemas = ReadonlyList.Create(
                     new ContentChangedTriggerSchemaV2
                     {
                         SchemaId = schemaMatch.Id
@@ -361,7 +361,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 trigger = trigger with
                 {
-                    Schemas = ImmutableList.Create(
+                    Schemas = ReadonlyList.Create(
                         new ContentChangedTriggerSchemaV2
                         {
                             SchemaId = schemaId.Id, Condition = condition

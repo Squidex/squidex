@@ -657,7 +657,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
         [Fact]
         public void CanConfigurePreviewUrls_should_not_throw_exception_if_valid()
         {
-            var command = new ConfigurePreviewUrls { PreviewUrls = ImmutableDictionary.Empty<string, string>() };
+            var command = new ConfigurePreviewUrls { PreviewUrls = ReadonlyDictionary.Empty<string, string>() };
 
             GuardSchema.CanConfigurePreviewUrls(command);
         }

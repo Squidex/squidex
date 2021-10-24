@@ -101,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The preview Urls.
         /// </summary>
         [LocalizedRequired]
-        public ImmutableDictionary<string, string> PreviewUrls { get; set; }
+        public ReadonlyDictionary<string, string> PreviewUrls { get; set; }
 
         /// <summary>
         /// The name of fields that are used in content lists.

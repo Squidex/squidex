@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class FieldRules : ImmutableList<FieldRule>
+    public sealed class FieldRules : ReadonlyList<FieldRule>
     {
         public static readonly FieldRules Empty = new FieldRules(new List<FieldRule>());
 
