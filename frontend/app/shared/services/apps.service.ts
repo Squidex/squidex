@@ -47,8 +47,7 @@ export class AppDto {
         public readonly permissions: ReadonlyArray<string>,
         public readonly canAccessApi: boolean,
         public readonly canAccessContent: boolean,
-        public readonly planName: string | undefined,
-        public readonly planUpgrade: string | undefined,
+        public readonly roleName: string | undefined,
         public readonly roleProperties: {},
     ) {
         this._links = links;
@@ -326,8 +325,7 @@ function parseApp(response: any) {
         response.permissions,
         response.canAccessApi,
         response.canAccessContent,
-        response.planName,
-        response.planUpgrade,
+        response.roleName,
         response.roleProperties);
 }
 

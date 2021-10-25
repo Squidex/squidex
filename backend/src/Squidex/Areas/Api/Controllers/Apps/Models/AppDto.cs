@@ -84,6 +84,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public bool CanAccessContent { get; set; }
 
         /// <summary>
+        /// The role name of the user.
+        /// </summary>
+        public string? RoleName { get; set; }
+
+        /// <summary>
         /// The properties from the role.
         /// </summary>
         [LocalizedRequired]
@@ -101,6 +106,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 isContributor = true;
 
+                result.RoleName = roleName;
+                result.RoleProperties = role.Properties;
+                result.Permissions = permissions.ToIds();
+
+                permissions = role.Permissions;
+            }
+            else if (app.Clients.TryGetValue(userId, out var client) && app.Roles.TryGet(app.Name, client.Role, isFrontend, out role))
+            {
+                result.RoleName = roleName;
                 result.RoleProperties = role.Properties;
                 result.Permissions = permissions.ToIds();
 
