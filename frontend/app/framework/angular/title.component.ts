@@ -10,6 +10,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TitleService } from '@app/framework/internal';
+import { Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-title[message]',
@@ -17,7 +18,7 @@ import { TitleService } from '@app/framework/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TitleComponent implements OnDestroy, OnChanges {
-    private previous: any;
+    private previousIndex: undefined | number;
 
     @Input()
     public url: any[] = ['./'];
@@ -36,13 +37,11 @@ export class TitleComponent implements OnDestroy, OnChanges {
         const routeTree = this.router.createUrlTree(this.url, { relativeTo: this.route });
         const routeUrl = this.router.serializeUrl(routeTree);
 
-        this.titleService.push(this.message, this.previous, routeUrl);
-
-        this.previous = this.message;
+        this.previousIndex = this.titleService.push(this.message, this.previousIndex, routeUrl);
     }
 
     public ngOnDestroy() {
-        if (this.previous) {
+        if (Types.isNumber(this.previousIndex)) {
             this.titleService.pop();
         }
     }

@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Types } from './../utils/types';
 import { LocalizerService } from './localizer.service';
 
 export class TitlesConfig {
@@ -43,7 +44,9 @@ export class TitleService {
         });
     }
 
-    public push(value: string, previous?: string, route?: any) {
+    public push(value: string, index?: number, route?: any) {
+        let result: number | undefined;
+
         if (value) {
             const clone = [...this.path$.value];
 
@@ -52,14 +55,20 @@ export class TitleService {
 
             const title = { localized, value, route };
 
-            if (previous && clone[lastIndex].value === previous) {
-                clone[lastIndex] = title;
+            if (Types.isNumber(index) && index >= 0 && index <= lastIndex) {
+                clone[index] = title;
+
+                result = index;
             } else {
                 clone.push(title);
+
+                result = lastIndex + 1;
             }
 
             this.path$.next(clone);
         }
+
+        return result;
     }
 
     public pop() {

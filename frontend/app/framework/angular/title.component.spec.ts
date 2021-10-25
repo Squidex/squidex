@@ -31,6 +31,9 @@ describe('TitleComponent', () => {
 
         router.setup(x => x.serializeUrl(tree))
             .returns(() => 'my-url');
+
+        titleService.setup(x => x.push(It.isAnyString(), It.isAny(), It.isAny()))
+            .returns(() => 0);
     });
 
     it('should set title in service', () => {
@@ -51,7 +54,7 @@ describe('TitleComponent', () => {
 
         expect().nothing();
 
-        titleService.verify(x => x.push('title2', 'title1', 'my-url'), Times.once());
+        titleService.verify(x => x.push('title2', 0, 'my-url'), Times.once());
     });
 
     it('should remove title on destroy if set before', () => {

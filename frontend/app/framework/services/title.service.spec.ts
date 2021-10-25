@@ -44,14 +44,24 @@ describe('TitleService', () => {
         expect(document.title).toBe('my-title1 | my-title2');
     });
 
-    it('should replace previous element if found', () => {
+    it('should replace previous index if found', () => {
         const titleService = new TitleService(new TitlesConfig(), localizer.object);
 
         titleService.push('i18n:my-title1');
         titleService.push('i18n:my-title2');
-        titleService.push('i18n:my-title3', 'i18n:my-title2');
+        titleService.push('i18n:my-title3', 1);
 
         expect(document.title).toBe('my-title1 | my-title3');
+    });
+
+    it('should replace previous index if found and not last', () => {
+        const titleService = new TitleService(new TitlesConfig(), localizer.object);
+
+        titleService.push('i18n:my-title1');
+        titleService.push('i18n:my-title2');
+        titleService.push('i18n:my-title3', 0);
+
+        expect(document.title).toBe('my-title3 | my-title2');
     });
 
     it('should concatenate remainging parts if title elements are popped', () => {
