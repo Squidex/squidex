@@ -66,6 +66,7 @@ export class Profile {
             picture: this.pictureUrl,
             pictureUrl: this.pictureUrl,
             token: this.token,
+            user: this.user,
         };
 
         for (const key of Object.keys(this.user.profile)) {
