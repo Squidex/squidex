@@ -9,8 +9,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TitleService } from '@app/framework/internal';
-import { Types } from '@app/shared';
+import { TitleService, Types } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-title[message]',
