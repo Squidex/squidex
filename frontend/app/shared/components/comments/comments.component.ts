@@ -8,10 +8,10 @@
 import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { switchSafe } from '@app/framework';
 import { AppsState, AuthService, CommentDto, CommentsService, CommentsState, ContributorsState, DialogService, ResourceOwner, UpsertCommentForm } from '@app/shared/internal';
 import { MentionConfig } from 'angular-mentions';
 import { timer } from 'rxjs';
-import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 import { CommentComponent } from './comment.component';
 
 @Component({
@@ -58,7 +58,7 @@ export class CommentsComponent extends ResourceOwner implements OnChanges {
         this.commentsUrl = `apps/${this.appsState.appName}/comments/${this.commentsId}`;
         this.commentsState = new CommentsState(this.commentsUrl, this.commentsService, this.dialogs);
 
-        this.own(timer(0, 4000).pipe(switchMap(() => this.commentsState.load(true).pipe(onErrorResumeNext()))));
+        this.own(timer(0, 4000).pipe(switchSafe(() => this.commentsState.load(true))));
     }
 
     public scrollDown() {

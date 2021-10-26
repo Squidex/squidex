@@ -27,36 +27,43 @@ namespace Squidex.Web.Pipeline
 
         public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
         {
-            var httpContext = httpContextAccessor.HttpContext;
+            try
+            {
+                var httpContext = httpContextAccessor.HttpContext;
 
-            if (string.IsNullOrEmpty(httpContext?.Request?.Method))
+                if (string.IsNullOrEmpty(httpContext?.Request?.Method))
+                {
+                    return;
+                }
+
+                var requestId = GetRequestId(httpContext);
+
+                var logContext = (requestId, context: httpContext, actionContextAccessor);
+
+                writer.WriteObject("web", logContext, (ctx, w) =>
+                {
+                    w.WriteProperty("requestId", ctx.requestId);
+                    w.WriteProperty("requestPath", ctx.context.Request.Path);
+                    w.WriteProperty("requestMethod", ctx.context.Request.Method);
+
+                    var actionContext = ctx.actionContextAccessor.ActionContext;
+
+                    if (actionContext != null)
+                    {
+                        w.WriteObject("routeValues", actionContext.ActionDescriptor.RouteValues, (routeValues, r) =>
+                        {
+                            foreach (var (key, value) in routeValues)
+                            {
+                                r.WriteProperty(key, value);
+                            }
+                        });
+                    }
+                });
+            }
+            catch
             {
                 return;
             }
-
-            var requestId = GetRequestId(httpContext);
-
-            var logContext = (requestId, context: httpContext, actionContextAccessor);
-
-            writer.WriteObject("web", logContext, (ctx, w) =>
-            {
-                w.WriteProperty("requestId", ctx.requestId);
-                w.WriteProperty("requestPath", ctx.context.Request.Path);
-                w.WriteProperty("requestMethod", ctx.context.Request.Method);
-
-                var actionContext = ctx.actionContextAccessor.ActionContext;
-
-                if (actionContext != null)
-                {
-                    w.WriteObject("routeValues", actionContext.ActionDescriptor.RouteValues, (routeValues, r) =>
-                    {
-                        foreach (var (key, value) in routeValues)
-                        {
-                            r.WriteProperty(key, value);
-                        }
-                    });
-                }
-            });
         }
 
         private static string GetRequestId(HttpContext httpContext)
