@@ -134,9 +134,11 @@
                 <i class="icon-filter"></i>
             </a>
 
-            <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left" *ngIf="schema.properties.contentsSidebarUrl">
-                <i class="icon-plugin"></i>
-            </a>
+            <div *ngFor="let item of extensionData;">
+                <a class="panel-link" [routerLink]="['sidebar', item.value]" (click)="setExtensionInfo(item)" routerLinkActive="active" queryParamsHandling="preserve" [title]="item.name" titlePosition="left">
+                    <i class={{item.icon}}></i>
+                </a>
+            </div>
         </div>
     </ng-container>
 </sqx-layout>

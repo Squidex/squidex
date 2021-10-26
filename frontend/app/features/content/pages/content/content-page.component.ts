@@ -10,6 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
+import { ExtensionInfo } from '../../../../shared/state/plugin';
+import { LocalizerService } from '../../../../framework/services/localizer.service';
 
 @Component({
     selector: 'sqx-content-page',
@@ -41,6 +43,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    public extensionData: Array<ExtensionInfo>;
+    public contentSidebarExtensionData: Array<ExtensionInfo>;
+
     public confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();
     };
@@ -54,6 +59,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly router: Router,
         private readonly schemasState: SchemasState,
         private readonly tempService: TempService,
+        private readonly localizer: LocalizerService,
     ) {
         super();
 
@@ -63,6 +69,38 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             appName: appsState.appName,
             user: authService.user,
         };
+
+        this.extensionData = [];
+        this.contentSidebarExtensionData = [];
+    }
+
+    private createExtensionData(data: string, isSideBarComp: boolean) {
+        let value = [];
+        const editorUrls = data.split(',');
+        const localizeText = this.localizer.getOrKey('i18n:common.extension');
+        for (let index = 0; index < editorUrls.length; index++) {
+            const values = editorUrls[index].split('?');
+            let extensionInfo: ExtensionInfo = {
+                url: values[0],
+                icon: "icon-plugin",
+                name: `${localizeText}-${index + 1}`,
+                value: `${localizeText}-${index + 1}`,
+            }
+            if (values.length > 1) {
+                if (isSideBarComp) {
+                    const params = values[1].split('&');
+                    extensionInfo.name = params[0].split('=')[1];
+                    extensionInfo.value = `${params[0].split('=')[1]}${index + 1}`;
+                    extensionInfo.icon = params.length === 1 ? extensionInfo.icon : params[1]
+                } else {
+                    extensionInfo.name = values[1].split('=')[1];
+                    extensionInfo.value = `${values[1].split('=')[1]}${index + 1}`;
+                }
+            }
+            value.push(extensionInfo);
+        }
+
+        return value;
     }
 
     public ngOnInit() {
@@ -84,6 +122,18 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.schemasState.selectedSchema.pipe(defined())
                 .subscribe(schema => {
                     this.schema = schema;
+                    this.extensionData = [];
+                    this.contentSidebarExtensionData = [];
+                    if (this.schema && this.schema.properties) {
+                        const contentEditorData: string | undefined = this.schema.properties.contentEditorUrl;
+                        if (contentEditorData && contentEditorData !== null) {
+                            this.extensionData = this.createExtensionData(contentEditorData, false);
+                        }
+                        const contentSidebarData: string | undefined = this.schema.properties.contentSidebarUrl;
+                        if (contentSidebarData && contentSidebarData !== null) {
+                            this.contentSidebarExtensionData = this.createExtensionData(contentSidebarData, true);
+                        }
+                    }
 
                     this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
                 }));
@@ -274,6 +324,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.contentForm.load(data, isInitial);
         this.contentForm.setEnabled(!this.content || this.content.canUpdate);
     }
+
+    public setExtensionInfo(params: string) {
+        localStorage.setItem('selectedContentSidebarData', JSON.stringify(params));
+    };
 }
 
 function isOtherContent(lhs: ContentDto | undefined | null, rhs: ContentDto | undefined | null) {

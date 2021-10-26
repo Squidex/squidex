@@ -13,6 +13,8 @@ import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
+import { ExtensionInfo } from '../../../../shared/state/plugin';
+import { LocalizerService } from '../../../../framework/services/localizer.service';
 
 @Component({
     selector: 'sqx-contents-page',
@@ -45,6 +47,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
 
+    public extensionData: Array<ExtensionInfo> = [];
+
     public get disableScheduler() {
         return this.appsState.snapshot.selectedSettings?.hideScheduler === true;
     }
@@ -72,8 +76,36 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly schemasState: SchemasState,
         private readonly tempService: TempService,
         private readonly uiState: UIState,
+        private readonly localizer: LocalizerService,
     ) {
         super();
+    }
+
+    public setExtensionInfo(params: string) {
+        localStorage.setItem('selectedContentsSidebarData', JSON.stringify(params));
+    };
+
+    private createExtensionData(contentEditorData: string | undefined) {
+        if (contentEditorData && contentEditorData !== null) {
+            const editorUrls = contentEditorData.split(',');
+            for (let index = 0; index < editorUrls.length; index++) {
+                const values = editorUrls[index].split('?');
+                const localizeText = this.localizer.getOrKey('i18n:common.extension');
+                let extensionInfo: ExtensionInfo = {
+                    url: values[0],
+                    icon: "icon-plugin",
+                    name: `${localizeText}-${index + 1}`,
+                    value: `${localizeText}-${index + 1}`,
+                }
+                if (values.length > 1) {
+                    const params = values[1].split('&');
+                    extensionInfo.name = params[0].split('=')[1];
+                    extensionInfo.value = `${params[0].split('=')[1]}${index + 1}`;
+                    extensionInfo.icon = params.length === 1 ? extensionInfo.icon : params[1];
+                }
+                this.extensionData.push(extensionInfo);
+            }
+        }
     }
 
     public ngOnInit() {
@@ -97,8 +129,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             getSchemaName(this.route).pipe(switchMap(() => this.schemasState.selectedSchema.pipe(defined(), take(1))))
                 .subscribe(schema => {
                     this.resetSelection();
-
+                    this.extensionData = [];
                     this.schema = schema;
+
+                    if (this.schema && this.schema.properties) {
+                        this.createExtensionData(this.schema.properties.contentsSidebarUrl);
+                    }
 
                     this.tableView = new TableFields(this.uiState, schema);
 

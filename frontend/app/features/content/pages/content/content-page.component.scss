@@ -13,6 +13,19 @@
     a {
         padding-bottom: 1.5rem;
     }
+
+    a.custom-width {
+        min-width: 6.2rem;
+    }
+}
+
+ul.nav-tabs2 {
+    width: calc(100% - 20% - 80px);
+    overflow-y: scroll;
+}
+
+ul::-webkit-scrollbar {
+    display: none;
 }
 
 .menu {

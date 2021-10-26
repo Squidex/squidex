@@ -1,6 +1,6 @@
-<sqx-layout titleText="i18n:common.sidebar" [width]="20" [white]="true" [padding]="true" [overflow]="true">
+<sqx-layout titleText={{snapshot.name}} [width]="20" [white]="true" [padding]="true" [overflow]="true">
     <sqx-content-extension
-        [url]="url | async"
+        [url]="snapshot.url"
         [content]="contentsState.selectedContent | async"
         [contentSchema]="(schemasState.selectedSchema | async)!">
     </sqx-content-extension>

@@ -40,7 +40,7 @@ const routes: Routes = [
                                 component: ContentsFiltersPageComponent,
                             },
                             {
-                                path: 'sidebar',
+                                path: 'sidebar/:id',
                                 component: SidebarPageComponent,
                             },
                         ],
@@ -75,7 +75,7 @@ const routes: Routes = [
                                 component: CommentsPageComponent,
                             },
                             {
-                                path: 'sidebar',
+                                path: 'sidebar/:id',
                                 component: SidebarPageComponent,
                             },
                         ],
