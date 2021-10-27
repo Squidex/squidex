@@ -36,7 +36,7 @@ describe('CommentsService', () => {
                 userIds = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/watching/my-users');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/watching/my-resource');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
