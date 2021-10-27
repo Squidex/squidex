@@ -77,6 +77,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
+        public Task<bool> HasFileAsync(string name,
+            CancellationToken ct = default)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
+
+            var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
+
+            return Task.FromResult(attachmentEntry?.Length > 0);
+        }
+
         private ZipArchiveEntry GetEntry(string name)
         {
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));

@@ -26,6 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         Task ClearAsync();
 
-        Task RebuildAsync(TagsExport tags);
+        Task RenameTagAsync(string name, string newName);
+
+        Task RebuildAsync(TagsExport export);
     }
 }

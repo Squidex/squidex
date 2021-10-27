@@ -40,6 +40,15 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
+        public async Task Should_call_grain_if_renaming()
+        {
+            await sut.RenameTagAsync(appId, TagGroups.Assets, "name", "newName");
+
+            A.CallTo(() => grain.RenameTagAsync("name", "newName"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_call_grain_if_rebuilding()
         {
             var tags = new TagsExport();
