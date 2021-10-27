@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateCategoryForm, DialogModel, MessageBus, ResourceOwner, SchemaCategory, SchemaDto, SchemasState } from '@app/shared';
+import { buildSchemaFilterFunction, CreateCategoryForm, DialogModel, MessageBus, ResourceOwner, SchemaCategory, SchemaDto, SchemasState } from '@app/shared';
 import { map } from 'rxjs/operators';
 import { SchemaCloning } from './../messages';
 
@@ -22,6 +22,10 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public addCategoryForm = new CreateCategoryForm(this.formBuilder);
 
     public schemasFilter = new FormControl();
+
+    public schemaFilterFunction =
+        this.schemasFilter.valueChanges.pipe(
+            map(buildSchemaFilterFunction));
 
     public import: any;
 

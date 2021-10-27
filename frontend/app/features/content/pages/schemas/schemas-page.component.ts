@@ -7,7 +7,8 @@
 
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { LocalStoreService, SchemaCategory, SchemasState, Settings } from '@app/shared';
+import { buildSchemaFilterFunction, LocalStoreService, SchemaCategory, SchemasState, Settings } from '@app/shared';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -16,6 +17,10 @@ import { LocalStoreService, SchemaCategory, SchemasState, Settings } from '@app/
 })
 export class SchemasPageComponent {
     public schemasFilter = new FormControl();
+
+    public schemaFilterFunction =
+        this.schemasFilter.valueChanges.pipe(
+            map(buildSchemaFilterFunction));
 
     public isCollapsed: boolean;
 

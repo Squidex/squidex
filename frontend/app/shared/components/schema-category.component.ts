@@ -14,7 +14,7 @@ import { Settings } from '../state/settings';
 const ITEM_HEIGHT = 2.5;
 
 @Component({
-    selector: 'sqx-schema-category',
+    selector: 'sqx-schema-category[schemaCategory]',
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
     animations: [
@@ -30,7 +30,7 @@ export class SchemaCategoryComponent implements OnChanges {
     public schemaCategory: SchemaCategory;
 
     @Input()
-    public schemasFilter: string;
+    public schemasFilter?: ((schema: SchemaDto) => boolean) | null;
 
     @Input()
     public forContent?: boolean | null;
@@ -62,8 +62,10 @@ export class SchemaCategoryComponent implements OnChanges {
             this.filteredSchemas = this.filteredSchemas.filter(x => !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(x.name)]);
         }
 
-        if (this.schemasFilter) {
-            this.filteredSchemas = this.filteredSchemas.filter(x => x.name.indexOf(this.schemasFilter) >= 0);
+        const filter = this.schemasFilter;
+
+        if (filter) {
+            this.filteredSchemas = this.filteredSchemas.filter(x => filter(x));
 
             this.isCollapsed = false;
         } else {
