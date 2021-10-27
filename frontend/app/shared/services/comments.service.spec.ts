@@ -28,6 +28,25 @@ describe('CommentsService', () => {
         httpMock.verify();
     }));
 
+    it('should make get request to get watching users',
+        inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
+            let userIds: ReadonlyArray<string>;
+
+            commentsService.getWatchingUsers('my-app', 'my-resource').subscribe(result => {
+                userIds = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/watching/my-resource');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+            expect(req.request.headers.get('X-Silent')).toBe('1');
+
+            req.flush(['user1', 'user2']);
+
+            expect(userIds!).toEqual(['user1', 'user2']);
+        }));
+
     it('should make get request to get comments',
         inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
             let comments: CommentsDto;

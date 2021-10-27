@@ -15,6 +15,8 @@ using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -27,11 +29,36 @@ namespace Squidex.Areas.Api.Controllers.Comments
     public sealed class CommentsController : ApiController
     {
         private readonly ICommentsLoader commentsLoader;
+        private readonly IWatchingService watchingService;
 
-        public CommentsController(ICommandBus commandBus, ICommentsLoader commentsLoader)
+        public CommentsController(ICommandBus commandBus, ICommentsLoader commentsLoader,
+            IWatchingService watchingService)
             : base(commandBus)
         {
             this.commentsLoader = commentsLoader;
+
+            this.watchingService = watchingService;
+        }
+
+        /// <summary>
+        /// Get all watching users..
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="resource">The path to the resource.</param>
+        /// <returns>
+        /// 200 => Watching users returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/watching/{*resource}")]
+        [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetWatchingUsers(string app, string? resource = null)
+        {
+            var result = await watchingService.GetWatchingUsersAsync(App.Id, resource ?? "all", UserId());
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -139,6 +166,18 @@ namespace Squidex.Areas.Api.Controllers.Comments
             await CommandBus.PublishAsync(command);
 
             return NoContent();
+        }
+
+        private string UserId()
+        {
+            var subject = User.OpenIdSubject();
+
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                throw new DomainForbiddenException(T.Get("common.httpOnlyAsUser"));
+            }
+
+            return subject;
         }
     }
 }

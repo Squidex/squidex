@@ -52,6 +52,29 @@ export class Profile {
         public readonly user: User,
     ) {
     }
+
+    public export() {
+        const result: any = {
+            id: this.id,
+            accessToken: this.accessToken,
+            accessCode: this.accessToken,
+            authorization: this.authorization,
+            displayName: this.displayName,
+            email: this.email,
+            notifoEnabled: !!this.notifoToken,
+            notifoToken: this.notifoToken,
+            picture: this.pictureUrl,
+            pictureUrl: this.pictureUrl,
+            token: this.token,
+            user: this.user,
+        };
+
+        for (const key of Object.keys(this.user.profile)) {
+            result[key] = this.user.profile[key];
+        }
+
+        return result;
+    }
 }
 
 @Injectable()

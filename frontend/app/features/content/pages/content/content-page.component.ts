@@ -57,11 +57,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     ) {
         super();
 
+        const role = appsState.snapshot.selectedApp?.roleName;
+
         this.formContext = {
             apiUrl: apiUrl.buildUrl('api'),
             appId: contentsState.appId,
-            appName: appsState.appName,
-            user: authService.user,
+            appName: contentsState.appName,
+            user: { role, ...authService.user?.export() },
         };
     }
 
