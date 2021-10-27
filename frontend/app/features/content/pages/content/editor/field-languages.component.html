@@ -1,4 +1,4 @@
-<ng-container *ngIf="field.isLocalizable && languages.length > 1">
+<ng-container *ngIf="field.isLocalizable && languages.length > 1  && data">
     <button *ngIf="!field.properties.isComplexUI" type="button" class="btn btn-text-secondary btn-sm me-1" (click)="toggleShowAllControls()">
         <ng-container *ngIf="showAllControls; else singleLanguage">
             <span>{{ 'contents.languageModeSingle' | sqxTranslate }}</span>
@@ -14,7 +14,8 @@
             <sqx-language-selector size="sm" #buttonLanguages
                 (languageChange)="languageChange.emit($event)"
                 [language]="language"
-                [languages]="languages">
+                [languages]="languages"
+                [languagesData]="data">
             </sqx-language-selector>
         </div>
 

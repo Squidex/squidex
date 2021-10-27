@@ -12,6 +12,7 @@
                         (languageChange)="languageChange.emit($event)"
                         [language]="language"
                         [languages]="languages"
+                        [data]="getLanguageData(formModel)"
                         [showAllControls]="showAllControls"
                         (showAllControlsChange)="changeShowAllControls($event)">
                     </sqx-field-languages>
@@ -60,6 +61,7 @@
                         (languageChange)="languageChange.emit($event)"
                         [language]="language"
                         [languages]="languages"
+                        [data]="getLanguageData(formModelCompare)"
                         [showAllControls]="showAllControls"
                         (showAllControlsChange)="changeShowAllControls($event)">
                     </sqx-field-languages>

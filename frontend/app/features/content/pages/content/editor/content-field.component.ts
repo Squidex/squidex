@@ -87,6 +87,25 @@ export class ContentFieldComponent implements OnChanges {
         }
     }
 
+    public getLanguageData(form: FieldForm): Map<string, boolean> {
+        const values = new Map<string, boolean>();
+
+        if (form.field.isLocalizable) {
+            for (const language of this.languages) {
+
+                const languageModel = form.get(language);
+
+                if (form.field.properties.fieldType === 'Array') {
+                    values.set(language.iso2Code, languageModel.form.value && languageModel.form.value.length > 0);
+                } else {
+                    values.set(language.iso2Code, languageModel.form.value !== null);
+                }
+            }
+        }
+
+        return values;
+    }
+
     public changeShowAllControls(showAllControls: boolean) {
         this.showAllControls = showAllControls;
 

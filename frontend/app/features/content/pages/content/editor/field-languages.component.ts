@@ -33,6 +33,9 @@ export class FieldLanguagesComponent {
     @Input()
     public field: RootFieldDto;
 
+    @Input()
+    public data: Map<string, boolean>;
+
     public toggleShowAllControls() {
         this.showAllControlsChange.emit(!this.showAllControls);
     }

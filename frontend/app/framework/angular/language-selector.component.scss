@@ -1,3 +1,11 @@
+.btn {
+    color: $color-text-decent;
+
+    &.data {
+        color: $color-text;
+    }
+}
+
 .dropdown-menu {
     max-height: 20rem;
     overflow-x: inherit;
@@ -5,10 +13,15 @@
 }
 
 .dropdown-item {
+    color: $color-text-decent;
     cursor: pointer;
 
     td {
         padding: .25rem 1rem;
+    }
+
+    &.data {
+        color: $color-text;
     }
 }
 

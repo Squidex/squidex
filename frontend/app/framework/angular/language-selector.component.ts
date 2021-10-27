@@ -30,9 +30,16 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public languages: ReadonlyArray<Language> = [];
 
     @Input()
+    public languagesData: Map<string, boolean> = new Map<string, boolean>();
+
+    @Input()
     public size: 'sm' | 'md' | 'lg' = 'md';
 
     public dropdown = new ModalModel();
+
+    public hasData(iso2Code: string) {
+        return this.languagesData && this.languagesData.has(iso2Code) && this.languagesData.get(iso2Code) === true;
+    }
 
     public get isSmallMode(): boolean {
         return this.languages && this.languages.length > 0 && this.languages.length <= 3;

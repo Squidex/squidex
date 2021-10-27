@@ -44,6 +44,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
+    public languagesData: Map<string, boolean> = new Map<string, boolean>();
 
     public get disableScheduler() {
         return this.appsState.snapshot.selectedSettings?.hideScheduler === true;
@@ -117,6 +118,57 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(() => {
                     this.updateSelectionSummary();
                 }));
+
+        this.own(
+            combineLatest([this.schemasState.selectedSchema, this.contentsState.contents])
+                .subscribe(values => this.updateLanguageDataPresent(values[0] as SchemaDto, values[1] as ContentDto[])));
+    }
+
+    public updateLanguageDataPresent(schema: SchemaDto, contents: readonly ContentDto[]): void {
+
+        this.languagesData.clear();
+
+        if (contents.length === 0) {
+            return;
+        }
+
+        for (const language of this.languages) {
+
+            const languageDataFound = this.languagesData.get(language.iso2Code) === true;
+
+            if (languageDataFound) {
+                continue;
+            }
+
+            for (const field of schema.fields.filter(f => f.isLocalizable)) {
+
+                let contentFoundWithLanguage = false;
+
+                for (const content of contents) {
+
+                    const hasLanguage = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code);
+
+                    if (hasLanguage) {
+
+                        const languageValue = content.data[field.name][language.iso2Code];
+                        
+                        console.log(languageValue);
+
+                        contentFoundWithLanguage = field.properties.fieldType === 'Array' ? languageValue !== undefined && languageValue.length > 0 : languageValue !== null;
+
+                        if (contentFoundWithLanguage) {
+                            break;
+                        }
+                    }
+                }
+
+                this.languagesData.set(language.iso2Code, contentFoundWithLanguage);
+
+                if (contentFoundWithLanguage) {
+                    break;
+                }
+            }
+        }
     }
 
     public reload() {
