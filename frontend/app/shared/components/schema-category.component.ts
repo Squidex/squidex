@@ -63,11 +63,12 @@ export class SchemaCategoryComponent implements OnChanges {
         }
 
         if (this.schemasFilter) {
-            const regex = new RegExp('/[^a-z\d]/gi');
-            const terms = this.schemasFilter.trim().split(' ').map(x => x.trim());
-            const searchSchemas = this.filteredSchemas.map(schema => ({ schema, values: schema.name.split(regex).concat((schema.properties.label ?? '').split(regex)) }));
-            this.filteredSchemas = searchSchemas.filter(search => terms.every(term => search.values.some(value => value.search(new RegExp(term, 'gi')) > -1))).map(search => search.schema);
-
+            const terms = this.schemasFilter.trim().split(' ').map(x => new RegExp(x.trim(), 'i'));
+            const matches = (value: string | undefined | null) => value && terms.every(term => value.search(term) >= 0);
+            this.filteredSchemas = this.filteredSchemas.filter(x => 
+                matches(x.name) || 
+                matches(x.properties.label) || 
+                matches(x.properties.hints));
             this.isCollapsed = false;
         } else {
             this.isCollapsed = this.localStore.getBoolean(this.configKey());
