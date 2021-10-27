@@ -63,7 +63,10 @@ export class SchemaCategoryComponent implements OnChanges {
         }
 
         if (this.schemasFilter) {
-            this.filteredSchemas = this.filteredSchemas.filter(x => x.name.indexOf(this.schemasFilter) >= 0);
+            const regex = new RegExp('/[^a-z\d]/gi');
+            const terms = this.schemasFilter.trim().split(' ').map(x => x.trim());
+            const searchSchemas = this.filteredSchemas.map(schema => ({ schema, values: schema.name.split(regex).concat((schema.properties.label ?? '').split(regex)) }));
+            this.filteredSchemas = searchSchemas.filter(search => terms.every(term => search.values.some(value => value.search(new RegExp(term, 'gi')) > -1))).map(search => search.schema);
 
             this.isCollapsed = false;
         } else {
