@@ -419,3 +419,16 @@ function buildCategories(categories: Set<string>, allSchemas: SchemasList): Read
 
     return result;
 }
+
+export function buildSchemaFilterFunction(filter: string): (schema: SchemaDto) => boolean {
+    const terms = filter.split(' ').map(filter => new RegExp(filter.trim(), 'i'));
+
+    const matches = (value: string | undefined | null) => {
+        return !!value && terms.every(term => value.search(term) >= 0);
+    };
+
+    return (schema: SchemaDto) =>
+        matches(schema.name) ||
+        matches(schema.properties.label) ||
+        matches(schema.properties.hints);
+}

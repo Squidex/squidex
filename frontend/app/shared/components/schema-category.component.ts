@@ -14,7 +14,7 @@ import { Settings } from '../state/settings';
 const ITEM_HEIGHT = 2.5;
 
 @Component({
-    selector: 'sqx-schema-category',
+    selector: 'sqx-schema-category[schemaCategory]',
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
     animations: [
@@ -30,7 +30,7 @@ export class SchemaCategoryComponent implements OnChanges {
     public schemaCategory: SchemaCategory;
 
     @Input()
-    public schemasFilter: string;
+    public schemasFilter?: ((schema: SchemaDto) => boolean) | null;
 
     @Input()
     public forContent?: boolean | null;
@@ -62,13 +62,11 @@ export class SchemaCategoryComponent implements OnChanges {
             this.filteredSchemas = this.filteredSchemas.filter(x => !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(x.name)]);
         }
 
-        if (this.schemasFilter) {
-            const terms = this.schemasFilter.trim().split(' ').map(x => new RegExp(x.trim(), 'i'));
-            const matches = (value: string | undefined | null) => value && terms.every(term => value.search(term) >= 0);
-            this.filteredSchemas = this.filteredSchemas.filter(x => 
-                matches(x.name) || 
-                matches(x.properties.label) || 
-                matches(x.properties.hints));
+        const filter = this.schemasFilter;
+
+        if (filter) {
+            this.filteredSchemas = this.filteredSchemas.filter(x => filter(x));
+
             this.isCollapsed = false;
         } else {
             this.isCollapsed = this.localStore.getBoolean(this.configKey());
