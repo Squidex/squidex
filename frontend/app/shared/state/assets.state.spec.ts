@@ -373,5 +373,16 @@ describe('AssetsState', () => {
 
             expect(assetsState.snapshot.folders.length).toBe(1);
         });
+
+        it('should replace tags if renamed', () => {
+            const newTags = {};
+
+            assetsService.setup(x => x.putTag(app, 'old-name', { tagName: 'new-name' }))
+                .returns(() => of(newTags));
+
+            assetsState.renameTag('old-name', 'new-name').subscribe();
+
+            expect(assetsState.snapshot.tagsAvailable).toBe(newTags);
+        });
     });
 });

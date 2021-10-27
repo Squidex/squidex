@@ -22,6 +22,10 @@ export class AssetsDto extends ResultSet<AssetDto> {
     public get canCreate() {
         return hasAnyLink(this._links, 'create');
     }
+
+    public get canRenameTag() {
+        return hasAnyLink(this._links, 'tags/rename');
+    }
 }
 
 export class AssetDto {
@@ -150,6 +154,9 @@ export type CreateAssetFolderDto =
 export type RenameAssetFolderDto =
     Readonly<{ folderName: string }>;
 
+export type RenameAssetTagDto =
+    Readonly<{ tagName: string }>;
+
 export type MoveAssetItemDto =
     Readonly<{ parentId?: string }>;
 
@@ -165,10 +172,18 @@ export class AssetsService {
     ) {
     }
 
+    public putTag(appName: string, name: string, dto: RenameAssetTagDto): Observable<{ [name: string]: number }> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags/${encodeURIComponent(name)}`);
+
+        return this.http.put<{ [name: string]: number }>(url, dto).pipe(
+            pretifyError('i18n:assets.renameTagFailed'));
+    }
+
     public getTags(appName: string): Observable<{ [name: string]: number }> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags`);
 
-        return this.http.get<{ [name: string]: number }>(url);
+        return this.http.get<{ [name: string]: number }>(url).pipe(
+            pretifyError('i18n:assets.loadTagsFailed'));
     }
 
     public getAssets(appName: string, q?: AssetQueryDto): Observable<AssetsDto> {
