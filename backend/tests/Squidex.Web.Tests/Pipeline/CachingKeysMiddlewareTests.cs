@@ -215,6 +215,21 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_append_surrogate_and_ecape_if_necessary()
+        {
+            var id = DomainId.Create("id@domain");
+
+            cachingOptions.MaxSurrogateKeysSize = 100;
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id, 12);
+            });
+
+            Assert.Equal("id%40domain", httpContext.Response.Headers["Surrogate-Key"]);
+        }
+
+        [Fact]
         public async Task Should_append_surrogate_keys()
         {
             var id1 = DomainId.NewGuid();

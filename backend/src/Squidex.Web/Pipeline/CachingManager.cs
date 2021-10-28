@@ -115,16 +115,18 @@ namespace Squidex.Web.Pipeline
                     {
                         foreach (var key in keys)
                         {
+                            var encoded = Uri.EscapeDataString(key);
+
                             if (stringBuilder.Length == 0)
                             {
-                                if (stringBuilder.Length + key.Length > maxKeysSize)
+                                if (stringBuilder.Length + encoded.Length > maxKeysSize)
                                 {
                                     break;
                                 }
                             }
                             else
                             {
-                                if (stringBuilder.Length + key.Length + 1 > maxKeysSize)
+                                if (stringBuilder.Length + encoded.Length + 1 > maxKeysSize)
                                 {
                                     break;
                                 }
@@ -132,7 +134,7 @@ namespace Squidex.Web.Pipeline
                                 stringBuilder.Append(' ');
                             }
 
-                            stringBuilder.Append(key);
+                            stringBuilder.Append(encoded);
                         }
 
                         if (stringBuilder.Length > 0)
