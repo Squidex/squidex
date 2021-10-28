@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -60,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <returns>
-        /// 200 => Assets returned.
+        /// 200 => Assets tags returned.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
@@ -78,6 +79,28 @@ namespace Squidex.Areas.Api.Controllers.Assets
             Response.Headers[HeaderNames.ETag] = tags.Version.ToString(CultureInfo.InvariantCulture);
 
             return Ok(tags);
+        }
+
+        /// <summary>
+        /// Rename an asset tag.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The tag to return.</param>
+        /// <param name="request">The required request object.</param>
+        /// <returns>
+        /// 200 => Asset tag renamed and new tags returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/assets/tags/{name}")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutTag(string app, string name, [FromBody] RenameTagDto request)
+        {
+            await tagService.RenameTagAsync(AppId, TagGroups.Assets, Uri.UnescapeDataString(name), request.TagName);
+
+            return await GetTags(app);
         }
 
         /// <summary>

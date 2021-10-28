@@ -22,19 +22,38 @@ namespace Squidex.Domain.Apps.Entities.Tags
             this.grainFactory = grainFactory;
         }
 
-        public Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId appId, string group, HashSet<string>? names, HashSet<string>? ids)
+        public Task RenameTagAsync(DomainId appId, string group, string name, string newName)
         {
-            return GetGrain(appId, group).NormalizeTagsAsync(names, ids);
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(newName, nameof(newName));
+
+            return GetGrain(appId, group).RenameTagAsync(name, newName);
+        }
+
+        public Task RebuildTagsAsync(DomainId appId, string group, TagsExport export)
+        {
+            Guard.NotNull(export, nameof(export));
+
+            return GetGrain(appId, group).RebuildAsync(export);
         }
 
         public Task<Dictionary<string, string>> GetTagIdsAsync(DomainId appId, string group, HashSet<string> names)
         {
+            Guard.NotNull(names, nameof(names));
+
             return GetGrain(appId, group).GetTagIdsAsync(names);
         }
 
         public Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId appId, string group, HashSet<string> ids)
         {
+            Guard.NotNull(ids, nameof(ids));
+
             return GetGrain(appId, group).DenormalizeTagsAsync(ids);
+        }
+
+        public Task<Dictionary<string, string>> NormalizeTagsAsync(DomainId appId, string group, HashSet<string>? names, HashSet<string>? ids)
+        {
+            return GetGrain(appId, group).NormalizeTagsAsync(names, ids);
         }
 
         public Task<TagsSet> GetTagsAsync(DomainId appId, string group)
@@ -45,11 +64,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
         public Task<TagsExport> GetExportableTagsAsync(DomainId appId, string group)
         {
             return GetGrain(appId, group).GetExportableTagsAsync();
-        }
-
-        public Task RebuildTagsAsync(DomainId appId, string group, TagsExport tags)
-        {
-            return GetGrain(appId, group).RebuildAsync(tags);
         }
 
         public Task ClearAsync(DomainId appId, string group)

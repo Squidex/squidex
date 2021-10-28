@@ -48,6 +48,13 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 response.AddPostLink("create", resources.Url<AssetsController>(x => nameof(x.PostAsset), values));
             }
 
+            if (resources.CanUpdateAsset)
+            {
+                var tagValue = new { values.app, name = "tag" };
+
+                response.AddPutLink("tags/rename", resources.Url<AssetsController>(x => nameof(x.PutTag), tagValue));
+            }
+
             response.AddGetLink("tags", resources.Url<AssetsController>(x => nameof(x.GetTags), values));
 
             return response;

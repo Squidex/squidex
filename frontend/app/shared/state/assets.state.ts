@@ -50,6 +50,9 @@ interface Snapshot extends ListState<Query> {
 
     // Indicates if the user can create asset folders.
     canCreateFolders?: boolean;
+
+    // Indicates if the user can rename asset tags.
+    canRenameTag?: boolean;
 }
 
 export abstract class AssetsStateBase extends State<Snapshot> {
@@ -103,6 +106,9 @@ export abstract class AssetsStateBase extends State<Snapshot> {
 
     public canCreateFolders =
         this.project(x => x.canCreateFolders === true);
+
+    public canRenameTag =
+        this.project(x => x.canRenameTag === true);
 
     protected constructor(name: string,
         private readonly appsState: AppsState,
@@ -165,6 +171,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     folders: foldersResult.items,
                     canCreate: assetsResult.canCreate,
                     canCreateFolders: foldersResult.canCreate,
+                    canRenameTag: assetsResult.canRenameTag,
                     isLoaded: true,
                     isLoadedOnce: true,
                     isLoading: false,
@@ -324,6 +331,18 @@ export abstract class AssetsStateBase extends State<Snapshot> {
 
                     return { ...s, folders };
                 }, 'Folder Deleted');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public renameTag(name: string, tagName: string): Observable<any> {
+        return this.assetsService.putTag(this.appName, name, { tagName }).pipe(
+            tap(tags => {
+                this.next(s => {
+                    const tagsAvailable = tags;
+
+                    return { ...s, tagsAvailable };
+                }, 'Tag Renamed');
             }),
             shareSubscribed(this.dialogs));
     }

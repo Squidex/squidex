@@ -2,6 +2,7 @@
     <h3>{{ 'common.tags' | sqxTranslate }}</h3>
 
     <sqx-asset-tags (reset)="resetTags()"
+        [canRename]="(assetsState.canRenameTag | async)!"
         [tags]="(assetsState.tags | async)!"
         [tagsSelected]="(assetsState.tagsSelected | async)!"
         (toggle)="toggleTag($event)">
