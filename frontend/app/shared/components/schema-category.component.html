@@ -1,4 +1,4 @@
-<ul *ngIf="!forContent || filteredSchemas.length > 0" class="nav nav-light flex-column"
+<ul *ngIf="!forContent || schemas.length > 0" class="nav nav-light flex-column"
     cdkDropList
     cdkDropListSortingDisabled
     [cdkDropListData]="schemaCategory.name"
@@ -17,8 +17,8 @@
                 </div>
             </div>
             <div class="col-auto">
-                <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
-                    <span class="badge rounded-pill badge-secondary">{{filteredSchemas.length}}</span>
+                <ng-container *ngIf="schemas.length > 0; else noSchemas">
+                    <span class="badge rounded-pill badge-secondary">{{schemas.length}}</span>
                 </ng-container>
                 <ng-template #noSchemas>
                     <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()" *ngIf="schemaCategory.name">
@@ -31,7 +31,7 @@
 
     <div *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
         <ng-container *ngIf="!forContent; else simpleMode">
-            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
+            <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
                 cdkDrag
                 cdkDragLockAxis="y"
                 [cdkDragData]="schema"
@@ -46,7 +46,7 @@
         </ng-container>
     
         <ng-template #simpleMode>
-            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate">
+            <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate">
                 <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
                     {{schema.displayName}}
                 </a>

@@ -18,11 +18,9 @@
             </li>
         </ul>
     
-        <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
-            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-                [schemaCategory]="category"
-                [schemasFilter]="schemaFilterFunction | async"
-                [forContent]="true">
+        <ng-container>
+            <sqx-schema-category *ngFor="let category of categories | async; trackBy: trackByCategory"
+                [schemaCategory]="category" [forContent]="true">
             </sqx-schema-category>
         </ng-container>
     </ng-container>

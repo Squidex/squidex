@@ -21,10 +21,8 @@
 
     <ng-container>
         <div cdkDropListGroup>
-            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-                [schemaCategory]="category"
-                [schemasFilter]="schemaFilterFunction | async"
-                (remove)="removeCategory(category.displayName)">
+            <sqx-schema-category *ngFor="let category of categories | async; trackBy: trackByCategory"
+                [schemaCategory]="category" (remove)="removeCategory(category.displayName)">
             </sqx-schema-category>
         </div>
 
