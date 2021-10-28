@@ -1,58 +1,72 @@
-<ul *ngIf="!forContent || filteredSchemas.length > 0" class="nav nav-light flex-column"
-    cdkDropList
-    cdkDropListSortingDisabled
-    [cdkDropListData]="schemaCategory.name"
-    (cdkDropListDropped)="changeCategory($event)">
+<ul [hidden]="forContent && filteredHierarchicalSchemaCount == 0" id="cat_{{schemaCategory.name}}" class="nav nav-light flex-column">
 
-    <li class="nav-item nav-heading">
-        <div class="row g-0 align-items-center mb-1">
-            <div class="col-auto">
-                <button type="button" class="btn btn-sm btn-decent btn-text-secondary btn-toggle" (click)="toggle()">
-                    <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
-                </button>
-            </div>
-            <div class="col">
-                <div class="truncate">
-                    {{schemaCategory.displayName | sqxTranslate}}
+    <div class="droppable category"
+        cdkDropList
+        cdkDropListSortingDisabled
+        [cdkDropListData]="schemaCategory.name"
+        (cdkDropListDropped)="changeCategory($event)">
+
+        <li class="nav-item nav-heading">
+            <div class="row g-0 align-items-center mb-1">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-decent btn-text-secondary btn-toggle" (click)="toggle()">
+                        <i [class.icon-caret-right]="isCollapsed" [class.icon-caret-down]="!isCollapsed"></i> 
+                    </button>
+                </div>
+                <div class="col">
+                    <div class="truncate">
+                        {{schemaCategory.displayName | sqxTranslate}}
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <ng-container *ngIf="schemaCategory.count > 0; else noSchemas">
+                        <span class="badge rounded-pill badge-secondary">{{filteredHierarchicalSchemaCount}}</span>
+                    </ng-container>
+                    <ng-template #noSchemas>
+                        <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit(schemaCategory.name)" *ngIf="schemaCategory.name && schemaCategory.categories.length == 0">
+                            <i class="icon-bin2"></i> 
+                        </button>
+                    </ng-template>
                 </div>
             </div>
-            <div class="col-auto">
-                <ng-container *ngIf="schemaCategory.schemas.length > 0; else noSchemas">
-                    <span class="badge rounded-pill badge-secondary">{{filteredSchemas.length}}</span>
-                </ng-container>
-                <ng-template #noSchemas>
-                    <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit()" *ngIf="schemaCategory.name">
-                        <i class="icon-bin2"></i> 
-                    </button>
-                </ng-template>
-            </div>
+        </li>
+
+        <div [hidden]="isCollapsed" @fade [style.height]="getContainerHeight()">
+            <ng-container *ngIf="!forContent; else simpleMode">
+                <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
+                    cdkDrag
+                    [cdkDragData]="schema"
+                    (cdkDragStarted)="dragStarted($event)">
+
+                    <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
+                        <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+
+                        <span class="item-published me-1" [class.unpublished]="!schema.isPublished" id="schema_{{schema.name}}"></span> {{schema.displayName}}
+                    </a>
+                </li>
+            </ng-container>
+        
+            <ng-template #simpleMode>
+                <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate">
+                    <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" id="schema_{{schema.name}}" titlePosition="top-left">
+                        {{schema.displayName}}
+                    </a>
+                </li>
+            </ng-template>
+
         </div>
-    </li>
 
-    <div *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
-        <ng-container *ngIf="!forContent; else simpleMode">
-            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
-                cdkDrag
-                cdkDragLockAxis="y"
-                [cdkDragData]="schema"
-                (cdkDragStarted)="dragStarted($event)">
-
-                <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
-                    <i cdkDragHandle class="icon-drag2 drag-handle"></i>
-
-                    <span class="item-published me-1" [class.unpublished]="!schema.isPublished"></span> {{schema.displayName}}
-                </a>
-            </li>
-        </ng-container>
-    
-        <ng-template #simpleMode>
-            <li *ngFor="let schema of filteredSchemas; trackBy: trackBySchema" class="nav-item truncate">
-                <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
-                    {{schema.displayName}}
-                </a>
-            </li>
-        </ng-template>
+        <div class="drop-indicator"></div>
     </div>
 
-    <div class="drop-indicator"></div>
+
+    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" [hidden]="isCollapsed" @fade>
+        <sqx-schema-category *ngFor="let category of schemaCategory.categories; trackBy: trackByCategory"
+            [schemaCategory]="category"
+            [schemasFilter]="schemasFilter"
+            [forContent]="forContent"
+            (remove)="remove.emit($event)"
+            (schemaCountUpdated)="childSchemaCountUpdate(category.name || '', $event)">
+        </sqx-schema-category>
+    </div>
 </ul>

@@ -35,7 +35,7 @@ interface Snapshot {
 }
 
 export type SchemasList = ReadonlyArray<SchemaDto>;
-export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[] };
+export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[]; count: number; categories: Array<SchemaCategory>;  };
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
@@ -57,11 +57,14 @@ export class SchemasState extends State<Snapshot> {
     public publishedSchemas =
         this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
 
-    public categoryNames =
+    public addedCategories =
         this.project(x => x.categories);
 
     public categories =
-        this.projectFrom2(this.schemas, this.categoryNames, (s, c) => buildCategories(c, s));
+        this.projectFrom2(this.schemas, this.addedCategories, (s, c) => buildNestedCategories(c, s));
+
+    public categoryNames =
+        this.projectFrom2(this.schemas, this.addedCategories, (s, c) => new Set(buildFlatCategories(c, s).map(x => x.name).filter(x => x !== undefined)));
 
     public get schemaId() {
         return this.snapshot.selectedSchema?.id || '';
@@ -173,7 +176,7 @@ export class SchemasState extends State<Snapshot> {
 
     public addCategory(name: string) {
         this.next(s => {
-            const categories = new Set([...s.categories, name]);
+            const categories = new Set([...s.categories, name.trim()]);
 
             return { ...s, categories };
         }, 'Category Added');
@@ -181,7 +184,7 @@ export class SchemasState extends State<Snapshot> {
 
     public removeCategory(name: string) {
         this.next(s => {
-            const categories = new Set([...s.categories].remove(name));
+            const categories = new Set([...s.categories].removed(name));
 
             return { ...s, categories };
         }, 'Category Removed');
@@ -369,16 +372,21 @@ function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | nu
 
 const SPECIAL_SCHEMAS = 'i18n:common.schemas';
 const SPECIAL_COMPONENTS = 'i18n:common.components';
+const dotTestRegex = /[^\s]\.[^\s]/;
 
-function buildCategories(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
+function buildFlatCategories(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
     const schemas: SchemaCategory = {
         displayName: SPECIAL_SCHEMAS,
         schemas: [],
+        count: 0,
+        categories: []
     };
 
     const components: SchemaCategory = {
         displayName: SPECIAL_COMPONENTS,
         schemas: [],
+        count: 0,
+        categories: []
     };
 
     const result: SchemaCategory[] = [schemas, components];
@@ -388,35 +396,89 @@ function buildCategories(categories: Set<string>, allSchemas: SchemasList): Read
             displayName: name,
             name,
             schemas: [],
+            count: 0,
+            categories: []
         });
+
+        addAllParentCategories(name, result, 0);
     }
 
     for (const schema of allSchemas) {
         const name = schema.category;
 
         if (name) {
-            let category = result.find(x => x.name === name);
-
-            if (!category) {
-                category = {
-                    displayName: name,
-                    name,
-                    schemas: [],
-                };
-
-                result.push(category);
-            }
-
+            
+            let category = getOrAddCategory(result, name);
             category.schemas.push(schema);
+            category.count += 1;
+
+            addAllParentCategories(name, result, category.count);
+
         } else if (schema.type === 'Component') {
             components.schemas.push(schema);
+            components.count += 1;
         } else {
             schemas.schemas.push(schema);
+            schemas.count += 1;
         }
     }
 
-    result.sortByString(x => x.displayName);
+    return result.sortByString(x => x.displayName);
+}
 
+function addAllParentCategories(name: string, result: SchemaCategory[], count: number) {
+    if (dotTestRegex.test(name)) {
+        // Split on the dot and add all the parent categories if they don't already exist
+        const parts = name.split('.');
+        let nameBuilder = '';
+        for (let i = 0; i < parts.length - 1; i++) {
+            if (i > 0) { nameBuilder += '.'; }
+            nameBuilder += parts[i];
+            var cat = getOrAddCategory(result, nameBuilder);
+            cat.count += count;
+        }
+    }
+}
+
+function getOrAddCategory(list: SchemaCategory[], name: string):SchemaCategory {
+    let category = list.find(x => x.name === name);
+    if (!category) {
+        category = {
+            displayName: name,
+            name,
+            schemas: [],
+            count: 0,
+            categories: []
+        };
+
+        list.push(category);
+    }
+    return category;
+}
+
+
+function buildNestedCategories(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
+    const result: SchemaCategory[] = [];
+    
+    var flatCategories = buildFlatCategories(categories, allSchemas);
+    // Loop categories and nest each in its parent
+    for (const cat of flatCategories) {
+        const name = cat.name;
+        if (name === undefined) { continue; }
+
+        if (dotTestRegex.test(name)) {
+            const parentName = name.substr(0, name.lastIndexOf('.'));
+            const parent = flatCategories.find(c => c.name === parentName);
+            if (parent === undefined) { continue; } // This should never happen, it just makes it type-safe
+            cat.displayName = name.substring(parentName.length + 1);
+            parent.count += cat.count;
+            parent.categories.push(cat);
+        } else {
+            // Add top-level categories to the output
+            result.push(cat);
+        }
+    }
+    
     return result;
 }
 

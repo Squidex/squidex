@@ -6,7 +6,7 @@
  */
 
 import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasList, SchemasState } from '@app/shared/internal';
 import { AppsState } from '../state/apps.state';
 import { Settings } from '../state/settings';
@@ -26,6 +26,9 @@ export class SchemaCategoryComponent implements OnChanges {
     @Output()
     public remove = new EventEmitter();
 
+    @Output()
+    public schemaCountUpdated = new EventEmitter<number>();
+
     @Input()
     public schemaCategory: SchemaCategory;
 
@@ -37,12 +40,17 @@ export class SchemaCategoryComponent implements OnChanges {
 
     public filteredSchemas: SchemasList;
 
+    public childSchemaCounts: { [name: string]: number } = {};
+
+    public filteredHierarchicalSchemaCount = 0;
+
     public isCollapsed = false;
 
     constructor(
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState,
+        private readonly cdr: ChangeDetectorRef
     ) {
     }
 
@@ -71,6 +79,8 @@ export class SchemaCategoryComponent implements OnChanges {
         } else {
             this.isCollapsed = this.localStore.getBoolean(this.configKey());
         }
+
+        this.emitSchemaCount();
     }
 
     public schemaRoute(schema: SchemaDto) {
@@ -108,6 +118,28 @@ export class SchemaCategoryComponent implements OnChanges {
 
     public trackBySchema(_index: number, schema: SchemaDto) {
         return schema.id;
+    }
+
+    public trackByCategory(_index: number, category: SchemaCategory) {
+        return category.name;
+    }
+
+    public childSchemaCountUpdate(categoryName: string, count: number) {
+        this.childSchemaCounts[categoryName] = count;
+        this.emitSchemaCount();
+        this.cdr.detectChanges();
+    }
+
+    private emitSchemaCount() {
+        // Add up all the filtered counts of the children
+        let filtered = this.filteredSchemas.length;
+
+        for (const category of Object.keys(this.childSchemaCounts)) {
+            filtered += this.childSchemaCounts[category];
+        }
+
+        this.filteredHierarchicalSchemaCount = filtered;
+        this.schemaCountUpdated.emit(this.filteredHierarchicalSchemaCount);
     }
 
     private configKey(): string {
