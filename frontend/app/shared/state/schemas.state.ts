@@ -35,7 +35,7 @@ interface Snapshot {
 }
 
 export type SchemasList = ReadonlyArray<SchemaDto>;
-export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[]; count: number; categories: Array<SchemaCategory>;  };
+export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[]; count: number; categories: Array<SchemaCategory> };
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
@@ -379,14 +379,14 @@ function buildFlatCategories(categories: Set<string>, allSchemas: SchemasList): 
         displayName: SPECIAL_SCHEMAS,
         schemas: [],
         count: 0,
-        categories: []
+        categories: [],
     };
 
     const components: SchemaCategory = {
         displayName: SPECIAL_COMPONENTS,
         schemas: [],
         count: 0,
-        categories: []
+        categories: [],
     };
 
     const result: SchemaCategory[] = [schemas, components];
@@ -397,7 +397,7 @@ function buildFlatCategories(categories: Set<string>, allSchemas: SchemasList): 
             name,
             schemas: [],
             count: 0,
-            categories: []
+            categories: [],
         });
 
         addAllParentCategories(name, result, 0);
@@ -407,13 +407,10 @@ function buildFlatCategories(categories: Set<string>, allSchemas: SchemasList): 
         const name = schema.category;
 
         if (name) {
-            
-            let category = getOrAddCategory(result, name);
+            const category = getOrAddCategory(result, name);
             category.schemas.push(schema);
             category.count += 1;
-
             addAllParentCategories(name, result, category.count);
-
         } else if (schema.type === 'Component') {
             components.schemas.push(schema);
             components.count += 1;
@@ -434,7 +431,7 @@ function addAllParentCategories(name: string, result: SchemaCategory[], count: n
         for (let i = 0; i < parts.length - 1; i++) {
             if (i > 0) { nameBuilder += '.'; }
             nameBuilder += parts[i];
-            var cat = getOrAddCategory(result, nameBuilder);
+            const cat = getOrAddCategory(result, nameBuilder);
             cat.count += count;
         }
     }
@@ -448,7 +445,7 @@ function getOrAddCategory(list: SchemaCategory[], name: string):SchemaCategory {
             name,
             schemas: [],
             count: 0,
-            categories: []
+            categories: [],
         };
 
         list.push(category);
@@ -456,29 +453,29 @@ function getOrAddCategory(list: SchemaCategory[], name: string):SchemaCategory {
     return category;
 }
 
-
 function buildNestedCategories(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
     const result: SchemaCategory[] = [];
-    
-    var flatCategories = buildFlatCategories(categories, allSchemas);
+
+    const flatCategories = buildFlatCategories(categories, allSchemas);
     // Loop categories and nest each in its parent
     for (const cat of flatCategories) {
         const name = cat.name;
-        if (name === undefined) { continue; }
-
-        if (dotTestRegex.test(name)) {
-            const parentName = name.substr(0, name.lastIndexOf('.'));
-            const parent = flatCategories.find(c => c.name === parentName);
-            if (parent === undefined) { continue; } // This should never happen, it just makes it type-safe
-            cat.displayName = name.substring(parentName.length + 1);
-            parent.count += cat.count;
-            parent.categories.push(cat);
-        } else {
-            // Add top-level categories to the output
-            result.push(cat);
+        if (name !== undefined) {
+            if (dotTestRegex.test(name)) {
+                const parentName = name.substr(0, name.lastIndexOf('.'));
+                const parent = flatCategories.find(c => c.name === parentName);
+                if (parent !== undefined) {
+                    cat.displayName = name.substring(parentName.length + 1);
+                    parent.count += cat.count;
+                    parent.categories.push(cat);
+                 }
+            } else {
+                // Add top-level categories to the output
+                result.push(cat);
+            }
         }
     }
-    
+
     return result;
 }
 

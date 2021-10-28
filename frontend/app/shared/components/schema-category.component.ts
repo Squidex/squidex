@@ -50,7 +50,7 @@ export class SchemaCategoryComponent implements OnChanges {
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState,
-        private readonly cdr: ChangeDetectorRef
+        private readonly cdr: ChangeDetectorRef,
     ) {
     }
 
