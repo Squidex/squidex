@@ -50,7 +50,7 @@ export class SchemaCategoryComponent implements OnChanges {
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState,
-        private readonly cdr: ChangeDetectorRef,
+        private readonly changeDetector: ChangeDetectorRef,
     ) {
     }
 
@@ -127,7 +127,7 @@ export class SchemaCategoryComponent implements OnChanges {
     public childSchemaCountUpdate(categoryName: string, count: number) {
         this.childSchemaCounts[categoryName] = count;
         this.emitSchemaCount();
-        this.cdr.detectChanges();
+        this.changeDetector.detectChanges();
     }
 
     private emitSchemaCount() {

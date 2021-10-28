@@ -429,15 +429,17 @@ function addAllParentCategories(name: string, result: SchemaCategory[], count: n
         const parts = name.split('.');
         let nameBuilder = '';
         for (let i = 0; i < parts.length - 1; i++) {
-            if (i > 0) { nameBuilder += '.'; }
+            if (i > 0) {
+                nameBuilder += '.';
+            }
             nameBuilder += parts[i];
-            const cat = getOrAddCategory(result, nameBuilder);
-            cat.count += count;
+            const category = getOrAddCategory(result, nameBuilder);
+            category.count += count;
         }
     }
 }
 
-function getOrAddCategory(list: SchemaCategory[], name: string):SchemaCategory {
+function getOrAddCategory(list: SchemaCategory[], name: string): SchemaCategory {
     let category = list.find(x => x.name === name);
     if (!category) {
         category = {
@@ -460,15 +462,15 @@ function buildNestedCategories(categories: Set<string>, allSchemas: SchemasList)
     // Loop categories and nest each in its parent
     for (const cat of flatCategories) {
         const name = cat.name;
-        if (name !== undefined) {
+        if (name) {
             if (dotTestRegex.test(name)) {
                 const parentName = name.substr(0, name.lastIndexOf('.'));
                 const parent = flatCategories.find(c => c.name === parentName);
-                if (parent !== undefined) {
+                if (parent) {
                     cat.displayName = name.substring(parentName.length + 1);
                     parent.count += cat.count;
                     parent.categories.push(cat);
-                 }
+                }
             } else {
                 // Add top-level categories to the output
                 result.push(cat);

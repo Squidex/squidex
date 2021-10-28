@@ -128,7 +128,7 @@ describe('SchemasState', () => {
 
             schemasState.load(true).subscribe();
             schemasState.loadIfNotLoaded().subscribe();
-6;
+
             expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
@@ -163,13 +163,13 @@ describe('SchemasState', () => {
             expect(categories!).toEqual([
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
-                { name: 'schema-category3',
-displayName: 'schema-category3',
-schemas: [],
-count: 0,
-categories: [
-                    { name: 'schema-category3.schema-category4', displayName: 'schema-category4', schemas: [], count: 0, categories: [] },
-                ] },
+                {
+                    displayName: 'schema-category3',
+                    name: 'schema-category3',
+                    schemas: [],
+                    count: 0,
+                    categories: [{ displayName: 'schema-category4', name: 'schema-category3.schema-category4', schemas: [], count: 0, categories: [] }],
+                },
             ]);
         });
 
@@ -178,28 +178,30 @@ categories: [
 
             const categories = getCategories(schemasState);
 
+            const category3Categories: SchemaCategory = {
+                name: 'schema-category3.schema-category4',
+                displayName: 'schema-category4',
+                schemas: [],
+                count: 0,
+                categories: [{
+                        name: 'schema-category3.schema-category4.schema-category5',
+                        displayName: 'schema-category5',
+                        schemas: [],
+                        count: 0,
+                        categories: [{
+                                name: 'schema-category3.schema-category4.schema-category5.schema-category6',
+                                displayName: 'schema-category6',
+                                schemas: [],
+                                count: 0,
+                                categories: [],
+                            }],
+                }],
+            };
+
             expect(categories!).toEqual([
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
-                { name: 'schema-category3',
-displayName: 'schema-category3',
-schemas: [],
-count: 0,
-categories: [
-                    { name: 'schema-category3.schema-category4',
-displayName: 'schema-category4',
-schemas: [],
-count: 0,
-categories: [
-                        { name: 'schema-category3.schema-category4.schema-category5',
-displayName: 'schema-category5',
-schemas: [],
-count: 0,
-categories: [
-                            { name: 'schema-category3.schema-category4.schema-category5.schema-category6', displayName: 'schema-category6', schemas: [], count: 0, categories: [] },
-                        ] },
-                    ] },
-                ] },
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [], count: 0, categories: [category3Categories] },
             ]);
         });
 
@@ -223,13 +225,15 @@ categories: [
             expect(categories!).toEqual([
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
-                { name: 'schema-category3',
-displayName: 'schema-category3',
-schemas: [],
-count: 0,
-categories: [
-                    { name: 'schema-category3.schema-category4', displayName: 'schema-category4', schemas: [], count: 0, categories: [] },
-                ] },
+                {
+                    name: 'schema-category3',
+                    displayName: 'schema-category3',
+                    schemas: [],
+                    count: 0,
+                    categories: [
+                        { name: 'schema-category3.schema-category4', displayName: 'schema-category4', schemas: [], count: 0, categories: [] },
+                    ],
+                },
             ]);
         });
 
