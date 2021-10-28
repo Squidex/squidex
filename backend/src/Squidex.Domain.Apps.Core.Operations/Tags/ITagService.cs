@@ -23,7 +23,9 @@ namespace Squidex.Domain.Apps.Core.Tags
 
         Task<TagsExport> GetExportableTagsAsync(DomainId appId, string group);
 
-        Task RebuildTagsAsync(DomainId appId, string group, TagsExport tags);
+        Task RenameTagAsync(DomainId appId, string group, string name, string newName);
+
+        Task RebuildTagsAsync(DomainId appId, string group, TagsExport export);
 
         Task ClearAsync(DomainId appId, string group);
     }

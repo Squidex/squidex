@@ -47,9 +47,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_writer_tags()
+        public async Task Should_write_tags()
         {
-            var tags = new TagsExport();
+            var tags = new TagsExport
+            {
+                Tags = new Dictionary<string, Tag>()
+            };
 
             var context = CreateBackupContext();
 
@@ -58,23 +61,75 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.BackupAsync(context, ct);
 
-            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags, ct))
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, ct))
+                .MustHaveHappened();
+
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias!, ct))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_write_tags_with_alias()
+        {
+            var tags = new TagsExport
+            {
+                Alias = new Dictionary<string, string>
+                {
+                    ["tag1"] = "new-name",
+                },
+                Tags = new Dictionary<string, Tag>()
+            };
+
+            var context = CreateBackupContext();
+
+            A.CallTo(() => tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets))
+                .Returns(tags);
+
+            await sut.BackupAsync(context, ct);
+
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Tags, ct))
+                .MustHaveHappened();
+
+            A.CallTo(() => context.Writer.WriteJsonAsync(A<string>._, tags.Alias, ct))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_read_tags()
         {
-            var tags = new TagsExport();
+            var tags = new Dictionary<string, Tag>();
 
             var context = CreateRestoreContext();
 
-            A.CallTo(() => context.Reader.ReadJsonAsync<TagsExport>(A<string>._, ct))
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
                 .Returns(tags);
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, tags))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_read_tags_alias_if_file_exists()
+        {
+            var tags = new Dictionary<string, Tag>();
+            var alias = new Dictionary<string, string>();
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
+                .Returns(true);
+
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
+                .Returns(tags);
+
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
+                .Returns(alias);
+
+            await sut.RestoreAsync(context, ct);
+
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags && x.Alias == alias)))
                 .MustHaveHappened();
         }
 

@@ -1,0 +1,29 @@
+<form [formGroup]="editForm.form" (ngSubmit)="renameAssetTag()">
+    <sqx-modal-dialog (close)="emitComplete()">
+        <ng-container title>
+            {{ 'common.renameTag' | sqxTranslate }}
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-error [error]="editForm.error | async"></sqx-form-error>
+        
+            <div class="form-group">
+                <label for="tagName">{{ 'common.name' | sqxTranslate }} <small class="hint">({{ 'common.requiredHint' | sqxTranslate }})</small></label>
+                
+                <sqx-control-errors for="tagName"></sqx-control-errors>
+        
+                <input type="text" class="form-control" id="tagName" formControlName="tagName" autocomplete="off" sqxFocusOnInit>
+            </div>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="button" class="btn btn-text-secondary" (click)="emitComplete()">
+                {{ 'common.cancel' | sqxTranslate }}
+            </button>
+            
+            <button type="submit" class="btn btn-success">
+                {{ 'common.rename' | sqxTranslate }}
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

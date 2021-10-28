@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { TagItem, TagsSelected } from '@app/shared';
+import { DialogModel, TagItem, TagsSelected } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-tags[tags][tagsSelected]',
@@ -29,12 +29,23 @@ export class AssetTagsComponent {
     @Input()
     public tagsSelected: TagsSelected;
 
+    @Input()
+    public canRename: boolean;
+
+    public tagRenaming: TagItem;
+    public tagRenameDialog = new DialogModel();
+
     public isEmpty() {
         return Object.keys(this.tagsSelected).length === 0;
     }
 
     public isSelected(tag: TagItem) {
         return this.tagsSelected[tag.name] === true;
+    }
+
+    public renameTag(tag: TagItem) {
+        this.tagRenaming = tag;
+        this.tagRenameDialog.show();
     }
 
     public trackByTag(_index: number, tag: TagItem) {

@@ -8,7 +8,7 @@
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Form, Mutable, Types } from '@app/framework';
 import slugify from 'slugify';
-import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto } from './../services/assets.service';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto, RenameAssetTagDto } from './../services/assets.service';
 
 export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
@@ -210,6 +210,18 @@ export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto,
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             folderName: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+        }));
+    }
+}
+
+export class RenameAssetTagForm extends Form<FormGroup, RenameAssetTagDto, RenameAssetTagDto> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            tagName: ['',
                 [
                     Validators.required,
                 ],
