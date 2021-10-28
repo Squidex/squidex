@@ -13,8 +13,16 @@
                 </div>
                 <div class="col-auto">
                     <div class="badge badge-secondary rounded-pill">{{tag.count}}</div>
+
+                    <a class="btn-sm btn-text-secondary btn-rename" (click)="renameTag(tag)" *ngIf="canRename" sqxStopClick>
+                        <i class="icon-pencil"></i>
+                    </a>
                 </div>
             </div>
         </a>
     </div>
 </div>
+
+<ng-container *sqxModal="tagRenameDialog">
+    <sqx-asset-tag-dialog [tagName]="tagRenaming.name" (complete)="tagRenameDialog.hide()"></sqx-asset-tag-dialog>
+</ng-container>

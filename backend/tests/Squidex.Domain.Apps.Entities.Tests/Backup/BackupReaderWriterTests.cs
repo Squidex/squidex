@@ -66,6 +66,42 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         [Fact]
+        public async Task Should_return_true_if_file_exists()
+        {
+            var file = "File.json";
+
+            var value = Guid.NewGuid();
+
+            await TestReaderWriterAsync(BackupVersion.V1, async writer =>
+            {
+                await WriteJsonGuidAsync(writer, file, value);
+            }, async reader =>
+            {
+                var hasFile = await reader.HasFileAsync(file);
+
+                Assert.True(hasFile);
+            });
+        }
+
+        [Fact]
+        public async Task Should_return_file_if_file_does_not_exist()
+        {
+            var file = "File.json";
+
+            var value = Guid.NewGuid();
+
+            await TestReaderWriterAsync(BackupVersion.V1, async writer =>
+            {
+                await Task.Yield();
+            }, async reader =>
+            {
+                var hasFile = await reader.HasFileAsync(file);
+
+                Assert.False(hasFile);
+            });
+        }
+
+        [Fact]
         public async Task Should_read_and_write_json_async()
         {
             var file = "File.json";

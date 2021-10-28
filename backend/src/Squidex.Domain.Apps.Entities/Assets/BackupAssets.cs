@@ -24,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private const int BatchSize = 100;
         private const string TagsFile = "AssetTags.json";
+        private const string TagsAliasFile = "AssetTagsAlias.json";
         private readonly HashSet<DomainId> assetIds = new HashSet<DomainId>();
         private readonly HashSet<DomainId> assetFolderIds = new HashSet<DomainId>();
         private readonly Rebuilder rebuilder;
@@ -119,9 +120,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private async Task RestoreTagsAsync(RestoreContext context,
             CancellationToken ct)
         {
-            var tags = await context.Reader.ReadJsonAsync<TagsExport>(TagsFile, ct);
+            var tags = await context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(TagsFile, ct);
 
-            await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, tags);
+            var alias = (Dictionary<string, string>?)null;
+
+            if (await context.Reader.HasFileAsync(TagsAliasFile, ct))
+            {
+                alias = await context.Reader.ReadJsonAsync<Dictionary<string, string>>(TagsAliasFile, ct);
+            }
+
+            var export = new TagsExport { Tags = tags, Alias = alias };
+
+            await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, export);
         }
 
         private async Task BackupTagsAsync(BackupContext context,
@@ -129,7 +139,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var tags = await tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets);
 
-            await context.Writer.WriteJsonAsync(TagsFile, tags, ct);
+            await context.Writer.WriteJsonAsync(TagsFile, tags.Tags, ct);
+
+            if (tags.Alias?.Count > 0)
+            {
+                await context.Writer.WriteJsonAsync(TagsAliasFile, tags.Alias, ct);
+            }
         }
 
         private async Task WriteAssetAsync(DomainId appId, DomainId assetId, long fileVersion, IBackupWriter writer,

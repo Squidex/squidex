@@ -53,6 +53,33 @@ describe('AssetsService', () => {
             });
         }));
 
+    it('should make put request to rename asset tag',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+            const dto = { tagName: 'new-name' };
+
+            let tags: any;
+
+            assetsService.putTag('my-app', 'old-name', dto).subscribe(result => {
+                tags = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/tags/old-name');
+
+            expect(req.request.body).toEqual(dto);
+            expect(req.request.method).toEqual('PUT');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush({
+                tag1: 1,
+                tag2: 4,
+            });
+
+            expect(tags!).toEqual({
+                tag1: 1,
+                tag2: 4,
+            });
+        }));
+
     it('should make get request to get assets',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let assets: AssetsDto;
