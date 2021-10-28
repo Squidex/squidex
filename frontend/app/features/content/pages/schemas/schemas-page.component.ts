@@ -27,6 +27,7 @@ export class SchemasPageComponent {
                 return schemas.filter(schema =>
                     schema.canReadContents &&
                     schema.isPublished &&
+                    schema.type !== 'Component' &&
                     !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(schema.name)],
                 );
             }));
