@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -86,7 +87,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var addressParts = projectionHost.Split(':');
 
-            if (addressParts.Length < 2 || !int.TryParse(addressParts[1], out var port))
+            if (addressParts.Length < 2 || !int.TryParse(addressParts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var port))
             {
                 port = 2113;
             }
@@ -131,12 +132,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static long? ParsePositionOrNull(string? position)
         {
-            return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
+            return long.TryParse(position, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedPosition) ? parsedPosition : null;
         }
 
         public static long ParsePosition(string? position)
         {
-            return long.TryParse(position, out var parsedPosition) ? parsedPosition + 1 : StreamPosition.Start;
+            return long.TryParse(position, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedPosition) ? parsedPosition + 1 : StreamPosition.Start;
         }
     }
 }

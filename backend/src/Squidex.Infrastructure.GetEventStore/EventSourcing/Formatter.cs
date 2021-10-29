@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using EventStore.ClientAPI;
@@ -32,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             return new StoredEvent(
                 streamName,
-                resolvedEvent.OriginalEventNumber.ToString(),
+                resolvedEvent.OriginalEventNumber.ToString(CultureInfo.InvariantCulture),
                 resolvedEvent.Event.EventNumber,
                 eventData);
         }

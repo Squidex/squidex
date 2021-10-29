@@ -6,13 +6,16 @@
 // ==========================================================================
 
 using System.Linq;
+using EventStore.ClientAPI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain
@@ -36,6 +39,25 @@ namespace Squidex.Config.Domain
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
                         .As<IEventStore>();
+                },
+                ["GetEventStore"] = () =>
+                {
+                    var eventStoreConfiguration = config.GetRequiredValue("eventStore:getEventStore:configuration");
+                    var eventStoreProjectionHost = config.GetRequiredValue("eventStore:getEventStore:projectionHost");
+                    var eventStorePrefix = config.GetValue<string>("eventStore:getEventStore:prefix");
+
+                    services.AddSingletonAs(_ => EventStoreConnection.Create(eventStoreConfiguration))
+                        .As<IEventStoreConnection>();
+
+                    services.AddSingletonAs(c => new GetEventStore(
+                            c.GetRequiredService<IEventStoreConnection>(),
+                            c.GetRequiredService<IJsonSerializer>(),
+                            eventStorePrefix,
+                            eventStoreProjectionHost))
+                        .As<IEventStore>();
+
+                    services.AddHealthChecks()
+                        .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: new[] { "node" });
                 }
             });
 
