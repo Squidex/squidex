@@ -460,20 +460,23 @@ function buildNestedCategories(categories: Set<string>, allSchemas: SchemasList)
 
     const flatCategories = buildFlatCategories(categories, allSchemas);
     // Loop categories and nest each in its parent
-    for (const cat of flatCategories) {
-        const name = cat.name;
-        if (name) {
+    for (const category of flatCategories) {
+        const name = category.name;
+        if (category.displayName.startsWith("i18n:")) {
+            //just push system categories straight out
+            result.push(category);
+        } else if (name) {
             if (dotTestRegex.test(name)) {
                 const parentName = name.substr(0, name.lastIndexOf('.'));
                 const parent = flatCategories.find(c => c.name === parentName);
                 if (parent) {
-                    cat.displayName = name.substring(parentName.length + 1);
-                    parent.count += cat.count;
-                    parent.categories.push(cat);
+                    category.displayName = name.substring(parentName.length + 1);
+                    parent.count += category.count;
+                    parent.categories.push(category);
                 }
             } else {
                 // Add top-level categories to the output
-                result.push(cat);
+                result.push(category);
             }
         }
     }

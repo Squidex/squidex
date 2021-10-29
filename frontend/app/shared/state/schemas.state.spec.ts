@@ -61,6 +61,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
             ]);
@@ -82,6 +84,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
                 { displayName: 'schema-category3', name: 'schema-category3', schemas: [], count: 0, categories: [] },
@@ -149,6 +153,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
                 { displayName: 'schema-category3', name: 'schema-category3', schemas: [], count: 0, categories: [] },
@@ -161,6 +167,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
                 {
@@ -199,6 +207,8 @@ describe('SchemasState', () => {
             };
 
             expect(categories!).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
                 { displayName: 'schema-category3', name: 'schema-category3', schemas: [], count: 0, categories: [category3Categories] },
@@ -211,6 +221,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
             ]);
@@ -223,6 +235,8 @@ describe('SchemasState', () => {
             const categories = getCategories(schemasState);
 
             expect(categories!).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
                 {
@@ -243,6 +257,8 @@ describe('SchemasState', () => {
             const categories1 = getCategories(schemasState);
 
             expect(categories1).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
                 { displayName: 'schema-category3', name: 'schema-category3', schemas: [], count: 0, categories: [] },
@@ -253,6 +269,8 @@ describe('SchemasState', () => {
             const categories2 = getCategories(schemasState);
 
             expect(categories2).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], count: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], count: 0, categories: [] },
                 { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], count: 1, categories: [] },
                 { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], count: 1, categories: [] },
             ]);
