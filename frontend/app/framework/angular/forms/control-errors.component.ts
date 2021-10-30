@@ -7,6 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
+import { touchedChange$ } from '@app/framework';
 import { fadeAnimation, LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
 import { formatError } from './error-formatting';
@@ -28,7 +29,6 @@ interface State {
 export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private displayFieldName: string;
     private control: AbstractControl;
-    private controlOriginalMarkAsTouched: any;
 
     @Input()
     public for: string | AbstractControl;
@@ -49,13 +49,9 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         });
     }
 
-    public ngOnDestroy() {
-        super.ngOnDestroy();
-
-        this.unsetCustomMarkAsTouchedFunction();
-    }
-
     public ngOnChanges() {
+        const previousControl = this.control;
+
         if (this.fieldName) {
             this.displayFieldName = this.fieldName;
         } else if (this.for) {
@@ -72,6 +68,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
+
         let control: AbstractControl | null = null;
 
         if (Types.isString(this.for)) {
@@ -82,41 +79,26 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             control = this.for;
         }
 
-        if (this.control !== control && control) {
-            this.unsubscribeAll();
-            this.unsetCustomMarkAsTouchedFunction();
+        if (this.control !== control) {
+            if (this.control) {
+                this.unsubscribeAll();
+            }
 
             this.control = control;
 
-            if (control) {
+            if (this.control) {
                 this.own(
-                    merge(control.valueChanges, control.statusChanges)
-                        .subscribe(() => {
-                            this.createMessages();
-                        }));
-
-                this.controlOriginalMarkAsTouched = this.control.markAsTouched;
-
-                // eslint-disable-next-line @typescript-eslint/no-this-alias
-                const self = this;
-
-                // eslint-disable-next-line func-names
-                this.control['markAsTouched'] = function () {
-                    // eslint-disable-next-line prefer-rest-params
-                    self.controlOriginalMarkAsTouched.apply(this, arguments);
-
-                    self.createMessages();
-                };
+                    merge(
+                        this.control.valueChanges,
+                        this.control.statusChanges,
+                        touchedChange$(control),
+                    ).subscribe(() => {
+                        this.createMessages();
+                    }));
             }
         }
 
         this.createMessages();
-    }
-
-    private unsetCustomMarkAsTouchedFunction() {
-        if (this.control && this.controlOriginalMarkAsTouched) {
-            this.control['markAsTouched'] = this.controlOriginalMarkAsTouched;
-        }
     }
 
     private createMessages() {
