@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> QueryLatestAsync(string streamName, int count = int.MaxValue,
+        public async Task<IReadOnlyList<StoredEvent>> QueryReverseAsync(string streamName, int count = int.MaxValue,
             CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));

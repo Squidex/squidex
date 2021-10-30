@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Linq;
+using EventStore.Client;
 using EventStore.ClientAPI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,18 +43,12 @@ namespace Squidex.Config.Domain
                 },
                 ["GetEventStore"] = () =>
                 {
-                    var eventStoreConfiguration = config.GetRequiredValue("eventStore:getEventStore:configuration");
-                    var eventStoreProjectionHost = config.GetRequiredValue("eventStore:getEventStore:projectionHost");
-                    var eventStorePrefix = config.GetValue<string>("eventStore:getEventStore:prefix");
+                    var configuration = config.GetRequiredValue("eventStore:getEventStore:configuration");
 
-                    services.AddSingletonAs(_ => EventStoreConnection.Create(eventStoreConfiguration))
-                        .As<IEventStoreConnection>();
+                    services.AddSingletonAs(_ => EventStoreClientSettings.Create(configuration))
+                        .AsSelf();
 
-                    services.AddSingletonAs(c => new GetEventStore(
-                            c.GetRequiredService<IEventStoreConnection>(),
-                            c.GetRequiredService<IJsonSerializer>(),
-                            eventStorePrefix,
-                            eventStoreProjectionHost))
+                    services.AddSingletonAs<GetEventStore>()
                         .As<IEventStore>();
 
                     services.AddHealthChecks()

@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             streamName = $"comments-{key}";
 
-            var storedEvents = await eventStore.QueryLatestAsync(streamName, 100);
+            var storedEvents = await eventStore.QueryReverseAsync(streamName, 100);
 
             foreach (var @event in storedEvents)
             {
