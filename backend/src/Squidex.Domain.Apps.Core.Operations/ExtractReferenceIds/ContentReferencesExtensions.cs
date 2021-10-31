@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return false;
             }
 
-            return source.Values.SelectMany(x => x.Values).Any(CanHaveReference);
+            return source.Values.NotNull().SelectMany(x => x.Values).Any(CanHaveReference);
         }
 
         public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema,

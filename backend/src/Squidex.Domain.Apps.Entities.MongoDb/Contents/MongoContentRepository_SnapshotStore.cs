@@ -94,6 +94,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 foreach (var (_, value, version) in snapshots)
                 {
+                    // Some data is corrupt and might throw an exception during migration if we do not skip them.
+                    if (value.AppId == null || value.CurrentVersion == null)
+                    {
+                        continue;
+                    }
+
                     if (ShouldWritePublished(value))
                     {
                         entitiesPublished.Add(await CreatePublishedContentAsync(value, version));
@@ -147,12 +153,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task<MongoContentEntity> CreatePublishedContentAsync(ContentDomainObject.State value, long newVersion)
         {
-            // In same cases the state has been corrupt. To ignore the error during migration we have to be flexible here.
-            var data = value.CurrentVersion?.Data ?? new ContentData();
+            var entity = await CreateContentAsync(value, value.CurrentVersion.Data, newVersion);
 
-            var entity = await CreateContentAsync(value, data, newVersion);
-
-            // Scheduling is only queried from the draft collection so we can usnet it here.
             entity.ScheduledAt = null;
             entity.ScheduleJob = null;
             entity.NewStatus = null;
@@ -162,12 +164,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task<MongoContentEntity> CreateDraftContentAsync(ContentDomainObject.State value, long newVersion)
         {
-            // In same cases the state has been corrupt. To ignore the error during migration we have to be flexible here.
-            var data = value.NewVersion?.Data ?? value.CurrentVersion?.Data ?? new ContentData();
+            var entity = await CreateContentAsync(value, value.Data, newVersion);
 
-            var entity = await CreateContentAsync(value, data, newVersion);
-
-            // Scheduling is queried from the draft collection.
             entity.ScheduledAt = value.ScheduleJob?.DueTime;
             entity.ScheduleJob = value.ScheduleJob;
             entity.NewStatus = value.NewStatus;
@@ -177,24 +175,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task<MongoContentEntity> CreateContentAsync(ContentDomainObject.State value, ContentData data, long newVersion)
         {
-            // Manual mapping to prevent the problem that value.Data can throw an exception for corrupt data.
-            var entity = new MongoContentEntity
-            {
-                Id = value.Id,
-                AppId = value.AppId,
-                Created = value.Created,
-                CreatedBy = value.CreatedBy,
-                Data = data,
-                DocumentId = value.UniqueId,
-                IndexedAppId = value.AppId.Id,
-                IndexedSchemaId = value.SchemaId.Id,
-                IsDeleted = value.IsDeleted,
-                LastModified = value.LastModified,
-                LastModifiedBy = value.LastModifiedBy,
-                SchemaId = value.SchemaId,
-                Status = value.Status,
-                Version = newVersion
-            };
+            var entity = SimpleMapper.Map(value, new MongoContentEntity());
+
+            entity.Data = data;
+            entity.DocumentId = value.UniqueId;
+            entity.IndexedAppId = value.AppId.Id;
+            entity.IndexedSchemaId = value.SchemaId.Id;
+            entity.Version = newVersion;
 
             if (data.CanHaveReference())
             {

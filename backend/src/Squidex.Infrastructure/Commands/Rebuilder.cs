@@ -16,6 +16,7 @@ using Squidex.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Log;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -26,6 +27,7 @@ namespace Squidex.Infrastructure.Commands
         private readonly ILocalCache localCache;
         private readonly IEventStore eventStore;
         private readonly IServiceProvider serviceProvider;
+        private readonly ISemanticLog log;
 
         private static class Factory<T, TState> where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
@@ -40,14 +42,23 @@ namespace Squidex.Infrastructure.Commands
         public Rebuilder(
             ILocalCache localCache,
             IEventStore eventStore,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            ISemanticLog log)
         {
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
+            this.log = log;
             this.localCache = localCache;
         }
 
-        public virtual async Task RebuildAsync<T, TState>(string filter, int batchSize,
+        public virtual Task RebuildAsync<T, TState>(string filter, int batchSize,
+            CancellationToken ct = default)
+            where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        {
+            return RebuildAsync<T, TState>(filter, batchSize, 0, ct);
+        }
+
+        public virtual async Task RebuildAsync<T, TState>(string filter, int batchSize, double errorThreshold,
             CancellationToken ct = default)
             where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
@@ -55,10 +66,17 @@ namespace Squidex.Infrastructure.Commands
 
             var ids = eventStore.QueryAllAsync(filter, ct: ct).Select(x => x.Data.Headers.AggregateId());
 
-            await InsertManyAsync<T, TState>(ids, batchSize, ct);
+            await InsertManyAsync<T, TState>(ids, batchSize, errorThreshold, ct);
         }
 
-        public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize,
+        public virtual Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize,
+            CancellationToken ct = default)
+            where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
+        {
+            return InsertManyAsync<T, TState>(source, batchSize, 0, ct);
+        }
+
+        public virtual async Task InsertManyAsync<T, TState>(IEnumerable<DomainId> source, int batchSize, double errorThreshold = 0,
             CancellationToken ct = default)
             where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
@@ -66,16 +84,19 @@ namespace Squidex.Infrastructure.Commands
 
             var ids = source.ToAsyncEnumerable();
 
-            await InsertManyAsync<T, TState>(ids, batchSize, ct);
+            await InsertManyAsync<T, TState>(ids, batchSize, errorThreshold, ct);
         }
 
-        private async Task InsertManyAsync<T, TState>(IAsyncEnumerable<DomainId> source, int batchSize,
+        private async Task InsertManyAsync<T, TState>(IAsyncEnumerable<DomainId> source, int batchSize, double errorThreshold,
             CancellationToken ct = default)
             where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
             var store = serviceProvider.GetRequiredService<IStore<TState>>();
 
             var parallelism = Environment.ProcessorCount;
+
+            var itemsProcessed = 0;
+            var itemsFailed = 0;
 
             var workerBlock = new ActionBlock<DomainId[]>(async ids =>
             {
@@ -98,6 +119,19 @@ namespace Squidex.Infrastructure.Commands
                             catch (DomainObjectNotFoundException)
                             {
                                 return;
+                            }
+                            catch (Exception ex)
+                            {
+                                log.LogWarning(ex, w => w
+                                    .WriteProperty("reason", "CorruptData")
+                                    .WriteProperty("domainObjectId", id.ToString())
+                                    .WriteProperty("domainObjectType", typeof(T).Name));
+
+                                Interlocked.Increment(ref itemsFailed);
+                            }
+                            finally
+                            {
+                                Interlocked.Increment(ref itemsProcessed);
                             }
                         }
                     }
@@ -141,6 +175,12 @@ namespace Squidex.Infrastructure.Commands
             }
 
             await workerBlock.Completion;
+
+            var errorRate = (double)itemsFailed / itemsProcessed;
+            if (errorRate >= errorThreshold)
+            {
+                throw new InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
+            }
         }
 
         private async Task ClearAsync<TState>() where TState : class, IDomainState<TState>, new()
