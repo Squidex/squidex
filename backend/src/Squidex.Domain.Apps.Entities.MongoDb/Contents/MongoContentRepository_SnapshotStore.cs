@@ -94,6 +94,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 foreach (var (_, value, version) in snapshots)
                 {
+                    // Some data is corrupt and might throw an exception during migration if we do not skip them.
+                    if (value.AppId == null || value.CurrentVersion == null)
+                    {
+                        continue;
+                    }
+
                     if (ShouldWritePublished(value))
                     {
                         entitiesPublished.Add(await CreatePublishedContentAsync(value, version));
@@ -177,18 +183,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             entity.IndexedSchemaId = value.SchemaId.Id;
             entity.Version = newVersion;
 
-            var schema = await appProvider.GetSchemaAsync(value.AppId.Id, value.SchemaId.Id, true);
-
-            if (schema != null)
+            if (data.CanHaveReference())
             {
-                var components = await appProvider.GetComponentsAsync(schema);
+                var schema = await appProvider.GetSchemaAsync(value.AppId.Id, value.SchemaId.Id, true);
 
-                entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef, components);
+                if (schema != null)
+                {
+                    var components = await appProvider.GetComponentsAsync(schema);
+
+                    entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef, components);
+                }
             }
-            else
-            {
-                entity.ReferencedIds = new HashSet<DomainId>();
-            }
+
+            entity.ReferencedIds ??= new HashSet<DomainId>();
 
             return entity;
         }
