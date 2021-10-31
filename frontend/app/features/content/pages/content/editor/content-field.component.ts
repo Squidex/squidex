@@ -6,9 +6,8 @@
  */
 
 import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, AppsState, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService, Types, value$ } from '@app/shared';
-import { combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'sqx-content-field[form][formContext][formModel][language][languages][schema]',
@@ -79,11 +78,7 @@ export class ContentFieldComponent implements OnChanges {
         }
 
         if ((changes['formModel'] || changes['formModelCompare']) && this.formModelCompare) {
-            this.isDifferent =
-                combineLatest([
-                    value$(this.formModel.form),
-                    value$(this.formModelCompare!.form),
-                ]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs, true)));
+            this.isDifferent = changed$(this.formModel.form, this.formModelCompare.form);
         }
     }
 
@@ -110,41 +105,44 @@ export class ContentFieldComponent implements OnChanges {
     public translate() {
         const master = this.languages.find(x => x.isMaster);
 
-        if (master) {
-            const masterCode = master.iso2Code;
-            const masterValue = this.formModel.get(masterCode)!.form.value;
+        if (!master) {
+            return;
+        }
+        const masterCode = master.iso2Code;
+        const masterValue = this.formModel.get(masterCode)!.form.value;
 
-            if (masterValue) {
-                if (this.showAllControls) {
-                    for (const language of this.languages) {
-                        if (!language.isMaster) {
-                            this.translateValue(masterValue, masterCode, language.iso2Code);
-                        }
-                    }
-                } else {
-                    this.translateValue(masterValue, masterCode, this.language.iso2Code);
-                }
+        if (!masterValue) {
+            return;
+        }
+
+        if (this.showAllControls) {
+            for (const language of this.languages.filter(x => !x.isMaster)) {
+                this.translateValue(masterValue, masterCode, language.iso2Code);
             }
+        } else {
+            this.translateValue(masterValue, masterCode, this.language.iso2Code);
         }
     }
 
     private translateValue(text: string, sourceLanguage: string, targetLanguage: string) {
         const control = this.formModel.get(targetLanguage);
 
-        if (control) {
-            const value = control.form.value;
-
-            if (!value) {
-                const request = { text, sourceLanguage, targetLanguage };
-
-                this.translations.translate(this.appsState.appName, request)
-                    .subscribe(result => {
-                        if (result.text) {
-                            control.form.setValue(result.text);
-                        }
-                    });
-            }
+        if (!control) {
+            return;
         }
+
+        if (control.form.value) {
+            return;
+        }
+
+        const request = { text, sourceLanguage, targetLanguage };
+
+        this.translations.translate(this.appsState.appName, request)
+            .subscribe(result => {
+                if (result.text) {
+                    control.form.setValue(result.text);
+                }
+            });
     }
 
     public prefix(language: AppLanguageDto) {

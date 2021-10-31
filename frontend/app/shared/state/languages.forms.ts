@@ -6,7 +6,7 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, valueAll$ } from '@app/framework';
+import { Form, value$ } from '@app/framework';
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 
@@ -17,14 +17,14 @@ export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppL
             isOptional: false,
         }));
 
-        valueAll$(this.form.controls['isMaster'])
+        value$(this.form.controls['isMaster'])
             .subscribe(value => {
                 if (value) {
                     this.form.controls['isOptional'].setValue(false);
                 }
             });
 
-        valueAll$(this.form.controls['isOptional'])
+        value$(this.form.controls['isOptional'])
             .subscribe(value => {
                 if (value) {
                     this.form.controls['isMaster'].setValue(false);

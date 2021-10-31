@@ -7,9 +7,8 @@
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, ResourceOwner, StringFieldPropertiesDto, STRING_FIELD_EDITORS, value$ } from '@app/shared';
+import { FieldDto, ResourceOwner, StringFieldPropertiesDto, STRING_FIELD_EDITORS, valueProjection$ } from '@app/shared';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-string-ui[field][fieldForm][properties]',
@@ -35,11 +34,13 @@ export class StringUIComponent extends ResourceOwner implements OnChanges {
         if (changes['fieldForm']) {
             this.unsubscribeAll();
 
+            const editor = this.fieldForm.controls['editor'];
+
             this.hideAllowedValues =
-                value$<string>(this.fieldForm.controls['editor']).pipe(map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
+                valueProjection$(editor, x => !(x && (x === 'Radio' || x === 'Dropdown')));
 
             this.hideInlineEditable =
-                value$<string>(this.fieldForm.controls['editor']).pipe(map(x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug'))));
+                valueProjection$(editor, x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug')));
 
             this.own(
                 this.hideAllowedValues.subscribe(isSelection => {

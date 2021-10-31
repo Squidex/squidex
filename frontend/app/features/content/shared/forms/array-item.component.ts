@@ -6,9 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectForm, RootFieldDto, StatefulComponent, Types, value$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectForm, RootFieldDto, StatefulComponent, Types, valueProjection$ } from '@app/shared';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ComponentSectionComponent } from './component-section.component';
 
 interface State {
@@ -88,7 +87,7 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
         if (changes['formModel']) {
             this.isInvalid = invalid$(this.formModel.form);
 
-            this.title = value$(this.formModel.form).pipe(map(x => this.getTitle(x)));
+            this.title = valueProjection$(this.formModel.form, x => this.getTitle(x));
         }
     }
 

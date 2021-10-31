@@ -6,7 +6,7 @@
  */
 
 import { AbstractControl, FormArray, FormGroup, ValidatorFn } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { Types } from './../../utils/types';
 
@@ -96,19 +96,67 @@ export function invalid$(form: AbstractControl): Observable<boolean> {
 }
 
 export function value$<T = any>(form: AbstractControl): Observable<T> {
-    return form.valueChanges.pipe(startWith(form.value), distinctUntilChanged());
-}
-
-export function valueAll$<T = any>(form: AbstractControl): Observable<T> {
     return form.valueChanges.pipe(map(() => getRawValue(form)), startWith(getRawValue(form)), distinctUntilChanged());
 }
 
+export function valueProjection$<T = any>(form: AbstractControl, projection: (value: any) => T): Observable<T> {
+    return value$(form).pipe(map(projection), distinctUntilChanged());
+}
+
 export function hasValue$(form: AbstractControl): Observable<boolean> {
-    return value$(form).pipe(map(v => !!v));
+    return valueProjection$(form, v => isValid(v));
 }
 
 export function hasNoValue$(form: AbstractControl): Observable<boolean> {
-    return value$(form).pipe(map(v => !v));
+    return valueProjection$(form, v => !isValid(v));
+}
+
+export function changed$(lhs: AbstractControl, rhs: AbstractControl) {
+    return combineLatest([
+        value$(lhs),
+        value$(rhs),
+    ]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs, true)),
+        distinctUntilChanged());
+}
+
+export function touchedChange$(form: AbstractControl) {
+    return new Observable(subscriber => {
+        let previousTouched = form.touched;
+
+        const updateTouched = (touched: boolean) => {
+            if (touched !== previousTouched) {
+                subscriber.next(touched);
+
+                previousTouched = touched;
+            }
+        };
+
+        subscriber.next(form.touched);
+
+        const previousMarkedAsTouched = form.markAsTouched;
+        const previousMarkedAsUntouched = form.markAsUntouched;
+
+        form['markAsTouched'] = function markAsTouched(...args: any[]) {
+            previousMarkedAsTouched.apply(this, args);
+
+            updateTouched(form.touched);
+        };
+
+        form['markAsUntouched'] = function markAsTouched(...args: any[]) {
+            previousMarkedAsUntouched.apply(this, args);
+
+            updateTouched(form.touched);
+        };
+
+        return () => {
+            form['markAsTouched'] = previousMarkedAsTouched;
+            form['markAsUntouched'] = previousMarkedAsUntouched;
+        };
+    });
+}
+
+function isValid(value: any) {
+    return !Types.isNull(value) && !Types.isUndefined(value);
 }
 
 export function getRawValue(form: AbstractControl): any {

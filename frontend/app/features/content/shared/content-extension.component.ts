@@ -20,14 +20,14 @@ export class ContentExtensionComponent extends ResourceOwner implements OnChange
     private readonly context: any;
     private isInitialized = false;
 
+    @ViewChild('iframe', { static: false })
+    public iframe: ElementRef<HTMLIFrameElement>;
+
     @Input()
     public content?: ContentDto | null;
 
     @Input()
     public contentSchema: SchemaDto;
-
-    @ViewChild('iframe', { static: false })
-    public iframe: ElementRef<HTMLIFrameElement>;
 
     @Input()
     public set url(value: string | undefined | null) {
