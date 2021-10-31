@@ -147,8 +147,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task<MongoContentEntity> CreatePublishedContentAsync(ContentDomainObject.State value, long newVersion)
         {
-            var entity = await CreateContentAsync(value, value.CurrentVersion.Data, newVersion);
+            // In same cases the state has been corrupt. To ignore the error during migration we have to be flexible here.
+            var data = value.CurrentVersion?.Data ?? new ContentData();
 
+            var entity = await CreateContentAsync(value, data, newVersion);
+
+            // Scheduling is only queried from the draft collection so we can usnet it here.
             entity.ScheduledAt = null;
             entity.ScheduleJob = null;
             entity.NewStatus = null;
@@ -158,8 +162,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task<MongoContentEntity> CreateDraftContentAsync(ContentDomainObject.State value, long newVersion)
         {
-            var entity = await CreateContentAsync(value, value.Data, newVersion);
+            // In same cases the state has been corrupt. To ignore the error during migration we have to be flexible here.
+            var data = value.NewVersion?.Data ?? value.CurrentVersion?.Data ?? new ContentData();
 
+            var entity = await CreateContentAsync(value, data, newVersion);
+
+            // Scheduling is queried from the draft collection.
             entity.ScheduledAt = value.ScheduleJob?.DueTime;
             entity.ScheduleJob = value.ScheduleJob;
             entity.NewStatus = value.NewStatus;
@@ -169,26 +177,38 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task<MongoContentEntity> CreateContentAsync(ContentDomainObject.State value, ContentData data, long newVersion)
         {
-            var entity = SimpleMapper.Map(value, new MongoContentEntity());
-
-            entity.Data = data;
-            entity.DocumentId = value.UniqueId;
-            entity.IndexedAppId = value.AppId.Id;
-            entity.IndexedSchemaId = value.SchemaId.Id;
-            entity.Version = newVersion;
-
-            var schema = await appProvider.GetSchemaAsync(value.AppId.Id, value.SchemaId.Id, true);
-
-            if (schema != null)
+            // Manual mapping to prevent the problem that value.Data can throw an exception for corrupt data.
+            var entity = new MongoContentEntity
             {
-                var components = await appProvider.GetComponentsAsync(schema);
+                Id = value.Id,
+                AppId = value.AppId,
+                Created = value.Created,
+                CreatedBy = value.CreatedBy,
+                Data = data,
+                DocumentId = value.UniqueId,
+                IndexedAppId = value.AppId.Id,
+                IndexedSchemaId = value.SchemaId.Id,
+                IsDeleted = value.IsDeleted,
+                LastModified = value.LastModified,
+                LastModifiedBy = value.LastModifiedBy,
+                SchemaId = value.SchemaId,
+                Status = value.Status,
+                Version = newVersion
+            };
 
-                entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef, components);
-            }
-            else
+            if (data.CanHaveReference())
             {
-                entity.ReferencedIds = new HashSet<DomainId>();
+                var schema = await appProvider.GetSchemaAsync(value.AppId.Id, value.SchemaId.Id, true);
+
+                if (schema != null)
+                {
+                    var components = await appProvider.GetComponentsAsync(schema);
+
+                    entity.ReferencedIds = entity.Data.GetReferencedIds(schema.SchemaDef, components);
+                }
             }
+
+            entity.ReferencedIds ??= new HashSet<DomainId>();
 
             return entity;
         }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -16,6 +17,37 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ContentReferencesExtensions
     {
+        public static bool CanHaveReference(this ContentData source)
+        {
+            if (source.Count == 0)
+            {
+                return false;
+            }
+
+            static bool CanHaveReference(IJsonValue value)
+            {
+                if (value is JsonArray)
+                {
+                    return true;
+                }
+
+                if (value is JsonObject obj)
+                {
+                    foreach (var nested in obj.Values)
+                    {
+                        if (CanHaveReference(nested))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            return source.Values.SelectMany(x => x.Values).Any(CanHaveReference);
+        }
+
         public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
