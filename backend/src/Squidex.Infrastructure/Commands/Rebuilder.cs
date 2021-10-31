@@ -98,6 +98,16 @@ namespace Squidex.Infrastructure.Commands
             var itemsProcessed = 0;
             var itemsFailed = 0;
 
+            void CheckErrorRate()
+            {
+                var errorRate = (double)itemsFailed / itemsProcessed;
+
+                if (errorRate >= errorThreshold)
+                {
+                    throw new InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
+                }
+            }
+
             var workerBlock = new ActionBlock<DomainId[]>(async ids =>
             {
                 try
@@ -128,6 +138,8 @@ namespace Squidex.Infrastructure.Commands
                                     .WriteProperty("domainObjectType", typeof(T).Name));
 
                                 Interlocked.Increment(ref itemsFailed);
+
+                                CheckErrorRate();
                             }
                             finally
                             {
@@ -176,11 +188,7 @@ namespace Squidex.Infrastructure.Commands
 
             await workerBlock.Completion;
 
-            var errorRate = (double)itemsFailed / itemsProcessed;
-            if (errorRate >= errorThreshold)
-            {
-                throw new InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
-            }
+            CheckErrorRate();
         }
 
         private async Task ClearAsync<TState>() where TState : class, IDomainState<TState>, new()
