@@ -7,9 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
-import { touchedChange$ } from '@app/framework';
 import { fadeAnimation, LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
+import { touchedChange$ } from './forms-helper';
 import { formatError } from './error-formatting';
 
 interface State {
@@ -28,7 +28,7 @@ interface State {
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private displayFieldName: string;
-    private control: AbstractControl;
+    private control: AbstractControl | null = null;
 
     @Input()
     public for: string | AbstractControl;
@@ -37,7 +37,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     public fieldName: string | null | undefined;
 
     public get isTouched() {
-        return this.control.touched || Types.is(this.control, FormArray);
+        return this.control?.touched || Types.is(this.control, FormArray);
     }
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -68,30 +68,25 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
-
-        let control: AbstractControl | null = null;
-
         if (Types.isString(this.for)) {
             if (this.formGroupDirective && this.formGroupDirective.form) {
-                control = this.formGroupDirective.form.controls[this.for];
+                this.control = this.formGroupDirective.form.controls[this.for];
+            } else {
+                this.control = null;
             }
         } else {
-            control = this.for;
+            this.control = this.for;
         }
 
-        if (this.control !== control) {
-            if (this.control) {
-                this.unsubscribeAll();
-            }
-
-            this.control = control;
+        if (this.control !== previousControl) {
+            this.unsubscribeAll();
 
             if (this.control) {
                 this.own(
                     merge(
                         this.control.valueChanges,
                         this.control.statusChanges,
-                        touchedChange$(control),
+                        touchedChange$(this.control),
                     ).subscribe(() => {
                         this.createMessages();
                     }));

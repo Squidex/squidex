@@ -16,17 +16,14 @@ $drag-margin: -8px;
     }
 }
 
-.category {
-    margin-bottom: 1rem;
-}
-
 .droppable {
     position: relative;
 
     .drop-indicator {
         @include absolute($drag-margin, $drag-margin, $drag-margin, $drag-margin);
         background: none;
-        border: 2px dashed $color-black;
+        border: 2px dashed $color-border;
+        border-radius: 4px;
         display: none;
         pointer-events: none;
     }
@@ -58,6 +55,15 @@ $drag-margin: -8px;
 
 .nav-heading {
     margin-left: -1rem;
+    margin-top: 0;
+}
+
+.nav-collapsed {
+    max-width: 100%;
+}
+
+.nav-light {
+    margin-top: 1rem;
 }
 
 .nav-item {
@@ -65,6 +71,14 @@ $drag-margin: -8px;
 
     .drag-handle {
         margin-right: .5rem;
+    }
+}
+
+:host {
+    &:first-child {
+        .nav-light {
+            margin-top: 1rem;
+        }
     }
 }
 

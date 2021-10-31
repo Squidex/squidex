@@ -72,6 +72,7 @@ export * from './angular/shortcut.component';
 export * from './angular/shortcut.directive';
 export * from './angular/status-icon.component';
 export * from './angular/stop-click.directive';
+export * from './angular/stop-drag.directive';
 export * from './angular/sync-scrolling.directive';
 export * from './angular/sync-width.directive';
 export * from './angular/tab-router-link.directive';

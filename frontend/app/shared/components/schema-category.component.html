@@ -1,4 +1,4 @@
-<ul *ngIf="!forContent || schemas.length > 0" class="nav nav-light flex-column"
+<ul *ngIf="!forContent || schemas.length > 0" class="nav nav-light flex-column droppable"
     cdkDropList
     cdkDropListSortingDisabled
     [cdkDropListData]="schemaCategory.name"
@@ -29,7 +29,7 @@
         </div>
     </li>
 
-    <div *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()">
+    <div *ngIf="!isCollapsed" @fade [style.height]="getContainerHeight()" class="nav-collapsed">
         <ng-container *ngIf="!forContent; else simpleMode">
             <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
                 cdkDrag
@@ -37,7 +37,9 @@
                 [cdkDragData]="schema"
                 (cdkDragStarted)="dragStarted($event)">
 
-                <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
+                <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
+                    title="{{schema.displayName}}"
+                    titlePosition="top-left">
                     <i cdkDragHandle class="icon-drag2 drag-handle"></i>
 
                     <span class="item-published me-1" [class.unpublished]="!schema.isPublished"></span> {{schema.displayName}}
@@ -47,7 +49,9 @@
     
         <ng-template #simpleMode>
             <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate">
-                <a class="nav-link truncate" [routerLink]="schemaRoute(schema)" routerLinkActive="active" title="{{schema.displayName}}" titlePosition="top-left">
+                <a class="nav-link truncate drag-none" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
+                    title="{{schema.displayName}}"
+                    titlePosition="top-left">
                     {{schema.displayName}}
                 </a>
             </li>

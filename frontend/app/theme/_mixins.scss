@@ -215,3 +215,7 @@
     min-width: 0;
     width: auto;
 }
+
+@mixin no-drag {
+    -webkit-user-drag: none;
+}

@@ -42,6 +42,12 @@ hr {
 .drag-handle {
     color: $color-text-decent;
     cursor: move;
+    font-size: 1.1rem;
+    font-weight: normal;
+}
+
+.drag-none {
+    @include no-drag;
 }
 
 //
