@@ -33,50 +33,38 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
+                Func<StreamSubscription, ResolvedEvent, CancellationToken, Task> onEvent = async (_, @event, _) =>
+                {
+                    var storedEvent = Formatter.Read(@event, prefix, serializer);
+
+                    await subscriber.OnEventAsync(this, storedEvent);
+                };
+
+                Action<StreamSubscription, SubscriptionDroppedReason, Exception?>? onError = (_, reason, ex) =>
+                {
+                    if (reason != SubscriptionDroppedReason.Disposed &&
+                        reason != SubscriptionDroppedReason.SubscriberError)
+                    {
+                        ex ??= new InvalidOperationException($"Subscription closed with reason {reason}.");
+
+                        subscriber.OnErrorAsync(this, ex);
+                    }
+                };
+
                 if (!string.IsNullOrWhiteSpace(position))
                 {
-                    var streamPosition = position.ToPosition();
+                    var streamPosition = position.ToPosition(true);
 
                     subscription = await client.SubscribeToStreamAsync(streamName, streamPosition,
-                        async (_, @event, _) =>
-                        {
-                            var storedEvent = Formatter.Read(@event, prefix, serializer);
-
-                            await subscriber.OnEventAsync(this, storedEvent);
-                        },
-                        true,
-                        (_, reason, ex) =>
-                        {
-                            if (reason != SubscriptionDroppedReason.Disposed &&
-                                reason != SubscriptionDroppedReason.SubscriberError)
-                            {
-                                ex ??= new InvalidOperationException($"Subscription closed with reason {reason}.");
-
-                                subscriber.OnErrorAsync(this, ex);
-                            }
-                        },
+                        onEvent, true,
+                        onError,
                         cancellationToken: ct);
                 }
                 else
                 {
                     subscription = await client.SubscribeToStreamAsync(streamName,
-                        async (_, @event, _) =>
-                        {
-                            var storedEvent = Formatter.Read(@event, prefix, serializer);
-
-                            await subscriber.OnEventAsync(this, storedEvent);
-                        },
-                        true,
-                        (_, reason, ex) =>
-                        {
-                            if (reason != SubscriptionDroppedReason.Disposed &&
-                                reason != SubscriptionDroppedReason.SubscriberError)
-                            {
-                                ex ??= new InvalidOperationException($"Subscription closed with reason {reason}.");
-
-                                subscriber.OnErrorAsync(this, ex);
-                            }
-                        },
+                        onEvent, true,
+                        onError,
                         cancellationToken: ct);
                 }
             }, cts.Token);

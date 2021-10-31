@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return StreamPosition.FromInt64(version);
         }
 
-        public static StreamPosition ToPosition(this string? position)
+        public static StreamPosition ToPosition(this string? position, bool inclusive)
         {
             if (string.IsNullOrWhiteSpace(position))
             {
@@ -39,25 +39,15 @@ namespace Squidex.Infrastructure.EventSourcing
 
             if (long.TryParse(position, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedPosition))
             {
+                if (!inclusive)
+                {
+                    parsedPosition++;
+                }
+
                 return StreamPosition.FromInt64(parsedPosition);
             }
 
             return StreamPosition.Start;
-        }
-
-        public static StreamPosition? ToPositionOrNull(this string? position)
-        {
-            if (string.IsNullOrWhiteSpace(position))
-            {
-                return null;
-            }
-
-            if (long.TryParse(position, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedPosition))
-            {
-                return StreamPosition.FromInt64(parsedPosition);
-            }
-
-            return null;
         }
 
         public static async IAsyncEnumerable<StoredEvent> IgnoreNotFound(this IAsyncEnumerable<StoredEvent> source,

@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
-            var stream = QueryAsync(streamName, position.ToPosition(), take, ct);
+            var stream = QueryAsync(streamName, position.ToPosition(false), take, ct);
 
             await foreach (var storedEvent in stream.IgnoreNotFound(ct))
             {
