@@ -95,83 +95,65 @@ namespace Squidex.Infrastructure.Commands
 
             var parallelism = Environment.ProcessorCount;
 
-            var itemsProcessed = 0;
-            var itemsFailed = 0;
-
-            void CheckErrorRate()
-            {
-                var errorRate = (double)itemsFailed / itemsProcessed;
-
-                if (errorRate >= errorThreshold)
-                {
-                    throw new InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
-                }
-            }
-
-            var workerBlock = new ActionBlock<DomainId[]>(async ids =>
-            {
-                try
-                {
-                    await using (var context = store.WithBatchContext(typeof(T)))
-                    {
-                        await context.LoadAsync(ids);
-
-                        foreach (var id in ids)
-                        {
-                            try
-                            {
-                                var domainObject = Factory<T, TState>.Create(serviceProvider, context);
-
-                                domainObject.Setup(id);
-
-                                await domainObject.RebuildStateAsync();
-                            }
-                            catch (DomainObjectNotFoundException)
-                            {
-                                return;
-                            }
-                            catch (Exception ex)
-                            {
-                                log.LogWarning(ex, w => w
-                                    .WriteProperty("reason", "CorruptData")
-                                    .WriteProperty("domainObjectId", id.ToString())
-                                    .WriteProperty("domainObjectType", typeof(T).Name));
-
-                                Interlocked.Increment(ref itemsFailed);
-
-                                CheckErrorRate();
-                            }
-                            finally
-                            {
-                                Interlocked.Increment(ref itemsProcessed);
-                            }
-                        }
-                    }
-                }
-                catch (OperationCanceledException ex)
-                {
-                    // Dataflow swallows operation cancelled exception.
-                    throw new AggregateException(ex);
-                }
-            },
-            new ExecutionDataflowBlockOptions
-            {
-                MaxDegreeOfParallelism = parallelism,
-                MaxMessagesPerTask = 10,
-                BoundedCapacity = parallelism
-            });
-
-            var batchBlock = new BatchBlock<DomainId>(batchSize, new GroupingDataflowBlockOptions
-            {
-                BoundedCapacity = batchSize
-            });
-
-            batchBlock.BidirectionalLinkTo(workerBlock);
-
             var handledIds = new HashSet<DomainId>();
+            var handlerErrors = 0;
 
             using (localCache.StartContext())
             {
+                var workerBlock = new ActionBlock<DomainId[]>(async ids =>
+                {
+                    try
+                    {
+                        await using (var context = store.WithBatchContext(typeof(T)))
+                        {
+                            await context.LoadAsync(ids);
+
+                            foreach (var id in ids)
+                            {
+                                try
+                                {
+                                    var domainObject = Factory<T, TState>.Create(serviceProvider, context);
+
+                                    domainObject.Setup(id);
+
+                                    await domainObject.RebuildStateAsync();
+                                }
+                                catch (DomainObjectNotFoundException)
+                                {
+                                    return;
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.LogWarning(ex, w => w
+                                        .WriteProperty("reason", "CorruptData")
+                                        .WriteProperty("domainObjectId", id.ToString())
+                                        .WriteProperty("domainObjectType", typeof(T).Name));
+
+                                    Interlocked.Increment(ref handlerErrors);
+                                }
+                            }
+                        }
+                    }
+                    catch (OperationCanceledException ex)
+                    {
+                        // Dataflow swallows operation cancelled exception.
+                        throw new AggregateException(ex);
+                    }
+                },
+                new ExecutionDataflowBlockOptions
+                {
+                    MaxDegreeOfParallelism = parallelism,
+                    MaxMessagesPerTask = 10,
+                    BoundedCapacity = parallelism
+                });
+
+                var batchBlock = new BatchBlock<DomainId>(batchSize, new GroupingDataflowBlockOptions
+                {
+                    BoundedCapacity = batchSize
+                });
+
+                batchBlock.BidirectionalLinkTo(workerBlock);
+
                 await foreach (var id in source.WithCancellation(ct))
                 {
                     if (handledIds.Add(id))
@@ -184,11 +166,16 @@ namespace Squidex.Infrastructure.Commands
                 }
 
                 batchBlock.Complete();
+
+                await workerBlock.Completion;
             }
 
-            await workerBlock.Completion;
+            var errorRate = (double)handlerErrors / handledIds.Count;
 
-            CheckErrorRate();
+            if (errorRate >= errorThreshold)
+            {
+                throw new InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
+            }
         }
 
         private async Task ClearAsync<TState>() where TState : class, IDomainState<TState>, new()
