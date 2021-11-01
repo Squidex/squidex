@@ -407,13 +407,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
     const flatCategoryList: SchemaCategory[] = [schemas, components];
 
     for (const name of categories) {
-        flatCategoryList.push({
-            displayName: name,
-            name,
-            schemas: [],
-            schemaTotalCount: 0,
-            categories: [],
-        });
+        getOrCreateCategory(name);
     }
 
     function addSchemaToCategory(schema: SchemaDto, category: SchemaCategory) {
