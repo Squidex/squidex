@@ -27,7 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     foreach (var (key, jsonValue) in value)
                     {
-                        if (GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson) == GeoJsonParseResult.Success)
+                        GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson);
+
+                        if (geoJson != null)
                         {
                             result ??= new Dictionary<string, GeoJSONObject>();
                             result[$"{field}.{key}"] = geoJson;
