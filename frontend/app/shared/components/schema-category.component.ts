@@ -32,6 +32,8 @@ export class SchemaCategoryComponent implements OnChanges {
 
     public isCollapsed = false;
 
+    public visibleCount = 0;
+
     public get schemas() {
         return this.schemaCategory.schemas;
     }
@@ -49,11 +51,17 @@ export class SchemaCategoryComponent implements OnChanges {
     }
 
     public ngOnChanges() {
+        this.visibleCount = this.getCount(this.schemaCategory);
         if (this.schemaCategory.schemas.length < this.schemaCategory.schemaTotalCount) {
             this.isCollapsed = false;
         } else {
             this.isCollapsed = this.localStore.getBoolean(this.configKey());
         }
+    }
+
+    private getCount(category: SchemaCategory): number {
+        const childCount = category.categories.reduce((total, child) => total + this.getCount(child), 0);
+        return childCount + category.schemas.length;
     }
 
     public schemaRoute(schema: SchemaDto) {

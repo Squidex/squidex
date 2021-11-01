@@ -1,4 +1,4 @@
-<ul [hidden]="forContent && schemaCategory.schemaTotalCount == 0" id="cat_{{schemaCategory.name}}" class="nav nav-light flex-column">
+<ul [hidden]="forContent && visibleCount == 0" id="cat_{{schemaCategory.name}}" class="nav nav-light flex-column">
 
     <div class="droppable category"
         cdkDropList
@@ -19,8 +19,8 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <ng-container *ngIf="schemaCategory.schemaTotalCount > 0; else noSchemas">
-                        <span class="badge rounded-pill badge-secondary">{{schemaCategory.schemaTotalCount}}</span>
+                    <ng-container *ngIf="visibleCount > 0; else noSchemas">
+                        <span class="badge rounded-pill badge-secondary">{{visibleCount}}</span>
                     </ng-container>
                     <ng-template #noSchemas>
                         <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit(schemaCategory.name)" *ngIf="schemaCategory.name">
