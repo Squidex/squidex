@@ -38,6 +38,49 @@ namespace Squidex.Domain.Apps.Core.Contents
             return this;
         }
 
+        public ContentData UseSameFields(ContentData? other)
+        {
+            if (other == null || other.Count == 0)
+            {
+                return this;
+            }
+
+            foreach (var (fieldName, fieldData) in this.ToList())
+            {
+                if (fieldData == null)
+                {
+                    continue;
+                }
+
+                if (!other.TryGetValue(fieldName, out var otherField) || otherField == null)
+                {
+                    continue;
+                }
+
+                if (otherField.Equals(fieldData))
+                {
+                    this[fieldName] = otherField;
+                }
+                else
+                {
+                    foreach (var (language, value) in fieldData.ToList())
+                    {
+                        if (!otherField.TryGetValue(language, out var otherValue) || otherValue == null)
+                        {
+                            continue;
+                        }
+
+                        if (otherValue.Equals(value))
+                        {
+                            fieldData[language] = otherValue;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+
         private static ContentData MergeTo(ContentData target, params ContentData[] sources)
         {
             Guard.NotEmpty(sources, nameof(sources));
@@ -49,19 +92,23 @@ namespace Squidex.Domain.Apps.Core.Contents
 
             foreach (var source in sources)
             {
-                foreach (var (key, contentFieldData) in source)
+                foreach (var (fieldName, sourceFieldData) in source)
                 {
-                    if (contentFieldData != null)
+                    if (sourceFieldData == null)
                     {
-                        var fieldValue = target.GetOrAdd(key, _ => new ContentFieldData());
+                        continue;
+                    }
 
-                        if (fieldValue != null)
-                        {
-                            foreach (var (fieldName, value) in contentFieldData)
-                            {
-                                fieldValue[fieldName] = value;
-                            }
-                        }
+                    var targetFieldData = target.GetOrAdd(fieldName, _ => new ContentFieldData());
+
+                    if (targetFieldData == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var (partition, value) in sourceFieldData)
+                    {
+                        targetFieldData[partition] = value;
                     }
                 }
             }

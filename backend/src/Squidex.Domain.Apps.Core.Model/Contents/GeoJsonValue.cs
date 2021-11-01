@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(value, nameof(value));
 
-            geoJSON = null!;
+            geoJSON = null;
 
             if (value is JsonObject obj)
             {
@@ -42,6 +42,8 @@ namespace Squidex.Domain.Apps.Core.Contents
                 }
 
                 geoJSON = new Point(new Position(lat.Value, lon.Value));
+
+                return GeoJsonParseResult.Success;
             }
 
             return GeoJsonParseResult.InvalidValue;

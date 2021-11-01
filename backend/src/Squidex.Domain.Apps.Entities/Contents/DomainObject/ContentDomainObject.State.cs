@@ -71,7 +71,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
                     case ContentDraftCreated e:
                         {
-                            NewVersion = new ContentVersion(e.Status, e.MigratedData ?? CurrentVersion.Data);
+                            var newData = e.MigratedData?.UseSameFields(Data) ?? CurrentVersion.Data;
+
+                            NewVersion = new ContentVersion(e.Status, newData);
 
                             ScheduleJob = null;
 
@@ -95,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                             {
                                 if (e.Status == Status.Published)
                                 {
-                                    CurrentVersion = new ContentVersion(e.Status, NewVersion.Data);
+                                    CurrentVersion = new ContentVersion(e.Status, NewVersion.Data.UseSameFields(Data));
 
                                     NewVersion = null;
                                 }
@@ -130,11 +132,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                         {
                             if (NewVersion != null)
                             {
-                                NewVersion = NewVersion.WithData(e.Data);
+                                NewVersion = NewVersion.WithData(e.Data.UseSameFields(Data));
                             }
                             else
                             {
-                                CurrentVersion = CurrentVersion.WithData(e.Data);
+                                CurrentVersion = CurrentVersion.WithData(e.Data.UseSameFields(Data));
                             }
 
                             break;

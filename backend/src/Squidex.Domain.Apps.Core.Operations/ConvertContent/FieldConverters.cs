@@ -119,15 +119,17 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     foreach (var languageCode in languages.AllKeys)
                     {
-                        if (!data.TryGetNonNull(languageCode, out _))
+                        if (data.TryGetNonNull(languageCode, out _))
                         {
-                            foreach (var fallback in languages.GetPriorities(languageCode))
+                            continue;
+                        }
+
+                        foreach (var fallback in languages.GetPriorities(languageCode))
+                        {
+                            if (data.TryGetNonNull(fallback, out var value))
                             {
-                                if (data.TryGetNonNull(fallback, out var value))
-                                {
-                                    data[languageCode] = value;
-                                    break;
-                                }
+                                data[languageCode] = value;
+                                break;
                             }
                         }
                     }
