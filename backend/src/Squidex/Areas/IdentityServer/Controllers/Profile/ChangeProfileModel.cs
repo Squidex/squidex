@@ -15,7 +15,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [LocalizedRequired]
         public string Email { get; set; }
 
-        [LocalizedRequiredAttribute]
+        [LocalizedRequired]
         public string DisplayName { get; set; }
 
         public bool IsHidden { get; set; }

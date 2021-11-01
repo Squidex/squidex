@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [LocalizedRequired]
         public string Email { get; set; }
 
-        [LocalizedRequiredAttribute]
+        [LocalizedRequired]
         public string Password { get; set; }
     }
 }

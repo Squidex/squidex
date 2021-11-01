@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [LocalizedRequired]
         public string OldPassword { get; set; }
 
-        [LocalizedRequiredAttribute]
+        [LocalizedRequired]
         public string Password { get; set; }
 
         [LocalizedCompare(nameof(Password))]

@@ -24,12 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private readonly IServiceProvider serviceProvider;
 
-        public AssetDomainObject(IPersistenceFactory<AssetDomainObject.State> factory, ISemanticLog log,
+        public AssetDomainObject(IPersistenceFactory<State> factory, ISemanticLog log,
             IServiceProvider serviceProvider)
             : base(factory, log)
         {
-            Capacity = int.MaxValue;
             this.serviceProvider = serviceProvider;
+
+            Capacity = 2;
         }
 
         protected override bool IsDeleted()

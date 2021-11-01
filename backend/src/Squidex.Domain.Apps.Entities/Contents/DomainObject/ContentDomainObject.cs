@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             this.serviceProvider = serviceProvider;
 
-            Capacity = int.MaxValue;
+            Capacity = 5;
         }
 
         protected override bool IsDeleted()

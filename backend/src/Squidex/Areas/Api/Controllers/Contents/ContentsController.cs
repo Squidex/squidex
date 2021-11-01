@@ -23,7 +23,7 @@ using Squidex.Web.GraphQL;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
-    [SchemaMustBePublishedAttribute]
+    [SchemaMustBePublished]
     public sealed class ContentsController : ApiController
     {
         private readonly IContentQueryService contentQuery;
