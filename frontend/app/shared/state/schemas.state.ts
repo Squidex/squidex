@@ -373,6 +373,7 @@ export type SchemaCategory = {
 
 const SPECIAL_SCHEMAS = 'i18n:common.schemas';
 const SPECIAL_COMPONENTS = 'i18n:common.components';
+const NESTED_CATEGORY_SEPARATOR = '/';
 
 export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories: Set<string>, filter?: string) {
     let match = (_: SchemaDto) => true;
@@ -421,7 +422,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
     function getOrCreateCategory(name: string): SchemaCategory {
         let category = flatCategoryList.find(x => x.name === name);
 
-        const displayName = (name.indexOf('.') === -1) ? name : name.substr(name.lastIndexOf('.') + 1);
+        const displayName = (name.indexOf(NESTED_CATEGORY_SEPARATOR) === -1) ? name : name.substr(name.lastIndexOf(NESTED_CATEGORY_SEPARATOR) + 1);
 
         if (!category) {
             category = {
@@ -434,9 +435,9 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
 
             flatCategoryList.push(category);
 
-            if (name.indexOf('.') !== -1) {
+            if (name.indexOf(NESTED_CATEGORY_SEPARATOR) !== -1) {
                 // Recurse back creating all the parents of this category
-                const parentName = name.substr(0, name.lastIndexOf('.'));
+                const parentName = name.substr(0, name.lastIndexOf(NESTED_CATEGORY_SEPARATOR));
                 getOrCreateCategory(parentName);
             }
         }
@@ -465,8 +466,8 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
     // Because we're processing in reverse we unshift rather than push to the results array to get everything in the right order at the end.
     for (const category of flatCategoryList.reverse()) {
         if (category.name) {
-            if (category.name?.indexOf('.') !== -1) {
-                const parentName = category.name?.substr(0, category.name.lastIndexOf('.'));
+            if (category.name?.indexOf(NESTED_CATEGORY_SEPARATOR) !== -1) {
+                const parentName = category.name?.substr(0, category.name.lastIndexOf(NESTED_CATEGORY_SEPARATOR));
                 const parentCategory = flatCategoryList.find(x => x.name === parentName);
                 if (parentCategory) {
                     parentCategory.categories.unshift(category);
