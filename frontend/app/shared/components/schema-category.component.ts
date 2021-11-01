@@ -22,7 +22,7 @@ const ITEM_HEIGHT = 2.5;
 })
 export class SchemaCategoryComponent implements OnChanges {
     @Output()
-    public remove = new EventEmitter();
+    public remove = new EventEmitter<string>();
 
     @Input()
     public schemaCategory: SchemaCategory;
@@ -91,6 +91,10 @@ export class SchemaCategoryComponent implements OnChanges {
 
     public trackBySchema(_index: number, schema: SchemaDto) {
         return schema.id;
+    }
+
+    public trackByCategory(_index: number, category: SchemaCategory) {
+        return category.name;
     }
 
     private configKey(): string {

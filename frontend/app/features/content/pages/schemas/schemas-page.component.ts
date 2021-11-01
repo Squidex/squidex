@@ -36,7 +36,7 @@ export class SchemasPageComponent {
         combineLatest([
             value$(this.schemasFilter),
             this.schemas,
-            this.schemasState.categoryNames,
+            this.schemasState.addedCategories,
         ], (filter, schemas, categories) => {
             return getCategoryTree(schemas, categories, filter);
         });

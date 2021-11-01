@@ -28,7 +28,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
         combineLatest([
             value$(this.schemasFilter),
             this.schemasState.schemas,
-            this.schemasState.categoryNames,
+            this.schemasState.addedCategories,
         ], (filter, schemas, categories) => {
             return getCategoryTree(schemas, categories, filter);
         });
