@@ -60,10 +60,10 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
             const Calendar = tui.Calendar;
 
             this.calendar = new Calendar(this.calendarContainer.nativeElement, {
-                taskView: false,
-                scheduleView: ['time'],
                 defaultView: 'month',
                 isReadOnly: true,
+                scheduleView: ['time'],
+                taskView: false,
                 ...getLocalizationSettings(),
             });
 

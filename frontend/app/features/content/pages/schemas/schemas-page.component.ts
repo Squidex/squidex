@@ -7,7 +7,9 @@
 
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { LocalStoreService, SchemaCategory, SchemasState, Settings } from '@app/shared';
+import { AppsState, getCategoryTree, LocalStoreService, SchemaCategory, SchemasState, Settings, value$ } from '@app/shared';
+import { combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -17,6 +19,28 @@ import { LocalStoreService, SchemaCategory, SchemasState, Settings } from '@app/
 export class SchemasPageComponent {
     public schemasFilter = new FormControl();
 
+    public schemas =
+        this.schemasState.schemas.pipe(
+            map(schemas => {
+                const app = this.appsState.snapshot.selectedApp!;
+
+                return schemas.filter(schema =>
+                    schema.canReadContents &&
+                    schema.isPublished &&
+                    schema.type !== 'Component' &&
+                    !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(schema.name)],
+                );
+            }));
+
+    public categories =
+        combineLatest([
+            value$(this.schemasFilter),
+            this.schemas,
+            this.schemasState.categoryNames,
+        ], (filter, schemas, categories) => {
+            return getCategoryTree(schemas, categories, filter);
+        });
+
     public isCollapsed: boolean;
 
     public get width() {
@@ -25,6 +49,7 @@ export class SchemasPageComponent {
 
     constructor(
         public readonly schemasState: SchemasState,
+        private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
     ) {
         this.isCollapsed = localStore.getBoolean(Settings.Local.SCHEMAS_COLLAPSED);

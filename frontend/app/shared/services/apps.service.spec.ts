@@ -333,8 +333,7 @@ describe('AppsService', () => {
             permissions: ['Owner'],
             canAccessApi: id % 2 === 0,
             canAccessContent: id % 2 === 0,
-            planName: 'Free',
-            planUpgrade: 'Basic',
+            roleName: `Role${id}`,
             roleProperties: createProperties(id),
             _links: {
                 update: { method: 'PUT', href: `apps/${id}` },
@@ -394,7 +393,7 @@ export function createApp(id: number, suffix = '') {
         ['Owner'],
         id % 2 === 0,
         id % 2 === 0,
-        'Free', 'Basic',
+        `Role${id}`,
         createProperties(id));
 }
 

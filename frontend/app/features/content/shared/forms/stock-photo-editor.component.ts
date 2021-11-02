@@ -7,9 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$ } from '@app/shared';
+import { StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$, valueProjection$ } from '@app/shared';
 import { of } from 'rxjs';
-import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
+import { debounceTime, switchMap, tap } from 'rxjs/operators';
 
 export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,
@@ -40,7 +40,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
 
     public valueControl = new FormControl('');
 
-    public stockPhotoThumbnail = value$(this.valueControl).pipe(map(v => thumbnail(v, 400) || v));
+    public stockPhotoThumbnail = valueProjection$(this.valueControl, x => thumbnail(x, 400) || x);
     public stockPhotoSearch = new FormControl('');
 
     public stockPhotos =

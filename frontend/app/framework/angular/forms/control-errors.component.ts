@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnC
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
 import { fadeAnimation, LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
+import { touchedChange$ } from './forms-helper';
 import { formatError } from './error-formatting';
 
 interface State {
@@ -27,8 +28,7 @@ interface State {
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private displayFieldName: string;
-    private control: AbstractControl;
-    private controlOriginalMarkAsTouched: any;
+    private control: AbstractControl | null = null;
 
     @Input()
     public for: string | AbstractControl;
@@ -37,7 +37,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     public fieldName: string | null | undefined;
 
     public get isTouched() {
-        return this.control.touched || Types.is(this.control, FormArray);
+        return this.control?.touched || Types.is(this.control, FormArray);
     }
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -49,13 +49,9 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         });
     }
 
-    public ngOnDestroy() {
-        super.ngOnDestroy();
-
-        this.unsetCustomMarkAsTouchedFunction();
-    }
-
     public ngOnChanges() {
+        const previousControl = this.control;
+
         if (this.fieldName) {
             this.displayFieldName = this.fieldName;
         } else if (this.for) {
@@ -72,51 +68,32 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
-        let control: AbstractControl | null = null;
-
         if (Types.isString(this.for)) {
             if (this.formGroupDirective && this.formGroupDirective.form) {
-                control = this.formGroupDirective.form.controls[this.for];
+                this.control = this.formGroupDirective.form.controls[this.for];
+            } else {
+                this.control = null;
             }
         } else {
-            control = this.for;
+            this.control = this.for;
         }
 
-        if (this.control !== control && control) {
+        if (this.control !== previousControl) {
             this.unsubscribeAll();
-            this.unsetCustomMarkAsTouchedFunction();
 
-            this.control = control;
-
-            if (control) {
+            if (this.control) {
                 this.own(
-                    merge(control.valueChanges, control.statusChanges)
-                        .subscribe(() => {
-                            this.createMessages();
-                        }));
-
-                this.controlOriginalMarkAsTouched = this.control.markAsTouched;
-
-                // eslint-disable-next-line @typescript-eslint/no-this-alias
-                const self = this;
-
-                // eslint-disable-next-line func-names
-                this.control['markAsTouched'] = function () {
-                    // eslint-disable-next-line prefer-rest-params
-                    self.controlOriginalMarkAsTouched.apply(this, arguments);
-
-                    self.createMessages();
-                };
+                    merge(
+                        this.control.valueChanges,
+                        this.control.statusChanges,
+                        touchedChange$(this.control),
+                    ).subscribe(() => {
+                        this.createMessages();
+                    }));
             }
         }
 
         this.createMessages();
-    }
-
-    private unsetCustomMarkAsTouchedFunction() {
-        if (this.control && this.controlOriginalMarkAsTouched) {
-            this.control['markAsTouched'] = this.controlOriginalMarkAsTouched;
-        }
     }
 
     private createMessages() {

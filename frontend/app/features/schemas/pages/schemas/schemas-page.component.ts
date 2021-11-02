@@ -8,7 +8,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreateCategoryForm, DialogModel, MessageBus, ResourceOwner, SchemaCategory, SchemaDto, SchemasState } from '@app/shared';
+import { CreateCategoryForm, DialogModel, getCategoryTree, MessageBus, ResourceOwner, SchemaCategory, SchemaDto, SchemasState, value$ } from '@app/shared';
+import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SchemaCloning } from './../messages';
 
@@ -22,6 +23,15 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public addCategoryForm = new CreateCategoryForm(this.formBuilder);
 
     public schemasFilter = new FormControl();
+
+    public categories =
+        combineLatest([
+            value$(this.schemasFilter),
+            this.schemasState.schemas,
+            this.schemasState.categoryNames,
+        ], (filter, schemas, categories) => {
+            return getCategoryTree(schemas, categories, filter);
+        });
 
     public import: any;
 

@@ -53,9 +53,16 @@ namespace Squidex.Extensions.APM.Stackdriver
 
         public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception exception)
         {
-            if (exception != null && exception is not DomainException)
+            try
             {
-                logger.Log(exception, httpContextWrapper);
+                if (exception != null && exception is not DomainException)
+                {
+                    logger.Log(exception, httpContextWrapper);
+                }
+            }
+            catch
+            {
+                return;
             }
         }
     }

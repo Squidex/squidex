@@ -35,7 +35,6 @@ interface Snapshot {
 }
 
 export type SchemasList = ReadonlyArray<SchemaDto>;
-export type SchemaCategory = { displayName: string; name?: string; schemas: SchemaDto[] };
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
@@ -59,9 +58,6 @@ export class SchemasState extends State<Snapshot> {
 
     public categoryNames =
         this.project(x => x.categories);
-
-    public categories =
-        this.projectFrom2(this.schemas, this.categoryNames, (s, c) => buildCategories(c, s));
 
     public get schemaId() {
         return this.snapshot.selectedSchema?.id || '';
@@ -367,18 +363,42 @@ function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | nu
     }
 }
 
+export type SchemaCategory = {
+    displayName: string;
+    name?: string;
+    schemas: SchemaDto[];
+    schemaTotalCount: number;
+};
+
 const SPECIAL_SCHEMAS = 'i18n:common.schemas';
 const SPECIAL_COMPONENTS = 'i18n:common.components';
 
-function buildCategories(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<SchemaCategory> {
+export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories: Set<string>, filter?: string) {
+    let match = (_: SchemaDto) => true;
+
+    if (filter) {
+        const terms = filter.split(' ').map(filter => new RegExp(filter.trim(), 'i'));
+
+        const matches = (value: string | undefined | null) => {
+            return !!value && terms.every(term => value.search(term) >= 0);
+        };
+
+        match = schema =>
+            matches(schema.name) ||
+            matches(schema.properties.label) ||
+            matches(schema.properties.hints);
+    }
+
     const schemas: SchemaCategory = {
         displayName: SPECIAL_SCHEMAS,
         schemas: [],
+        schemaTotalCount: 0,
     };
 
     const components: SchemaCategory = {
         displayName: SPECIAL_COMPONENTS,
         schemas: [],
+        schemaTotalCount: 0,
     };
 
     const result: SchemaCategory[] = [schemas, components];
@@ -388,7 +408,16 @@ function buildCategories(categories: Set<string>, allSchemas: SchemasList): Read
             displayName: name,
             name,
             schemas: [],
+            schemaTotalCount: 0,
         });
+    }
+
+    function add(schema: SchemaDto, category: SchemaCategory) {
+        category.schemaTotalCount++;
+
+        if (match(schema)) {
+            category.schemas.push(schema);
+        }
     }
 
     for (const schema of allSchemas) {
@@ -402,16 +431,17 @@ function buildCategories(categories: Set<string>, allSchemas: SchemasList): Read
                     displayName: name,
                     name,
                     schemas: [],
+                    schemaTotalCount: 0,
                 };
 
                 result.push(category);
             }
 
-            category.schemas.push(schema);
+            add(schema, category);
         } else if (schema.type === 'Component') {
-            components.schemas.push(schema);
+            add(schema, components);
         } else {
-            schemas.schemas.push(schema);
+            add(schema, schemas);
         }
     }
 

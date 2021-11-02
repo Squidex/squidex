@@ -69,7 +69,14 @@ export function defined<T>() {
 
 export function switchSafe<T, R>(project: (source: T) => Observable<R>) {
     return function mapOperation(source: Observable<T>) {
-        return source.pipe(switchMap(project), onErrorResumeNext());
+        return source.pipe(
+            switchMap(x => {
+                try {
+                    return project(x).pipe(catchError(_ => EMPTY));
+                } catch {
+                    return EMPTY;
+                }
+            }));
     };
 }
 

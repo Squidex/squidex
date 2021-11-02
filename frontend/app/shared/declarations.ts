@@ -56,6 +56,7 @@ export * from './components/search/query-list.component';
 export * from './components/search/search-form.component';
 export * from './components/search/shared-queries.component';
 export * from './components/table-header.component';
+export * from './components/watching-users.component';
 export * from './guards/app-must-exist.guard';
 export * from './guards/content-must-exist.guard';
 export * from './guards/load-apps.guard';

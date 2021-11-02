@@ -45,6 +45,18 @@ export class CommentsService {
     ) {
     }
 
+    public getWatchingUsers(appId: string, resource: string): Observable<ReadonlyArray<string>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appId}/watching/${resource}`);
+
+        const options = {
+            headers: new HttpHeaders({
+                'X-Silent': '1',
+            }),
+        };
+
+        return this.http.get<ReadonlyArray<string>>(url, options);
+    }
+
     public getComments(commentsUrl: string, version: Version): Observable<CommentsDto> {
         const url = this.apiUrl.buildUrl(`api/${commentsUrl}?version=${version.value}`);
 

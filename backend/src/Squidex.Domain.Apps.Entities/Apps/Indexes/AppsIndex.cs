@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
             catch
             {
-                // Catch our own exception, juist in case something went wrong before.
+                // Catch our own exception, just in case something went wrong before.
                 await cache.RemoveReservationAsync(token);
                 throw;
             }

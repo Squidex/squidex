@@ -6,7 +6,7 @@
  */
 
 import { Directive, ElementRef, HostListener, Input, OnDestroy, Renderer2 } from '@angular/core';
-import { DialogService, Keys, Tooltip } from '@app/framework/internal';
+import { DialogService, Tooltip } from '@app/framework/internal';
 
 @Directive({
     selector: '[title]:not(sqx-layout),[shortcut]',
@@ -52,38 +52,6 @@ export class TooltipDirective implements OnDestroy {
     public ngOnDestroy() {
         this.hide();
         this.hideShortcut();
-    }
-
-    @HostListener('body:keydown', ['$event'])
-    public onBodyKeyDown(event: KeyboardEvent) {
-        const shortcut = this.shortcut;
-
-        if (Keys.isControl(event) && shortcut && !this.shortcutTimer) {
-            this.shortcutTimer = setTimeout(() => {
-                this.showShortcut(shortcut);
-            }, this.shortcutDelay);
-        }
-    }
-
-    @HostListener('body:keyup')
-    public onBodyKeyUp() {
-        if (this.shortcutTimer) {
-            this.hideShortcut();
-        }
-    }
-
-    @HostListener('body:click')
-    public onBodyClick() {
-        if (this.shortcutTimer) {
-            this.hideShortcut();
-        }
-    }
-
-    @HostListener('window:blur')
-    public onWindowBlur() {
-        if (this.shortcutTimer) {
-            this.hideShortcut();
-        }
     }
 
     @HostListener('mouseenter')
@@ -137,10 +105,6 @@ export class TooltipDirective implements OnDestroy {
 
     private show() {
         this.dialogs.tooltip(new Tooltip(this.target, this.titleText!, this.titlePosition, false, this.shortcut));
-    }
-
-    private showShortcut(shortcut: string) {
-        this.dialogs.tooltip(new Tooltip(this.target, shortcut, this.shortcutPosition, true));
     }
 
     private unsetAttribute() {

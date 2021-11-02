@@ -321,7 +321,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var expected = allExpected.TakeLast(take).ToArray();
 
-                var readEvents = await Sut.QueryLatestAsync(streamName, take);
+                var readEvents = await Sut.QueryReverseAsync(streamName, take);
 
                 ShouldBeEquivalentTo(readEvents, expected);
             }
@@ -375,9 +375,22 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
 
-            await Sut.DeleteAsync($"^{streamName.Substring(0, 10)}");
+            IReadOnlyList<StoredEvent>? readEvents = null;
 
-            var readEvents = await QueryAsync(streamName);
+            for (var i = 0; i < 5; i++)
+            {
+                await Sut.DeleteAsync($"^{streamName.Substring(0, 10)}");
+
+                readEvents = await QueryAsync(streamName);
+
+                if (readEvents.Count == 0)
+                {
+                    break;
+                }
+
+                // Get event store needs a little bit of time for the projections.
+                await Task.Delay(1000);
+            }
 
             Assert.Empty(readEvents);
         }
@@ -395,9 +408,22 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
 
-            await Sut.DeleteStreamAsync(streamName);
+            IReadOnlyList<StoredEvent>? readEvents = null;
 
-            var readEvents = await QueryAsync(streamName);
+            for (var i = 0; i < 5; i++)
+            {
+                await Sut.DeleteStreamAsync(streamName);
+
+                readEvents = await QueryAsync(streamName);
+
+                if (readEvents.Count == 0)
+                {
+                    break;
+                }
+
+                // Get event store needs a little bit of time for the projections.
+                await Task.Delay(1000);
+            }
 
             Assert.Empty(readEvents);
         }
@@ -424,7 +450,8 @@ namespace Squidex.Infrastructure.EventSourcing
             return readEvents;
         }
 
-        private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter, Func<Task>? subscriptionRunning = null, bool fromBeginning = false)
+        private async Task<IReadOnlyList<StoredEvent>?> QueryWithSubscriptionAsync(string streamFilter,
+            Func<Task>? subscriptionRunning = null, bool fromBeginning = false)
         {
             var subscriber = new EventSubscriber();
 

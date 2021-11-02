@@ -6,10 +6,9 @@
  */
 
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { AbstractControl, FormControl } from '@angular/forms';
-import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, MathHelper, RootFieldDto, Types, value$ } from '@app/shared';
+import { AbstractControl } from '@angular/forms';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, Types } from '@app/shared';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-field-editor[form][formContext][formModel][language][languages]',
@@ -17,6 +16,8 @@ import { map } from 'rxjs/operators';
     templateUrl: './field-editor.component.html',
 })
 export class FieldEditorComponent implements OnChanges {
+    public readonly uniqueId = MathHelper.guid();
+
     @Input()
     public form: EditContentForm;
 
@@ -50,25 +51,13 @@ export class FieldEditorComponent implements OnChanges {
         return this.formModel.field;
     }
 
-    public get editorControl() {
-        return this.formModel.form as FormControl;
+    public get fieldForm() {
+        return this.formModel.form;
     }
-
-    public get rootField() {
-        return this.formModel.field as RootFieldDto;
-    }
-
-    public uniqueId = MathHelper.guid();
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
-            const previousControl: AbstractContentForm<FieldDto, AbstractControl> = changes['formModel'].previousValue;
-
-            if (previousControl && Types.isFunction(previousControl.form['_clearChangeFns'])) {
-                previousControl.form['_clearChangeFns']();
-            }
-
-            this.isEmpty = value$(this.formModel.form).pipe(map(x => Types.isUndefined(x) || Types.isNull(x)));
+            this.isEmpty = hasNoValue$(this.formModel.form);
         }
     }
 

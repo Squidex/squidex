@@ -7,8 +7,8 @@
 
 import { ChangeDetectorRef, Directive, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
-import { onErrorResumeNext, skip } from 'rxjs/operators';
+import { EMPTY, Observable, Subscription } from 'rxjs';
+import { catchError, skip } from 'rxjs/operators';
 import { State } from './../state';
 import { Types } from './../utils/types';
 
@@ -23,7 +23,7 @@ export class ResourceOwner implements OnDestroy {
             if (Types.isFunction(subscription['subscribe'])) {
                 const observable = <Observable<T>>subscription;
 
-                this.subscriptions.push(observable.pipe(onErrorResumeNext()).subscribe());
+                this.subscriptions.push(observable.pipe(catchError(_ => EMPTY)).subscribe());
             } else {
                 this.subscriptions.push(<any>subscription);
             }

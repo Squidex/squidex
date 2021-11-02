@@ -99,6 +99,9 @@ env:
   STORE__TYPE: MongoDb
   STORE__MONGODB__DATABASE: "Squidex"
   STORE__MONGODB__CONTENTDATABASE: "SquidexContent"
+  
+  # Assets
+  ASSETSTORE__TYPE: MongoDb
 
   URLS__BASEURL: https://squidex.local/ # Set the base url of your application, to generate correct urls in background process
   URLS__ENFORCEHTTPS: false # Set it to true to redirect the user from http to https permanently

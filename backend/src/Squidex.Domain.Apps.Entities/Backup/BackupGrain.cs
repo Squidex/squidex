@@ -51,8 +51,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IEventStore eventStore,
             IGrainState<BackupState> state,
             IServiceProvider serviceProvider,
-            IUserResolver userResolver,
-            ISemanticLog log)
+            ISemanticLog log,
+            IUserResolver userResolver)
         {
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;

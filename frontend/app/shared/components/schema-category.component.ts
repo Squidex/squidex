@@ -7,14 +7,12 @@
 
 import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasList, SchemasState } from '@app/shared/internal';
-import { AppsState } from '../state/apps.state';
-import { Settings } from '../state/settings';
+import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
 
 const ITEM_HEIGHT = 2.5;
 
 @Component({
-    selector: 'sqx-schema-category',
+    selector: 'sqx-schema-category[schemaCategory]',
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
     animations: [
@@ -30,17 +28,15 @@ export class SchemaCategoryComponent implements OnChanges {
     public schemaCategory: SchemaCategory;
 
     @Input()
-    public schemasFilter: string;
-
-    @Input()
     public forContent?: boolean | null;
-
-    public filteredSchemas: SchemasList;
 
     public isCollapsed = false;
 
+    public get schemas() {
+        return this.schemaCategory.schemas;
+    }
+
     constructor(
-        private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState,
     ) {
@@ -53,18 +49,7 @@ export class SchemaCategoryComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.filteredSchemas = this.schemaCategory.schemas;
-
-        if (this.forContent) {
-            const app = this.appsState.snapshot.selectedApp!;
-
-            this.filteredSchemas = this.filteredSchemas.filter(x => x.canReadContents && x.isPublished && x.type !== 'Component');
-            this.filteredSchemas = this.filteredSchemas.filter(x => !app.roleProperties[Settings.AppProperties.HIDE_CONTENTS(x.name)]);
-        }
-
-        if (this.schemasFilter) {
-            this.filteredSchemas = this.filteredSchemas.filter(x => x.name.indexOf(this.schemasFilter) >= 0);
-
+        if (this.schemaCategory.schemas.length < this.schemaCategory.schemaTotalCount) {
             this.isCollapsed = false;
         } else {
             this.isCollapsed = this.localStore.getBoolean(this.configKey());
@@ -101,7 +86,7 @@ export class SchemaCategoryComponent implements OnChanges {
     }
 
     public getContainerHeight() {
-        return `${ITEM_HEIGHT * this.filteredSchemas.length}rem`;
+        return `${ITEM_HEIGHT * this.schemas.length}rem`;
     }
 
     public trackBySchema(_index: number, schema: SchemaDto) {

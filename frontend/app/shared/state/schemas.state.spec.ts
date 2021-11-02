@@ -10,7 +10,7 @@ import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { createSchema } from './../services/schemas.service.spec';
-import { SchemaCategory, SchemasState } from './schemas.state';
+import { getCategoryTree, SchemasState } from './schemas.state';
 import { TestValues } from './_test-helpers';
 
 describe('SchemasState', () => {
@@ -58,15 +58,6 @@ describe('SchemasState', () => {
             expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
 
-            const categories = getCategories(schemasState);
-
-            expect(categories!).toEqual([
-                { displayName: 'i18n:common.components', schemas: [] },
-                { displayName: 'i18n:common.schemas', schemas: [] },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-            ]);
-
             schemasService.verifyAll();
         });
 
@@ -80,16 +71,6 @@ describe('SchemasState', () => {
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
             expect(schemasState.snapshot.isLoading).toBeFalsy();
             expect(schemasState.snapshot.schemas).toEqual(oldSchemas.items);
-
-            const categories = getCategories(schemasState);
-
-            expect(categories!).toEqual([
-                { displayName: 'i18n:common.components', schemas: [] },
-                { displayName: 'i18n:common.schemas', schemas: [] },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] },
-            ]);
 
             schemasService.verifyAll();
         });
@@ -150,53 +131,14 @@ describe('SchemasState', () => {
         it('should add category', () => {
             schemasState.addCategory('schema-category3');
 
-            const categories = getCategories(schemasState);
-
-            expect(categories!).toEqual([
-                { displayName: 'i18n:common.components', schemas: [] },
-                { displayName: 'i18n:common.schemas', schemas: [] },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] },
-            ]);
-        });
-
-        it('should not remove category with schemas', () => {
-            schemasState.removeCategory('schema-category1');
-
-            const categories = getCategories(schemasState);
-
-            expect(categories!).toEqual([
-                { displayName: 'i18n:common.components', schemas: [] },
-                { displayName: 'i18n:common.schemas', schemas: [] },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-            ]);
+            expect([...schemasState.snapshot.categories]).toEqual(['schema-category3']);
         });
 
         it('should remove category', () => {
             schemasState.addCategory('schema-category3');
-
-            const categories1 = getCategories(schemasState);
-
-            expect(categories1).toEqual([
-                { displayName: 'i18n:common.components', schemas: [] },
-                { displayName: 'i18n:common.schemas', schemas: [] },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-                { displayName: 'schema-category3', name: 'schema-category3', schemas: [] },
-            ]);
-
             schemasState.removeCategory('schema-category3');
 
-            const categories2 = getCategories(schemasState);
-
-            expect(categories2).toEqual([
-                { displayName: 'i18n:common.components', schemas: [] },
-                { displayName: 'i18n:common.schemas', schemas: [] },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1] },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2] },
-            ]);
+            expect([...schemasState.snapshot.categories]).toEqual([]);
         });
 
         it('should return schema on select and reload if already loaded', () => {
@@ -550,14 +492,40 @@ describe('SchemasState', () => {
             });
         });
     });
-});
 
-function getCategories(schemasState: SchemasState) {
-    let categories: ReadonlyArray<SchemaCategory>;
+    describe('Categories', () => {
+        it('should be build from schemas', () => {
+            const result = getCategoryTree([schema1, schema2], new Set<string>());
 
-    schemasState.categories.subscribe(result => {
-        categories = result;
+            expect(result).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0 },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0 },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1 },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1 },
+            ]);
+        });
+
+        it('should be build from schemas and custom name', () => {
+            const result = getCategoryTree([schema1, schema2], new Set<string>(['schema-category3']));
+
+            expect(result).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0 },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0 },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1 },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1 },
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [], schemaTotalCount: 0 },
+            ]);
+        });
+
+        it('should be build from schemas and filter', () => {
+            const result = getCategoryTree([schema1, schema2], new Set<string>(), '1');
+
+            expect(result).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0 },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0 },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1 },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [], schemaTotalCount: 1 }, // Filtered out
+            ]);
+        });
     });
-
-    return categories!;
-}
+});
