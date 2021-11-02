@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invalid$, isValidFormValue, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -88,12 +88,7 @@ export class ContentFieldComponent implements OnChanges {
         if (form.field.isLocalizable) {
             for (const language of this.languages) {
                 const languageModel = form.get(language);
-
-                if (form.field.properties.fieldType === 'Array') {
-                    values.set(language.iso2Code, languageModel.form.value && languageModel.form.value.length > 0);
-                } else {
-                    values.set(language.iso2Code, languageModel.form.value !== null);
-                }
+                values.set(language.iso2Code, isValidFormValue(languageModel.form.value));
             }
         }
 

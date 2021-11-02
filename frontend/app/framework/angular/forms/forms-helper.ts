@@ -104,11 +104,11 @@ export function valueProjection$<T = any>(form: AbstractControl, projection: (va
 }
 
 export function hasValue$(form: AbstractControl): Observable<boolean> {
-    return valueProjection$(form, v => isValid(v));
+    return valueProjection$(form, v => isValidFormValue(v));
 }
 
 export function hasNoValue$(form: AbstractControl): Observable<boolean> {
-    return valueProjection$(form, v => !isValid(v));
+    return valueProjection$(form, v => !isValidFormValue(v));
 }
 
 export function changed$(lhs: AbstractControl, rhs: AbstractControl) {
@@ -155,7 +155,7 @@ export function touchedChange$(form: AbstractControl) {
     });
 }
 
-function isValid(value: any) {
+export function isValidFormValue(value: any) {
     return !Types.isNull(value) && !Types.isUndefined(value);
 }
 
