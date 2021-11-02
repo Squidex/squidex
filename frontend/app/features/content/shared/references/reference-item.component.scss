@@ -25,11 +25,9 @@
         position: relative;
 
         .badge {
+            @include absolute(1.25rem, .75rem);
             max-width: 500px;
-            position: absolute;
-            right: .75rem;
-            top: 1.25rem;
-            width: auto;
+            transition: .2s ease-in all;
         }
     }
 }
