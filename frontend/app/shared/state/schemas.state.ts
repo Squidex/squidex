@@ -59,6 +59,9 @@ export class SchemasState extends State<Snapshot> {
     public addedCategories =
         this.project(x => x.addedCategories);
 
+    public categoryNames =
+        this.projectFrom2(this.schemas, this.addedCategories, (s, c) => buildCategoryNames(c, s));
+
     public get schemaId() {
         return this.snapshot.selectedSchema?.id || '';
     }
@@ -363,6 +366,26 @@ function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | nu
     }
 }
 
+function buildCategoryNames(categories: Set<string>, allSchemas: SchemasList): ReadonlyArray<string> {
+    const uniqueCategories: { [name: string]: boolean } = {};
+
+    function addCategory(name: string) {
+        if (name) {
+            uniqueCategories[name] = true;
+        }
+    }
+
+    for (const category of categories) {
+        addCategory(category);
+    }
+
+    for (const schema of allSchemas) {
+        addCategory(schema.category);
+    }
+
+    return Object.keys(uniqueCategories).sortByString(x => x);
+}
+
 export type SchemaCategory = {
     displayName: string;
     name?: string;
@@ -468,10 +491,8 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
     }
 
     for (const schema of allSchemas) {
-        const name = schema.category;
-
-        if (name) {
-            addSchemaToCategory(schema, getOrCreateCategory(name));
+        if (schema.category) {
+            addSchemaToCategory(schema, getOrCreateCategory(schema.category));
         } else if (schema.type === 'Component') {
             addSchemaToCategory(schema, components);
         } else {
