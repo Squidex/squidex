@@ -131,14 +131,14 @@ describe('SchemasState', () => {
         it('should add category', () => {
             schemasState.addCategory('schema-category3');
 
-            expect([...schemasState.snapshot.categories]).toEqual(['schema-category3']);
+            expect([...schemasState.snapshot.addedCategories]).toEqual(['schema-category3']);
         });
 
         it('should remove category', () => {
             schemasState.addCategory('schema-category3');
             schemasState.removeCategory('schema-category3');
 
-            expect([...schemasState.snapshot.categories]).toEqual([]);
+            expect([...schemasState.snapshot.addedCategories]).toEqual([]);
         });
 
         it('should return schema on select and reload if already loaded', () => {
@@ -498,10 +498,10 @@ describe('SchemasState', () => {
             const result = getCategoryTree([schema1, schema2], new Set<string>());
 
             expect(result).toEqual([
-                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0 },
-                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0 },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1 },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1 },
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1, categories: [] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1, categories: [] },
             ]);
         });
 
@@ -509,11 +509,11 @@ describe('SchemasState', () => {
             const result = getCategoryTree([schema1, schema2], new Set<string>(['schema-category3']));
 
             expect(result).toEqual([
-                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0 },
-                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0 },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1 },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1 },
-                { displayName: 'schema-category3', name: 'schema-category3', schemas: [], schemaTotalCount: 0 },
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1, categories: [] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1, categories: [] },
+                { displayName: 'schema-category3', name: 'schema-category3', schemas: [], schemaTotalCount: 0, categories: [] },
             ]);
         });
 
@@ -521,11 +521,51 @@ describe('SchemasState', () => {
             const result = getCategoryTree([schema1, schema2], new Set<string>(), '1');
 
             expect(result).toEqual([
-                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0 },
-                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0 },
-                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1 },
-                { displayName: 'schema-category2', name: 'schema-category2', schemas: [], schemaTotalCount: 1 }, // Filtered out
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1, categories: [] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [], schemaTotalCount: 1, categories: [] }, // Filtered out
             ]);
         });
+
+        it('should be build from schemas with nested categories', () => {
+            const schema3 = createSchema(3, '', 'A');
+            const schema4 = createSchema(4, '', 'A/B');
+            const result = getCategoryTree([schema1, schema2, schema3, schema4], new Set<string>());
+
+            expect(result).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'A', name: 'A', schemas: [schema3], schemaTotalCount: 2, categories: [{ displayName: 'B', name: 'A/B', schemas: [schema4], schemaTotalCount: 1, categories: [] }] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1, categories: [] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1, categories: [] },
+            ]);
+        });
+
+        it('should be build from schemas and custom name with nested categories', () => {
+            const result = getCategoryTree([schema1, schema2], new Set<string>(['A/B']));
+
+            expect(result).toEqual([
+                { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0, categories: [] },
+                { displayName: 'A', name: 'A', schemas: [], schemaTotalCount: 0, categories: [{ displayName: 'B', name: 'A/B', schemas: [], schemaTotalCount: 0, categories: [] }] },
+                { displayName: 'schema-category1', name: 'schema-category1', schemas: [schema1], schemaTotalCount: 1, categories: [] },
+                { displayName: 'schema-category2', name: 'schema-category2', schemas: [schema2], schemaTotalCount: 1, categories: [] },
+            ]);
+        });
+    });
+
+    it('should be build from schemas with nested categories and filter', () => {
+        const schema3 = createSchema(3, '', 'A');
+        const schema4 = createSchema(4, '', 'A/B');
+        const result = getCategoryTree([schema1, schema2, schema3, schema4], new Set<string>(), '4');
+
+        expect(result).toEqual([
+            { displayName: 'i18n:common.components', schemas: [], schemaTotalCount: 0, categories: [] },
+            { displayName: 'i18n:common.schemas', schemas: [], schemaTotalCount: 0, categories: [] },
+            { displayName: 'A', name: 'A', schemas: [], schemaTotalCount: 2, categories: [{ displayName: 'B', name: 'A/B', schemas: [schema4], schemaTotalCount: 1, categories: [] }] },
+            { displayName: 'schema-category1', name: 'schema-category1', schemas: [], schemaTotalCount: 1, categories: [] },
+            { displayName: 'schema-category2', name: 'schema-category2', schemas: [], schemaTotalCount: 1, categories: [] },
+        ]);
     });
 });

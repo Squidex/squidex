@@ -22,7 +22,7 @@ const ITEM_HEIGHT = 2.5;
 })
 export class SchemaCategoryComponent implements OnChanges {
     @Output()
-    public remove = new EventEmitter();
+    public remove = new EventEmitter<string>();
 
     @Input()
     public schemaCategory: SchemaCategory;
@@ -31,6 +31,8 @@ export class SchemaCategoryComponent implements OnChanges {
     public forContent?: boolean | null;
 
     public isCollapsed = false;
+
+    public visibleCount = 0;
 
     public get schemas() {
         return this.schemaCategory.schemas;
@@ -49,11 +51,17 @@ export class SchemaCategoryComponent implements OnChanges {
     }
 
     public ngOnChanges() {
+        this.visibleCount = this.getCount(this.schemaCategory);
         if (this.schemaCategory.schemas.length < this.schemaCategory.schemaTotalCount) {
             this.isCollapsed = false;
         } else {
             this.isCollapsed = this.localStore.getBoolean(this.configKey());
         }
+    }
+
+    private getCount(category: SchemaCategory): number {
+        const childCount = category.categories.reduce((total, child) => total + this.getCount(child), 0);
+        return childCount + category.schemas.length;
     }
 
     public schemaRoute(schema: SchemaDto) {
@@ -91,6 +99,10 @@ export class SchemaCategoryComponent implements OnChanges {
 
     public trackBySchema(_index: number, schema: SchemaDto) {
         return schema.id;
+    }
+
+    public trackByCategory(_index: number, category: SchemaCategory) {
+        return category.name;
     }
 
     private configKey(): string {

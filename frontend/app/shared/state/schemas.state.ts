@@ -16,7 +16,7 @@ type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
 interface Snapshot {
     // The schema categories.
-    categories: Set<string>;
+    addedCategories: Set<string>;
 
     // The current schemas.
     schemas: SchemasList;
@@ -56,8 +56,8 @@ export class SchemasState extends State<Snapshot> {
     public publishedSchemas =
         this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
 
-    public categoryNames =
-        this.project(x => x.categories);
+    public addedCategories =
+        this.project(x => x.addedCategories);
 
     public get schemaId() {
         return this.snapshot.selectedSchema?.id || '';
@@ -76,7 +76,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService,
     ) {
-        super({ schemas: [], categories: new Set() }, 'Schemas');
+        super({ schemas: [], addedCategories: new Set() }, 'Schemas');
     }
 
     public select(idOrName: string | null): Observable<SchemaDto | null> {
@@ -169,17 +169,17 @@ export class SchemasState extends State<Snapshot> {
 
     public addCategory(name: string) {
         this.next(s => {
-            const categories = new Set([...s.categories, name]);
+            const categories = new Set([...s.addedCategories, name]);
 
-            return { ...s, categories };
+            return { ...s, addedCategories: categories };
         }, 'Category Added');
     }
 
     public removeCategory(name: string) {
         this.next(s => {
-            const categories = new Set([...s.categories].remove(name));
+            const categories = new Set([...s.addedCategories].remove(name));
 
-            return { ...s, categories };
+            return { ...s, addedCategories: categories };
         }, 'Category Removed');
     }
 
@@ -368,10 +368,12 @@ export type SchemaCategory = {
     name?: string;
     schemas: SchemaDto[];
     schemaTotalCount: number;
+    categories: SchemaCategory[];
 };
 
 const SPECIAL_SCHEMAS = 'i18n:common.schemas';
 const SPECIAL_COMPONENTS = 'i18n:common.components';
+const NESTED_CATEGORY_SEPARATOR = '/';
 
 export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories: Set<string>, filter?: string) {
     let match = (_: SchemaDto) => true;
@@ -393,26 +395,23 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         displayName: SPECIAL_SCHEMAS,
         schemas: [],
         schemaTotalCount: 0,
+        categories: [],
     };
 
     const components: SchemaCategory = {
         displayName: SPECIAL_COMPONENTS,
         schemas: [],
         schemaTotalCount: 0,
+        categories: [],
     };
 
-    const result: SchemaCategory[] = [schemas, components];
+    const flatCategoryList: SchemaCategory[] = [schemas, components];
 
     for (const name of categories) {
-        result.push({
-            displayName: name,
-            name,
-            schemas: [],
-            schemaTotalCount: 0,
-        });
+        getOrCreateCategory(name);
     }
 
-    function add(schema: SchemaDto, category: SchemaCategory) {
+    function addSchemaToCategory(schema: SchemaDto, category: SchemaCategory) {
         category.schemaTotalCount++;
 
         if (match(schema)) {
@@ -420,32 +419,67 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         }
     }
 
+    function getOrCreateCategory(name: string): SchemaCategory {
+        let category = flatCategoryList.find(x => x.name === name);
+
+        const displayName = (name.indexOf(NESTED_CATEGORY_SEPARATOR) === -1) ? name : name.substr(name.lastIndexOf(NESTED_CATEGORY_SEPARATOR) + 1);
+
+        if (!category) {
+            category = {
+                displayName,
+                name,
+                schemas: [],
+                schemaTotalCount: 0,
+                categories: [],
+            };
+
+            flatCategoryList.push(category);
+
+            if (name.indexOf(NESTED_CATEGORY_SEPARATOR) !== -1) {
+                // Recurse back creating all the parents of this category
+                const parentName = name.substr(0, name.lastIndexOf(NESTED_CATEGORY_SEPARATOR));
+                getOrCreateCategory(parentName);
+            }
+        }
+
+        return category;
+    }
+
     for (const schema of allSchemas) {
         const name = schema.category;
 
         if (name) {
-            let category = result.find(x => x.name === name);
-
-            if (!category) {
-                category = {
-                    displayName: name,
-                    name,
-                    schemas: [],
-                    schemaTotalCount: 0,
-                };
-
-                result.push(category);
-            }
-
-            add(schema, category);
+            const category = getOrCreateCategory(name);
+            addSchemaToCategory(schema, category);
         } else if (schema.type === 'Component') {
-            add(schema, components);
+            addSchemaToCategory(schema, components);
         } else {
-            add(schema, schemas);
+            addSchemaToCategory(schema, schemas);
         }
     }
 
-    result.sortByString(x => x.displayName);
+    // Sort by name and than DisplayName so that children get correctly sorted under their parents but component and schema still sort correctly
+    flatCategoryList.sortByString(x => `${x.name ?? ''} - ${x.displayName}`);
+
+    const result: SchemaCategory[] = [];
+    // Child categories by necessity come after their parents alphabetically so processing in reverse lets us roll up all categories into their parents nicely.
+    // Because we're processing in reverse we unshift rather than push to the results array to get everything in the right order at the end.
+    for (const category of flatCategoryList.reverse()) {
+        if (category.name) {
+            if (category.name?.indexOf(NESTED_CATEGORY_SEPARATOR) !== -1) {
+                const parentName = category.name?.substr(0, category.name.lastIndexOf(NESTED_CATEGORY_SEPARATOR));
+                const parentCategory = flatCategoryList.find(x => x.name === parentName);
+                if (parentCategory) {
+                    parentCategory.categories.unshift(category);
+                    parentCategory.schemaTotalCount += category.schemaTotalCount;
+                }
+            } else {
+                result.unshift(category);
+            }
+        } else {
+            result.unshift(category);
+        }
+    }
 
     return result;
 }

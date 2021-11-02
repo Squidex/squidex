@@ -818,12 +818,15 @@ function createSchemaProperties(id: number, suffix = '') {
     );
 }
 
-export function createSchema(id: number, suffix = '') {
+export function createSchema(id: number, suffix = '', category = '') {
     const links: ResourceLinks = {
         update: { method: 'PUT', href: `/schemas/${id}` },
     };
 
     const key = `${id}${suffix}`;
+    if (category === '') {
+        category = `schema-category${key}`;
+    }
 
     return new SchemaDto(links,
         `id${id}`,
@@ -831,7 +834,7 @@ export function createSchema(id: number, suffix = '') {
         DateTime.parseISO(`${id % 1000 + 2000}-11-11T10:10:00Z`), `modifier${id}`,
         new Version(key),
         `schema-name${key}`,
-        `schema-category${key}`,
+        category,
         id % 2 === 0 ? 'Default' : 'Singleton',
         id % 3 === 0,
         createSchemaProperties(id, suffix),
