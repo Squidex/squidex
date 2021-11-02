@@ -1,6 +1,5 @@
-<ul [hidden]="forContent && visibleCount == 0" id="cat_{{schemaCategory.name}}" class="nav nav-light flex-column">
-
-    <div class="droppable category"
+<ul [hidden]="forContent && schemaCategory.countSchemasInSubtree === 0" class="nav nav-light flex-column">
+    <div class="droppable nav-category"
         cdkDropList
         cdkDropListSortingDisabled
         [cdkDropListData]="schemaCategory.name"
@@ -19,8 +18,8 @@
                     </div>
                 </div>
                 <div class="col-auto">
-                    <ng-container *ngIf="visibleCount > 0; else noSchemas">
-                        <span class="badge rounded-pill badge-secondary">{{visibleCount}}</span>
+                    <ng-container *ngIf="schemaCategory.countSchemasInSubtree > 0; else noSchemas">
+                        <span class="badge rounded-pill badge-secondary">{{schemaCategory.countSchemasInSubtreeFiltered}}</span>
                     </ng-container>
                     <ng-template #noSchemas>
                         <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit(schemaCategory.name)" *ngIf="schemaCategory.name">
@@ -31,7 +30,7 @@
             </div>
         </li>
 
-        <div [hidden]="isCollapsed" @fade [style.height]="getContainerHeight()" class="nav-collapsed">
+        <div [hidden]="isCollapsed" [style.height]="getContainerHeight()" class="nav-collapsed">
             <ng-container *ngIf="!forContent; else simpleMode">
                 <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate" [style.height]="getItemHeight()"
                     cdkDrag
@@ -52,8 +51,7 @@
                 <li *ngFor="let schema of schemas; trackBy: trackBySchema" class="nav-item truncate">
                     <a class="nav-link truncate drag-none" [routerLink]="schemaRoute(schema)" routerLinkActive="active" sqxStopDrag
                         title="{{schema.displayName}}"
-                        titlePosition="top-left"
-                        id="schema_{{schema.name}}">
+                        titlePosition="top-left">
                         {{schema.displayName}}
                     </a>
                 </li>
@@ -61,13 +59,12 @@
         </div>
 
         <div class="drop-indicator"></div>
-
     </div>
 
-    <div class="nav nav-panel nav-dark nav-dark-bordered flex-column" [hidden]="isCollapsed" @fade>
+    <div class="categories" [hidden]="isCollapsed">
         <sqx-schema-category *ngFor="let category of schemaCategory.categories; trackBy: trackByCategory"
             [schemaCategory]="category"
-            [forContent]="forContent"
+            [schemaTarget]="schemaTarget"
             (remove)="remove.emit($event)">
         </sqx-schema-category>
     </div>

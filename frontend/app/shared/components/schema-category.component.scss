@@ -74,26 +74,31 @@ $drag-margin: -8px;
     }
 }
 
+.item-published {
+    margin-bottom: 1px;
+}
+
+.nav-category,
+.nav-panel,
+sqx-schema-category {
+    max-width: 100%;
+}
+
+.categories {
+    padding: 0;
+    padding-left: 1rem;
+    font-size: 1rem;
+
+    .nav-light {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
 :host {
     &:first-child {
         .nav-light {
             margin-top: 0;
         }
     }
-}
-
-.item-published {
-    margin-bottom: 1px;
-}
-
-ul.nav-light {
-    margin-left: 1rem;
-    margin-right: 0;
-    font-size: 100%;
-}
-
-.category,
-.nav-panel,
-sqx-schema-category {
-    max-width: 100%;
 }

@@ -20,7 +20,8 @@
     
         <ng-container>
             <sqx-schema-category *ngFor="let category of categories | async; trackBy: trackByCategory"
-                [schemaCategory]="category" [forContent]="true">
+                [schemaCategory]="category" 
+                [schemaTarget]="'Contents'">
             </sqx-schema-category>
         </ng-container>
     </ng-container>

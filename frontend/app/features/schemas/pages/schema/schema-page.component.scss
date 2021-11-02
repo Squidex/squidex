@@ -6,6 +6,7 @@
 }
 
 .cards {
+    overflow-x: hidden;
     overflow-y: auto;
     padding: $panel-padding;
 }

@@ -367,7 +367,9 @@ export type SchemaCategory = {
     displayName: string;
     name?: string;
     schemas: SchemaDto[];
-    schemaTotalCount: number;
+    schemasFiltered: SchemaDto[];
+    countSchemasInSubtree: number;
+    countSchemasInSubtreeFiltered: number;
     categories: SchemaCategory[];
 };
 
@@ -394,52 +396,72 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
     const schemas: SchemaCategory = {
         displayName: SPECIAL_SCHEMAS,
         schemas: [],
-        schemaTotalCount: 0,
+        schemasFiltered: [],
+        countSchemasInSubtree: 0,
+        countSchemasInSubtreeFiltered: 0,
         categories: [],
     };
 
     const components: SchemaCategory = {
         displayName: SPECIAL_COMPONENTS,
         schemas: [],
-        schemaTotalCount: 0,
+        schemasFiltered: [],
+        countSchemasInSubtree: 0,
+        countSchemasInSubtreeFiltered: 0,
         categories: [],
     };
 
-    const flatCategoryList: SchemaCategory[] = [schemas, components];
+    const categoryCache: { [name: string]: SchemaCategory } = {};
+    const categoryRoots: SchemaCategory[] = [];
 
+    // Sort the categories so that components and schemas stay top.
     for (const name of categories) {
         getOrCreateCategory(name);
     }
 
     function addSchemaToCategory(schema: SchemaDto, category: SchemaCategory) {
-        category.schemaTotalCount++;
+        category.schemas.push(schema);
 
         if (match(schema)) {
-            category.schemas.push(schema);
+            category.schemasFiltered.push(schema);
         }
     }
 
     function getOrCreateCategory(name: string): SchemaCategory {
-        let category = flatCategoryList.find(x => x.name === name);
+        let category = categoryCache[name];
 
-        const displayName = (name.indexOf(NESTED_CATEGORY_SEPARATOR) === -1) ? name : name.substr(name.lastIndexOf(NESTED_CATEGORY_SEPARATOR) + 1);
+        if (category) {
+            return category;
+        }
 
-        if (!category) {
-            category = {
-                displayName,
-                name,
-                schemas: [],
-                schemaTotalCount: 0,
-                categories: [],
-            };
+        let displayName = name;
 
-            flatCategoryList.push(category);
+        const lastSeparatorIndex = name.lastIndexOf(NESTED_CATEGORY_SEPARATOR);
 
-            if (name.indexOf(NESTED_CATEGORY_SEPARATOR) !== -1) {
-                // Recurse back creating all the parents of this category
-                const parentName = name.substr(0, name.lastIndexOf(NESTED_CATEGORY_SEPARATOR));
-                getOrCreateCategory(parentName);
-            }
+        if (lastSeparatorIndex >= 0) {
+            displayName = displayName.substr(lastSeparatorIndex + 1);
+        }
+
+        category = {
+            displayName,
+            name,
+            schemas: [],
+            schemasFiltered: [],
+            countSchemasInSubtree: 0,
+            countSchemasInSubtreeFiltered: 0,
+            categories: [],
+        };
+
+        categoryCache[name] = category;
+
+        if (lastSeparatorIndex >= 0) {
+            // Recurse back creating all the parents of this category
+            const parentName = name.substr(0, lastSeparatorIndex);
+            const parentCategory = getOrCreateCategory(parentName);
+
+            parentCategory.categories.push(category);
+        } else {
+            categoryRoots.push(category);
         }
 
         return category;
@@ -449,8 +471,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         const name = schema.category;
 
         if (name) {
-            const category = getOrCreateCategory(name);
-            addSchemaToCategory(schema, category);
+            addSchemaToCategory(schema, getOrCreateCategory(name));
         } else if (schema.type === 'Component') {
             addSchemaToCategory(schema, components);
         } else {
@@ -458,28 +479,29 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         }
     }
 
-    // Sort by name and than DisplayName so that children get correctly sorted under their parents but component and schema still sort correctly
-    flatCategoryList.sortByString(x => `${x.name ?? ''} - ${x.displayName}`);
+    function update(category: SchemaCategory) {
+        category.countSchemasInSubtree = category.schemas.length;
+        category.countSchemasInSubtreeFiltered = category.schemasFiltered.length;
 
-    const result: SchemaCategory[] = [];
-    // Child categories by necessity come after their parents alphabetically so processing in reverse lets us roll up all categories into their parents nicely.
-    // Because we're processing in reverse we unshift rather than push to the results array to get everything in the right order at the end.
-    for (const category of flatCategoryList.reverse()) {
-        if (category.name) {
-            if (category.name?.indexOf(NESTED_CATEGORY_SEPARATOR) !== -1) {
-                const parentName = category.name?.substr(0, category.name.lastIndexOf(NESTED_CATEGORY_SEPARATOR));
-                const parentCategory = flatCategoryList.find(x => x.name === parentName);
-                if (parentCategory) {
-                    parentCategory.categories.unshift(category);
-                    parentCategory.schemaTotalCount += category.schemaTotalCount;
-                }
-            } else {
-                result.unshift(category);
-            }
-        } else {
-            result.unshift(category);
+        // Add up the total count of the whole tree.
+        for (const child of category.categories) {
+            update(child);
+
+            category.countSchemasInSubtree += child.countSchemasInSubtree;
+            category.countSchemasInSubtreeFiltered += child.countSchemasInSubtreeFiltered;
         }
+
+        // Sort each category category individually because sorting is O(log N).
+        category.categories.sortByString(x => x.displayName);
     }
 
-    return result;
+    // Sort by name and then add components and schemas, so that both categories are on top.
+    categoryRoots.sortByString(x => x.displayName);
+    categoryRoots.unshift(components, schemas);
+
+    for (const child of categoryRoots) {
+        update(child);
+    }
+
+    return categoryRoots;
 }

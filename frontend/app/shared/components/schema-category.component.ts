@@ -28,14 +28,16 @@ export class SchemaCategoryComponent implements OnChanges {
     public schemaCategory: SchemaCategory;
 
     @Input()
-    public forContent?: boolean | null;
+    public schemaTarget?: 'Schema' | 'Contents';
 
     public isCollapsed = false;
 
-    public visibleCount = 0;
+    public get forContent() {
+        return this.schemaTarget === 'Contents';
+    }
 
     public get schemas() {
-        return this.schemaCategory.schemas;
+        return this.schemaCategory.schemasFiltered;
     }
 
     constructor(
@@ -51,17 +53,11 @@ export class SchemaCategoryComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.visibleCount = this.getCount(this.schemaCategory);
-        if (this.schemaCategory.schemas.length < this.schemaCategory.schemaTotalCount) {
+        if (this.schemaCategory.countSchemasInSubtreeFiltered < this.schemaCategory.countSchemasInSubtree) {
             this.isCollapsed = false;
         } else {
             this.isCollapsed = this.localStore.getBoolean(this.configKey());
         }
-    }
-
-    private getCount(category: SchemaCategory): number {
-        const childCount = category.categories.reduce((total, child) => total + this.getCount(child), 0);
-        return childCount + category.schemas.length;
     }
 
     public schemaRoute(schema: SchemaDto) {
