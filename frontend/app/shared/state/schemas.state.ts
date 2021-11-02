@@ -458,8 +458,8 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         }
     }
 
-    // Sort by name rather than DisplayName so that children get correctly sorted under their parents
-    flatCategoryList.sortByString(x => x.name ?? '');
+    // Sort by name and than DisplayName so that children get correctly sorted under their parents but component and schema still sort correctly
+    flatCategoryList.sortByString(x => `${x.name ?? ''} - ${x.displayName}`);
 
     const result: SchemaCategory[] = [];
     // Child categories by necessity come after their parents alphabetically so processing in reverse lets us roll up all categories into their parents nicely.
