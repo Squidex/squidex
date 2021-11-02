@@ -19,3 +19,17 @@
 .badge {
     @include truncate;
 }
+
+.cell-label {
+    &:hover {
+        position: relative;
+
+        .badge {
+            max-width: 500px;
+            position: absolute;
+            right: .75rem;
+            top: 1.25rem;
+            width: auto;
+        }
+    }
+}
