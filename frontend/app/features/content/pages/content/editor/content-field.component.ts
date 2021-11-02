@@ -87,7 +87,6 @@ export class ContentFieldComponent implements OnChanges {
 
         if (form.field.isLocalizable) {
             for (const language of this.languages) {
-
                 const languageModel = form.get(language);
 
                 if (form.field.properties.fieldType === 'Array') {

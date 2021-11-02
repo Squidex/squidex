@@ -125,7 +125,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public updateLanguageDataPresent(schema: SchemaDto, contents: readonly ContentDto[]): void {
-
         this.languagesData.clear();
 
         if (contents.length === 0) {
@@ -133,39 +132,28 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
 
         for (const language of this.languages) {
+            let dataFound = this.languagesData.get(language.iso2Code) === true;
 
-            const languageDataFound = this.languagesData.get(language.iso2Code) === true;
+            if (!dataFound) {
+                for (const field of schema.fields.filter(f => f.isLocalizable)) {
+                    for (const content of contents) {
+                        const languageSupported = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code);
 
-            if (languageDataFound) {
-                continue;
-            }
+                        if (languageSupported) {
+                            const languageValue = content.data[field.name][language.iso2Code];
+                            dataFound = field.properties.fieldType === 'Array' ? languageValue && languageValue.length > 0 : !!languageValue;
 
-            for (const field of schema.fields.filter(f => f.isLocalizable)) {
-
-                let contentFoundWithLanguage = false;
-
-                for (const content of contents) {
-
-                    const hasLanguage = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code);
-
-                    if (hasLanguage) {
-
-                        const languageValue = content.data[field.name][language.iso2Code];
-                        
-                        console.log(languageValue);
-
-                        contentFoundWithLanguage = field.properties.fieldType === 'Array' ? languageValue !== undefined && languageValue.length > 0 : languageValue !== null;
-
-                        if (contentFoundWithLanguage) {
-                            break;
+                            if (dataFound) {
+                                break;
+                            }
                         }
                     }
-                }
 
-                this.languagesData.set(language.iso2Code, contentFoundWithLanguage);
+                    this.languagesData.set(language.iso2Code, dataFound);
 
-                if (contentFoundWithLanguage) {
-                    break;
+                    if (dataFound) {
+                        break;
+                    }
                 }
             }
         }
