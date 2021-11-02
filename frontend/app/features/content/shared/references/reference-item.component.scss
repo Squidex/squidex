@@ -21,13 +21,15 @@
 }
 
 .cell-label {
-    &:hover {
-        position: relative;
+    position: relative;
 
-        .badge {
-            @include absolute(1.25rem, .75rem);
-            max-width: 500px;
-            transition: .2s ease-in all;
+    .badge-container {
+        @include absolute(0, 0, 0, 0);
+    }
+
+    &:hover {
+        .badge-container {
+            left: auto;
         }
     }
 }

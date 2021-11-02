@@ -21,7 +21,9 @@
     </td>
 
     <td class="cell-label" *ngIf="!isCompact">
-        <span class="badge badge-primary rounded-pill truncate-inline">{{content.schemaDisplayName}}</span>
+        <div class="badge-container d-flex align-items-center">
+            <span class="badge badge-primary rounded-pill truncate-inline">{{content.schemaDisplayName}}</span>
+        </div>
     </td>
 
     <td class="cell-actions">
