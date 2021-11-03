@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, isValidFormValue, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, getLanguagesData, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version } from '@app/shared';
 import { combineLatest, Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 
@@ -138,16 +138,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         this.own(
             combineLatest([this.schemasState.selectedSchema.pipe(defined()), this.contentsState.selectedContent.pipe(defined())])
-            .subscribe(values => this.updateLanguageDataPresent(values[0] as SchemaDto, values[1] as ContentDto)));
-    }
-
-    public updateLanguageDataPresent(schema: SchemaDto, content: ContentDto): void {
-        for (const language of this.languages) {
-            for (const field of schema.fields.filter(f => f.isLocalizable)) {
-                const hasLanguage = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code);
-                this.languagesData.set(language.iso2Code, hasLanguage && isValidFormValue(content.data[field.name][language.iso2Code]));
-            }
-        }
+            .subscribe(values => {
+                this.languagesData = getLanguagesData(values[0], [values[1]], this.languages);
+            }));
     }
 
     public canDeactivate(): Observable<boolean> {

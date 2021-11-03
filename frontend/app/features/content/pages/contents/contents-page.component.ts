@@ -9,7 +9,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, fadeAnimation, isValidFormValue, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, fadeAnimation, getLanguagesData, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
@@ -120,41 +120,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 }));
 
         this.own(
-            combineLatest([this.schemasState.selectedSchema, this.contentsState.contents])
-                .subscribe(values => this.updateLanguageDataPresent(values[0] as SchemaDto, values[1] as ContentDto[])));
-    }
-
-    public updateLanguageDataPresent(schema: SchemaDto, contents: readonly ContentDto[]): void {
-        this.languagesData.clear();
-
-        if (contents.length === 0) {
-            return;
-        }
-
-        for (const language of this.languages) {
-            let dataFound = this.languagesData.get(language.iso2Code) === true;
-
-            if (!dataFound) {
-                for (const field of schema.fields.filter(f => f.isLocalizable)) {
-                    for (const content of contents) {
-                        const hasLanguage = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code);
-
-                        if (hasLanguage) {
-                            dataFound = isValidFormValue(content.data[field.name][language.iso2Code]);
-                            if (dataFound) {
-                                break;
-                            }
-                        }
-                    }
-
-                    this.languagesData.set(language.iso2Code, dataFound);
-
-                    if (dataFound) {
-                        break;
-                    }
-                }
-            }
-        }
+            combineLatest([this.schemasState.selectedSchema.pipe(defined()), this.contentsState.contents])
+                .subscribe(values => {
+                    this.languagesData = getLanguagesData(values[0], values[1], this.languages);
+                }));
     }
 
     public reload() {

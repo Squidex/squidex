@@ -6,9 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, isValidFormValue, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
+import { ContentDto, FieldForm, SchemaDto } from '@app/shared';
 import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
@@ -202,4 +203,42 @@ export class LanguagesState extends State<Snapshot> {
                     .sortByString(x => x.englishName),
         };
     }
+}
+
+export function getLanguageData(form: FieldForm, languages: readonly LanguageDto[]): Map<string, boolean> {
+    const languagesData = new Map<string, boolean>();
+    if (form.field.isLocalizable) {
+        for (const language of languages) {
+            const languageModel = form.get(language);
+            languagesData.set(language.iso2Code, isValidFormValue(languageModel.form.value));
+        }
+    }
+    return languagesData;
+}
+
+function isLanguageDataPresent(schema: SchemaDto, content: ContentDto, language: LanguageDto): boolean {
+    for (const field of schema.fields.filter(f => f.isLocalizable)) {
+        const present = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code) && isValidFormValue(content.data[field.name][language.iso2Code]);
+        if (present) {
+            return present;
+        }
+    }
+    return false;
+}
+
+export function getLanguagesData(schema: SchemaDto, contents: readonly ContentDto[], languages: readonly LanguageDto[]): Map<string, boolean> {
+    const languagesData = new Map<string, boolean>();
+    if (contents.length > 0) {
+        for (const language of languages) {
+            let found = false;
+            for (const content of contents) {
+                found = isLanguageDataPresent(schema, content, language);
+                if (found) {
+                    break;
+                }
+            }
+            languagesData.set(language.iso2Code, found);
+        }
+    }
+    return languagesData;
 }

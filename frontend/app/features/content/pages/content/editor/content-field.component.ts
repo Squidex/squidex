@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invalid$, isValidFormValue, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, getLanguageData, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -83,16 +83,7 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     public getLanguageData(form: FieldForm): Map<string, boolean> {
-        const values = new Map<string, boolean>();
-
-        if (form.field.isLocalizable) {
-            for (const language of this.languages) {
-                const languageModel = form.get(language);
-                values.set(language.iso2Code, isValidFormValue(languageModel.form.value));
-            }
-        }
-
-        return values;
+        return getLanguageData(form, this.languages);
     }
 
     public changeShowAllControls(showAllControls: boolean) {
