@@ -156,6 +156,10 @@ export function touchedChange$(form: AbstractControl) {
 }
 
 export function isValidFormValue(value: any) {
+    if (Types.isArray(value)) {
+        return !Types.isEmpty(value);
+    }
+
     return !Types.isNull(value) && !Types.isUndefined(value);
 }
 

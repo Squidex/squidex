@@ -56,7 +56,7 @@
                     <sqx-notifo topic="apps/{{contentsState.appId}}/schemas/{{schema?.name}}/contents/{{content.id}}"></sqx-notifo>
         
                     <ng-container *ngIf="languages.length > 1">
-                        <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
+                        <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages" [languagesData]="languagesData"></sqx-language-selector>
                     </ng-container>
 
                     <ng-container *ngIf="content?.canDelete">

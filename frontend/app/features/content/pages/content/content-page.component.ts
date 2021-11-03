@@ -7,8 +7,8 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version } from '@app/shared';
-import { Observable, of } from 'rxjs';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, isValidFormValue, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version } from '@app/shared';
+import { combineLatest, Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 
 @Component({
@@ -40,6 +40,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public language: AppLanguageDto;
     public languages: ReadonlyArray<AppLanguageDto>;
+    public languagesData: Map<string, boolean> = new Map<string, boolean>();
 
     public confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();
@@ -134,6 +135,19 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         this.autoSaveService.remove(this.autoSaveKey);
                     }
                 }));
+
+        this.own(
+            combineLatest([this.schemasState.selectedSchema.pipe(defined()), this.contentsState.selectedContent.pipe(defined())])
+            .subscribe(values => this.updateLanguageDataPresent(values[0] as SchemaDto, values[1] as ContentDto)));
+    }
+
+    public updateLanguageDataPresent(schema: SchemaDto, content: ContentDto): void {
+        for (const language of this.languages) {
+            for (const field of schema.fields.filter(f => f.isLocalizable)) {
+                const hasLanguage = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code);
+                this.languagesData.set(language.iso2Code, hasLanguage && isValidFormValue(content.data[field.name][language.iso2Code]));
+            }
+        }
     }
 
     public canDeactivate(): Observable<boolean> {
