@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, isValidFormValue, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-selector[language][languages]',
@@ -50,6 +50,8 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public selectionCount = 0;
     public selectedAll = false;
 
+    public languagesData: Map<string, boolean> = new Map<string, boolean>();
+
     constructor(
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,
@@ -60,6 +62,10 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
+        this.own(this.contentsState.contents.subscribe((contents: ContentDto[]) => {
+            this.updateLanguageDataPresent(contents);
+        }));
+
         this.own(
             this.contentsState.statuses
                 .subscribe(() => {
@@ -73,6 +79,41 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
         }
 
         this.selectSchema(this.schemas[0]);
+    }
+
+    private updateLanguageDataPresent(contents: ContentDto[]) {
+        this.languagesData.clear();
+
+        if (contents.length === 0) {
+            return;
+        }
+
+        if (this.schema) {
+            for (const language of this.languages) {
+                let dataFound = this.languagesData.get(language.iso2Code) === true;
+
+                if (!dataFound) {
+                    for (const field of this.schema.fields.filter(f => f.isLocalizable)) {
+                        for (const content of contents) {
+                            const hasLanguage = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code);
+
+                            if (hasLanguage) {
+                                dataFound = isValidFormValue(content.data[field.name][language.iso2Code]);
+                                if (dataFound) {
+                                    break;
+                                }
+                            }
+                        }
+
+                        this.languagesData.set(language.iso2Code, dataFound);
+
+                        if (dataFound) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public selectSchema(schema: SchemaDto) {

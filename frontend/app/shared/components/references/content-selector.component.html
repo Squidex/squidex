@@ -30,7 +30,7 @@
                 </div>
                     
                 <div class="col-auto" *ngIf="languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages" [languagesData]="languagesData"></sqx-language-selector>
                 </div>
             </ng-container>
         </div>
