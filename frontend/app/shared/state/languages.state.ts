@@ -6,13 +6,15 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, isLanguagePresent, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, isValidFormValue, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
-import { ContentDto, FieldForm, SchemaDto } from '@app/shared';
+import { ContentDto } from '../services/contents.service';
+import { SchemaDto } from '../services/schemas.service';
 import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
+import { FieldForm } from './contents.forms';
 
 export interface SnapshotLanguage {
     // The language.
@@ -205,15 +207,8 @@ export class LanguagesState extends State<Snapshot> {
     }
 }
 
-export function getLanguageData(form: FieldForm, languages: readonly LanguageDto[]): Map<string, boolean> {
-    const languagesData = new Map<string, boolean>();
-    if (form.field.isLocalizable) {
-        for (const language of languages) {
-            const languageModel = form.get(language);
-            languagesData.set(language.iso2Code, isLanguagePresent(languageModel.form.value));
-        }
-    }
-    return languagesData;
+function isLanguagePresent(value: any): boolean {
+    return Types.isArray(value) ? !Types.isEmpty(value) : isValidFormValue(value);
 }
 
 function isLanguageDataPresent(schema: SchemaDto, content: ContentDto, language: LanguageDto): boolean {
@@ -224,6 +219,17 @@ function isLanguageDataPresent(schema: SchemaDto, content: ContentDto, language:
         }
     }
     return false;
+}
+
+export function getLanguageData(form: FieldForm, languages: readonly LanguageDto[]): Map<string, boolean> {
+    const languagesData = new Map<string, boolean>();
+    if (form.field.isLocalizable) {
+        for (const language of languages) {
+            const languageModel = form.get(language);
+            languagesData.set(language.iso2Code, isLanguagePresent(languageModel.form.value));
+        }
+    }
+    return languagesData;
 }
 
 export function getLanguagesData(schema: SchemaDto, contents: readonly ContentDto[], languages: readonly LanguageDto[]): Map<string, boolean> {

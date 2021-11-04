@@ -70,7 +70,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
                         if (languagesData.get(language.iso2Code) !== true) {
                             for (const field of section.fields) {
                                 if (languagesData.get(language.iso2Code) !== true) {
-                                    languagesData.set(language.iso2Code, isValidFormValue(field.get(this.language).getRawValue()));
+                                    languagesData.set(language.iso2Code, isValidFormValue(field.get(language.iso2Code).getRawValue()));
                                 }
                             }
                         }

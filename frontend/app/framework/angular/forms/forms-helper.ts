@@ -159,10 +159,6 @@ export function isValidFormValue(value: any): boolean {
     return !Types.isNull(value) && !Types.isUndefined(value);
 }
 
-export function isLanguagePresent(value: any): boolean {
-    return Types.isArray(value) ? !Types.isEmpty(value) : isValidFormValue(value);
-}
-
 export function getRawValue(form: AbstractControl): any {
     if (Types.is(form, FormGroup)) {
         return form.getRawValue();
