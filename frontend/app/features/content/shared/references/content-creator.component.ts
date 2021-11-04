@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, isValidFormValue, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator[formContext][language][languages]',
@@ -42,6 +42,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     public schemas: ReadonlyArray<SchemaDto> = [];
 
     public contentForm: EditContentForm;
+    public languagesData: Map<string, boolean>;
 
     constructor(
         private readonly contentsState: ComponentContentsState,
@@ -60,6 +61,25 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         const selectedSchema = this.schemas.find(x => x.name === this.schemaName) || this.schemas[0];
 
         this.selectSchema(selectedSchema);
+
+        this.own(this.contentForm.valueChanges.subscribe(() => {
+            const languagesData = new Map<string, boolean>();
+            this.languages.forEach((language) => {
+                if (languagesData.get(language.iso2Code) !== true) {
+                    for (const section of this.contentForm.sections) {
+                        if (languagesData.get(language.iso2Code) !== true) {
+                            for (const field of section.fields) {
+                                if (languagesData.get(language.iso2Code) !== true) {
+                                    languagesData.set(language.iso2Code, isValidFormValue(field.get(this.language).getRawValue()));
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            this.languagesData = languagesData;
+        }));
     }
 
     public selectSchema(schema: SchemaDto) {

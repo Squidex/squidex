@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, isValidFormValue, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { DialogService, isLanguagePresent, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { ContentDto, FieldForm, SchemaDto } from '@app/shared';
@@ -210,7 +210,7 @@ export function getLanguageData(form: FieldForm, languages: readonly LanguageDto
     if (form.field.isLocalizable) {
         for (const language of languages) {
             const languageModel = form.get(language);
-            languagesData.set(language.iso2Code, isValidFormValue(languageModel.form.value));
+            languagesData.set(language.iso2Code, isLanguagePresent(languageModel.form.value));
         }
     }
     return languagesData;
@@ -218,7 +218,7 @@ export function getLanguageData(form: FieldForm, languages: readonly LanguageDto
 
 function isLanguageDataPresent(schema: SchemaDto, content: ContentDto, language: LanguageDto): boolean {
     for (const field of schema.fields.filter(f => f.isLocalizable)) {
-        const present = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code) && isValidFormValue(content.data[field.name][language.iso2Code]);
+        const present = content.data && content.data[field.name] && Object.keys(content.data[field.name]).includes(language.iso2Code) && isLanguagePresent(content.data[field.name][language.iso2Code]);
         if (present) {
             return present;
         }

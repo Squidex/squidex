@@ -155,12 +155,12 @@ export function touchedChange$(form: AbstractControl) {
     });
 }
 
-export function isValidFormValue(value: any) {
-    if (Types.isArray(value)) {
-        return !Types.isEmpty(value);
-    }
-
+export function isValidFormValue(value: any): boolean {
     return !Types.isNull(value) && !Types.isUndefined(value);
+}
+
+export function isLanguagePresent(value: any): boolean {
+    return Types.isArray(value) ? !Types.isEmpty(value) : isValidFormValue(value);
 }
 
 export function getRawValue(form: AbstractControl): any {
