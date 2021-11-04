@@ -18,7 +18,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
-    <PackageReference Include="Elasticsearch.Net" Version="7.14.1" />
     <PackageReference Include="Equals.Fody" Version="4.0.1" PrivateAssets="all" />
     <PackageReference Include="Fody" Version="6.5.2">
       <PrivateAssets>all</PrivateAssets>

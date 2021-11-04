@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
+namespace Squidex.Extensions.Text.ElasticSearch
 {
     public static class ElasticSearchMapping
     {

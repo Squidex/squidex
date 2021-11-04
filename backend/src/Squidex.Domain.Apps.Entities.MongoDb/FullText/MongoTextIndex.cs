@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -143,13 +144,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Filter_ByScope(scope),
                     Filter.Text(queryText, "none"));
 
-            var bySchema =
+            var documents =
                 await GetCollection(scope).Find(findFilter).Limit(limit).Only(x => x.ContentId)
                     .ToListAsync(ct);
 
-            var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
-
-            return bySchema.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
+            return GetIds(documents);
         }
 
         private async Task<List<DomainId>> SearchByAppAsync(string queryText, IAppEntity app, SearchScope scope, int limit,
@@ -162,13 +161,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Filter_ByScope(scope),
                     Filter.Text(queryText, "none"));
 
-            var bySchema =
+            var documents =
                 await GetCollection(scope).Find(findFilter).Limit(limit).Only(x => x.ContentId)
                     .ToListAsync(ct);
 
+            return GetIds(documents);
+        }
+
+        private static List<DomainId> GetIds(List<BsonDocument> documents)
+        {
             var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
 
-            return bySchema.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
+            return documents.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
         }
 
         private static FilterDefinition<MongoTextIndexEntity> Filter_ByScope(SearchScope scope)

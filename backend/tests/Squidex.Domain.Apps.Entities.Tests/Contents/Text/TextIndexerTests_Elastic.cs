@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Contents.Text.Elastic;
+using Squidex.Extensions.Text.ElasticSearch;
 using Squidex.Infrastructure;
 using Xunit;
 
