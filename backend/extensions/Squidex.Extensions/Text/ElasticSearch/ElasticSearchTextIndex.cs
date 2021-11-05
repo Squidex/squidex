@@ -161,24 +161,29 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 size = 2000
             };
 
-            if (query.Filter?.SchemaIds?.Length > 0)
+            if (query.RequiredSchemaIds?.Count > 0)
             {
                 var bySchema = new
                 {
                     terms = new Dictionary<string, object>
                     {
-                        ["schemaId.keyword"] = query.Filter.SchemaIds.Select(x => x.ToString()).ToArray()
+                        ["schemaId.keyword"] = query.RequiredSchemaIds.Select(x => x.ToString()).ToArray()
                     }
                 };
 
-                if (query.Filter.Must)
+                elasticQuery.query.@bool.must.Add(bySchema);
+            }
+            else if (query.PreferredSchemaId.HasValue)
+            {
+                var bySchema = new
                 {
-                    elasticQuery.query.@bool.must.Add(bySchema);
-                }
-                else
-                {
-                    elasticQuery.query.@bool.should.Add(bySchema);
-                }
+                    terms = new Dictionary<string, object>
+                    {
+                        ["schemaId.keyword"] = query.PreferredSchemaId.ToString()
+                    }
+                };
+
+                elasticQuery.query.@bool.should.Add(bySchema);
             }
 
             var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(elasticQuery), ctx: ct);

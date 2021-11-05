@@ -73,6 +73,9 @@ namespace Squidex.Extensions.Text.Azure
         public Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
+
             return Task.FromResult<List<DomainId>>(null);
         }
 
@@ -82,18 +85,9 @@ namespace Squidex.Extensions.Text.Azure
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            var queryText = query.Text;
-
-            if (string.IsNullOrWhiteSpace(queryText))
+            if (string.IsNullOrWhiteSpace(query.Text))
             {
                 return null;
-            }
-
-            var isFuzzy = queryText.EndsWith("~", StringComparison.OrdinalIgnoreCase);
-
-            if (isFuzzy)
-            {
-                queryText = queryText[..^1];
             }
 
             var searchOptions = new SearchOptions
@@ -101,22 +95,10 @@ namespace Squidex.Extensions.Text.Azure
                 Filter = BuildFilter(app, query, scope)
             };
 
-            if (queryText.Length >= 4 && queryText.IndexOf(":", StringComparison.OrdinalIgnoreCase) == 2)
-            {
-                var candidateLanguage = queryText.Substring(0, 2);
-
-                if (Language.IsValidLanguage(candidateLanguage))
-                {
-                    searchOptions.SearchFields.Add(candidateLanguage);
-
-                    queryText = queryText[3..];
-                }
-            }
-
             searchOptions.Select.Add("contentId");
             searchOptions.Size = 2000;
 
-            var results = await searchClient.SearchAsync<SearchDocument>(queryText, searchOptions, ct);
+            var results = await searchClient.SearchAsync<SearchDocument>("*", searchOptions, ct);
 
             var ids = new List<DomainId>();
 
@@ -137,11 +119,19 @@ namespace Squidex.Extensions.Text.Azure
 
             sb.Append($"appId eq '{app.Id}' and {GetServeField(scope)} eq true");
 
-            if (query.Filter.SchemaIds?.Length > 0 && query.Filter.Must)
+            if (query.RequiredSchemaIds?.Count > 0)
             {
-                var schemaIds = string.Join(",", query.Filter.SchemaIds.Select(x => $"'{x}'"));
+                var schemaIds = string.Join(" or ", query.RequiredSchemaIds.Select(x => $"schemaId eq '{x}'"));
 
-                sb.Append($" and schemaId in ({schemaIds})");
+                sb.Append($" and ({schemaIds}) and search.ismatchscoring('{query.Text}')");
+            }
+            else if (query.PreferredSchemaId.HasValue)
+            {
+                sb.Append($" and ((search.ismatchscoring('{query.Text}') and search.ismatchscoring('{query.PreferredSchemaId}', 'schemaId')) or search.ismatchscoring('{query.Text}'))");
+            }
+            else
+            {
+                sb.Append($" and search.ismatchscoring('{query.Text}')");
             }
 
             return sb.ToString();

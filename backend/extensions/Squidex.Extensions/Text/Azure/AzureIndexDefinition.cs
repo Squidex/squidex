@@ -90,7 +90,7 @@ namespace Squidex.Extensions.Text.Azure
                 {
                     IsFilterable = false
                 },
-                new SimpleField("schemaId", SearchFieldDataType.String)
+                new SearchableField("schemaId")
                 {
                     IsFilterable = true
                 },
@@ -114,6 +114,7 @@ namespace Squidex.Extensions.Text.Azure
                     new SearchableField(field)
                     {
                         IsFilterable = false,
+                        IsFacetable = false,
                         AnalyzerName = analyzer
                     });
             }

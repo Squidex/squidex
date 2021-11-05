@@ -92,7 +92,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     throw new InvalidOperationException();
                 }
 
-                var textQuery = new TextQuery(query.FullText, TextFilter.ShouldHaveSchemas(schema.Id));
+                var textQuery = new TextQuery(query.FullText, 1000)
+                {
+                    PreferredSchemaId = schema.Id
+                };
 
                 var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope());
                 var fullTextFilter = ClrFilter.Eq("id", "__notfound__");

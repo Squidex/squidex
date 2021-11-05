@@ -12,7 +12,7 @@ import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/int
     selector: '[sqxResized], [sqxResizeCondition]',
 })
 export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChanges, ResizeListener {
-    private condition: ((rect: ClientRect) => boolean) | undefined;
+    private condition: ((rect: DOMRect) => boolean) | undefined;
     private conditionValue = false;
 
     @Input('sqxResizeMinWidth')
@@ -25,7 +25,7 @@ export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChan
     public resizeCondition = new EventEmitter<boolean>();
 
     @Output('sqxResized')
-    public resize = new EventEmitter<ClientRect>();
+    public resize = new EventEmitter<DOMRect>();
 
     constructor(resizeService: ResizeService, element: ElementRef,
         private readonly zone: NgZone,
@@ -50,7 +50,7 @@ export class ResizedDirective extends ResourceOwner implements OnDestroy, OnChan
         }
     }
 
-    public onResize(rect: ClientRect) {
+    public onResize(rect: DOMRect) {
         if (this.condition) {
             const value = this.condition(rect);
 

@@ -75,6 +75,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public debounceTime = 300;
 
     @Input()
+    public dropdownPosition = 'bottom-left';
+
+    @Input()
     public dropdownWidth = '18rem';
 
     @Input()

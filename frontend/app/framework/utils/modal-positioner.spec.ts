@@ -8,7 +8,7 @@
 import { positionModal } from './modal-positioner';
 
 describe('position', () => {
-    function buildRect(x: number, y: number, w: number, h: number): ClientRect {
+    function buildRect(x: number, y: number, w: number, h: number): any {
         return {
             top: y,
             left: x,
