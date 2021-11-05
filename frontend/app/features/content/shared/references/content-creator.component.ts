@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, isValidFormValue, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
+import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, getContentFormLanguagesData, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-creator[formContext][language][languages]',
@@ -63,22 +63,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         this.selectSchema(selectedSchema);
 
         this.own(this.contentForm.valueChanges.subscribe(() => {
-            const languagesData = new Map<string, boolean>();
-            this.languages.forEach((language) => {
-                if (languagesData.get(language.iso2Code) !== true) {
-                    for (const section of this.contentForm.sections) {
-                        if (languagesData.get(language.iso2Code) !== true) {
-                            for (const field of section.fields) {
-                                if (languagesData.get(language.iso2Code) !== true) {
-                                    languagesData.set(language.iso2Code, isValidFormValue(field.get(language.iso2Code).getRawValue()));
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            this.languagesData = languagesData;
+            this.languagesData = getContentFormLanguagesData(this.contentForm, this.languages);
         }));
     }
 

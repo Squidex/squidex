@@ -14,7 +14,7 @@ import { SchemaDto } from '../services/schemas.service';
 import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
-import { FieldForm } from './contents.forms';
+import { EditContentForm, FieldForm } from './contents.forms';
 
 export interface SnapshotLanguage {
     // The language.
@@ -246,5 +246,23 @@ export function getLanguagesData(schema: SchemaDto, contents: readonly ContentDt
             languagesData.set(language.iso2Code, found);
         }
     }
+    return languagesData;
+}
+
+export function getContentFormLanguagesData(contentForm: EditContentForm, languages: readonly LanguageDto[]) {
+    const languagesData = new Map<string, boolean>();
+    languages.forEach((language) => {
+        if (languagesData.get(language.iso2Code) !== true) {
+            for (const section of contentForm.sections) {
+                if (languagesData.get(language.iso2Code) !== true) {
+                    for (const field of section.fields) {
+                        if (languagesData.get(language.iso2Code) !== true) {
+                            languagesData.set(language.iso2Code, isValidFormValue(field.get(language.iso2Code).getRawValue()));
+                        }
+                    }
+                }
+            }
+        }
+    });
     return languagesData;
 }
