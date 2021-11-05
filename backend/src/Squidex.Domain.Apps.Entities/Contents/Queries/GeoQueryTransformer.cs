@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 var field = string.Join(".", nodeIn.Path.Skip(1));
 
-                var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius);
+                var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius, 1000);
                 var searchScope = args.Context.Scope();
 
                 var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope);

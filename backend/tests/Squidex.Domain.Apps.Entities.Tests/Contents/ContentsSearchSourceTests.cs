@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ids = new List<DomainId> { content.Id };
 
-            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~" && x.Filter != null), ctx.Scope(), ct))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope(), ct))
                 .Returns(ids);
 
             A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids), ct))

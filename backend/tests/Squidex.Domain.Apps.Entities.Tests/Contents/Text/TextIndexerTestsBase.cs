@@ -392,7 +392,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             return async p =>
             {
-                var query = new GeoQuery(schemaId.Id, field, latitude, longitude, 1000);
+                var query = new GeoQuery(schemaId.Id, field, latitude, longitude, 1000, 1000);
 
                 var result = await p.TextIndex.SearchAsync(app, query, target);
 
@@ -411,7 +411,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             return async p =>
             {
-                var query = new TextQuery(text, TextFilter.ShouldHaveSchemas(schemaId.Id));
+                var query = new TextQuery(text, 1000)
+                {
+                    RequiredSchemaIds = new List<DomainId> { schemaId.Id }
+                };
 
                 var result = await p.TextIndex.SearchAsync(app, query, target);
 

@@ -6,8 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
+namespace Squidex.Extensions.Text.ElasticSearch
 {
     public static class CommandFactory
     {

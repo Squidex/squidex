@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_geo_query_to_filter()
         {
-            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope(), default))
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30, 1000), requestContext.Scope(), default))
                 .Returns(new List<DomainId> { DomainId.Create("1"), DomainId.Create("2") });
 
             var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_geo_query_to_filter_if_single_id_found()
         {
-            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope(), default))
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30, 1000), requestContext.Scope(), default))
                 .Returns(new List<DomainId> { DomainId.Create("1") });
 
             var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_geo_query_to_filter_if_index_returns_null()
         {
-            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope(), default))
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30, 1000), requestContext.Scope(), default))
                 .Returns(Task.FromResult<List<DomainId>?>(null));
 
             var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public async Task Should_convert_geo_query_to_filter_if_index_returns_empty()
         {
-            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30), requestContext.Scope(), default))
+            A.CallTo(() => textIndex.SearchAsync(requestContext.App, new GeoQuery(schemaId.Id, "geo.iv", 10, 20, 30, 1000), requestContext.Scope(), default))
                 .Returns(new List<DomainId>());
 
             var query = Q.Empty.WithODataQuery("$filter=geo.distance(data/geo/iv, geography'POINT(20 10)') lt 30.0");

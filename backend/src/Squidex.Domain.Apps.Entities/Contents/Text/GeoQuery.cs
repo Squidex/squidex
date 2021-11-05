@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed record GeoQuery(DomainId SchemaId, string Field, double Latitude, double Longitude, double Radius)
+    public sealed record GeoQuery(DomainId SchemaId, string Field, double Latitude, double Longitude, double Radius, int Take)
     {
     }
 }

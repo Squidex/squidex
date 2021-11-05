@@ -29,7 +29,7 @@ export class SyncWidthDirective extends ResourceOwner implements AfterViewInit, 
         this.onReposition();
     }
 
-    public onResize(size: ClientRect) {
+    public onResize(size: DOMRect) {
         this.resize(size.width);
     }
 

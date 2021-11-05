@@ -7,7 +7,6 @@
 
 using System.Linq;
 using EventStore.Client;
-using EventStore.ClientAPI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -16,7 +15,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain

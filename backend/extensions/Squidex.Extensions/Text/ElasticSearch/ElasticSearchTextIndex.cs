@@ -7,18 +7,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
+namespace Squidex.Extensions.Text.ElasticSearch
 {
-    [ExcludeFromCodeCoverage]
     public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
     {
         private readonly ElasticLowLevelClient client;
@@ -74,13 +74,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
             }
         }
 
-        public Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+        public Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            return Task.FromResult<List<DomainId>?>(null);
+            return Task.FromResult<List<DomainId>>(null);
         }
 
-        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+        public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
             Guard.NotNull(app, nameof(app));
@@ -161,24 +161,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Elastic
                 size = 2000
             };
 
-            if (query.Filter?.SchemaIds?.Length > 0)
+            if (query.RequiredSchemaIds?.Count > 0)
             {
                 var bySchema = new
                 {
                     terms = new Dictionary<string, object>
                     {
-                        ["schemaId.keyword"] = query.Filter.SchemaIds.Select(x => x.ToString()).ToArray()
+                        ["schemaId.keyword"] = query.RequiredSchemaIds.Select(x => x.ToString()).ToArray()
                     }
                 };
 
-                if (query.Filter.Must)
+                elasticQuery.query.@bool.must.Add(bySchema);
+            }
+            else if (query.PreferredSchemaId.HasValue)
+            {
+                var bySchema = new
                 {
-                    elasticQuery.query.@bool.must.Add(bySchema);
-                }
-                else
-                {
-                    elasticQuery.query.@bool.should.Add(bySchema);
-                }
+                    terms = new Dictionary<string, object>
+                    {
+                        ["schemaId.keyword"] = query.PreferredSchemaId.ToString()
+                    }
+                };
+
+                elasticQuery.query.@bool.should.Add(bySchema);
             }
 
             var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(elasticQuery), ctx: ct);

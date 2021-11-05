@@ -9,25 +9,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
     public sealed class MongoTextIndex : MongoRepositoryBase<MongoTextIndexEntity>, ITextIndex, IDeleter
     {
-        private const int Limit = 2000;
-        private const int LimitHalf = 1000;
-        private static readonly List<DomainId> EmptyResults = new List<DomainId>();
+        private readonly ProjectionDefinition<MongoTextIndexEntity> searchTextProjection;
+        private readonly ProjectionDefinition<MongoTextIndexEntity> searchGeoProjection;
+
+        private sealed class MongoTextResult
+        {
+            [BsonId]
+            [BsonElement]
+            [BsonRepresentation(BsonType.String)]
+            public string Id { get; set; }
+
+            [BsonRequired]
+            [BsonElement("_ci")]
+            [BsonRepresentation(BsonType.String)]
+            public DomainId ContentId { get; set; }
+
+            [BsonIgnoreIfDefault]
+            [BsonElement("score")]
+            public double Score { get; set; }
+        }
 
         public MongoTextIndex(IMongoDatabase database, bool setup = false)
             : base(database, setup)
         {
+            searchGeoProjection = Projection.Include(x => x.ContentId);
+            searchTextProjection = Projection.Include(x => x.ContentId).MetaTextScore("score");
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity> collection,
@@ -97,78 +116,80 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Filter.GeoWithinCenterSphere(x => x.GeoObject, query.Longitude, query.Latitude, query.Radius / 6378100));
 
             var byGeo =
-                await GetCollection(scope).Find(findFilter).Limit(Limit).Only(x => x.ContentId)
+                await GetCollection(scope).Find(findFilter).Limit(query.Take).Project<MongoTextResult>(searchGeoProjection)
                     .ToListAsync(ct);
 
-            var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
-
-            return byGeo.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
+            return byGeo.Select(x => x.ContentId).ToList();
         }
 
         public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            var (queryText, filter) = query;
-
-            if (string.IsNullOrWhiteSpace(queryText))
+            if (string.IsNullOrWhiteSpace(query.Text))
             {
-                return EmptyResults;
+                return null;
             }
 
-            if (filter == null)
+            List<MongoTextResult> documents;
+
+            if (query.RequiredSchemaIds?.Count > 0)
             {
-                return await SearchByAppAsync(queryText, app, scope, Limit, ct);
+                documents = await SearchBySchemaAsync(query.Text, app, query.RequiredSchemaIds, scope, query.Take, ct);
             }
-            else if (filter.Must)
+            else if (query.PreferredSchemaId == null)
             {
-                return await SearchBySchemaAsync(queryText, app, filter, scope, Limit, ct);
+                documents = await SearchByAppAsync(query.Text, app, scope, query.Take, ct);
             }
             else
             {
-                var (bySchema, byApp) = await AsyncHelper.WhenAll(
-                    SearchBySchemaAsync(queryText, app, filter, scope, LimitHalf, ct),
-                    SearchByAppAsync(queryText, app, scope, LimitHalf, ct));
+                var halfBucket = query.Take / 2;
 
-                return bySchema.Union(byApp).Distinct().ToList();
+                var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
+
+                documents = new List<MongoTextResult>();
+                documents.AddRange(await SearchBySchemaAsync(query.Text, app, schemaIds, scope, halfBucket, ct));
+                documents.AddRange(await SearchByAppAsync(query.Text, app, scope, halfBucket, ct));
             }
+
+            return documents.OrderByDescending(x => x.Score).Select(x => x.ContentId).Distinct().ToList();
         }
 
-        private async Task<List<DomainId>> SearchBySchemaAsync(string queryText, IAppEntity app, TextFilter filter, SearchScope scope, int limit,
+        private Task<List<MongoTextResult>> SearchBySchemaAsync(string queryText, IAppEntity app, IEnumerable<DomainId> schemaIds, SearchScope scope, int limit,
             CancellationToken ct = default)
         {
-            var findFilter =
+            var filter =
                 Filter.And(
                     Filter.Eq(x => x.AppId, app.Id),
-                    Filter.In(x => x.SchemaId, filter.SchemaIds),
+                    Filter.In(x => x.SchemaId, schemaIds),
                     Filter_ByScope(scope),
                     Filter.Text(queryText, "none"));
 
-            var bySchema =
-                await GetCollection(scope).Find(findFilter).Limit(limit).Only(x => x.ContentId)
-                    .ToListAsync(ct);
-
-            var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
-
-            return bySchema.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
+            return SearchAsync(filter, scope, limit, ct);
         }
 
-        private async Task<List<DomainId>> SearchByAppAsync(string queryText, IAppEntity app, SearchScope scope, int limit,
+        private Task<List<MongoTextResult>> SearchByAppAsync(string queryText, IAppEntity app, SearchScope scope, int limit,
             CancellationToken ct = default)
         {
-            var findFilter =
+            var filter =
                 Filter.And(
                     Filter.Eq(x => x.AppId, app.Id),
                     Filter.Exists(x => x.SchemaId),
                     Filter_ByScope(scope),
                     Filter.Text(queryText, "none"));
 
-            var bySchema =
-                await GetCollection(scope).Find(findFilter).Limit(limit).Only(x => x.ContentId)
-                    .ToListAsync(ct);
+            return SearchAsync(filter, scope, limit, ct);
+        }
 
-            var field = Field.Of<MongoTextIndexEntity>(x => nameof(x.ContentId));
+        private Task<List<MongoTextResult>> SearchAsync(FilterDefinition<MongoTextIndexEntity> filter, SearchScope scope, int limit,
+            CancellationToken ct = default)
+        {
+            var collection = GetCollection(scope);
 
-            return bySchema.Select(x => DomainId.Create(x[field].AsString)).Distinct().ToList();
+            var find =
+                collection.Find(filter).Limit(limit)
+                    .Project<MongoTextResult>(searchTextProjection).Sort(Sort.MetaTextScore("score"));
+
+            return find.ToListAsync(ct);
         }
 
         private static FilterDefinition<MongoTextIndexEntity> Filter_ByScope(SearchScope scope)

@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.Domain.Apps.Entities.Contents.Text.Elastic;
 using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
@@ -97,19 +96,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
                 .AsSelf();
-
-            config.ConfigureByOption("fullText:type", new Alternatives
-            {
-                ["Elastic"] = () =>
-                {
-                    var elasticConfiguration = config.GetRequiredValue("fullText:elastic:configuration");
-                    var elasticIndexName = config.GetRequiredValue("fullText:elastic:indexName");
-
-                    services.AddSingletonAs(c => new ElasticSearchTextIndex(elasticConfiguration, elasticIndexName))
-                        .As<ITextIndex>();
-                },
-                ["Default"] = () => { }
-            });
         }
     }
 }

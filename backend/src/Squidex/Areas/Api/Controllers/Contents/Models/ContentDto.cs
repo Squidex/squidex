@@ -104,6 +104,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public FieldDto[]? ReferenceFields { get; set; }
 
         /// <summary>
+        /// Indicates whether the content is deleted.
+        /// </summary>
+        public bool IsDeleted { get; set; }
+
+        /// <summary>
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
@@ -138,6 +143,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 };
 
                 SimpleMapper.Map(content.ScheduleJob, response.ScheduleJob);
+            }
+
+            if (response.IsDeleted)
+            {
+                return response;
             }
 
             return response.CreateLinksAsync(content, resources, content.SchemaId.Name);
