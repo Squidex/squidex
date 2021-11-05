@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         public override ITextIndex CreateIndex()
         {
-            var index = new AzureTextIndex("https://squidex.search.windows.net", "4DA7CD642E16805AC27236065854D232", "test", 2000);
+            var index = new AzureTextIndex("https://squidex.search.windows.net", "API_KEY", "test", 2000);
 
             index.InitializeAsync(default).Wait();
 
