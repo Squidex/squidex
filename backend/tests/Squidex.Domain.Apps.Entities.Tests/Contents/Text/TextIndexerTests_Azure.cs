@@ -6,17 +6,17 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Extensions.Text.ElasticSearch;
+using Squidex.Extensions.Text.Azure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
-    public class TextIndexerTests_Elastic : TextIndexerTestsBase
+    public class TextIndexerTests_Azure : TextIndexerTestsBase
     {
         public override ITextIndex CreateIndex()
         {
-            var index = new ElasticSearchTextIndex("http://localhost:9200", "squidex", 1000);
+            var index = new AzureTextIndex("https://squidex.search.windows.net", "API_KEY", "test", 2000);
 
             index.InitializeAsync(default).Wait();
 

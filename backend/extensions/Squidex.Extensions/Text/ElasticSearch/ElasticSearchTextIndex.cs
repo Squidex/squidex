@@ -23,9 +23,9 @@ namespace Squidex.Extensions.Text.ElasticSearch
     {
         private readonly ElasticLowLevelClient client;
         private readonly string indexName;
-        private readonly bool waitForTesting;
+        private readonly int waitAfterUpdate;
 
-        public ElasticSearchTextIndex(string configurationString, string indexName, bool waitForTesting = false)
+        public ElasticSearchTextIndex(string configurationString, string indexName, int waitAfterUpdate = 0)
         {
             var config = new ConnectionConfiguration(new Uri(configurationString));
 
@@ -33,7 +33,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
             this.indexName = indexName;
 
-            this.waitForTesting = waitForTesting;
+            this.waitAfterUpdate = waitAfterUpdate;
         }
 
         public Task InitializeAsync(
@@ -58,19 +58,21 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 CommandFactory.CreateCommands(command, args, indexName);
             }
 
-            if (args.Count > 0)
+            if (args.Count == 0)
             {
-                var result = await client.BulkAsync<StringResponse>(PostData.MultiJson(args), ctx: ct);
-
-                if (!result.Success)
-                {
-                    throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
-                }
+                return;
             }
 
-            if (waitForTesting)
+            var result = await client.BulkAsync<StringResponse>(PostData.MultiJson(args), ctx: ct);
+
+            if (!result.Success)
             {
-                await Task.Delay(1000, ct);
+                throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
+            }
+
+            if (waitAfterUpdate > 0)
+            {
+                await Task.Delay(waitAfterUpdate, ct);
             }
         }
 

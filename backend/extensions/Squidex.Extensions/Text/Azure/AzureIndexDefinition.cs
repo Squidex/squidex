@@ -17,8 +17,8 @@ namespace Squidex.Extensions.Text.Azure
     {
         private static readonly Dictionary<string, (string Field, string Analyzer)> AllowedLanguages = new Dictionary<string, (string Field, string Analyzer)>(StringComparer.OrdinalIgnoreCase)
         {
-            ["iv"] = ("text_iv", LexicalAnalyzerName.StandardLucene.ToString()),
-            ["zh"] = ("text_zh", LexicalAnalyzerName.ZhHansLucene.ToString())
+            ["iv"] = ("iv", LexicalAnalyzerName.StandardLucene.ToString()),
+            ["zh"] = ("zh", LexicalAnalyzerName.ZhHansLucene.ToString())
         };
 
         static AzureIndexDefinition()
@@ -47,7 +47,7 @@ namespace Squidex.Extensions.Text.Azure
 
                     if (isValidLanguage && addedLanguage.Add(language))
                     {
-                        var fieldName = $"text_{language.Replace('-', '_')}";
+                        var fieldName = language.Replace('-', '_');
 
                         AllowedLanguages[language] = (fieldName, analyzer);
                     }
@@ -90,7 +90,7 @@ namespace Squidex.Extensions.Text.Azure
                 {
                     IsFilterable = false
                 },
-                new SearchableField("schemaId")
+                new SimpleField("schemaId", SearchFieldDataType.String)
                 {
                     IsFilterable = true
                 },
