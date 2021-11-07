@@ -108,6 +108,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
+
             var findFilter =
                 Filter.And(
                     Filter.Eq(x => x.AppId, app.Id),
@@ -125,42 +128,40 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
         public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(query.Text))
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
+
+            var (search, take) = query;
+
+            if (string.IsNullOrWhiteSpace(search))
             {
                 return null;
             }
 
-            List<(DomainId, double)> documents;
+            var result = new List<(DomainId Id, double Score)>();
 
             if (query.RequiredSchemaIds?.Count > 0)
             {
-                documents = await SearchBySchemaAsync(query.Text, app, query.RequiredSchemaIds, scope, query.Take, 1, ct);
+                await SearchBySchemaAsync(result, search, app, query.RequiredSchemaIds, scope, take, 1, ct);
             }
             else if (query.PreferredSchemaId == null)
             {
-                documents = await SearchByAppAsync(query.Text, app, scope, query.Take, 1, ct);
+                await SearchByAppAsync(result, search, app, scope, take, 1, ct);
             }
             else
             {
-                var halfBucket = query.Take / 2;
+                var halfBucket = take / 2;
 
                 var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
 
-                documents = await SearchBySchemaAsync(
-                    query.Text,
-                    app,
-                    schemaIds,
-                    scope,
-                    halfBucket, 1,
-                    ct);
-
-                documents.AddRange(await SearchByAppAsync(query.Text, app, scope, halfBucket, 1, ct));
+                await SearchBySchemaAsync(result, search, app, schemaIds, scope, halfBucket, 1.1, ct);
+                await SearchByAppAsync(result, search, app, scope, halfBucket, 1, ct);
             }
 
-            return documents.OrderByDescending(x => x.Item2).Select(x => x.Item1).Distinct().ToList();
+            return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
         }
 
-        private Task<List<(DomainId, double)>> SearchBySchemaAsync(string text, IAppEntity app, IEnumerable<DomainId> schemaIds, SearchScope scope, int limit, double factor,
+        private Task SearchBySchemaAsync(List<(DomainId, double)> result, string text, IAppEntity app, IEnumerable<DomainId> schemaIds, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
             var filter =
@@ -170,10 +171,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Filter_ByScope(scope),
                     Filter.Text(text, "none"));
 
-            return SearchAsync(filter, scope, limit, factor, ct);
+            return SearchAsync(result, filter, scope, take, factor, ct);
         }
 
-        private Task<List<(DomainId, double)>> SearchByAppAsync(string text, IAppEntity app, SearchScope scope, int limit, double factor,
+        private Task SearchByAppAsync(List<(DomainId, double)> result, string text, IAppEntity app, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
             var filter =
@@ -183,21 +184,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Filter_ByScope(scope),
                     Filter.Text(text, "none"));
 
-            return SearchAsync(filter, scope, limit, factor, ct);
+            return SearchAsync(result, filter, scope, take, factor, ct);
         }
 
-        private async Task<List<(DomainId, double)>> SearchAsync(FilterDefinition<MongoTextIndexEntity> filter, SearchScope scope, int limit, double factor,
+        private async Task SearchAsync(List<(DomainId, double)> result, FilterDefinition<MongoTextIndexEntity> filter, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
             var collection = GetCollection(scope);
 
             var find =
-                collection.Find(filter).Limit(limit)
+                collection.Find(filter).Limit(take)
                     .Project<MongoTextResult>(searchTextProjection).Sort(Sort.MetaTextScore("score"));
 
             var documents = await find.ToListAsync(ct);
 
-            return documents.Select(x => (x.ContentId, x.Score * factor)).ToList();
+            result.AddRange(documents.Select(x => (x.ContentId, x.Score * factor)));
         }
 
         private static FilterDefinition<MongoTextIndexEntity> Filter_ByScope(SearchScope scope)

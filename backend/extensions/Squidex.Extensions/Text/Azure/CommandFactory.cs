@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Azure.Search.Documents.Models;
+using GeoJSON.Net.Geometry;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Extensions.Text.Azure
@@ -20,43 +21,71 @@ namespace Squidex.Extensions.Text.Azure
             switch (command)
             {
                 case UpsertIndexEntry upsert:
-                    batch.Add(UpsertEntry(upsert));
+                    UpsertTextEntry(upsert, batch);
                     break;
                 case UpdateIndexEntry update:
-                    batch.Add(UpdateEntry(update));
+                    UpdateEntry(update, batch);
                     break;
                 case DeleteIndexEntry delete:
-                    batch.Add(DeleteEntry(delete));
+                    DeleteEntry(delete, batch);
                     break;
             }
         }
 
-        private static IndexDocumentsAction<SearchDocument> UpsertEntry(UpsertIndexEntry upsert)
+        private static void UpsertTextEntry(UpsertIndexEntry upsert, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
-            var searchDocument = new SearchDocument
+            static SearchDocument CreateDoc(UpsertIndexEntry upsert)
             {
-                ["docId"] = upsert.DocId.ToBase64(),
-                ["appId"] = upsert.AppId.Id.ToString(),
-                ["appName"] = upsert.AppId.Name,
-                ["contentId"] = upsert.ContentId.ToString(),
-                ["schemaId"] = upsert.SchemaId.Id.ToString(),
-                ["schemaName"] = upsert.SchemaId.Name,
-                ["serveAll"] = upsert.ServeAll,
-                ["servePublished"] = upsert.ServePublished
-            };
+                return new SearchDocument
+                {
+                    ["docId"] = upsert.DocId.ToBase64(),
+                    ["appId"] = upsert.AppId.Id.ToString(),
+                    ["appName"] = upsert.AppId.Name,
+                    ["contentId"] = upsert.ContentId.ToString(),
+                    ["schemaId"] = upsert.SchemaId.Id.ToString(),
+                    ["schemaName"] = upsert.SchemaId.Name,
+                    ["serveAll"] = upsert.ServeAll,
+                    ["servePublished"] = upsert.ServePublished
+                };
+            }
 
             if (upsert.Texts != null)
             {
+                var searchDocument = CreateDoc(upsert);
+
                 foreach (var (key, value) in upsert.Texts)
                 {
                     searchDocument[AzureIndexDefinition.GetTextField(key)] = value;
                 }
+
+                batch.Add(IndexDocumentsAction.MergeOrUpload(searchDocument));
+            }
+            else if (upsert.GeoObjects != null)
+            {
+                foreach (var (key, value) in upsert.GeoObjects)
+                {
+                    var geography = value.ToSpatialGeometry();
+
+                    if (geography != null)
+                    {
+                        var searchDocument = CreateDoc(upsert);
+
+                        searchDocument["geoField"] = key;
+                        searchDocument["geoObject"] = new
+                        {
+                            type = "Point",
+                            coordinates = new[] { geography.Longitude, geography.Latitude }
+                        };
+
+                        batch.Add(IndexDocumentsAction.MergeOrUpload(searchDocument));
+                        break;
+                    }
+                }
             }
 
-            return IndexDocumentsAction.MergeOrUpload(searchDocument);
         }
 
-        private static IndexDocumentsAction<SearchDocument> UpdateEntry(UpdateIndexEntry update)
+        private static void UpdateEntry(UpdateIndexEntry update, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
             var searchDocument = new SearchDocument
             {
@@ -65,12 +94,12 @@ namespace Squidex.Extensions.Text.Azure
                 ["servePublished"] = update.ServePublished,
             };
 
-            return IndexDocumentsAction.MergeOrUpload(searchDocument);
+            batch.Add(IndexDocumentsAction.MergeOrUpload(searchDocument));
         }
 
-        private static IndexDocumentsAction<SearchDocument> DeleteEntry(DeleteIndexEntry delete)
+        private static void DeleteEntry(DeleteIndexEntry delete, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
-            return IndexDocumentsAction.Delete("docId", delete.DocId.ToBase64());
+            batch.Add(IndexDocumentsAction.Delete("docId", delete.DocId.ToBase64()));
         }
 
         private static string ToBase64(this string value)

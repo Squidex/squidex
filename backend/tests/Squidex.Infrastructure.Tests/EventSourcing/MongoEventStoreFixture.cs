@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing
         protected MongoEventStoreFixture(string connectionString)
         {
             mongoClient = new MongoClient(connectionString);
-            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
+            mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
             BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.DefaultSettings()));
 
@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing
     public sealed class MongoEventStoreDirectFixture : MongoEventStoreFixture
     {
         public MongoEventStoreDirectFixture()
-            : base("mongodb://localhost:27019")
+            : base(TestConfig.Configuration["mongodb:configuration"])
         {
         }
     }
@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.EventSourcing
     public sealed class MongoEventStoreReplicaSetFixture : MongoEventStoreFixture
     {
         public MongoEventStoreReplicaSetFixture()
-            : base("mongodb://localhost:27017")
+            : base(TestConfig.Configuration["mongodb:configurationReplica"])
         {
         }
     }

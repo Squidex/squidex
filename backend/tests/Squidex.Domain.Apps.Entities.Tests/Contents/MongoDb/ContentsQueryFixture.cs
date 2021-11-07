@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
     {
         private readonly Random random = new Random();
         private readonly int numValues = 10000;
-        private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
+        private readonly IMongoClient mongoClient;
         private readonly IMongoDatabase mongoDatabase;
 
         public MongoContentRepository ContentRepository { get; }
@@ -55,7 +55,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         public ContentsQueryFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
+            mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+            mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
             SetupJson();
 

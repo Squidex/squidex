@@ -105,6 +105,14 @@ namespace Squidex.Extensions.Text.Azure
                 new SimpleField("servePublished", SearchFieldDataType.Boolean)
                 {
                     IsFilterable = true
+                },
+                new SimpleField("geoObject", SearchFieldDataType.GeographyPoint)
+                {
+                    IsFilterable = true
+                },
+                new SimpleField("geoField", SearchFieldDataType.String)
+                {
+                    IsFilterable = true
                 }
             };
 

@@ -23,17 +23,14 @@ namespace Squidex.Extensions.Text.ElasticSearch
     {
         private readonly ElasticLowLevelClient client;
         private readonly string indexName;
-        private readonly int waitAfterUpdate;
 
-        public ElasticSearchTextIndex(string configurationString, string indexName, int waitAfterUpdate = 0)
+        public ElasticSearchTextIndex(string configurationString, string indexName)
         {
             var config = new ConnectionConfiguration(new Uri(configurationString));
 
             client = new ElasticLowLevelClient(config);
 
             this.indexName = indexName;
-
-            this.waitAfterUpdate = waitAfterUpdate;
         }
 
         public Task InitializeAsync(
@@ -69,11 +66,6 @@ namespace Squidex.Extensions.Text.ElasticSearch
             {
                 throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
             }
-
-            if (waitAfterUpdate > 0)
-            {
-                await Task.Delay(waitAfterUpdate, ct);
-            }
         }
 
         public Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
@@ -88,31 +80,31 @@ namespace Squidex.Extensions.Text.ElasticSearch
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            var queryText = query.Text;
+            var (text, take) = query;
 
-            if (string.IsNullOrWhiteSpace(queryText))
+            if (string.IsNullOrWhiteSpace(text))
             {
                 return null;
             }
 
-            var isFuzzy = queryText.EndsWith("~", StringComparison.OrdinalIgnoreCase);
+            var isFuzzy = text.EndsWith("~", StringComparison.OrdinalIgnoreCase);
 
             if (isFuzzy)
             {
-                queryText = queryText[..^1];
+                text = text[..^1];
             }
 
             var field = "texts.*";
 
-            if (queryText.Length >= 4 && queryText.IndexOf(":", StringComparison.OrdinalIgnoreCase) == 2)
+            if (text.Length >= 4 && text.IndexOf(":", StringComparison.OrdinalIgnoreCase) == 2)
             {
-                var candidateLanguage = queryText.Substring(0, 2);
+                var candidateLanguage = text.Substring(0, 2);
 
                 if (Language.IsValidLanguage(candidateLanguage))
                 {
                     field = $"texts.{candidateLanguage}";
 
-                    queryText = queryText[3..];
+                    text = text[3..];
                 }
             }
 
@@ -149,7 +141,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                                     {
                                         field
                                     },
-                                    query = query.Text
+                                    query = text
                                 }
                             }
                         },
@@ -160,7 +152,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 {
                     "contentId"
                 },
-                size = 2000
+                size = take
             };
 
             if (query.RequiredSchemaIds?.Count > 0)

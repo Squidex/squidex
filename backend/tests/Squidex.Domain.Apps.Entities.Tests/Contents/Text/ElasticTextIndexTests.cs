@@ -6,21 +6,25 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Extensions.Text.Azure;
 using Xunit;
+
+#pragma warning disable SA1300 // Element should begin with upper-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
-    public class TextIndexerTests_Azure : TextIndexerTestsBase
+    public class ElasticTextIndexTests : TextIndexerTestsBase, IClassFixture<ElasticTextIndexFixture>
     {
+        public ElasticTextIndexFixture _ { get; }
+
+        public ElasticTextIndexTests(ElasticTextIndexFixture fixture)
+        {
+            _ = fixture;
+        }
+
         public override ITextIndex CreateIndex()
         {
-            var index = new AzureTextIndex("https://squidex.search.windows.net", "API_KEY", "test", 2000);
-
-            index.InitializeAsync(default).Wait();
-
-            return index;
+            return _.Index;
         }
 
         [Fact]

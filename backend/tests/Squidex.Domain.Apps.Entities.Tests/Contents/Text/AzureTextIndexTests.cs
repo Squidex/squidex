@@ -6,21 +6,29 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Extensions.Text.ElasticSearch;
 using Xunit;
+
+#pragma warning disable SA1300 // Element should begin with upper-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
-    public class TextIndexerTests_Elastic : TextIndexerTestsBase
+    public class AzureTextIndexTests : TextIndexerTestsBase, IClassFixture<AzureTextIndexFixture>
     {
+        public override bool SupportsGeo => true;
+
+        public override int WaitAfterUpdate => 2000;
+
+        public AzureTextIndexFixture _ { get; }
+
+        public AzureTextIndexTests(AzureTextIndexFixture fixture)
+        {
+            _ = fixture;
+        }
+
         public override ITextIndex CreateIndex()
         {
-            var index = new ElasticSearchTextIndex("http://localhost:9200", "squidex", 1000);
-
-            index.InitializeAsync(default).Wait();
-
-            return index;
+            return _.Index;
         }
 
         [Fact]
