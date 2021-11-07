@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
@@ -21,6 +22,8 @@ namespace Squidex.Extensions.Text.ElasticSearch
 {
     public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
     {
+        private static readonly Regex LanguageRegex = new Regex(@"[^\w]+([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private static readonly Regex LanguageRegexStart = new Regex(@"$^([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private readonly ElasticLowLevelClient client;
         private readonly string indexName;
 
@@ -143,26 +146,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 return null;
             }
 
-            var isFuzzy = text.EndsWith("~", StringComparison.OrdinalIgnoreCase);
-
-            if (isFuzzy)
-            {
-                text = text[..^1];
-            }
-
-            var field = "texts.*";
-
-            if (text.Length >= 4 && text.IndexOf(":", StringComparison.OrdinalIgnoreCase) == 2)
-            {
-                var candidateLanguage = text.Substring(0, 2);
-
-                if (Language.IsValidLanguage(candidateLanguage))
-                {
-                    field = $"texts.{candidateLanguage}";
-
-                    text = text[3..];
-                }
-            }
+            text = text.PrefixField("texts.");
 
             var serveField = GetServeField(scope);
 
@@ -191,13 +175,8 @@ namespace Squidex.Extensions.Text.ElasticSearch
                         },
                         must = new
                         {
-                            multi_match = new
+                            query_string = new
                             {
-                                fuzziness = isFuzzy ? (object)"AUTO" : 0,
-                                fields = new[]
-                                {
-                                    field
-                                },
                                 query = text
                             }
                         },

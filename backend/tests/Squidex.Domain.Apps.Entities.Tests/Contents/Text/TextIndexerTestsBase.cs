@@ -54,7 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     Language.EN);
 
             sut = new Lazy<TextIndexingProcess>(CreateSut);
-
         }
 
         private TextIndexingProcess CreateSut()
@@ -66,7 +65,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public abstract ITextIndex CreateIndex();
 
-        public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
+        [Fact]
+        public async Task Should_search_with_fuzzy()
         {
             if (!SupportsQuerySyntax)
             {
@@ -76,18 +76,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await CreateTextAsync(ids1[0], "iv", "Hello");
 
             await SearchText(expected: ids1, text: "helo~");
-        }
-
-        public async Task Should_index_invariant_content_and_retrieve_with_fuzzy_with_full_scope()
-        {
-            if (!SupportsQuerySyntax)
-            {
-                return;
-            }
-
-            await CreateTextAsync(ids2[0], "iv", "World");
-
-            await SearchText(expected: ids2, text: "wold~", SearchScope.All);
         }
 
         [Fact]

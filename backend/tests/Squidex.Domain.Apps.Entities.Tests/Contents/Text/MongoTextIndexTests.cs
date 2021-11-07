@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Xunit;
 
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
