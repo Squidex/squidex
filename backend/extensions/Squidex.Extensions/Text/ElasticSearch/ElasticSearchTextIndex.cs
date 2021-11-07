@@ -68,10 +68,66 @@ namespace Squidex.Extensions.Text.ElasticSearch
             }
         }
 
-        public Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+        public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            return Task.FromResult<List<DomainId>>(null);
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
+
+            var serveField = GetServeField(scope);
+
+            var elasticQuery = new
+            {
+                query = new
+                {
+                    @bool = new
+                    {
+                        filter = new object[]
+                        {
+                            new
+                            {
+                                term = new Dictionary<string, object>
+                                {
+                                    ["schemaId.keyword"] = query.SchemaId.ToString()
+                                }
+                            },
+                            new
+                            {
+                                term = new Dictionary<string, string>
+                                {
+                                    ["geoField.keyword"] = query.Field
+                                }
+                            },
+                            new
+                            {
+                                term = new Dictionary<string, string>
+                                {
+                                    [serveField] = "true"
+                                }
+                            },
+                            new
+                            {
+                                geo_distance = new
+                                {
+                                    geoObject = new
+                                    {
+                                        lat = query.Latitude,
+                                        lon = query.Longitude
+                                    },
+                                    distance = $"{query.Radius}m"
+                                }
+                            }
+                        },
+                    }
+                },
+                _source = new[]
+                {
+                    "contentId"
+                },
+                size = query.Take
+            };
+
+            return await SearchAsync(elasticQuery, ct);
         }
 
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
@@ -116,7 +172,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 {
                     @bool = new
                     {
-                        must = new List<object>
+                        filter = new List<object>
                         {
                             new
                             {
@@ -131,18 +187,18 @@ namespace Squidex.Extensions.Text.ElasticSearch
                                 {
                                     [serveField] = "true"
                                 }
-                            },
-                            new
+                            }
+                        },
+                        must = new
+                        {
+                            multi_match = new
                             {
-                                multi_match = new
+                                fuzziness = isFuzzy ? (object)"AUTO" : 0,
+                                fields = new[]
                                 {
-                                    fuzziness = isFuzzy ? (object)"AUTO" : 0,
-                                    fields = new[]
-                                    {
-                                        field
-                                    },
-                                    query = text
-                                }
+                                    field
+                                },
+                                query = text
                             }
                         },
                         should = new List<object>()
@@ -165,7 +221,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                     }
                 };
 
-                elasticQuery.query.@bool.must.Add(bySchema);
+                elasticQuery.query.@bool.filter.Add(bySchema);
             }
             else if (query.PreferredSchemaId.HasValue)
             {
@@ -180,7 +236,13 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 elasticQuery.query.@bool.should.Add(bySchema);
             }
 
-            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(elasticQuery), ctx: ct);
+            return await SearchAsync(elasticQuery, ct);
+        }
+
+        private async Task<List<DomainId>> SearchAsync(object query,
+            CancellationToken ct)
+        {
+            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(query), ctx: ct);
 
             if (!result.Success)
             {

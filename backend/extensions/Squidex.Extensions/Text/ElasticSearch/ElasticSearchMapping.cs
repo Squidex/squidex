@@ -206,6 +206,10 @@ namespace Squidex.Extensions.Text.ElasticSearch
                     {
                         type = "text",
                         analyzer = "thai"
+                    },
+                    ["geoObject"] = new
+                    {
+                        type ="geo_point"
                     }
                 }
             };

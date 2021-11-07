@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using GeoJSON.Net.Geometry;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Extensions.Text.ElasticSearch
@@ -30,26 +31,51 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
         private static void UpsertEntry(UpsertIndexEntry upsert, List<object> args, string indexName)
         {
-            args.Add(new
-            {
-                index = new
-                {
-                    _id = upsert.DocId,
-                    _index = indexName
-                }
-            });
+            var geoField = string.Empty;
+            var geoObject = (object)null;
 
-            args.Add(new
+            if (upsert.GeoObjects != null)
             {
-                appId = upsert.AppId.Id.ToString(),
-                appName = upsert.AppId.Name,
-                contentId = upsert.ContentId.ToString(),
-                schemaId = upsert.SchemaId.Id.ToString(),
-                schemaName = upsert.SchemaId.Name,
-                serveAll = upsert.ServeAll,
-                servePublished = upsert.ServePublished,
-                texts = upsert.Texts
-            });
+                foreach (var (key, value) in upsert.GeoObjects)
+                {
+                    if (value is Point point)
+                    {
+                        geoField = key;
+                        geoObject = new
+                        {
+                            lat = point.Coordinates.Latitude,
+                            lon = point.Coordinates.Longitude
+                        };
+                        break;
+                    }
+                }
+            }
+
+            if (upsert.Texts != null || geoObject != null)
+            {
+                args.Add(new
+                {
+                    index = new
+                    {
+                        _id = upsert.DocId,
+                        _index = indexName
+                    }
+                });
+
+                args.Add(new
+                {
+                    appId = upsert.AppId.Id.ToString(),
+                    appName = upsert.AppId.Name,
+                    contentId = upsert.ContentId.ToString(),
+                    schemaId = upsert.SchemaId.Id.ToString(),
+                    schemaName = upsert.SchemaId.Name,
+                    serveAll = upsert.ServeAll,
+                    servePublished = upsert.ServePublished,
+                    texts = upsert.Texts,
+                    geoField,
+                    geoObject
+                });
+            }
         }
 
         private static void UpdateEntry(UpdateIndexEntry update, List<object> args, string indexName)

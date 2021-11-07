@@ -34,9 +34,33 @@ namespace Squidex.Extensions.Text.Azure
 
         private static void UpsertTextEntry(UpsertIndexEntry upsert, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
-            static SearchDocument CreateDoc(UpsertIndexEntry upsert)
+            var geoField = string.Empty;
+            var geoObject = (object)null;
+
+            if (upsert.GeoObjects != null)
             {
-                return new SearchDocument
+                foreach (var (key, value) in upsert.GeoObjects)
+                {
+                    if (value is Point point)
+                    {
+                        geoField = key;
+                        geoObject = new
+                        {
+                            type = "Point",
+                            coordinates = new[]
+                            {
+                                point.Coordinates.Longitude,
+                                point.Coordinates.Latitude
+                            }
+                        };
+                        break;
+                    }
+                }
+            }
+
+            if (upsert.Texts != null || geoObject != null)
+            {
+                var document = new SearchDocument
                 {
                     ["docId"] = upsert.DocId.ToBase64(),
                     ["appId"] = upsert.AppId.Id.ToString(),
@@ -45,56 +69,30 @@ namespace Squidex.Extensions.Text.Azure
                     ["schemaId"] = upsert.SchemaId.Id.ToString(),
                     ["schemaName"] = upsert.SchemaId.Name,
                     ["serveAll"] = upsert.ServeAll,
-                    ["servePublished"] = upsert.ServePublished
+                    ["servePublished"] = upsert.ServePublished,
+                    ["geoField"] = geoField,
+                    ["geoObject"] = geoObject
                 };
-            }
-
-            if (upsert.Texts != null)
-            {
-                var searchDocument = CreateDoc(upsert);
 
                 foreach (var (key, value) in upsert.Texts)
                 {
-                    searchDocument[AzureIndexDefinition.GetTextField(key)] = value;
+                    document[AzureIndexDefinition.GetTextField(key)] = value;
                 }
 
-                batch.Add(IndexDocumentsAction.MergeOrUpload(searchDocument));
+                batch.Add(IndexDocumentsAction.MergeOrUpload(document));
             }
-            else if (upsert.GeoObjects != null)
-            {
-                foreach (var (key, value) in upsert.GeoObjects)
-                {
-                    var geography = value.ToSpatialGeometry();
-
-                    if (geography != null)
-                    {
-                        var searchDocument = CreateDoc(upsert);
-
-                        searchDocument["geoField"] = key;
-                        searchDocument["geoObject"] = new
-                        {
-                            type = "Point",
-                            coordinates = new[] { geography.Longitude, geography.Latitude }
-                        };
-
-                        batch.Add(IndexDocumentsAction.MergeOrUpload(searchDocument));
-                        break;
-                    }
-                }
-            }
-
         }
 
         private static void UpdateEntry(UpdateIndexEntry update, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
-            var searchDocument = new SearchDocument
+            var document = new SearchDocument
             {
                 ["docId"] = update.DocId.ToBase64(),
                 ["serveAll"] = update.ServeAll,
                 ["servePublished"] = update.ServePublished,
             };
 
-            batch.Add(IndexDocumentsAction.MergeOrUpload(searchDocument));
+            batch.Add(IndexDocumentsAction.MergeOrUpload(document));
         }
 
         private static void DeleteEntry(DeleteIndexEntry delete, IList<IndexDocumentsAction<SearchDocument>> batch)
