@@ -15,7 +15,7 @@ namespace Squidex.Extensions.Text.Azure
 {
     public static class AzureIndexDefinition
     {
-        private static readonly Dictionary<string, (string Field, string Analyzer)> AllowedLanguages = new Dictionary<string, (string Field, string Analyzer)>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, (string Field, string Analyzer)> Analyzers = new Dictionary<string, (string Field, string Analyzer)>(StringComparer.OrdinalIgnoreCase)
         {
             ["iv"] = ("iv", LexicalAnalyzerName.StandardLucene.ToString()),
             ["zh"] = ("zh", LexicalAnalyzerName.ZhHansLucene.ToString())
@@ -49,25 +49,25 @@ namespace Squidex.Extensions.Text.Azure
                     {
                         var fieldName = language.Replace('-', '_');
 
-                        AllowedLanguages[language] = (fieldName, analyzer);
+                        Analyzers[language] = (fieldName, analyzer);
                     }
                 }
             }
         }
 
-        public static string GetTextField(string key)
+        public static string GetFieldName(string key)
         {
-            if (AllowedLanguages.TryGetValue(key, out var field))
+            if (Analyzers.TryGetValue(key, out var field))
             {
                 return field.Field;
             }
 
-            if (key.Length > 2 && AllowedLanguages.TryGetValue(key[2..], out field))
+            if (key.Length > 2 && Analyzers.TryGetValue(key[2..], out field))
             {
                 return field.Field;
             }
 
-            return AllowedLanguages["iv"].Field;
+            return "iv";
         }
 
         public static SearchIndex Create(string indexName)
@@ -116,7 +116,7 @@ namespace Squidex.Extensions.Text.Azure
                 }
             };
 
-            foreach (var (field, analyzer) in AllowedLanguages.Values)
+            foreach (var (field, analyzer) in Analyzers.Values)
             {
                 fields.Add(
                     new SearchableField(field)

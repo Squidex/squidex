@@ -25,6 +25,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
         private static readonly Regex LanguageRegex = new Regex(@"[^\w]+([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private static readonly Regex LanguageRegexStart = new Regex(@"$^([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private readonly ElasticLowLevelClient client;
+        private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
         private readonly string indexName;
 
         public ElasticSearchTextIndex(string configurationString, string indexName)
@@ -39,7 +40,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
         public Task InitializeAsync(
             CancellationToken ct)
         {
-            return ElasticSearchMapping.ApplyAsync(client, indexName, ct);
+            return ElasticSearchIndexDefinition.ApplyAsync(client, indexName, ct);
         }
 
         public Task ClearAsync(
@@ -139,14 +140,12 @@ namespace Squidex.Extensions.Text.ElasticSearch
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            var (text, take) = query;
+            var parsed = queryParser.Parse(query.Text);
 
-            if (string.IsNullOrWhiteSpace(text))
+            if (parsed == null)
             {
                 return null;
             }
-
-            text = text.PrefixField("texts.");
 
             var serveField = GetServeField(scope);
 
@@ -177,7 +176,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                         {
                             query_string = new
                             {
-                                query = text
+                                query = parsed.Text
                             }
                         },
                         should = new List<object>()
@@ -187,7 +186,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 {
                     "contentId"
                 },
-                size = take
+                size = query.Take
             };
 
             if (query.RequiredSchemaIds?.Count > 0)

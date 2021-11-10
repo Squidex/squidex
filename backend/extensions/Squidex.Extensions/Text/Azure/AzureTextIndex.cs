@@ -26,6 +26,7 @@ namespace Squidex.Extensions.Text.Azure
     {
         private readonly SearchIndexClient indexClient;
         private readonly SearchClient searchClient;
+        private readonly QueryParser queryParser = new QueryParser(AzureIndexDefinition.GetFieldName);
 
         public AzureTextIndex(
             string serviceEndpoint,
@@ -93,9 +94,9 @@ namespace Squidex.Extensions.Text.Azure
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            var (text, take) = query;
+            var parsed = queryParser.Parse(query.Text);
 
-            if (string.IsNullOrWhiteSpace(query.Text))
+            if (parsed == null)
             {
                 return null;
             }
@@ -104,20 +105,20 @@ namespace Squidex.Extensions.Text.Azure
 
             if (query.RequiredSchemaIds?.Count > 0)
             {
-                await SearchBySchemaAsync(result, text, query.RequiredSchemaIds, scope, take, 1, ct);
+                await SearchBySchemaAsync(result, parsed.Text, query.RequiredSchemaIds, scope, query.Take, 1, ct);
             }
             else if (query.PreferredSchemaId == null)
             {
-                await SearchByAppAsync(result, text, app, scope, take, 1, ct);
+                await SearchByAppAsync(result, parsed.Text, app, scope, query.Take, 1, ct);
             }
             else
             {
-                var halfTake = take / 2;
+                var halfTake = query.Take / 2;
 
                 var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
 
-                await SearchBySchemaAsync(result, text, schemaIds, scope, halfTake, 1.1, ct);
-                await SearchByAppAsync(result, text, app, scope, halfTake, 1, ct);
+                await SearchBySchemaAsync(result, parsed.Text, schemaIds, scope, halfTake, 1.1, ct);
+                await SearchByAppAsync(result, parsed.Text, app, scope, halfTake, 1, ct);
             }
 
             return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();

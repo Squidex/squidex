@@ -13,12 +13,21 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
-    public static class CommandFactory
+    public sealed class CommandFactory<T> where T : class
     {
-        private static readonly FilterDefinitionBuilder<MongoTextIndexEntity> Filter = Builders<MongoTextIndexEntity>.Filter;
-        private static readonly UpdateDefinitionBuilder<MongoTextIndexEntity> Update = Builders<MongoTextIndexEntity>.Update;
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+        private static readonly FilterDefinitionBuilder<MongoTextIndexEntity<T>> Filter = Builders<MongoTextIndexEntity<T>>.Filter;
+        private static readonly UpdateDefinitionBuilder<MongoTextIndexEntity<T>> Update = Builders<MongoTextIndexEntity<T>>.Update;
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
-        public static void CreateCommands(IndexCommand command, List<WriteModel<MongoTextIndexEntity>> writes)
+        private readonly Func<Dictionary<string, string>, T> textBuilder;
+
+        public CommandFactory(Func<Dictionary<string, string>, T> textBuilder)
+        {
+            this.textBuilder = textBuilder;
+        }
+
+        public void CreateCommands(IndexCommand command, List<WriteModel<MongoTextIndexEntity<T>>> writes)
         {
             switch (command)
             {
@@ -34,10 +43,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             }
         }
 
-        private static void UpsertEntry(UpsertIndexEntry upsert, List<WriteModel<MongoTextIndexEntity>> writes)
+        private void UpsertEntry(UpsertIndexEntry upsert, List<WriteModel<MongoTextIndexEntity<T>>> writes)
         {
             writes.Add(
-                new UpdateOneModel<MongoTextIndexEntity>(
+                new UpdateOneModel<MongoTextIndexEntity<T>>(
                     Filter.And(
                         Filter.Eq(x => x.DocId, upsert.DocId),
                         Filter.Exists(x => x.GeoField, false),
@@ -45,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Update
                         .Set(x => x.ServeAll, upsert.ServeAll)
                         .Set(x => x.ServePublished, upsert.ServePublished)
-                        .Set(x => x.Texts, upsert.Texts?.Values.Select(MongoTextIndexEntityText.FromText).ToList())
+                        .Set(x => x.Texts, BuildTexts(upsert))
                         .SetOnInsert(x => x.Id, Guid.NewGuid().ToString())
                         .SetOnInsert(x => x.DocId, upsert.DocId)
                         .SetOnInsert(x => x.AppId, upsert.AppId.Id)
@@ -60,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 if (!upsert.IsNew)
                 {
                     writes.Add(
-                        new DeleteOneModel<MongoTextIndexEntity>(
+                        new DeleteOneModel<MongoTextIndexEntity<T>>(
                             Filter.And(
                                 Filter.Eq(x => x.DocId, upsert.DocId),
                                 Filter.Exists(x => x.GeoField),
@@ -70,8 +79,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 foreach (var (field, geoObject) in upsert.GeoObjects)
                 {
                     writes.Add(
-                        new InsertOneModel<MongoTextIndexEntity>(
-                            new MongoTextIndexEntity
+                        new InsertOneModel<MongoTextIndexEntity<T>>(
+                            new MongoTextIndexEntity<T>
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 AppId = upsert.AppId.Id,
@@ -87,20 +96,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             }
         }
 
-        private static void UpdateEntry(UpdateIndexEntry update, List<WriteModel<MongoTextIndexEntity>> writes)
+        private T? BuildTexts(UpsertIndexEntry upsert)
+        {
+            return upsert.Texts == null ? null : textBuilder(upsert.Texts);
+        }
+
+        private static void UpdateEntry(UpdateIndexEntry update, List<WriteModel<MongoTextIndexEntity<T>>> writes)
         {
             writes.Add(
-                new UpdateOneModel<MongoTextIndexEntity>(
+                new UpdateOneModel<MongoTextIndexEntity<T>>(
                     Filter.Eq(x => x.DocId, update.DocId),
                     Update
                         .Set(x => x.ServeAll, update.ServeAll)
                         .Set(x => x.ServePublished, update.ServePublished)));
         }
 
-        private static void DeleteEntry(DeleteIndexEntry delete, List<WriteModel<MongoTextIndexEntity>> writes)
+        private static void DeleteEntry(DeleteIndexEntry delete, List<WriteModel<MongoTextIndexEntity<T>>> writes)
         {
             writes.Add(
-                new DeleteOneModel<MongoTextIndexEntity>(
+                new DeleteOneModel<MongoTextIndexEntity<T>>(
                     Filter.Eq(x => x.DocId, delete.DocId)));
         }
     }

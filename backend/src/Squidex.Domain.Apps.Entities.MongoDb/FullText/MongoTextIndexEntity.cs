@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using GeoJSON.Net;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -14,7 +13,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 {
-    public sealed class MongoTextIndexEntity
+    public sealed class MongoTextIndexEntity<T>
     {
         [BsonId]
         [BsonElement]
@@ -50,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         [BsonIgnoreIfNull]
         [BsonElement("t")]
-        public List<MongoTextIndexEntityText> Texts { get; set; }
+        public T Texts { get; set; }
 
         [BsonIgnoreIfNull]
         [BsonElement("gf")]

@@ -76,7 +76,16 @@ namespace Squidex.Extensions.Text.Azure
 
                 foreach (var (key, value) in upsert.Texts)
                 {
-                    document[AzureIndexDefinition.GetTextField(key)] = value;
+                    var text = value;
+
+                    var languageCode = AzureIndexDefinition.GetFieldName(key);
+
+                    if (document.TryGetValue(languageCode, out var existing))
+                    {
+                        text = $"{existing} {value}";
+                    }
+
+                    document[languageCode] = text;
                 }
 
                 batch.Add(IndexDocumentsAction.MergeOrUpload(document));

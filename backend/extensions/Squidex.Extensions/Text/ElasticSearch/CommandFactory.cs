@@ -62,6 +62,22 @@ namespace Squidex.Extensions.Text.ElasticSearch
                     }
                 });
 
+                var texts = new Dictionary<string, string>();
+
+                foreach (var (key, value) in upsert.Texts)
+                {
+                    var text = value;
+
+                    var languageCode = ElasticSearchIndexDefinition.GetFieldName(key);
+
+                    if (texts.TryGetValue(languageCode, out var existing))
+                    {
+                        text = $"{existing} {value}";
+                    }
+
+                    texts[languageCode] = text;
+                }
+
                 args.Add(new
                 {
                     appId = upsert.AppId.Id.ToString(),
@@ -71,7 +87,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                     schemaName = upsert.SchemaId.Name,
                     serveAll = upsert.ServeAll,
                     servePublished = upsert.ServePublished,
-                    texts = upsert.Texts,
+                    texts,
                     geoField,
                     geoObject
                 });
