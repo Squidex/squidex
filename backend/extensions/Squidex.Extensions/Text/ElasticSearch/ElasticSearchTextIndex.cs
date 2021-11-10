@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -213,6 +214,8 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
                 elasticQuery.query.@bool.should.Add(bySchema);
             }
+
+            var json = JsonConvert.SerializeObject(elasticQuery, Formatting.Indented);
 
             return await SearchAsync(elasticQuery, ct);
         }

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public sealed class AtlasOptions
     {

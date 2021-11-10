@@ -14,12 +14,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Hosting.Configuration;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public static class AtlasIndexDefinition
     {
-        private static readonly Dictionary<string, string> Fields = new Dictionary<string, string>();
-        private static readonly Dictionary<string, string> Analyzers = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> FieldPaths = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> FieldAnalyzers = new Dictionary<string, string>
         {
             ["iv"] = "lucene.standard",
             ["ar"] = "lucene.arabic",
@@ -30,24 +30,30 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             ["bg"] = "lucene.bulgarian",
             ["ca"] = "lucene.catalan",
             ["ko"] = "lucene.cjk",
-            ["jp"] = "lucene.cjk",
-            ["zh"] = "lucene.cjk",
             ["da"] = "lucene.danish",
+            ["nl"] = "lucene.dutch",
             ["en"] = "lucene.english",
             ["fi"] = "lucene.finnish",
             ["fr"] = "lucene.french",
+            ["gl"] = "lucene.galician",
+            ["de"] = "lucene.german",
             ["el"] = "lucene.greek",
             ["hi"] = "lucene.hindi",
+            ["hu"] = "lucene.hungarian",
             ["id"] = "lucene.indonesian",
             ["ga"] = "lucene.irish",
             ["it"] = "lucene.italian",
+            ["jp"] = "lucene.japanese",
             ["lv"] = "lucene.latvian",
             ["no"] = "lucene.norwegian",
+            ["fa"] = "lucene.persian",
             ["pt"] = "lucene.portuguese",
             ["ro"] = "lucene.romanian",
             ["ru"] = "lucene.russian",
+            ["zh"] = "lucene.smartcn",
             ["es"] = "lucene.spanish",
             ["sv"] = "lucene.swedish",
+            ["th"] = "lucene.thai",
             ["tr"] = "lucene.turkish",
             ["uk"] = "lucene.ukrainian"
         };
@@ -61,19 +67,44 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         static AtlasIndexDefinition()
         {
-            Fields = Analyzers.ToDictionary(x => x.Key, x => x.Key);
+            FieldPaths = FieldAnalyzers.ToDictionary(x => x.Key, x => $"t.{x.Key}");
         }
 
-        public static string GetTextField(string key)
+        public static string GetFieldName(string key)
         {
-            if (Fields.TryGetValue(key, out var fieldName))
+            if (FieldAnalyzers.ContainsKey(key))
             {
-                return fieldName;
+                return key;
             }
 
-            if (key.Length > 2 && Analyzers.TryGetValue(key[2..], out fieldName))
+            if (key.Length > 0)
             {
-                return fieldName;
+                var language = key[2..];
+
+                if (FieldAnalyzers.ContainsKey(language))
+                {
+                    return language;
+                }
+            }
+
+            return "iv";
+        }
+
+        public static string GetFieldPath(string key)
+        {
+            if (FieldPaths.TryGetValue(key, out var path))
+            {
+                return path;
+            }
+
+            if (key.Length > 0)
+            {
+                var language = key[2..];
+
+                if (FieldPaths.TryGetValue(language, out path))
+                {
+                    return path;
+                }
             }
 
             return "t.iv";
@@ -162,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                 }
             };
 
-            foreach (var (field, analyzer) in Analyzers)
+            foreach (var (field, analyzer) in FieldAnalyzers)
             {
                 texts.fields[field] = new
                 {

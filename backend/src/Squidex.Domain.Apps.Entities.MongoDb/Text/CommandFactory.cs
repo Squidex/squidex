@@ -11,7 +11,7 @@ using System.Linq;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public sealed class CommandFactory<T> where T : class
     {

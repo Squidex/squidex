@@ -11,7 +11,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public sealed class MongoTextIndexEntity<T>
     {

@@ -58,21 +58,21 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
         static ElasticSearchIndexDefinition()
         {
-            FieldPaths = FieldAnalyzers.ToDictionary(x => x.Key, x => $"texts.{x}");
+            FieldPaths = FieldAnalyzers.ToDictionary(x => x.Key, x => $"texts.{x.Key}");
         }
 
         public static string GetFieldName(string key)
         {
-            if (FieldPaths.TryGetValue(key, out var field))
+            if (FieldAnalyzers.ContainsKey(key))
             {
-                return field;
+                return key;
             }
 
             if (key.Length > 0)
             {
                 var language = key[2..];
 
-                if (FieldAnalyzers.TryGetValue(language, out _))
+                if (FieldAnalyzers.ContainsKey(language))
                 {
                     return language;
                 }
@@ -117,9 +117,9 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
             foreach (var (key, analyzer) in FieldAnalyzers)
             {
-                query.properties[key] = new
+                query.properties[GetFieldPath(key)] = new
                 {
-                    type = "string",
+                    type = "text",
                     analyzer
                 };
             }

@@ -15,9 +15,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     [Trait("Category", "Dependencies")]
     public class AtlasTextIndexTests : TextIndexerTestsBase, IClassFixture<AtlasTextIndexFixture>
     {
-        public override bool SupportsQuerySyntax => false;
+        public override bool SupportsQuerySyntax => true;
 
         public override bool SupportsGeo => true;
+
+        public override int WaitAfterUpdate => 2000;
 
         public AtlasTextIndexFixture _ { get; }
 

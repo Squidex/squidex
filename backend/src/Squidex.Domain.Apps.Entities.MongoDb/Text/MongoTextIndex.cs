@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public sealed class MongoTextIndex : MongoTextIndexBase<List<MongoTextIndexEntityText>>
     {

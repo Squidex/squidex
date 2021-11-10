@@ -15,7 +15,7 @@ namespace Squidex.Extensions.Text.Azure
 {
     public static class AzureIndexDefinition
     {
-        private static readonly Dictionary<string, (string Field, string Analyzer)> Analyzers = new Dictionary<string, (string Field, string Analyzer)>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, (string Field, string Analyzer)> FieldAnalyzers = new (StringComparer.OrdinalIgnoreCase)
         {
             ["iv"] = ("iv", LexicalAnalyzerName.StandardLucene.ToString()),
             ["zh"] = ("zh", LexicalAnalyzerName.ZhHansLucene.ToString())
@@ -49,7 +49,7 @@ namespace Squidex.Extensions.Text.Azure
                     {
                         var fieldName = language.Replace('-', '_');
 
-                        Analyzers[language] = (fieldName, analyzer);
+                        FieldAnalyzers[language] = (fieldName, analyzer);
                     }
                 }
             }
@@ -57,14 +57,19 @@ namespace Squidex.Extensions.Text.Azure
 
         public static string GetFieldName(string key)
         {
-            if (Analyzers.TryGetValue(key, out var field))
+            if (FieldAnalyzers.TryGetValue(key, out var analyzer))
             {
-                return field.Field;
+                return analyzer.Field;
             }
 
-            if (key.Length > 2 && Analyzers.TryGetValue(key[2..], out field))
+            if (key.Length > 0)
             {
-                return field.Field;
+                var language = key[2..];
+
+                if (FieldAnalyzers.TryGetValue(language, out analyzer))
+                {
+                    return analyzer.Field;
+                }
             }
 
             return "iv";
@@ -116,7 +121,7 @@ namespace Squidex.Extensions.Text.Azure
                 }
             };
 
-            foreach (var (field, analyzer) in Analyzers.Values)
+            foreach (var (field, analyzer) in FieldAnalyzers.Values)
             {
                 fields.Add(
                     new SearchableField(field)
