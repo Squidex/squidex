@@ -43,21 +43,20 @@ namespace Squidex.Extensions.Actions.Notification
                     throw new InvalidOperationException($"Cannot find user by '{action.User}'");
                 }
 
-                var ruleJob = new CreateComment
-                {
-                    Text = await FormatAsync(action.Text, @event)
-                };
+                var actor = userEvent.Actor;
 
                 if (!string.IsNullOrEmpty(action.Client))
                 {
-                    ruleJob.Actor = RefToken.Client(action.Client);
-                }
-                else
-                {
-                    ruleJob.Actor = userEvent.Actor;
+                    actor = RefToken.Client(action.Client);
                 }
 
-                ruleJob.CommentsId = DomainId.Create(user.Id);
+                var ruleJob = new CreateComment
+                {
+                    Actor = actor,
+                    CommentId = DomainId.NewGuid(),
+                    CommentsId = DomainId.Create(user.Id),
+                    Text = await FormatAsync(action.Text, @event)
+                };
 
                 if (!string.IsNullOrWhiteSpace(action.Url))
                 {
