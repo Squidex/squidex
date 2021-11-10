@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public class AtlasParsingTests
     {
-        private static readonly LuceneQueryVisitor QueryVisitor = new LuceneQueryVisitor(AtlasIndexDefinition.GetFieldPath);
+        private static readonly LuceneQueryVisitor QueryVisitor = new LuceneQueryVisitor();
         private static readonly LuceneQueryAnalyzer QueryParser =
             new LuceneQueryAnalyzer(LuceneVersion.LUCENE_48, "*",
                 new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
@@ -87,6 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                                 path = "title",
                                 query = new[]
                                 {
+                                    "the",
                                     "right",
                                     "way"
                                 }
@@ -126,6 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                                 query = new[]
                                 {
                                     "do",
+                                    "it",
                                     "right"
                                 }
                             }
