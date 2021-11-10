@@ -9,6 +9,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Analysis.Util;
 using Lucene.Net.Util;
 using MongoDB.Bson;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static readonly LuceneQueryVisitor QueryVisitor = new LuceneQueryVisitor(AtlasIndexDefinition.GetFieldPath);
         private static readonly LuceneQueryAnalyzer QueryParser =
             new LuceneQueryAnalyzer(LuceneVersion.LUCENE_48, "*",
-                new StandardAnalyzer(LuceneVersion.LUCENE_48));
+                new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
         private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
         {
             WriteIndented = true

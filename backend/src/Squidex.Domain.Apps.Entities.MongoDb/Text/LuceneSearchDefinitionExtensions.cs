@@ -34,20 +34,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 
         private sealed class DelegatedPipelineStageDefinition<TInput, TOutput> : PipelineStageDefinition<TInput, TOutput>
         {
-            private readonly string operatorName;
             private readonly Func<IBsonSerializer<TInput>, RenderedPipelineStageDefinition<TOutput>> renderer;
+
+            public override string OperatorName { get; }
 
             public DelegatedPipelineStageDefinition(string operatorName,
                 Func<IBsonSerializer<TInput>, RenderedPipelineStageDefinition<TOutput>> renderer)
             {
-                this.operatorName = operatorName;
-
                 this.renderer = renderer;
-            }
 
-            public override string OperatorName
-            {
-                get { return operatorName; }
+                OperatorName = operatorName;
             }
 
             public override RenderedPipelineStageDefinition<TOutput> Render(
