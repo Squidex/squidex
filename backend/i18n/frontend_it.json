@@ -606,6 +606,7 @@
   "languages.updateFailed": "Non è stato possibile cambiare la lingua. Per favore ricarica.",
   "news.headline": "Che cosa c'è di nuovo?",
   "news.title": "Nuove funzionalità",
+  "notifications.empty": "No notifications yet",
   "notifo.subscripeTooltip": "Fai clic su questo pulsante per iscriverti a tutte le modifiche e ricevere le notifiche push.",
   "plans.billingPortal": "Portale di fatturazione",
   "plans.billingPortalHint": "Vai al portale di fatturazione per lo storico dei pagamenti e una panoramica per l'abbonamento.",

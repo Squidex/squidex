@@ -1,8 +1,12 @@
+/* stylelint-disable no-descending-specificity */
+
 .actions {
     @include absolute(-5px, -15px, auto, auto);
     background: $color-white;
     border: 0;
+    border-radius: 0;
     display: none;
+    width: auto;
 }
 
 .user-ref {
@@ -41,6 +45,14 @@
     &:hover {
         .actions {
             display: block;
+        }
+    }
+}
+
+:host {
+    &:last-child {
+        .comment {
+            margin-bottom: 0;
         }
     }
 }

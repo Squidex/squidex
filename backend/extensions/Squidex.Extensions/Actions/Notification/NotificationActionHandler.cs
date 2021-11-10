@@ -36,15 +36,6 @@ namespace Squidex.Extensions.Actions.Notification
         {
             if (@event is EnrichedUserEventBase userEvent)
             {
-                var text = await FormatAsync(action.Text, @event);
-
-                var actor = userEvent.Actor;
-
-                if (!string.IsNullOrEmpty(action.Client))
-                {
-                    actor = RefToken.Client(action.Client);
-                }
-
                 var user = await userResolver.FindByIdOrEmailAsync(action.User);
 
                 if (user == null)
@@ -52,9 +43,21 @@ namespace Squidex.Extensions.Actions.Notification
                     throw new InvalidOperationException($"Cannot find user by '{action.User}'");
                 }
 
-                var commentsId = DomainId.Create(user.Id);
+                var ruleJob = new CreateComment
+                {
+                    Text = await FormatAsync(action.Text, @event)
+                };
 
-                var ruleJob = new CreateComment { Actor = actor, CommentsId = commentsId, Text = text };
+                if (!string.IsNullOrEmpty(action.Client))
+                {
+                    ruleJob.Actor = RefToken.Client(action.Client);
+                }
+                else
+                {
+                    ruleJob.Actor = userEvent.Actor;
+                }
+
+                ruleJob.CommentsId = DomainId.Create(user.Id);
 
                 if (!string.IsNullOrWhiteSpace(action.Url))
                 {

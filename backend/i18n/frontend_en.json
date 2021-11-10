@@ -606,6 +606,7 @@
   "languages.updateFailed": "Failed to change language. Please reload.",
   "news.headline": "What's new?",
   "news.title": "New Features",
+  "notifications.empty": "No notifications yet",
   "notifo.subscripeTooltip": "Click this button to subscribe to all changes and to receive push notifications.",
   "plans.billingPortal": "Billing Portal",
   "plans.billingPortalHint": "Go to Billing Portal for payment history and subscription overview.",
