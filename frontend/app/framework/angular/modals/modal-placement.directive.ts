@@ -7,6 +7,7 @@
 
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, Renderer2 } from '@angular/core';
 import { positionModal, ResourceOwner } from '@app/framework/internal';
+import { RelativePosition } from '@app/shared';
 import { timer } from 'rxjs';
 
 @Directive({
@@ -33,14 +34,23 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     public offset = 2;
 
     @Input()
-    public position = 'bottom-right';
+    public position: RelativePosition | 'full' = 'bottom-right';
+
+    @Input()
+    public scrollX = false;
+
+    @Input()
+    public scrollY = false;
+
+    @Input()
+    public scrollMargin = 10;
 
     @Input()
     public update = true;
 
     constructor(
         private readonly renderer: Renderer2,
-        private readonly element: ElementRef<Element>,
+        private readonly element: ElementRef<HTMLElement>,
     ) {
         super();
     }
@@ -103,13 +113,37 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
             this.renderer.setStyle(modalRef, 'width', `${w}px`);
             this.renderer.setStyle(modalRef, 'height', `${h}px`);
         } else {
-            const viewH = document.documentElement!.clientHeight;
-            const viewW = document.documentElement!.clientWidth;
+            if (this.scrollX) {
+                modalRect.width = modalRef.scrollWidth;
+            }
 
-            const position = positionModal(targetRect, modalRect, this.position, this.offset, this.update, viewW, viewH);
+            if (this.scrollY) {
+                modalRect.height = modalRef.scrollHeight;
+            }
+
+            const viewportHeight = document.documentElement!.clientHeight;
+            const viewportWidth = document.documentElement!.clientWidth;
+
+            const position = positionModal(targetRect, modalRect, this.position, this.offset, this.update, viewportWidth, viewportHeight);
 
             x = position.x;
             y = position.y;
+
+            if (this.scrollX) {
+                const maxWidth = position.xMax > 0 ? `${position.xMax - 10}px` : 'none';
+
+                this.renderer.setStyle(modalRef, 'overflow-x', 'auto');
+                this.renderer.setStyle(modalRef, 'max-width', maxWidth);
+                this.renderer.setStyle(modalRef, 'min-width', 0);
+            }
+
+            if (this.scrollY) {
+                const maxHeight = position.yMax > 0 ? `${position.yMax - 10}px` : 'none';
+
+                this.renderer.setStyle(modalRef, 'overflow-y', 'auto');
+                this.renderer.setStyle(modalRef, 'max-height', maxHeight);
+                this.renderer.setStyle(modalRef, 'min-height', 0);
+            }
         }
 
         this.renderer.setStyle(modalRef, 'top', `${y}px`);

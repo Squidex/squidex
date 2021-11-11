@@ -27,7 +27,7 @@
         </button>
 
         <ng-container *sqxModal="dropdown;closeAlways:true">
-            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
+            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" position="bottom-left" @fade>
                 <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="statusChange.emit(info.status)">
                     {{ 'common.statusChangeTo' | sqxTranslate }} 
 

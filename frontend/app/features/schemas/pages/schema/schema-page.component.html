@@ -46,7 +46,7 @@
         </button>
 
         <ng-container *sqxModal="editOptionsDropdown;closeAlways:true">
-            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>                    
+            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>                    
                 <ng-container *ngIf="schemasState.canCreate">
                     <div class="dropdown-divider"></div>
     

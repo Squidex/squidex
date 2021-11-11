@@ -15,7 +15,7 @@
 
 <div class="items-container">
     <ng-container *sqxModal="dropdown">
-        <div class="control-dropdown" [sqxAnchoredTo]="input" position="bottom-left">
+        <div class="control-dropdown" [sqxAnchoredTo]="input" [scrollY]="true" position="bottom-left">
             <div *ngIf="canSearch" class="search-form">
                 <input class="form-control search" [formControl]="queryInput" placeholder="{{ 'contributors.search' | sqxTranslate }}" (keydown)="onKeyDown($event)" sqxFocusOnInit>
             </div>

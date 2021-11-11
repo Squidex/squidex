@@ -62,7 +62,7 @@
                         </button>
 
                         <ng-container *sqxModal="tableViewModal">
-                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
+                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" [scrollY]="true" @fade position="bottom-right">
                                 <sqx-custom-view-editor
                                     [allFields]="tableView.allFields" 
                                     (fieldNamesChange)="tableView.updateFields($event)"

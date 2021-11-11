@@ -36,7 +36,7 @@
 
             <ng-container *ngIf="settings.patterns.length > 0 && (showPatternSuggestions | async)">
                 <ng-container *sqxModal="patternsModal">
-                    <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" position="bottom-left" @fade>
+                    <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" [scrollY]="true" position="bottom-left" @fade>
                         <h4>{{ 'schemas.fieldTypes.string.suggestions' | sqxTranslate }}</h4>
         
                         <div *ngFor="let pattern of settings.patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">

@@ -22,25 +22,25 @@ describe('position', () => {
     const targetRect = buildRect(200, 200, 100, 100);
 
     const tests = [
-        { position: 'top', x: 235, y: 160 },
-        { position: 'top-left', x: 200, y: 160 },
-        { position: 'top-right', x: 270, y: 160 },
-        { position: 'bottom', x: 235, y: 310 },
+        { position: 'bottom-center', x: 235, y: 310 },
         { position: 'bottom-left', x: 200, y: 310 },
         { position: 'bottom-right', x: 270, y: 310 },
-        { position: 'left', x: 160, y: 235 },
-        { position: 'left-top', x: 160, y: 200 },
         { position: 'left-bottom', x: 160, y: 270 },
-        { position: 'right', x: 310, y: 235 },
-        { position: 'right-top', x: 310, y: 200 },
+        { position: 'left-center', x: 160, y: 235 },
+        { position: 'left-top', x: 160, y: 200 },
         { position: 'right-bottom', x: 310, y: 270 },
+        { position: 'right-center', x: 310, y: 235 },
+        { position: 'right-top', x: 310, y: 200 },
+        { position: 'top-center', x: 235, y: 160 },
+        { position: 'top-left', x: 200, y: 160 },
+        { position: 'top-right', x: 270, y: 160 },
     ];
 
     tests.forEach(test => {
         it(`should calculate modal position for ${test.position}`, () => {
             const modalRect = buildRect(0, 0, 30, 30);
 
-            const result = positionModal(targetRect, modalRect, test.position, 10, false, 0, 0);
+            const result = positionModal(targetRect, modalRect, test.position as any, 10, false, 1000, 1000);
 
             expect(result.x).toBe(test.x);
             expect(result.y).toBe(test.y);

@@ -65,7 +65,7 @@
                         </button>
 
                         <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>
                                 <a class="dropdown-item dropdown-item-delete"
                                     (sqxConfirmClick)="delete()"
                                     confirmTitle="i18n:contents.deleteConfirmTitle"

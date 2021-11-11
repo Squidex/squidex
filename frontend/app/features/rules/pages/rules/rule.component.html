@@ -16,7 +16,7 @@
                 </button>
         
                 <ng-container *sqxModal="dropdown;closeAlways:true">
-                    <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-right" @fade>
+                    <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" position="bottom-right" @fade>
                         <a class="dropdown-item" *ngIf="rule.canUpdate" [routerLink]="rule.id">
                             {{ 'common.edit' | sqxTranslate }}
                         </a>
