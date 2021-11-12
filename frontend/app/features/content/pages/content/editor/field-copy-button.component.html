@@ -4,7 +4,7 @@
     </button>
 
     <ng-container *sqxModal="dropdown">
-        <div class="dropdown-menu" [sqxAnchoredTo]="button" @fade>
+        <div class="dropdown-menu" [sqxAnchoredTo]="button" [scrollY]="true" @fade>
             <div class="section d-flex justify-content-end">
                 <button type="button" class="btn btn-primary" (click)="copy()" tabindex="-1">
                     {{ 'common.copy' | sqxTranslate }}

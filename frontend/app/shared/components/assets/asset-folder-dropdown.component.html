@@ -11,7 +11,7 @@
 
 <div class="items-container">
     <ng-container *sqxModal="dropdown">
-        <div class="control-dropdown" [sqxAnchoredTo]="input" position="bottom-left">
+        <div class="control-dropdown" [sqxAnchoredTo]="input" [scrollY]="true" position="bottom-left">
             <sqx-asset-folder-dropdown-item 
                 [appName]="appName"
                 [node]="root"

@@ -8,6 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { fadeAnimation, Keys, StatefulControlComponent, Types } from '@app/framework/internal';
+import { RelativePosition } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
 
@@ -75,7 +76,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public debounceTime = 300;
 
     @Input()
-    public dropdownPosition = 'bottom-left';
+    public dropdownPosition: RelativePosition = 'bottom-left';
 
     @Input()
     public dropdownWidth = '18rem';

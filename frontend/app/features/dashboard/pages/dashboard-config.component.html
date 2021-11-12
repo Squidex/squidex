@@ -4,7 +4,7 @@
     </button>
     
     <ng-container *sqxModal="dropdownModal">
-        <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" @fade position="bottom-right">
+        <div class="dropdown-menu" [sqxAnchoredTo]="buttonSettings" [scrollY]="true" @fade position="bottom-right">
             <div class="dropdown-item" *ngFor="let item of configOptions">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="field_{{item.type}}" [ngModel]="isSelected(item)" (ngModelChange)="addOrRemove(item)">

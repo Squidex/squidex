@@ -46,7 +46,7 @@
                     </button>
 
                     <ng-container *sqxModal="dropdown;closeAlways:true">
-                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>
                             <ng-container *ngIf="field.properties.isContentField">
                                 <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
                                     {{ 'schemas.field.enable' | sqxTranslate }}
