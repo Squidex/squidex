@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, Subject, throwError } from 'rxjs';
+import { RelativePosition } from './../utils/modal-positioner';
 import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
 import { LocalStoreService } from './local-store.service';
@@ -60,7 +61,7 @@ export class Tooltip {
     constructor(
         public readonly target: any,
         public readonly text: string | null | undefined,
-        public readonly position: string,
+        public readonly position: RelativePosition,
         public readonly multiple?: boolean,
         public readonly shortcut?: string,
     ) {
