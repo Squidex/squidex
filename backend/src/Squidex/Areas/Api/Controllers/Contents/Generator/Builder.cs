@@ -16,15 +16,12 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
-    internal sealed class Builder : SchemaResolver
+    internal sealed class Builder
     {
-        private const string ResultTotal = "total";
-        private const string ResultItems = "items";
-        private readonly Dictionary<string, (Func<JsonSchema> Creator, List<JsonSchema> References)> factories = new Dictionary<string, (Func<JsonSchema>, List<JsonSchema>)>();
-
         public string AppName { get; }
 
         public JsonSchema ChangeStatusSchema { get; }
@@ -32,8 +29,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         public OpenApiDocument OpenApiDocument { get; }
 
         public OpenApiSchemaResolver OpenApiSchemaResolver { get; }
-
-        public override bool ProvidesComponents => true;
 
         internal Builder(IAppEntity app,
             OpenApiDocument document,
@@ -45,94 +40,24 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             OpenApiDocument = document;
             OpenApiSchemaResolver = schemaResolver;
 
-            ChangeStatusSchema = schemaGenerator.GenerateWithReference<JsonSchema>(typeof(ChangeStatusDto).ToContextualType(), schemaResolver);
-        }
+            var changeStatusType = typeof(ChangeStatusDto).ToContextualType();
 
-        public override JsonSchema Register(JsonSchema schema, string typeName)
-        {
-            OpenApiSchemaResolver.AppendSchema(schema, typeName);
-
-            return new JsonSchema
-            {
-                Reference = schema
-            };
-        }
-
-        public override (string?, JsonSchema?) GetComponent(Schema schema)
-        {
-            var name = $"{schema.TypeName()}ComponentDto";
-
-            return (name, GetReference(name));
-        }
-
-        public void Prepare(Schema schema, ResolvedComponents components, bool flat)
-        {
-            var typeName = schema.TypeName();
-
-            RegisterFactory($"{typeName}ComponentDto", () =>
-            {
-                return schema.BuildJsonSchemaForComponent(this, components);
-            });
-
-            var dataSchema = RegisterFactory($"{typeName}DataDto", () =>
-            {
-                return schema.BuildJsonSchemaDynamic(this, components);
-            });
-
-            var flatDataSchema = RegisterFactory($"{typeName}FlatDataDto", () =>
-            {
-                return schema.BuildJsonSchemaFlat(this, components);
-            });
-
-            var contentSchema = RegisterFactory($"{typeName}ContentDto", () =>
-            {
-                return ContentJsonSchemaBuilder.BuildSchema(flat ? flatDataSchema : dataSchema, true);
-            });
-
-            RegisterFactory($"{typeName}ContentResultDto", () =>
-            {
-                return BuildResult(contentSchema);
-            });
-        }
-
-        public void Complete()
-        {
-            foreach (var (typeName, (factory, _)) in factories)
-            {
-                var schema = factory();
-
-                OpenApiDocument.Definitions.Add(typeName, schema);
-            }
-
-            foreach (var (typeName, (_, references)) in factories)
-            {
-                var schema = OpenApiDocument.Definitions[typeName];
-
-                if (references.Count == 0)
-                {
-                    OpenApiDocument.Definitions.Remove(typeName);
-                }
-
-                foreach (var reference in references)
-                {
-                    reference.Reference = schema;
-                }
-            }
+            ChangeStatusSchema = schemaGenerator.GenerateWithReference<JsonSchema>(changeStatusType, schemaResolver);
         }
 
         public OperationsBuilder Shared()
         {
-            var dataSchema = RegisterFactory("DataDto", () =>
+            var dataSchema = RegisterReference("DataDto", _ =>
             {
                 return JsonSchema.CreateAnySchema();
             });
 
-            var contentSchema = RegisterFactory("ContentDto", () =>
+            var contentSchema = RegisterReference("ContentDto", _ =>
             {
                 return ContentJsonSchemaBuilder.BuildSchema(dataSchema, true);
             });
 
-            var contentsSchema = RegisterFactory("ContentResultDto", () =>
+            var contentsSchema = RegisterReference("ContentResultDto", _ =>
             {
                 return BuildResult(contentSchema);
             });
@@ -158,17 +83,37 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return builder;
         }
 
-        public OperationsBuilder Schema(Schema schema)
+        public OperationsBuilder Schema(Schema schema, PartitionResolver partitionResolver, ResolvedComponents components, bool flat)
         {
             var typeName = schema.TypeName();
+
+            var dataSchema = RegisterReference($"{typeName}DataDto", _ =>
+            {
+                return schema.BuildJsonSchemaDynamic(partitionResolver, components, CreateReference, false, true);
+            });
+
+            var flatDataSchema = RegisterReference($"{typeName}FlatDataDto", _ =>
+            {
+                return schema.BuildJsonSchemaFlat(partitionResolver, components, CreateReference, false, true);
+            });
+
+            var contentSchema = RegisterReference($"{typeName}ContentDto", _ =>
+            {
+                return ContentJsonSchemaBuilder.BuildSchema(flat ? flatDataSchema : dataSchema, true);
+            });
+
+            var contentsSchema = RegisterReference($"{typeName}ContentResultDto", _ =>
+            {
+                return BuildResult(contentSchema);
+            });
 
             var path = $"/content/{AppName}/{schema.Name}";
 
             var builder = new OperationsBuilder
             {
-                ContentSchema = GetReference($"{typeName}ContentDto"),
-                ContentsSchema = GetReference($"{typeName}ContentResultDto"),
-                DataSchema = GetReference($"{typeName}DataDto"),
+                ContentSchema = contentSchema,
+                ContentsSchema = contentsSchema,
+                DataSchema = dataSchema,
                 Path = path,
                 Parent = this,
                 SchemaDisplayName = schema.DisplayName(),
@@ -183,32 +128,40 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return builder;
         }
 
-        private JsonSchema GetReference(string name)
+        private JsonSchema RegisterReference(string name, Func<string, JsonSchema> creator)
         {
             name = char.ToUpperInvariant(name[0]) + name[1..];
 
-            var reference = new JsonSchema();
+            var reference = OpenApiDocument.Definitions.GetOrAdd(name, creator);
 
-            factories[name].References.Add(reference);
-
-            return reference;
+            return new JsonSchema
+            {
+                Reference = reference
+            };
         }
 
-        private JsonSchema RegisterFactory(string name, Func<JsonSchema> creator)
+        private (JsonSchema, JsonSchema?) CreateReference(string name)
         {
             name = char.ToUpperInvariant(name[0]) + name[1..];
 
-            if (!factories.TryGetValue(name, out var factory))
+            if (OpenApiDocument.Definitions.TryGetValue(name, out var definition))
             {
-                factory = (creator, new List<JsonSchema>());
-                factories.Add(name, factory);
+                var reference = new JsonSchema
+                {
+                    Reference = definition
+                };
+
+                return (reference, null);
             }
 
-            var reference = new JsonSchema();
+            definition = JsonTypeBuilder.Object();
 
-            factory.References.Add(reference);
+            OpenApiDocument.Definitions.Add(name, definition);
 
-            return reference;
+            return (new JsonSchema
+            {
+                Reference = definition
+            }, definition);
         }
 
         private static JsonSchema BuildResult(JsonSchema contentSchema)
@@ -218,9 +171,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 AllowAdditionalProperties = false,
                 Properties =
                 {
-                    [ResultTotal] = SchemaBuilder.NumberProperty(
+                    ["total"] = JsonTypeBuilder.NumberProperty(
                         FieldDescriptions.ContentsTotal, true),
-                    [ResultItems] = SchemaBuilder.ArrayProperty(contentSchema,
+                    ["items"] = JsonTypeBuilder.ArrayProperty(contentSchema,
                         FieldDescriptions.ContentsItems, true)
                 },
                 Type = JsonObjectType.Object

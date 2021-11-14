@@ -25,19 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var schemaResolver = SchemaResolver.Default;
-
-            var jsonSchema = schema.BuildJsonSchema(schemaResolver, languagesConfig.ToResolver(), ResolvedComponents.Empty);
-
-            CheckFields(jsonSchema);
-        }
-
-        [Fact]
-        public void Should_build_json_component_json_schema()
-        {
-            var schemaResolver = SchemaResolver.Default;
-
-            var jsonSchema = schema.BuildJsonSchemaDynamic(schemaResolver, ResolvedComponents.Empty);
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }
@@ -45,9 +33,9 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         [Fact]
         public void Should_build_json_dynamic_json_schema()
         {
-            var schemaResolver = SchemaResolver.Default;
+            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchemaDynamic(schemaResolver, ResolvedComponents.Empty);
+            var jsonSchema = schema.BuildJsonSchemaDynamic(languagesConfig.ToResolver(), ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }
@@ -55,9 +43,9 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         [Fact]
         public void Should_build_flat_json_schema()
         {
-            var schemaResolver = SchemaResolver.Default;
+            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchemaFlat(schemaResolver, ResolvedComponents.Empty);
+            var jsonSchema = schema.BuildJsonSchemaFlat(languagesConfig.ToResolver(), ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }

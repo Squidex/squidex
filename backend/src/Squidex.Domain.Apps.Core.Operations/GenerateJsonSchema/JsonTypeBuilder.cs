@@ -9,23 +9,24 @@ using NJsonSchema;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
-    public static class SchemaBuilder
+    public static class JsonTypeBuilder
     {
         public static JsonSchema Object()
         {
-            return new JsonSchema { Type = JsonObjectType.Object };
+            return new JsonSchema
+            {
+                Type = JsonObjectType.Object,
+                AllowAdditionalProperties = false,
+                AllowAdditionalItems = false
+            };
         }
 
         public static JsonSchema String()
         {
-            return new JsonSchema { Type = JsonObjectType.String };
-        }
-
-        public static JsonSchemaProperty ArrayProperty(JsonSchema item, string? description = null, bool isRequired = false)
-        {
-            return new JsonSchemaProperty { Type = JsonObjectType.Array, Item = item }
-                .SetDescription(description)
-                .SetRequired(isRequired);
+            return new JsonSchema
+            {
+                Type = JsonObjectType.String
+            };
         }
 
         public static JsonSchemaProperty BooleanProperty(string? description = null, bool isRequired = false)
@@ -65,9 +66,28 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public static JsonSchemaProperty ObjectProperty(JsonSchema? value = null, string? description = null, bool isRequired = false)
         {
-            return new JsonSchemaProperty { Type = JsonObjectType.Object, AdditionalPropertiesSchema = value }
-                .SetDescription(description)
-                .SetRequired(isRequired);
+            return new JsonSchemaProperty
+            {
+                Type = JsonObjectType.Object,
+                AllowAdditionalProperties = true,
+                AllowAdditionalItems = false,
+                AdditionalPropertiesSchema = value
+            }
+            .SetDescription(description)
+            .SetRequired(isRequired);
+        }
+
+        public static JsonSchemaProperty ArrayProperty(JsonSchema item, string? description = null, bool isRequired = false)
+        {
+            return new JsonSchemaProperty
+            {
+                Type = JsonObjectType.Array,
+                AllowAdditionalProperties = false,
+                AllowAdditionalItems = false,
+                Item = item
+            }
+            .SetDescription(description)
+            .SetRequired(isRequired);
         }
 
         public static JsonSchemaProperty JsonProperty(string? description = null, bool isRequired = false)

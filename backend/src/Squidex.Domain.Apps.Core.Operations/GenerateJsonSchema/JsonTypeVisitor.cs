@@ -24,15 +24,22 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         private const int MaxDepth = 5;
         private static readonly JsonTypeVisitor Instance = new JsonTypeVisitor();
 
-        public sealed record Args(ResolvedComponents Components, Schema Schema, SchemaResolver SchemaResolver, bool WithHidden, int Level = 0);
+        public sealed record Args(ResolvedComponents Components, Schema Schema,
+            JsonTypeFactory Factory,
+            bool WithHidden,
+            bool WithComponents,
+            int Level = 0);
 
         private JsonTypeVisitor()
         {
         }
 
-        public static JsonSchemaProperty? BuildProperty(IField field, ResolvedComponents components, Schema schema, SchemaResolver schemaResolver, bool withHidden)
+        public static JsonSchemaProperty? BuildProperty(IField field, ResolvedComponents components, Schema schema,
+            JsonTypeFactory factory,
+            bool withHidden,
+            bool withComponents)
         {
-            var args = new Args(components, schema, schemaResolver, withHidden);
+            var args = new Args(components, schema, factory, withHidden, withComponents);
 
             return field.Accept(Instance, args);
         }
@@ -49,42 +56,45 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IArrayField field, Args args)
         {
-            var itemSchema = SchemaBuilder.Object();
+            var typeName = $"{args.Schema.TypeName()}{field.Name.ToPascalCase()}ItemDto";
 
-            var nestedArgs = args with { Level = args.Level + 1 };
+            // Create a reference to give it a nice name in code generation.
+            var (reference, actual) = args.Factory(typeName);
 
-            foreach (var nestedField in field.Fields.ForApi(args.WithHidden))
+            if (actual != null)
             {
-                var nestedProperty = Accept(nestedArgs, nestedField);
+                var nestedArgs = args with { Level = args.Level + 1 };
 
-                if (nestedProperty != null)
+                foreach (var nestedField in field.Fields.ForApi(args.WithHidden))
                 {
-                    nestedProperty.Description = nestedField.RawProperties.Hints;
-                    nestedProperty.SetRequired(nestedField.RawProperties.IsRequired);
+                    var nestedProperty = Accept(nestedArgs, nestedField);
 
-                    itemSchema.Properties.Add(nestedField.Name, nestedProperty);
+                    if (nestedProperty != null)
+                    {
+                        nestedProperty.Description = nestedField.RawProperties.Hints;
+                        nestedProperty.SetRequired(nestedField.RawProperties.IsRequired);
+
+                        actual.Properties.Add(nestedField.Name, nestedProperty);
+                    }
                 }
             }
 
-            // Create a reference to give it a nice name in code generation.
-            var itemReference = args.SchemaResolver.Register(itemSchema, $"{args.Schema.TypeName()}{field.Name.ToPascalCase()}PropertyDto");
-
-            return SchemaBuilder.ArrayProperty(itemReference);
+            return JsonTypeBuilder.ArrayProperty(reference);
         }
 
         public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
+            return JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
         }
 
         public JsonSchemaProperty? Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            return SchemaBuilder.BooleanProperty();
+            return JsonTypeBuilder.BooleanProperty();
         }
 
         public JsonSchemaProperty? Visit(IField<ComponentFieldProperties> field, Args args)
         {
-            var property = SchemaBuilder.ObjectProperty();
+            var property = JsonTypeBuilder.ObjectProperty();
 
             BuildComponent(property, field.Properties.SchemaIds, args);
 
@@ -93,21 +103,21 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ComponentsFieldProperties> field, Args args)
         {
-            var itemSchema = SchemaBuilder.Object();
+            var itemSchema = JsonTypeBuilder.Object();
 
             BuildComponent(itemSchema, field.Properties.SchemaIds, args);
 
-            return SchemaBuilder.ArrayProperty(itemSchema);
+            return JsonTypeBuilder.ArrayProperty(itemSchema);
         }
 
         public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)
         {
-            return SchemaBuilder.DateTimeProperty();
+            return JsonTypeBuilder.DateTimeProperty();
         }
 
         public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            var property = SchemaBuilder.ObjectProperty();
+            var property = JsonTypeBuilder.ObjectProperty();
 
             property.Format = GeoJson.Format;
 
@@ -116,12 +126,12 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<JsonFieldProperties> field, Args args)
         {
-            return SchemaBuilder.JsonProperty();
+            return JsonTypeBuilder.JsonProperty();
         }
 
         public JsonSchemaProperty? Visit(IField<NumberFieldProperties> field, Args args)
         {
-            var property = SchemaBuilder.NumberProperty();
+            var property = JsonTypeBuilder.NumberProperty();
 
             if (field.Properties.MinValue != null)
             {
@@ -138,12 +148,12 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
+            return JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
         }
 
         public JsonSchemaProperty? Visit(IField<StringFieldProperties> field, Args args)
         {
-            var property = SchemaBuilder.StringProperty();
+            var property = JsonTypeBuilder.StringProperty();
 
             property.MaxLength = field.Properties.MaxLength;
             property.MinLength = field.Properties.MinLength;
@@ -165,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<TagsFieldProperties> field, Args args)
         {
-            return SchemaBuilder.ArrayProperty(SchemaBuilder.String());
+            return JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
         }
 
         public JsonSchemaProperty? Visit(IField<UIFieldProperties> field, Args args)
@@ -175,9 +185,9 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         private static void BuildComponent(JsonSchema jsonSchema, ReadonlyList<DomainId>? schemaIds, Args args)
         {
-            if (args.SchemaResolver.ProvidesComponents)
+            if (args.WithComponents)
             {
-                jsonSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
+                jsonSchema.Properties.Add(Component.Discriminator, JsonTypeBuilder.StringProperty(isRequired: true));
 
                 var schemas = schemaIds?.Select(x => args.Components.Get(x)).NotNull() ?? Enumerable.Empty<Schema>();
 
@@ -188,14 +198,37 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 foreach (var schema in schemas)
                 {
-                    var (componentName, componentSchema) = args.SchemaResolver.GetComponent(schema);
+                    var typeName = $"{schema.TypeName()}ComponentDto";
 
-                    if (componentName != null && componentSchema != null)
+                    // Create a reference to give it a nice name in code generation.
+                    var (reference, actual) = args.Factory(typeName);
+
+                    if (actual != null)
                     {
-                        jsonSchema.OneOf.Add(componentSchema);
+                        foreach (var field in schema.Fields.ForApi(args.WithHidden))
+                        {
+                            var property =
+                                BuildProperty(
+                                    field,
+                                    args.Components,
+                                    schema,
+                                    args.Factory,
+                                    args.WithHidden,
+                                    args.WithComponents);
 
-                        discriminator.Mapping[componentName] = componentSchema;
+                            if (property != null)
+                            {
+                                property.SetRequired(field.RawProperties.IsRequired);
+                                property.SetDescription(field);
+
+                                actual.Properties.Add(field.Name, property);
+                            }
+                        }
                     }
+
+                    jsonSchema.OneOf.Add(reference);
+
+                    discriminator.Mapping[typeName] = reference;
                 }
 
                 jsonSchema.DiscriminatorObject = discriminator;
