@@ -25,17 +25,29 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), ResolvedComponents.Empty);
+            var schemaResolver = SchemaResolver.Default;
+
+            var jsonSchema = schema.BuildJsonSchema(schemaResolver, languagesConfig.ToResolver(), ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }
 
         [Fact]
-        public void Should_build_json_schema_with_resolver()
+        public void Should_build_json_component_json_schema()
         {
-            var schemaResolver = new SchemaResolver((name, action) => action());
+            var schemaResolver = SchemaResolver.Default;
 
-            var jsonSchema = schema.BuildDynamicJsonSchema(schemaResolver, ResolvedComponents.Empty);
+            var jsonSchema = schema.BuildJsonSchemaDynamic(schemaResolver, ResolvedComponents.Empty);
+
+            CheckFields(jsonSchema);
+        }
+
+        [Fact]
+        public void Should_build_json_dynamic_json_schema()
+        {
+            var schemaResolver = SchemaResolver.Default;
+
+            var jsonSchema = schema.BuildJsonSchemaDynamic(schemaResolver, ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }
@@ -43,14 +55,9 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         [Fact]
         public void Should_build_flat_json_schema()
         {
-            var languagesConfig = LanguagesConfig.English.Set(Language.DE);
+            var schemaResolver = SchemaResolver.Default;
 
-            var schemaResolver = new SchemaResolver((name, action) =>
-            {
-                return action();
-            });
-
-            var jsonSchema = schema.BuildFlatJsonSchema(schemaResolver, ResolvedComponents.Empty);
+            var jsonSchema = schema.BuildJsonSchemaFlat(schemaResolver, ResolvedComponents.Empty);
 
             CheckFields(jsonSchema);
         }

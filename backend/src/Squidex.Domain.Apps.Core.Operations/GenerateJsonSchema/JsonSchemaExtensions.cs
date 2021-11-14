@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NJsonSchema;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Text;
@@ -14,47 +15,43 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class JsonSchemaExtensions
     {
-        public static JsonSchema BuildFlatJsonSchema(this Schema schema, SchemaResolver schemaResolver,
-            ResolvedComponents components)
+        public static JsonSchema BuildJsonSchemaForComponent(this Schema schema, SchemaResolver schemaResolver,
+            ResolvedComponents components, bool withHidden = false)
         {
-            Guard.NotNull(schemaResolver, nameof(schemaResolver));
+            // Properties can be required because components itself are not localized.
+            var jsonSchema = BuildFlatSchema(schema, schemaResolver, components, withHidden, true);
 
-            var schemaName = schema.TypeName();
-
-            var jsonSchema = SchemaBuilder.Object();
-
-            foreach (var field in schema.Fields.ForApi())
-            {
-                var property = JsonTypeVisitor.BuildProperty(field, components);
-
-                if (property != null)
-                {
-                    var propertyReference = schemaResolver($"{schemaName}{field.Name.ToPascalCase()}FlatPropertyDto", () => property);
-
-                    jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyReference));
-                }
-            }
+            jsonSchema.Properties.Add(Component.Discriminator, SchemaBuilder.StringProperty(isRequired: true));
 
             return jsonSchema;
         }
 
-        public static JsonSchema BuildDynamicJsonSchema(this Schema schema, SchemaResolver schemaResolver,
+        public static JsonSchema BuildJsonSchemaFlat(this Schema schema, SchemaResolver schemaResolver,
             ResolvedComponents components, bool withHidden = false)
         {
+            // Properties can not be required because we do not check all languages.
+            var jsonSchema = BuildFlatSchema(schema, schemaResolver, components, withHidden, false);
+
+            return jsonSchema;
+        }
+
+        private static JsonSchema BuildFlatSchema(Schema schema, SchemaResolver schemaResolver,
+            ResolvedComponents components, bool withHidden, bool canBeRequired)
+        {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
+            Guard.NotNull(components, nameof(components));
 
             var jsonSchema = SchemaBuilder.Object();
 
             foreach (var field in schema.Fields.ForApi(withHidden))
             {
-                var propertyItem = JsonTypeVisitor.BuildProperty(field, components, schemaResolver, withHidden);
+                var property = JsonTypeVisitor.BuildProperty(field, components, schema, schemaResolver, withHidden);
 
-                if (propertyItem != null)
+                // Property is null for UI fields.
+                if (property != null)
                 {
-                    var property =
-                        SchemaBuilder.ObjectProperty(propertyItem)
-                            .SetDescription(field)
-                            .SetRequired(field.RawProperties.IsRequired);
+                    property.SetRequired(field.RawProperties.IsRequired && canBeRequired);
+                    property.SetDescription(field);
 
                     jsonSchema.Properties.Add(field.Name, property);
                 }
@@ -63,10 +60,42 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return jsonSchema;
         }
 
-        public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver,
+        public static JsonSchema BuildJsonSchemaDynamic(this Schema schema, SchemaResolver schemaResolver,
             ResolvedComponents components, bool withHidden = false)
         {
+            Guard.NotNull(schemaResolver, nameof(schemaResolver));
+            Guard.NotNull(components, nameof(components));
+
+            var jsonSchema = SchemaBuilder.Object();
+
+            foreach (var field in schema.Fields.ForApi(withHidden))
+            {
+                var propertyItem = JsonTypeVisitor.BuildProperty(field, components, schema, schemaResolver, withHidden);
+
+                // Property is null for UI fields.
+                if (propertyItem != null)
+                {
+                    var property = SchemaBuilder.ObjectProperty(propertyItem);
+
+                    // Property is not required because not all languages might be required.
+                    property.SetRequired(false);
+                    property.SetDescription(field);
+
+                    jsonSchema.Properties.Add(field.Name, property);
+                }
+            }
+
+            return jsonSchema;
+        }
+
+        public static JsonSchema BuildJsonSchema(this Schema schema, SchemaResolver schemaResolver, PartitionResolver partitionResolver,
+            ResolvedComponents components, bool withHidden = false)
+        {
+            Guard.NotNull(schemaResolver, nameof(schemaResolver));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(components, nameof(components));
+
+            var schemaName = schema.TypeName();
 
             var jsonSchema = SchemaBuilder.Object();
 
@@ -78,16 +107,18 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    var propertyItem = JsonTypeVisitor.BuildProperty(field, components, withHiddenFields: withHidden);
+                    var propertyItem = JsonTypeVisitor.BuildProperty(field, components, schema, schemaResolver, withHidden);
 
+                    // Property is null for UI fields.
                     if (propertyItem != null)
                     {
                         var isOptional = partitioning.IsOptional(partitionKey);
 
                         var name = partitioning.GetName(partitionKey);
 
-                        propertyItem.SetDescription(name);
+                        // Required if property is required and language/partitioning is not optional.
                         propertyItem.SetRequired(field.RawProperties.IsRequired && !isOptional);
+                        propertyItem.SetDescription(name);
 
                         propertyObject.Properties.Add(partitionKey, propertyItem);
                     }
@@ -95,21 +126,19 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 if (propertyObject.Properties.Count > 0)
                 {
-                    jsonSchema.Properties.Add(field.Name, CreateProperty(field, propertyObject));
+                    // Create a reference to give it a nice name in code generation.
+                    var propertyReference = schemaResolver.Register(propertyObject, $"{schemaName}{field.Name.ToPascalCase()}PropertyDto");
+
+                    var property =
+                        SchemaBuilder.ReferenceProperty(propertyReference)
+                            .SetDescription(field)
+                            .SetRequired(field.RawProperties.IsRequired);
+
+                    jsonSchema.Properties.Add(field.Name, property);
                 }
             }
 
             return jsonSchema;
-        }
-
-        public static JsonSchemaProperty CreateProperty(IField field, JsonSchema reference)
-        {
-            var jsonProperty =
-                SchemaBuilder.ReferenceProperty(reference)
-                    .SetDescription(field)
-                    .SetRequired(field.RawProperties.IsRequired);
-
-            return jsonProperty;
         }
 
         private static JsonSchemaProperty SetDescription(this JsonSchemaProperty jsonProperty, IField field)

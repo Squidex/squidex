@@ -66,19 +66,24 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 schemaResolver,
                 schemaGenerator);
 
-            var validSchemas = schemas.Where(x =>
-                x.SchemaDef.IsPublished &&
-                x.SchemaDef.Type != SchemaDefType.Component &&
-                x.SchemaDef.Fields.Count > 0);
+            var validSchemas = schemas.Where(x => x.SchemaDef.IsPublished);
 
+            // Prepare all schemas first so that self referencing components do not create an endless recursion.
             foreach (var schema in validSchemas)
             {
                 var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
 
-                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, components, flat));
+                builder.Prepare(schema.SchemaDef, components, flat);
+            }
+
+            foreach (var schema in validSchemas.Where(x => x.SchemaDef.Type != SchemaDefType.Component && x.SchemaDef.Fields.Count > 0))
+            {
+                GenerateSchemaOperations(builder.Schema(schema.SchemaDef));
             }
 
             GenerateSharedOperations(builder.Shared());
+
+            builder.Complete();
 
             var context =
                 new DocumentProcessorContext(document,

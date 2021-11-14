@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 }
             };
 
-            var operations = Parent.Document.Paths.GetOrAddNew($"{Path}{path}");
+            var operations = Parent.OpenApiDocument.Paths.GetOrAddNew($"{Path}{path}");
 
             operations[method] = operation;
 
