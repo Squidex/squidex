@@ -187,21 +187,22 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             if (args.WithComponents)
             {
-                jsonSchema.Properties.Add(Component.Discriminator, JsonTypeBuilder.StringProperty(isRequired: true));
+                var schemas = args.Components;
 
-                var schemas = schemaIds?.Select(x => args.Components.Get(x)).NotNull() ?? Enumerable.Empty<Schema>();
+                if (schemaIds?.Count > 0)
+                {
+                    schemas = args.Components.Resolve(schemaIds);
+                }
 
                 var discriminator = new OpenApiDiscriminator
                 {
                     PropertyName = Component.Discriminator
                 };
 
-                foreach (var schema in schemas)
+                foreach (var schema in schemas.Values)
                 {
-                    var typeName = $"{schema.TypeName()}ComponentDto";
-
                     // Create a reference to give it a nice name in code generation.
-                    var (reference, actual) = args.Factory(typeName);
+                    var (reference, actual) = args.Factory($"{schema.TypeName()}ComponentDto");
 
                     if (actual != null)
                     {
@@ -228,10 +229,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                     jsonSchema.OneOf.Add(reference);
 
-                    discriminator.Mapping[typeName] = reference;
+                    discriminator.Mapping[schema.Name] = reference;
                 }
 
                 jsonSchema.DiscriminatorObject = discriminator;
+                jsonSchema.Properties.Add(Component.Discriminator, JsonTypeBuilder.StringProperty(isRequired: true));
             }
             else
             {

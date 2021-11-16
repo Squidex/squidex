@@ -49,6 +49,16 @@ namespace Squidex.Domain.Apps.Entities
                         }
                     }
                 }
+                else
+                {
+                    var all = await appProvider.GetSchemasAsync(appId, ct);
+
+                    foreach (var schema in all)
+                    {
+                        result ??= new Dictionary<DomainId, Schema>();
+                        result[schema.Id] = schema.SchemaDef;
+                    }
+                }
             }
 
             async Task ResolveArrayAsync(IArrayField arrayField)
