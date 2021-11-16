@@ -26,37 +26,24 @@ namespace Squidex.Domain.Apps.Entities
 
             async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
             {
-                if (schemaIds != null)
+                foreach (var schemaId in schemaIds)
                 {
-                    foreach (var schemaId in schemaIds)
-                    {
-                        if (schemaId == schema.Id)
-                        {
-                            result ??= new Dictionary<DomainId, Schema>();
-                            result[schemaId] = schema.SchemaDef;
-                        }
-                        else if (result == null || !result.TryGetValue(schemaId, out _))
-                        {
-                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
-
-                            if (resolvedEntity != null)
-                            {
-                                result ??= new Dictionary<DomainId, Schema>();
-                                result[schemaId] = resolvedEntity.SchemaDef;
-
-                                await ResolveSchemaAsync(resolvedEntity);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    var all = await appProvider.GetSchemasAsync(appId, ct);
-
-                    foreach (var schema in all)
+                    if (schemaId == schema.Id)
                     {
                         result ??= new Dictionary<DomainId, Schema>();
-                        result[schema.Id] = schema.SchemaDef;
+                        result[schemaId] = schema.SchemaDef;
+                    }
+                    else if (result == null || !result.TryGetValue(schemaId, out _))
+                    {
+                        var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
+
+                        if (resolvedEntity != null)
+                        {
+                            result ??= new Dictionary<DomainId, Schema>();
+                            result[schemaId] = resolvedEntity.SchemaDef;
+
+                            await ResolveSchemaAsync(resolvedEntity);
+                        }
                     }
                 }
             }

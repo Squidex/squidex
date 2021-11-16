@@ -56,10 +56,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IArrayField field, Args args)
         {
-            var typeName = $"{args.Schema.TypeName()}{field.Name.ToPascalCase()}ItemDto";
-
             // Create a reference to give it a nice name in code generation.
-            var (reference, actual) = args.Factory(typeName);
+            var (reference, actual) = args.Factory($"{args.Schema.TypeName()}{field.Name.ToPascalCase()}ItemDto");
 
             if (actual != null)
             {
@@ -187,19 +185,12 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             if (args.WithComponents)
             {
-                var schemas = args.Components;
-
-                if (schemaIds?.Count > 0)
-                {
-                    schemas = args.Components.Resolve(schemaIds);
-                }
-
                 var discriminator = new OpenApiDiscriminator
                 {
                     PropertyName = Component.Discriminator
                 };
 
-                foreach (var schema in schemas.Values)
+                foreach (var schema in args.Components.Resolve(schemaIds).Values)
                 {
                     // Create a reference to give it a nice name in code generation.
                     var (reference, actual) = args.Factory($"{schema.TypeName()}ComponentDto");
