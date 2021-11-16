@@ -60,22 +60,21 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 requestCache.AddDependency(schema.UniqueId, schema.Version);
             }
 
-            var builder = new Builder(
-                app,
-                document,
-                schemaResolver,
-                schemaGenerator);
+            var builder = new Builder(app, document, schemaResolver, schemaGenerator);
 
-            var validSchemas = schemas.Where(x =>
-                x.SchemaDef.IsPublished &&
-                x.SchemaDef.Type != SchemaDefType.Component &&
-                x.SchemaDef.Fields.Count > 0);
+            var validSchemas =
+                schemas.Where(x =>
+                    x.SchemaDef.IsPublished &&
+                    x.SchemaDef.Type != SchemaDefType.Component &&
+                    x.SchemaDef.Fields.Count > 0);
+
+            var partitionResolver = app.PartitionResolver();
 
             foreach (var schema in validSchemas)
             {
                 var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
 
-                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, components, flat));
+                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, partitionResolver, components, true));
             }
 
             GenerateSharedOperations(builder.Shared());

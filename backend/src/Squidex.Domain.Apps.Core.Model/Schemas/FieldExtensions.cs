@@ -32,14 +32,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return Enumerable.Empty<IRootField>();
             }
 
-            var allFields =
-                schemaIds
-                    .Select(x => components.Get(x)).NotNull()
-                    .SelectMany(x => x.Fields.ForApi(withHidden))
-                    .GroupBy(x => new { x.Name, Type = x.RawProperties.GetType() }).Where(x => x.Count() == 1)
-                    .Select(x => x.First());
+            var allFields = components.Resolve(schemaIds).Values.SelectMany(x => x.Fields.ForApi(withHidden));
 
-            return allFields;
+            return allFields.GroupBy(x => new { x.Name, Type = x.RawProperties }).SingleGroups();
         }
 
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField

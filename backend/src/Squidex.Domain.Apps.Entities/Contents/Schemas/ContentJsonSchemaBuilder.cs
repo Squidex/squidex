@@ -15,35 +15,36 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             var jsonSchema = new JsonSchema
             {
+                AllowAdditionalProperties = false,
                 Properties =
                 {
-                    ["id"] = SchemaBuilder.StringProperty(FieldDescriptions.EntityId, true),
-                    ["created"] = SchemaBuilder.DateTimeProperty(FieldDescriptions.EntityCreated, true),
-                    ["createdBy"] = SchemaBuilder.StringProperty(FieldDescriptions.EntityCreatedBy, true),
-                    ["lastModified"] = SchemaBuilder.DateTimeProperty(FieldDescriptions.EntityLastModified, true),
-                    ["lastModifiedBy"] = SchemaBuilder.StringProperty(FieldDescriptions.EntityLastModifiedBy, true),
-                    ["newStatus"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentNewStatus),
-                    ["status"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentStatus, true)
+                    ["id"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityId, true),
+                    ["created"] = JsonTypeBuilder.DateTimeProperty(FieldDescriptions.EntityCreated, true),
+                    ["createdBy"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityCreatedBy, true),
+                    ["lastModified"] = JsonTypeBuilder.DateTimeProperty(FieldDescriptions.EntityLastModified, true),
+                    ["lastModifiedBy"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityLastModifiedBy, true),
+                    ["newStatus"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentNewStatus),
+                    ["status"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentStatus, true)
                 },
                 Type = JsonObjectType.Object
             };
 
             if (withDeleted)
             {
-                jsonSchema.Properties["isDeleted"] = SchemaBuilder.BooleanProperty(FieldDescriptions.EntityIsDeleted, false);
+                jsonSchema.Properties["isDeleted"] = JsonTypeBuilder.BooleanProperty(FieldDescriptions.EntityIsDeleted, false);
             }
 
             if (extended)
             {
-                jsonSchema.Properties["newStatusColor"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentNewStatusColor, false);
-                jsonSchema.Properties["schema"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentSchema, true);
-                jsonSchema.Properties["SchemaName"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentSchemaName, true);
-                jsonSchema.Properties["statusColor"] = SchemaBuilder.StringProperty(FieldDescriptions.ContentStatusColor, true);
+                jsonSchema.Properties["newStatusColor"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentNewStatusColor, false);
+                jsonSchema.Properties["schema"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentSchema, true);
+                jsonSchema.Properties["SchemaName"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentSchemaName, true);
+                jsonSchema.Properties["statusColor"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentStatusColor, true);
             }
 
             if (dataSchema != null)
             {
-                jsonSchema.Properties["data"] = SchemaBuilder.ReferenceProperty(dataSchema, FieldDescriptions.ContentData, true);
+                jsonSchema.Properties["data"] = JsonTypeBuilder.ReferenceProperty(dataSchema, FieldDescriptions.ContentData, true);
             }
 
             return jsonSchema;
