@@ -13,46 +13,68 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
     {
         public static JsonSchema Object()
         {
-            return new JsonSchema
-            {
-                Type = JsonObjectType.Object,
-                AllowAdditionalProperties = false,
-                AllowAdditionalItems = false
-            };
+            const JsonObjectType type = JsonObjectType.Object;
+
+            return new JsonSchema { Type = type, AllowAdditionalProperties = false };
         }
 
         public static JsonSchema String()
         {
-            return new JsonSchema
-            {
-                Type = JsonObjectType.String
-            };
+            const JsonObjectType type = JsonObjectType.String;
+
+            return new JsonSchema { Type = type };
         }
 
         public static JsonSchemaProperty BooleanProperty(string? description = null, bool isRequired = false)
         {
-            return new JsonSchemaProperty { Type = JsonObjectType.Boolean }
+            const JsonObjectType type = JsonObjectType.Boolean;
+
+            return new JsonSchemaProperty { Type = type }
                 .SetDescription(description)
                 .SetRequired(isRequired);
         }
 
         public static JsonSchemaProperty DateTimeProperty(string? description = null, bool isRequired = false)
         {
-            return new JsonSchemaProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime }
+            const JsonObjectType type = JsonObjectType.String;
+
+            return new JsonSchemaProperty { Type = type, Format = JsonFormatStrings.DateTime }
                 .SetDescription(description)
                 .SetRequired(isRequired);
         }
 
         public static JsonSchemaProperty NumberProperty(string? description = null, bool isRequired = false)
         {
-            return new JsonSchemaProperty { Type = JsonObjectType.Number }
+            const JsonObjectType type = JsonObjectType.Number;
+
+            return new JsonSchemaProperty { Type = type }
                 .SetDescription(description)
                 .SetRequired(isRequired);
         }
 
         public static JsonSchemaProperty StringProperty(string? description = null, bool isRequired = false)
         {
-            return new JsonSchemaProperty { Type = JsonObjectType.String }
+            const JsonObjectType type = JsonObjectType.String;
+
+            return new JsonSchemaProperty { Type = type }
+                .SetDescription(description)
+                .SetRequired(isRequired);
+        }
+
+        public static JsonSchemaProperty ObjectProperty(JsonSchema? value = null, string? description = null, bool isRequired = false)
+        {
+            const JsonObjectType type = JsonObjectType.Object;
+
+            return new JsonSchemaProperty { Type = type, AdditionalPropertiesSchema = value }
+                .SetDescription(description)
+                .SetRequired(isRequired);
+        }
+
+        public static JsonSchemaProperty ArrayProperty(JsonSchema item, string? description = null, bool isRequired = false)
+        {
+            const JsonObjectType type = JsonObjectType.Array;
+
+            return new JsonSchemaProperty { Type = type, Item = item }
                 .SetDescription(description)
                 .SetRequired(isRequired);
         }
@@ -62,32 +84,6 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return new JsonSchemaProperty { Reference = reference }
                 .SetDescription(description)
                 .SetRequired(isRequired);
-        }
-
-        public static JsonSchemaProperty ObjectProperty(JsonSchema? value = null, string? description = null, bool isRequired = false)
-        {
-            return new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Object,
-                AllowAdditionalProperties = true,
-                AllowAdditionalItems = false,
-                AdditionalPropertiesSchema = value
-            }
-            .SetDescription(description)
-            .SetRequired(isRequired);
-        }
-
-        public static JsonSchemaProperty ArrayProperty(JsonSchema item, string? description = null, bool isRequired = false)
-        {
-            return new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Array,
-                AllowAdditionalProperties = false,
-                AllowAdditionalItems = false,
-                Item = item
-            }
-            .SetDescription(description)
-            .SetRequired(isRequired);
         }
 
         public static JsonSchemaProperty JsonProperty(string? description = null, bool isRequired = false)

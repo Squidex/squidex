@@ -36,13 +36,22 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return text?.Replace("[schema]", $"'{SchemaDisplayName}'", StringComparison.Ordinal);
         }
 
+        public void AddTag(string description)
+        {
+            var tag = new OpenApiTag { Name = SchemaTypeName, Description = FormatText(description) };
+
+            Parent.OpenApiDocument.Tags.Add(tag);
+        }
+
         public OperationBuilder AddOperation(string method, string path)
         {
+            var tag = SchemaTypeName;
+
             var operation = new OpenApiOperation
             {
                 Tags = new List<string>
                 {
-                    SchemaDisplayName
+                    tag
                 }
             };
 

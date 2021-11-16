@@ -76,9 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 SchemaTypeName = "__Shared"
             };
 
-            var description = "API endpoints for operations across all schemas.";
-
-            OpenApiDocument.Tags.Add(new OpenApiTag { Name = "__Shared", Description = description });
+            builder.AddTag("API endpoints for operations across all schemas.");
 
             return builder;
         }
@@ -121,9 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 SchemaTypeName = typeName
             };
 
-            var description = builder.FormatText("API endpoints for schema content items.");
-
-            OpenApiDocument.Tags.Add(new OpenApiTag { Name = schema.DisplayName(), Description = description });
+            builder.AddTag("API endpoints for [schema] content items.");
 
             return builder;
         }

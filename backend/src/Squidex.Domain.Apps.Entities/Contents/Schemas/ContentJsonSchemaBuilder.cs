@@ -15,7 +15,6 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             var jsonSchema = new JsonSchema
             {
-                AllowAdditionalItems = false,
                 AllowAdditionalProperties = false,
                 Properties =
                 {
