@@ -144,14 +144,12 @@ namespace Squidex.Infrastructure.Translations
         private string? GetCore(CultureInfo culture, string key)
         {
             var translation = resourceManager.GetString(key, culture);
-
+#if DEBUG
             if (translation == null)
             {
-#if DEBUG
                 MissingKeys.Log(key);
-#endif
             }
-
+#endif
             return translation;
         }
     }
