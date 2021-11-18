@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.EventSourcing
 {
     public delegate IEventConsumer EventConsumerFactory(string name);

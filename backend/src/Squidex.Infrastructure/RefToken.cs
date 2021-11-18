@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -70,7 +69,7 @@ namespace Squidex.Infrastructure
 
             if (idx > 0 && idx < value.Length - 1)
             {
-                if (!Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
+                if (!Enum.TryParse<RefTokenType>(value[..idx], true, out var type))
                 {
                     type = RefTokenType.Subject;
                 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             this.grainFactory = grainFactory;
         }
 
-        public void Extend(ExecutionContext context)
+        public void Extend(ScriptExecutionContext context)
         {
             if (context.TryGetValue<DomainId>("appId", out var appId))
             {

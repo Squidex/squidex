@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
@@ -208,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var type = FindDataType(model, "MySchema");
 
-            Assert.Contains(type.Fields, x => x.Name == "content");
+            Assert.Contains(type?.Fields, x => x.Name == "content");
         }
 
         [Fact]
@@ -224,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var type = FindDataType(model, "MySchema");
 
-            Assert.Contains(type.Fields, x => x.Name == "gql_2Field");
+            Assert.Contains(type?.Fields, x => x.Name == "gql_2Field");
         }
 
         [Fact]
@@ -241,8 +239,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var type = FindDataType(model, "MySchema");
 
-            Assert.Contains(type.Fields, x => x.Name == "myField");
-            Assert.Contains(type.Fields, x => x.Name == "myField2");
+            Assert.Contains(type?.Fields, x => x.Name == "myField");
+            Assert.Contains(type?.Fields, x => x.Name == "myField2");
         }
 
         [Fact]
@@ -260,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var type = FindDataType(model, "MySchema");
 
-            Assert.DoesNotContain(type.Fields, x => x.Name == "myComponent");
+            Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponent");
         }
 
         [Fact]
@@ -278,7 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var type = FindDataType(model, "MySchema");
 
-            Assert.DoesNotContain(type.Fields, x => x.Name == "myComponents");
+            Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponents");
         }
 
         [Fact]
@@ -296,14 +294,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var type = FindDataType(model, "MySchema");
 
-            Assert.DoesNotContain(type.Fields, x => x.Name == "myReferences");
+            Assert.DoesNotContain(type?.Fields, x => x.Name == "myReferences");
         }
 
-        private static IObjectGraphType FindDataType(GraphQLModel model, string schema)
+        private static IObjectGraphType? FindDataType(GraphQLModel model, string schema)
         {
             var type = (IObjectGraphType)model.Schema.AllTypes.Single(x => x.Name == schema);
 
-            return (IObjectGraphType)type.GetField("flatData").ResolvedType.Flatten();
+            return (IObjectGraphType?)type.GetField("flatData")?.ResolvedType?.Flatten();
         }
     }
 }

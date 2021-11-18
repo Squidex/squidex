@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Infrastructure;

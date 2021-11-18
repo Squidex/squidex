@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure.Commands;

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using NodaTime;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;

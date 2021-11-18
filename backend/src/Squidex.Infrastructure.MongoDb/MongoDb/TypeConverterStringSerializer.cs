@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 var value = context.Reader.ReadString();
 
-                return (T)typeConverter.ConvertFromInvariantString(value);
+                return (T)typeConverter.ConvertFromInvariantString(value)!;
             }
         }
 

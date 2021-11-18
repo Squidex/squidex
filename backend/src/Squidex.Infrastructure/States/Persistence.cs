@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0012 // 'if' statement can be re-written as 'switch' statement

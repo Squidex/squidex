@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -26,23 +23,26 @@ namespace Squidex.Domain.Apps.Entities
 
             async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
             {
-                foreach (var schemaId in schemaIds)
+                if (schemaIds != null)
                 {
-                    if (schemaId == schema.Id)
+                    foreach (var schemaId in schemaIds)
                     {
-                        result ??= new Dictionary<DomainId, Schema>();
-                        result[schemaId] = schema.SchemaDef;
-                    }
-                    else if (result == null || !result.TryGetValue(schemaId, out _))
-                    {
-                        var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
-
-                        if (resolvedEntity != null)
+                        if (schemaId == schema.Id)
                         {
                             result ??= new Dictionary<DomainId, Schema>();
-                            result[schemaId] = resolvedEntity.SchemaDef;
+                            result[schemaId] = schema.SchemaDef;
+                        }
+                        else if (result == null || !result.TryGetValue(schemaId, out _))
+                        {
+                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
 
-                            await ResolveSchemaAsync(resolvedEntity);
+                            if (resolvedEntity != null)
+                            {
+                                result ??= new Dictionary<DomainId, Schema>();
+                                result[schemaId] = resolvedEntity.SchemaDef;
+
+                                await ResolveSchemaAsync(resolvedEntity);
+                            }
                         }
                     }
                 }

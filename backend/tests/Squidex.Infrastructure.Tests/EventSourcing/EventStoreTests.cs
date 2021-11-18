@@ -5,12 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
@@ -379,7 +374,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             for (var i = 0; i < 5; i++)
             {
-                await Sut.DeleteAsync($"^{streamName.Substring(0, 10)}");
+                await Sut.DeleteAsync($"^{streamName[..10]}");
 
                 readEvents = await QueryAsync(streamName);
 

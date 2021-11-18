@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.serviceProvider = serviceProvider;
         }
 
-        public void ExtendAsync(ExecutionContext context)
+        public void ExtendAsync(ScriptExecutionContext context)
         {
             if (!context.TryGetValue<DomainId>("appId", out var appId))
             {
@@ -48,12 +44,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             context.Engine.SetValue("getReferences", action);
         }
 
-        private void GetReferences(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+        private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
             GetReferencesAsync(context, appId, user, references, callback).Forget();
         }
 
-        private async Task GetReferencesAsync(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+        private async Task GetReferencesAsync(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
             Guard.NotNull(callback, nameof(callback));
 

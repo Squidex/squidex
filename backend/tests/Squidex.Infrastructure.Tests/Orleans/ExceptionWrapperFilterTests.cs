@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Net;
-using System.Threading.Tasks;
 using FakeItEasy;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Clusters;

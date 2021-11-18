@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Globalization;
 using Lazy;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Configuration;
@@ -115,7 +113,7 @@ namespace TestSuite
                 Console.WriteLine("Using: CONFIG__WAIT={0}", variable);
             }
 
-            return int.TryParse(variable, out timeout) && timeout > 10;
+            return int.TryParse(variable, NumberStyles.Integer, CultureInfo.InvariantCulture, out timeout) && timeout > 10;
         }
 
         private static string GetValue(string name, string defaultValue)

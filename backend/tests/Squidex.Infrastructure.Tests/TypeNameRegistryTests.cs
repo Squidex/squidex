@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;

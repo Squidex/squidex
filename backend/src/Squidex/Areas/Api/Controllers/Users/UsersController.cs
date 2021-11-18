@@ -5,12 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Users.Models;
@@ -195,11 +189,12 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                             if (response.IsSuccessStatusCode)
                             {
-                                var contentType = response.Content.Headers.ContentType?.ToString();
+                                var contentType = response.Content.Headers.ContentType?.ToString()!;
+                                var contentStream = await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted);
 
                                 var etag = response.Headers.ETag;
 
-                                var result = new FileStreamResult(await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted), contentType);
+                                var result = new FileStreamResult(contentStream, contentType);
 
                                 if (!string.IsNullOrWhiteSpace(etag?.Tag))
                                 {

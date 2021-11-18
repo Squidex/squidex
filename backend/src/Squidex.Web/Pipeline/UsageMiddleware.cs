@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using NodaTime;
@@ -92,7 +91,7 @@ namespace Squidex.Web.Pipeline
 
         private static UsageResponseBodyFeature SetUsageBody(HttpContext context)
         {
-            var originalBodyFeature = context.Features.Get<IHttpResponseBodyFeature>();
+            var originalBodyFeature = context.Features.Get<IHttpResponseBodyFeature>()!;
 
             var usageBody = new UsageResponseBodyFeature(originalBodyFeature);
 

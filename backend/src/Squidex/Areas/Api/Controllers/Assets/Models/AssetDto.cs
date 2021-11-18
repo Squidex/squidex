@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;

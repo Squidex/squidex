@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -72,7 +68,7 @@ namespace Migrations.Migrations.MongoDb
                                     indexOfId = indexOfOldId + 2;
                                 }
 
-                                var domainType = eventStream.Substring(0, indexOfType);
+                                var domainType = eventStream[..indexOfType];
                                 var domainId = eventStream[indexOfId..];
 
                                 var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();

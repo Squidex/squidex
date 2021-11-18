@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Comments.Models;

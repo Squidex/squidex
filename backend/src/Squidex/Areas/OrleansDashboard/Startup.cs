@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Builder;
 using Orleans;
 using Squidex.Areas.OrleansDashboard.Middlewares;
 using Squidex.Web;

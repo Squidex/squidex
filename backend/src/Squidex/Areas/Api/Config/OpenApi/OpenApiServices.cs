@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NJsonSchema;
 using NJsonSchema.Generation;

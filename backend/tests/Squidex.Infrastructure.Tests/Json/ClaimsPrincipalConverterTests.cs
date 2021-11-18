@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Security.Claims;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models

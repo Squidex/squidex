@@ -5,11 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
@@ -56,7 +51,7 @@ namespace TestSuite.ApiTests
         public async Task Should_manage_image()
         {
             // STEP 1: Upload image.
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var file = new FileParameter(stream, "logo-squared.png", "image/png");
 
@@ -68,7 +63,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Download image.
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var temp = new MemoryStream();
 

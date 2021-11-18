@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
@@ -78,7 +74,7 @@ namespace Squidex.Extensions.Actions.Kafka
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {
-                    var key = line.Substring(0, indexEqual);
+                    var key = line[..indexEqual];
                     var val = line[(indexEqual + 1)..];
 
                     val = await FormatAsync(val, @event);

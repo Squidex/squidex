@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.SignalR.Management;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -16,12 +14,12 @@ namespace Squidex.Extensions.Actions.SignalR
 {
     public sealed class SignalRActionHandler : RuleActionHandler<SignalRAction, SignalRJob>
     {
-        private readonly ClientPool<(string ConnectionString, string HubName), IServiceManager> clients;
+        private readonly ClientPool<(string ConnectionString, string HubName), ServiceManager> clients;
 
         public SignalRActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
-            clients = new ClientPool<(string ConnectionString, string HubName), IServiceManager>(key =>
+            clients = new ClientPool<(string ConnectionString, string HubName), ServiceManager>(key =>
             {
                 var serviceManager = new ServiceManagerBuilder()
                     .WithOptions(option =>
@@ -29,7 +27,7 @@ namespace Squidex.Extensions.Actions.SignalR
                         option.ConnectionString = key.ConnectionString;
                         option.ServiceTransportType = ServiceTransportType.Transient;
                     })
-                    .Build();
+                    .BuildServiceManager();
 
                 return serviceManager;
             });

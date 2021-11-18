@@ -5,15 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Squidex.Translator.State;
-
-#pragma warning disable SA1025 // Code should not contain multiple whitespace in a row
 
 namespace Squidex.Translator.Processes
 {
@@ -100,12 +94,12 @@ namespace Squidex.Translator.Processes
 
                 while (trimmed.StartsWith(whitespace, StringComparison.OrdinalIgnoreCase))
                 {
-                    trimmed = trimmed.Substring(whitespace.Length);
+                    trimmed = trimmed[whitespace.Length..];
                 }
 
                 while (trimmed.EndsWith(whitespace, StringComparison.OrdinalIgnoreCase))
                 {
-                    trimmed = trimmed.Substring(0, trimmed.Length - whitespace.Length);
+                    trimmed = trimmed[..^whitespace.Length];
                 }
 
                 if (!string.IsNullOrWhiteSpace(trimmed) && !IsTranslated(trimmed) && !IsVariable(trimmed))
@@ -115,8 +109,8 @@ namespace Squidex.Translator.Processes
                         // Extract prefix and suffix to keep our original indentation.
                         var originalIndex = text.IndexOf(trimmed, StringComparison.Ordinal);
 
-                        var originalPrefix = text.Substring(0, originalIndex);
-                        var originalSuffix = text.Substring(originalIndex + trimmed.Length);
+                        var originalPrefix = text[..originalIndex];
+                        var originalSuffix = text[(originalIndex + trimmed.Length)..];
 
                         var originText = $"text in {textNode.ParentNode.Name}";
 
@@ -153,7 +147,7 @@ namespace Squidex.Translator.Processes
                             }
                             else
                             {
-                                if (attribute.Name.Contains("["))
+                                if (attribute.Name.Contains('[', StringComparison.Ordinal))
                                 {
                                     node.SetAttributeValue(attribute.Name, $"{{{{ '{key}' | sqxTranslate }}}}");
                                 }
@@ -177,20 +171,20 @@ namespace Squidex.Translator.Processes
 
         private static bool IsPipe(HtmlAttribute attribute)
         {
-            return attribute.Value.Contains("{");
+            return attribute.Value.Contains('{', StringComparison.Ordinal);
         }
 
-        private bool IsTranslatedAttribute(string text)
+        private static bool IsTranslatedAttribute(string text)
         {
-            return text.Contains("i18n:");
+            return text.Contains("i18n:", StringComparison.Ordinal);
         }
 
-        private bool IsTranslated(string text)
+        private static bool IsTranslated(string text)
         {
-            return text.Contains("| sqxTranslate");
+            return text.Contains("| sqxTranslate", StringComparison.Ordinal);
         }
 
-        private bool IsVariable(string text)
+        private static bool IsVariable(string text)
         {
             return text.StartsWith("{{", StringComparison.Ordinal) && Regex.Matches(text, "\\}\\}").Count == 1;
         }

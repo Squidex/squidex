@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
 using GraphQL.NewtonsoftJson;

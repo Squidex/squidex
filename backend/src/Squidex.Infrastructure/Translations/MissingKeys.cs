@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.IO;
-
 namespace Squidex.Infrastructure.Translations
 {
     public sealed class MissingKeys

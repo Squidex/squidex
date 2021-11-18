@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +37,7 @@ namespace Squidex.Web.Pipeline
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             var actionFilters = new List<IFilterMetadata>();
 
-            executingContext = new ActionExecutingContext(actionContext, actionFilters, new Dictionary<string, object>(), this);
+            executingContext = new ActionExecutingContext(actionContext, actionFilters, new Dictionary<string, object?>(), this);
             executedContext = new ActionExecutedContext(actionContext, actionFilters, this)
             {
                 Result = new OkResult()
@@ -58,7 +56,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(304, ((StatusCodeResult)executedContext.Result).StatusCode);
+            Assert.Equal(304, ((StatusCodeResult)executedContext.Result!).StatusCode);
         }
 
         [Fact]
@@ -71,7 +69,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(200, ((StatusCodeResult)executedContext.Result).StatusCode);
+            Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
         }
 
         [Fact]
@@ -84,7 +82,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 
-            Assert.Equal(200, ((StatusCodeResult)executedContext.Result).StatusCode);
+            Assert.Equal(200, ((StatusCodeResult)executedContext.Result!).StatusCode);
         }
 
         private ActionExecutionDelegate Next()

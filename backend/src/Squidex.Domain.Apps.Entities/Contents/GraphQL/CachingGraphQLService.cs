@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Globalization;
-using System.Threading.Tasks;
 using GraphQL;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -49,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
-            var context = ((GraphQLExecutionContext)options.UserContext).Context;
+            var context = ((GraphQLExecutionContext)options.UserContext!).Context;
 
             var model = await GetModelAsync(context.App);
 

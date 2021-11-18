@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.States
 {
     public interface IStore<T> : IPersistenceFactory<T>

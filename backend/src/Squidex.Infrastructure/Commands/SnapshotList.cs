@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Squidex.Infrastructure.Commands
 {
     public sealed class SnapshotList<T> where T : class, IDomainState<T>, new()

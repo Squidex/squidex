@@ -30,7 +30,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 
             public static readonly IFieldResolver Resolver = Resolvers.Sync<IEnrichedAssetEntity, object?>((source, fieldContext, _) =>
             {
-                if (fieldContext.Arguments.TryGetValue("path", out var path))
+                if (fieldContext.Arguments != null &&
+                    fieldContext.Arguments.TryGetValue("path", out var path))
                 {
                     source.Metadata.TryGetByPath(path.Value as string, out var result);
 

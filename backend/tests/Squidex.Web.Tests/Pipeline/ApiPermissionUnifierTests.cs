@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Xunit;

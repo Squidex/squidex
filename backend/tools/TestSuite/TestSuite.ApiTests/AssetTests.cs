@@ -5,12 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
@@ -36,7 +30,7 @@ namespace TestSuite.ApiTests
             // STEP 1: Create asset
             var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var downloaded = await _.DownloadAsync(asset_1);
 
@@ -95,7 +89,7 @@ namespace TestSuite.ApiTests
             // STEP 2: Reupload asset
             var asset_2 = await _.UploadFileAsync("Assets/logo-wide.png", asset_1);
 
-            using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
             {
                 var downloaded = await _.DownloadAsync(asset_2);
 
@@ -155,7 +149,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Download asset
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var downloaded = await _.DownloadAsync(asset_1);
 
@@ -171,7 +165,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 5: Download asset with authentication.
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var downloaded = new MemoryStream();
 
@@ -186,22 +180,22 @@ namespace TestSuite.ApiTests
 
 
             // STEP 5: Download asset without key.
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.DownloadAsync(asset_1));
 
                 // Should return 403 when not authenticated.
-                Assert.Contains("403", ex.Message);
+                Assert.Contains("403", ex.Message, StringComparison.Ordinal);
             }
 
 
             // STEP 6: Download asset without key and version.
-            using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+            await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.DownloadAsync(asset_1, 0));
 
                 // Should return 403 when not authenticated.
-                Assert.Contains("403", ex.Message);
+                Assert.Contains("403", ex.Message, StringComparison.Ordinal);
             }
         }
 

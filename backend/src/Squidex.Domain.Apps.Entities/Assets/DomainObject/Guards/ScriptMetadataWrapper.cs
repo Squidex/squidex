@@ -6,9 +6,7 @@
 // ==========================================================================
 
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure.Json.Objects;
 

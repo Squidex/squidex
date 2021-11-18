@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using MongoDB.Bson.Serialization;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Infrastructure;

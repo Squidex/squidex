@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators

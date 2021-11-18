@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Squidex.Domain.Apps.Entities.Search
 {
     public interface ISearchSource

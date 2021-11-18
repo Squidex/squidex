@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
@@ -378,7 +374,7 @@ namespace TestSuite.ApiTests
                 // STEP 2: Create a new item with a custom id.
                 var ex = await Assert.ThrowsAsync<SquidexException>(() => _.Contents.CreateAsync(new TestEntityData { Number = 1 }, id, true));
 
-                Assert.Contains("\"statusCode\":409", ex.Message);
+                Assert.Contains("\"statusCode\":409", ex.Message, StringComparison.Ordinal);
             }
             finally
             {
@@ -621,7 +617,7 @@ namespace TestSuite.ApiTests
             // STEP 4: Check if we can find it again with a query.
             var contents_4 = await _.Contents.GetAsync(new ContentQuery { Filter = $"id eq '{content_1.Id}'" });
 
-            Assert.NotNull(contents_4.Items.FirstOrDefault(x => x.Id == content_1.Id));
+            Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
         }
 
         [Theory]
@@ -646,7 +642,7 @@ namespace TestSuite.ApiTests
             // STEP 4: Check if we can find it again with a query.
             var contents_4 = await _.Contents.GetAsync(new ContentQuery { Filter = $"id eq '{content_1.Id}'" });
 
-            Assert.NotNull(contents_4.Items.FirstOrDefault(x => x.Id == content_1.Id));
+            Assert.NotNull(contents_4.Items.Find(x => x.Id == content_1.Id));
         }
 
         [Fact]

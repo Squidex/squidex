@@ -5,11 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -106,7 +101,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
 
             if (queryText.Length >= 4 && queryText.IndexOf(":", StringComparison.OrdinalIgnoreCase) == 2)
             {
-                var candidateLanguage = queryText.Substring(0, 2);
+                var candidateLanguage = queryText[..2];
 
                 if (Language.IsValidLanguage(candidateLanguage))
                 {

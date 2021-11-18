@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -47,7 +46,7 @@ namespace Squidex.Infrastructure
                 {
                     if (value.Length > GuidLength + 1 && value[GuidLength] == ',')
                     {
-                        if (parser(span.Slice(0, GuidLength), out var id))
+                        if (parser(span[..GuidLength], out var id))
                         {
                             result = new NamedId<T>(id, value[(GuidLength + 1)..]);
 
@@ -61,7 +60,7 @@ namespace Squidex.Infrastructure
 
                     if (index > 0 && index < value.Length - 1)
                     {
-                        if (parser(span.Slice(0, index), out var id))
+                        if (parser(span[..index], out var id))
                         {
                             result = new NamedId<T>(id, value[(index + 1)..]);
 

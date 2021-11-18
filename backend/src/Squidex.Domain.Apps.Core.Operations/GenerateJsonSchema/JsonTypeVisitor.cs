@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.ObjectModel;
-using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
