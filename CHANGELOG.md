@@ -3,6 +3,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.1.0] - 202-11-18
+
+### Fixed
+
+- **Contents**: Fixed OpenAPI generation for self referencing components.
+- **Contents**: Improve the number of hold contents in memory to reduce memory footprint.
+- **Contents**: Fixed caching headers if they contain non-ASCII characters.
+- **Migration**: Accept a few errors when a migration fails for some items.
+- **UI**: Fix modals by showing scrollbars if they would not have enough space.
+- **UI**: Fixed spelling errors.
+
+### Changed
+
+- **Assets**: Remove max length restriction in the UI for assets metadata.
+
+### Added
+
+- **Assets**: Rename asset tags.
+- **Contents**: Fixed OData queries over POST requests.
+- **Contents**: Save content from inspection tab.
+- **Contents**: Sample how to implement custom editor with Monaco.
+- **Contents**: Sample how to implement custom editor with EditorJS.
+- **Search**: EXPERIMENTAL Azure Cognitive Search support.
+- **Search**: EXPERIMENTAL Mongo Atlas Search support.
+- **Event Sourcing**: EXPERIMENTAL Support for EventStore.
+- **Clustering**: Support to run Squidex in Azure App Services.
+- **UI**: Nested schema categories.
+- **UI**: New modal dialog to copy from one language to other languages.
+- **UI**: Show the users that are currently visiting a content page.
+- **UI**: Fix tooltip performance issues (can really slow down the Browser.)
+
 ## [6.0.1] - 2021-10-15
 
 ### Fixed
