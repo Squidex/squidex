@@ -235,6 +235,9 @@ namespace TestSuite.ApiTests
                     Publish = true
                 });
 
+                Assert.Single(results);
+                Assert.NotNull(results[0].Error);
+
 
                 // STEP 2: Query content.
                 content = await _.Contents.GetAsync(results[0].ContentId);
@@ -275,6 +278,9 @@ namespace TestSuite.ApiTests
                     },
                     Publish = true
                 });
+
+                Assert.Single(results);
+                Assert.NotNull(results[0].Error);
 
 
                 // STEP 2: Query content.
