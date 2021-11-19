@@ -15,7 +15,7 @@ namespace Squidex.Extensions.Text.Azure
 {
     public static class AzureIndexDefinition
     {
-        private static readonly Dictionary<string, (string Field, string Analyzer)> AllowedLanguages = new Dictionary<string, (string Field, string Analyzer)>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, (string Field, string Analyzer)> FieldAnalyzers = new (StringComparer.OrdinalIgnoreCase)
         {
             ["iv"] = ("iv", LexicalAnalyzerName.StandardLucene.ToString()),
             ["zh"] = ("zh", LexicalAnalyzerName.ZhHansLucene.ToString())
@@ -49,25 +49,30 @@ namespace Squidex.Extensions.Text.Azure
                     {
                         var fieldName = language.Replace('-', '_');
 
-                        AllowedLanguages[language] = (fieldName, analyzer);
+                        FieldAnalyzers[language] = (fieldName, analyzer);
                     }
                 }
             }
         }
 
-        public static string GetTextField(string key)
+        public static string GetFieldName(string key)
         {
-            if (AllowedLanguages.TryGetValue(key, out var field))
+            if (FieldAnalyzers.TryGetValue(key, out var analyzer))
             {
-                return field.Field;
+                return analyzer.Field;
             }
 
-            if (key.Length > 2 && AllowedLanguages.TryGetValue(key[2..], out field))
+            if (key.Length > 0)
             {
-                return field.Field;
+                var language = key[2..];
+
+                if (FieldAnalyzers.TryGetValue(language, out analyzer))
+                {
+                    return analyzer.Field;
+                }
             }
 
-            return AllowedLanguages["iv"].Field;
+            return "iv";
         }
 
         public static SearchIndex Create(string indexName)
@@ -105,10 +110,18 @@ namespace Squidex.Extensions.Text.Azure
                 new SimpleField("servePublished", SearchFieldDataType.Boolean)
                 {
                     IsFilterable = true
+                },
+                new SimpleField("geoObject", SearchFieldDataType.GeographyPoint)
+                {
+                    IsFilterable = true
+                },
+                new SimpleField("geoField", SearchFieldDataType.String)
+                {
+                    IsFilterable = true
                 }
             };
 
-            foreach (var (field, analyzer) in AllowedLanguages.Values)
+            foreach (var (field, analyzer) in FieldAnalyzers.Values)
             {
                 fields.Add(
                     new SearchableField(field)
