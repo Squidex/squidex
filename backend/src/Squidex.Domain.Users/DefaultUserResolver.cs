@@ -28,16 +28,18 @@ namespace Squidex.Domain.Users
         {
             Guard.NotNullOrEmpty(email, nameof(email));
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
                 try
                 {
-                    var user = await userService.CreateAsync(email, new UserValues
+                    var values = new UserValues
                     {
                         Invited = invited
-                    }, ct: ct);
+                    };
+
+                    var user = await userService.CreateAsync(email, values, ct: ct);
 
                     return (user, true);
                 }
@@ -58,7 +60,7 @@ namespace Squidex.Domain.Users
             Guard.NotNullOrEmpty(type, nameof(type));
             Guard.NotNullOrEmpty(value, nameof(value));
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
@@ -79,7 +81,7 @@ namespace Squidex.Domain.Users
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
@@ -92,11 +94,11 @@ namespace Squidex.Domain.Users
         {
             Guard.NotNullOrEmpty(idOrEmail, nameof(idOrEmail));
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                if (idOrEmail.Contains("@", StringComparison.Ordinal))
+                if (idOrEmail.Contains('@', StringComparison.Ordinal))
                 {
                     return await userService.FindByEmailAsync(idOrEmail, ct);
                 }
@@ -110,7 +112,7 @@ namespace Squidex.Domain.Users
         public async Task<List<IUser>> QueryAllAsync(
             CancellationToken ct = default)
         {
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
@@ -125,7 +127,7 @@ namespace Squidex.Domain.Users
         {
             Guard.NotNullOrEmpty(email, nameof(email));
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
@@ -140,7 +142,7 @@ namespace Squidex.Domain.Users
         {
             Guard.NotNull(ids, nameof(ids));
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 

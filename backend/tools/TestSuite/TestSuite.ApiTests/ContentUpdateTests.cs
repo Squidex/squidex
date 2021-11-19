@@ -236,7 +236,7 @@ namespace TestSuite.ApiTests
                 });
 
                 Assert.Single(results);
-                Assert.NotNull(results[0].Error);
+                Assert.Null(results[0].Error);
 
 
                 // STEP 2: Query content.
@@ -280,7 +280,7 @@ namespace TestSuite.ApiTests
                 });
 
                 Assert.Single(results);
-                Assert.NotNull(results[0].Error);
+                Assert.Null(results[0].Error);
 
 
                 // STEP 2: Query content.

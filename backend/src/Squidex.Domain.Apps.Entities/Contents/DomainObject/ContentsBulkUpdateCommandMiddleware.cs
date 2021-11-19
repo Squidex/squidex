@@ -15,6 +15,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
+using Squidex.Log;
 using Squidex.Shared;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -26,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContextProvider contextProvider;
+        private readonly ISemanticLog log;
 
         private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command)
         {
@@ -42,10 +44,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
         }
 
-        public ContentsBulkUpdateCommandMiddleware(IContentQueryService contentQuery, IContextProvider contextProvider)
+        public ContentsBulkUpdateCommandMiddleware(
+            IContentQueryService contentQuery,
+            IContextProvider contextProvider,
+            ISemanticLog log)
         {
             this.contentQuery = contentQuery;
             this.contextProvider = contextProvider;
+            this.log = log;
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
@@ -130,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
         }
 
-        private static async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
+        private async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
         {
             var (task, id, command) = bulkCommand;
 
@@ -142,6 +148,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             }
             catch (Exception ex)
             {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "BulkContent")
+                    .WriteProperty("status", "Failed")
+                    .WriteProperty("jobIndex", task.JobIndex)
+                    .WriteProperty("jobType", task.CommandJob.Type.ToString()));
+
                 task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
             }
         }
@@ -171,6 +183,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     }
                     catch (Exception ex)
                     {
+                        log.LogError(ex, w => w
+                            .WriteProperty("action", "BulkContent")
+                            .WriteProperty("status", "Failed")
+                            .WriteProperty("jobIndex", task.JobIndex)
+                            .WriteProperty("jobType", task.CommandJob.Type.ToString()));
+
                         task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
                     }
                 }

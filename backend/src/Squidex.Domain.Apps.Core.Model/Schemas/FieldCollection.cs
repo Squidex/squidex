@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            if (newField is not T)
+            if (newField is null)
             {
                 throw new InvalidOperationException($"Field must be of type {typeof(T)}");
             }

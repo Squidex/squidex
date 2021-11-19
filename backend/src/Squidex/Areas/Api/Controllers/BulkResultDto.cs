@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers
         {
             var error = result.Exception?.ToErrorDto(httpContext).Error;
 
-            return SimpleMapper.Map(result, new BulkResultDto { Error = error, Id = result.Id });
+            return SimpleMapper.Map(result, new BulkResultDto { Error = error });
         }
     }
 }
