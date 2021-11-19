@@ -11,6 +11,13 @@ namespace TestSuite.Fixtures
 {
     public class CreatedAppFixture : ClientFixture
     {
+        private static readonly string[] Contributors =
+        {
+            "sebastian@squidex.io",
+            "hello1@squidex.io",
+            "hello2@squidex.io",
+        };
+
         private static bool isCreated;
 
         public CreatedAppFixture()
@@ -31,9 +38,14 @@ namespace TestSuite.Fixtures
                         }
                     }
 
-                    var invite = new AssignContributorDto { ContributorId = "sebastian@squidex.io", Invite = true, Role = "Owner" };
+                    var invite = new AssignContributorDto { Invite = true, Role = "Owner" };
 
-                    await Apps.PostContributorAsync(AppName, invite);
+                    foreach (var contributor in Contributors)
+                    {
+                        invite.ContributorId = contributor;
+
+                        await Apps.PostContributorAsync(AppName, invite);
+                    }
                 }).Wait();
 
                 isCreated = true;

@@ -5,11 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Globalization;
 using Lazy;
+using Microsoft.Extensions.Configuration;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Configuration;
 using Squidex.ClientLibrary.Management;
+using TestSuite.Utils;
 
 namespace TestSuite
 {
@@ -42,10 +43,10 @@ namespace TestSuite
 
         public ClientManagerWrapper()
         {
-            var appName = GetValue("APP__NAME", "integration-tests");
-            var clientId = GetValue("CLIENT__ID", "root");
-            var clientSecret = GetValue("CLIENT__SECRET", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-            var serviceURl = GetValue("SERVER__URL", "https://localhost:5001");
+            var appName = TestHelpers.Configuration["app:name"] ?? "integration-tests";
+            var clientId = TestHelpers.Configuration["client:id"] ?? "root";
+            var clientSecret = TestHelpers.Configuration["client:secret"] ?? "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=";
+            var serviceURl = TestHelpers.Configuration["service:url"] ?? "https://localhost:5001";
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {
@@ -79,7 +80,9 @@ namespace TestSuite
 
         public async Task ConnectAsync()
         {
-            if (TryGetTimeout(out var waitSeconds))
+            var waitSeconds = TestHelpers.Configuration.GetValue<int>("config:timeout");
+
+            if (waitSeconds > 10)
             {
                 Console.WriteLine("Waiting {0} seconds to access server", waitSeconds);
 
@@ -102,32 +105,6 @@ namespace TestSuite
                     }
                 }
             }
-        }
-
-        private static bool TryGetTimeout(out int timeout)
-        {
-            var variable = Environment.GetEnvironmentVariable("CONFIG__WAIT");
-
-            if (!string.IsNullOrWhiteSpace(variable))
-            {
-                Console.WriteLine("Using: CONFIG__WAIT={0}", variable);
-            }
-
-            return int.TryParse(variable, NumberStyles.Integer, CultureInfo.InvariantCulture, out timeout) && timeout > 10;
-        }
-
-        private static string GetValue(string name, string defaultValue)
-        {
-            var variable = Environment.GetEnvironmentVariable($"CONFIG__{name}");
-
-            if (!string.IsNullOrWhiteSpace(variable))
-            {
-                Console.WriteLine("Using: {0}={1}", name, variable);
-
-                return variable;
-            }
-
-            return defaultValue;
         }
     }
 }
