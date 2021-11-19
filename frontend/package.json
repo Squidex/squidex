@@ -60,7 +60,7 @@
     "rxjs": "7.2.0",
     "simplemde": "1.11.2",
     "slugify": "1.6.0",
-    "tinymce": "5.8.2",
+    "tinymce": "5.10.0",
     "tslib": "2.3.0",
     "tui-calendar": "^1.13.1",
     "video.js": "7.13.3",
