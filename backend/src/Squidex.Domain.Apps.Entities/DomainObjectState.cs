@@ -42,6 +42,11 @@ namespace Squidex.Domain.Apps.Entities
             return false;
         }
 
+        public T Copy()
+        {
+            return (T)MemberwiseClone();
+        }
+
         public T Apply(Envelope<IEvent> @event)
         {
             var payload = (SquidexEvent)@event.Payload;

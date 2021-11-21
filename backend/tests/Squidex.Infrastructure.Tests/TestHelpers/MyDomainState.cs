@@ -20,6 +20,11 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public long Value { get; set; }
 
+        public MyDomainState Copy()
+        {
+            return (MyDomainState)MemberwiseClone();
+        }
+
         public MyDomainState Apply(Envelope<IEvent> @event)
         {
             switch (@event.Payload)

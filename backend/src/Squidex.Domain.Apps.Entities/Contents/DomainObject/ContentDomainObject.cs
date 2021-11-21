@@ -38,9 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Capacity = 5;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -51,6 +51,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         protected override bool CanRecreate()
         {
             return true;
+        }
+
+        protected override bool CanRecreate(IEvent @event)
+        {
+            return @event is ContentCreated;
         }
 
         protected override bool CanAccept(ICommand command)
@@ -70,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        if (Version > EtagVersion.Empty && !IsDeleted())
+                        if (Version > EtagVersion.Empty && !IsDeleted(Snapshot))
                         {
                             await UpdateCore(c.AsUpdate(), operation);
                         }

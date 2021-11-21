@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -32,9 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             this.ruleEnqueuer = ruleEnqueuer;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
