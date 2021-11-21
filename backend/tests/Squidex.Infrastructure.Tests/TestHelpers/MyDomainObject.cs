@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Log;
 
@@ -17,6 +18,8 @@ namespace Squidex.Infrastructure.TestHelpers
     public sealed class MyDomainObject : DomainObject<MyDomainState>
     {
         public bool Recreate { get; set; }
+
+        public bool RecreateEvent { get; set; }
 
         public int VersionsToKeep
         {
@@ -27,6 +30,11 @@ namespace Squidex.Infrastructure.TestHelpers
         public MyDomainObject(IPersistenceFactory<MyDomainState> factory)
            : base(factory, A.Dummy<ISemanticLog>())
         {
+        }
+
+        protected override bool CanRecreate(IEvent @event)
+        {
+            return RecreateEvent ? @event is ValueChanged : false;
         }
 
         protected override bool CanRecreate()
@@ -54,9 +62,9 @@ namespace Squidex.Infrastructure.TestHelpers
             return true;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(MyDomainState snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         public override Task<CommandResult> ExecuteAsync(IAggregateCommand command)

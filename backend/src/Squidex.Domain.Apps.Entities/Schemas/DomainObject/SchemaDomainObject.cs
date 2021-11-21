@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)

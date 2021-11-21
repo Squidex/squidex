@@ -44,9 +44,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             this.initialSettings = initialPatterns;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)

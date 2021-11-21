@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             this.serviceProvider = serviceProvider;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
             return Snapshot.IsDeleted;
         }

@@ -33,14 +33,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             Capacity = 2;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanRecreate()
         {
             return true;
+        }
+
+        protected override bool CanRecreate(IEvent @event)
+        {
+            return @event is AssetCreated;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -64,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        if (Version > EtagVersion.Empty && !IsDeleted())
+                        if (Version > EtagVersion.Empty && !IsDeleted(Snapshot))
                         {
                             await UpdateCore(c.AsUpdate(), operation);
                         }

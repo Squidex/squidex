@@ -245,6 +245,31 @@ namespace Squidex.Infrastructure.Migrations
                 .MustHaveHappenedOnceExactly();
         }
 
+        [Fact]
+        public async Task Should_not_release_lock_if_not_acquired()
+        {
+            using (var tcs = new CancellationTokenSource())
+            {
+                var sut = new Migrator(status, path, log) { LockWaitMs = 2 };
+
+                A.CallTo(() => status.TryLockAsync(tcs.Token))
+                    .Returns(false);
+
+                var task = sut.MigrateAsync(tcs.Token);
+
+#pragma warning disable MA0040 // Flow the cancellation token
+                await Task.Delay(100);
+#pragma warning restore MA0040 // Flow the cancellation token
+
+                tcs.Cancel();
+
+                await task;
+
+                A.CallTo(() => status.UnlockAsync(A<CancellationToken>._))
+                    .MustNotHaveHappened();
+            }
+        }
+
         private IMigration BuildMigration(int fromVersion, int toVersion)
         {
             var migration = A.Fake<IMigration>();
