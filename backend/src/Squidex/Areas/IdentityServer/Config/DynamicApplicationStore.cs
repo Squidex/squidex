@@ -75,7 +75,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 }
             }
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 

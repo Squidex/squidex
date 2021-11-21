@@ -123,9 +123,9 @@ namespace Squidex.Shared.Identity
         {
             var url = user.FirstOrDefault(x => x.Type == SquidexClaimTypes.PictureUrl)?.Value;
 
-            if (!string.IsNullOrWhiteSpace(url) && Uri.IsWellFormedUriString(url, UriKind.Absolute) && url.Contains("gravatar", StringComparison.Ordinal))
+            if (Uri.IsWellFormedUriString(url, UriKind.Absolute) && url.Contains("gravatar", StringComparison.Ordinal))
             {
-                if (url.Contains("?", StringComparison.Ordinal))
+                if (url.Contains('?', StringComparison.Ordinal))
                 {
                     url += "&d=404";
                 }

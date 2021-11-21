@@ -11,9 +11,9 @@ using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
-    public sealed class MongoTextIndexEntity
+    public sealed class MongoTextIndexEntity<T>
     {
         [BsonId]
         [BsonElement]
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
 
         [BsonIgnoreIfNull]
         [BsonElement("t")]
-        public List<MongoTextIndexEntityText> Texts { get; set; }
+        public T Texts { get; set; }
 
         [BsonIgnoreIfNull]
         [BsonElement("gf")]

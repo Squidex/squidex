@@ -29,8 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 {
     public class ContentQueryTests
     {
-        private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
-        private static readonly IBsonSerializer<MongoContentEntity> Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly DomainId appId = DomainId.NewGuid();
         private readonly Schema schemaDef;
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
@@ -230,13 +228,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
         private void AssertQuery(ClrQuery query, string expected, object? arg = null)
         {
+            var filter = query.AdjustToModel(appId).BuildFilter<MongoContentEntity>(false).Filter!;
+
             var rendered =
-                query.AdjustToModel(appId).BuildFilter<MongoContentEntity>().Filter!
-                    .Render(Serializer, Registry).ToString();
+                filter.Render(
+                    BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
+                    BsonSerializer.SerializerRegistry)
+                .ToString();
 
-            var expectation = Cleanup(expected, arg);
-
-            Assert.Equal(expectation, rendered);
+            Assert.Equal(Cleanup(expected, arg), rendered);
         }
 
         private void AssertSorting(string expected, params SortNode[] sort)
@@ -248,14 +248,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>._))
                 .Invokes((SortDefinition<MongoContentEntity> sortDefinition) =>
                 {
-                    rendered = sortDefinition.Render(Serializer, Registry).ToString();
+                    rendered =
+                       sortDefinition.Render(
+                           BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
+                           BsonSerializer.SerializerRegistry)
+                       .ToString();
                 });
 
             cursor.QuerySort(new ClrQuery { Sort = sort.ToList() }.AdjustToModel(appId));
 
-            var expectation = Cleanup(expected);
-
-            Assert.Equal(expectation, rendered);
+            Assert.Equal(Cleanup(expected), rendered);
         }
 
         private static string Cleanup(string filter, object? arg = null)

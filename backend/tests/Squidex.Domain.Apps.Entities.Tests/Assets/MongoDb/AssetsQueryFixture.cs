@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.MongoDb;
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
     {
         private readonly Random random = new Random();
         private readonly int numValues = 250;
-        private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
+        private readonly IMongoClient mongoClient;
         private readonly IMongoDatabase mongoDatabase;
 
         public MongoAssetRepository AssetRepository { get; }
@@ -35,7 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public AssetsQueryFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
+            mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
+            mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
             SetupJson();
 

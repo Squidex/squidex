@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Email
@@ -16,18 +18,19 @@ namespace Squidex.Infrastructure.Email
         [Fact]
         public async Task Should_handle_timeout_properly()
         {
-            var sut = new SmtpEmailSender(Options.Create(new SmtpOptions
+            var options = TestConfig.Configuration.GetSection("email:smtp").Get<SmtpOptions>();
+
+            var recipient = TestConfig.Configuration["email:smtp:recipient"];
+
+            var testSubject = TestConfig.Configuration["email:smtp:testSubject"];
+            var testBody = TestConfig.Configuration["email:smtp:testBody"];
+
+            var sut = new SmtpEmailSender(Options.Create(options));
+
+            using (var cts = new CancellationTokenSource(5000))
             {
-                Sender = "sebastian@squidex.io",
-                Server = "invalid",
-                Timeout = 1000
-            }));
-
-            var timer = Task.Delay(5000);
-
-            var result = await Task.WhenAny(timer, sut.SendAsync("hello@squidex.io", "TEST", "TEST"));
-
-            Assert.NotSame(timer, result);
+                await sut.SendAsync(recipient, testSubject, testBody, cts.Token);
+            }
         }
     }
 }

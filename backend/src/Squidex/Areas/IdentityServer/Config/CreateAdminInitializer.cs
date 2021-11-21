@@ -39,7 +39,7 @@ namespace Squidex.Areas.IdentityServer.Config
 
             if (identityOptions.IsAdminConfigured())
             {
-                using (var scope = serviceProvider.CreateScope())
+                await using (var scope = serviceProvider.CreateAsyncScope())
                 {
                     var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 

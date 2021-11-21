@@ -154,4 +154,6 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605;IDE0060</NoWarn>
   </PropertyGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/bamboo-spec.json" /></VisualStudio></ProjectExtensions>
 </Project>

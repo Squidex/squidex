@@ -6,38 +6,29 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using Newtonsoft.Json;
-using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.MongoDb.FullText;
-using Squidex.Infrastructure.MongoDb;
 using Xunit;
+
+#pragma warning disable SA1300 // Element should begin with upper-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
-    public class TextIndexerTests_Mongo : TextIndexerTestsBase
+    public class MongoTextIndexTests : TextIndexerTestsBase, IClassFixture<MongoTextIndexFixture>
     {
         public override bool SupportsQuerySyntax => false;
 
         public override bool SupportsGeo => true;
 
-        static TextIndexerTests_Mongo()
-        {
-            BsonJsonConvention.Register(JsonSerializer.Create(TestUtils.CreateSerializerSettings()));
+        public MongoTextIndexFixture _ { get; }
 
-            DomainIdSerializer.Register();
+        public MongoTextIndexTests(MongoTextIndexFixture fixture)
+        {
+            _ = fixture;
         }
 
         public override ITextIndex CreateIndex()
         {
-            var mongoClient = new MongoClient("mongodb://localhost");
-            var mongoDatabase = mongoClient.GetDatabase("Squidex_Testing");
-
-            var index = new MongoTextIndex(mongoDatabase, false);
-
-            index.InitializeAsync(default).Wait();
-
-            return index;
+            return _.Index;
         }
 
         [Fact]

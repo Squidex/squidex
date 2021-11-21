@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-            settings = EventStoreClientSettings.Create("esdb://admin:changeit@127.0.0.1:2113?tls=false");
+            settings = EventStoreClientSettings.Create(TestConfig.Configuration["eventStore:configuration"]);
 
             EventStore = new GetEventStore(settings, TestUtils.DefaultSerializer);
             EventStore.InitializeAsync(default).Wait();

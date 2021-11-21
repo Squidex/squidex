@@ -5,21 +5,31 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Extensions.Text.Azure;
 using Xunit;
+
+#pragma warning disable SA1300 // Element should begin with upper-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     [Trait("Category", "Dependencies")]
-    public class TextIndexerTests_Azure : TextIndexerTestsBase
+    public class AtlasTextIndexTests : TextIndexerTestsBase, IClassFixture<AtlasTextIndexFixture>
     {
+        public override bool SupportsQuerySyntax => true;
+
+        public override bool SupportsGeo => true;
+
+        public override int WaitAfterUpdate => 2000;
+
+        public AtlasTextIndexFixture _ { get; }
+
+        public AtlasTextIndexTests(AtlasTextIndexFixture fixture)
+        {
+            _ = fixture;
+        }
+
         public override ITextIndex CreateIndex()
         {
-            var index = new AzureTextIndex("https://squidex.search.windows.net", "API_KEY", "test", 2000);
-
-            index.InitializeAsync(default).Wait();
-
-            return index;
+            return _.Index;
         }
 
         [Fact]

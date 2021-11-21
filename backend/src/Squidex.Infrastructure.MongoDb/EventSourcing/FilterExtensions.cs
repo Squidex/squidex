@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return null;
             }
 
-            if (streamFilter.Contains("^", StringComparison.Ordinal))
+            if (streamFilter.Contains('^', StringComparison.Ordinal))
             {
                 return Builders<MongoEventCommit>.Filter.Regex(x => x.EventStream, streamFilter);
             }
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return null;
             }
 
-            if (streamFilter.Contains("^", StringComparison.Ordinal))
+            if (streamFilter.Contains('^', StringComparison.Ordinal))
             {
                 return Builders<ChangeStreamDocument<MongoEventCommit>>.Filter.Regex(x => x.FullDocument.EventStream, streamFilter);
             }

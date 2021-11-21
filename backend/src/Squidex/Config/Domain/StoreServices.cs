@@ -21,10 +21,10 @@ using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Apps;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
-using Squidex.Domain.Apps.Entities.MongoDb.FullText;
 using Squidex.Domain.Apps.Entities.MongoDb.History;
 using Squidex.Domain.Apps.Entities.MongoDb.Rules;
 using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
+using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -132,9 +132,6 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoSchemasHash>()
                         .AsOptional<ISchemasHash>().As<IEventConsumer>().As<IDeleter>();
 
-                    services.AddSingletonAs<MongoTextIndex>()
-                        .AsOptional<ITextIndex>().As<IDeleter>();
-
                     services.AddSingletonAs<MongoTextIndexerState>()
                         .As<ITextIndexerState>().As<IDeleter>();
 
@@ -148,6 +145,21 @@ namespace Squidex.Config.Domain
                             builder.SetDefaultScopeEntity<ImmutableScope>();
                             builder.SetDefaultApplicationEntity<ImmutableApplication>();
                         });
+
+                    var atlasOptions = config.GetSection("store:mongoDb:atlas").Get<AtlasOptions>() ?? new ();
+
+                    if (atlasOptions.IsConfigured() && atlasOptions.FullTextEnabled)
+                    {
+                        services.Configure<AtlasOptions>(config.GetSection("store:mongoDb:atlas"));
+
+                        services.AddSingletonAs<AtlasTextIndex>()
+                            .AsOptional<ITextIndex>().As<IDeleter>();
+                    }
+                    else
+                    {
+                        services.AddSingletonAs<MongoTextIndex>()
+                            .AsOptional<ITextIndex>().As<IDeleter>();
+                    }
                 }
             });
 

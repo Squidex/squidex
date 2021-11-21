@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure
 
             var result = typeConverter.ConvertFrom(guid);
 
-            Assert.Equal(guid.ToString(), result.ToString());
+            Assert.Equal(guid.ToString(), result?.ToString());
         }
 
         [Fact]

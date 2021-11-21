@@ -7,6 +7,7 @@
 
 using System.Text;
 using Azure.Search.Documents.Models;
+using GeoJSON.Net.Geometry;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.Extensions.Text.Azure
@@ -18,57 +19,92 @@ namespace Squidex.Extensions.Text.Azure
             switch (command)
             {
                 case UpsertIndexEntry upsert:
-                    batch.Add(UpsertEntry(upsert));
+                    UpsertTextEntry(upsert, batch);
                     break;
                 case UpdateIndexEntry update:
-                    batch.Add(UpdateEntry(update));
+                    UpdateEntry(update, batch);
                     break;
                 case DeleteIndexEntry delete:
-                    batch.Add(DeleteEntry(delete));
+                    DeleteEntry(delete, batch);
                     break;
             }
         }
 
-        private static IndexDocumentsAction<SearchDocument> UpsertEntry(UpsertIndexEntry upsert)
+        private static void UpsertTextEntry(UpsertIndexEntry upsert, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
-            var searchDocument = new SearchDocument
-            {
-                ["docId"] = upsert.DocId.ToBase64(),
-                ["appId"] = upsert.AppId.Id.ToString(),
-                ["appName"] = upsert.AppId.Name,
-                ["contentId"] = upsert.ContentId.ToString(),
-                ["schemaId"] = upsert.SchemaId.Id.ToString(),
-                ["schemaName"] = upsert.SchemaId.Name,
-                ["serveAll"] = upsert.ServeAll,
-                ["servePublished"] = upsert.ServePublished
-            };
+            var geoField = string.Empty;
+            var geoObject = (object)null;
 
-            if (upsert.Texts != null)
+            if (upsert.GeoObjects != null)
             {
-                foreach (var (key, value) in upsert.Texts)
+                foreach (var (key, value) in upsert.GeoObjects)
                 {
-                    searchDocument[AzureIndexDefinition.GetTextField(key)] = value;
+                    if (value is Point point)
+                    {
+                        geoField = key;
+                        geoObject = new
+                        {
+                            type = "Point",
+                            coordinates = new[]
+                            {
+                                point.Coordinates.Longitude,
+                                point.Coordinates.Latitude
+                            }
+                        };
+                        break;
+                    }
                 }
             }
 
-            return IndexDocumentsAction.MergeOrUpload(searchDocument);
+            if (upsert.Texts != null || geoObject != null)
+            {
+                var document = new SearchDocument
+                {
+                    ["docId"] = upsert.DocId.ToBase64(),
+                    ["appId"] = upsert.AppId.Id.ToString(),
+                    ["appName"] = upsert.AppId.Name,
+                    ["contentId"] = upsert.ContentId.ToString(),
+                    ["schemaId"] = upsert.SchemaId.Id.ToString(),
+                    ["schemaName"] = upsert.SchemaId.Name,
+                    ["serveAll"] = upsert.ServeAll,
+                    ["servePublished"] = upsert.ServePublished,
+                    ["geoField"] = geoField,
+                    ["geoObject"] = geoObject
+                };
+
+                foreach (var (key, value) in upsert.Texts)
+                {
+                    var text = value;
+
+                    var languageCode = AzureIndexDefinition.GetFieldName(key);
+
+                    if (document.TryGetValue(languageCode, out var existing))
+                    {
+                        text = $"{existing} {value}";
+                    }
+
+                    document[languageCode] = text;
+                }
+
+                batch.Add(IndexDocumentsAction.MergeOrUpload(document));
+            }
         }
 
-        private static IndexDocumentsAction<SearchDocument> UpdateEntry(UpdateIndexEntry update)
+        private static void UpdateEntry(UpdateIndexEntry update, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
-            var searchDocument = new SearchDocument
+            var document = new SearchDocument
             {
                 ["docId"] = update.DocId.ToBase64(),
                 ["serveAll"] = update.ServeAll,
                 ["servePublished"] = update.ServePublished,
             };
 
-            return IndexDocumentsAction.MergeOrUpload(searchDocument);
+            batch.Add(IndexDocumentsAction.MergeOrUpload(document));
         }
 
-        private static IndexDocumentsAction<SearchDocument> DeleteEntry(DeleteIndexEntry delete)
+        private static void DeleteEntry(DeleteIndexEntry delete, IList<IndexDocumentsAction<SearchDocument>> batch)
         {
-            return IndexDocumentsAction.Delete("docId", delete.DocId.ToBase64());
+            batch.Add(IndexDocumentsAction.Delete("docId", delete.DocId.ToBase64()));
         }
 
         private static string ToBase64(this string value)
