@@ -28,17 +28,13 @@ namespace Squidex.Infrastructure.Migrations
         public async Task MigrateAsync(
             CancellationToken ct = default)
         {
+            if (!await TryLockAsync(ct))
+            {
+                return;
+            }
+
             try
             {
-                while (!await migrationStatus.TryLockAsync(ct))
-                {
-                    log.LogInformation(w => w
-                        .WriteProperty("action", "Migrate")
-                        .WriteProperty("mesage", $"Waiting {LockWaitMs}ms to acquire lock."));
-
-                    await Task.Delay(LockWaitMs, ct);
-                }
-
                 var version = await migrationStatus.GetVersionAsync(ct);
 
                 while (!ct.IsCancellationRequested)
@@ -87,12 +83,35 @@ namespace Squidex.Infrastructure.Migrations
             }
             finally
             {
-#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
-#pragma warning disable MA0040 // Flow the cancellation token
-                await migrationStatus.UnlockAsync();
-#pragma warning restore MA0040 // Flow the cancellation token
-#pragma warning restore CA2016 // Forward the 'CancellationToken' parameter to methods that take one
+                await UnlockAsync();
             }
+        }
+
+        private async Task<bool> TryLockAsync(
+            CancellationToken ct)
+        {
+            try
+            {
+                while (!await migrationStatus.TryLockAsync(ct))
+                {
+                    log.LogInformation(w => w
+                        .WriteProperty("action", "Migrate")
+                        .WriteProperty("mesage", $"Waiting {LockWaitMs}ms to acquire lock."));
+
+                    await Task.Delay(LockWaitMs, ct);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private Task UnlockAsync()
+        {
+            return migrationStatus.UnlockAsync();
         }
     }
 }

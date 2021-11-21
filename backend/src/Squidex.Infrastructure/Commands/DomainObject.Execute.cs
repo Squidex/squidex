@@ -158,7 +158,7 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(command, nameof(command));
 
-            if (Version != EtagVersion.Empty && !(IsDeleted() && CanRecreate()))
+            if (Version != EtagVersion.Empty && !(IsDeleted(Snapshot) && CanRecreate()))
             {
                 throw new DomainObjectConflictException(uniqueId.ToString());
             }
@@ -186,7 +186,7 @@ namespace Squidex.Infrastructure.Commands
 
             await EnsureLoadedAsync();
 
-            if (IsDeleted() && !CanRecreate())
+            if (IsDeleted(Snapshot) && !CanRecreate())
             {
                 throw new DomainObjectDeletedException(uniqueId.ToString());
             }
@@ -217,7 +217,7 @@ namespace Squidex.Infrastructure.Commands
 
         private void NotDeleted()
         {
-            if (IsDeleted())
+            if (IsDeleted(Snapshot))
             {
                 throw new DomainObjectDeletedException(uniqueId.ToString());
             }

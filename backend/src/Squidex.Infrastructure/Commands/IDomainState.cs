@@ -13,6 +13,8 @@ namespace Squidex.Infrastructure.Commands
     {
         long Version { get; set; }
 
+        T Copy();
+
         T Apply(Envelope<IEvent> @event);
     }
 }

@@ -95,9 +95,46 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
+        public async Task Should_recreate_when_loading()
+        {
+            sut.RecreateEvent = true;
+
+            SetupCreated(
+                new ValueChanged { Value = 2 },
+                new ValueChanged { Value = 3 },
+                new Deleted(),
+                new ValueChanged { Value = 4 });
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(3, sut.Version);
+            Assert.Equal(3, sut.Snapshot.Version);
+
+            AssertSnapshot(sut.Snapshot, 4, 3);
+        }
+
+        [Fact]
+        public async Task Should_ignore_events_after_deleting_when_loading()
+        {
+            SetupCreated(
+                new ValueChanged { Value = 2 },
+                new ValueChanged { Value = 3 },
+                new Deleted(),
+                new ValueChanged { Value = 4 });
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(2, sut.Version);
+            Assert.Equal(2, sut.Snapshot.Version);
+
+            AssertSnapshot(sut.Snapshot, 3, 2, true);
+        }
+
+        [Fact]
         public async Task Should_recreate_with_create_command_if_deleted_before()
         {
             sut.Recreate = true;
+            sut.RecreateEvent = true;
 
             SetupCreated(2);
             SetupDeleted();
@@ -138,6 +175,7 @@ namespace Squidex.Infrastructure.Commands
         public async Task Should_recreate_with_upsert_command_if_deleted_before()
         {
             sut.Recreate = true;
+            sut.RecreateEvent = true;
 
             SetupCreated(2);
             SetupDeleted();

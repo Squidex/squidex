@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
@@ -46,6 +47,11 @@ namespace Squidex.Config.Orleans
             {
                 parts.AddApplicationPart(SquidexEntities.Assembly);
                 parts.AddApplicationPart(SquidexInfrastructure.Assembly);
+            });
+
+            builder.Configure<SchedulingOptions>(options =>
+            {
+                options.TurnWarningLengthThreshold = TimeSpan.FromSeconds(5);
             });
 
             builder.Configure<ClusterOptions>(options =>

@@ -69,17 +69,12 @@ namespace Squidex.Infrastructure.Commands
                 {
                     var newVersion = snapshot.Version + 1;
 
-                    if (!snapshots.Contains(newVersion))
+                    if (snapshots.Contains(newVersion))
                     {
-                        snapshot = Apply(snapshot, @event);
-                        snapshot.Version = newVersion;
-
-                        snapshots.Add(snapshot, newVersion, false);
-
-                        return true;
+                        return false;
                     }
 
-                    return false;
+                    return ApplyEvent(@event, true, snapshot, snapshot.Version, false);
                 });
 
                 await allEvents.ReadAsync();
@@ -109,7 +104,7 @@ namespace Squidex.Infrastructure.Commands
                         @event = new Envelope<IEvent>(payload, @event.Headers);
                     }
 
-                    return ApplyEvent(@event, true);
+                    return ApplyEvent(@event, true, Snapshot, Version, true);
                 });
         }
 
@@ -151,7 +146,7 @@ namespace Squidex.Infrastructure.Commands
 
             @event.SetAggregateId(uniqueId);
 
-            if (ApplyEvent(@event, false))
+            if (ApplyEvent(@event, false, Snapshot, Version, true))
             {
                 uncomittedEvents.Add(@event);
             }
@@ -214,7 +209,7 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(handler, nameof(handler));
 
-            var wasDeleted = IsDeleted();
+            var wasDeleted = IsDeleted(Snapshot);
 
             var previousSnapshot = Snapshot;
             var previousVersion = Version;
@@ -240,7 +235,7 @@ namespace Squidex.Infrastructure.Commands
 
                             foreach (var @event in uncomittedEvents)
                             {
-                                ApplyEvent(@event, false);
+                                ApplyEvent(@event, false, Snapshot, Version, true);
                             }
 
                             await WriteAsync(events);
@@ -284,7 +279,7 @@ namespace Squidex.Infrastructure.Commands
             return true;
         }
 
-        protected virtual bool IsDeleted()
+        protected virtual bool IsDeleted(T snapshot)
         {
             return false;
         }
@@ -294,36 +289,49 @@ namespace Squidex.Infrastructure.Commands
             return false;
         }
 
+        protected virtual bool CanRecreate(IEvent @event)
+        {
+            return false;
+        }
+
         private void RestorePreviousSnapshot(T previousSnapshot, long previousVersion)
         {
             snapshots.ResetTo(previousSnapshot, previousVersion);
         }
 
-        private bool ApplyEvent(Envelope<IEvent> @event, bool isLoading)
+        private bool ApplyEvent(Envelope<IEvent> @event, bool isLoading, T snapshot, long version, bool clean)
         {
-            var newVersion = Version + 1;
-
-            var snapshotOld = Snapshot;
-
-            if (IsDeleted())
+            if (IsDeleted(snapshot))
             {
-                snapshotOld = new T
+                if (!CanRecreate(@event.Payload))
+                {
+                    return false;
+                }
+
+                snapshot = new T
                 {
                     Version = Version
                 };
             }
 
-            var snapshotNew = Apply(snapshotOld, @event);
+            var newVersion = version + 1;
+            var newSnapshot = Apply(snapshot, @event);
 
-            if (!ReferenceEquals(snapshotOld, snapshotNew) || isLoading)
+            if (ReferenceEquals(snapshot, newSnapshot) && isLoading)
             {
-                snapshotNew.Version = newVersion;
-                snapshots.Add(snapshotNew, newVersion, true);
-
-                return true;
+                newSnapshot = snapshot.Copy();
             }
 
-            return false;
+            var isChanged = !ReferenceEquals(snapshot, newSnapshot);
+
+            if (!ReferenceEquals(newSnapshot, snapshot))
+            {
+                newSnapshot.Version = newVersion;
+
+                snapshots.Add(newSnapshot, newVersion, clean);
+            }
+
+            return isChanged;
         }
 
         private async Task ReadAsync()
