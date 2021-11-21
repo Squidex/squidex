@@ -8,9 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -21,25 +23,25 @@ namespace Squidex.Extensions.Text.ElasticSearch
 {
     public sealed class ElasticSearchTextIndex : ITextIndex, IInitializable
     {
+        private static readonly Regex LanguageRegex = new Regex(@"[^\w]+([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private static readonly Regex LanguageRegexStart = new Regex(@"$^([a-z\-_]{2,}):", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private readonly ElasticLowLevelClient client;
+        private readonly QueryParser queryParser = new QueryParser(ElasticSearchIndexDefinition.GetFieldPath);
         private readonly string indexName;
-        private readonly int waitAfterUpdate;
 
-        public ElasticSearchTextIndex(string configurationString, string indexName, int waitAfterUpdate = 0)
+        public ElasticSearchTextIndex(string configurationString, string indexName)
         {
             var config = new ConnectionConfiguration(new Uri(configurationString));
 
             client = new ElasticLowLevelClient(config);
 
             this.indexName = indexName;
-
-            this.waitAfterUpdate = waitAfterUpdate;
         }
 
         public Task InitializeAsync(
             CancellationToken ct)
         {
-            return ElasticSearchMapping.ApplyAsync(client, indexName, ct);
+            return ElasticSearchIndexDefinition.ApplyAsync(client, indexName, ct);
         }
 
         public Task ClearAsync(
@@ -69,17 +71,68 @@ namespace Squidex.Extensions.Text.ElasticSearch
             {
                 throw new InvalidOperationException($"Failed with ${result.Body}", result.OriginalException);
             }
-
-            if (waitAfterUpdate > 0)
-            {
-                await Task.Delay(waitAfterUpdate, ct);
-            }
         }
 
-        public Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+        public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            return Task.FromResult<List<DomainId>>(null);
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
+
+            var serveField = GetServeField(scope);
+
+            var elasticQuery = new
+            {
+                query = new
+                {
+                    @bool = new
+                    {
+                        filter = new object[]
+                        {
+                            new
+                            {
+                                term = new Dictionary<string, object>
+                                {
+                                    ["schemaId.keyword"] = query.SchemaId.ToString()
+                                }
+                            },
+                            new
+                            {
+                                term = new Dictionary<string, string>
+                                {
+                                    ["geoField.keyword"] = query.Field
+                                }
+                            },
+                            new
+                            {
+                                term = new Dictionary<string, string>
+                                {
+                                    [serveField] = "true"
+                                }
+                            },
+                            new
+                            {
+                                geo_distance = new
+                                {
+                                    geoObject = new
+                                    {
+                                        lat = query.Latitude,
+                                        lon = query.Longitude
+                                    },
+                                    distance = $"{query.Radius}m"
+                                }
+                            }
+                        },
+                    }
+                },
+                _source = new[]
+                {
+                    "contentId"
+                },
+                size = query.Take
+            };
+
+            return await SearchAsync(elasticQuery, ct);
         }
 
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
@@ -88,32 +141,11 @@ namespace Squidex.Extensions.Text.ElasticSearch
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            var queryText = query.Text;
+            var parsed = queryParser.Parse(query.Text);
 
-            if (string.IsNullOrWhiteSpace(queryText))
+            if (parsed == null)
             {
                 return null;
-            }
-
-            var isFuzzy = queryText.EndsWith("~", StringComparison.OrdinalIgnoreCase);
-
-            if (isFuzzy)
-            {
-                queryText = queryText[..^1];
-            }
-
-            var field = "texts.*";
-
-            if (queryText.Length >= 4 && queryText.IndexOf(":", StringComparison.OrdinalIgnoreCase) == 2)
-            {
-                var candidateLanguage = queryText.Substring(0, 2);
-
-                if (Language.IsValidLanguage(candidateLanguage))
-                {
-                    field = $"texts.{candidateLanguage}";
-
-                    queryText = queryText[3..];
-                }
             }
 
             var serveField = GetServeField(scope);
@@ -124,7 +156,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 {
                     @bool = new
                     {
-                        must = new List<object>
+                        filter = new List<object>
                         {
                             new
                             {
@@ -139,18 +171,13 @@ namespace Squidex.Extensions.Text.ElasticSearch
                                 {
                                     [serveField] = "true"
                                 }
-                            },
-                            new
+                            }
+                        },
+                        must = new
+                        {
+                            query_string = new
                             {
-                                multi_match = new
-                                {
-                                    fuzziness = isFuzzy ? (object)"AUTO" : 0,
-                                    fields = new[]
-                                    {
-                                        field
-                                    },
-                                    query = query.Text
-                                }
+                                query = parsed.Text
                             }
                         },
                         should = new List<object>()
@@ -160,7 +187,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 {
                     "contentId"
                 },
-                size = 2000
+                size = query.Take
             };
 
             if (query.RequiredSchemaIds?.Count > 0)
@@ -173,7 +200,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                     }
                 };
 
-                elasticQuery.query.@bool.must.Add(bySchema);
+                elasticQuery.query.@bool.filter.Add(bySchema);
             }
             else if (query.PreferredSchemaId.HasValue)
             {
@@ -188,7 +215,15 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 elasticQuery.query.@bool.should.Add(bySchema);
             }
 
-            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(elasticQuery), ctx: ct);
+            var json = JsonConvert.SerializeObject(elasticQuery, Formatting.Indented);
+
+            return await SearchAsync(elasticQuery, ct);
+        }
+
+        private async Task<List<DomainId>> SearchAsync(object query,
+            CancellationToken ct)
+        {
+            var result = await client.SearchAsync<DynamicResponse>(indexName, CreatePost(query), ctx: ct);
 
             if (!result.Success)
             {

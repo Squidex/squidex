@@ -13,27 +13,17 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 {
-    public delegate (EdmComplexType Type, bool Created) EdmTypeFactory(string names);
+    public delegate (EdmComplexType Type, bool Created) EdmTypeFactory(string name);
 
     public static class EdmSchemaExtensions
     {
-        public static string EscapeEdmField(this string field)
-        {
-            return field.Replace("-", "_", StringComparison.Ordinal);
-        }
-
-        public static string UnescapeEdmField(this string field)
-        {
-            return field.Replace("_", "-", StringComparison.Ordinal);
-        }
-
-        public static EdmComplexType BuildEdmType(this Schema schema, bool withHidden, PartitionResolver partitionResolver, EdmTypeFactory typeFactory,
+        public static EdmComplexType BuildEdmType(this Schema schema, bool withHidden, PartitionResolver partitionResolver, EdmTypeFactory factory,
             ResolvedComponents components)
         {
-            Guard.NotNull(typeFactory, nameof(typeFactory));
+            Guard.NotNull(factory, nameof(factory));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
 
-            var (edmType, _) = typeFactory("Data");
+            var (edmType, _) = factory("Data");
 
             foreach (var field in schema.FieldsByName.Values)
             {
@@ -42,14 +32,14 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
                     continue;
                 }
 
-                var fieldEdmType = EdmTypeVisitor.BuildType(field, typeFactory, components);
+                var fieldEdmType = EdmTypeVisitor.BuildType(field, factory, components);
 
                 if (fieldEdmType == null)
                 {
                     continue;
                 }
 
-                var (partitionType, created) = typeFactory($"Data.{field.Name.ToPascalCase()}");
+                var (partitionType, created) = factory($"Data.{field.Name.ToPascalCase()}");
 
                 if (created)
                 {
@@ -65,6 +55,16 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             }
 
             return edmType;
+        }
+
+        public static string EscapeEdmField(this string field)
+        {
+            return field.Replace("-", "_", StringComparison.Ordinal);
+        }
+
+        public static string UnescapeEdmField(this string field)
+        {
+            return field.Replace("_", "-", StringComparison.Ordinal);
         }
     }
 }

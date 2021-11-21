@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,11 +33,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly IAppEntity app;
-        private readonly TextIndexingProcess sut;
+        private readonly Lazy<TextIndexingProcess> sut;
+
+        protected TextIndexingProcess Sut
+        {
+            get { return sut.Value; }
+        }
 
         public virtual bool SupportsQuerySyntax => true;
 
         public virtual bool SupportsGeo => false;
+
+        public virtual int WaitAfterUpdate => 0;
 
         protected TextIndexerTestsBase()
         {
@@ -45,58 +53,65 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     Language.DE,
                     Language.EN);
 
-#pragma warning disable MA0056 // Do not call overridable members in constructor
-            sut = new TextIndexingProcess(TestUtils.DefaultSerializer, CreateIndex(), new InMemoryTextIndexerState());
-#pragma warning restore MA0056 // Do not call overridable members in constructor
+            sut = new Lazy<TextIndexingProcess>(CreateSut);
+        }
+
+        private TextIndexingProcess CreateSut()
+        {
+            var index = CreateIndex();
+
+            return new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState());
         }
 
         public abstract ITextIndex CreateIndex();
 
-        [SkippableFact]
-        public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
+        [Fact]
+        public async Task Should_search_with_fuzzy()
         {
-            Skip.IfNot(SupportsQuerySyntax);
+            if (!SupportsQuerySyntax)
+            {
+                return;
+            }
 
             await CreateTextAsync(ids1[0], "iv", "Hello");
 
             await SearchText(expected: ids1, text: "helo~");
         }
 
-        [SkippableFact]
-        public async Task Should_index_invariant_content_and_retrieve_with_fuzzy_with_full_scope()
-        {
-            Skip.IfNot(SupportsQuerySyntax);
-
-            await CreateTextAsync(ids2[0], "iv", "World");
-
-            await SearchText(expected: ids2, text: "wold~", SearchScope.All);
-        }
-
-        [SkippableFact]
+        [Fact]
         public async Task Should_search_by_field()
         {
-            Skip.IfNot(SupportsQuerySyntax);
+            if (!SupportsQuerySyntax)
+            {
+                return;
+            }
 
             await CreateTextAsync(ids1[0], "en", "City");
 
             await SearchText(expected: ids1, text: "en:city");
         }
 
-        [SkippableFact]
+        [Fact]
         public async Task Should_search_by_geo()
         {
-            Skip.IfNot(SupportsGeo);
+            if (!SupportsGeo)
+            {
+                return;
+            }
 
-            // Within radius
-            await CreateGeoAsync(ids1[0], "geo", 51.343391192211506, 12.401476788622826);
+            var field = Guid.NewGuid().ToString();
 
-            // Not in radius
-            await CreateGeoAsync(ids2[0], "geo", 51.30765141427311, 12.379631713912486);
+            // Within search radius
+            await CreateGeoAsync(ids1[0], field, 51.343391192211506, 12.401476788622826);
 
-            await SearchGeo(expected: ids1, "geo.iv", 51.34641682574934, 12.401965298137707);
+            // Outside of search radius
+            await CreateGeoAsync(ids2[0], field, 51.30765141427311, 12.379631713912486);
 
-            // Wrong field
-            await SearchGeo(expected: null, "abc.iv", 51.48596429889613, 12.102629469505713);
+            // Within search radius and correct field.
+            await SearchGeo(expected: ids1, $"{field}.iv", 51.34641682574934, 12.401965298137707);
+
+            // Within search radius but incorrect field.
+            await SearchGeo(expected: null, "other.iv", 51.48596429889613, 12.102629469505713);
         }
 
         [Fact]
@@ -346,13 +361,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return UpdateAsync(id, new ContentDeleted());
         }
 
-        private Task UpdateAsync(DomainId id, ContentEvent contentEvent)
+        private async Task UpdateAsync(DomainId id, ContentEvent contentEvent)
         {
             contentEvent.ContentId = id;
             contentEvent.AppId = appId;
             contentEvent.SchemaId = schemaId;
 
-            return sut.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
+            await Sut.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
+
+            await Task.Delay(WaitAfterUpdate);
         }
 
         private static ContentData TextData(string language, string text)
@@ -375,7 +392,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var query = new GeoQuery(schemaId.Id, field, latitude, longitude, 1000, 1000);
 
-            var result = await sut.TextIndex.SearchAsync(app, query, target);
+            var result = await Sut.TextIndex.SearchAsync(app, query, target);
 
             if (expected != null)
             {
@@ -394,7 +411,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 RequiredSchemaIds = new List<DomainId> { schemaId.Id }
             };
 
-            var result = await sut.TextIndex.SearchAsync(app, query, target);
+            var result = await Sut.TextIndex.SearchAsync(app, query, target);
 
             if (expected != null)
             {

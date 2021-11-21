@@ -7,7 +7,7 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
     public sealed class MongoTextIndexEntityText
     {

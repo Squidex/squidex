@@ -26,26 +26,23 @@ namespace Squidex.Domain.Apps.Entities
 
             async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
             {
-                if (schemaIds != null)
+                foreach (var schemaId in schemaIds)
                 {
-                    foreach (var schemaId in schemaIds)
+                    if (schemaId == schema.Id)
                     {
-                        if (schemaId == schema.Id)
+                        result ??= new Dictionary<DomainId, Schema>();
+                        result[schemaId] = schema.SchemaDef;
+                    }
+                    else if (result == null || !result.TryGetValue(schemaId, out _))
+                    {
+                        var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
+
+                        if (resolvedEntity != null)
                         {
                             result ??= new Dictionary<DomainId, Schema>();
-                            result[schemaId] = schema.SchemaDef;
-                        }
-                        else if (result == null || !result.TryGetValue(schemaId, out _))
-                        {
-                            var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
+                            result[schemaId] = resolvedEntity.SchemaDef;
 
-                            if (resolvedEntity != null)
-                            {
-                                result ??= new Dictionary<DomainId, Schema>();
-                                result[schemaId] = resolvedEntity.SchemaDef;
-
-                                await ResolveSchemaAsync(resolvedEntity);
-                            }
+                            await ResolveSchemaAsync(resolvedEntity);
                         }
                     }
                 }

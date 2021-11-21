@@ -14,7 +14,7 @@
                     </button>
     
                     <ng-container *sqxModal="dropdown;closeAlways:true">
-                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>  
+                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>  
                             <ng-container *ngIf="canUpdate">
                                 <a class="dropdown-item" (click)="editDialog.show()">
                                     {{ 'common.rename' | sqxTranslate }}

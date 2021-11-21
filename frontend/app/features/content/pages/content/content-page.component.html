@@ -65,7 +65,7 @@
                         </button>
 
                         <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>
                                 <a class="dropdown-item dropdown-item-delete"
                                     (sqxConfirmClick)="delete()"
                                     confirmTitle="i18n:contents.deleteConfirmTitle"
@@ -157,15 +157,15 @@
 
         <ng-container sidebarMenu>
             <div class="panel-nav">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.workflow" titlePosition="left" #linkHistory>
+                <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.workflow" titlePosition="left-center" #linkHistory>
                     <i class="icon-time"></i>
                 </a>
 
-                <a class="panel-link" routerLink="comments" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.comments" titlePosition="left">
+                <a class="panel-link" routerLink="comments" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.comments" titlePosition="left-center">
                     <i class="icon-comments"></i>
                 </a>
                 
-                <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left" *ngIf="schema.properties.contentSidebarUrl">
+                <a class="panel-link" routerLink="sidebar" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.sidebar" titlePosition="left-center" *ngIf="schema.properties.contentSidebarUrl">
                     <i class="icon-plugin"></i>
                 </a>
 

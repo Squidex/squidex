@@ -7,6 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { DialogModel, fadeAnimation, OnboardingService, StatefulComponent, Types } from '@app/framework/internal';
+import { RelativePosition } from '@app/shared';
 import { timer } from 'rxjs';
 
 @Component({
@@ -29,7 +30,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
     public after = 1000;
 
     @Input()
-    public position = 'left';
+    public position: RelativePosition = 'left-center';
 
     public tooltipModal = new DialogModel();
 

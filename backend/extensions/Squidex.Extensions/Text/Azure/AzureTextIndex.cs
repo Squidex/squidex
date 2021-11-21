@@ -26,19 +26,16 @@ namespace Squidex.Extensions.Text.Azure
     {
         private readonly SearchIndexClient indexClient;
         private readonly SearchClient searchClient;
-        private readonly int waitAfterUpdate;
+        private readonly QueryParser queryParser = new QueryParser(AzureIndexDefinition.GetFieldName);
 
         public AzureTextIndex(
             string serviceEndpoint,
             string serviceApiKey,
-            string indexName,
-            int waitAfterUpdate = 0)
+            string indexName)
         {
             indexClient = new SearchIndexClient(new Uri(serviceEndpoint), new AzureKeyCredential(serviceApiKey));
 
             searchClient = indexClient.GetSearchClient(indexName);
-
-            this.waitAfterUpdate = waitAfterUpdate;
         }
 
         public async Task InitializeAsync(
@@ -76,20 +73,19 @@ namespace Squidex.Extensions.Text.Azure
             }
 
             await searchClient.IndexDocumentsAsync(batch, cancellationToken: ct);
-
-            if (waitAfterUpdate > 0)
-            {
-                await Task.Delay(waitAfterUpdate, ct);
-            }
         }
 
-        public Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+        public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            return Task.FromResult<List<DomainId>>(null);
+            var result = new List<(DomainId Id, double Score)>();
+
+            await SearchAsync(result, "*", BuildGeoQuery(query, scope), query.Take, 1, ct);
+
+            return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
         }
 
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
@@ -98,57 +94,57 @@ namespace Squidex.Extensions.Text.Azure
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(query, nameof(query));
 
-            if (string.IsNullOrWhiteSpace(query.Text))
+            var parsed = queryParser.Parse(query.Text);
+
+            if (parsed == null)
             {
                 return null;
             }
 
-            List<(DomainId, double)> documents;
+            var result = new List<(DomainId Id, double Score)>();
 
             if (query.RequiredSchemaIds?.Count > 0)
             {
-                documents = await SearchBySchemaAsync(query.Text, query.RequiredSchemaIds, scope, query.Take, 1, ct);
+                await SearchBySchemaAsync(result, parsed.Text, query.RequiredSchemaIds, scope, query.Take, 1, ct);
             }
             else if (query.PreferredSchemaId == null)
             {
-                documents = await SearchByAppAsync(query.Text, app, scope, query.Take, 1, ct);
+                await SearchByAppAsync(result, parsed.Text, app, scope, query.Take, 1, ct);
             }
             else
             {
-                var halfBucket = query.Take / 2;
+                var halfTake = query.Take / 2;
 
                 var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
 
-                documents = await SearchBySchemaAsync(
-                    query.Text,
-                    schemaIds,
-                    scope,
-                    halfBucket, 1,
-                    ct);
-
-                documents.AddRange(await SearchByAppAsync(query.Text, app, scope, halfBucket, 1, ct));
+                await SearchBySchemaAsync(result, parsed.Text, schemaIds, scope, halfTake, 1.1, ct);
+                await SearchByAppAsync(result, parsed.Text, app, scope, halfTake, 1, ct);
             }
 
-            return documents.OrderByDescending(x => x.Item2).Select(x => x.Item1).Distinct().ToList();
+            return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
         }
 
-        private Task<List<(DomainId, double)>> SearchBySchemaAsync(string search, IEnumerable<DomainId> schemaIds, SearchScope scope, int limit, double factor,
+        private Task SearchBySchemaAsync(List<(DomainId, double)> result, string text, IEnumerable<DomainId> schemaIds, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
-            var filter = $"{string.Join(" or ", schemaIds.Select(x => $"schemaId eq '{x}'"))} and {GetServeField(scope)} eq true";
+            var searchField = GetServeField(scope);
 
-            return SearchAsync(search, filter, limit, factor, ct);
+            var filter = $"{string.Join(" or ", schemaIds.Select(x => $"schemaId eq '{x}'"))} and {searchField} eq true";
+
+            return SearchAsync(result, text, filter, take, factor, ct);
         }
 
-        private Task<List<(DomainId, double)>> SearchByAppAsync(string search, IAppEntity app, SearchScope scope, int limit, double factor,
+        private Task SearchByAppAsync(List<(DomainId, double)> result, string text, IAppEntity app, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
-            var filter = $"appId eq '{app.Id}' and {GetServeField(scope)} eq true";
+            var searchField = GetServeField(scope);
 
-            return SearchAsync(search, filter, limit, factor, ct);
+            var filter = $"appId eq '{app.Id}' and {searchField} eq true";
+
+            return SearchAsync(result, text, filter, take, factor, ct);
         }
 
-        private async Task<List<(DomainId, double)>> SearchAsync(string search, string filter, int size, double factor,
+        private async Task SearchAsync(List<(DomainId, double)> result, string text, string filter, int take, double factor,
             CancellationToken ct = default)
         {
             var searchOptions = new SearchOptions
@@ -157,22 +153,30 @@ namespace Squidex.Extensions.Text.Azure
             };
 
             searchOptions.Select.Add("contentId");
-            searchOptions.Size = size;
+            searchOptions.Size = take;
             searchOptions.QueryType = SearchQueryType.Full;
 
-            var results = await searchClient.SearchAsync<SearchDocument>(search, searchOptions, ct);
-
-            var ids = new List<(DomainId, double)>();
+            var results = await searchClient.SearchAsync<SearchDocument>(text, searchOptions, ct);
 
             await foreach (var item in results.Value.GetResultsAsync().WithCancellation(ct))
             {
                 if (item != null)
                 {
-                    ids.Add((DomainId.Create(item.Document["contentId"].ToString()), factor * item.Score ?? 0));
+                    var id = DomainId.Create(item.Document["contentId"].ToString());
+
+                    result.Add((id, factor * item.Score ?? 0));
                 }
             }
+        }
 
-            return ids;
+        private static string BuildGeoQuery(GeoQuery query, SearchScope scope)
+        {
+            var (schema, field, lat, lng, radius, _) = query;
+
+            var searchField = GetServeField(scope);
+            var searchDistance = radius / 1000;
+
+            return $"schemaId eq '{schema}' and geoField eq '{field}' and geo.distance(geoObject, geography'POINT({lng} {lat})') lt {searchDistance} and {searchField} eq true";
         }
 
         private static string GetServeField(SearchScope scope)

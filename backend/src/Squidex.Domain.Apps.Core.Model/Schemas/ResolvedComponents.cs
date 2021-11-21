@@ -24,9 +24,28 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
         }
 
-        public Schema? Get(DomainId schemaId)
+        public ResolvedComponents Resolve(IEnumerable<DomainId>? schemaIds)
         {
-            return this.GetOrDefault(schemaId);
+            var result = (Dictionary<DomainId, Schema>?)null;
+
+            if (schemaIds != null)
+            {
+                foreach (var schemaId in schemaIds)
+                {
+                    if (TryGetValue(schemaId, out var schema))
+                    {
+                        result ??= new Dictionary<DomainId, Schema>();
+                        result[schemaId] = schema;
+                    }
+                }
+            }
+
+            if (result == null)
+            {
+                return Empty;
+            }
+
+            return new ResolvedComponents(result);
         }
     }
 }

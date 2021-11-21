@@ -18,14 +18,15 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
+namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
-    public sealed class MongoTextIndex : MongoRepositoryBase<MongoTextIndexEntity>, ITextIndex, IDeleter
+    public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndexEntity<T>>, ITextIndex, IDeleter where T : class
     {
-        private readonly ProjectionDefinition<MongoTextIndexEntity> searchTextProjection;
-        private readonly ProjectionDefinition<MongoTextIndexEntity> searchGeoProjection;
+        private readonly ProjectionDefinition<MongoTextIndexEntity<T>> searchTextProjection;
+        private readonly ProjectionDefinition<MongoTextIndexEntity<T>> searchGeoProjection;
+        private readonly CommandFactory<T> commandFactory;
 
-        private sealed class MongoTextResult
+        protected sealed class MongoTextResult
         {
             [BsonId]
             [BsonElement]
@@ -42,30 +43,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             public double Score { get; set; }
         }
 
-        public MongoTextIndex(IMongoDatabase database, bool setup = false)
+        protected MongoTextIndexBase(IMongoDatabase database, bool setup = false)
             : base(database, setup)
         {
             searchGeoProjection = Projection.Include(x => x.ContentId);
             searchTextProjection = Projection.Include(x => x.ContentId).MetaTextScore("score");
+
+#pragma warning disable MA0056 // Do not call overridable members in constructor
+            commandFactory = new CommandFactory<T>(BuildTexts);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity> collection,
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
             CancellationToken ct)
         {
             return collection.Indexes.CreateManyAsync(new[]
             {
-                new CreateIndexModel<MongoTextIndexEntity>(
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
                     Index.Ascending(x => x.DocId)),
 
-                new CreateIndexModel<MongoTextIndexEntity>(
-                    Index
-                        .Text("t.t")
-                        .Ascending(x => x.AppId)
-                        .Ascending(x => x.ServeAll)
-                        .Ascending(x => x.ServePublished)
-                        .Ascending(x => x.SchemaId)),
-
-                new CreateIndexModel<MongoTextIndexEntity>(
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
                     Index
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.ServeAll)
@@ -81,20 +78,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return "TextIndex";
         }
 
+        protected abstract T BuildTexts(Dictionary<string, string> source);
+
         async Task IDeleter.DeleteAppAsync(IAppEntity app,
             CancellationToken ct)
         {
             await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
         }
 
-        public Task ExecuteAsync(IndexCommand[] commands,
+        public virtual Task ExecuteAsync(IndexCommand[] commands,
             CancellationToken ct = default)
         {
-            var writes = new List<WriteModel<MongoTextIndexEntity>>(commands.Length);
+            var writes = new List<WriteModel<MongoTextIndexEntity<T>>>(commands.Length);
 
             foreach (var command in commands)
             {
-                CommandFactory.CreateCommands(command, writes);
+                commandFactory.CreateCommands(command, writes);
             }
 
             if (writes.Count == 0)
@@ -105,9 +104,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return Collection.BulkWriteAsync(writes, BulkUnordered, ct);
         }
 
-        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
+        public virtual async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
+
             var findFilter =
                 Filter.And(
                     Filter.Eq(x => x.AppId, app.Id),
@@ -122,45 +124,43 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             return byGeo.Select(x => x.ContentId).ToList();
         }
 
-        public async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
+        public virtual async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(query.Text))
+            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(query, nameof(query));
+
+            var (search, take) = query;
+
+            if (string.IsNullOrWhiteSpace(search))
             {
                 return null;
             }
 
-            List<(DomainId, double)> documents;
+            var result = new List<(DomainId Id, double Score)>();
 
             if (query.RequiredSchemaIds?.Count > 0)
             {
-                documents = await SearchBySchemaAsync(query.Text, app, query.RequiredSchemaIds, scope, query.Take, 1, ct);
+                await SearchBySchemaAsync(result, search, app, query.RequiredSchemaIds, scope, take, 1, ct);
             }
             else if (query.PreferredSchemaId == null)
             {
-                documents = await SearchByAppAsync(query.Text, app, scope, query.Take, 1, ct);
+                await SearchByAppAsync(result, search, app, scope, take, 1, ct);
             }
             else
             {
-                var halfBucket = query.Take / 2;
+                var halfBucket = take / 2;
 
                 var schemaIds = Enumerable.Repeat(query.PreferredSchemaId.Value, 1);
 
-                documents = await SearchBySchemaAsync(
-                    query.Text,
-                    app,
-                    schemaIds,
-                    scope,
-                    halfBucket, 1,
-                    ct);
-
-                documents.AddRange(await SearchByAppAsync(query.Text, app, scope, halfBucket, 1, ct));
+                await SearchBySchemaAsync(result, search, app, schemaIds, scope, halfBucket, 1.1, ct);
+                await SearchByAppAsync(result, search, app, scope, halfBucket, 1, ct);
             }
 
-            return documents.OrderByDescending(x => x.Item2).Select(x => x.Item1).Distinct().ToList();
+            return result.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
         }
 
-        private Task<List<(DomainId, double)>> SearchBySchemaAsync(string text, IAppEntity app, IEnumerable<DomainId> schemaIds, SearchScope scope, int limit, double factor,
+        private Task SearchBySchemaAsync(List<(DomainId, double)> result, string text, IAppEntity app, IEnumerable<DomainId> schemaIds, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
             var filter =
@@ -170,10 +170,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Filter_ByScope(scope),
                     Filter.Text(text, "none"));
 
-            return SearchAsync(filter, scope, limit, factor, ct);
+            return SearchAsync(result, filter, scope, take, factor, ct);
         }
 
-        private Task<List<(DomainId, double)>> SearchByAppAsync(string text, IAppEntity app, SearchScope scope, int limit, double factor,
+        private Task SearchByAppAsync(List<(DomainId, double)> result, string text, IAppEntity app, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
             var filter =
@@ -183,24 +183,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
                     Filter_ByScope(scope),
                     Filter.Text(text, "none"));
 
-            return SearchAsync(filter, scope, limit, factor, ct);
+            return SearchAsync(result, filter, scope, take, factor, ct);
         }
 
-        private async Task<List<(DomainId, double)>> SearchAsync(FilterDefinition<MongoTextIndexEntity> filter, SearchScope scope, int limit, double factor,
+        private async Task SearchAsync(List<(DomainId, double)> result, FilterDefinition<MongoTextIndexEntity<T>> filter, SearchScope scope, int take, double factor,
             CancellationToken ct = default)
         {
             var collection = GetCollection(scope);
 
             var find =
-                collection.Find(filter).Limit(limit)
+                collection.Find(filter).Limit(take)
                     .Project<MongoTextResult>(searchTextProjection).Sort(Sort.MetaTextScore("score"));
 
             var documents = await find.ToListAsync(ct);
 
-            return documents.Select(x => (x.ContentId, x.Score * factor)).ToList();
+            result.AddRange(documents.Select(x => (x.ContentId, x.Score * factor)));
         }
 
-        private static FilterDefinition<MongoTextIndexEntity> Filter_ByScope(SearchScope scope)
+        private static FilterDefinition<MongoTextIndexEntity<T>> Filter_ByScope(SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.FullText
             }
         }
 
-        private IMongoCollection<MongoTextIndexEntity> GetCollection(SearchScope scope)
+        private IMongoCollection<MongoTextIndexEntity<T>> GetCollection(SearchScope scope)
         {
             if (scope == SearchScope.All)
             {
