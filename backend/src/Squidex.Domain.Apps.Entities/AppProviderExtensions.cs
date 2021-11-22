@@ -26,6 +26,11 @@ namespace Squidex.Domain.Apps.Entities
 
             async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
             {
+                if (schemaIds == null)
+                {
+                    return;
+                }
+
                 foreach (var schemaId in schemaIds)
                 {
                     if (schemaId == schema.Id)
