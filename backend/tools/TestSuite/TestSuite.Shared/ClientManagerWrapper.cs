@@ -43,19 +43,26 @@ namespace TestSuite
 
         public ClientManagerWrapper()
         {
-            var appName = TestHelpers.Configuration["app:name"] ?? "integration-tests";
-            var clientId = TestHelpers.Configuration["client:id"] ?? "root";
-            var clientSecret = TestHelpers.Configuration["client:secret"] ?? "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=";
-            var serviceURl = TestHelpers.Configuration["service:url"] ?? "https://localhost:5001";
+            static string Variable(string key, string fallback)
+            {
+                var result = TestHelpers.Configuration[key];
+
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    result = fallback;
+                }
+
+                return result;
+            }
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {
-                AppName = appName,
-                ClientId = clientId,
-                ClientSecret = clientSecret,
+                AppName = Variable("app:name", "integration-tests"),
+                ClientId = Variable("client:id", "root"),
+                ClientSecret = Variable("client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0="),
                 Configurator = AcceptAllCertificatesConfigurator.Instance,
                 ReadResponseAsString = true,
-                Url = serviceURl
+                Url = Variable("service:url", "https://localhost:5001")
             });
         }
 
