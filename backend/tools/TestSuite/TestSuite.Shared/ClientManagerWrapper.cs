@@ -43,26 +43,20 @@ namespace TestSuite
 
         public ClientManagerWrapper()
         {
-            static string Variable(string key, string fallback)
-            {
-                var result = TestHelpers.Configuration[key];
-
-                if (string.IsNullOrWhiteSpace(result))
-                {
-                    result = fallback;
-                }
-
-                return result;
-            }
+            var appName = GetValue("config:app:name", "integration-tests");
+            var clientId = GetValue("config:client:id", "root");
+            var clientSecret = GetValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
+            var serviceURl = GetValue("config:service:url", "https://localhost:5001");
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {
-                AppName = Variable("app:name", "integration-tests"),
-                ClientId = Variable("client:id", "root"),
-                ClientSecret = Variable("client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0="),
+                AppName = appName,
+                ClientId = clientId,
+                ClientSecret = clientSecret,
+                ClientFactory = null,
                 Configurator = AcceptAllCertificatesConfigurator.Instance,
                 ReadResponseAsString = true,
-                Url = Variable("service:url", "https://localhost:5001")
+                Url = serviceURl
             });
         }
 
@@ -112,6 +106,26 @@ namespace TestSuite
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine("Waiting for server is skipped.");
+            }
+        }
+
+        private static string GetValue(string name, string fallback)
+        {
+            var value = TestHelpers.Configuration[name];
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                value = fallback;
+            }
+            else
+            {
+                Console.WriteLine("Using: {0}={1}", name, value);
+            }
+
+            return value;
         }
     }
 }
