@@ -80,7 +80,7 @@ namespace TestSuite
 
         public async Task ConnectAsync()
         {
-            var waitSeconds = TestHelpers.Configuration.GetValue<int>("config:timeout");
+            var waitSeconds = TestHelpers.Configuration.GetValue<int>("config:wait");
 
             if (waitSeconds > 10)
             {
