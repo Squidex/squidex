@@ -46,7 +46,7 @@ namespace TestSuite
             var appName = GetValue("config:app:name", "integration-tests");
             var clientId = GetValue("config:client:id", "root");
             var clientSecret = GetValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-            var serviceURl = GetValue("config:service:url", "https://localhost:5001");
+            var serverUrl = GetValue("config:server:url", "https://localhost:5001");
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {
@@ -56,7 +56,7 @@ namespace TestSuite
                 ClientFactory = null,
                 Configurator = AcceptAllCertificatesConfigurator.Instance,
                 ReadResponseAsString = true,
-                Url = serviceURl
+                Url = serverUrl
             });
         }
 
