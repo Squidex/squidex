@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;

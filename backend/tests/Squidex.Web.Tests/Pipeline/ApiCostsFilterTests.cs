@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +34,7 @@ namespace Squidex.Web.Pipeline
                 new ActionExecutingContext(
                     new ActionContext(httpContext, new RouteData(),
                         new ActionDescriptor()),
-                    new List<IFilterMetadata>(), new Dictionary<string, object>(), null!);
+                    new List<IFilterMetadata>(), new Dictionary<string, object?>(), null!);
 
             next = () =>
             {

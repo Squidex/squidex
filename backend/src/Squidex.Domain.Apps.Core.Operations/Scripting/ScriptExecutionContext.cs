@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
@@ -15,7 +12,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class ExecutionContext : ScriptContext
+    public sealed class ScriptExecutionContext : ScriptContext
     {
         private Func<Exception, bool>? completion;
 
@@ -25,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public bool IsAsync { get; private set; }
 
-        internal ExecutionContext(Engine engine)
+        internal ScriptExecutionContext(Engine engine)
         {
             Engine = engine;
         }
@@ -40,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             completion?.Invoke(exception);
         }
 
-        public ExecutionContext ExtendAsync(IEnumerable<IJintExtension> extensions, Func<Exception, bool> completion,
+        public ScriptExecutionContext ExtendAsync(IEnumerable<IJintExtension> extensions, Func<Exception, bool> completion,
             CancellationToken ct)
         {
             CancellationToken = ct;
@@ -55,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return this;
         }
 
-        public ExecutionContext Extend(IEnumerable<IJintExtension> extensions)
+        public ScriptExecutionContext Extend(IEnumerable<IJintExtension> extensions)
         {
             foreach (var extension in extensions)
             {
@@ -65,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return this;
         }
 
-        public ExecutionContext Extend(ScriptVars vars, ScriptOptions options)
+        public ScriptExecutionContext Extend(ScriptVars vars, ScriptOptions options)
         {
             var engine = Engine;
 

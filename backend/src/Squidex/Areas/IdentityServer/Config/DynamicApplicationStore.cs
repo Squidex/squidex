@@ -5,11 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Squidex.Config;
@@ -80,7 +75,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 }
             }
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 

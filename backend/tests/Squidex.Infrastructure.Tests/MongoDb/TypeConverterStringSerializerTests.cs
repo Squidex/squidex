@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Xunit;

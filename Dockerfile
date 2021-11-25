@@ -1,7 +1,7 @@
 #
 # Stage 1, Build Backend
 #
-FROM mcr.microsoft.com/dotnet/sdk:5.0 as backend
+FROM mcr.microsoft.com/dotnet/sdk:6.0 as backend
 
 ARG SQUIDEX__VERSION=5.0.0
 
@@ -64,7 +64,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/aspnet:5.0.0-buster-slim
+FROM mcr.microsoft.com/dotnet/aspnet:6.0.0-bullseye-slim
 
 # Curl for debugging and libc-dev for Protobuf
 RUN apt-get update \

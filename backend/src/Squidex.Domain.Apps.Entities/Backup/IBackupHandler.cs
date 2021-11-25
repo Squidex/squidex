@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 

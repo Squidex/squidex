@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards

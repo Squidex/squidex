@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes
@@ -17,7 +13,7 @@ namespace Squidex.Translator.Processes
     {
         public static string RelativeName(FileInfo file, DirectoryInfo folder)
         {
-            return file.FullName[folder.FullName.Length..].Replace("\\", "/");
+            return file.FullName[folder.FullName.Length..].Replace("\\", "/", StringComparison.Ordinal);
         }
 
         public static void CheckOtherLocales(TranslationService service)

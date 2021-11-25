@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;
 using NSwag;

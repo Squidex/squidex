@@ -5,11 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types

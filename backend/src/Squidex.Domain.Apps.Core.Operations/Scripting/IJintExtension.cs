@@ -15,11 +15,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
         }
 
-        void Extend(ExecutionContext context)
+        void Extend(ScriptExecutionContext context)
         {
         }
 
-        void ExtendAsync(ExecutionContext context)
+        void ExtendAsync(ScriptExecutionContext context)
         {
         }
     }

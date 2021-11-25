@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Core.Contents;

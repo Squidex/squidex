@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using IdentityModel;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure.Json.Objects;
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Description = $"The structure of the {fieldInfo.DisplayName} nested schema.";
         }
 
-        public override object ParseDictionary(IDictionary<string, object> value)
+        public override object ParseDictionary(IDictionary<string, object?> value)
         {
             var result = JsonValue.Object();
 

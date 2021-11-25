@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;

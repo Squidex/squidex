@@ -5,11 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Security;
 using System.Text;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +57,7 @@ namespace Squidex.Web
                 "property1, property2: Error3",
                 "property3.property4: Error4",
                 "property5[0].property6: Error5"
-            }, ((ErrorDto)result.Value).Details);
+            }, ((ErrorDto)result.Value!).Details);
 
             A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
                 .MustNotHaveHappened();

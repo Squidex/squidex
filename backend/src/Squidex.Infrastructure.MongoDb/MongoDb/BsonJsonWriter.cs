@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson.IO;
 using NewtonsoftJSonWriter = Newtonsoft.Json.JsonWriter;
 

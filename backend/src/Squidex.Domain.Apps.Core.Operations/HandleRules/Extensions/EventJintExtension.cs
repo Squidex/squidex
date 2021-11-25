@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
             this.urlGenerator = urlGenerator;
         }
 
-        public void Extend(ExecutionContext context)
+        public void Extend(ScriptExecutionContext context)
         {
             context.Engine.SetValue("contentAction", new EventDelegate(() =>
             {

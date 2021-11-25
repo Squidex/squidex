@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Globalization;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;

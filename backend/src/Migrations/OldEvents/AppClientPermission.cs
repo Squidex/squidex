@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Migrations.OldEvents
 {
     [Obsolete("New Event introduced")]

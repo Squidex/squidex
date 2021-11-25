@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using GraphQL;
 using GraphQL.DataLoader;
@@ -89,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var sut = CreateSut(TestSchemas.Default, TestSchemas.Ref1, TestSchemas.Ref2);
 
-            options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context);
+            options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context)!;
 
             var listener = sut.Services.GetService<DataLoaderDocumentListener>();
 

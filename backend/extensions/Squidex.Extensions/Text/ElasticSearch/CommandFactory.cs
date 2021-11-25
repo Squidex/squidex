@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using GeoJSON.Net.Geometry;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 

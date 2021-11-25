@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 

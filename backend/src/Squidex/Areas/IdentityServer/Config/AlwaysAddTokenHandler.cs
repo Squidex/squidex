@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Immutable;
-using System.Threading.Tasks;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
 using static OpenIddict.Server.OpenIddictServerEvents;

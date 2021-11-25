@@ -8,11 +8,8 @@
 using GraphQL;
 using GraphQL.Server;
 using GraphQL.Server.Transports.AspNetCore;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;

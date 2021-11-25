@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
@@ -18,14 +17,14 @@ namespace Squidex.Config.Authentication
     {
         public override Task CreatingTicket(OAuthCreatingTicketContext context)
         {
-            var nameClaim = context.Identity.FindFirst(ClaimTypes.Name)?.Value;
+            var nameClaim = context.Identity?.FindFirst(ClaimTypes.Name)?.Value;
 
             if (!string.IsNullOrWhiteSpace(nameClaim))
             {
-                context.Identity.AddClaim(new Claim(SquidexClaimTypes.DisplayName, nameClaim));
+                context.Identity?.AddClaim(new Claim(SquidexClaimTypes.DisplayName, nameClaim));
             }
 
-            if (string.IsNullOrWhiteSpace(context.Identity.FindFirst(ClaimTypes.Email)?.Value))
+            if (string.IsNullOrWhiteSpace(context.Identity?.FindFirst(ClaimTypes.Email)?.Value))
             {
                 throw new DomainException(T.Get("login.githubPrivateEmail"));
             }

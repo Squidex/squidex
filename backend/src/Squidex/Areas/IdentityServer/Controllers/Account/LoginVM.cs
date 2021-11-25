@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public class LoginVM

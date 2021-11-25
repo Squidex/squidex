@@ -1,7 +1,7 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Account.LoginVM
 
 @{
-    var action = Model.IsLogin ? T.Get("common.login") : T.Get("common.signup");
+    var action = Model!.IsLogin ? T.Get("common.login") : T.Get("common.signup");
 
     ViewBag.Title = action;
 }
@@ -10,28 +10,28 @@
     <div class="container">
         <div class="row text-center">
             <div class="btn-group profile-headline">
-                @if (Model.IsLogin)
+                @if (Model!.IsLogin)
                 {
-                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.login")</a>
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.login")</a>
                 }
                 else
                 {
-                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.login")</a>
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.login")</a>
                 }
-                @if (!Model.IsLogin)
+                @if (!Model!.IsLogin)
                 {
-                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.signup")</a>
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.signup")</a>
                 }
                 else
                 {
-                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">@T.Get("common.signup")</a>
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">@T.Get("common.signup")</a>
                 }
             </div>
         </div>
     </div>
 
-    <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
-        @foreach (var provider in Model.ExternalProviders)
+    <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model!.ReturnUrl" method="post">
+        @foreach (var provider in Model!.ExternalProviders)
         {
             var schema = provider.AuthenticationScheme.ToLowerInvariant();
 
@@ -43,23 +43,23 @@
         }
     </form>
 
-    @if (Model.HasExternalLogin && Model.HasPasswordAuth)
+    @if (Model!.HasExternalLogin && Model!.HasPasswordAuth)
     {
         <div class="profile-separator">
             <div class="profile-separator-text">@T.Get("users.login.separator")</div>
         </div>
     }
 
-    @if (Model.HasPasswordAuth)
+    @if (Model!.HasPasswordAuth)
     {
-        if (Model.IsLogin)
+        if (Model!.IsLogin)
         {
-            if (Model.IsFailed)
+            if (Model!.IsFailed)
             {
                 <div class="form-alert form-alert-error">@T.Get("users.login.error")</div>
             }
 
-            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl" method="post">
                 <div class="form-group">
                     <input type="email" class="form-control" name="email" id="email" placeholder="@T.Get("users.login.emailPlaceholder")" />
                 </div>
@@ -77,12 +77,12 @@
         }
     }
 
-    @if (Model.IsLogin)
+    @if (Model!.IsLogin)
     {
         <p class="profile-footer">
             @T.Get("users.login.noAccountSignupQuestion")
 
-            <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">
+            <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model!.ReturnUrl">
                 @T.Get("users.login.noAccountSignupAction")
             </a>
         </p>
@@ -92,7 +92,7 @@
         <p class="profile-footer">
             @T.Get("users.login.noAccountLoginQuestion")
 
-            <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">
+            <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model!.ReturnUrl">
                 @T.Get("users.login.noAccountLoginAction")
             </a>
         </p>

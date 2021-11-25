@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Squidex.Infrastructure.Json.Objects

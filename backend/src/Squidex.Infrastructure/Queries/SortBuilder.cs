@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-
 namespace Squidex.Infrastructure.Queries
 {
     public static class SortBuilder

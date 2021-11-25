@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;

@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Fluid;
 using Fluid.Ast;
 using Fluid.Values;

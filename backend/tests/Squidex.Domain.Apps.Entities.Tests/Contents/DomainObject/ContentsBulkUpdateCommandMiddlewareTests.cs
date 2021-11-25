@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -18,6 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Xunit;
@@ -36,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         public ContentsBulkUpdateCommandMiddlewareTests()
         {
-            sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider);
+            sut = new ContentsBulkUpdateCommandMiddleware(contentQuery, contextProvider, A.Fake<ISemanticLog>());
         }
 
         [Fact]

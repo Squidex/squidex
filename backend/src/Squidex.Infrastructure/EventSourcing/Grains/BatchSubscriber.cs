@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
 #pragma warning disable RECS0082 // Parameter has the same name as a member and hides it

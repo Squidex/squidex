@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.Queries
 {
     public abstract class AsyncTransformVisitor<TValue, TArgs> : FilterNodeVisitor<ValueTask<FilterNode<TValue>?>, TValue, TArgs>

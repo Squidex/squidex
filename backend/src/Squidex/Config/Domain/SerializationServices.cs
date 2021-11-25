@@ -10,7 +10,6 @@ using GraphQL;
 using GraphQL.Execution;
 using GraphQL.NewtonsoftJson;
 using GraphQL.Server;
-using Microsoft.Extensions.DependencyInjection;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using GraphQL.Language.AST;
 using Squidex.Infrastructure.Json.Objects;
 

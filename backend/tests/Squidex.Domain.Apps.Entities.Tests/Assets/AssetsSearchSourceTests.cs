@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core;

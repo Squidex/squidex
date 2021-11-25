@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Jint.Native;
 using Jint.Runtime;
 using Jint.Runtime.Interop;
@@ -33,13 +29,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.serviceProvider = serviceProvider;
         }
 
-        public void ExtendAsync(ExecutionContext context)
+        public void ExtendAsync(ScriptExecutionContext context)
         {
             AddAssetText(context);
             AddAsset(context);
         }
 
-        private void AddAsset(ExecutionContext context)
+        private void AddAsset(ScriptExecutionContext context)
         {
             if (!context.TryGetValue<DomainId>("appId", out var appId))
             {
@@ -57,19 +53,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
             context.Engine.SetValue("getAssets", action);
         }
 
-        private void AddAssetText(ExecutionContext context)
+        private void AddAssetText(ScriptExecutionContext context)
         {
             var action = new GetAssetTextDelegate((references, callback, encoding) => GetText(context, references, callback, encoding));
 
             context.Engine.SetValue("getAssetText", action);
         }
 
-        private void GetText(ExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
+        private void GetText(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
         {
             GetTextAsync(context, input, callback, encoding).Forget();
         }
 
-        private async Task GetTextAsync(ExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
+        private async Task GetTextAsync(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
         {
             Guard.NotNull(callback, nameof(callback));
 
@@ -117,12 +113,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
             callback(JsValue.FromObject(context.Engine, "ErrorNoAsset"));
         }
 
-        private void GetAssets(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+        private void GetAssets(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
             GetReferencesAsync(context, appId, user, references, callback).Forget();
         }
 
-        private async Task GetReferencesAsync(ExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
+        private async Task GetReferencesAsync(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
             Guard.NotNull(callback, nameof(callback));
 

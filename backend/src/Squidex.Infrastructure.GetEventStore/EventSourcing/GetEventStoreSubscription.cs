@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using EventStore.Client;
 using Squidex.Infrastructure.Json;
 
@@ -33,14 +30,14 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
-                Func<StreamSubscription, ResolvedEvent, CancellationToken, Task> onEvent = async (_, @event, _) =>
+                async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event, CancellationToken ct)
                 {
                     var storedEvent = Formatter.Read(@event, prefix, serializer);
 
                     await subscriber.OnEventAsync(this, storedEvent);
-                };
+                }
 
-                Action<StreamSubscription, SubscriptionDroppedReason, Exception?>? onError = (_, reason, ex) =>
+                void OnError(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception? ex)
                 {
                     if (reason != SubscriptionDroppedReason.Disposed &&
                         reason != SubscriptionDroppedReason.SubscriberError)
@@ -49,22 +46,22 @@ namespace Squidex.Infrastructure.EventSourcing
 
                         subscriber.OnErrorAsync(this, ex);
                     }
-                };
+                }
 
                 if (!string.IsNullOrWhiteSpace(position))
                 {
                     var streamPosition = position.ToPosition(true);
 
                     subscription = await client.SubscribeToStreamAsync(streamName, streamPosition,
-                        onEvent, true,
-                        onError,
+                        OnEvent, true,
+                        OnError,
                         cancellationToken: ct);
                 }
                 else
                 {
                     subscription = await client.SubscribeToStreamAsync(streamName,
-                        onEvent, true,
-                        onError,
+                        OnEvent, true,
+                        OnError,
                         cancellationToken: ct);
                 }
             }, cts.Token);

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.EventSourcing;

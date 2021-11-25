@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -150,7 +147,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            if (newField is not T)
+            if (newField is null)
             {
                 throw new InvalidOperationException($"Field must be of type {typeof(T)}");
             }

@@ -5,12 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Esprima;
 using Jint;
 using Jint.Native;
@@ -179,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return JsonMapper.Map(context.Engine.GetCompletionValue());
         }
 
-        private ExecutionContext CreateEngine(ScriptOptions options)
+        private ScriptExecutionContext CreateEngine(ScriptOptions options)
         {
             var engine = new Engine(engineOptions =>
             {
@@ -204,7 +199,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 extension.Extend(engine);
             }
 
-            var context = new ExecutionContext(engine);
+            var context = new ScriptExecutionContext(engine);
 
             return context;
         }

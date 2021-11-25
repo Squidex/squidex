@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Reflection;

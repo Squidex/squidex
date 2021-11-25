@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Builder;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Web;
 using Squidex.Web.Pipeline;

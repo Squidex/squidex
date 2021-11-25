@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;

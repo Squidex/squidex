@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using EventStore.Client;
 using Squidex.Infrastructure.TestHelpers;
 

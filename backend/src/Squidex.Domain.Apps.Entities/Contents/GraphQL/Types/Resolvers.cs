@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using Squidex.Infrastructure;
@@ -48,11 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             public T Resolve(IResolveFieldContext context)
             {
-                var executionContext = (GraphQLExecutionContext)context.UserContext;
+                var executionContext = (GraphQLExecutionContext)context.UserContext!;
 
                 try
                 {
-                    return resolver((TSource)context.Source, context, executionContext);
+                    return resolver((TSource)context.Source!, context, executionContext);
                 }
                 catch (ValidationException ex)
                 {
@@ -90,11 +88,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             public async Task<T> Resolve(IResolveFieldContext context)
             {
-                var executionContext = (GraphQLExecutionContext)context.UserContext;
+                var executionContext = (GraphQLExecutionContext)context.UserContext!;
 
                 try
                 {
-                    return await resolver((TSource)context.Source, context, executionContext);
+                    return await resolver((TSource)context.Source!, context, executionContext);
                 }
                 catch (ValidationException ex)
                 {

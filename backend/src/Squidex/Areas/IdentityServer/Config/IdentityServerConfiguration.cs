@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using OpenIddict.Abstractions;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Web;

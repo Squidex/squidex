@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;

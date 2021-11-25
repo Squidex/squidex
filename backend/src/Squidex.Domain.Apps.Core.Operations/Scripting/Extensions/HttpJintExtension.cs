@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Jint;
 using Jint.Native;
 using Jint.Native.Json;
@@ -28,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             this.httpClientFactory = httpClientFactory;
         }
 
-        public void ExtendAsync(ExecutionContext context)
+        public void ExtendAsync(ScriptExecutionContext context)
         {
             AddMethod(context, HttpMethod.Get, "getJSON");
             AddMethod(context, HttpMethod.Delete, "deleteJSON");
@@ -38,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             AdBodyMethod(context, HttpMethod.Put, "putJSON");
         }
 
-        private void AddMethod(ExecutionContext context, HttpMethod method, string name)
+        private void AddMethod(ScriptExecutionContext context, HttpMethod method, string name)
         {
             var action = new HttpJson((url, callback, headers) =>
             {
@@ -48,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             context.Engine.SetValue(name, action);
         }
 
-        private void AdBodyMethod(ExecutionContext context, HttpMethod method, string name)
+        private void AdBodyMethod(ScriptExecutionContext context, HttpMethod method, string name)
         {
             var action = new HttpJsonWithBody((url, body, callback, headers) =>
             {
@@ -58,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             context.Engine.SetValue(name, action);
         }
 
-        private async Task RequestAsync(ExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers)
+        private async Task RequestAsync(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers)
         {
             if (callback == null)
             {
@@ -99,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         }
 
-        private static HttpRequestMessage CreateRequest(ExecutionContext context, HttpMethod method, Uri uri, JsValue? body, JsValue? headers)
+        private static HttpRequestMessage CreateRequest(ScriptExecutionContext context, HttpMethod method, Uri uri, JsValue? body, JsValue? headers)
         {
             var request = new HttpRequestMessage(method, uri);
 
@@ -135,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             return request;
         }
 
-        private static async Task<JsValue> ParseResponse(ExecutionContext context, HttpResponseMessage response)
+        private static async Task<JsValue> ParseResponse(ScriptExecutionContext context, HttpResponseMessage response)
         {
             var responseString = await response.Content.ReadAsStringAsync(context.CancellationToken);
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Infrastructure.Json;
 
 #pragma warning disable SA1401 // Fields must be private

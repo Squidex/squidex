@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using System.Text;
 using System.Text.Json;
 using Lucene.Net.Analysis.Standard;

@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Lazy;
+using Microsoft.Extensions.Configuration;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Configuration;
 using Squidex.ClientLibrary.Management;
+using TestSuite.Utils;
 
 namespace TestSuite
 {
@@ -44,19 +43,20 @@ namespace TestSuite
 
         public ClientManagerWrapper()
         {
-            var appName = GetValue("APP__NAME", "integration-tests");
-            var clientId = GetValue("CLIENT__ID", "root");
-            var clientSecret = GetValue("CLIENT__SECRET", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-            var serviceURl = GetValue("SERVER__URL", "https://localhost:5001");
+            var appName = GetValue("config:app:name", "integration-tests");
+            var clientId = GetValue("config:client:id", "root");
+            var clientSecret = GetValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
+            var serverUrl = GetValue("config:server:url", "https://localhost:5001");
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {
                 AppName = appName,
                 ClientId = clientId,
                 ClientSecret = clientSecret,
+                ClientFactory = null,
                 Configurator = AcceptAllCertificatesConfigurator.Instance,
                 ReadResponseAsString = true,
-                Url = serviceURl
+                Url = serverUrl
             });
         }
 
@@ -81,7 +81,9 @@ namespace TestSuite
 
         public async Task ConnectAsync()
         {
-            if (TryGetTimeout(out var waitSeconds))
+            var waitSeconds = TestHelpers.Configuration.GetValue<int>("config:wait");
+
+            if (waitSeconds > 10)
             {
                 Console.WriteLine("Waiting {0} seconds to access server", waitSeconds);
 
@@ -104,32 +106,26 @@ namespace TestSuite
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine("Waiting for server is skipped.");
+            }
         }
 
-        private static bool TryGetTimeout(out int timeout)
+        private static string GetValue(string name, string fallback)
         {
-            var variable = Environment.GetEnvironmentVariable("CONFIG__WAIT");
+            var value = TestHelpers.Configuration[name];
 
-            if (!string.IsNullOrWhiteSpace(variable))
+            if (string.IsNullOrWhiteSpace(value))
             {
-                Console.WriteLine("Using: CONFIG__WAIT={0}", variable);
+                value = fallback;
+            }
+            else
+            {
+                Console.WriteLine("Using: {0}={1}", name, value);
             }
 
-            return int.TryParse(variable, out timeout) && timeout > 10;
-        }
-
-        private static string GetValue(string name, string defaultValue)
-        {
-            var variable = Environment.GetEnvironmentVariable($"CONFIG__{name}");
-
-            if (!string.IsNullOrWhiteSpace(variable))
-            {
-                Console.WriteLine("Using: {0}={1}", name, variable);
-
-                return variable;
-            }
-
-            return defaultValue;
+            return value;
         }
     }
 }

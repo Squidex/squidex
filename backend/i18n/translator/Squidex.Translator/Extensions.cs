@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-
 namespace Squidex.Translator
 {
     public static class Extensions
@@ -18,7 +16,7 @@ namespace Squidex.Translator
 
         public static bool IsPotentialMultiWordText(this string text)
         {
-            return text.Contains(' ') && text.IsPotentialText();
+            return text.Contains(' ', StringComparison.Ordinal) && text.IsPotentialText();
         }
     }
 }

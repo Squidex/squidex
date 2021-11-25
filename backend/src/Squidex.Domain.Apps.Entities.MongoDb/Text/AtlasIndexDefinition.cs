@@ -5,13 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Hosting.Configuration;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text

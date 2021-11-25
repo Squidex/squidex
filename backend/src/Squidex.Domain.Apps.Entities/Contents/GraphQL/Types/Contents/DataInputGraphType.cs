@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -62,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Description = $"The structure of the {schemaInfo.DisplayName} data input type.";
         }
 
-        public override object ParseDictionary(IDictionary<string, object> value)
+        public override object ParseDictionary(IDictionary<string, object?> value)
         {
             var result = new ContentData();
 
@@ -74,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     if (source.TryGetValue(field.Name, out var value))
                     {
-                        if (value is IEnumerable<object> list && field.ResolvedType.Flatten() is IComplexGraphType nestedType)
+                        if (value is IEnumerable<object> list && field.ResolvedType?.Flatten() is IComplexGraphType nestedType)
                         {
                             var array = new JsonArray(list.Count());
 

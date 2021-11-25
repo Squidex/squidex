@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 namespace Squidex.Translator.Processes
 {
     public static class Backend
@@ -28,7 +24,8 @@ namespace Squidex.Translator.Processes
             {
                 var relativeName = Helper.RelativeName(file, folder);
 
-                if (relativeName.Contains("/obj/") || relativeName.Contains("/bin/"))
+                if (relativeName.Contains("/obj/", StringComparison.Ordinal) ||
+                    relativeName.Contains("/bin/", StringComparison.Ordinal))
                 {
                     continue;
                 }
@@ -45,7 +42,8 @@ namespace Squidex.Translator.Processes
             {
                 var relativeName = Helper.RelativeName(file, folder);
 
-                if (relativeName.Contains("/obj/") || relativeName.Contains("/bin/"))
+                if (relativeName.Contains("/obj/", StringComparison.Ordinal) ||
+                    relativeName.Contains("/bin/", StringComparison.Ordinal))
                 {
                     continue;
                 }

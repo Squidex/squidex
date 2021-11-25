@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +45,7 @@ namespace Squidex.Web.Pipeline
                 EndpointMetadata = new List<object>()
             });
 
-            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
             actionExecutingContext.HttpContext = httpContext;
             actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
             actionExecutingContext.HttpContext.Features.Set<IAppFeature>(new AppFeature(Mocks.App(appId)));
@@ -203,7 +201,7 @@ namespace Squidex.Web.Pipeline
 
         private void AssertSchema(ISchemaEntity schema)
         {
-            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>().Schema);
+            Assert.Equal(schema, actionContext.HttpContext.Features.Get<ISchemaFeature>()!.Schema);
             Assert.True(isNextCalled);
         }
 

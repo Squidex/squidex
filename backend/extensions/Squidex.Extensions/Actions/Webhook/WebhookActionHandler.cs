@@ -5,12 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
@@ -78,7 +73,7 @@ namespace Squidex.Extensions.Actions.Webhook
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {
-                    var headerKey = line.Substring(0, indexEqual);
+                    var headerKey = line[..indexEqual];
                     var headerValue = line[(indexEqual + 1)..];
 
                     headerValue = await FormatAsync(headerValue, @event);

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -18,14 +17,14 @@ namespace TestSuite.Utils
             return Guid.NewGuid()
                 .ToString().Sha256Base64()
                 .ToLowerInvariant()
-                .Replace("+", "x")
-                .Replace("=", "x")
-                .Replace("/", "x");
+                .Replace("+", "x", StringComparison.Ordinal)
+                .Replace("=", "x", StringComparison.Ordinal)
+                .Replace("/", "x", StringComparison.Ordinal);
         }
 
         public static string Simple()
         {
-            return Guid.NewGuid().ToString().Replace("-", string.Empty);
+            return Guid.NewGuid().ToString().Replace("-", string.Empty, StringComparison.Ordinal);
         }
 
         public static string Sha256Base64(this string value)

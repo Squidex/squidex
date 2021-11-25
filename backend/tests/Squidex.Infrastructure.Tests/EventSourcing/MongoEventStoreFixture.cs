@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using FakeItEasy;
 using MongoDB.Driver;
 using Newtonsoft.Json;

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Xml.Linq;
 using FakeItEasy;
 using Squidex.Infrastructure;

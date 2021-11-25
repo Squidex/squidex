@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;

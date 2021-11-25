@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -36,7 +35,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly ValueResolver Resolver = (value, fieldContext, context) =>
             {
-                if (fieldContext.Arguments.TryGetValue("path", out var v) && v.Value is string path)
+                if (fieldContext.Arguments != null &&
+                    fieldContext.Arguments.TryGetValue("path", out var contextValue) &&
+                    contextValue.Value is string path)
                 {
                     value.TryGetByPath(path, out var result);
 
@@ -208,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsCreate, c =>
             {
                 var contentId = c.GetArgument<string?>("id");
-                var contentData = c.GetArgument<ContentData>("data");
+                var contentData = c.GetArgument<ContentData>("data")!;
                 var contentStatus = c.GetArgument<string?>("status");
 
                 var command = new CreateContent { Data = contentData };
@@ -272,13 +273,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpsert, c =>
             {
-                var contentId = c.GetArgument<string>("id");
-                var contentData = c.GetArgument<ContentData>("data");
+                var contentId = c.GetArgument<DomainId>("id");
+                var contentData = c.GetArgument<ContentData>("data")!;
                 var contentStatus = c.GetArgument<string?>("status");
 
-                var id = DomainId.Create(contentId);
-
-                var command = new UpsertContent { ContentId = id, Data = contentData };
+                var command = new UpsertContent { ContentId = contentId, Data = contentData };
 
                 if (!string.IsNullOrWhiteSpace(contentStatus))
                 {
@@ -323,7 +322,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
-                var contentData = c.GetArgument<ContentData>("data");
+                var contentData = c.GetArgument<ContentData>("data")!;
 
                 return new UpdateContent { ContentId = contentId, Data = contentData };
             });
@@ -359,7 +358,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             public static readonly IFieldResolver Resolver = ResolveAsync(Permissions.AppContentsUpdateOwn, c =>
             {
                 var contentId = c.GetArgument<DomainId>("id");
-                var contentData = c.GetArgument<ContentData>("data");
+                var contentData = c.GetArgument<ContentData>("data")!;
 
                 return new PatchContent { ContentId = contentId, Data = contentData };
             });

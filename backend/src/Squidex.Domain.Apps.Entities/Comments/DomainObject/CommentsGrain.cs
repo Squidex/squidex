@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards;
 using Squidex.Domain.Apps.Events.Comments;

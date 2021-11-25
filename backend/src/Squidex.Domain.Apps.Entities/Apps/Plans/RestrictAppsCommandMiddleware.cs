@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Globalization;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Collections;

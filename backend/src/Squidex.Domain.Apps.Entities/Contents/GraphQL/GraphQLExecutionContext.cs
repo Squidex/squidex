@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -57,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             Log = log;
         }
 
-        public async Task<IUser> FindUserAsync(RefToken refToken,
+        public async Task<IUser?> FindUserAsync(RefToken refToken,
             CancellationToken ct)
         {
             if (refToken.IsClient)

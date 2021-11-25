@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -31,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNullOrEmpty(stream, nameof(stream));
 
             var typeIndex = stream.IndexOf("-", StringComparison.Ordinal);
-            var typeName = stream.Substring(0, typeIndex);
+            var typeName = stream[..typeIndex];
 
             var id = DomainId.Create(stream[(typeIndex + 1)..]);
 

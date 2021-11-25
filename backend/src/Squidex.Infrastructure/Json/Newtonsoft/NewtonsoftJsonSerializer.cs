@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
 using Newtonsoft.Json;
 using NewtonsoftException = Newtonsoft.Json.JsonException;
 

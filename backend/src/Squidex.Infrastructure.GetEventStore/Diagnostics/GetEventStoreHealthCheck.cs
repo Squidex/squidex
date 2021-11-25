@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using EventStore.Client;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 

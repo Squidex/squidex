@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Globalization;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -45,7 +44,7 @@ namespace Squidex.Infrastructure.Http
         {
             var method = request.Method.ToString().ToUpperInvariant();
 
-            writer.AppendLine($"{method}: {request.RequestUri} HTTP/{request.Version}");
+            writer.AppendLine(CultureInfo.InvariantCulture, $"{method}: {request.RequestUri} HTTP/{request.Version}");
 
             writer.AppendHeaders(request.Headers);
             writer.AppendHeaders(request.Content?.Headers);
@@ -64,7 +63,7 @@ namespace Squidex.Infrastructure.Http
                 var responseCode = (int)response.StatusCode;
                 var responseText = Enum.GetName(typeof(HttpStatusCode), response.StatusCode);
 
-                writer.AppendLine($"HTTP/{response.Version} {responseCode} {responseText}");
+                writer.AppendLine(CultureInfo.InvariantCulture, $"HTTP/{response.Version} {responseCode} {responseText}");
 
                 writer.AppendHeaders(response.Headers);
                 writer.AppendHeaders(response.Content?.Headers);
@@ -79,12 +78,12 @@ namespace Squidex.Infrastructure.Http
             if (response != null && elapsed != TimeSpan.Zero)
             {
                 writer.AppendLine();
-                writer.AppendLine($"Elapsed: {elapsed}");
+                writer.AppendLine(CultureInfo.InvariantCulture, $"Elapsed: {elapsed}");
             }
 
             if (isTimeout)
             {
-                writer.AppendLine($"Timeout after {elapsed}");
+                writer.AppendLine(CultureInfo.InvariantCulture, $"Timeout after {elapsed}");
             }
         }
 
