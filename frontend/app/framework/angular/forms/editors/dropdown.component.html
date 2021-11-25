@@ -5,7 +5,7 @@
         autocapitalize="off">
     
     <div class="control-dropdown-item" *ngIf="snapshot.selectedItem; let selectedItem">
-        <div>
+        <div class="no-wrap">
             <span class="truncate" *ngIf="!templateSelection">{{selectedItem}}</span>
             
             <ng-template *ngIf="templateSelection" [sqxTemplateWrapper]="templateSelection" [item]="selectedItem"></ng-template>

@@ -17,7 +17,10 @@
             </sqx-color-picker>
         </div>
         <div class="col">
-            <sqx-editable-title [name]="step.name" (nameChange)="changeName($event)" [disabled]="step.isLocked || disabled">
+            <sqx-editable-title 
+                [name]="step.name" 
+                (nameChange)="changeName($event)" 
+                [disabled]="step.isLocked || disabled">
             </sqx-editable-title>
         </div>
         <div class="col">
