@@ -70,11 +70,11 @@
     <PackageReference Include="OrleansDashboard.EmbeddedAssets" Version="3.6.1" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.0.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="1.10.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="1.10.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="1.10.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="1.10.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="1.10.0" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="2.0.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="2.0.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="2.0.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="2.0.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="2.0.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="7.5.0" />
     <PackageReference Include="Squidex.Hosting" Version="2.3.0" />

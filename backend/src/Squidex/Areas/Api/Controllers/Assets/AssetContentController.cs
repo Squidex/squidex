@@ -224,7 +224,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 {
                     try
                     {
-                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, stream, resizeOptions);
+                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, asset.MimeType, stream, resizeOptions);
                         stream.Position = 0;
                     }
                     catch

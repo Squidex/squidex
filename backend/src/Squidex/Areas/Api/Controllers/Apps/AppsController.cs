@@ -29,7 +29,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions { Width = 50, Height = 50, Mode = ResizeMode.Crop };
+        private static readonly ResizeOptions ResizeOptions = new ResizeOptions
+        {
+            TargetWidth = 50,
+            TargetHeight = 50,
+            Mode = ResizeMode.Crop
+        };
         private readonly IAppImageStore appImageStore;
         private readonly IAppProvider appProvider;
         private readonly IAssetStore assetStore;
@@ -218,7 +223,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                     {
                         await using (var destinationStream = GetTempStream())
                         {
-                            await ResizeAsync(resizedAsset, destinationStream);
+                            await ResizeAsync(resizedAsset, App.Image.MimeType, destinationStream);
 
                             await destinationStream.CopyToAsync(body, ct);
                         }
@@ -232,7 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             };
         }
 
-        private async Task ResizeAsync(string resizedAsset, FileStream destinationStream)
+        private async Task ResizeAsync(string resizedAsset, string mimeType, FileStream destinationStream)
         {
 #pragma warning disable MA0040 // Flow the cancellation token
             await using (var sourceStream = GetTempStream())
@@ -245,7 +250,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 using (Telemetry.Activities.StartActivity("ResizeImage"))
                 {
-                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, ResizeOptions);
+                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, mimeType, destinationStream, ResizeOptions);
                     destinationStream.Position = 0;
                 }
 

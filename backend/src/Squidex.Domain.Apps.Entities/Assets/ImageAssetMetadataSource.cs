@@ -55,11 +55,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             if (command.Type == AssetType.Unknown || command.Type == AssetType.Image)
             {
+                var mimeType = command.File.MimeType;
+
                 ImageInfo? imageInfo = null;
 
                 await using (var uploadStream = command.File.OpenRead())
                 {
-                    imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
+                    imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, mimeType);
                 }
 
                 if (imageInfo != null)
@@ -72,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         await using (var uploadStream = command.File.OpenRead())
                         {
-                            imageInfo = await assetThumbnailGenerator.FixOrientationAsync(uploadStream, tempFile.Stream);
+                            imageInfo = await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempFile.Stream);
                         }
 
                         command.File.Dispose();
