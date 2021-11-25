@@ -228,9 +228,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 throw;
             }
-            catch
+            catch (Exception ex)
             {
-                throw new ValidationException(T.Get("common.jsError", new { message = "RuntimeError" }));
+                throw new ValidationException(T.Get("common.jsError", new { message = ex.Message }));
             }
         }
     }
