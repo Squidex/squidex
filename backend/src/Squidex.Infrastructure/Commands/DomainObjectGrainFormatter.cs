@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class DomainObjectGrainFormatter
     {
-        public static string Format(IIncomingGrainCallContext context)
+        public static readonly Func<IIncomingGrainCallContext, string> Format = context =>
         {
             if (context.InterfaceMethod == null)
             {
@@ -34,6 +34,6 @@ namespace Squidex.Infrastructure.Commands
             }
 
             return context.InterfaceMethod.Name;
-        }
+        };
     }
 }

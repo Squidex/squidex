@@ -51,6 +51,19 @@ namespace Squidex.Config.Domain
             services.AddAsyncLocalCache();
             services.AddBackgroundCache();
 
+            var timeoutExecution = config.GetValue<TimeSpan>("scripting:timeoutExecution");
+            var timeoutScript = config.GetValue<TimeSpan>("scripting:timeoutScript");
+
+            services.AddSingletonAs(c =>
+                new JintScriptEngine(
+                    c.GetRequiredService<IMemoryCache>(),
+                    c.GetRequiredService<IEnumerable<IJintExtension>>())
+                {
+                    TimeoutExecution = timeoutExecution,
+                    TimeoutScript = timeoutScript
+
+                }).As<IScriptEngine>();
+
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
@@ -96,7 +109,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<UserFluidExtension>()
                 .As<IFluidExtension>();
 
-            services.AddSingleton<Func<IIncomingGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
+            services.AddSingleton(DomainObjectGrainFormatter.Format);
         }
 
         public static void AddSquidexUsageTracking(this IServiceCollection services, IConfiguration config)

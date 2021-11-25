@@ -18,6 +18,8 @@ services:
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__TYPE=MongoDB
+      - SCRIPTING__TIMEOUTSCRIPT="00:00:10"
+      - SCRIPTING__TIMEOUTEXECUTION="00:00:10"
       - GRAPHQL__CACHEDURATION=0
     networks:
       - internal
