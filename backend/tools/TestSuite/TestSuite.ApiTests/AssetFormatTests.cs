@@ -9,6 +9,7 @@ using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
 
+#pragma warning disable xUnit1004 // Test methods should not be skipped
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable CS0618 // Type or member is obsolete
 
@@ -24,60 +25,82 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_upload_image_gif()
-        {
-            var asset = await _.UploadFileAsync("Assets/SampleGIFImage_40kbmb.gif", "image/gif");
-
-            // Should parse image metadata.
-            Assert.True(asset.IsImage);
-            Assert.Equal(312, asset.PixelHeight);
-            Assert.Equal(312, asset.PixelWidth);
-            Assert.Equal(312L, asset.Metadata["pixelHeight"]);
-            Assert.Equal(312L, asset.Metadata["pixelWidth"]);
-            Assert.Equal(AssetType.Image, asset.Type);
-        }
-
-        [Fact]
         public async Task Should_upload_image_gif_without_extension()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleGIFImage_40kbmb.gif", "image/gif", Guid.NewGuid().ToString());
+            var asset = await _.UploadFileAsync("Assets/SampleImage_150kb.gif", "image/gif", Guid.NewGuid().ToString());
 
             // Should parse image metadata.
             Assert.True(asset.IsImage);
-            Assert.Equal(312, asset.PixelHeight);
-            Assert.Equal(312, asset.PixelWidth);
-            Assert.Equal(312L, asset.Metadata["pixelHeight"]);
-            Assert.Equal(312L, asset.Metadata["pixelWidth"]);
+            Assert.Equal(600L, (long)asset.PixelWidth);
+            Assert.Equal(600L, asset.Metadata["pixelWidth"]);
+            Assert.Equal(400L, (long)asset.PixelHeight);
+            Assert.Equal(400L, asset.Metadata["pixelHeight"]);
             Assert.Equal(AssetType.Image, asset.Type);
         }
 
         [Fact]
-        public async Task Should_upload_image_png()
+        public async Task Should_upload_image_gif_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SamplePNGImage_100kbmb.png", "image/png");
+            var asset = await _.UploadFileAsync("Assets/SampleImage_150kb.gif", "image/gif");
 
-            // Should parse image metadata.
-            Assert.True(asset.IsImage);
-            Assert.Equal(170, asset.PixelHeight);
-            Assert.Equal(272, asset.PixelWidth);
-            Assert.Equal(170L, asset.Metadata["pixelHeight"]);
-            Assert.Equal(272L, asset.Metadata["pixelWidth"]);
-            Assert.Equal(AssetType.Image, asset.Type);
+            await AssetImageAsync(asset);
         }
 
         [Fact]
-        public async Task Should_upload_image_jpg()
+        public async Task Should_upload_image_png_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleJPGImage_50kbmb.jpg", "image/jpg");
+            var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.png", "image/png");
 
+            await AssetImageAsync(asset);
+        }
+
+        [Fact]
+        public async Task Should_upload_image_jpg_and_resize()
+        {
+            var asset = await _.UploadFileAsync("Assets/SampleImage_62kb.jpg", "image/jpg");
+
+            await AssetImageAsync(asset);
+
+            Assert.Equal(79L, asset.Metadata["imageQuality"]);
+        }
+
+        [Fact]
+        public async Task Should_upload_image_webp_and_resize()
+        {
+            var asset = await _.UploadFileAsync("Assets/SampleImage_100kb.webp", "image/jpg");
+
+            await AssetImageAsync(asset);
+        }
+
+        [Fact]
+        public async Task Should_upload_image_tiff_and_resize()
+        {
+            var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpg");
+
+            await AssetImageAsync(asset);
+        }
+
+        [Fact(Skip = "Not supported yet.")]
+        public async Task Should_upload_image_tg_and_resize()
+        {
+            var asset = await _.UploadFileAsync("Assets/SampleImage_600kb.tga", "image/jpg");
+
+            await AssetImageAsync(asset);
+        }
+
+        private async Task AssetImageAsync(AssetDto asset)
+        {
             // Should parse image metadata.
             Assert.True(asset.IsImage);
-            Assert.Equal(300, asset.PixelHeight);
-            Assert.Equal(300, asset.PixelWidth);
-            Assert.Equal(300L, asset.Metadata["pixelHeight"]);
-            Assert.Equal(300L, asset.Metadata["pixelWidth"]);
-            Assert.Equal(96L, asset.Metadata["imageQuality"]);
+            Assert.Equal(600L, (long)asset.PixelWidth);
+            Assert.Equal(600L, asset.Metadata["pixelWidth"]);
+            Assert.Equal(400L, (long)asset.PixelHeight);
+            Assert.Equal(400L, asset.Metadata["pixelHeight"]);
             Assert.Equal(AssetType.Image, asset.Type);
+
+            var resized = await GetResizedLengthAsync(asset.Id, 100, 100);
+
+            Assert.True(resized < asset.FileSize * .25);
         }
 
         [Fact]
@@ -87,10 +110,10 @@ namespace TestSuite.ApiTests
 
             // Should parse image metadata and fix orientation.
             Assert.True(asset.IsImage);
-            Assert.Equal(135, asset.PixelHeight);
-            Assert.Equal(600, asset.PixelWidth);
-            Assert.Equal(135L, asset.Metadata["pixelHeight"]);
+            Assert.Equal(600L, (long)asset.PixelWidth);
             Assert.Equal(600L, asset.Metadata["pixelWidth"]);
+            Assert.Equal(135L, (long)asset.PixelHeight);
+            Assert.Equal(135L, asset.Metadata["pixelHeight"]);
             Assert.Equal(79L, asset.Metadata["imageQuality"]);
             Assert.Equal(AssetType.Image, asset.Type);
         }
@@ -150,6 +173,25 @@ namespace TestSuite.ApiTests
 
             // Should not parse yet.
             Assert.Equal(AssetType.Unknown, asset.Type);
+        }
+
+        private async Task<long> GetResizedLengthAsync(string imageId, int width, int height)
+        {
+            var url = $"{_.ClientManager.GenerateImageUrl(imageId)}?width={width}&height={height}";
+
+            using (var httpClient = _.ClientManager.CreateHttpClient())
+            {
+                var response = await httpClient.GetAsync(url);
+
+                await using (var stream = await response.Content.ReadAsStreamAsync())
+                {
+                    var buffer = new MemoryStream();
+
+                    await stream.CopyToAsync(buffer);
+
+                    return buffer.Length;
+                }
+            }
         }
     }
 }

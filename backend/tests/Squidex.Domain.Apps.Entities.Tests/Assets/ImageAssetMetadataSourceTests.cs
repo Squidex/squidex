@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.EnhanceAsync(command);
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._))
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
                 .MustHaveHappened();
         }
 
@@ -54,8 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file };
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(new ImageInfo(800, 600, false));
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, default))
+                .Returns(new ImageInfo(800, 600, false, ImageFormat.PNG));
 
             await sut.EnhanceAsync(command);
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Equal(600, command.Metadata.GetPixelHeight());
             Assert.Equal(AssetType.Image, command.Type);
 
-            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, A<Stream>._))
+            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -72,11 +72,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file };
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(new ImageInfo(600, 800, true));
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, default))
+                .Returns(new ImageInfo(600, 800, true, ImageFormat.PNG));
 
-            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, A<Stream>._))
-                .Returns(new ImageInfo(800, 600, true));
+            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, default))
+                .Returns(new ImageInfo(800, 600, true, ImageFormat.PNG));
 
             await sut.EnhanceAsync(command);
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Equal(600, command.Metadata.GetPixelHeight());
             Assert.Equal(AssetType.Image, command.Type);
 
-            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, A<Stream>._))
+            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, default))
                 .MustHaveHappened();
         }
 

@@ -6,6 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\SampleImage_BMP_3MB - Copy.bmp" />
+    <None Remove="Assets\SampleImage_GIF_500kb - Copy.gif" />
+    <None Remove="Assets\SampleImage_JPG_200kb - Copy.jpg" />
+    <None Remove="Assets\SampleImage_PNG_1mb - Copy.png" />
+    <None Remove="Assets\SampleImage_TGA_2mb - Copy.tga" />
+    <None Remove="Assets\SampleImage_WEBP_350kb - Copy.webp" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.676">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -38,6 +46,27 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\SampleGIFImage_40kbmb.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SampleImage_100kb.webp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SampleImage_150kb.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SampleImage_400kb.tiff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SampleImage_400kb.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SampleImage_600kb.tga">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SampleImage_62kb.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\SampleImage_700kb.bmp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\SampleJPGImage_50kbmb.jpg">

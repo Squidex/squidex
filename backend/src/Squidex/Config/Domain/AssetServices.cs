@@ -9,6 +9,7 @@ using FluentFTP;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Squidex.Assets;
+using Squidex.Assets.ImageMagick;
 using Squidex.Assets.ImageSharp;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -177,7 +178,14 @@ namespace Squidex.Config.Domain
                 }
             });
 
-            services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
+            var thumbnailGenerator = new CompositeThumbnailGenerator(
+                new IAssetThumbnailGenerator[]
+                {
+                    new ImageSharpThumbnailGenerator(),
+                    new ImageMagickThumbnailGenerator()
+                });
+
+            services.AddSingletonAs(c => thumbnailGenerator)
                 .As<IAssetThumbnailGenerator>();
 
             services.AddSingletonAs(c => new DelegateInitializer(

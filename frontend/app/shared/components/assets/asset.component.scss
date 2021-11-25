@@ -138,6 +138,7 @@ $list-height: 2.25rem;
 
 .overlay {
     @include overlay;
+    cursor: pointer;
     font-size: $font-smallest;
     font-weight: normal;
 
