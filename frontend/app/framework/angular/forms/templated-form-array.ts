@@ -12,13 +12,13 @@ import { UndefinableFormArray } from './undefinable-form-array';
 export interface FormArrayTemplate {
     createControl(value?: any): AbstractControl;
 
-    removeControl?(control: AbstractControl, index: number): void;
+    removeControl?(index: number, control: AbstractControl) : void;
 
     clearControls?(): void;
 }
 
 export class TemplatedFormArray extends UndefinableFormArray {
-    constructor(private readonly template: FormArrayTemplate,
+    constructor(public readonly template: FormArrayTemplate,
         validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null,
     ) {
         super([], validatorOrOpts, asyncValidator);
@@ -46,6 +46,8 @@ export class TemplatedFormArray extends UndefinableFormArray {
         const control = this.template.createControl(value);
 
         this.push(control);
+
+        return control;
     }
 
     private prepare(value?: any[]) {
@@ -66,13 +68,11 @@ export class TemplatedFormArray extends UndefinableFormArray {
                 while (this.controls.length > value.length) {
                     const index = this.controls.length - 1;
 
-                    this.removeAt(index, { emitEvent: false });
-
                     if (this.template.removeControl) {
-                        const control = this.controls[index];
-
-                        this.template.removeControl(control, index);
+                        this.template.removeControl(index, this.controls[index]);
                     }
+
+                    this.removeAt(index, { emitEvent: false });
                 }
             }
         } else if (this.template.clearControls) {

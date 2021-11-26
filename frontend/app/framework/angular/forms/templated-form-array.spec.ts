@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { FormArrayTemplate, TemplatedFormArray } from './templated-form-array';
 
 describe('TemplatedFormArray', () => {
@@ -23,7 +23,7 @@ describe('TemplatedFormArray', () => {
             this.clearCalled++;
         }
 
-        public removeControl(_: AbstractControl, index: number) {
+        public removeControl(index: number) {
             this.removeCalled.push(index);
         }
     }

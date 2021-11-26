@@ -63,22 +63,6 @@ export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, A
             editors: new TemplatedFormArray(new EditorTemplate(formBuilder)),
         }));
     }
-
-    public addPattern() {
-        this.patterns.add();
-    }
-
-    public addEditor() {
-        this.editors.add();
-    }
-
-    public removePattern(index: number) {
-        this.patterns.removeAt(index);
-    }
-
-    public removeEditor(index: number) {
-        this.editors.removeAt(index);
-    }
 }
 
 class PatternTemplate {

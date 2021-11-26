@@ -102,7 +102,7 @@ export class ArrayEditorComponent implements OnChanges {
     }
 
     public clear() {
-        this.formModel.reset();
+        this.formModel.setValue([]);
     }
 
     public sort(event: CdkDragDrop<ReadonlyArray<ObjectForm>>) {

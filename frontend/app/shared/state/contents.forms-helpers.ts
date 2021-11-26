@@ -307,8 +307,6 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
     }
 
     public setValue(value: any) {
-        this.prepareLoad(value);
-
         this.form.reset(value);
     }
 
@@ -317,10 +315,6 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
     }
 
     protected updateCustomState(_context: RuleContext, _fieldData: any, _itemData: any, _state: AbstractContentFormState): void {
-        return;
-    }
-
-    public prepareLoad(_data: any): void {
         return;
     }
 }

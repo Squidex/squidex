@@ -45,14 +45,6 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
         }));
     }
 
-    public addMetadata() {
-        this.metadata.add();
-    }
-
-    public removeMetadata(index: number) {
-        this.metadata.removeAt(index);
-    }
-
     public transformSubmit(value: any) {
         const result = { ...value, metadata: {} };
 

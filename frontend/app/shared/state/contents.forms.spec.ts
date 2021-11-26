@@ -553,7 +553,7 @@ describe('ContentForm', () => {
         it('should reset array item', () => {
             const { array } = createArrayFormWith2Items();
 
-            array.reset();
+            array.setValue([]);
 
             expectLength(array, 0);
             expect(array.form.value).toEqual([]);
