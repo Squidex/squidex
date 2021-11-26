@@ -5,22 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, Mutable, Types } from '@app/framework';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Form, Mutable, TemplatedFormArray, Types } from '@app/framework';
 import slugify from 'slugify';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto, RenameAssetTagDto } from './../services/assets.service';
 
 export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
-        return this.form.get('metadata')! as FormArray;
+        return this.form.get('metadata')! as TemplatedFormArray;
     }
+
     public get metadataControls(): ReadonlyArray<FormGroup> {
         return this.metadata.controls as any;
     }
 
-    constructor(
-        private readonly formBuilder: FormBuilder,
-    ) {
+    constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             isProtected: [false,
                 [
@@ -42,20 +41,12 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
                     Validators.nullValidator,
                 ],
             ],
-            metadata: formBuilder.array([]),
+            metadata: new TemplatedFormArray(new MetadataTemplate(formBuilder)),
         }));
     }
 
     public addMetadata() {
-        this.metadata.push(
-            this.formBuilder.group({
-                name: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-                value: [''],
-            }));
+        this.metadata.add();
     }
 
     public removeMetadata(index: number) {
@@ -143,16 +134,6 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
         }
 
         if (Types.isObject(value.metadata)) {
-            const length = Object.keys(value.metadata).length;
-
-            while (this.metadata.controls.length < length) {
-                this.addMetadata();
-            }
-
-            while (this.metadata.controls.length > length) {
-                this.removeMetadata(this.metadata.controls.length - 1);
-            }
-
             result.metadata = [];
 
             for (const name in value.metadata) {
@@ -191,6 +172,21 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
 
             this.form.get('slug')!.setValue(slug);
         }
+    }
+}
+
+class MetadataTemplate {
+    constructor(private readonly formBuilder: FormBuilder) {}
+
+    public createControl() {
+        return this.formBuilder.group({
+            name: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+            value: [''],
+        });
     }
 }
 

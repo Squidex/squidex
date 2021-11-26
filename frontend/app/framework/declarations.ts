@@ -31,6 +31,7 @@ export * from './angular/forms/forms-helper';
 export * from './angular/forms/indeterminate-value.directive';
 export * from './angular/forms/model';
 export * from './angular/forms/progress-bar.component';
+export * from './angular/forms/templated-form-array';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/undefinable-form-array';
 export * from './angular/forms/undefinable-form-group';

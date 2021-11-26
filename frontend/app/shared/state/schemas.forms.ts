@@ -7,8 +7,8 @@
 
 /* eslint-disable no-useless-escape */
 
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, ValidatorsEx, value$ } from '@app/framework';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Form, TemplatedFormArray, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
 import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
 import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from './../services/schemas.types';
@@ -78,36 +78,17 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
     }
 }
 
-export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<FieldRule>, SchemaDto> {
+export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyArray<FieldRule>, SchemaDto> {
     public get rulesControls(): ReadonlyArray<FormGroup> {
         return this.form.controls as any;
     }
 
-    constructor(
-        private readonly formBuilder: FormBuilder,
-    ) {
-        super(formBuilder.array([]));
+    constructor(formBuilder: FormBuilder) {
+        super(new TemplatedFormArray(new FieldRuleTemplate(formBuilder)));
     }
 
     public add(fieldNames: ReadonlyArray<string>) {
-        this.form.push(
-            this.formBuilder.group({
-                action: ['Disable',
-                    [
-                        Validators.required,
-                    ],
-                ],
-                field: [fieldNames[0],
-                    [
-                        Validators.required,
-                    ],
-                ],
-                condition: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-            }));
+        this.form.add(fieldNames);
     }
 
     public remove(index: number) {
@@ -115,47 +96,47 @@ export class ConfigureFieldRulesForm extends Form<FormArray, ReadonlyArray<Field
     }
 
     public transformLoad(value: Partial<SchemaDto>) {
-        const result = value.fieldRules || [];
+        return value.fieldRules || [];
+    }
+}
 
-        while (this.form.controls.length < result.length) {
-            this.add([]);
-        }
+class FieldRuleTemplate {
+    constructor(private readonly formBuilder: FormBuilder) {}
 
-        while (this.form.controls.length > result.length) {
-            this.remove(this.form.controls.length - 1);
-        }
-
-        return result;
+    public createControl(value?: any) {
+        return this.formBuilder.group({
+            action: ['Disable',
+                [
+                    Validators.required,
+                ],
+            ],
+            field: [value?.[0],
+                [
+                    Validators.required,
+                ],
+            ],
+            condition: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+        });
     }
 }
 
 type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
-export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUrlsFormType, SchemaDto> {
+export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, ConfigurePreviewUrlsFormType, SchemaDto> {
     public get previewControls(): ReadonlyArray<FormGroup> {
         return this.form.controls as any;
     }
 
-    constructor(
-        private readonly formBuilder: FormBuilder,
-    ) {
-        super(formBuilder.array([]));
+    constructor(formBuilder: FormBuilder) {
+        super(new TemplatedFormArray(new PreviewUrlTemplate(formBuilder)));
     }
 
     public add() {
-        this.form.push(
-            this.formBuilder.group({
-                name: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-                url: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-            }));
+        this.form.add();
     }
 
     public remove(index: number) {
@@ -165,21 +146,9 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
     public transformLoad(value: Partial<SchemaDto>) {
         const result = [];
 
-        const previewUrls = value.previewUrls || {};
-
-        const length = Object.keys(previewUrls).length;
-
-        while (this.form.controls.length < length) {
-            this.add();
-        }
-
-        while (this.form.controls.length > length) {
-            this.remove(this.form.controls.length - 1);
-        }
-
-        for (const key in previewUrls) {
-            if (previewUrls.hasOwnProperty(key)) {
-                result.push({ name: key, url: previewUrls[key] });
+        if (value.previewUrls) {
+            for (const [name, url] of Object.entries(value.previewUrls)) {
+                result.push({ name, url });
             }
         }
 
@@ -194,6 +163,25 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray, ConfigurePreviewUr
         }
 
         return result;
+    }
+}
+
+class PreviewUrlTemplate {
+    constructor(private readonly formBuilder: FormBuilder) {}
+
+    public createControl() {
+        return this.formBuilder.group({
+            name: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+            url: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+        });
     }
 }
 

@@ -7,8 +7,8 @@
 
 /* eslint-disable no-useless-escape */
 
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, ValidatorsEx } from '@app/framework';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
 import { AppDto, AppSettingsDto, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
 export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
@@ -39,64 +39,37 @@ export class UpdateAppForm extends Form<FormGroup, UpdateAppDto, AppDto> {
 }
 
 export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, AppSettingsDto> {
-    public get patterns(): FormArray {
-        return this.form.controls['patterns']! as FormArray;
+    public get patterns() {
+        return this.form.controls['patterns']! as TemplatedFormArray;
     }
 
     public get patternsControls(): ReadonlyArray<FormGroup> {
         return this.patterns.controls as any;
     }
 
-    public get editors(): FormArray {
-        return this.form.controls['editors']! as FormArray;
+    public get editors() {
+        return this.form.controls['editors']! as TemplatedFormArray;
     }
 
     public get editorsControls(): ReadonlyArray<FormGroup> {
         return this.editors.controls as any;
     }
 
-    constructor(
-        private readonly formBuilder: FormBuilder,
-    ) {
+    constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            patterns: formBuilder.array([]),
+            patterns: new TemplatedFormArray(new PatternTemplate(formBuilder)),
             hideScheduler: false,
             hideDateTimeButtons: false,
-            editors: formBuilder.array([]),
+            editors: new TemplatedFormArray(new EditorTemplate(formBuilder)),
         }));
     }
 
     public addPattern() {
-        this.patterns.push(
-            this.formBuilder.group({
-                name: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-                regex: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-                message: '',
-            }));
+        this.patterns.add();
     }
 
     public addEditor() {
-        this.editors.push(
-            this.formBuilder.group({
-                name: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-                url: ['',
-                    [
-                        Validators.required,
-                    ],
-                ],
-            }));
+        this.editors.add();
     }
 
     public removePattern(index: number) {
@@ -106,28 +79,43 @@ export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, A
     public removeEditor(index: number) {
         this.editors.removeAt(index);
     }
+}
 
-    public transformLoad(value: AppSettingsDto) {
-        const patterns = this.patterns;
+class PatternTemplate {
+    constructor(private readonly formBuilder: FormBuilder) {}
 
-        while (patterns.controls.length < value.patterns.length) {
-            this.addPattern();
-        }
+    public createControl() {
+        return this.formBuilder.group({
+            name: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+            regex: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+            message: '',
+        });
+    }
+}
 
-        while (patterns.controls.length > value.patterns.length) {
-            this.removePattern(patterns.controls.length - 1);
-        }
+class EditorTemplate {
+    constructor(private readonly formBuilder: FormBuilder) {}
 
-        const editors = this.editors;
-
-        while (editors.controls.length < value.editors.length) {
-            this.addEditor();
-        }
-
-        while (editors.controls.length > value.editors.length) {
-            this.removeEditor(editors.controls.length - 1);
-        }
-
-        return value;
+    public createControl() {
+        return this.formBuilder.group({
+            name: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+            url: ['',
+                [
+                    Validators.required,
+                ],
+            ],
+        });
     }
 }
