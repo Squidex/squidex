@@ -316,9 +316,9 @@ export class FieldValueForm extends AbstractContentForm<FieldDto, FormControl> {
 }
 
 export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormArray> {
-    private readonly item$ = new BehaviorSubject<ReadonlyArray<ObjectForm>>([]);
+    private readonly item$ = new BehaviorSubject<ReadonlyArray<ObjectFormBase>>([]);
 
-    public get itemChanges(): Observable<ReadonlyArray<ObjectForm>> {
+    public get itemChanges(): Observable<ReadonlyArray<ObjectFormBase>> {
         return this.item$;
     }
 
@@ -326,7 +326,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         return this.item$.value;
     }
 
-    public set items(value: ReadonlyArray<ObjectForm>) {
+    public set items(value: ReadonlyArray<ObjectFormBase>) {
         this.item$.next(value);
     }
 
@@ -345,7 +345,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         return this.items[index];
     }
 
-    public addCopy(source: ObjectForm) {
+    public addCopy(source: ObjectFormBase) {
         this.form.add().reset(getRawValue(source.form));
     }
 
@@ -361,7 +361,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         this.form.removeAt(index);
     }
 
-    public move(index: number, item: ObjectForm) {
+    public move(index: number, item: ObjectFormBase) {
         const children = [...this.items];
 
         children.splice(children.indexOf(item), 1);
@@ -372,7 +372,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         this.sort(children);
     }
 
-    public sort(children: ReadonlyArray<ObjectForm>) {
+    public sort(children: ReadonlyArray<ObjectFormBase>) {
         for (let i = 0; i < children.length; i++) {
             this.form.setControl(i, children[i].form);
         }
@@ -467,7 +467,7 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
         public readonly partition: string,
     ) {
         super(globals, field, fieldPath,
-            ObjectForm.buildControl(template),
+            ObjectFormBase.buildControl(template),
             isOptional, rules);
     }
 
@@ -490,37 +490,43 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
     }
 }
 
-abstract class ObjectTemplate<TField extends FieldDto = FieldDto> implements FormGroupTemplate {
+abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> implements FormGroupTemplate {
     private currentSchema: ReadonlyArray<FieldDto> | undefined;
 
+    protected get model() {
+        return this.modelProvider();
+    }
+
     constructor(
-        protected readonly objectForm: () => ObjectFormBase<TField>,
+        private readonly modelProvider: () => T,
     ) {
     }
 
-    protected abstract getSchema(value: any, objectForm: ObjectFormBase<TField>): ReadonlyArray<FieldDto> | undefined;
+    protected abstract getSchema(value: any, model: T): ReadonlyArray<FieldDto> | undefined;
 
     public setControls(form: FormGroup, value: any) {
-        const objectForm = this.objectForm();
-
-        if (!objectForm) {
-            return;
-        }
-
-        const schema = this.getSchema(value, objectForm);
+        const schema = this.getSchema(value, this.model);
 
         if (this.currentSchema !== schema) {
-            this.clearControlsCore(objectForm);
+            this.clearControlsCore(this.model);
 
             if (schema) {
-                this.setControlsCore(schema, objectForm, form);
+                this.setControlsCore(schema, value, this.model, form);
             }
 
             this.currentSchema = schema;
         }
     }
 
-    protected setControlsCore(schema: ReadonlyArray<FieldDto>, objectForm: ObjectForm, form: FormGroup) {
+    public clearControls() {
+        if (this.currentSchema !== undefined) {
+            this.clearControlsCore(this.model);
+
+            this.currentSchema = undefined;
+        }
+    }
+
+    protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: T, form: FormGroup) {
         const fieldMap: FieldMap = {};
         const fieldSections: FieldSection<FieldDto, FieldItemForm>[] = [];
 
@@ -529,12 +535,12 @@ abstract class ObjectTemplate<TField extends FieldDto = FieldDto> implements For
 
             for (const field of fields) {
                 const childForm = buildForm(
-                    objectForm.globals,
+                    model.globals,
                     field,
-                    objectForm.path(field.name),
-                    objectForm.isOptional,
-                    objectForm.rules,
-                    objectForm.partition);
+                    model.path(field.name),
+                    model.isOptional,
+                    model.rules,
+                    model.partition);
 
                 form.setControl(field.name, childForm.form);
 
@@ -546,29 +552,17 @@ abstract class ObjectTemplate<TField extends FieldDto = FieldDto> implements For
             fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(separator, forms));
         }
 
-        objectForm.fields = fieldMap;
-        objectForm.fieldSections = fieldSections;
+        model.fields = fieldMap;
+        model.fieldSections = fieldSections;
     }
 
-    public clearControls() {
-        const objectForm = this.objectForm();
-
-        if (!objectForm) {
-            return;
+    protected clearControlsCore(model: T) {
+        for (const name of Object.keys(model.form.controls)) {
+            model.form.removeControl(name);
         }
 
-        this.clearControlsCore(objectForm);
-
-        this.currentSchema = undefined;
-    }
-
-    private clearControlsCore(objectForm: ObjectFormBase<TField>) {
-        for (const name of Object.keys(objectForm.form.controls)) {
-            objectForm.form.removeControl(name);
-        }
-
-        objectForm.fields = {};
-        objectForm.fieldSections = [];
+        model.fields = {};
+        model.fieldSections = [];
     }
 }
 
@@ -581,29 +575,29 @@ export class ArrayItemForm extends ObjectFormBase<RootFieldDto> {
     }
 }
 
-class ArrayItemTemplate extends ObjectTemplate<RootFieldDto> {
+class ArrayItemTemplate extends ObjectTemplate<ArrayItemForm> {
     public getSchema() {
-        return this.objectForm()?.field?.nested;
-    }
-}
-
-export class ObjectForm extends ObjectFormBase {
-    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
-        super(globals, field, fieldPath, isOptional, rules,
-            new ComponentTemplate(() => this),
-            partition);
-
-        this.form.build();
+        return this.model.field.nested;
     }
 }
 
 export class ComponentForm extends ObjectFormBase {
-    public get properties() {
-        return this.field.properties as ComponentFieldPropertiesDto;
+    private readonly schema$ = new BehaviorSubject<SchemaDto | undefined>(undefined);
+
+    public get schemaChanges(): Observable<SchemaDto | undefined> {
+        return this.schema$;
     }
 
     public get schema() {
-        return this.form.template['schema'];
+        return this.schema$.value;
+    }
+
+    public set schema(value: SchemaDto | undefined) {
+        this.schema$.next(value);
+    }
+
+    public get properties() {
+        return this.field.properties as ComponentFieldPropertiesDto;
     }
 
     constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
@@ -620,19 +614,23 @@ export class ComponentForm extends ObjectFormBase {
     }
 }
 
-class ComponentTemplate extends ObjectTemplate {
-    public schema?: SchemaDto;
-
-    public getSchema(value: any, objectForm: ObjectFormBase<FieldDto>) {
-        this.schema = objectForm.globals.schemas[value?.schemaId];
-
-        return this.schema?.fields;
+class ComponentTemplate extends ObjectTemplate<ComponentForm> {
+    public getSchema(value: any, model: ComponentForm) {
+        return model.globals.schemas[value?.schemaId].fields;
     }
 
-    protected setControlsCore(schema: ReadonlyArray<FieldDto>, objectForm: ObjectForm, form: FormGroup) {
+    protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: ComponentForm, form: FormGroup) {
         form.setControl('schemaId', new FormControl());
 
-        super.setControlsCore(schema, objectForm, form);
+        this.model.schema = model.globals.schemas[value?.schemaId];
+
+        super.setControlsCore(schema, value, model, form);
+    }
+
+    protected clearControlsCore(model: ComponentForm) {
+        this.model.schema = undefined;
+
+        super.clearControlsCore(model);
     }
 }
 
