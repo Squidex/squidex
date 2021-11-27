@@ -18,14 +18,6 @@ export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDt
         super(new TemplatedFormArray(new PermissionTemplate()));
     }
 
-    public add(value?: string) {
-        this.form.add(value);
-    }
-
-    public remove(index: number) {
-        this.form.removeAt(index);
-    }
-
     public transformSubmit(value: any) {
         return { permissions: value, properties: {} };
     }

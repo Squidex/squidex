@@ -462,6 +462,7 @@ describe('ContentForm', () => {
         it('should hide components fields based on condition', () => {
             const componentId = MathHelper.guid();
             const component = createSchema({
+                id: 2,
                 fields: [
                     createField({
                         id: 1,

@@ -101,15 +101,11 @@ export class RoleComponent implements OnChanges {
         this.rolesState.delete(this.role);
     }
 
-    public removePermission(index: number) {
-        this.editForm.remove(index);
-    }
-
     public addPermission() {
         const value = this.addPermissionForm.submit();
 
         if (value) {
-            this.editForm.add(value.permission);
+            this.editForm.form.add(value.permission);
 
             this.addPermissionForm.submitCompleted();
             this.addPermissionInput.focus();

@@ -135,14 +135,6 @@ export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, Configure
         super(new TemplatedFormArray(new PreviewUrlTemplate(formBuilder)));
     }
 
-    public add() {
-        this.form.add();
-    }
-
-    public remove(index: number) {
-        this.form.removeAt(index);
-    }
-
     public transformLoad(value: Partial<SchemaDto>) {
         const result = [];
 

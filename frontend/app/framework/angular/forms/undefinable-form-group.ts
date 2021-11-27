@@ -24,8 +24,6 @@ export class UndefinableFormGroup extends FormGroup {
                 return reduce.apply(this);
             }
         };
-
-        this.setValue(undefined);
     }
 
     public getRawValue() {
@@ -40,7 +38,7 @@ export class UndefinableFormGroup extends FormGroup {
         this.checkUndefined(value);
 
         if (this.isUndefined) {
-            super.reset([], options);
+            super.reset({}, options);
         } else {
             super.setValue(value!, options);
         }
@@ -50,7 +48,7 @@ export class UndefinableFormGroup extends FormGroup {
         this.checkUndefined(value);
 
         if (this.isUndefined) {
-            super.reset([], options);
+            super.reset({}, options);
         } else {
             super.patchValue(value!, options);
         }

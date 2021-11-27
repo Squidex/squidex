@@ -27,7 +27,7 @@
 
                     <div class="col-auto">
                         <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
-                            (sqxConfirmClick)="editForm.remove(i)"
+                            (sqxConfirmClick)="editForm.form.removeAt(i)"
                             confirmTitle="i18n:schemas.deleteUrlConfirmTitle"
                             confirmText="i18n:schemas.deleteUrlConfirmText"
                             confirmRememberKey="removePreviewUrl">
@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="col-auto col-options">
-                        <button type="button" class="btn btn-success" (click)="add()">
+                        <button type="button" class="btn btn-success" (click)="editForm.form.add()">
                             <i class="icon-add"></i>
                         </button>
                     </div>
