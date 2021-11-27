@@ -37,7 +37,7 @@ export class UndefinableFormGroup extends FormGroup {
     }
 
     public setValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         if (this.isUndefined) {
             super.reset([], options);
@@ -47,7 +47,7 @@ export class UndefinableFormGroup extends FormGroup {
     }
 
     public patchValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         if (this.isUndefined) {
             super.reset([], options);
@@ -57,9 +57,13 @@ export class UndefinableFormGroup extends FormGroup {
     }
 
     public reset(value?: {}, options: { onlySelf?: boolean; emitEvent?: boolean } = {}) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         super.reset(value || {}, options);
+    }
+
+    private checkUndefined(value?: {}) {
+        this.isUndefined = Types.isUndefined(value);
     }
 
     public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean } = {}) {

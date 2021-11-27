@@ -97,7 +97,7 @@ export class Queries {
 }
 
 function parseQueries(settings: {}) {
-    const queries = Object.keys(settings).map(name => parseStored(name, settings[name]));
+    const queries = Object.entries(settings).map(([name, value]) => parseStored(name, value as any));
 
     return queries.sort((a, b) => compareStrings(a.name, b.name));
 }

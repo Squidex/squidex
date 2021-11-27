@@ -103,14 +103,14 @@ export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyAr
 class FieldRuleTemplate {
     constructor(private readonly formBuilder: FormBuilder) {}
 
-    public createControl(value?: any) {
+    public createControl(_: any, fieldNames?: ReadonlyArray<string>) {
         return this.formBuilder.group({
             action: ['Disable',
                 [
                     Validators.required,
                 ],
             ],
-            field: [value?.[0],
+            field: [fieldNames?.[0],
                 [
                     Validators.required,
                 ],

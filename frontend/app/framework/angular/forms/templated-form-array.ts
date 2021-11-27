@@ -10,7 +10,7 @@ import { Types } from '@app/framework/internal';
 import { UndefinableFormArray } from './undefinable-form-array';
 
 export interface FormArrayTemplate {
-    createControl(value?: any): AbstractControl;
+    createControl(value: any, initialValue?: any): AbstractControl;
 
     removeControl?(index: number, control: AbstractControl) : void;
 
@@ -42,43 +42,45 @@ export class TemplatedFormArray extends UndefinableFormArray {
         super.reset(value, options);
     }
 
-    public add(value?: any) {
-        const control = this.template.createControl(value);
+    public add(initialValue?: any) {
+        const control = this.template.createControl({}, initialValue);
 
         this.push(control);
 
         return control;
     }
 
-    private prepare(value?: any[]) {
-        if (Types.isArray(value)) {
-            if (value.length === 0) {
-                if (this.controls.length > 0) {
-                    this.clear({ emitEvent: false });
+    public removeAt(index: number, options?: { emitEvent?: boolean }) {
+        if (this.template.removeControl && index >= 0 && index < this.controls.length) {
+            this.template.removeControl(index, this.controls[index]);
+        }
 
-                    if (this.template.clearControls) {
-                        this.template.clearControls();
-                    }
-                }
-            } else {
-                while (this.controls.length < value.length) {
-                    this.add();
-                }
+        super.removeAt(index, options);
+    }
 
-                while (this.controls.length > value.length) {
-                    const index = this.controls.length - 1;
-
-                    if (this.template.removeControl) {
-                        this.template.removeControl(index, this.controls[index]);
-                    }
-
-                    this.removeAt(index, { emitEvent: false });
-                }
-            }
-        } else if (this.template.clearControls) {
-            this.clear();
-
+    public clear(options?: { emitEvent?: boolean }) {
+        if (this.template.clearControls && this.controls.length > 0) {
             this.template.clearControls();
+        }
+
+        super.clear(options);
+    }
+
+    private prepare(value?: any[]) {
+        if (Types.isArray(value) && value.length > 0) {
+            let index = this.controls.length;
+
+            while (this.controls.length < value.length) {
+                this.add(value[index]);
+
+                index++;
+            }
+
+            while (this.controls.length > value.length) {
+                this.removeAt(this.controls.length - 1, { emitEvent: false });
+            }
+        } else {
+            this.clear();
         }
     }
 }

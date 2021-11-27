@@ -197,9 +197,8 @@ export module Types {
             return source;
         }
 
-        Object.keys(source).forEach(key => {
+        Object.entries(source).forEach(([key, sourceValue]) => {
             const targetValue = target[key];
-            const sourceValue = source[key];
 
             if (Types.isArray(targetValue) && Types.isArray(sourceValue)) {
                 target[key] = targetValue.concat(sourceValue);

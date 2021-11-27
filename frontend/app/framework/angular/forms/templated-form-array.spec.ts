@@ -123,4 +123,31 @@ describe('TemplatedFormArray', () => {
             value: null,
         }]);
     });
+
+    it('should call template when cleared', () => {
+        formArray.add();
+        formArray.clear();
+
+        expect(formTemplate.clearCalled).toEqual(1);
+    });
+
+    it('should not call template when clearing empty form', () => {
+        formArray.clear();
+
+        expect(formTemplate.clearCalled).toEqual(0);
+    });
+
+    it('should call template when item removed', () => {
+        formArray.add();
+        formArray.removeAt(0);
+
+        expect(formTemplate.removeCalled).toEqual([0]);
+    });
+
+    it('should not call template when item to remove out of bounds', () => {
+        formArray.add();
+        formArray.removeAt(1);
+
+        expect(formTemplate.removeCalled).toEqual([]);
+    });
 });

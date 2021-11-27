@@ -36,8 +36,8 @@ export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDt
 }
 
 class PermissionTemplate {
-    public createControl(value?: any) {
-        return new FormControl(value, Validators.required);
+    public createControl(_: any, initialValue: string) {
+        return new FormControl(initialValue, Validators.required);
     }
 }
 
