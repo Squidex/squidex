@@ -69,9 +69,7 @@ export class Profile {
             user: this.user,
         };
 
-        for (const key of Object.keys(this.user.profile)) {
-            result[key] = this.user.profile[key];
-        }
+        Object.assign(result, this.user.profile);
 
         return result;
     }

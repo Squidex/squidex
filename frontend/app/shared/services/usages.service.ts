@@ -88,8 +88,8 @@ export class UsagesService {
             map(body => {
                 const details: { [category: string]: CallsUsagePerDateDto[] } = {};
 
-                for (const category of Object.keys(body.details)) {
-                    details[category] = body.details[category].map((item: any) =>
+                for (const [category, value] of Object.entries(body.details)) {
+                    details[category] = (value as any).map((item: any) =>
                         new CallsUsagePerDateDto(
                             DateTime.parseISO(item.date),
                             item.totalBytes,

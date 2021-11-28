@@ -5,25 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Form, hasNoValue$, hasValue$ } from '@app/framework';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, hasNoValue$, hasValue$, TemplatedFormArray } from '@app/framework';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
-export class EditRoleForm extends Form<FormArray, UpdateRoleDto, RoleDto> {
+export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
     public get controls() {
         return this.form.controls as FormControl[];
     }
 
     constructor() {
-        super(new FormArray([]));
-    }
-
-    public add(value?: string) {
-        this.form.push(new FormControl(value, Validators.required));
-    }
-
-    public remove(index: number) {
-        this.form.removeAt(index);
+        super(new TemplatedFormArray(new PermissionTemplate()));
     }
 
     public transformSubmit(value: any) {
@@ -31,17 +23,13 @@ export class EditRoleForm extends Form<FormArray, UpdateRoleDto, RoleDto> {
     }
 
     public transformLoad(value: Partial<UpdateRoleDto>) {
-        const permissions = value.permissions || [];
+        return value.permissions || [];
+    }
+}
 
-        while (this.form.controls.length < permissions.length) {
-            this.add();
-        }
-
-        while (permissions.length > this.form.controls.length) {
-            this.form.removeAt(this.form.controls.length - 1);
-        }
-
-        return value.permissions;
+class PermissionTemplate {
+    public createControl(_: any, initialValue: string) {
+        return new FormControl(initialValue, Validators.required);
     }
 }
 

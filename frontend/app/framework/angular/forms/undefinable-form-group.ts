@@ -24,8 +24,6 @@ export class UndefinableFormGroup extends FormGroup {
                 return reduce.apply(this);
             }
         };
-
-        this.setValue(undefined);
     }
 
     public getRawValue() {
@@ -37,29 +35,33 @@ export class UndefinableFormGroup extends FormGroup {
     }
 
     public setValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         if (this.isUndefined) {
-            super.reset([], options);
+            super.reset({}, options);
         } else {
             super.setValue(value!, options);
         }
     }
 
     public patchValue(value?: {}, options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         if (this.isUndefined) {
-            super.reset([], options);
+            super.reset({}, options);
         } else {
             super.patchValue(value!, options);
         }
     }
 
     public reset(value?: {}, options: { onlySelf?: boolean; emitEvent?: boolean } = {}) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         super.reset(value || {}, options);
+    }
+
+    private checkUndefined(value?: {}) {
+        this.isUndefined = Types.isUndefined(value);
     }
 
     public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean } = {}) {

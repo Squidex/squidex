@@ -59,7 +59,7 @@
                             <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                         </div>
                         <div class="col-auto" *ngIf="isEditable">
-                            <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
+                            <button type="button" class="btn btn-text-danger" (click)="editForm.form.removeAt(i)">
                                 <i class="icon-bin2"></i>
                             </button>
                         </div>

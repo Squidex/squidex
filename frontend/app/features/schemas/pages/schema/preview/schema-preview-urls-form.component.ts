@@ -35,10 +35,6 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
         this.editForm.setEnabled(this.isEditable);
     }
 
-    public add() {
-        this.editForm.add();
-    }
-
     public saveSchema() {
         if (!this.isEditable) {
             return;

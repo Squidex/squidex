@@ -44,13 +44,13 @@ export class ApiPerformanceCardComponent implements OnChanges {
 
             this.chartData = {
                 labels,
-                datasets: Object.keys(this.usage.details).map((k, i) => (
+                datasets: Object.entries(this.usage.details).map(([key, value], i) => (
                     {
-                        label: ChartHelpers.label(k),
+                        label: ChartHelpers.label(key),
                         backgroundColor: ChartHelpers.getBackgroundColor(i),
                         borderColor: ChartHelpers.getBorderColor(i),
                         borderWidth: 1,
-                        data: this.usage.details[k].map(x => x.averageElapsedMs),
+                        data: value.map(x => x.averageElapsedMs),
                     })),
             };
 
