@@ -28,13 +28,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 new CounterJintExtension(grainFactory)
             };
 
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-
-            sut = new JintScriptEngine(cache, extensions)
-            {
-                TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
-            };
+            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }), extensions);
         }
 
         [Fact]

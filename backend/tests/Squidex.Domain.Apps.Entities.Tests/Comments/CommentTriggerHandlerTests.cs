@@ -265,9 +265,15 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 Condition = condition
             };
 
-            var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            var realScriptEngine =
+                new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                    Options.Create(new JintScriptOptions
+                    {
+                        TimeoutScript = TimeSpan.FromSeconds(2),
+                        TimeoutExecution = TimeSpan.FromSeconds(10)
+                    }));
 
-            var handler = new CommentTriggerHandler(new JintScriptEngine(memoryCache), userResolver);
+            var handler = new CommentTriggerHandler(realScriptEngine, userResolver);
 
             action(handler, Context(trigger));
         }

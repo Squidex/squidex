@@ -89,10 +89,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             A.CallTo(() => app.AssetScripts)
                 .Returns(scripts);
 
+            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }));
+
             var serviceProvider =
                 new ServiceCollection()
-                    .AddSingleton<IScriptEngine>(
-                        new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions()))))
+                    .AddMemoryCache()
+                    .AddOptions()
+                    .AddOptions<MemoryCacheOptions>().Services
+                    .AddSingleton<IScriptEngine, JintScriptEngine>()
                     .BuildServiceProvider();
 
             command.Actor = actor;

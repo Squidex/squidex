@@ -48,11 +48,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
                 .Returns(Mocks.App(appId));
 
-            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())), extensions)
-            {
-                TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
-            };
+            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }),
+                extensions);
         }
 
         [Fact]

@@ -47,27 +47,21 @@ namespace Squidex.Config.Domain
             services.Configure<ReplicatedCacheOptions>(config,
                 "caching:replicated");
 
+            services.Configure<JintScriptEngine>(config,
+                "scripting");
+
             services.AddReplicatedCache();
             services.AddAsyncLocalCache();
             services.AddBackgroundCache();
-
-            var timeoutExecution = config.GetValue<TimeSpan>("scripting:timeoutExecution");
-            var timeoutScript = config.GetValue<TimeSpan>("scripting:timeoutScript");
-
-            services.AddSingletonAs(c =>
-                new JintScriptEngine(
-                    c.GetRequiredService<IMemoryCache>(),
-                    c.GetRequiredService<IEnumerable<IJintExtension>>())
-                {
-                    TimeoutExecution = timeoutExecution,
-                    TimeoutScript = timeoutScript
-                }).As<IScriptEngine>();
 
             services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
             services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
                 .AsSelf();
+
+            services.AddSingletonAs<JintScriptEngine>()
+                .As<IScriptEngine>();
 
             services.AddSingletonAs<GrainTagService>()
                 .As<ITagService>();

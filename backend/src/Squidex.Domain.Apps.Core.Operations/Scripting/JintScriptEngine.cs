@@ -11,6 +11,7 @@ using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
@@ -25,40 +26,15 @@ namespace Squidex.Domain.Apps.Core.Scripting
     {
         private readonly IJintExtension[] extensions;
         private readonly Parser parser;
+        private readonly TimeSpan timeoutScript;
+        private readonly TimeSpan timeoutExecution;
 
-        public TimeSpan TimeoutScript { get; set; } = TimeSpan.FromMilliseconds(200);
-
-        public TimeSpan TimeoutExecution { get; set; } = TimeSpan.FromMilliseconds(4000);
-
-        private TimeSpan ActualTimeoutScript
-        {
-            get
-            {
-                if (Debugger.IsAttached)
-                {
-                    return TimeSpan.FromHours(1);
-                }
-
-                return TimeoutScript;
-            }
-        }
-
-        private TimeSpan ActualTimeoutExecution
-        {
-            get
-            {
-                if (Debugger.IsAttached)
-                {
-                    return TimeSpan.FromHours(1);
-                }
-
-                return TimeoutExecution;
-            }
-        }
-
-        public JintScriptEngine(IMemoryCache cache, IEnumerable<IJintExtension>? extensions = null)
+        public JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOptions> options, IEnumerable<IJintExtension>? extensions = null)
         {
             parser = new Parser(cache);
+
+            timeoutScript = options.Value.TimeoutScript;
+            timeoutExecution = options.Value.TimeoutExecution;
 
             this.extensions = extensions?.ToArray() ?? Array.Empty<IJintExtension>();
         }
@@ -69,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
-            using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
+            using (var cts = new CancellationTokenSource(timeoutExecution))
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
@@ -107,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNull(vars, nameof(vars));
             Guard.NotNullOrEmpty(script, nameof(script));
 
-            using (var cts = new CancellationTokenSource(ActualTimeoutExecution))
+            using (var cts = new CancellationTokenSource(timeoutExecution))
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
@@ -181,7 +157,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 engineOptions.AddObjectConverter(DefaultConverter.Instance);
                 engineOptions.SetReferencesResolver(NullPropagation.Instance);
                 engineOptions.Strict();
-                engineOptions.TimeoutInterval(ActualTimeoutScript);
+                engineOptions.TimeoutInterval(timeoutScript);
             });
 
             if (options.CanDisallow)

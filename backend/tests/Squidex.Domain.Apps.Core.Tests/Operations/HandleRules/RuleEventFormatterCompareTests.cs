@@ -106,13 +106,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 new StringWordsJintExtension()
             };
 
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-
-            return new JintScriptEngine(cache, extensions)
-            {
-                TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
-            };
+            return new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }),
+                extensions);
         }
 
         [Theory]

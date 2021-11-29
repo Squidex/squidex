@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), context.CancellationToken);
 
-                // Reset the time contraints and other constraints so that our awaiting does not count.
+                // Reset the time contraints and other constraints so that our awaiting does not count as script time.
                 context.Engine.ResetConstraints();
 
                 callback(JsValue.FromObject(context.Engine, contents.ToArray()));

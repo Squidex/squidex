@@ -90,11 +90,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
-            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())))
-            {
-                TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
-            };
+            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }));
 
             sut = new DynamicContentWorkflow(scriptEngine, appProvider);
         }
