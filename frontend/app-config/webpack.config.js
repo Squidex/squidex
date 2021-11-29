@@ -134,7 +134,6 @@ module.exports = function calculateConfig(env) {
                     loader: 'file-loader',
                     options: {
                         name: '[name].[hash].[ext]',
-
                         // Store the assets in custom path because of fonts need relative urls.
                         outputPath: 'assets',
 

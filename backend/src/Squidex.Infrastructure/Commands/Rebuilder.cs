@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.Commands
 
             var errorRate = (double)handlerErrors / handledIds.Count;
 
-            if (errorRate >= errorThreshold)
+            if (errorRate > 0 && errorRate >= errorThreshold)
             {
                 throw new InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
             }
