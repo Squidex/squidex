@@ -6,7 +6,6 @@
  */
 
 import { Component, Injectable, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AssignContributorForm, AutocompleteSource, ContributorsState, DialogModel, DialogService, RoleDto, UsersService } from '@app/shared';
 import { Observable } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
@@ -48,7 +47,7 @@ export class ContributorAddFormComponent implements OnChanges {
     @Input()
     public roles: ReadonlyArray<RoleDto>;
 
-    public assignContributorForm = new AssignContributorForm(this.formBuilder);
+    public assignContributorForm = new AssignContributorForm();
 
     public importDialog = new DialogModel();
 
@@ -56,7 +55,6 @@ export class ContributorAddFormComponent implements OnChanges {
         public readonly contributorsState: ContributorsState,
         public readonly usersDataSource: UsersDataSource,
         private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

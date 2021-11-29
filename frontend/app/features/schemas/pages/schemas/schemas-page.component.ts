@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreateCategoryForm, DialogModel, getCategoryTree, MessageBus, ResourceOwner, SchemaCategory, SchemaDto, SchemasState, value$ } from '@app/shared';
 import { combineLatest } from 'rxjs';
@@ -20,7 +20,7 @@ import { SchemaCloning } from './../messages';
 })
 export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public addSchemaDialog = new DialogModel();
-    public addCategoryForm = new CreateCategoryForm(this.formBuilder);
+    public addCategoryForm = new CreateCategoryForm();
 
     public schemasFilter = new FormControl();
 
@@ -37,7 +37,6 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
 
     constructor(
         public readonly schemasState: SchemasState,
-        private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
         private readonly router: Router,

@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AddRoleForm, RolesState } from '@app/shared';
 
 @Component({
@@ -16,11 +15,10 @@ import { AddRoleForm, RolesState } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoleAddFormComponent {
-    public addRoleForm = new AddRoleForm(this.formBuilder);
+    public addRoleForm = new AddRoleForm();
 
     constructor(
         private readonly rolesState: RolesState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

@@ -7,7 +7,6 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
@@ -50,7 +49,6 @@ export class FieldComponent implements OnChanges {
     public addFieldDialog = new DialogModel();
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
     ) {
         this.trackByFieldFn = this.trackByField.bind(this);
@@ -60,7 +58,7 @@ export class FieldComponent implements OnChanges {
         if (changes['field']) {
             this.isEditable = this.field.canUpdate;
 
-            this.editForm = new EditFieldForm(this.formBuilder, this.field.properties);
+            this.editForm = new EditFieldForm(this.field.properties);
             this.editForm.load(this.field.properties);
         }
     }

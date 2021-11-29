@@ -7,7 +7,6 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted } from '@app/shared';
 
 @Component({
@@ -30,10 +29,9 @@ export class LanguageComponent implements OnChanges {
     public isEditing?: boolean | null;
     public isEditable = false;
 
-    public editForm = new EditLanguageForm(this.formBuilder);
+    public editForm = new EditLanguageForm();
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly languagesState: LanguagesState,
     ) {
     }

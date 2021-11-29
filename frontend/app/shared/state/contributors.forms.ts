@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, hasNoValue$, Types, value$ } from '@app/framework';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, hasNoValue$, Types, UndefinableFormGroup, value$ } from '@app/framework';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { AssignContributorDto } from './../services/contributors.service';
 import { UserDto } from './../services/users.service';
@@ -14,18 +14,14 @@ import { UserDto } from './../services/users.service';
 export class AssignContributorForm extends Form<FormGroup, AssignContributorDto> {
     public hasNoUser = hasNoValue$(this.form.controls['user']);
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            user: [null,
-                [
-                    Validators.required,
-                ],
-            ],
-            role: [null,
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            user: new FormControl('',
+                Validators.required,
+            ),
+            role: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 
@@ -47,13 +43,11 @@ export class ImportContributorsForm extends Form<FormGroup, ImportContributorsFo
 
     public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            import: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            import: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 

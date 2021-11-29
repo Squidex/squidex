@@ -5,16 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, value$ } from '@app/framework';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, UndefinableFormGroup, value$ } from '@app/framework';
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 
 export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppLanguageDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            isMaster: false,
-            isOptional: false,
+    constructor() {
+        super(new UndefinableFormGroup({
+            isMaster: new FormControl(false,
+                Validators.nullValidator,
+            ),
+            isOptional: new FormControl(false,
+                Validators.nullValidator,
+            ),
         }));
 
         value$(this.form.controls['isMaster'])
@@ -36,13 +40,11 @@ export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppL
 type AddLanguageFormType = { language: LanguageDto };
 
 export class AddLanguageForm extends Form<FormGroup, AddLanguageFormType> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            language: [null,
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            language: new FormControl(null,
+                Validators.required,
+            ),
         }));
     }
 }

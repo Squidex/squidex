@@ -15,13 +15,17 @@ export class UndefinableFormGroup extends FormGroup {
     constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
         super(controls, validatorOrOpts, asyncValidator);
 
-        const reduce = this['_reduceValue'];
-
         this['_reduceValue'] = () => {
             if (this.isUndefined) {
                 return undefined;
             } else {
-                return reduce.apply(this);
+                const result = {};
+
+                for (const [key, value] of Object.entries(this.controls)) {
+                    result[key] = value;
+                }
+
+                return result;
             }
         };
     }

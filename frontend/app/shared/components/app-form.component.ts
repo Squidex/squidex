@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ApiUrlConfig, AppsState, CreateAppForm } from '@app/shared/internal';
 
 @Component({
@@ -22,12 +21,11 @@ export class AppFormComponent {
     @Input()
     public template = '';
 
-    public createForm = new CreateAppForm(this.formBuilder);
+    public createForm = new CreateAppForm();
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
         private readonly appsStore: AppsState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

@@ -6,7 +6,8 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
+import { UndefinableFormGroup } from '@app/framework';
 import { Keys } from '@app/framework/internal';
 
 @Component({
@@ -41,18 +42,10 @@ export class EditableTitleComponent {
     }
 
     public renaming = false;
-    public renameForm = this.formBuilder.group({
-        name: ['',
-            [
-                Validators.required,
-            ],
-        ],
-    });
-
-    constructor(
-        private readonly formBuilder: FormBuilder,
-    ) {
-    }
+    public renameForm =
+        new UndefinableFormGroup({
+            name: new FormControl('', Validators.required),
+        });
 
     public onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {

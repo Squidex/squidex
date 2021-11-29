@@ -6,7 +6,6 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 import { EMPTY, Observable } from 'rxjs';
 
@@ -22,13 +21,12 @@ export class SchemaScriptsFormComponent implements OnChanges {
     public schemaScript = 'query';
     public schemaCompletions: Observable<SchemaCompletions> = EMPTY;
 
-    public editForm = new EditSchemaScriptsForm(this.formBuilder);
+    public editForm = new EditSchemaScriptsForm();
 
     public isEditable = false;
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
         private readonly schemasService: SchemasService,
     ) {

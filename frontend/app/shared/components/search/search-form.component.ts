@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, Types } from '@app/shared/internal';
 import { Observable } from 'rxjs';
 
@@ -53,16 +52,11 @@ export class SearchFormComponent implements OnChanges {
 
     public saveKey: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
-    public saveQueryForm = new SaveQueryForm(this.formBuilder);
+    public saveQueryForm = new SaveQueryForm();
 
     public searchDialog = new DialogModel(false);
 
     public hasFilter: boolean;
-
-    constructor(
-        private readonly formBuilder: FormBuilder,
-    ) {
-    }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['query'] || changes['queries']) {

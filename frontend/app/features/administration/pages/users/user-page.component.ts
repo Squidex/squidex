@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreateUserDto, UserDto, UserForm, UsersState } from '@app/features/administration/internal';
 import { ResourceOwner } from '@app/shared';
@@ -20,11 +19,10 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
     public isEditable = false;
 
     public user?: UserDto | null;
-    public userForm = new UserForm(this.formBuilder);
+    public userForm = new UserForm();
 
     constructor(
         public readonly usersState: UsersState,
-        private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {

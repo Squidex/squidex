@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, ViewChildren } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsState, AssetUploaderState, AuthService, DialogService, Types, UploadCanceled } from '@app/shared/internal';
 import { AssetsService } from '@app/shared/services/assets.service';
 import { AssetPathItem, ROOT_ITEM } from '@app/shared/state/assets.state';
@@ -53,7 +52,7 @@ export class AssetDialogComponent implements OnChanges {
 
     public selectedTab = 0;
 
-    public annotateForm = new AnnotateAssetForm(this.formBuilder);
+    public annotateForm = new AnnotateAssetForm();
 
     public get isImage() {
         return this.asset.type === 'Image';
@@ -74,7 +73,6 @@ export class AssetDialogComponent implements OnChanges {
         private readonly assetsService: AssetsService,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder,
         public readonly authService: AuthService,
     ) {
     }

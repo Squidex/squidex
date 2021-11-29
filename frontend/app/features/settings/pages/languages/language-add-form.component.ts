@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AddLanguageForm, LanguageDto, LanguagesState } from '@app/shared';
 
 @Component({
@@ -19,11 +18,10 @@ export class LanguageAddFormComponent implements OnChanges {
     @Input()
     public newLanguages: ReadonlyArray<LanguageDto>;
 
-    public addLanguageForm = new AddLanguageForm(this.formBuilder);
+    public addLanguageForm = new AddLanguageForm();
 
     constructor(
         private readonly languagesState: LanguagesState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

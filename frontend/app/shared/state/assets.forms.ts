@@ -5,43 +5,35 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, Mutable, TemplatedFormArray, Types } from '@app/framework';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, Mutable, TemplatedFormArray, Types, UndefinableFormGroup } from '@app/framework';
 import slugify from 'slugify';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto, RenameAssetTagDto } from './../services/assets.service';
 
 export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
-        return this.form.get('metadata')! as TemplatedFormArray;
+        return this.form.controls['metadata'] as TemplatedFormArray;
     }
 
     public get metadataControls(): ReadonlyArray<FormGroup> {
         return this.metadata.controls as any;
     }
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            isProtected: [false,
-                [
-                    Validators.nullValidator,
-                ],
-            ],
-            fileName: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            slug: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            tags: [[],
-                [
-                    Validators.nullValidator,
-                ],
-            ],
-            metadata: new TemplatedFormArray(new MetadataTemplate(formBuilder)),
+    constructor() {
+        super(new UndefinableFormGroup({
+            isProtected: new FormControl(false,
+                Validators.nullValidator,
+            ),
+            fileName: new FormControl('',
+                Validators.required,
+            ),
+            slug: new FormControl('',
+                Validators.required,
+            ),
+            tags: new FormControl([],
+                Validators.nullValidator,
+            ),
+            metadata: new TemplatedFormArray(new MetadataTemplate()),
         }));
     }
 
@@ -149,7 +141,7 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
     }
 
     public generateSlug(asset: AssetDto) {
-        const fileName = this.form.get('fileName')!.value;
+        const fileName = this.form.controls['fileName'].value;
 
         if (fileName) {
             let slug = slugify(fileName, { lower: true });
@@ -162,58 +154,60 @@ export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDt
                 }
             }
 
-            this.form.get('slug')!.setValue(slug);
+            this.form.controls['slug'].setValue(slug);
         }
     }
 }
 
 class MetadataTemplate {
-    constructor(private readonly formBuilder: FormBuilder) {}
-
     public createControl() {
-        return this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            value: [''],
+        return new UndefinableFormGroup({
+            name: new FormControl('',
+                Validators.required,
+            ),
+            value: new FormControl(''),
         });
     }
 }
 
 export class EditAssetScriptsForm extends Form<FormGroup, {}, object> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            annotate: '',
-            create: '',
-            delete: '',
-            move: '',
-            update: '',
+    constructor() {
+        super(new UndefinableFormGroup({
+            annotate: new FormControl('',
+                Validators.nullValidator,
+            ),
+            create: new FormControl('',
+                Validators.nullValidator,
+            ),
+            delete: new FormControl('',
+                Validators.nullValidator,
+            ),
+            move: new FormControl('',
+                Validators.nullValidator,
+            ),
+            update: new FormControl('',
+                Validators.nullValidator,
+            ),
         }));
     }
 }
 
 export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto, AssetFolderDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            folderName: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            folderName: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 }
 
 export class RenameAssetTagForm extends Form<FormGroup, RenameAssetTagDto, RenameAssetTagDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            tagName: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            tagName: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 }

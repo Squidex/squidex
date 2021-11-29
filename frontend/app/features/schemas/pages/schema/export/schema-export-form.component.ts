@@ -6,7 +6,6 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 
 @Component({
@@ -18,12 +17,11 @@ export class SchemaExportFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDto;
 
-    public synchronizeForm = new SynchronizeSchemaForm(this.formBuilder);
+    public synchronizeForm = new SynchronizeSchemaForm();
 
     public isEditable = false;
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
     ) {
     }

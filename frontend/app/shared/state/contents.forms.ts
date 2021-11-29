@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTimeSafe, Form, FormArrayTemplate, getRawValue, TemplatedFormArray, Types, value$ } from '@app/framework';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { debounceTimeSafe, Form, FormArrayTemplate, TemplatedFormArray, Types, UndefinableFormGroup, value$ } from '@app/framework';
 import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
 import { BehaviorSubject, distinctUntilChanged, Observable } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -20,14 +20,14 @@ import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 type SaveQueryFormType = { name: string; user: boolean };
 
 export class SaveQueryForm extends Form<FormGroup, SaveQueryFormType> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            user: false,
+    constructor() {
+        super(new UndefinableFormGroup({
+            name: new FormControl('',
+                Validators.required,
+            ),
+            user: new FormControl(false,
+                Validators.nullValidator,
+            ),
         }));
     }
 }
@@ -194,7 +194,7 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     private updateInitialData() {
-        this.initialData = this.form.getRawValue();
+        this.initialData = this.form.value;
     }
 }
 
@@ -346,7 +346,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
     }
 
     public addCopy(source: ObjectFormBase) {
-        this.form.add().reset(getRawValue(source.form));
+        this.form.add().reset(source.form.value);
     }
 
     public addComponent(schemaId: string) {

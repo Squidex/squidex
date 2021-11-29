@@ -9,7 +9,6 @@
 /* eslint-disable no-useless-return */
 
 import { AbstractControl, ValidatorFn } from '@angular/forms';
-import { getRawValue } from '@app/framework';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -179,10 +178,6 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         }
 
         this.updateCustomState(context, fieldData, itemData, state);
-    }
-
-    public getRawValue() {
-        return getRawValue(this.form);
     }
 
     public setValue(value: any) {

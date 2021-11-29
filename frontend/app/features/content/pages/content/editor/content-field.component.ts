@@ -91,12 +91,12 @@ export class ContentFieldComponent implements OnChanges {
     public copy() {
         if (this.formModel && this.formModelCompare) {
             if (this.showAllControls) {
-                this.formModel.setValue(this.formModelCompare.getRawValue());
+                this.formModel.setValue(this.formModelCompare.form.value);
             } else {
                 const target = this.formModel.get(this.language.iso2Code);
 
                 if (target) {
-                    target.setValue(this.formModelCompare.get(this.language.iso2Code)?.getRawValue());
+                    target.setValue(this.formModelCompare.get(this.language.iso2Code)?.form.value);
                 }
             }
         }

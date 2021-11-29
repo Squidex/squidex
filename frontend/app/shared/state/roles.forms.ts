@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Form, hasNoValue$, hasValue$, TemplatedFormArray } from '@app/framework';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, hasNoValue$, hasValue$, TemplatedFormArray, UndefinableFormGroup } from '@app/framework';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
 export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
@@ -38,13 +38,11 @@ type AddPermissionFormType = { permission: string };
 export class AddPermissionForm extends Form<FormGroup, AddPermissionFormType> {
     public hasPermission = hasValue$(this.form.controls['permission']);
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            permission: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            permission: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 }
@@ -52,13 +50,11 @@ export class AddPermissionForm extends Form<FormGroup, AddPermissionFormType> {
 export class AddRoleForm extends Form<FormGroup, CreateRoleDto> {
     public hasNoName = hasNoValue$(this.form.controls['name']);
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            name: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 }

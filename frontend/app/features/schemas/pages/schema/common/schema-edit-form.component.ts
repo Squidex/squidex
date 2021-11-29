@@ -6,7 +6,6 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { EditSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
@@ -18,12 +17,11 @@ export class SchemaEditFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDto;
 
-    public fieldForm = new EditSchemaForm(this.formBuilder);
+    public fieldForm = new EditSchemaForm();
 
     public isEditable?: boolean | null;
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
     ) {
     }

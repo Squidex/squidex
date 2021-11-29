@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AddPermissionForm, AutocompleteComponent, AutocompleteSource, EditRoleForm, RoleDto, RolesState, SchemaDto, Settings } from '@app/shared';
 
 const DESCRIPTIONS = {
@@ -64,12 +63,11 @@ export class RoleComponent implements OnChanges {
     public isEditing = false;
     public isEditable = false;
 
-    public addPermissionForm = new AddPermissionForm(this.formBuilder);
+    public addPermissionForm = new AddPermissionForm();
 
     public editForm = new EditRoleForm();
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly rolesState: RolesState,
     ) {
     }

@@ -96,7 +96,7 @@ export function invalid$(form: AbstractControl): Observable<boolean> {
 }
 
 export function value$<T = any>(form: AbstractControl): Observable<T> {
-    return form.valueChanges.pipe(map(() => getRawValue(form)), startWith(getRawValue(form)), distinctUntilChanged());
+    return form.valueChanges.pipe(startWith(form.value), distinctUntilChanged());
 }
 
 export function valueProjection$<T = any>(form: AbstractControl, projection: (value: any) => T): Observable<T> {
@@ -157,16 +157,6 @@ export function touchedChange$(form: AbstractControl) {
 
 function isValid(value: any) {
     return !Types.isNull(value) && !Types.isUndefined(value);
-}
-
-export function getRawValue(form: AbstractControl): any {
-    if (Types.is(form, FormGroup)) {
-        return form.getRawValue();
-    } else if (Types.is(form, FormArray)) {
-        return form.getRawValue();
-    } else {
-        return form.value;
-    }
 }
 
 export function hasNonCustomError(form: AbstractControl) {

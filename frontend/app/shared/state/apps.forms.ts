@@ -7,33 +7,29 @@
 
 /* eslint-disable no-useless-escape */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, TemplatedFormArray, UndefinableFormGroup, ValidatorsEx } from '@app/framework';
 import { AppDto, AppSettingsDto, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
 export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                    Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage'),
-                ],
-            ],
+    constructor() {
+        super(new UndefinableFormGroup({
+            name: new FormControl('', [
+                Validators.required,
+                Validators.maxLength(40),
+                ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:apps.appNameValidationMessage'),
+            ]),
         }));
     }
 }
 
 export class UpdateAppForm extends Form<FormGroup, UpdateAppDto, AppDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            label: ['',
-                [
-                    Validators.maxLength(40),
-                ],
-            ],
-            description: '',
+    constructor() {
+        super(new UndefinableFormGroup({
+            label: new FormControl('',
+                Validators.maxLength(40),
+            ),
+            description: new FormControl(''),
         }));
     }
 }
@@ -55,51 +51,39 @@ export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, A
         return this.editors.controls as any;
     }
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            patterns: new TemplatedFormArray(new PatternTemplate(formBuilder)),
-            hideScheduler: false,
-            hideDateTimeButtons: false,
-            editors: new TemplatedFormArray(new EditorTemplate(formBuilder)),
+    constructor() {
+        super(new UndefinableFormGroup({
+            patterns: new TemplatedFormArray(new PatternTemplate()),
+            hideScheduler: new FormControl(false),
+            hideDateTimeButtons: new FormControl(false),
+            editors: new TemplatedFormArray(new EditorTemplate()),
         }));
     }
 }
 
 class PatternTemplate {
-    constructor(private readonly formBuilder: FormBuilder) {}
-
     public createControl() {
-        return this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            regex: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            message: '',
+        return new FormControl({
+            name: new FormControl('',
+                Validators.required,
+            ),
+            regex: new FormControl('',
+                Validators.required,
+            ),
+            message: new FormControl(''),
         });
     }
 }
 
 class EditorTemplate {
-    constructor(private readonly formBuilder: FormBuilder) {}
-
     public createControl() {
-        return this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            url: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+        return new FormControl({
+            name: new FormControl('',
+                Validators.required,
+            ),
+            url: new FormControl('',
+                Validators.required,
+            ),
         });
     }
 }
