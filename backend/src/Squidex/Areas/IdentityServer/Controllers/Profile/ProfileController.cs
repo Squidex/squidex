@@ -26,7 +26,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
     [Authorize]
     public sealed class ProfileController : IdentityServerController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions { Width = 128, Height = 128, Mode = ResizeMode.Crop };
+        private static readonly ResizeOptions ResizeOptions = new ResizeOptions
+        {
+            TargetWidth = 128,
+            TargetHeight = 128,
+            Mode = ResizeMode.Crop
+        };
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserService userService;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -144,9 +149,9 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             await userService.AddLoginAsync(id, externalLogin, HttpContext.RequestAborted);
         }
 
-        private async Task UpdatePictureAsync(List<IFormFile> file, string id)
+        private async Task UpdatePictureAsync(List<IFormFile> files, string id)
         {
-            if (file.Count != 1)
+            if (files.Count != 1)
             {
                 throw new ValidationException(T.Get("validation.onlyOneFile"));
             }
@@ -155,7 +160,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             {
                 try
                 {
-                    await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, ResizeOptions);
+                    var file = files[0];
+
+                    await using (var stream = file.OpenReadStream())
+                    {
+                        await assetThumbnailGenerator.CreateThumbnailAsync(stream, file.ContentType, thumbnailStream, ResizeOptions,
+                            HttpContext.RequestAborted);
+                    }
 
                     thumbnailStream.Position = 0;
                 }

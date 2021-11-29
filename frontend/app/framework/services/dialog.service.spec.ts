@@ -160,7 +160,7 @@ describe('DialogService', () => {
     it('should publish tooltip', () => {
         const dialogService = new DialogService(localStore.object);
 
-        const tooltip = new Tooltip('target', 'text', 'left');
+        const tooltip = new Tooltip('target', 'text', 'left-center');
 
         let publishedTooltip: Tooltip;
 

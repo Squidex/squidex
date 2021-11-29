@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             await using (var uploadStream = file.OpenRead())
             {
-                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
+                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, file.MimeType);
 
                 if (image == null)
                 {

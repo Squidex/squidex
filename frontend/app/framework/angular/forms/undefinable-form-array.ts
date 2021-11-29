@@ -47,7 +47,7 @@ export class UndefinableFormArray extends FormArray {
     }
 
     public setValue(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         if (this.isUndefined) {
             super.reset([], options);
@@ -57,7 +57,7 @@ export class UndefinableFormArray extends FormArray {
     }
 
     public patchValue(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         if (this.isUndefined) {
             super.reset([], options);
@@ -67,9 +67,17 @@ export class UndefinableFormArray extends FormArray {
     }
 
     public reset(value?: any[], options?: { onlySelf?: boolean; emitEvent?: boolean }) {
-        this.isUndefined = Types.isUndefined(value);
+        this.checkUndefined(value);
 
         super.reset(value || [], options);
+    }
+
+    private checkUndefined(value?: any[]) {
+        this.isUndefined = Types.isUndefined(value);
+
+        if (this.isUndefined) {
+            this.clear({ emitEvent: false });
+        }
     }
 
     public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean } = {}) {

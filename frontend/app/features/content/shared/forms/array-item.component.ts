@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectForm, RootFieldDto, StatefulComponent, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, StatefulComponent, Types, valueProjection$ } from '@app/shared';
 import { Observable } from 'rxjs';
 import { ComponentSectionComponent } from './component-section.component';
 
@@ -38,7 +38,7 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public formContext: any;
 
     @Input()
-    public formModel: ObjectForm;
+    public formModel: ObjectFormBase;
 
     @Input()
     public canUnset?: boolean | null;

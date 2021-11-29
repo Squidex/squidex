@@ -462,6 +462,7 @@ describe('ContentForm', () => {
         it('should hide components fields based on condition', () => {
             const componentId = MathHelper.guid();
             const component = createSchema({
+                id: 2,
                 fields: [
                     createField({
                         id: 1,
@@ -553,7 +554,7 @@ describe('ContentForm', () => {
         it('should reset array item', () => {
             const { array } = createArrayFormWith2Items();
 
-            array.reset();
+            array.setValue([]);
 
             expectLength(array, 0);
             expect(array.form.value).toEqual([]);
