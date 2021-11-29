@@ -83,6 +83,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
                             var responseObject = await ParseResponse(context, response);
 
+                            // Reset the time contraints and other constraints so that our awaiting does not count as script time.
                             context.Engine.ResetConstraints();
 
                             callback(responseObject);

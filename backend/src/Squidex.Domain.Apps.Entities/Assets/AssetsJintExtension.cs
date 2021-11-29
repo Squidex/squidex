@@ -92,6 +92,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     var encoded = await assetFileStore.GetTextAsync(appId, id, fileVersion, encoding?.ToString());
 
+                    // Reset the time contraints and other constraints so that our awaiting does not count as script time.
+                    context.Engine.ResetConstraints();
+
                     callback(JsValue.FromObject(context.Engine, encoded));
                 }
                 catch (Exception ex)
@@ -160,6 +163,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
                 var assetItems = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), context.CancellationToken);
+
+                // Reset the time contraints and other constraints so that our awaiting does not count as script time.
+                context.Engine.ResetConstraints();
 
                 callback(JsValue.FromObject(context.Engine, assetItems.ToArray()));
             }
