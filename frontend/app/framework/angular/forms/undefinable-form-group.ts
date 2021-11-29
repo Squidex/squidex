@@ -21,8 +21,8 @@ export class UndefinableFormGroup extends FormGroup {
             } else {
                 const result = {};
 
-                for (const [key, value] of Object.entries(this.controls)) {
-                    result[key] = value;
+                for (const [key, control] of Object.entries(this.controls)) {
+                    result[key] = control.value;
                 }
 
                 return result;

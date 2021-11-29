@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, Mutable, TemplatedFormArray, Types, UndefinableFormGroup } from '@app/framework';
 import slugify from 'slugify';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto, RenameAssetTagDto } from './../services/assets.service';
 
-export class AnnotateAssetForm extends Form<FormGroup, AnnotateAssetDto, AssetDto> {
+export class AnnotateAssetForm extends Form<UndefinableFormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
         return this.form.controls['metadata'] as TemplatedFormArray;
     }
 
-    public get metadataControls(): ReadonlyArray<FormGroup> {
+    public get metadataControls(): ReadonlyArray<TemplatedFormArray> {
         return this.metadata.controls as any;
     }
 
@@ -170,7 +170,7 @@ class MetadataTemplate {
     }
 }
 
-export class EditAssetScriptsForm extends Form<FormGroup, {}, object> {
+export class EditAssetScriptsForm extends Form<UndefinableFormGroup, {}, object> {
     constructor() {
         super(new UndefinableFormGroup({
             annotate: new FormControl('',
@@ -192,7 +192,7 @@ export class EditAssetScriptsForm extends Form<FormGroup, {}, object> {
     }
 }
 
-export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto, AssetFolderDto> {
+export class RenameAssetFolderForm extends Form<UndefinableFormGroup, RenameAssetFolderDto, AssetFolderDto> {
     constructor() {
         super(new UndefinableFormGroup({
             folderName: new FormControl('',
@@ -202,7 +202,7 @@ export class RenameAssetFolderForm extends Form<FormGroup, RenameAssetFolderDto,
     }
 }
 
-export class RenameAssetTagForm extends Form<FormGroup, RenameAssetTagDto, RenameAssetTagDto> {
+export class RenameAssetTagForm extends Form<UndefinableFormGroup, RenameAssetTagDto, RenameAssetTagDto> {
     constructor() {
         super(new UndefinableFormGroup({
             tagName: new FormControl('',

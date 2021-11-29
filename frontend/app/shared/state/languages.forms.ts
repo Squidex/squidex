@@ -5,12 +5,20 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, UndefinableFormGroup, value$ } from '@app/framework';
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 
-export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppLanguageDto> {
+export class EditLanguageForm extends Form<UndefinableFormGroup, UpdateAppLanguageDto, AppLanguageDto> {
+    public get isMaster() {
+        return this.form.controls['isMaster'];
+    }
+
+    public get isOptional() {
+        return this.form.controls['isOptional'];
+    }
+
     constructor() {
         super(new UndefinableFormGroup({
             isMaster: new FormControl(false,
@@ -21,17 +29,17 @@ export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppL
             ),
         }));
 
-        value$(this.form.controls['isMaster'])
+        value$(this.isMaster)
             .subscribe(value => {
                 if (value) {
-                    this.form.controls['isOptional'].setValue(false);
+                    this.isOptional.setValue(false);
                 }
             });
 
-        value$(this.form.controls['isOptional'])
+        value$(this.isMaster)
             .subscribe(value => {
                 if (value) {
-                    this.form.controls['isMaster'].setValue(false);
+                    this.isOptional.setValue(false);
                 }
             });
     }
@@ -39,7 +47,7 @@ export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppL
 
 type AddLanguageFormType = { language: LanguageDto };
 
-export class AddLanguageForm extends Form<FormGroup, AddLanguageFormType> {
+export class AddLanguageForm extends Form<UndefinableFormGroup, AddLanguageFormType> {
     constructor() {
         super(new UndefinableFormGroup({
             language: new FormControl(null,

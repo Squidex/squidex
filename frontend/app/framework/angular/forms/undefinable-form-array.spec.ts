@@ -17,6 +17,19 @@ describe('UndefinableFormArray', () => {
         value: ['1'],
     }];
 
+    it('should provide value even if controls required', () => {
+        const control = new UndefinableFormArray([
+            new FormControl('1'),
+            new FormControl('2'),
+        ]);
+
+        expect(control.value).toEqual(['1', '2']);
+
+        control.controls[0].disable();
+
+        expect(control.value).toEqual(['1', '2']);
+    });
+
     tests.forEach(x => {
         it(`should set value as <${x.name}>`, () => {
             const control =

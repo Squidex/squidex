@@ -17,6 +17,19 @@ describe('UndefinableFormGroup', () => {
         value: { field: ['1'] },
     }];
 
+    it('should provide value even if controls required', () => {
+        const control = new UndefinableFormGroup({
+            test1: new FormControl('1'),
+            test2: new FormControl('2'),
+        });
+
+        expect(control.value).toEqual({ test1: '1', test2: '2' });
+
+        control.controls['test1'].disable();
+
+        expect(control.value).toEqual({ test1: '1', test2: '2' });
+    });
+
     tests.forEach(x => {
         it(`should set value as <${x.name}>`, () => {
             const control =

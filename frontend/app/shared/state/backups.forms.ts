@@ -7,12 +7,16 @@
 
 /* eslint-disable no-useless-escape */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, hasNoValue$, UndefinableFormGroup, ValidatorsEx } from '@app/framework';
 import { StartRestoreDto } from './../services/backups.service';
 
-export class RestoreForm extends Form<FormGroup, StartRestoreDto> {
-    public hasNoUrl = hasNoValue$(this.form.controls['url']);
+export class RestoreForm extends Form<UndefinableFormGroup, StartRestoreDto> {
+    public get url() {
+        return this.form.controls['url'];
+    }
+
+    public hasNoUrl = hasNoValue$(this.url);
 
     constructor() {
         super(

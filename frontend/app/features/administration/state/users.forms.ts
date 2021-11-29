@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, UndefinableFormGroup, ValidatorsEx } from '@app/shared';
 import { UpdateUserDto, UserDto } from './../services/users.service';
 
-export class UserForm extends Form<FormGroup, UpdateUserDto, UserDto> {
+export class UserForm extends Form<UndefinableFormGroup, UpdateUserDto, UserDto> {
     constructor() {
         super(new UndefinableFormGroup({
             email: new FormControl('', [

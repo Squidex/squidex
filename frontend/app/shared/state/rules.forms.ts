@@ -28,7 +28,7 @@ export class ActionForm extends Form<any, FormGroup> {
             controls[property.name] = new FormControl(undefined, validator);
         }
 
-        return new FormGroup(controls);
+        return new UndefinableFormGroup(controls);
     }
 
     protected transformSubmit(value: any): any {

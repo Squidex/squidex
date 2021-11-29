@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, hasNoValue$, hasValue$, TemplatedFormArray, UndefinableFormGroup } from '@app/framework';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
@@ -35,8 +35,12 @@ class PermissionTemplate {
 
 type AddPermissionFormType = { permission: string };
 
-export class AddPermissionForm extends Form<FormGroup, AddPermissionFormType> {
-    public hasPermission = hasValue$(this.form.controls['permission']);
+export class AddPermissionForm extends Form<UndefinableFormGroup, AddPermissionFormType> {
+    public get permission() {
+        return this.form.controls['permission'];
+    }
+
+    public hasPermission = hasValue$(this.permission);
 
     constructor() {
         super(new UndefinableFormGroup({
@@ -47,8 +51,12 @@ export class AddPermissionForm extends Form<FormGroup, AddPermissionFormType> {
     }
 }
 
-export class AddRoleForm extends Form<FormGroup, CreateRoleDto> {
-    public hasNoName = hasNoValue$(this.form.controls['name']);
+export class AddRoleForm extends Form<UndefinableFormGroup, CreateRoleDto> {
+    public get name() {
+        return this.form.controls['name'];
+    }
+
+    public hasNoName = hasNoValue$(this.name);
 
     constructor() {
         super(new UndefinableFormGroup({

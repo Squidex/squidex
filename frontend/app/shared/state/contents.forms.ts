@@ -19,7 +19,7 @@ import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string; user: boolean };
 
-export class SaveQueryForm extends Form<FormGroup, SaveQueryFormType> {
+export class SaveQueryForm extends Form<UndefinableFormGroup, SaveQueryFormType> {
     constructor() {
         super(new UndefinableFormGroup({
             name: new FormControl('',
@@ -32,14 +32,14 @@ export class SaveQueryForm extends Form<FormGroup, SaveQueryFormType> {
     }
 }
 
-export class PatchContentForm extends Form<FormGroup, any> {
+export class PatchContentForm extends Form<UndefinableFormGroup, any> {
     private readonly editableFields: ReadonlyArray<RootFieldDto>;
 
     constructor(
         private readonly listFields: ReadonlyArray<TableField>,
         private readonly language: AppLanguageDto,
     ) {
-        super(new FormGroup({}));
+        super(new UndefinableFormGroup({}));
 
         this.editableFields = this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable) as any;
 
@@ -73,7 +73,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
     }
 }
 
-export class EditContentForm extends Form<FormGroup, any> {
+export class EditContentForm extends Form<UndefinableFormGroup, any> {
     private readonly fields: { [name: string]: FieldForm } = {};
     private readonly valueChange$ = new BehaviorSubject<any>(this.form.value);
     private initialData: any;
@@ -94,7 +94,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         public context: any,
         debounce = 100,
     ) {
-        super(new FormGroup({}));
+        super(new UndefinableFormGroup({}));
 
         const globals: FormGlobals = {
             schema,
@@ -268,7 +268,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     }
 
     private static buildForm() {
-        return new FormGroup({});
+        return new UndefinableFormGroup({});
     }
 }
 

@@ -1,11 +1,11 @@
 <div class="title">
-    <form *ngIf="renaming; else noRenaming" [formGroup]="renameForm" (ngSubmit)="rename()">
+    <form *ngIf="renaming; else noRenaming" (ngSubmit)="rename()">
         <div class="row g-0">
             <div class="col">
                 <div class="form-group me-2">
                     <sqx-control-errors for="name"></sqx-control-errors>
                     
-                    <input type="text" class="form-control" formControlName="name" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event)" spellcheck="false">
+                    <input type="text" class="form-control" [formControl]="renameForm" [maxLength]="maxLength" sqxFocusOnInit (keydown)="onKeyDown($event)" spellcheck="false">
                 </div>
             </div>
             <div class="col-auto">

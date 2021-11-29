@@ -5,12 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, hasNoValue$, UndefinableFormGroup } from '@app/framework';
 import { CreateWorkflowDto } from './../services/workflows.service';
 
-export class AddWorkflowForm extends Form<FormGroup, CreateWorkflowDto> {
-    public hasNoName = hasNoValue$(this.form.controls['name']);
+export class AddWorkflowForm extends Form<UndefinableFormGroup, CreateWorkflowDto> {
+    public get name() {
+        return this.form.controls['name'];
+    }
+
+    public hasNoName = hasNoValue$(this.name);
 
     constructor() {
         super(new UndefinableFormGroup({

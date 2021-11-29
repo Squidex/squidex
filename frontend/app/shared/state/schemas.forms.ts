@@ -7,7 +7,7 @@
 
 /* eslint-disable no-useless-escape */
 
-import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, Validators } from '@angular/forms';
 import { Form, TemplatedFormArray, UndefinableFormGroup, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
 import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
@@ -15,7 +15,7 @@ import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from './
 
 type CreateCategoryFormType = { name: string };
 
-export class CreateCategoryForm extends Form<FormGroup, CreateCategoryFormType> {
+export class CreateCategoryForm extends Form<UndefinableFormGroup, CreateCategoryFormType> {
     constructor() {
         super(new UndefinableFormGroup({
             name: new FormControl('',
@@ -25,7 +25,7 @@ export class CreateCategoryForm extends Form<FormGroup, CreateCategoryFormType> 
     }
 }
 
-export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
+export class CreateSchemaForm extends Form<UndefinableFormGroup, CreateSchemaDto> {
     constructor() {
         super(new UndefinableFormGroup({
             name: new FormControl('', [
@@ -58,7 +58,7 @@ export class CreateSchemaForm extends Form<FormGroup, CreateSchemaDto> {
     }
 }
 
-export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto> {
+export class SynchronizeSchemaForm extends Form<UndefinableFormGroup, SynchronizeSchemaDto> {
     constructor() {
         super(new UndefinableFormGroup({
             json: new FormControl({},
@@ -74,7 +74,7 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
     }
 
     public loadSchema(schema: SchemaDto) {
-        this.form.controls['json'].setValue(schema.export());
+        this.form.patchValue({ json: schema.export() });
     }
 
     public transformSubmit(value: any) {
@@ -87,7 +87,7 @@ export class SynchronizeSchemaForm extends Form<FormGroup, SynchronizeSchemaDto>
 }
 
 export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyArray<FieldRule>, SchemaDto> {
-    public get rulesControls(): ReadonlyArray<FormGroup> {
+    public get rulesControls(): ReadonlyArray<UndefinableFormGroup> {
         return this.form.controls as any;
     }
 
@@ -127,7 +127,7 @@ class FieldRuleTemplate {
 type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
 export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, ConfigurePreviewUrlsFormType, SchemaDto> {
-    public get previewControls(): ReadonlyArray<FormGroup> {
+    public get previewControls(): ReadonlyArray<UndefinableFormGroup> {
         return this.form.controls as any;
     }
 
@@ -171,7 +171,7 @@ class PreviewUrlTemplate {
     }
 }
 
-export class EditSchemaScriptsForm extends Form<FormGroup, {}, object> {
+export class EditSchemaScriptsForm extends Form<UndefinableFormGroup, {}, object> {
     constructor() {
         super(new UndefinableFormGroup({
             query: new FormControl('',
@@ -193,7 +193,7 @@ export class EditSchemaScriptsForm extends Form<FormGroup, {}, object> {
     }
 }
 
-export class EditFieldForm extends Form<FormGroup, {}, FieldPropertiesDto> {
+export class EditFieldForm extends Form<UndefinableFormGroup, {}, FieldPropertiesDto> {
     constructor(properties: FieldPropertiesDto) {
         super(EditFieldForm.buildForm(properties));
     }
@@ -355,7 +355,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 }
 
-export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto, SchemaPropertiesDto> {
+export class EditSchemaForm extends Form<UndefinableFormGroup, UpdateSchemaDto, SchemaPropertiesDto> {
     constructor() {
         super(new UndefinableFormGroup({
             label: new FormControl('',
@@ -383,7 +383,7 @@ export class EditSchemaForm extends Form<FormGroup, UpdateSchemaDto, SchemaPrope
     }
 }
 
-export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
+export class AddFieldForm extends Form<UndefinableFormGroup, AddFieldDto> {
     public isContentField = value$(this.form.controls['type']).pipe(map(x => x !== 'UI'));
 
     constructor() {
@@ -403,20 +403,24 @@ export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
     }
 
     public transformLoad(value: Partial<AddFieldDto>) {
-        const isLocalizable = value.partitioning === 'language';
+        const { name, properties, partitioning } = value;
+
+        const isLocalizable = partitioning === 'language';
 
         const type =
-            value.properties ?
-            value.properties.fieldType :
+            properties ?
+            properties.fieldType :
             'String';
 
-        return { name: value.name, isLocalizable, type };
+        return { name, isLocalizable, type };
     }
 
     public transformSubmit(value: any) {
-        const properties = createProperties(value.type);
-        const partitioning = value.isLocalizable ? 'language' : 'invariant';
+        const { name, type, isLocalizable } = value;
 
-        return { name: value.name, partitioning, properties };
+        const properties = createProperties(type);
+        const partitioning = isLocalizable ? 'language' : 'invariant';
+
+        return { name, partitioning, properties };
     }
 }

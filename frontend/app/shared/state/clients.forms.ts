@@ -7,11 +7,11 @@
 
 /* eslint-disable no-useless-escape */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, hasNoValue$, UndefinableFormGroup, ValidatorsEx } from '@app/framework';
 import { ClientDto, CreateClientDto, UpdateClientDto } from './../services/clients.service';
 
-export class RenameClientForm extends Form<FormGroup, UpdateClientDto, ClientDto> {
+export class RenameClientForm extends Form<UndefinableFormGroup, UpdateClientDto, ClientDto> {
     constructor() {
         super(new UndefinableFormGroup({
             name: new FormControl('',
@@ -21,8 +21,12 @@ export class RenameClientForm extends Form<FormGroup, UpdateClientDto, ClientDto
     }
 }
 
-export class AddClientForm extends Form<FormGroup, CreateClientDto> {
-    public hasNoId = hasNoValue$(this.form.controls['id']);
+export class AddClientForm extends Form<UndefinableFormGroup, CreateClientDto> {
+    public get id() {
+        return this.form.controls['id'];
+    }
+
+    public hasNoId = hasNoValue$(this.id);
 
     constructor() {
         super(new UndefinableFormGroup({

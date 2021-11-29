@@ -5,14 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, hasNoValue$, Types, UndefinableFormGroup, value$ } from '@app/framework';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { AssignContributorDto } from './../services/contributors.service';
 import { UserDto } from './../services/users.service';
 
-export class AssignContributorForm extends Form<FormGroup, AssignContributorDto> {
-    public hasNoUser = hasNoValue$(this.form.controls['user']);
+export class AssignContributorForm extends Form<UndefinableFormGroup, AssignContributorDto> {
+    public get user() {
+        return this.form.controls['user'];
+    }
+
+    public hasNoUser = hasNoValue$(this.user);
 
     constructor() {
         super(new UndefinableFormGroup({
@@ -38,8 +42,12 @@ export class AssignContributorForm extends Form<FormGroup, AssignContributorDto>
 
 type ImportContributorsFormType = ReadonlyArray<AssignContributorDto>;
 
-export class ImportContributorsForm extends Form<FormGroup, ImportContributorsFormType> {
-    public numberOfEmails = value$(this.form.controls['import']).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
+export class ImportContributorsForm extends Form<UndefinableFormGroup, ImportContributorsFormType> {
+    public get import() {
+        return this.form.controls['import'];
+    }
+
+    public numberOfEmails = value$(this.import).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
 
     public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
 

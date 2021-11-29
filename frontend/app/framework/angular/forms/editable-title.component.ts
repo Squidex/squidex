@@ -7,7 +7,6 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { UndefinableFormGroup } from '@app/framework';
 import { Keys } from '@app/framework/internal';
 
 @Component({
@@ -38,14 +37,11 @@ export class EditableTitleComponent {
             Validators.required :
             Validators.nullValidator;
 
-        this.renameForm.controls['name'].setValidators(validator);
+        this.renameForm.setValidators(validator);
     }
 
     public renaming = false;
-    public renameForm =
-        new UndefinableFormGroup({
-            name: new FormControl('', Validators.required),
-        });
+    public renameForm = new FormControl();
 
     public onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {
@@ -58,7 +54,7 @@ export class EditableTitleComponent {
             return;
         }
 
-        this.renameForm.setValue({ name: this.name || '' });
+        this.renameForm.setValue(this.name || '');
         this.renaming = !this.renaming;
     }
 
@@ -68,10 +64,10 @@ export class EditableTitleComponent {
         }
 
         if (this.renameForm.valid) {
-            const value = this.renameForm.value;
+            const name = this.renameForm.value;
 
-            this.nameChange.emit(value.name);
-            this.name = value.name;
+            this.nameChange.emit(name);
+            this.name = name;
 
             this.renaming = false;
         }

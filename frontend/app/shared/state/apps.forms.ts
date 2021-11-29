@@ -7,11 +7,11 @@
 
 /* eslint-disable no-useless-escape */
 
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Form, TemplatedFormArray, UndefinableFormGroup, ValidatorsEx } from '@app/framework';
 import { AppDto, AppSettingsDto, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
-export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
+export class CreateAppForm extends Form<UndefinableFormGroup, CreateAppDto> {
     constructor() {
         super(new UndefinableFormGroup({
             name: new FormControl('', [
@@ -23,7 +23,7 @@ export class CreateAppForm extends Form<FormGroup, CreateAppDto> {
     }
 }
 
-export class UpdateAppForm extends Form<FormGroup, UpdateAppDto, AppDto> {
+export class UpdateAppForm extends Form<UndefinableFormGroup, UpdateAppDto, AppDto> {
     constructor() {
         super(new UndefinableFormGroup({
             label: new FormControl('',
@@ -34,20 +34,20 @@ export class UpdateAppForm extends Form<FormGroup, UpdateAppDto, AppDto> {
     }
 }
 
-export class EditAppSettingsForm extends Form<FormGroup, UpdateAppSettingsDto, AppSettingsDto> {
+export class EditAppSettingsForm extends Form<UndefinableFormGroup, UpdateAppSettingsDto, AppSettingsDto> {
     public get patterns() {
-        return this.form.controls['patterns']! as TemplatedFormArray;
+        return this.form.controls['patterns'] as TemplatedFormArray;
     }
 
-    public get patternsControls(): ReadonlyArray<FormGroup> {
+    public get patternsControls(): ReadonlyArray<UndefinableFormGroup> {
         return this.patterns.controls as any;
     }
 
     public get editors() {
-        return this.form.controls['editors']! as TemplatedFormArray;
+        return this.form.controls['editors'] as TemplatedFormArray;
     }
 
-    public get editorsControls(): ReadonlyArray<FormGroup> {
+    public get editorsControls(): ReadonlyArray<UndefinableFormGroup> {
         return this.editors.controls as any;
     }
 

@@ -92,7 +92,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         this.form.markAllAsTouched();
 
         if (!hasNonCustomError(this.form)) {
-            const value = this.transformSubmit(this.form);
+            const value = this.transformSubmit(this.form.value);
 
             if (value) {
                 this.disable();
