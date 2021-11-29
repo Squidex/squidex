@@ -230,7 +230,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
             catch (Exception ex)
             {
-                throw new ValidationException(T.Get("common.jsError", new { message = ex.ToString() }));
+                throw new ValidationException(T.Get("common.jsError", new { message = ex.GetType().Name }), ex);
             }
         }
     }

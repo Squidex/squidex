@@ -25,20 +25,30 @@ namespace Squidex.Infrastructure.Orleans
             {
                 await context.Invoke();
             }
-            catch (DomainException)
+            catch (DomainException ex)
             {
+                if (ex.InnerException != null)
+                {
+                    Log(context, ex.InnerException);
+                }
+
                 throw;
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "GrainInvoked")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("grain", context.Grain.ToString())
-                    .WriteProperty("grainMethod", context.ImplementationMethod.ToString()));
+                Log(context, ex);
 
                 throw;
             }
+        }
+
+        private void Log(IIncomingGrainCallContext context, Exception ex)
+        {
+            log.LogError(ex, w => w
+                .WriteProperty("action", "GrainInvoked")
+                .WriteProperty("status", "Failed")
+                .WriteProperty("grain", context.Grain.ToString())
+                .WriteProperty("grainMethod", context.ImplementationMethod.ToString()));
         }
     }
 }

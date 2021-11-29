@@ -33,16 +33,16 @@ namespace Squidex.Web
             [500] = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
         };
 
-        public static (ErrorDto Error, bool WellKnown) ToErrorDto(int statusCode, HttpContext? httpContext)
+        public static (ErrorDto Error, Exception? Unhandled) ToErrorDto(int statusCode, HttpContext? httpContext)
         {
             var error = new ErrorDto { StatusCode = statusCode };
 
             Enrich(httpContext, error);
 
-            return (error, true);
+            return (error, null);
         }
 
-        public static (ErrorDto Error, bool WellKnown) ToErrorDto(this ProblemDetails problem, HttpContext? httpContext)
+        public static (ErrorDto Error, Exception? Unhandled) ToErrorDto(this ProblemDetails problem, HttpContext? httpContext)
         {
             Guard.NotNull(problem, nameof(problem));
 
@@ -50,10 +50,10 @@ namespace Squidex.Web
 
             Enrich(httpContext, error);
 
-            return (error, true);
+            return (error, null);
         }
 
-        public static (ErrorDto Error, bool WellKnown) ToErrorDto(this Exception exception, HttpContext? httpContext)
+        public static (ErrorDto Error, Exception? Unhandled) ToErrorDto(this Exception exception, HttpContext? httpContext)
         {
             Guard.NotNull(exception, nameof(exception));
 
@@ -76,43 +76,64 @@ namespace Squidex.Web
             error.Type = Links.GetOrDefault(error.StatusCode);
         }
 
-        private static (ErrorDto Error, bool WellKnown) CreateError(Exception exception)
+        private static (ErrorDto Error, Exception? Unhandled) CreateError(Exception exception)
         {
             switch (exception)
             {
                 case ValidationException ex:
-                    return (CreateError(400, T.Get("common.httpValidationError"), null, ToErrors(ex.Errors)), true);
+                    {
+                        var message = T.Get("common.httpValidationError");
+
+                        return (CreateError(400, message, null, ToErrors(ex.Errors)), GetInner(exception));
+                    }
 
                 case DomainObjectNotFoundException ex:
-                    return (CreateError(404, ex.ErrorCode), true);
+                    return (CreateError(404, ex.ErrorCode), GetInner(exception));
 
                 case DomainObjectVersionException ex:
-                    return (CreateError(412, ex.Message, ex.ErrorCode), true);
+                    return (CreateError(412, ex.Message, ex.ErrorCode), GetInner(exception));
 
                 case DomainObjectDeletedException ex:
-                    return (CreateError(410, ex.Message, ex.ErrorCode), true);
+                    return (CreateError(410, ex.Message, ex.ErrorCode), GetInner(exception));
 
                 case DomainObjectConflictException ex:
-                    return (CreateError(409, ex.Message, ex.ErrorCode), true);
+                    return (CreateError(409, ex.Message, ex.ErrorCode), GetInner(exception));
 
                 case DomainForbiddenException ex:
-                    return (CreateError(403, ex.Message, ex.ErrorCode), true);
+                    return (CreateError(403, ex.Message, ex.ErrorCode), GetInner(exception));
 
                 case DomainException ex:
-                    return (CreateError(400, ex.Message, ex.ErrorCode), true);
+                    return (CreateError(400, ex.Message, ex.ErrorCode), GetInner(exception));
 
                 case SecurityException:
-                    return (CreateError(403), false);
+                    return (CreateError(403), exception);
 
                 case DecoderFallbackException ex:
-                    return (CreateError(400, ex.Message), true);
+                    return (CreateError(400, ex.Message), null);
 
                 case BadHttpRequestException ex:
-                    return (CreateError(ex.StatusCode, ex.Message), true);
+                    return (CreateError(ex.StatusCode, ex.Message), null);
 
                 default:
-                    return (CreateError(500), false);
+                    return (CreateError(500), exception);
             }
+        }
+
+        private static Exception? GetInner(Exception exception)
+        {
+            var current = exception;
+
+            while (current != null)
+            {
+                if (current is not DomainException)
+                {
+                    return current;
+                }
+
+                current = current.InnerException;
+            }
+
+            return null;
         }
 
         private static ErrorDto CreateError(int status, string? message = null, string? errorCode = null, IEnumerable<string>? details = null)

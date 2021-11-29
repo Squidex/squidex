@@ -28,13 +28,13 @@ namespace Squidex.Web
 
         public void OnException(ExceptionContext context)
         {
-            var (error, wellKnown) = context.Exception.ToErrorDto(context.HttpContext);
+            var (error, unhandled) = context.Exception.ToErrorDto(context.HttpContext);
 
-            if (!wellKnown)
+            if (unhandled != null)
             {
                 var log = context.HttpContext.RequestServices.GetRequiredService<ISemanticLog>();
 
-                log.LogError(context.Exception, w => w
+                log.LogError(unhandled, w => w
                     .WriteProperty("message", "An unexpected exception has occurred."));
             }
 
