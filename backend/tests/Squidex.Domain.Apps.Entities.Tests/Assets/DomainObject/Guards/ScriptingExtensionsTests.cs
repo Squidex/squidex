@@ -8,7 +8,6 @@
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -88,13 +87,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
             A.CallTo(() => app.AssetScripts)
                 .Returns(scripts);
-
-            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
-                Options.Create(new JintScriptOptions
-                {
-                    TimeoutScript = TimeSpan.FromSeconds(2),
-                    TimeoutExecution = TimeSpan.FromSeconds(10)
-                }));
 
             var serviceProvider =
                 new ServiceCollection()
