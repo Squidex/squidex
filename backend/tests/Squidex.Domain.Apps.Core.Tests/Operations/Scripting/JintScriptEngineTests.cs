@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task ExecuteAsync_should_catch_script_syntax_errors()
         {
             const string script = @"
-                invalid()
+                invalid(()
             ";
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var context = new ScriptVars { ["data"] = content };
 
             const string script = @"
-                invalid();
+                invalid(();
             ";
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(context, script, contentOptions));

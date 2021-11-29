@@ -88,11 +88,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
                             tcs.TrySetResult(JsonMapper.Map(value));
                         }));
 
-                        Execute(context.Engine, script);
+                        var result = Execute(context.Engine, script);
 
                         if (!context.IsAsync)
                         {
-                            tcs.TrySetResult(JsonMapper.Map(context.Engine.GetCompletionValue()));
+                            tcs.TrySetResult(JsonMapper.Map(result));
                         }
 
                         return await tcs.Task;
@@ -169,9 +169,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     .Extend(vars, options)
                     .Extend(extensions);
 
-            Execute(context.Engine, script);
+            var result = Execute(context.Engine, script);
 
-            return JsonMapper.Map(context.Engine.GetCompletionValue());
+            return JsonMapper.Map(result);
         }
 
         private ScriptExecutionContext CreateEngine(ScriptOptions options)
@@ -204,13 +204,13 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return context;
         }
 
-        private void Execute(Engine engine, string script)
+        private JsValue Execute(Engine engine, string script)
         {
             try
             {
                 var program = parser.Parse(script);
 
-                engine.Execute(program);
+                return engine.Evaluate(program);
             }
             catch (ArgumentException ex)
             {

@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 target[i] = Map(arr[i], engine);
             }
 
-            return engine.Array.Construct(target);
+            return engine.Realm.Intrinsics.Array.Construct(target);
         }
 
         private static JsValue FromObject(JsonObject obj, Engine engine)

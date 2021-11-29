@@ -244,7 +244,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             engine.SetValue("data", new ContentDataObject(engine, content));
 
-            var result = engine.Execute(@"
+            var result = engine.Evaluate(@"
                 var result = [];
                 for (var x in data) {
                     var field = data[x];
@@ -253,7 +253,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         result.push(field[y]);
                     }
                 }
-                result;").GetCompletionValue().ToObject();
+                result;").ToObject();
 
             Assert.Equal(new[] { "1", "2", "3", "4" }, result);
         }

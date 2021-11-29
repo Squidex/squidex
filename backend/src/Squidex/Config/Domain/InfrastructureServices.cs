@@ -61,7 +61,6 @@ namespace Squidex.Config.Domain
                 {
                     TimeoutExecution = timeoutExecution,
                     TimeoutScript = timeoutScript
-
                 }).As<IScriptEngine>();
 
             services.AddSingletonAs(_ => SystemClock.Instance)

@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             engine.SetValue("user", JintUser.Create(engine, new ClaimsPrincipal(new[] { identity })));
 
-            return engine.Execute(script).GetCompletionValue().ToObject();
+            return engine.Evaluate(script).ToObject();
         }
     }
 }
