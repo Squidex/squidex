@@ -6,7 +6,7 @@
  */
 
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Form, UndefinableFormGroup, ValidatorsEx } from '@app/framework';
+import { Form, ExtendedFormGroup, ValidatorsEx } from '@app/framework';
 import { RuleElementDto } from '../services/rules.service';
 
 export class ActionForm extends Form<any, FormGroup> {
@@ -28,7 +28,7 @@ export class ActionForm extends Form<any, FormGroup> {
             controls[property.name] = new FormControl(undefined, validator);
         }
 
-        return new UndefinableFormGroup(controls);
+        return new ExtendedFormGroup(controls);
     }
 
     protected transformSubmit(value: any): any {
@@ -48,7 +48,7 @@ export class TriggerForm extends Form<any, FormGroup> {
     private static builForm(triggerType: string) {
         switch (triggerType) {
             case 'ContentChanged': {
-                return new UndefinableFormGroup({
+                return new ExtendedFormGroup({
                     handleAll: new FormControl(false,
                         Validators.nullValidator,
                     ),
@@ -58,7 +58,7 @@ export class TriggerForm extends Form<any, FormGroup> {
                 });
             }
             case 'Usage': {
-                return new UndefinableFormGroup({
+                return new ExtendedFormGroup({
                     limit: new FormControl(20000,
                         Validators.required,
                     ),
@@ -68,7 +68,7 @@ export class TriggerForm extends Form<any, FormGroup> {
                 });
             }
             default: {
-                return new UndefinableFormGroup({
+                return new ExtendedFormGroup({
                     condition: new FormControl('',
                         Validators.nullValidator,
                     ),

@@ -6,7 +6,7 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, hasNoValue$, hasValue$, TemplatedFormArray, UndefinableFormGroup } from '@app/framework';
+import { Form, hasNoValue$, hasValue$, TemplatedFormArray, ExtendedFormGroup } from '@app/framework';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
 export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
@@ -35,7 +35,7 @@ class PermissionTemplate {
 
 type AddPermissionFormType = { permission: string };
 
-export class AddPermissionForm extends Form<UndefinableFormGroup, AddPermissionFormType> {
+export class AddPermissionForm extends Form<ExtendedFormGroup, AddPermissionFormType> {
     public get permission() {
         return this.form.controls['permission'];
     }
@@ -43,7 +43,7 @@ export class AddPermissionForm extends Form<UndefinableFormGroup, AddPermissionF
     public hasPermission = hasValue$(this.permission);
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             permission: new FormControl('',
                 Validators.required,
             ),
@@ -51,7 +51,7 @@ export class AddPermissionForm extends Form<UndefinableFormGroup, AddPermissionF
     }
 }
 
-export class AddRoleForm extends Form<UndefinableFormGroup, CreateRoleDto> {
+export class AddRoleForm extends Form<ExtendedFormGroup, CreateRoleDto> {
     public get name() {
         return this.form.controls['name'];
     }
@@ -59,7 +59,7 @@ export class AddRoleForm extends Form<UndefinableFormGroup, CreateRoleDto> {
     public hasNoName = hasNoValue$(this.name);
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),

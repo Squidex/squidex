@@ -8,16 +8,16 @@
 /* eslint-disable no-useless-escape */
 
 import { AbstractControl, FormControl, Validators } from '@angular/forms';
-import { Form, TemplatedFormArray, UndefinableFormGroup, ValidatorsEx, value$ } from '@app/framework';
+import { Form, TemplatedFormArray, ExtendedFormGroup, ValidatorsEx, value$ } from '@app/framework';
 import { map } from 'rxjs/operators';
 import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from './../services/schemas.service';
 import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from './../services/schemas.types';
 
 type CreateCategoryFormType = { name: string };
 
-export class CreateCategoryForm extends Form<UndefinableFormGroup, CreateCategoryFormType> {
+export class CreateCategoryForm extends Form<ExtendedFormGroup, CreateCategoryFormType> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.nullValidator,
             ),
@@ -25,9 +25,9 @@ export class CreateCategoryForm extends Form<UndefinableFormGroup, CreateCategor
     }
 }
 
-export class CreateSchemaForm extends Form<UndefinableFormGroup, CreateSchemaDto> {
+export class CreateSchemaForm extends Form<ExtendedFormGroup, CreateSchemaDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             name: new FormControl('', [
                 Validators.required,
                 Validators.maxLength(40),
@@ -58,9 +58,9 @@ export class CreateSchemaForm extends Form<UndefinableFormGroup, CreateSchemaDto
     }
 }
 
-export class SynchronizeSchemaForm extends Form<UndefinableFormGroup, SynchronizeSchemaDto> {
+export class SynchronizeSchemaForm extends Form<ExtendedFormGroup, SynchronizeSchemaDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             json: new FormControl({},
                 Validators.nullValidator,
             ),
@@ -87,7 +87,7 @@ export class SynchronizeSchemaForm extends Form<UndefinableFormGroup, Synchroniz
 }
 
 export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyArray<FieldRule>, SchemaDto> {
-    public get rulesControls(): ReadonlyArray<UndefinableFormGroup> {
+    public get rulesControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.form.controls as any;
     }
 
@@ -110,7 +110,7 @@ export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyAr
 
 class FieldRuleTemplate {
     public createControl(_: any, fieldNames?: ReadonlyArray<string>) {
-        return new UndefinableFormGroup({
+        return new ExtendedFormGroup({
             name: new FormControl('Disable',
                 Validators.required,
             ),
@@ -127,7 +127,7 @@ class FieldRuleTemplate {
 type ConfigurePreviewUrlsFormType = { [name: string]: string };
 
 export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, ConfigurePreviewUrlsFormType, SchemaDto> {
-    public get previewControls(): ReadonlyArray<UndefinableFormGroup> {
+    public get previewControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.form.controls as any;
     }
 
@@ -160,7 +160,7 @@ export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, Configure
 
 class PreviewUrlTemplate {
     public createControl() {
-        return new UndefinableFormGroup({
+        return new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),
@@ -171,9 +171,9 @@ class PreviewUrlTemplate {
     }
 }
 
-export class EditSchemaScriptsForm extends Form<UndefinableFormGroup, {}, object> {
+export class EditSchemaScriptsForm extends Form<ExtendedFormGroup, {}, object> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             query: new FormControl('',
                 Validators.nullValidator,
             ),
@@ -193,7 +193,7 @@ export class EditSchemaScriptsForm extends Form<UndefinableFormGroup, {}, object
     }
 }
 
-export class EditFieldForm extends Form<UndefinableFormGroup, {}, FieldPropertiesDto> {
+export class EditFieldForm extends Form<ExtendedFormGroup, {}, FieldPropertiesDto> {
     constructor(properties: FieldPropertiesDto) {
         super(EditFieldForm.buildForm(properties));
     }
@@ -231,7 +231,7 @@ export class EditFieldForm extends Form<UndefinableFormGroup, {}, FieldPropertie
 
         properties.accept(new EditFieldFormVisitor(config));
 
-        return new UndefinableFormGroup(config);
+        return new ExtendedFormGroup(config);
     }
 }
 
@@ -355,9 +355,9 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 }
 
-export class EditSchemaForm extends Form<UndefinableFormGroup, UpdateSchemaDto, SchemaPropertiesDto> {
+export class EditSchemaForm extends Form<ExtendedFormGroup, UpdateSchemaDto, SchemaPropertiesDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             label: new FormControl('',
                 Validators.maxLength(100),
             ),
@@ -383,11 +383,11 @@ export class EditSchemaForm extends Form<UndefinableFormGroup, UpdateSchemaDto, 
     }
 }
 
-export class AddFieldForm extends Form<UndefinableFormGroup, AddFieldDto> {
+export class AddFieldForm extends Form<ExtendedFormGroup, AddFieldDto> {
     public isContentField = value$(this.form.controls['type']).pipe(map(x => x !== 'UI'));
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             type: new FormControl('String',
                 Validators.required,
             ),

@@ -6,12 +6,12 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, UndefinableFormGroup, ValidatorsEx } from '@app/shared';
+import { Form, ExtendedFormGroup, ValidatorsEx } from '@app/shared';
 import { UpdateUserDto, UserDto } from './../services/users.service';
 
-export class UserForm extends Form<UndefinableFormGroup, UpdateUserDto, UserDto> {
+export class UserForm extends Form<ExtendedFormGroup, UpdateUserDto, UserDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             email: new FormControl('', [
                 Validators.email,
                 Validators.required,

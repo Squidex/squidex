@@ -539,7 +539,7 @@ describe('ContentForm', () => {
             array.sort([array.get(1), array.get(0)]);
 
             expectLength(array, 2);
-            expect(array.form.value).toEqual([{ nested41: 'Text2' }, { nested41: 'Text1' }]);
+            expect(array.form.value).toEqual([{ nested41: 'Text2', nested42: null }, { nested41: 'Text1', nested42: null }]);
         });
 
         it('should remove array item', () => {
@@ -548,7 +548,7 @@ describe('ContentForm', () => {
             array.removeItemAt(0);
 
             expectLength(array, 1);
-            expect(array.form.value).toEqual([{ nested41: 'Text2' }]);
+            expect(array.form.value).toEqual([{ nested41: 'Text2', nested42: null }]);
         });
 
         it('should reset array item', () => {

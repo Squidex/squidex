@@ -8,12 +8,12 @@
 /* eslint-disable no-useless-escape */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, hasNoValue$, UndefinableFormGroup, ValidatorsEx } from '@app/framework';
+import { Form, hasNoValue$, ExtendedFormGroup, ValidatorsEx } from '@app/framework';
 import { ClientDto, CreateClientDto, UpdateClientDto } from './../services/clients.service';
 
-export class RenameClientForm extends Form<UndefinableFormGroup, UpdateClientDto, ClientDto> {
+export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, ClientDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),
@@ -21,7 +21,7 @@ export class RenameClientForm extends Form<UndefinableFormGroup, UpdateClientDto
     }
 }
 
-export class AddClientForm extends Form<UndefinableFormGroup, CreateClientDto> {
+export class AddClientForm extends Form<ExtendedFormGroup, CreateClientDto> {
     public get id() {
         return this.form.controls['id'];
     }
@@ -29,7 +29,7 @@ export class AddClientForm extends Form<UndefinableFormGroup, CreateClientDto> {
     public hasNoId = hasNoValue$(this.id);
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             id: new FormControl('', [
                 Validators.maxLength(40),
                 ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:clients.clientIdValidationMessage'),

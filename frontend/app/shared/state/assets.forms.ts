@@ -6,11 +6,11 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, Mutable, TemplatedFormArray, Types, UndefinableFormGroup } from '@app/framework';
+import { Form, Mutable, TemplatedFormArray, Types, ExtendedFormGroup } from '@app/framework';
 import slugify from 'slugify';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, RenameAssetFolderDto, RenameAssetTagDto } from './../services/assets.service';
 
-export class AnnotateAssetForm extends Form<UndefinableFormGroup, AnnotateAssetDto, AssetDto> {
+export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
         return this.form.controls['metadata'] as TemplatedFormArray;
     }
@@ -20,7 +20,7 @@ export class AnnotateAssetForm extends Form<UndefinableFormGroup, AnnotateAssetD
     }
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             isProtected: new FormControl(false,
                 Validators.nullValidator,
             ),
@@ -161,7 +161,7 @@ export class AnnotateAssetForm extends Form<UndefinableFormGroup, AnnotateAssetD
 
 class MetadataTemplate {
     public createControl() {
-        return new UndefinableFormGroup({
+        return new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),
@@ -170,9 +170,9 @@ class MetadataTemplate {
     }
 }
 
-export class EditAssetScriptsForm extends Form<UndefinableFormGroup, {}, object> {
+export class EditAssetScriptsForm extends Form<ExtendedFormGroup, {}, object> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             annotate: new FormControl('',
                 Validators.nullValidator,
             ),
@@ -192,9 +192,9 @@ export class EditAssetScriptsForm extends Form<UndefinableFormGroup, {}, object>
     }
 }
 
-export class RenameAssetFolderForm extends Form<UndefinableFormGroup, RenameAssetFolderDto, AssetFolderDto> {
+export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFolderDto, AssetFolderDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             folderName: new FormControl('',
                 Validators.required,
             ),
@@ -202,9 +202,9 @@ export class RenameAssetFolderForm extends Form<UndefinableFormGroup, RenameAsse
     }
 }
 
-export class RenameAssetTagForm extends Form<UndefinableFormGroup, RenameAssetTagDto, RenameAssetTagDto> {
+export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameAssetTagDto, RenameAssetTagDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             tagName: new FormControl('',
                 Validators.required,
             ),

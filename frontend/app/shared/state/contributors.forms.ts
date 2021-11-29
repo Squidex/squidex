@@ -6,12 +6,12 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, hasNoValue$, Types, UndefinableFormGroup, value$ } from '@app/framework';
+import { Form, hasNoValue$, Types, ExtendedFormGroup, value$ } from '@app/framework';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { AssignContributorDto } from './../services/contributors.service';
 import { UserDto } from './../services/users.service';
 
-export class AssignContributorForm extends Form<UndefinableFormGroup, AssignContributorDto> {
+export class AssignContributorForm extends Form<ExtendedFormGroup, AssignContributorDto> {
     public get user() {
         return this.form.controls['user'];
     }
@@ -19,7 +19,7 @@ export class AssignContributorForm extends Form<UndefinableFormGroup, AssignCont
     public hasNoUser = hasNoValue$(this.user);
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             user: new FormControl('',
                 Validators.required,
             ),
@@ -42,7 +42,7 @@ export class AssignContributorForm extends Form<UndefinableFormGroup, AssignCont
 
 type ImportContributorsFormType = ReadonlyArray<AssignContributorDto>;
 
-export class ImportContributorsForm extends Form<UndefinableFormGroup, ImportContributorsFormType> {
+export class ImportContributorsForm extends Form<ExtendedFormGroup, ImportContributorsFormType> {
     public get import() {
         return this.form.controls['import'];
     }
@@ -52,7 +52,7 @@ export class ImportContributorsForm extends Form<UndefinableFormGroup, ImportCon
     public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             import: new FormControl('',
                 Validators.required,
             ),

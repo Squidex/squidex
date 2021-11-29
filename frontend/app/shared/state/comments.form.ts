@@ -6,12 +6,12 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, UndefinableFormGroup } from '@app/framework';
+import { Form, ExtendedFormGroup } from '@app/framework';
 import { UpsertCommentDto } from './../services/comments.service';
 
-export class UpsertCommentForm extends Form<UndefinableFormGroup, UpsertCommentDto> {
+export class UpsertCommentForm extends Form<ExtendedFormGroup, UpsertCommentDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             text: new FormControl('',
                 Validators.nullValidator,
             ),

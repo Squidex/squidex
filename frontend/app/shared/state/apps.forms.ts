@@ -8,12 +8,12 @@
 /* eslint-disable no-useless-escape */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, TemplatedFormArray, UndefinableFormGroup, ValidatorsEx } from '@app/framework';
+import { Form, TemplatedFormArray, ExtendedFormGroup, ValidatorsEx } from '@app/framework';
 import { AppDto, AppSettingsDto, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
-export class CreateAppForm extends Form<UndefinableFormGroup, CreateAppDto> {
+export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             name: new FormControl('', [
                 Validators.required,
                 Validators.maxLength(40),
@@ -23,9 +23,9 @@ export class CreateAppForm extends Form<UndefinableFormGroup, CreateAppDto> {
     }
 }
 
-export class UpdateAppForm extends Form<UndefinableFormGroup, UpdateAppDto, AppDto> {
+export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             label: new FormControl('',
                 Validators.maxLength(40),
             ),
@@ -34,12 +34,12 @@ export class UpdateAppForm extends Form<UndefinableFormGroup, UpdateAppDto, AppD
     }
 }
 
-export class EditAppSettingsForm extends Form<UndefinableFormGroup, UpdateAppSettingsDto, AppSettingsDto> {
+export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettingsDto, AppSettingsDto> {
     public get patterns() {
         return this.form.controls['patterns'] as TemplatedFormArray;
     }
 
-    public get patternsControls(): ReadonlyArray<UndefinableFormGroup> {
+    public get patternsControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.patterns.controls as any;
     }
 
@@ -47,12 +47,12 @@ export class EditAppSettingsForm extends Form<UndefinableFormGroup, UpdateAppSet
         return this.form.controls['editors'] as TemplatedFormArray;
     }
 
-    public get editorsControls(): ReadonlyArray<UndefinableFormGroup> {
+    public get editorsControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.editors.controls as any;
     }
 
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             patterns: new TemplatedFormArray(new PatternTemplate()),
             hideScheduler: new FormControl(false),
             hideDateTimeButtons: new FormControl(false),

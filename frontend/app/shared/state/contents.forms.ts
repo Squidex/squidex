@@ -6,7 +6,7 @@
  */
 
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTimeSafe, Form, FormArrayTemplate, TemplatedFormArray, Types, UndefinableFormGroup, value$ } from '@app/framework';
+import { debounceTimeSafe, Form, FormArrayTemplate, TemplatedFormArray, Types, ExtendedFormGroup, value$ } from '@app/framework';
 import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
 import { BehaviorSubject, distinctUntilChanged, Observable } from 'rxjs';
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -19,9 +19,9 @@ import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string; user: boolean };
 
-export class SaveQueryForm extends Form<UndefinableFormGroup, SaveQueryFormType> {
+export class SaveQueryForm extends Form<ExtendedFormGroup, SaveQueryFormType> {
     constructor() {
-        super(new UndefinableFormGroup({
+        super(new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),
@@ -32,14 +32,14 @@ export class SaveQueryForm extends Form<UndefinableFormGroup, SaveQueryFormType>
     }
 }
 
-export class PatchContentForm extends Form<UndefinableFormGroup, any> {
+export class PatchContentForm extends Form<ExtendedFormGroup, any> {
     private readonly editableFields: ReadonlyArray<RootFieldDto>;
 
     constructor(
         private readonly listFields: ReadonlyArray<TableField>,
         private readonly language: AppLanguageDto,
     ) {
-        super(new UndefinableFormGroup({}));
+        super(new ExtendedFormGroup({}));
 
         this.editableFields = this.listFields.filter(x => Types.is(x, RootFieldDto) && x.isInlineEditable) as any;
 
@@ -73,7 +73,7 @@ export class PatchContentForm extends Form<UndefinableFormGroup, any> {
     }
 }
 
-export class EditContentForm extends Form<UndefinableFormGroup, any> {
+export class EditContentForm extends Form<ExtendedFormGroup, any> {
     private readonly fields: { [name: string]: FieldForm } = {};
     private readonly valueChange$ = new BehaviorSubject<any>(this.form.value);
     private initialData: any;
@@ -94,7 +94,7 @@ export class EditContentForm extends Form<UndefinableFormGroup, any> {
         public context: any,
         debounce = 100,
     ) {
-        super(new UndefinableFormGroup({}));
+        super(new ExtendedFormGroup({}));
 
         const globals: FormGlobals = {
             schema,
@@ -268,7 +268,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
     }
 
     private static buildForm() {
-        return new UndefinableFormGroup({});
+        return new ExtendedFormGroup({});
     }
 }
 
