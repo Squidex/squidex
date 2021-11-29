@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
