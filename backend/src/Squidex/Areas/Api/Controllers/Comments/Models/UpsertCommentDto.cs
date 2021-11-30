@@ -27,12 +27,19 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
 
         public CreateComment ToCreateCommand(DomainId commentsId)
         {
-            return SimpleMapper.Map(this, new CreateComment { CommentsId = commentsId });
+            return SimpleMapper.Map(this, new CreateComment
+            {
+                CommentsId = commentsId
+            });
         }
 
         public UpdateComment ToUpdateComment(DomainId commentsId, DomainId commentId)
         {
-            return SimpleMapper.Map(this, new UpdateComment { CommentsId = commentsId, CommentId = commentId });
+            return SimpleMapper.Map(this, new UpdateComment
+            {
+                CommentsId = commentsId,
+                CommentId = commentId
+            });
         }
     }
 }

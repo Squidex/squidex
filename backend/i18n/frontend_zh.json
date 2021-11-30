@@ -607,6 +607,7 @@
   "languages.updateFailed": "更改语言失败。请重新加载。",
   "news.headline": "有什么新鲜事？",
   "news.title": "新功能",
+  "notifications.empty": "No notifications yet",
   "notifo.subscripeTooltip": "单击此按钮可订阅所有更改并接收推送通知。",
   "plans.billingPortal": "计费门户",
   "plans.billingPortalHint": "前往账单门户查看付款历史和订阅概览。",
