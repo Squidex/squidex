@@ -81,7 +81,7 @@ namespace TestSuite.ApiTests
         }
 
         [Fact(Skip = "Not supported yet.")]
-        public async Task Should_upload_image_tg_and_resize()
+        public async Task Should_upload_image_tga_and_resize()
         {
             var asset = await _.UploadFileAsync("Assets/SampleImage_600kb.tga", "image/jpg");
 

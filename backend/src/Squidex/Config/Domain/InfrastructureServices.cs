@@ -47,7 +47,7 @@ namespace Squidex.Config.Domain
             services.Configure<ReplicatedCacheOptions>(config,
                 "caching:replicated");
 
-            services.Configure<JintScriptEngine>(config,
+            services.Configure<JintScriptOptions>(config,
                 "scripting");
 
             services.AddReplicatedCache();
