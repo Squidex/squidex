@@ -27,7 +27,9 @@ export class UserForm extends Form<ExtendedFormGroup, UpdateUserDto, UserDto> {
             passwordConfirm: new FormControl('',
                 ValidatorsEx.match('password', 'i18n:users.passwordConfirmValidationMessage'),
             ),
-            permissions: new FormControl(''),
+            permissions: new FormControl('',
+                Validators.nullValidator,
+            ),
         }));
     }
 

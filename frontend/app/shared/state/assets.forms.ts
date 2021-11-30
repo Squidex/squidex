@@ -15,7 +15,7 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
         return this.form.controls['metadata'] as TemplatedFormArray;
     }
 
-    public get metadataControls(): ReadonlyArray<TemplatedFormArray> {
+    public get metadataControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.metadata.controls as any;
     }
 
@@ -33,7 +33,9 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
             tags: new FormControl([],
                 Validators.nullValidator,
             ),
-            metadata: new TemplatedFormArray(new MetadataTemplate()),
+            metadata: new TemplatedFormArray(
+                MetadataTemplate.INSTANCE,
+            ),
         }));
     }
 
@@ -160,12 +162,16 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
 }
 
 class MetadataTemplate {
+    public static readonly INSTANCE = new MetadataTemplate();
+
     public createControl() {
         return new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),
-            value: new FormControl(''),
+            value: new FormControl('',
+                Validators.nullValidator,
+            ),
         });
     }
 }

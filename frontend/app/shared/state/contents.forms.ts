@@ -335,7 +335,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         public readonly isComponents: boolean,
     ) {
         super(globals, field, fieldPath,
-            FieldArrayForm.buildControl(field, isOptional),
+            new TemplatedFormArray(new ArrayTemplate(() => this), FieldsValidators.create(field, isOptional)),
             isOptional, rules);
 
         this.form.template['form'] = this;
@@ -379,55 +379,58 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
     }
 
     protected updateCustomState(context: any, itemData: any, state: AbstractContentFormState) {
-        for (let i = 0; i < this.items.length; i++) {
-            this.items[i].updateState(context, itemData, state);
+        for (const item of this.items) {
+            item.updateState(context, itemData, state);
         }
-    }
-
-    private static buildControl(field: FieldDto, isOptional: boolean) {
-        return new TemplatedFormArray(new ArrayTemplate(), FieldsValidators.create(field, isOptional));
     }
 }
 
 class ArrayTemplate implements FormArrayTemplate {
-    public form: FieldArrayForm;
+    protected get model() {
+        return this.modelProvider();
+    }
+
+    constructor(
+        private readonly modelProvider: () => FieldArrayForm,
+    ) {
+    }
 
     public createControl() {
-        const child = this.form.isComponents ?
+        const child = this.model.isComponents ?
             this.createComponent() :
             this.createItem();
 
-        this.form.items = [...this.form.items, child];
+        this.model.items = [...this.model.items, child];
 
         return child.form;
     }
 
     public removeControl(index: number) {
-        this.form.items = this.form.items.filter((_, i) => i !== index);
+        this.model.items = this.model.items.filter((_, i) => i !== index);
     }
 
     public clearControls() {
-        this.form.items = [];
+        this.model.items = [];
     }
 
     private createItem() {
         return new ArrayItemForm(
-            this.form.globals,
-            this.form.field as RootFieldDto,
-            this.form.fieldPath,
-            this.form.isOptional,
-            this.form.rules,
-            this.form.partition);
+            this.model.globals,
+            this.model.field as RootFieldDto,
+            this.model.fieldPath,
+            this.model.isOptional,
+            this.model.rules,
+            this.model.partition);
     }
 
     private createComponent() {
         return new ComponentForm(
-            this.form.globals,
-            this.form.field as RootFieldDto,
-            this.form.fieldPath,
-            this.form.isOptional,
-            this.form.rules,
-            this.form.partition);
+            this.model.globals,
+            this.model.field as RootFieldDto,
+            this.model.fieldPath,
+            this.model.isOptional,
+            this.model.rules,
+            this.model.partition);
     }
 }
 

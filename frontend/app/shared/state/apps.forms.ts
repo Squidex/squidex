@@ -29,7 +29,9 @@ export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto>
             label: new FormControl('',
                 Validators.maxLength(40),
             ),
-            description: new FormControl(''),
+            description: new FormControl('',
+                Validators.nullValidator,
+            ),
         }));
     }
 }
@@ -53,15 +55,25 @@ export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettin
 
     constructor() {
         super(new ExtendedFormGroup({
-            patterns: new TemplatedFormArray(new PatternTemplate()),
-            hideScheduler: new FormControl(false),
-            hideDateTimeButtons: new FormControl(false),
-            editors: new TemplatedFormArray(new EditorTemplate()),
+            patterns: new TemplatedFormArray(
+                PatternTemplate.INSTANCE,
+            ),
+            hideScheduler: new FormControl(false,
+                Validators.nullValidator,
+            ),
+            hideDateTimeButtons: new FormControl(false,
+                Validators.nullValidator,
+            ),
+            editors: new TemplatedFormArray(
+                EditorTemplate.INSTANCE,
+            ),
         }));
     }
 }
 
 class PatternTemplate {
+    public static readonly INSTANCE = new PatternTemplate();
+
     public createControl() {
         return new FormControl({
             name: new FormControl('',
@@ -70,12 +82,16 @@ class PatternTemplate {
             regex: new FormControl('',
                 Validators.required,
             ),
-            message: new FormControl(''),
+            message: new FormControl('',
+                Validators.nullValidator,
+            ),
         });
     }
 }
 
 class EditorTemplate {
+    public static readonly INSTANCE = new EditorTemplate();
+
     public createControl() {
         return new FormControl({
             name: new FormControl('',

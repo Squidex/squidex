@@ -92,7 +92,7 @@ export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyAr
     }
 
     constructor() {
-        super(new TemplatedFormArray(new FieldRuleTemplate()));
+        super(new TemplatedFormArray(FieldRuleTemplate.INSTANCE));
     }
 
     public add(fieldNames: ReadonlyArray<string>) {
@@ -109,6 +109,8 @@ export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyAr
 }
 
 class FieldRuleTemplate {
+    public static readonly INSTANCE = new FieldRuleTemplate();
+
     public createControl(_: any, fieldNames?: ReadonlyArray<string>) {
         return new ExtendedFormGroup({
             name: new FormControl('Disable',
@@ -132,7 +134,7 @@ export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, Configure
     }
 
     constructor() {
-        super(new TemplatedFormArray(new PreviewUrlTemplate()));
+        super(new TemplatedFormArray(PreviewUrlTemplate.INSTANCE));
     }
 
     public transformLoad(value: Partial<SchemaDto>) {
@@ -159,6 +161,8 @@ export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, Configure
 }
 
 class PreviewUrlTemplate {
+    public static readonly INSTANCE = new PreviewUrlTemplate();
+
     public createControl() {
         return new ExtendedFormGroup({
             name: new FormControl('',

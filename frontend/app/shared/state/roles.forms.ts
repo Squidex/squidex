@@ -15,7 +15,7 @@ export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDt
     }
 
     constructor() {
-        super(new TemplatedFormArray(new PermissionTemplate()));
+        super(new TemplatedFormArray(PermissionTemplate.INSTANCE));
     }
 
     public transformSubmit(value: any) {
@@ -28,6 +28,8 @@ export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDt
 }
 
 class PermissionTemplate {
+    public static readonly INSTANCE = new PermissionTemplate();
+
     public createControl(_: any, initialValue: string) {
         return new FormControl(initialValue, Validators.required);
     }
