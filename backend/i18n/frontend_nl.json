@@ -408,6 +408,7 @@
   "contents.changeStatusTo": "Verander inhoud item(s) in {action}",
   "contents.changeStatusToImmediately": "Zet onmiddellijk op {action}.",
   "contents.changeStatusToLater": "Zet op {action} op een latere datum en tijd.",
+  "contents.componentInvalid": "Invalid component, schema has been deleted.",
   "contents.componentNoSchema": "Add at least one schema to set component.",
   "contents.componentsNoSchema": "Add at least one schema to add components.",
   "contents.contentNotValid": "Inhoudselement niet geldig, controleer het veld met de rode balk aan de linkerkant in alle talen (indien lokaliseerbaar).",
