@@ -11,7 +11,7 @@
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
             <sqx-iframe-editor [url]="field.properties.editorUrl" #editor
                 [context]="formContext"
-                [formControl]="$any(fieldForm)"
+                [formControlBinding]="$any(fieldForm)"
                 [formValue]="form.valueChanges | async"
                 [formIndex]="index"
                 [language]="language?.iso2Code">

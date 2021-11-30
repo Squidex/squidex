@@ -148,7 +148,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         return `${this.fieldPath}.${relative}`;
     }
 
-    public updateState(context: RuleContext, fieldData: any, itemData: any, parentState: AbstractContentFormState) {
+    public updateState(context: RuleContext, itemData: any, parentState: AbstractContentFormState) {
         const state = {
             isDisabled: this.field.isDisabled || parentState.isDisabled === true,
             isHidden: parentState.isHidden === true,
@@ -177,7 +177,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
             }
         }
 
-        this.updateCustomState(context, fieldData, itemData, state);
+        this.updateCustomState(context, itemData, state);
     }
 
     public setValue(value: any) {
@@ -188,7 +188,7 @@ export abstract class AbstractContentForm<T extends FieldDto, TForm extends Abst
         this.form.setValue(undefined);
     }
 
-    protected updateCustomState(_context: RuleContext, _fieldData: any, _itemData: any, _state: AbstractContentFormState): void {
+    protected updateCustomState(_context: RuleContext, _itemData: any, _state: AbstractContentFormState): void {
         return;
     }
 }

@@ -499,8 +499,130 @@ describe('ContentForm', () => {
                 },
             });
 
+            // Should hide fields.
             expect(array.get(0)!.get('field1')!.hidden).toBeTruthy();
             expect(array.get(1)!.get('field1')!.hidden).toBeFalsy();
+        });
+
+        it('should replace component with new fields', () => {
+            const component1Id = MathHelper.guid();
+            const component1 = createSchema({
+                id: 1,
+                fields: [
+                    createField({
+                        id: 11,
+                        properties: createProperties('String'),
+                        partitioning: 'invariant',
+                    }),
+                ],
+            });
+
+            const component2Id = MathHelper.guid();
+            const component2 = createSchema({
+                id: 2,
+                fields: [
+                    createField({
+                        id: 21,
+                        properties: createProperties('String'),
+                        partitioning: 'invariant',
+                    }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({
+                    id: 4,
+                    properties: createProperties('Component'),
+                    partitioning: 'invariant',
+                }),
+            ], [], {
+                [component1Id]: component1,
+                [component2Id]: component2,
+            });
+
+            contentForm.load({});
+
+            // Should be undefined by default.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: undefined,
+                },
+            });
+
+            contentForm.load({
+                field4: {
+                    iv: {
+                        schemaId: component1Id,
+                    },
+                },
+            });
+
+            // Should add field from component1.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: {
+                        schemaId: component1Id,
+                        field11: null,
+                    },
+                },
+            });
+
+            contentForm.load({
+                field4: {
+                    iv: {
+                        schemaId: component2Id,
+                    },
+                },
+            });
+
+            // Should add field from component1.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: {
+                        schemaId: component2Id,
+                        field21: null,
+                    },
+                },
+            });
+        });
+
+        it('should ignore invalid schema ids', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                id: 1,
+                fields: [
+                    createField({
+                        id: 11,
+                        properties: createProperties('String'),
+                        partitioning: 'invariant',
+                    }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({
+                    id: 4,
+                    properties: createProperties('Component'),
+                    partitioning: 'invariant',
+                }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            contentForm.load({
+                field4: {
+                    iv: {
+                        schemaId: 'invalid',
+                    },
+                },
+            });
+
+            // Should ignore invalid id.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: {},
+                },
+            });
         });
 
         it('should load with array and not enable disabled nested fields', () => {

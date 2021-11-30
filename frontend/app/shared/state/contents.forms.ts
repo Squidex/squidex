@@ -185,7 +185,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
         const context = { ...this.context || {}, data };
 
         for (const field of Object.values(this.fields)) {
-            field.updateState(context, data[field.field.name], data, { isDisabled: this.form.disabled });
+            field.updateState(context, data, { isDisabled: this.form.disabled });
         }
 
         for (const section of this.sections) {
@@ -236,7 +236,7 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
         }
     }
 
-    protected updateCustomState(context: any, fieldData: any, itemData: any, state: AbstractContentFormState) {
+    protected updateCustomState(context: any, itemData: any, state: AbstractContentFormState) {
         const isRequired = state.isRequired === true;
 
         if (this.isRequired !== isRequired) {
@@ -262,8 +262,8 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, FormGroup> {
             }
         }
 
-        for (const [key, partition] of Object.entries(this.partitions)) {
-            partition.updateState(context, fieldData?.[key], itemData, state);
+        for (const partition of Object.values(this.partitions)) {
+            partition.updateState(context, itemData, state);
         }
     }
 
@@ -283,7 +283,7 @@ export class FieldValueForm extends AbstractContentForm<FieldDto, FormControl> {
         this.isRequired = field.properties.isRequired && !isOptional;
     }
 
-    protected updateCustomState(_context: any, _fieldData: any, _itemData: any, state: AbstractContentFormState) {
+    protected updateCustomState(_context: any, _itemData: any, state: AbstractContentFormState) {
         const isRequired = state.isRequired === true;
 
         if (!this.isOptional && this.isRequired !== isRequired) {
@@ -378,9 +378,9 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         }
     }
 
-    protected updateCustomState(context: any, fieldData: any, itemData: any, state: AbstractContentFormState) {
+    protected updateCustomState(context: any, itemData: any, state: AbstractContentFormState) {
         for (let i = 0; i < this.items.length; i++) {
-            this.items[i].updateState(context, fieldData?.[i], itemData, state);
+            this.items[i].updateState(context, itemData, state);
         }
     }
 
@@ -475,9 +475,9 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
         return this.fields[field['name'] || field];
     }
 
-    protected updateCustomState(context: any, fieldData: any, _: any, state: AbstractContentFormState) {
-        for (const [key, field] of Object.entries(this.fields)) {
-            field.updateState(context, fieldData?.[key], fieldData, state);
+    protected updateCustomState(context: any, _: any, state: AbstractContentFormState) {
+        for (const field of Object.values(this.fields)) {
+            field.updateState(context, this.form.value, state);
         }
 
         for (const section of this.fieldSections) {
@@ -606,6 +606,7 @@ export class ComponentForm extends ObjectFormBase {
             new ComponentTemplate(() => this),
             partition);
 
+        this.form.reset(undefined);
         this.form.build();
     }
 
@@ -616,7 +617,7 @@ export class ComponentForm extends ObjectFormBase {
 
 class ComponentTemplate extends ObjectTemplate<ComponentForm> {
     public getSchema(value: any, model: ComponentForm) {
-        return model.globals.schemas[value?.schemaId].fields;
+        return model.globals.schemas[value?.schemaId]?.fields;
     }
 
     protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: ComponentForm, form: FormGroup) {
