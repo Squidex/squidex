@@ -11,7 +11,7 @@
                 {{ 'backups.backupDuration' | sqxTranslate }}:
             </div>
         </div>
-        <div class="col">
+        <div class="col text-nowrap">
             <div>
                 {{backup.started | sqxFromNow}}
             </div>
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="col">
-            <div>
+            <div class="text-nowrap">
                 <span title="i18n:backups.backupCountEventsTooltip">
                     {{ 'backups.backupCountEventsLabel' | sqxTranslate }}: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
                 </span>,
