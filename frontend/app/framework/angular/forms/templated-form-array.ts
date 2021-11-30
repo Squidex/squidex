@@ -7,7 +7,7 @@
 
 import { AbstractControl, AbstractControlOptions, AsyncValidatorFn, ValidatorFn } from '@angular/forms';
 import { Types } from '@app/framework/internal';
-import { UndefinableFormArray } from './undefinable-form-array';
+import { UndefinableFormArray } from './extended-form-array';
 
 export interface FormArrayTemplate {
     createControl(value: any, initialValue?: any): AbstractControl;

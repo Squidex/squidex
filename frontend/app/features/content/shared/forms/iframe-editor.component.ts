@@ -5,15 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, HostListener, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DialogModel, DialogService, StatefulControlComponent, Types } from '@app/framework';
+import { DialogModel, DialogService, disabled$, StatefulComponent, Types, value$ } from '@app/framework';
 import { AppsState, AssetDto, computeEditorUrl } from '@app/shared';
-
-export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true,
-};
 
 interface State {
     // True, when the editor is shown as fullscreen.
@@ -21,17 +17,15 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-iframe-editor[context][formValue]',
+    selector: 'sqx-iframe-editor[context][formValue][formControlBinding]',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
-    providers: [
-        SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IFrameEditorComponent extends StatefulControlComponent<State, any> implements OnChanges, OnDestroy {
+export class IFrameEditorComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private value: any;
     private isInitialized = false;
+    private isDisabled = false;
     private assetsCorrelationId: any;
 
     @ViewChild('iframe', { static: false })
@@ -56,8 +50,11 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     public language?: string | null;
 
     @Input()
+    public formControlBinding: AbstractControl;
+
+    @Input()
     public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
+        this.updatedisabled(value === true);
     }
 
     @Input()
@@ -81,21 +78,39 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     public ngOnDestroy() {
+        super.ngOnDestroy();
+
         this.toggleFullscreen(false);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (this.iframe?.nativeElement) {
-            if (changes['formValue']) {
-                this.sendFormValue();
-            }
+        if (changes['formValue']) {
+            this.sendFormValue();
+        }
 
-            if (changes['language']) {
-                this.sendLanguage();
-            }
+        if (changes['language']) {
+            this.sendLanguage();
+        }
 
-            if (changes['formIndex']) {
-                this.sendMoved();
+        if (changes['formIndex']) {
+            this.sendMoved();
+        }
+
+        if (changes['formControlBinding']) {
+            this.unsubscribeAll();
+
+            const control = this.formControlBinding;
+
+            if (control) {
+                this.own(value$(control)
+                    .subscribe(value => {
+                        this.updateValue(value);
+                    }));
+
+                this.own(disabled$(control)
+                    .subscribe(isDisabled => {
+                        this.updatedisabled(isDisabled);
+                    }));
             }
         }
     }
@@ -135,10 +150,10 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
                 if (!Types.equals(this.value, value)) {
                     this.value = value;
 
-                    this.callChange(value);
+                    this.formControlBinding?.reset(value);
                 }
             } else if (type === 'touched') {
-                this.callTouched();
+                this.formControlBinding?.markAsTouched();
             } else if (type === 'notifyInfo') {
                 const { text } = event.data;
 
@@ -182,14 +197,20 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
         this.assetsDialog.hide();
     }
 
-    public writeValue(obj: any) {
-        this.value = obj;
+    public updateValue(obj: any) {
+        if (!Types.equals(obj, this.value)) {
+            this.value = obj;
 
-        this.sendValue();
+            this.sendValue();
+        }
     }
 
-    public onDisabled() {
-        this.sendDisabled();
+    public updatedisabled(isDisabled: boolean) {
+        if (isDisabled !== this.isDisabled) {
+            this.isDisabled === isDisabled;
+
+            this.sendDisabled();
+        }
     }
 
     public reset() {
@@ -209,7 +230,7 @@ export class IFrameEditorComponent extends StatefulControlComponent<State, any> 
     }
 
     private sendDisabled() {
-        this.sendMessage('disabled', { isDisabled: this.snapshot.isDisabled });
+        this.sendMessage('disabled', { isDisabled: this.isDisabled });
     }
 
     private sendFormValue() {

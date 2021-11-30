@@ -6,7 +6,6 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
@@ -18,7 +17,7 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDto;
 
-    public editForm = new ConfigureFieldRulesForm(this.formBuilder);
+    public editForm = new ConfigureFieldRulesForm();
 
     public fieldNames: ReadonlyArray<string>;
     public fieldActions = FIELD_RULE_ACTIONS;
@@ -26,7 +25,6 @@ export class SchemaFieldRulesFormComponent implements OnChanges {
     public isEditable = false;
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
     ) {
     }

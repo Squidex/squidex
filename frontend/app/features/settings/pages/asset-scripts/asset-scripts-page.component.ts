@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAssetScriptsForm, ResourceOwner } from '@app/shared';
 import { EMPTY, Observable } from 'rxjs';
 
@@ -19,13 +18,12 @@ export class AssetScriptsPageComponent extends ResourceOwner implements OnInit {
     public assetScript = 'create';
     public assetCompletions: Observable<AssetCompletions> = EMPTY;
 
-    public editForm = new EditAssetScriptsForm(this.formBuilder);
+    public editForm = new EditAssetScriptsForm();
 
     public isEditable = false;
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly formBuilder: FormBuilder,
         private readonly assetScriptsState: AssetScriptsState,
         private readonly assetsService: AssetsService,
     ) {

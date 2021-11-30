@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
 @Component({
@@ -21,11 +20,10 @@ export class AssetFolderDialogComponent implements OnInit {
     @Input()
     public assetFolder: AssetFolderDto;
 
-    public editForm = new RenameAssetFolderForm(this.formBuilder);
+    public editForm = new RenameAssetFolderForm();
 
     constructor(
         private readonly assetsState: AssetsState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

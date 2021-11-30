@@ -5,11 +5,30 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { EventEmitter } from '@angular/core';
 import { AbstractControl, AbstractControlOptions, AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 
-export class UndefinableFormGroup extends FormGroup {
+export class ExtendedFormGroup extends FormGroup {
+    constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
+        super(controls, validatorOrOpts, asyncValidator);
+
+        this['_reduceValue'] = () => {
+            const result = {};
+
+            for (const [key, control] of Object.entries(this.controls)) {
+                result[key] = control.value;
+            }
+
+            return result;
+        };
+
+        this['_updateValue'] = () => {
+            (this as { value: any }).value = this['_reduceValue']();
+        };
+    }
+}
+
+export class UndefinableFormGroup extends ExtendedFormGroup {
     private isUndefined = false;
 
     constructor(controls: { [key: string]: AbstractControl }, validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
@@ -62,26 +81,5 @@ export class UndefinableFormGroup extends FormGroup {
 
     private checkUndefined(value?: {}) {
         this.isUndefined = Types.isUndefined(value);
-    }
-
-    public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean } = {}) {
-        super.updateValueAndValidity({ emitEvent: false, onlySelf: true });
-
-        if (this.isUndefined) {
-            this.unsetValue();
-        }
-
-        if (opts.emitEvent !== false) {
-            (this.valueChanges as EventEmitter<any>).emit(this.value);
-            (this.statusChanges as EventEmitter<string>).emit(this.status);
-        }
-
-        if (this.parent && !opts.onlySelf) {
-            this.parent.updateValueAndValidity(opts);
-        }
-    }
-
-    private unsetValue() {
-        (this as { value: any }).value = undefined;
     }
 }

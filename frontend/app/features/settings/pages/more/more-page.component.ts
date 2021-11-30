@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppDto, AppsState, defined, ResourceOwner, Types, UpdateAppForm } from '@app/shared';
 
@@ -25,11 +24,10 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     public uploading = false;
     public uploadProgress = 10;
 
-    public updateForm = new UpdateAppForm(this.formBuilder);
+    public updateForm = new UpdateAppForm();
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly formBuilder: FormBuilder,
         private readonly router: Router,
     ) {
         super();

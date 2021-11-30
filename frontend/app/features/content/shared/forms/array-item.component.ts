@@ -7,7 +7,8 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, StatefulComponent, Types, valueProjection$ } from '@app/shared';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ComponentSectionComponent } from './component-section.component';
 
 interface State {
@@ -69,6 +70,7 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
 
     public isCollapsed = false;
     public isInvalid: Observable<boolean>;
+    public isInvalidComponent: Observable<boolean>;
 
     public title: Observable<string>;
 
@@ -87,32 +89,14 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
         if (changes['formModel']) {
             this.isInvalid = invalid$(this.formModel.form);
 
-            this.title = valueProjection$(this.formModel.form, x => this.getTitle(x));
-        }
-    }
-
-    private getTitle(value: any) {
-        const values: string[] = [];
-
-        if (Types.is(this.formModel, ComponentForm) && this.formModel.schema) {
-            values.push(this.formModel.schema.displayName);
-        }
-
-        if (Types.is(this.formModel.field, RootFieldDto)) {
-            for (const field of this.formModel.field.nested) {
-                const fieldValue = value[field.name];
-
-                if (fieldValue) {
-                    const formatted = FieldFormatter.format(field, fieldValue);
-
-                    if (formatted) {
-                        values.push(formatted);
-                    }
-                }
+            if (Types.is(this.formModel, ComponentForm)) {
+                this.isInvalidComponent = this.formModel.schemaChanges.pipe(map(x => !x));
+            } else {
+                this.isInvalidComponent = of(false);
             }
-        }
 
-        return values.join(', ');
+            this.title = valueProjection$(this.formModel.form, () => getTitle(this.formModel));
+        }
     }
 
     public collapse() {
@@ -148,4 +132,29 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public trackBySection(_index: number, section: FieldSection<FieldDto, any>) {
         return section.separator?.fieldId;
     }
+}
+
+function getTitle(formModel: ObjectFormBase) {
+    const value = formModel.form.value;
+    const values: string[] = [];
+
+    if (Types.is(formModel, ComponentForm) && formModel.schema) {
+        values.push(formModel.schema.displayName);
+    }
+
+    if (Types.is(formModel.field, RootFieldDto)) {
+        for (const field of formModel.field.nested) {
+            const fieldValue = value[field.name];
+
+            if (fieldValue) {
+                const formatted = FieldFormatter.format(field, fieldValue);
+
+                if (formatted) {
+                    values.push(formatted);
+                }
+            }
+        }
+    }
+
+    return values.join(', ');
 }

@@ -7,7 +7,7 @@
 
 import { AbstractControlOptions, AsyncValidatorFn, FormGroup, ValidatorFn } from '@angular/forms';
 import { Types } from '@app/framework/internal';
-import { UndefinableFormGroup } from './undefinable-form-group';
+import { UndefinableFormGroup } from './extended-form-group';
 
 export interface FormGroupTemplate {
     setControls(form: FormGroup, value: any): void;

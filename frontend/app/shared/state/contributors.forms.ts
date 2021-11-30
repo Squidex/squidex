@@ -5,27 +5,27 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, hasNoValue$, Types, value$ } from '@app/framework';
+import { FormControl, Validators } from '@angular/forms';
+import { Form, hasNoValue$, Types, ExtendedFormGroup, value$ } from '@app/framework';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { AssignContributorDto } from './../services/contributors.service';
 import { UserDto } from './../services/users.service';
 
-export class AssignContributorForm extends Form<FormGroup, AssignContributorDto> {
-    public hasNoUser = hasNoValue$(this.form.controls['user']);
+export class AssignContributorForm extends Form<ExtendedFormGroup, AssignContributorDto> {
+    public get user() {
+        return this.form.controls['user'];
+    }
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            user: [null,
-                [
-                    Validators.required,
-                ],
-            ],
-            role: [null,
-                [
-                    Validators.required,
-                ],
-            ],
+    public hasNoUser = hasNoValue$(this.user);
+
+    constructor() {
+        super(new ExtendedFormGroup({
+            user: new FormControl('',
+                Validators.required,
+            ),
+            role: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 
@@ -42,18 +42,20 @@ export class AssignContributorForm extends Form<FormGroup, AssignContributorDto>
 
 type ImportContributorsFormType = ReadonlyArray<AssignContributorDto>;
 
-export class ImportContributorsForm extends Form<FormGroup, ImportContributorsFormType> {
-    public numberOfEmails = value$(this.form.controls['import']).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
+export class ImportContributorsForm extends Form<ExtendedFormGroup, ImportContributorsFormType> {
+    public get import() {
+        return this.form.controls['import'];
+    }
+
+    public numberOfEmails = value$(this.import).pipe(debounceTime(100), map(v => extractEmails(v).length), shareReplay(1));
 
     public hasNoUser = this.numberOfEmails.pipe(map(v => v === 0));
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            import: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    constructor() {
+        super(new ExtendedFormGroup({
+            import: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 

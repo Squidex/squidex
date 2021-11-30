@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AuthService, BackupsService, DialogService, RestoreForm, switchSafe } from '@app/shared';
 import { timer } from 'rxjs';
 
@@ -16,7 +15,7 @@ import { timer } from 'rxjs';
     templateUrl: './restore-page.component.html',
 })
 export class RestorePageComponent {
-    public restoreForm = new RestoreForm(this.formBuilder);
+    public restoreForm = new RestoreForm();
 
     public restoreJob =
         timer(0, 2000).pipe(switchSafe(() => this.backupsService.getRestore()));
@@ -25,7 +24,6 @@ export class RestorePageComponent {
         public readonly authState: AuthService,
         private readonly backupsService: BackupsService,
         private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

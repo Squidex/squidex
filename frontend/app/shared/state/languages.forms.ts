@@ -5,29 +5,41 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, value$ } from '@app/framework';
+import { FormControl, Validators } from '@angular/forms';
+import { Form, ExtendedFormGroup, value$ } from '@app/framework';
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';
 
-export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppLanguageDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            isMaster: false,
-            isOptional: false,
+export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateAppLanguageDto, AppLanguageDto> {
+    public get isMaster() {
+        return this.form.controls['isMaster'];
+    }
+
+    public get isOptional() {
+        return this.form.controls['isOptional'];
+    }
+
+    constructor() {
+        super(new ExtendedFormGroup({
+            isMaster: new FormControl(false,
+                Validators.nullValidator,
+            ),
+            isOptional: new FormControl(false,
+                Validators.nullValidator,
+            ),
         }));
 
-        value$(this.form.controls['isMaster'])
+        value$(this.isMaster)
             .subscribe(value => {
                 if (value) {
-                    this.form.controls['isOptional'].setValue(false);
+                    this.isOptional.setValue(false);
                 }
             });
 
-        value$(this.form.controls['isOptional'])
+        value$(this.isMaster)
             .subscribe(value => {
                 if (value) {
-                    this.form.controls['isMaster'].setValue(false);
+                    this.isOptional.setValue(false);
                 }
             });
     }
@@ -35,14 +47,12 @@ export class EditLanguageForm extends Form<FormGroup, UpdateAppLanguageDto, AppL
 
 type AddLanguageFormType = { language: LanguageDto };
 
-export class AddLanguageForm extends Form<FormGroup, AddLanguageFormType> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            language: [null,
-                [
-                    Validators.required,
-                ],
-            ],
+export class AddLanguageForm extends Form<ExtendedFormGroup, AddLanguageFormType> {
+    constructor() {
+        super(new ExtendedFormGroup({
+            language: new FormControl(null,
+                Validators.required,
+            ),
         }));
     }
 }

@@ -6,7 +6,6 @@
  */
 
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AddFieldForm, AppSettingsDto, createProperties, EditFieldForm, FieldDto, fieldTypes, LanguagesState, RootFieldDto, SchemaDto, SchemasState, Types } from '@app/shared';
 
 const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
@@ -39,12 +38,11 @@ export class FieldWizardComponent implements OnInit {
     public fieldTypes = fieldTypes;
     public field: FieldDto;
 
-    public addFieldForm = new AddFieldForm(this.formBuilder);
+    public addFieldForm = new AddFieldForm();
 
     public editForm?: EditFieldForm;
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
         public readonly languagesState: LanguagesState,
     ) {
@@ -76,7 +74,7 @@ export class FieldWizardComponent implements OnInit {
                                 this.nameInput.nativeElement.focus();
                             }
                         } else if (edit) {
-                            this.editForm = new EditFieldForm(this.formBuilder, this.field.properties);
+                            this.editForm = new EditFieldForm(this.field.properties);
                             this.editForm.load(this.field.properties);
                         } else {
                             this.emitComplete();

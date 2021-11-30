@@ -5,14 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Form } from '@app/framework';
+import { FormControl, Validators } from '@angular/forms';
+import { Form, ExtendedFormGroup } from '@app/framework';
 import { UpsertCommentDto } from './../services/comments.service';
 
-export class UpsertCommentForm extends Form<FormGroup, UpsertCommentDto> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            text: '',
+export class UpsertCommentForm extends Form<ExtendedFormGroup, UpsertCommentDto> {
+    constructor() {
+        super(new ExtendedFormGroup({
+            text: new FormControl('',
+                Validators.nullValidator,
+            ),
         }));
     }
 }

@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AppSettingsDto, AppsState, EditAppSettingsForm, ResourceOwner } from '@app/shared';
 
 @Component({
@@ -17,12 +16,11 @@ import { AppSettingsDto, AppsState, EditAppSettingsForm, ResourceOwner } from '@
 export class SettingsPageComponent extends ResourceOwner implements OnInit {
     public isEditable = false;
 
-    public editForm = new EditAppSettingsForm(this.formBuilder);
+    public editForm = new EditAppSettingsForm();
     public editingSettings: AppSettingsDto;
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly formBuilder: FormBuilder,
     ) {
         super();
     }

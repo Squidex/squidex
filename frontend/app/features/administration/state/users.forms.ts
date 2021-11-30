@@ -5,39 +5,31 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Form, ValidatorsEx } from '@app/shared';
+import { FormControl, Validators } from '@angular/forms';
+import { Form, ExtendedFormGroup, ValidatorsEx } from '@app/shared';
 import { UpdateUserDto, UserDto } from './../services/users.service';
 
-export class UserForm extends Form<FormGroup, UpdateUserDto, UserDto> {
-    constructor(
-        formBuilder: FormBuilder,
-    ) {
-        super(formBuilder.group({
-            email: ['',
-                [
-                    Validators.email,
-                    Validators.required,
-                    Validators.maxLength(100),
-                ],
-            ],
-            displayName: ['',
-                [
-                    Validators.required,
-                    Validators.maxLength(100),
-                ],
-            ],
-            password: ['',
-                [
-                    Validators.required,
-                ],
-            ],
-            passwordConfirm: ['',
-                [
-                    ValidatorsEx.match('password', 'i18n:users.passwordConfirmValidationMessage'),
-                ],
-            ],
-            permissions: [''],
+export class UserForm extends Form<ExtendedFormGroup, UpdateUserDto, UserDto> {
+    constructor() {
+        super(new ExtendedFormGroup({
+            email: new FormControl('', [
+                Validators.email,
+                Validators.required,
+                Validators.maxLength(100),
+            ]),
+            displayName: new FormControl('', [
+                Validators.required,
+                Validators.maxLength(100),
+            ]),
+            password: new FormControl('',
+                Validators.required,
+            ),
+            passwordConfirm: new FormControl('',
+                ValidatorsEx.match('password', 'i18n:users.passwordConfirmValidationMessage'),
+            ),
+            permissions: new FormControl('',
+                Validators.nullValidator,
+            ),
         }));
     }
 

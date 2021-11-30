@@ -6,8 +6,8 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
+import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ExtendedFormGroup, ValidatorsEx } from '@app/shared/internal';
 
 declare const L: any;
 declare const google: any;
@@ -54,19 +54,13 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     }
 
     public geolocationForm =
-        this.formBuilder.group({
-            latitude: [
-                '',
-                [
-                    ValidatorsEx.between(-90, 90),
-                ],
-            ],
-            longitude: [
-                '',
-                [
-                    ValidatorsEx.between(-180, 180),
-                ],
-            ],
+        new ExtendedFormGroup({
+            latitude: new FormControl('',
+                ValidatorsEx.between(-90, 90),
+            ),
+            longitude: new FormControl('',
+                ValidatorsEx.between(-180, 180),
+            ),
         });
 
     @ViewChild('editor', { static: false })
@@ -78,7 +72,6 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
-        private readonly formBuilder: FormBuilder,
         private readonly uiOptions: UIOptions,
     ) {
         super(changeDetector, {

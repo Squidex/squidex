@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { switchSafe } from '@app/framework';
 import { AppsState, AuthService, CommentDto, CommentsService, CommentsState, ContributorsState, DialogService, ResourceOwner, UpsertCommentForm } from '@app/shared/internal';
@@ -31,7 +30,7 @@ export class CommentsComponent extends ResourceOwner implements OnChanges {
 
     public commentsUrl: string;
     public commentsState: CommentsState;
-    public commentForm = new UpsertCommentForm(this.formBuilder);
+    public commentForm = new UpsertCommentForm();
 
     public mentionUsers = this.contributorsState.contributors;
     public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
@@ -44,7 +43,6 @@ export class CommentsComponent extends ResourceOwner implements OnChanges {
         private readonly contributorsState: ContributorsState,
         private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder,
         private readonly router: Router,
     ) {
         super();

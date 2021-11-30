@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Form, ValidatorsEx } from '@app/framework';
+import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Form, ExtendedFormGroup, ValidatorsEx } from '@app/framework';
 import { RuleElementDto } from '../services/rules.service';
 
 export class ActionForm extends Form<any, FormGroup> {
@@ -28,7 +28,7 @@ export class ActionForm extends Form<any, FormGroup> {
             controls[property.name] = new FormControl(undefined, validator);
         }
 
-        return new FormGroup(controls);
+        return new ExtendedFormGroup(controls);
     }
 
     protected transformSubmit(value: any): any {
@@ -39,33 +39,40 @@ export class ActionForm extends Form<any, FormGroup> {
 }
 
 export class TriggerForm extends Form<any, FormGroup> {
-    constructor(formBuilder: FormBuilder,
+    constructor(
         private readonly triggerType: string,
     ) {
-        super(TriggerForm.builForm(formBuilder, triggerType));
+        super(TriggerForm.builForm(triggerType));
     }
 
-    private static builForm(formBuilder: FormBuilder, triggerType: string) {
+    private static builForm(triggerType: string) {
         switch (triggerType) {
             case 'ContentChanged': {
-                return formBuilder.group({ handleAll: false, schemas: undefined });
+                return new ExtendedFormGroup({
+                    handleAll: new FormControl(false,
+                        Validators.nullValidator,
+                    ),
+                    schemas: new FormControl(undefined,
+                        Validators.nullValidator,
+                    ),
+                });
             }
             case 'Usage': {
-                return formBuilder.group({
-                    limit: [20000,
-                        [
-                            Validators.required,
-                        ],
-                    ],
-                    numDays: [3,
-                        [
-                            ValidatorsEx.between(1, 30),
-                        ],
-                    ],
+                return new ExtendedFormGroup({
+                    limit: new FormControl(20000,
+                        Validators.required,
+                    ),
+                    numDays: new FormControl(3,
+                        ValidatorsEx.between(1, 30),
+                    ),
                 });
             }
             default: {
-                return formBuilder.group({ condition: undefined });
+                return new ExtendedFormGroup({
+                    condition: new FormControl('',
+                        Validators.nullValidator,
+                    ),
+                });
             }
         }
     }

@@ -9,7 +9,7 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { ErrorDto, Types } from '@app/framework/internal';
 import { State } from './../../state';
 import { ErrorValidator } from './error-validator';
-import { addValidator, getRawValue, hasNonCustomError, updateAll } from './forms-helper';
+import { addValidator, hasNonCustomError, updateAll } from './forms-helper';
 
 export interface FormState {
     // The number of submits.
@@ -92,7 +92,7 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         this.form.markAllAsTouched();
 
         if (!hasNonCustomError(this.form)) {
-            const value = this.transformSubmit(getRawValue(this.form));
+            const value = this.transformSubmit(this.form.value);
 
             if (value) {
                 this.disable();

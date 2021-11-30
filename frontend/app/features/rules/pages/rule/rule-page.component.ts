@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActionForm, ALL_TRIGGERS, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm } from '@app/shared';
 
@@ -45,7 +44,6 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
         public readonly rulesState: RulesState,
         public readonly rulesService: RulesService,
         public readonly schemasState: SchemasState,
-        private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
@@ -97,7 +95,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     }
 
     public selectTrigger(type: string, values = {}) {
-        const form = new TriggerForm(this.formBuilder, type);
+        const form = new TriggerForm(type);
 
         form.setEnabled(this.isEditable);
         form.load(values);

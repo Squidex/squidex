@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ContributorsState, ErrorDto, ImportContributorsForm, RoleDto } from '@app/shared';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
@@ -30,12 +29,11 @@ export class ImportContributorsDialogComponent {
     @Input()
     public roles: ReadonlyArray<RoleDto>;
 
-    public importForm = new ImportContributorsForm(this.formBuilder);
+    public importForm = new ImportContributorsForm();
     public importStatus: ReadonlyArray<ImportStatus> = [];
     public importStage: 'Start' | 'Change' | 'Wait' = 'Start';
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly contributorsState: ContributorsState,
     ) {
     }

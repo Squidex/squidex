@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
 
 @Component({
@@ -21,11 +20,10 @@ export class AssetTagDialogComponent implements OnInit {
     @Input()
     public tagName: string;
 
-    public editForm = new RenameAssetTagForm(this.formBuilder);
+    public editForm = new RenameAssetTagForm();
 
     constructor(
         private readonly assetsState: AssetsState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

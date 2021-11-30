@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Form, hasNoValue$, hasValue$, TemplatedFormArray } from '@app/framework';
+import { FormControl, Validators } from '@angular/forms';
+import { Form, hasNoValue$, hasValue$, TemplatedFormArray, ExtendedFormGroup } from '@app/framework';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
 export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
@@ -15,7 +15,7 @@ export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDt
     }
 
     constructor() {
-        super(new TemplatedFormArray(new PermissionTemplate()));
+        super(new TemplatedFormArray(PermissionTemplate.INSTANCE));
     }
 
     public transformSubmit(value: any) {
@@ -28,6 +28,8 @@ export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDt
 }
 
 class PermissionTemplate {
+    public static readonly INSTANCE = new PermissionTemplate();
+
     public createControl(_: any, initialValue: string) {
         return new FormControl(initialValue, Validators.required);
     }
@@ -35,30 +37,34 @@ class PermissionTemplate {
 
 type AddPermissionFormType = { permission: string };
 
-export class AddPermissionForm extends Form<FormGroup, AddPermissionFormType> {
-    public hasPermission = hasValue$(this.form.controls['permission']);
+export class AddPermissionForm extends Form<ExtendedFormGroup, AddPermissionFormType> {
+    public get permission() {
+        return this.form.controls['permission'];
+    }
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            permission: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    public hasPermission = hasValue$(this.permission);
+
+    constructor() {
+        super(new ExtendedFormGroup({
+            permission: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 }
 
-export class AddRoleForm extends Form<FormGroup, CreateRoleDto> {
-    public hasNoName = hasNoValue$(this.form.controls['name']);
+export class AddRoleForm extends Form<ExtendedFormGroup, CreateRoleDto> {
+    public get name() {
+        return this.form.controls['name'];
+    }
 
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                ],
-            ],
+    public hasNoName = hasNoValue$(this.name);
+
+    constructor() {
+        super(new ExtendedFormGroup({
+            name: new FormControl('',
+                Validators.required,
+            ),
         }));
     }
 }

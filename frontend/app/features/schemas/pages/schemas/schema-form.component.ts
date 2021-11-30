@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ApiUrlConfig, AppsState, CreateSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
@@ -24,7 +23,7 @@ export class SchemaFormComponent implements OnInit {
     @Input()
     public import: any;
 
-    public createForm = new CreateSchemaForm(this.formBuilder);
+    public createForm = new CreateSchemaForm();
 
     public showImport = false;
 
@@ -32,7 +31,6 @@ export class SchemaFormComponent implements OnInit {
         public readonly apiUrl: ApiUrlConfig,
         public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

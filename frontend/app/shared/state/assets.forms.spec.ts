@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder } from '@angular/forms';
 import { AnnotateAssetForm } from './assets.forms';
 
 describe('AnnotateAssetForm', () => {
@@ -28,7 +27,7 @@ describe('AnnotateAssetForm', () => {
     };
 
     beforeEach(() => {
-        form = new AnnotateAssetForm(new FormBuilder());
+        form = new AnnotateAssetForm();
     });
 
     it('shoulde remove extension if loading asset file name', () => {

@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AddClientForm, ClientsState } from '@app/shared';
 
 @Component({
@@ -16,11 +15,10 @@ import { AddClientForm, ClientsState } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClientAddFormComponent {
-    public addClientForm = new AddClientForm(this.formBuilder);
+    public addClientForm = new AddClientForm();
 
     constructor(
         private readonly clientsState: ClientsState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

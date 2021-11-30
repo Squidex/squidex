@@ -54,5 +54,9 @@
                 [languages]="languages">
             </sqx-component-section>
         </div>
+
+        <sqx-form-hint *ngIf="isInvalidComponent | async">
+            {{ 'contents.componentInvalid' | sqxTranslate }}
+        </sqx-form-hint>
     </div>
 </div>

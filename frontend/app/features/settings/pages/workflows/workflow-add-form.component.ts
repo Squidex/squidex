@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { AddWorkflowForm, WorkflowsState } from '@app/shared';
 
 @Component({
@@ -16,11 +15,10 @@ import { AddWorkflowForm, WorkflowsState } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkflowAddFormComponent {
-    public addWorkflowForm = new AddWorkflowForm(this.formBuilder);
+    public addWorkflowForm = new AddWorkflowForm();
 
     constructor(
         private readonly workflowsState: WorkflowsState,
-        private readonly formBuilder: FormBuilder,
     ) {
     }
 

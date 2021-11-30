@@ -5,11 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { EventEmitter } from '@angular/core';
 import { AbstractControl, AbstractControlOptions, AsyncValidatorFn, FormArray, ValidatorFn } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 
-export class UndefinableFormArray extends FormArray {
+export class ExtendedFormArray extends FormArray {
+    constructor(controls: AbstractControl[], validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
+        super(controls, validatorOrOpts, asyncValidator);
+
+        this['_reduceValue'] = () => {
+            return this.controls.map(x => x.value);
+        };
+
+        this['_updateValue'] = () => {
+            (this as { value: any }).value = this['_reduceValue']();
+        };
+    }
+}
+
+export class UndefinableFormArray extends ExtendedFormArray {
     private isUndefined = false;
 
     constructor(controls: AbstractControl[], validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null, asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null) {
@@ -78,26 +91,5 @@ export class UndefinableFormArray extends FormArray {
         if (this.isUndefined) {
             this.clear({ emitEvent: false });
         }
-    }
-
-    public updateValueAndValidity(opts: { onlySelf?: boolean; emitEvent?: boolean } = {}) {
-        super.updateValueAndValidity({ emitEvent: false, onlySelf: true });
-
-        if (this.isUndefined) {
-            this.unsetValue();
-        }
-
-        if (opts.emitEvent !== false) {
-            (this.valueChanges as EventEmitter<any>).emit(this.value);
-            (this.statusChanges as EventEmitter<string>).emit(this.status);
-        }
-
-        if (this.parent && !opts.onlySelf) {
-            this.parent.updateValueAndValidity(opts);
-        }
-    }
-
-    private unsetValue() {
-        (this as { value: any }).value = undefined;
     }
 }

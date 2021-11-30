@@ -49,7 +49,7 @@ export class FieldCopyButtonComponent implements OnChanges {
 
     public copy() {
         if (this.copySource && this.copyTargets?.length > 0) {
-            const source = this.formModel.get(this.copySource).getRawValue();
+            const source = this.formModel.get(this.copySource).form.value;
 
             for (const target of this.copyTargets) {
                 if (target !== this.copySource) {

@@ -6,7 +6,6 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { ConfigurePreviewUrlsForm, SchemaDto, SchemasState } from '@app/shared';
 
 @Component({
@@ -18,12 +17,11 @@ export class SchemaPreviewUrlsFormComponent implements OnChanges {
     @Input()
     public schema: SchemaDto;
 
-    public editForm = new ConfigurePreviewUrlsForm(this.formBuilder);
+    public editForm = new ConfigurePreviewUrlsForm();
 
     public isEditable = false;
 
     constructor(
-        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState,
     ) {
     }

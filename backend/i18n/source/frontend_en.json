@@ -408,6 +408,7 @@
   "contents.changeStatusTo": "Change content item(s) to {action}",
   "contents.changeStatusToImmediately": "Set to {action} immediately.",
   "contents.changeStatusToLater": "Set to {action} at a later point date and time.",
+  "contents.componentInvalid": "Invalid component, schema has been deleted.",
   "contents.componentNoSchema": "Add at least one schema to set component.",
   "contents.componentsNoSchema": "Add at least one schema to add components.",
   "contents.contentNotValid": "Content element not valid, please check the field with the red bar on the left in all languages (if localizable).",
