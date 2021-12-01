@@ -166,7 +166,8 @@ export abstract class AssetsStateBase extends State<Snapshot> {
 
                 const { items: assets, total } = assetsResult;
 
-                this.next({
+                this.next(s => ({
+                    ...s,
                     assets,
                     folders: foldersResult.items,
                     canCreate: assetsResult.canCreate,
@@ -177,8 +178,8 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     isLoading: false,
                     path,
                     tagsAvailable,
-                    total,
-                }, 'Loading Success');
+                    total: total >= 0 ? total : s.total,
+                }), 'Loading Success');
             }),
             finalize(() => {
                 this.next({ isLoading: false }, 'Loading Done');
@@ -462,11 +463,16 @@ function createQuery(snapshot: Snapshot) {
         pageSize,
         query,
         tagsSelected,
+        total,
     } = snapshot;
 
     const result: any = { take: pageSize, skip: pageSize * page };
 
     const hasQuery = !!query?.fullText || Object.keys(tagsSelected).length > 0;
+
+    if (page > 0 && total > 0) {
+        result.noTotal = true;
+    }
 
     if (hasQuery) {
         if (query) {

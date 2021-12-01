@@ -100,7 +100,7 @@ describe('AssetsState', () => {
         });
 
         it('should load with new pagination if paging', () => {
-            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID }))
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noTotal: true }))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
             assetsState.page({ page: 1, pageSize: 30 }).subscribe();

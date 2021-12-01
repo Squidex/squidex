@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { encodeQuery, Query, StatusInfo } from './../state/query';
+import { Query, sanitize, StatusInfo } from './../state/query';
 import { parseField, RootFieldDto } from './schemas.service';
 
 export class ScheduleDto {
@@ -125,14 +125,20 @@ export type BulkUpdateDto =
 export type BulkUpdateJobDto =
     Readonly<{ id: string; type: BulkUpdateType; status?: string; schema?: string; dueTime?: string | null; expectedVersion?: number }>;
 
+export type ContentsQuery =
+    Readonly<{ noTotal?: boolean }>;
+
 export type ContentsByIds =
-    Readonly<{ ids: ReadonlyArray<string> }>;
+    Readonly<{ ids: ReadonlyArray<string> }> & ContentsQuery;
 
 export type ContentsBySchedule =
-    Readonly<{ scheduledFrom: string | null; scheduledTo: string | null }>;
+    Readonly<{ scheduledFrom: string | null; scheduledTo: string | null }> & ContentsQuery;
 
-export type ContentsByQuery =
-    Readonly<{ query?: Query; skip?: number; take?: number }>;
+type ContentsByQuery =
+    Readonly<{ query?: Query; skip?: number; take?: number }> & ContentsQuery;
+
+type ContentsResponse =
+    Readonly<{ total: number; items: []; statuses: StatusInfo[] } & Resource>;
 
 @Injectable()
 export class ContentsService {
@@ -144,19 +150,21 @@ export class ContentsService {
     }
 
     public getContents(appName: string, schemaName: string, q?: ContentsByQuery): Observable<ContentsDto> {
-        const { odataParts, queryObj } = buildQuery(q);
-
-        const body: any = {};
-
-        if (odataParts.length > 0) {
-            body.odata = odataParts.join('&');
-        } else if (queryObj) {
-            body.q = queryObj;
-        }
+        const body = buildQuery(q);
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/query`);
 
-        return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, body).pipe(
+        let options = {};
+
+        if (q?.noTotal) {
+            options = {
+                headers: {
+                    'X-NoTotal': '1',
+                },
+            };
+        }
+
+        return this.http.post<ContentsResponse>(url, body, options).pipe(
             map(({ total, items, statuses, _links }) => {
                 const contents = items.map(parseContent);
 
@@ -183,9 +191,21 @@ export class ContentsService {
     }
 
     public getAllContents(appName: string, q: ContentsByIds | ContentsBySchedule): Observable<ContentsDto> {
+        const { noTotal, ...body } = q;
+
         const url = this.apiUrl.buildUrl(`/api/content/${appName}`);
 
-        return this.http.post<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url, q).pipe(
+        let options = {};
+
+        if (noTotal) {
+            options = {
+                headers: {
+                    'X-NoTotal': '1',
+                },
+            };
+        }
+
+        return this.http.post<ContentsResponse>(url, body, options).pipe(
             map(({ total, items, statuses, _links }) => {
                 const contents = items.map(parseContent);
 
@@ -199,7 +219,17 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/references?${fullQuery}`);
 
-        return this.http.get<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url).pipe(
+        let options = {};
+
+        if (q?.noTotal) {
+            options = {
+                headers: {
+                    'X-NoTotal': '1',
+                },
+            };
+        }
+
+        return this.http.get<ContentsResponse>(url, options).pipe(
             map(({ total, items, statuses, _links }) => {
                 const contents = items.map(parseContent);
 
@@ -213,7 +243,7 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/referencing?${fullQuery}`);
 
-        return this.http.get<{ total: number; items: []; statuses: StatusInfo[] } & Resource>(url).pipe(
+        return this.http.get<ContentsResponse>(url).pipe(
             map(({ total, items, statuses, _links }) => {
                 const contents = items.map(parseContent);
 
@@ -337,13 +367,12 @@ export class ContentsService {
 function buildQuery(q?: ContentsByQuery) {
     const { query, skip, take } = q || {};
 
-    const queryParts: string[] = [];
-    const odataParts: string[] = [];
-
-    let queryObj: Query | undefined;
+    const body: any = {};
 
     if (query && query.fullText && query.fullText.indexOf('$') >= 0) {
-        odataParts.push(`${query.fullText.trim()}`);
+        const odataParts: string[] = [
+            `${query.fullText.trim()}`,
+        ];
 
         if (take && take > 0) {
             odataParts.push(`$top=${take}`);
@@ -352,8 +381,10 @@ function buildQuery(q?: ContentsByQuery) {
         if (skip && skip > 0) {
             odataParts.push(`$skip=${skip}`);
         }
+
+        body.odata = odataParts.join('&');
     } else {
-        queryObj = { ...query };
+        const queryObj: Query = { ...query };
 
         if (take && take > 0) {
             queryObj.take = take;
@@ -363,12 +394,10 @@ function buildQuery(q?: ContentsByQuery) {
             queryObj.skip = skip;
         }
 
-        queryParts.push(`q=${encodeQuery(queryObj)}`);
+        body.q = sanitize(queryObj);
     }
 
-    const fullQuery = [...queryParts, ...odataParts].join('&');
-
-    return { fullQuery, odataParts, queryObj };
+    return body;
 }
 
 function parseContent(response: any) {
