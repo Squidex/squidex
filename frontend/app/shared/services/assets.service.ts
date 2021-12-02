@@ -402,7 +402,7 @@ function buildQuery(q?: AssetsByQuery & AssetsByIds) {
         body.parentId = parentId;
     }
 
-    if (ids && ids.length > 0) {
+    if (Types.isArray(ids)) {
         body.ids = ids;
     } else {
         const queryObj: Query = {};
