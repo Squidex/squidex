@@ -13,9 +13,7 @@ namespace TestSuite.Fixtures
     {
         private static readonly string[] Contributors =
         {
-            "sebastian@squidex.io",
-            "hello1@squidex.io",
-            "hello2@squidex.io",
+            "hello@squidex.io"
         };
 
         private static bool isCreated;
