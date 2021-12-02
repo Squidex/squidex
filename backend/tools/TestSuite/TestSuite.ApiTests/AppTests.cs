@@ -136,7 +136,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_manage_contributors()
         {
-            var contributorEmail = "hello@squidex.io";
+            var contributorEmail = "sebastian@squidex.io";
             var contributorRole1 = "Developer";
             var contributorRole2 = "Owner";
 
