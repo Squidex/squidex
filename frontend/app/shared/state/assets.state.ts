@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State } from '@app/framework';
+import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
@@ -468,24 +468,22 @@ function createQuery(snapshot: Snapshot) {
 
     const result: any = { take: pageSize, skip: pageSize * page };
 
-    const hasQuery = !!query?.fullText || Object.keys(tagsSelected).length > 0;
+    const tags = Object.keys(tagsSelected);
 
-    if (page > 0 && total > 0) {
-        result.noTotal = true;
-    }
-
-    if (hasQuery) {
+    if (Types.isString(query?.fullText) || tags.length > 0) {
         if (query) {
             result.query = query;
         }
 
-        const searchTags = Object.keys(snapshot.tagsSelected);
-
-        if (searchTags.length > 0) {
-            result.tags = searchTags;
+        if (tags.length > 0) {
+            result.tags = tags;
         }
     } else {
         result.parentId = snapshot.parentId;
+    }
+
+    if (page > 0 && total > 0) {
+        result.noTotal = true;
     }
 
     return result;
