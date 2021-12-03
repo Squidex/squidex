@@ -13,7 +13,7 @@ import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
-    selector: 'sqx-array-editor[form][formContext][formModel][language][languages]',
+    selector: 'sqx-array-editor[form][formContext][formLevel][formModel][language][languages]',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +27,9 @@ export class ArrayEditorComponent implements OnChanges {
 
     @Input()
     public formContext: any;
+
+    @Input()
+    public formLevel: number;
 
     @Input()
     public formModel: FieldArrayForm;
@@ -81,7 +84,7 @@ export class ArrayEditorComponent implements OnChanges {
                 return disabled || items.length >= maxItems;
             }));
 
-            this.isCollapsedInitial = this.localStore.getBoolean(this.expandedKey());
+            this.isCollapsedInitial = this.formLevel > 0 || this.localStore.getBoolean(this.expandedKey());
         }
     }
 

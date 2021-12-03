@@ -10,7 +10,7 @@ import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, EditContent
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    selector: 'sqx-component[form][formContext][formModel][language][languages]',
+    selector: 'sqx-component[form][formContext][formLevel][formModel][language][languages]',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +27,9 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
 
     @Input()
     public formContext: any;
+
+    @Input()
+    public formLevel: number;
 
     @Input()
     public formModel: ComponentForm;

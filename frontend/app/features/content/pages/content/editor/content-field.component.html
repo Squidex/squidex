@@ -26,6 +26,7 @@
                         [canUnset]="!formModel.field.isDisabled"
                         [form]="form"
                         [formContext]="formContext"
+                        [formLevel]="formLevel"
                         [formModel]="formModel.get(language)"
                         [language]="language"
                         [languages]="languages"
@@ -39,6 +40,7 @@
                     [canUnset]="!formModel.field.isDisabled"
                     [form]="form"
                     [formContext]="formContext"
+                    [formLevel]="formLevel"
                     [formModel]="getControl()"
                     [language]="language"
                     [languages]="languages">
@@ -71,6 +73,7 @@
                     <sqx-field-editor
                         [form]="formCompare"
                         [formContext]="formContext"
+                        [formLevel]="formLevel"
                         [formModel]="formModelCompare.get(language)"
                         [language]="language"
                         [languages]="languages"
@@ -82,8 +85,9 @@
             <ng-template #singleControlCompare>
                 <sqx-field-editor
                     [form]="formCompare"
-                    [formModel]="getControlCompare()!"
                     [formContext]="formContext"
+                    [formLevel]="formLevel"
+                    [formModel]="getControlCompare()!"
                     [language]="language"
                     [languages]="languages">
                 </sqx-field-editor>

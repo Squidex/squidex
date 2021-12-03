@@ -11,7 +11,7 @@ import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoVa
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-field-editor[form][formContext][formModel][language][languages]',
+    selector: 'sqx-field-editor[form][formContext][formLevel][formModel][language][languages]',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
 })
@@ -23,6 +23,9 @@ export class FieldEditorComponent implements OnChanges {
 
     @Input()
     public formContext: any;
+
+    @Input()
+    public formLevel: number;
 
     @Input()
     public formModel: AbstractContentForm<FieldDto, AbstractControl>;

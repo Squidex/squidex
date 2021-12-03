@@ -20,12 +20,13 @@
 <div class="row gx-1" [class.hidden]="snapshot.isCollapsed && !formCompare">
     <sqx-content-field *ngFor="let field of formSection.fields; trackBy: trackByField"
         (languageChange)="languageChange.emit($event)"
-        [isCompact]="isCompact"
         [form]="form"
         [formCompare]="formCompare"
         [formContext]="formContext"
+        [formLevel]="formLevel"
         [formModel]="field"
         [formModelCompare]="getFieldFormCompare(field)"
+        [isCompact]="isCompact"
         [language]="language"
         [languages]="languages"
         [schema]="schema">

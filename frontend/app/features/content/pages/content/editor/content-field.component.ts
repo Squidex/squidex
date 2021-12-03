@@ -10,7 +10,7 @@ import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invali
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-content-field[form][formContext][formModel][language][languages][schema]',
+    selector: 'sqx-content-field[form][formContext][formLevel][formModel][language][languages][schema]',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',
 })
@@ -29,6 +29,9 @@ export class ContentFieldComponent implements OnChanges {
 
     @Input()
     public formContext: any;
+
+    @Input()
+    public formLevel: number;
 
     @Input()
     public formModel: FieldForm;
