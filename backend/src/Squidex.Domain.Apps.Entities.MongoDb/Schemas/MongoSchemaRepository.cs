@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         {
             using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryAsync"))
             {
-                var find = Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted);
+                var find = Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted).SortBy(x => x.IndexedCreated);
 
                 return await QueryAsync(find, ct);
             }
@@ -57,13 +57,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         {
             var entities = await find.Only(x => x.IndexedId, x => x.IndexedName).ToListAsync(ct);
 
-            return entities.Select(x =>
-            {
-                var indexedId = DomainId.Create(x["_si"].AsString);
-                var indexedName = x["_sn"].AsString;
+            var result = new Dictionary<string, DomainId>();
 
-                return new { indexedName, indexedId };
-            }).ToDictionary(x => x.indexedName, x => x.indexedId);
+            foreach (var entity in entities)
+            {
+                var indexedId = DomainId.Create(entity["_si"].AsString);
+                var indexedName = entity["_sn"].AsString;
+
+                if (!result.ContainsKey(indexedName))
+                {
+                    result.Add(indexedName, indexedId);
+                }
+            }
+
+            return result;
         }
     }
 }

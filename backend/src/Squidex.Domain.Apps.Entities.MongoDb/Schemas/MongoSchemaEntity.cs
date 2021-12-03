@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization.Attributes;
+using NodaTime;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -30,12 +31,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         [BsonElement("_dl")]
         public bool IndexedDeleted { get; set; }
 
+        [BsonIgnoreIfDefault]
+        [BsonElement("_ct")]
+        public Instant IndexedCreated { get; set; }
+
         public override void Prepare()
         {
             IndexedAppId = Document.AppId.Id;
             IndexedDeleted = Document.IsDeleted;
             IndexedId = Document.Id;
             IndexedName = Document.SchemaDef.Name;
+            IndexedCreated = Document.Created;
         }
     }
 }

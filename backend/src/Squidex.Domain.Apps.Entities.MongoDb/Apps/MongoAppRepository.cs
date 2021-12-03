@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryIdsAsync"))
             {
-                var find = Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted);
+                var find = Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted).SortBy(x => x.IndexedCreated);
 
                 return await QueryAsync(find, ct);
             }
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAsync"))
             {
-                var find = Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted);
+                var find = Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted).SortBy(x => x.IndexedCreated);
 
                 return await QueryAsync(find, ct);
             }
@@ -70,13 +70,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
             var entities = await find.Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
 
-            return entities.Select(x =>
-            {
-                var indexedId = DomainId.Create(x["_id"].AsString);
-                var indexedName = x["_an"].AsString;
+            var result = new Dictionary<string, DomainId>();
 
-                return new { indexedName, indexedId };
-            }).ToDictionary(x => x.indexedName, x => x.indexedId);
+            foreach (var entity in entities)
+            {
+                var indexedId = DomainId.Create(entity["_id"].AsString);
+                var indexedName = entity["_an"].AsString;
+
+                if (!result.ContainsKey(indexedName))
+                {
+                    result.Add(indexedName, indexedId);
+                }
+            }
+
+            return result;
         }
     }
 }
