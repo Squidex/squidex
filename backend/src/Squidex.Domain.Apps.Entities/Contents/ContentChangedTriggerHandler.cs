@@ -203,9 +203,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return false;
         }
 
-        private static bool MatchsSchema(ContentChangedTriggerSchemaV2? schema, NamedId<DomainId> eventId)
+        private static bool MatchsSchema(ContentChangedTriggerSchemaV2? schema, NamedId<DomainId> schemaId)
         {
-            return eventId.Id == schema?.SchemaId;
+            return schemaId != null && schemaId.Id == schema?.SchemaId;
         }
 
         private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEventBase @event)
