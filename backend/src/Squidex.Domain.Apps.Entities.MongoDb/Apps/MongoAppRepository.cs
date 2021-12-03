@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryIdsAsync"))
             {
-                var find = Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted).SortBy(x => x.IndexedCreated);
+                var find = Collection.Find(x => x.IndexedUserIds.Contains(contributorId) && !x.IndexedDeleted);
 
                 return await QueryAsync(find, ct);
             }
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
             using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAsync"))
             {
-                var find = Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted).SortBy(x => x.IndexedCreated);
+                var find = Collection.Find(x => names.Contains(x.IndexedName) && !x.IndexedDeleted);
 
                 return await QueryAsync(find, ct);
             }
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         private static async Task<Dictionary<string, DomainId>> QueryAsync(IFindFluent<MongoAppEntity, MongoAppEntity> find,
             CancellationToken ct)
         {
-            var entities = await find.Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
+            var entities = await find.SortBy(x => x.IndexedCreated).Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
 
             var result = new Dictionary<string, DomainId>();
 
@@ -77,10 +77,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
                 var indexedId = DomainId.Create(entity["_id"].AsString);
                 var indexedName = entity["_an"].AsString;
 
-                if (!result.ContainsKey(indexedName))
-                {
-                    result.Add(indexedName, indexedId);
-                }
+                result[indexedName] = indexedId;
             }
 
             return result;
