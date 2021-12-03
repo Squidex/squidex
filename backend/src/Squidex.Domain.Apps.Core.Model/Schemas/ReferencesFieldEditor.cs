@@ -12,6 +12,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         List,
         Dropdown,
         Tags,
-        Checkboxes
+        Checkboxes,
+        Input
     }
 }

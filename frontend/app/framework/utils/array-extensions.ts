@@ -22,6 +22,8 @@ interface ReadonlyArray<T> {
 }
 
 interface Array<T> {
+    clear(): Array<T>;
+
     replacedBy(field: keyof T, value: T): ReadonlyArray<T>;
 
     replaceBy(field: keyof T, value: T): Array<T>;
@@ -81,6 +83,14 @@ Array.prototype.replacedBy = function<T>(field: keyof T, value: T) {
     }
 
     return copy;
+};
+
+Array.prototype.clear = function<T>() {
+    const self: T[] = this;
+
+    self.splice(0, self.length);
+
+    return self;
 };
 
 Array.prototype.removeBy = function<T>(field: keyof T, value: T) {

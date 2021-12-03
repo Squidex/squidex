@@ -68,15 +68,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         private static async Task<Dictionary<string, DomainId>> QueryAsync(IFindFluent<MongoAppEntity, MongoAppEntity> find,
             CancellationToken ct)
         {
-            var entities = await find.Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
+            var entities = await find.SortBy(x => x.IndexedCreated).Only(x => x.DocumentId, x => x.IndexedName).ToListAsync(ct);
 
-            return entities.Select(x =>
+            var result = new Dictionary<string, DomainId>();
+
+            foreach (var entity in entities)
             {
-                var indexedId = DomainId.Create(x["_id"].AsString);
-                var indexedName = x["_an"].AsString;
+                var indexedId = DomainId.Create(entity["_id"].AsString);
+                var indexedName = entity["_an"].AsString;
 
-                return new { indexedName, indexedId };
-            }).ToDictionary(x => x.indexedName, x => x.indexedId);
+                result[indexedName] = indexedId;
+            }
+
+            return result;
         }
     }
 }

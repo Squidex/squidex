@@ -22,7 +22,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-reference-input[language][languages]',
+    selector: 'sqx-reference-input[mode][[language][languages]',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',
     providers: [
@@ -30,7 +30,7 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReferenceInputComponent extends StatefulControlComponent<State, string> implements OnChanges {
+export class ReferenceInputComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
     @Input()
     public schemaIds?: ReadonlyArray<string>;
 
@@ -39,6 +39,9 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, str
 
     @Input()
     public languages: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public mode: 'Array' | 'Single' = 'Single';
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
@@ -63,18 +66,24 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, str
 
     public writeValue(obj: any) {
         if (Types.isString(obj)) {
-            this.contentsService.getAllContents(this.appsState.appName, { ids: [obj] })
-                .subscribe({
-                    next: contents => {
-                        this.updateContent(contents.items[0]);
-                    },
-                    error: () => {
-                        this.updateContent(undefined);
-                    },
-                });
+            this.loadContent(obj);
+        } else if (Types.isArrayOfString(obj)) {
+            this.loadContent(obj[0]);
         } else {
             this.updateContent();
         }
+    }
+
+    private loadContent(id: string) {
+        this.contentsService.getAllContents(this.appsState.appName, { ids: [id] })
+            .subscribe({
+                next: contents => {
+                    this.updateContent(contents.items[0]);
+                },
+                error: () => {
+                    this.updateContent(undefined);
+                },
+            });
     }
 
     public select(contents: ReadonlyArray<ContentDto>) {
@@ -86,7 +95,20 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, str
     }
 
     public selectContent(selectedContent?: ContentDto) {
-        this.callChange(selectedContent?.id);
+        const id = selectedContent?.id;
+
+        if (id) {
+            if (this.mode === 'Single') {
+                this.callChange(id);
+            } else {
+                this.callChange([id]);
+            }
+        } else if (this.mode === 'Single') {
+            this.callChange(null);
+        } else {
+            this.callChange([]);
+        }
+
         this.callTouched();
 
         this.updateContent(selectedContent);

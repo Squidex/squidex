@@ -227,6 +227,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     await state.WriteAsync();
                 }
             }
+            catch (Exception ex)
+            {
+                Unsubscribe();
+
+                State = State.Stopped(ex);
+
+                DeactivateOnIdle();
+            }
             finally
             {
                 semaphore.Release();

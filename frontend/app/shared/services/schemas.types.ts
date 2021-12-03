@@ -367,13 +367,14 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     }
 }
 
-export type ReferencesFieldEditor = 'List' | 'Dropdown' | 'Checkboxes' | 'Tags';
+export type ReferencesFieldEditor = 'List' | 'Dropdown' | 'Checkboxes' | 'Tags' | 'Input';
 
 export const REFERENCES_FIELD_EDITORS: ReadonlyArray<ReferencesFieldEditor> = [
     'List',
     'Dropdown',
     'Checkboxes',
     'Tags',
+    'Input',
 ];
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {

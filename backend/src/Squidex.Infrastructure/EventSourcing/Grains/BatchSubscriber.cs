@@ -97,6 +97,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 await foreach (var task in taskQueue.Reader.ReadAllAsync(completed.Token))
                 {
+                    var scheduler = TaskScheduler.Current;
+
                     var sender = eventSubscription?.Sender;
 
                     if (sender == null)
