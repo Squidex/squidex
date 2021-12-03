@@ -163,12 +163,16 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
         this.next({ isLoading: true }, 'Loading Done');
 
-        const { page, pageSize, query, reference, referencing } = this.snapshot;
+        const { page, pageSize, query, reference, referencing, total } = this.snapshot;
 
         const q: any = { take: pageSize, skip: pageSize * page };
 
         if (query) {
             q.query = query;
+        }
+
+        if (page > 0 && total > 0) {
+            q.noTotal = true;
         }
 
         let content$: Observable<ContentsDto>;
@@ -205,7 +209,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         contents,
                         selectedContent,
                         statuses,
-                        total,
+                        total: total >= 0 ? total : s.total,
                     };
                 }, 'Loading Success');
             }),

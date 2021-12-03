@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ResultSet, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
-import { encodeQuery, Query } from './../state/query';
+import { Query, sanitize } from './../state/query';
 import { AuthService } from './auth.service';
 
 const SVG_PREVIEW_LIMIT = 10 * 1024;
@@ -160,8 +160,20 @@ export type RenameAssetTagDto =
 export type MoveAssetItemDto =
     Readonly<{ parentId?: string }>;
 
-export type AssetQueryDto =
-    Readonly<{ ids?: Tags; maxLength?: number; parentId?: string; query?: Query; skip?: number; tags?: Tags; take?: number }>;
+export type AssetsQuery =
+    Readonly<{ noTotal?: boolean; parentId?: string }>;
+
+export type AssetsByIds =
+    Readonly<{ ids: ReadonlyArray<string> }> & AssetsQuery;
+
+export type AssetsByQuery =
+    Readonly<{ query?: Query; skip?: number; tags?: Tags; take?: number; noTotal?: boolean }> & AssetsQuery;
+
+type AssetsResponse =
+    Readonly<{ total: number; items: any[]; folders: any[] } & Resource>;
+
+type AssetFolderResponse =
+    Readonly<{ total: number; items: any[]; folders: any[]; path: any[] } & Resource>;
 
 @Injectable()
 export class AssetsService {
@@ -186,90 +198,34 @@ export class AssetsService {
             pretifyError('i18n:assets.loadTagsFailed'));
     }
 
-    public getAssets(appName: string, q?: AssetQueryDto): Observable<AssetsDto> {
-        const { ids, maxLength, parentId, query, skip, tags, take } = q || {};
+    public getAssets(appName: string, q?: AssetsByQuery | AssetsByIds): Observable<AssetsDto> {
+        const body = buildQuery(q as any);
 
-        let fullQuery: string;
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
 
-        let queryObj: Query | undefined;
+        let options = {};
 
-        if (ids && ids.length > 0) {
-            fullQuery = `ids=${ids.join(',')}`;
-        } else {
-            queryObj = {};
-
-            const filters: any[] = [];
-
-            if (query && query.fullText && query.fullText.length > 0) {
-                filters.push({ path: 'fileName', op: 'contains', value: query.fullText });
-            }
-
-            if (tags) {
-                for (const tag of tags) {
-                    if (tag && tag.length > 0) {
-                        filters.push({ path: 'tags', op: 'eq', value: tag });
-                    }
-                }
-            }
-
-            if (filters.length > 0) {
-                queryObj.filter = { and: filters };
-            }
-
-            if (take && take > 0) {
-                queryObj.take = take;
-            }
-
-            if (skip && skip > 0) {
-                queryObj.skip = skip;
-            }
-
-            fullQuery = `q=${encodeQuery(queryObj)}`;
-
-            if (parentId) {
-                fullQuery = StringHelper.appendToUrl(fullQuery, 'parentId', parentId, true);
-            }
+        if (q?.noTotal) {
+            options = {
+                headers: {
+                    'X-NoTotal': '1',
+                },
+            };
         }
 
-        if (fullQuery.length > (maxLength || 2000)) {
-            const body: any = {};
+        return this.http.post<AssetsResponse>(url, body, options).pipe(
+            map(({ total, items, _links }) => {
+                const assets = items.map(parseAsset);
 
-            if (ids && ids.length > 0) {
-                body.ids = ids;
-            } else if (queryObj) {
-                body.q = queryObj;
-            }
-
-            if (parentId) {
-                body.parentId = parentId;
-            }
-
-            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
-
-            return this.http.post<{ total: number; items: any[]; folders: any[] } & Resource>(url, body).pipe(
-                map(({ total, items, _links }) => {
-                    const assets = items.map(parseAsset);
-
-                    return new AssetsDto(total, assets, _links);
-                }),
-                pretifyError('i18n:assets.loadFailed'));
-        } else {
-            const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
-
-            return this.http.get<{ total: number; items: any[]; folders: any[] } & Resource>(url).pipe(
-                map(({ total, items, _links }) => {
-                    const assets = items.map(parseAsset);
-
-                    return new AssetsDto(total, assets, _links);
-                }),
-                pretifyError('i18n:assets.loadFailed'));
-        }
+                return new AssetsDto(total, assets, _links);
+            }),
+            pretifyError('i18n:assets.loadFailed'));
     }
 
     public getAssetFolders(appName: string, parentId: string, scope: AssetFolderScope): Observable<AssetFoldersDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}&scope=${scope}`);
 
-        return this.http.get<{ total: number; items: any[]; folders: any[]; path: any[] } & Resource>(url).pipe(
+        return this.http.get<AssetFolderResponse>(url).pipe(
             map(({ total, items, path, _links }) => {
                 const assetFolders = items.map(parseAssetFolder);
                 const assetPath = path.map(parseAssetFolder);
@@ -435,6 +391,52 @@ export class AssetsService {
 
         return this.http.get<AssetCompletions>(url);
     }
+}
+
+function buildQuery(q?: AssetsByQuery & AssetsByIds) {
+    const { ids, parentId, query, skip, tags, take } = q || {};
+
+    const body: any = {};
+
+    if (parentId) {
+        body.parentId = parentId;
+    }
+
+    if (Types.isArray(ids)) {
+        body.ids = ids;
+    } else {
+        const queryObj: Query = {};
+
+        const filters: any[] = [];
+
+        if (query && query.fullText && query.fullText.length > 0) {
+            filters.push({ path: 'fileName', op: 'contains', value: query.fullText });
+        }
+
+        if (tags) {
+            for (const tag of tags) {
+                if (tag && tag.length > 0) {
+                    filters.push({ path: 'tags', op: 'eq', value: tag });
+                }
+            }
+        }
+
+        if (filters.length > 0) {
+            queryObj.filter = { and: filters };
+        }
+
+        if (take && take > 0) {
+            queryObj.take = take;
+        }
+
+        if (skip && skip > 0) {
+            queryObj.skip = skip;
+        }
+
+        body.q = sanitize(queryObj);
+    }
+
+    return body;
 }
 
 function parseAsset(response: any) {

@@ -194,10 +194,6 @@ export function serializeQuery(query?: Query | null) {
     return JSON.stringify(sanitize(query));
 }
 
-export function encodeQuery(query?: Query | null) {
-    return encodeURIComponent(serializeQuery(query));
-}
-
 export function deserializeQuery(raw?: string): Query | undefined {
     let query: Query | undefined;
 

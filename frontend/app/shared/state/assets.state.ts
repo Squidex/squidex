@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State } from '@app/framework';
+import { compareStrings, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from './../services/assets.service';
@@ -166,7 +166,8 @@ export abstract class AssetsStateBase extends State<Snapshot> {
 
                 const { items: assets, total } = assetsResult;
 
-                this.next({
+                this.next(s => ({
+                    ...s,
                     assets,
                     folders: foldersResult.items,
                     canCreate: assetsResult.canCreate,
@@ -177,8 +178,8 @@ export abstract class AssetsStateBase extends State<Snapshot> {
                     isLoading: false,
                     path,
                     tagsAvailable,
-                    total,
-                }, 'Loading Success');
+                    total: total >= 0 ? total : s.total,
+                }), 'Loading Success');
             }),
             finalize(() => {
                 this.next({ isLoading: false }, 'Loading Done');
@@ -462,24 +463,27 @@ function createQuery(snapshot: Snapshot) {
         pageSize,
         query,
         tagsSelected,
+        total,
     } = snapshot;
 
     const result: any = { take: pageSize, skip: pageSize * page };
 
-    const hasQuery = !!query?.fullText || Object.keys(tagsSelected).length > 0;
+    const tags = Object.keys(tagsSelected);
 
-    if (hasQuery) {
+    if (Types.isString(query?.fullText) || tags.length > 0) {
         if (query) {
             result.query = query;
         }
 
-        const searchTags = Object.keys(snapshot.tagsSelected);
-
-        if (searchTags.length > 0) {
-            result.tags = searchTags;
+        if (tags.length > 0) {
+            result.tags = tags;
         }
     } else {
         result.parentId = snapshot.parentId;
+    }
+
+    if (page > 0 && total > 0) {
+        result.noTotal = true;
     }
 
     return result;
