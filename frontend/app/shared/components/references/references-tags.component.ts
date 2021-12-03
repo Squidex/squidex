@@ -22,7 +22,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-tags[language][schemaId]',
+    selector: 'sqx-references-tags[language][languages][schemaId]',
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
     providers: [
@@ -39,6 +39,9 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
     @Input()
     public language: LanguageDto;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
     public set disabled(value: boolean | undefined | null) {

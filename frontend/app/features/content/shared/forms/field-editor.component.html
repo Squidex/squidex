@@ -116,13 +116,24 @@
                                 mode="Array"
                                 [formControl]="$any(fieldForm)" 
                                 [language]="language"
+                                [languages]="languages"
 								[schemaId]="field.rawProperties.singleId">
                             </sqx-reference-dropdown>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Input'">
+                            <sqx-reference-input
+                                mode="Array"
+                                [formControl]="$any(fieldForm)" 
+                                [language]="language"
+                                [languages]="languages"
+                                [schemaIds]="field.rawProperties.schemaIds">
+                            </sqx-reference-input>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Tags'">
                             <sqx-references-tags
                                 [formControl]="$any(fieldForm)" 
                                 [language]="language"
+                                [languages]="languages"
 								[schemaId]="field.rawProperties.singleId">
                             </sqx-references-tags>
                         </ng-container>
