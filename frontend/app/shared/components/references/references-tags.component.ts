@@ -7,7 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, UIOptions } from '@app/shared/internal';
+import { Types } from '@app/framework';
+import { AppsState, ContentDto, ContentsDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, UIOptions } from '@app/shared/internal';
+import { Observable } from 'rxjs';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
@@ -22,7 +24,7 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    selector: 'sqx-references-tags[language][schemaId]',
+    selector: 'sqx-references-tags[language][languages][schemaId]',
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
     providers: [
@@ -32,13 +34,18 @@ const NO_EMIT = { emitEvent: false };
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
     private readonly itemCount: number;
-    private contentItems: ReadonlyArray<ContentDto> | null = null;
+    private readonly contents: ContentDto[] = [];
+    private isOpenedBefore = false;
+    private isLoadingFailed = false;
 
     @Input()
     public schemaId: string;
 
     @Input()
     public language: LanguageDto;
+
+    @Input()
+    public languages: ReadonlyArray<LanguageDto>;
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
@@ -77,29 +84,13 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['schemaId']) {
+            this.contents.clear();
+
             this.resetState();
+        }
 
-            if (this.isValid) {
-                this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount })
-                    .subscribe({
-                        next: contents => {
-                            this.contentItems = contents.items;
-
-                            this.resetConverterState();
-                        },
-                        error: () => {
-                            this.contentItems = null;
-
-                            this.resetConverterState();
-                        },
-                    });
-            } else {
-                this.contentItems = null;
-
-                this.resetConverterState();
-            }
-        } else {
-            this.resetConverterState();
+        if (changes['language'] || changes['schemaId']) {
+            this.resetConverterState(true);
         }
     }
 
@@ -111,23 +102,72 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         }
     }
 
-    public writeValue(obj: ReadonlyArray<string>) {
-        this.control.setValue(obj, NO_EMIT);
-    }
-
-    private resetConverterState() {
-        let converter: ReferencesTagsConverter;
-
-        if (this.isValid && this.contentItems && this.contentItems.length > 0) {
-            converter = new ReferencesTagsConverter(this.language, this.contentItems, this.localizer);
-
-            this.control.enable(NO_EMIT);
-        } else {
-            converter = new ReferencesTagsConverter(null!, [], this.localizer);
-
-            this.control.disable(NO_EMIT);
+    public onOpened() {
+        if (this.isOpenedBefore) {
+            return;
         }
 
-        this.next({ converter });
+        this.isOpenedBefore = true;
+        this.loadMore(this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount }));
+    }
+
+    public writeValue(obj: ReadonlyArray<string>) {
+        if (Types.isArrayOfString(obj)) {
+            this.selectContent(obj);
+        } else {
+            this.selectContent(undefined);
+        }
+    }
+
+    private selectContent(ids?: ReadonlyArray<string>) {
+        const newIds = ids?.filter(x => !this.contents?.find(y => y.id === x));
+
+        if (newIds && newIds.length > 0) {
+            this.loadMore(this.contentsService.getAllContents(this.appsState.appName, { ids: newIds }));
+        }
+
+        this.control.setValue(ids, NO_EMIT);
+    }
+
+    private loadMore(observable: Observable<ContentsDto>) {
+        observable
+            .subscribe({
+                next: ({ items: newContents }) => {
+                    if (newContents.length === 0) {
+                        return;
+                    }
+
+                    for (const content of newContents) {
+                        const index = this.contents.findIndex(x => x.id === content.id);
+
+                        if (index >= 0) {
+                            this.contents[index] = content;
+                        } else {
+                            this.contents.push(content);
+                        }
+                    }
+
+                    this.isLoadingFailed = false;
+
+                    this.resetConverterState(true);
+                },
+                error: () => {
+                    this.isLoadingFailed = true;
+
+                    this.resetConverterState(false);
+                },
+            });
+    }
+
+    private resetConverterState(rebuild: boolean) {
+        const success = this.isValid && !this.isLoadingFailed;
+
+        this.onDisabled(!success);
+
+        if (rebuild) {
+            const converter = new ReferencesTagsConverter(this.language, this.contents, this.localizer);
+
+            this.next({ converter });
+        }
     }
 }

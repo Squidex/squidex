@@ -52,6 +52,12 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputElement: ElementRef<HTMLInputElement>;
 
     @Output()
+    public open = new EventEmitter();
+
+    @Output()
+    public close = new EventEmitter();
+
+    @Output()
     public blur = new EventEmitter();
 
     @Input()
@@ -62,6 +68,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     @Input()
     public acceptEnter?: boolean | null;
+
+    @Input()
+    public allowOpen?: boolean | null = true;
 
     @Input()
     public allowDuplicates?: boolean | null = true;
@@ -277,7 +286,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                 return false;
             }
         } else if (Keys.isEscape(event) && this.suggestionsModal.isOpen) {
-            this.suggestionsModal.hide();
+            this.closeModal();
             return false;
         } else if (Keys.isUp(event)) {
             this.selectPrevIndex();
@@ -368,6 +377,22 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public isSelected(tagValue: TagValue) {
         return this.snapshot.items.find(x => x.id === tagValue.id);
+    }
+
+    public closeModal() {
+        if (this.suggestionsModal.isOpen) {
+            this.close.emit();
+
+            this.suggestionsModal.hide();
+        }
+    }
+
+    public openModal() {
+        if (!this.suggestionsModal.isOpen) {
+            this.open.emit();
+
+            this.suggestionsModal.show();
+        }
     }
 
     public callTouched() {

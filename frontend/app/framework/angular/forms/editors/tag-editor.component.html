@@ -24,7 +24,7 @@
             [formControl]="addInput">
     </div>
 
-    <div class="btn btn-sm" (click)="suggestionsModal.show()" sqxStopClick *ngIf="suggestionsSorted.length > 0">
+    <div class="btn btn-sm" (click)="openModal()" sqxStopClick *ngIf="allowOpen || suggestionsSorted.length > 0">
         <i class="icon-caret-down"></i>
     </div>
 
@@ -42,7 +42,7 @@
         </div>
     </ng-container>
 
-    <ng-container *ngIf="snapshot.suggestedItems.length === 0 && suggestionsSorted.length > 0">
+    <ng-container *ngIf="allowOpen || suggestionsSorted.length > 0">
         <ng-container *sqxModal="suggestionsModal">
             <div class="control-dropdown suggestions-dropdown" [sqxAnchoredTo]="form" position="bottom-left" @fade>
                 <div class="row">

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, forwardRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, TemplateRef } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, TemplateRef } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Keys, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { map } from 'rxjs/operators';
@@ -39,6 +39,12 @@ interface State {
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnChanges, OnInit {
     private value: any;
+
+    @Output()
+    public open = new EventEmitter();
+
+    @Output()
+    public close = new EventEmitter();
 
     @Input()
     public items: ReadonlyArray<any> | undefined | null = [];
@@ -147,7 +153,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
 
     public onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event) && this.dropdown.isOpen) {
-            this.close();
+            this.closeModal();
             return false;
         } else if (Keys.isUp(event)) {
             this.selectPrevIndex();
@@ -163,12 +169,16 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
         return true;
     }
 
-    public open() {
+    public openModal() {
         if (!this.dropdown.isOpen) {
             this.selectSearch('');
         }
 
-        this.dropdown.show();
+        if (!this.dropdown.isOpen) {
+            this.open.emit();
+
+            this.dropdown.show();
+        }
 
         this.callTouched();
     }
@@ -176,11 +186,15 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public selectIndexAndClose(selectedIndex: number) {
         this.selectIndex(selectedIndex, true);
 
-        this.close();
+        this.closeModal();
     }
 
-    private close() {
-        this.dropdown.hide();
+    public closeModal() {
+        if (this.dropdown.isOpen) {
+            this.close.emit();
+
+            this.dropdown.hide();
+        }
     }
 
     private selectSearch(value: string) {
