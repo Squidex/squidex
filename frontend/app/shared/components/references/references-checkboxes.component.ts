@@ -116,16 +116,16 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     }
 
     private resetConverterState() {
+        const success = this.isValid && this.contentItems && this.contentItems.length > 0;
+
+        this.onDisabled(!success);
+
         let converter: ReferencesTagsConverter;
 
-        if (this.isValid && this.contentItems && this.contentItems.length > 0) {
-            converter = new ReferencesTagsConverter(this.language, this.contentItems, this.localizer);
-
-            this.control.enable(NO_EMIT);
+        if (success) {
+            converter = new ReferencesTagsConverter(this.language, this.contentItems!, this.localizer);
         } else {
             converter = new ReferencesTagsConverter(null!, [], this.localizer);
-
-            this.control.disable(NO_EMIT);
         }
 
         this.next({ converter });
