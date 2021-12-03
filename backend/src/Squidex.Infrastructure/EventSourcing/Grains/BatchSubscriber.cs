@@ -97,8 +97,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 await foreach (var task in taskQueue.Reader.ReadAllAsync(completed.Token))
                 {
-                    var scheduler = TaskScheduler.Current;
-
                     var sender = eventSubscription?.Sender;
 
                     if (sender == null)
@@ -138,6 +136,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             catch (OperationCanceledException)
             {
                 return;
+            }
+            catch (Exception ex)
+            {
+                var sender = eventSubscription?.Sender;
+
+                if (sender != null)
+                {
+                    await grain.OnErrorAsync(sender, ex);
+                }
+
+                throw;
             }
         }
 

@@ -14,14 +14,6 @@
         </ng-container>
 
         <ng-container menu>
-            <button class="btn btn-outline-secondary btn-run" *ngIf="isManual" [disabled]="!rule?.canTrigger"
-                (sqxConfirmClick)="trigger()"
-                confirmTitle="i18n:rules.triggerConfirmTitle"
-                confirmText="i18n:rules.triggerConfirmText"
-                confirmRememberKey="triggerRule">
-                <i class="icon-play-line"></i>
-            </button>
-
             <div class="btn btn-outline-secondary btn-enabled ms-2" *ngIf="rule">
                 <span class="me-2" *ngIf="isEnabled">
                     {{ 'common.enabled' | sqxTranslate }}
@@ -33,6 +25,14 @@
         
                 <sqx-toggle [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }" [disabled]="!isEditable"></sqx-toggle>
             </div>
+
+            <button class="btn btn-outline-secondary btn-run ms-2" *ngIf="isManual" [disabled]="!rule?.canTrigger"
+                (sqxConfirmClick)="trigger()"
+                confirmTitle="i18n:rules.triggerConfirmTitle"
+                confirmText="i18n:rules.triggerConfirmText"
+                confirmRememberKey="triggerRule">
+                <i class="icon-play-line"></i>
+            </button>
 
             <button type="button" class="btn btn-primary ms-2" (click)="save()">
                 {{ 'common.save' | sqxTranslate }}

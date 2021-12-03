@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using FluentAssertions;
+using Orleans.Storage;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.TestHelpers;
 using Squidex.Log;
@@ -479,10 +480,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_start_after_stop_if_handling_failed()
         {
-            var exception = new InvalidOperationException();
+            var ex = new InvalidOperationException();
 
             A.CallTo(() => eventConsumer.On(envelope))
-                .Throws(exception);
+                .Throws(ex);
 
             await sut.ActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -508,6 +509,24 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustHaveHappened(2, Times.Exactly);
+        }
+
+        [Fact]
+        public async Task Should_fail_if_writing_failed()
+        {
+            var ex = new InconsistentStateException();
+
+            A.CallTo(() => grainState.WriteAsync())
+                .Throws(ex);
+
+            await sut.ActivateAsync(consumerName);
+            await sut.ActivateAsync();
+
+            await OnEventAsync(eventSubscription, storedEvent);
+
+            await sut.CompleteAsync();
+
+            AssetGrainState(isStopped: true, position: storedEvent.EventPosition, error: ex.ToString(), 1);
         }
 
         private Task OnErrorAsync(IEventSubscription subscription, Exception exception)

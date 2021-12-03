@@ -62,7 +62,16 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             if (currentSubscription is BatchSubscriber batchSubscriber)
             {
-                await batchSubscriber.CompleteAsync();
+                try
+                {
+                    await batchSubscriber.CompleteAsync();
+                }
+                catch (Exception ex)
+                {
+                    log.LogFatal(ex, w => w
+                        .WriteProperty("action", "CompleteConsumer")
+                        .WriteProperty("status", "Failed"));
+                }
             }
         }
 
@@ -226,14 +235,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 {
                     await state.WriteAsync();
                 }
-            }
-            catch (Exception ex)
-            {
-                Unsubscribe();
-
-                State = State.Stopped(ex);
-
-                DeactivateOnIdle();
             }
             finally
             {
