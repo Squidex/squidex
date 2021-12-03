@@ -10,7 +10,7 @@ import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, FieldSe
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
-    selector: 'sqx-component-section[form][formContext][formSection][language][languages]',
+    selector: 'sqx-component-section[form][formContext][formLevel][formSection][language][languages]',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +21,9 @@ export class ComponentSectionComponent {
 
     @Input()
     public formContext: any;
+
+    @Input()
+    public formLevel: number;
 
     @Input()
     public formSection: FieldSection<FieldDto, any>;

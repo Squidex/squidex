@@ -17,7 +17,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-array-item[form][formContext][language][languages][index]',
+    selector: 'sqx-array-item[form][formContext][formLevel][language][languages][index]',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +37,9 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
 
     @Input()
     public formContext: any;
+
+    @Input()
+    public formLevel: number;
 
     @Input()
     public formModel: ObjectFormBase;

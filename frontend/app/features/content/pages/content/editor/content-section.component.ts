@@ -14,7 +14,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-content-section[form][formContext][formSection][language][languages][schema]',
+    selector: 'sqx-content-section[form][formContext][formLevel][formSection][language][languages][schema]',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,6 +31,9 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
 
     @Input()
     public formCompare?: EditContentForm | null;
+
+    @Input()
+    public formLevel: number;
 
     @Input()
     public formContext: any;
