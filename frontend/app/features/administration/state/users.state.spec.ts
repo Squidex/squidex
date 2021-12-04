@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UserDto, UsersDto, UsersService } from '@app/features/administration/internal';
+import { UsersDto, UsersService } from '@app/features/administration/internal';
 import { DialogService } from '@app/shared';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';

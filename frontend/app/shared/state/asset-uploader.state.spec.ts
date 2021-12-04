@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AssetDto, AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever, Types } from '@app/shared/internal';
+import { AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever } from '@app/shared/internal';
 import { lastValueFrom, NEVER, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock } from 'typemoq';
@@ -137,7 +137,7 @@ describe('AssetUploaderState', () => {
     });
 
     it('should update status if uploading asset failed', () => {
-        const file: File = <any>{ name: 'my-file' };
+        const file: File = { name: 'my-file' } as any;
 
         assetsService.setup(x => x.putAssetFile(app, asset, file, asset.version))
             .returns(() => throwError(() => 'Service Error')).verifiable();
@@ -151,14 +151,14 @@ describe('AssetUploaderState', () => {
     });
 
     it('should update status if uploading asset completes', async () => {
-        const file: File = <any>{ name: 'my-file' };
+        const file: File = { name: 'my-file' } as any;
 
         const updated = createAsset(1, undefined, '_new');
 
         assetsService.setup(x => x.putAssetFile(app, asset, file, asset.version))
             .returns(() => of(10, 20, updated)).verifiable();
 
-        const uploadedAsset = await lastValueFrom(assetUploader.uploadFile(file));
+        const uploadedAsset = await lastValueFrom(assetUploader.uploadAsset(asset, file));
 
         const upload = assetUploader.snapshot.uploads[0];
 

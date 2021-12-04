@@ -1,6 +1,13 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
 import { UIOptions } from '@app/framework';
 import { firstValueFrom, of, throwError } from 'rxjs';
-import { IMock, It, Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 import { ContentsDto, ContentsService } from '../services/contents.service';
 import { createContent } from '../services/contents.service.spec';
 import { ResolveContents } from './resolvers';
@@ -34,13 +41,16 @@ describe('ResolveContents', () => {
     it('should not resolve contents immediately', () => {
         const ids = ['id1', 'id2'];
 
+        contentsService.setup(x => x.getAllContents(app, { ids }))
+            .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
+
         return expectAsync(firstValueFrom(contentsResolver.resolveMany(ids))).toBePending();
     });
 
     it('should resolve content from one request after delay', async () => {
         const ids = ['id1', 'id2'];
 
-        contentsService.setup(x => x.getAllContents(app, It.isValue({ ids })))
+        contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
 
         const result = await firstValueFrom(contentsResolver.resolveMany(ids));
@@ -54,7 +64,7 @@ describe('ResolveContents', () => {
     it('should resolve content if not found', async () => {
         const ids = ['id1', 'id2'];
 
-        contentsService.setup(x => x.getAllContents(app, It.isValue({ ids })))
+        contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => of(new ContentsDto([], 2, [contents[0]])));
 
         const result = await firstValueFrom(contentsResolver.resolveMany(ids));
@@ -67,7 +77,7 @@ describe('ResolveContents', () => {
     it('should resolve errors', () => {
         const ids = ['id1', 'id2'];
 
-        contentsService.setup(x => x.getAllContents(app, It.isValue({ ids })))
+        contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => throwError(() => new Error('error')));
 
         return expectAsync(firstValueFrom(contentsResolver.resolveMany(ids))).toBeRejected();
@@ -79,7 +89,7 @@ describe('ResolveContents', () => {
 
         const ids = ['id1', 'id2', 'id3'];
 
-        contentsService.setup(x => x.getAllContents(app, It.isValue({ ids })))
+        contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1], contents[2]])));
 
         const result1Promise = firstValueFrom(contentsResolver.resolveMany(ids1));
@@ -97,13 +107,13 @@ describe('ResolveContents', () => {
             contents[2],
         ]);
 
-        contentsService.verify(x => x.getAllContents(app, It.isValue({ ids })), Times.once());
+        contentsService.verify(x => x.getAllContents(app, { ids }), Times.once());
     });
 
     it('should cache results for parallel requests', async () => {
         const ids = ['id1', 'id2'];
 
-        contentsService.setup(x => x.getAllContents(app, It.isValue({ ids })))
+        contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
 
         const result1Promise = firstValueFrom(contentsResolver.resolveMany(ids));
@@ -121,13 +131,13 @@ describe('ResolveContents', () => {
             contents[1],
         ]);
 
-        contentsService.verify(x => x.getAllContents(app, It.isValue({ ids })), Times.once());
+        contentsService.verify(x => x.getAllContents(app, { ids }), Times.once());
     });
 
     it('should cache results', async () => {
         const ids = ['id1', 'id2'];
 
-        contentsService.setup(x => x.getAllContents(app, It.isValue({ ids })))
+        contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => of(new ContentsDto([], 2, [contents[0], contents[1]])));
 
         const result1 = await firstValueFrom(contentsResolver.resolveMany(ids));
@@ -143,7 +153,7 @@ describe('ResolveContents', () => {
             contents[1],
         ]);
 
-        contentsService.verify(x => x.getAllContents(app, It.isValue({ ids })), Times.once());
+        contentsService.verify(x => x.getAllContents(app, { ids }), Times.once());
     });
 
     it('should resolve all contents', async () => {

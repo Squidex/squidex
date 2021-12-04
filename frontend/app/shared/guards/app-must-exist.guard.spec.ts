@@ -38,7 +38,7 @@ describe('AppMustExistGuard', () => {
 
         expect(result).toBeFalsy();
 
-        appsState.verify(x => x.select('my-app'), Times.once());
+        router.verify(x => x.navigate(['/404']), Times.once());
     });
 
     it('should return true if app is found', async () => {
@@ -47,8 +47,6 @@ describe('AppMustExistGuard', () => {
 
         const result = await firstValueFrom(appGuard.canActivate(route));
 
-        expect(result!).toBeTruthy();
-
-        router.verify(x => x.navigate(['/404']), Times.once());
+        expect(result).toBeTruthy();
     });
 });

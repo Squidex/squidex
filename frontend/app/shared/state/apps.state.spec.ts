@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AppDto, AppsService, AppsState, DialogService } from '@app/shared/internal';
+import { AppsService, AppsState, DialogService } from '@app/shared/internal';
 import { firstValueFrom, of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { createApp, createAppSettings } from './../services/apps.service.spec';
 
@@ -80,18 +79,6 @@ describe('AppsState', () => {
         appsService.verify(x => x.getSettings(It.isAnyString()), Times.never());
     });
 
-    it('should return new app if loaded', async () => {
-        const newApp = createApp(1, '_new');
-
-        appsService.setup(x => x.getApp(app1.name))
-            .returns(() => of(newApp));
-
-        const appSelected = await firstValueFrom(appsState.select(app1.name));
-
-        expect(appSelected!).toEqual(newApp);
-        expect(appsState.snapshot.selectedApp).toBeNull();
-    });
-
     it('should return null on select if app is not found', async () => {
         appsService.setup(x => x.getApp('unknown'))
             .returns(() => throwError(() => 'Service Error'));
@@ -99,6 +86,18 @@ describe('AppsState', () => {
         const appSelected = await firstValueFrom(appsState.select('unknown'));
 
         expect(appSelected).toBeNull();
+        expect(appsState.snapshot.selectedApp).toBeNull();
+    });
+
+    it('should return new app if loaded', async () => {
+        const newApp = createApp(1, '_new');
+
+        appsService.setup(x => x.getApp(app1.name))
+            .returns(() => of(newApp));
+
+        const appSelected = await firstValueFrom(appsState.loadApp(app1.name));
+
+        expect(appSelected).toEqual(newApp);
         expect(appsState.snapshot.selectedApp).toBeNull();
     });
 
