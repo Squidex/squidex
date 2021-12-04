@@ -6,7 +6,7 @@
  */
 
 import { SchemasState } from '@app/shared';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { LoadSchemasGuard } from './load-schemas.guard';
 
@@ -19,15 +19,11 @@ describe('LoadSchemasGuard', () => {
         schemaGuard = new LoadSchemasGuard(schemasState.object);
     });
 
-    it('should load schemas', () => {
+    it('should load schemas', async () => {
         schemasState.setup(x => x.load())
             .returns(() => of(null));
 
-        let result = false;
-
-        schemaGuard.canActivate().subscribe(value => {
-            result = value;
-        });
+        const result = await firstValueFrom(schemaGuard.canActivate());
 
         expect(result).toBeTruthy();
 

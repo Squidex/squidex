@@ -7,7 +7,7 @@
 
 import { UserDto, UsersDto, UsersService } from '@app/features/administration/internal';
 import { DialogService } from '@app/shared';
-import { of, throwError } from 'rxjs';
+import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { createUser } from './../services/users.service.spec';
@@ -98,53 +98,37 @@ describe('UsersState', () => {
             usersState.load().subscribe();
         });
 
-        it('should return user on select and not load if already loaded', () => {
-            let selectedUser: UserDto;
+        it('should return user on select and not load if already loaded', async () => {
+            const userSelected = await firstValueFrom(usersState.select(user1.id));
 
-            usersState.select(user1.id).subscribe(x => {
-                selectedUser = x!;
-            });
-
-            expect(selectedUser!).toEqual(user1);
+            expect(userSelected).toEqual(user1);
             expect(usersState.snapshot.selectedUser).toEqual(user1);
         });
 
-        it('should return user on select and load if not loaded', () => {
+        it('should return user on select and load if not loaded', async () => {
             usersService.setup(x => x.getUser('id3'))
                 .returns(() => of(newUser));
 
-            let userSelected: UserDto;
-
-            usersState.select('id3').subscribe(x => {
-                userSelected = x!;
-            });
+            const userSelected = await firstValueFrom(usersState.select('id3'));
 
             expect(userSelected!).toEqual(newUser);
             expect(usersState.snapshot.selectedUser).toEqual(newUser);
         });
 
-        it('should return null on select if unselecting user', () => {
-            let userSelected: UserDto;
+        it('should return null on select if unselecting user', async () => {
+            const userSelected = await firstValueFrom(usersState.select(null));
 
-            usersState.select(null).subscribe(x => {
-                userSelected = x!;
-            });
-
-            expect(userSelected!).toBeNull();
+            expect(userSelected).toBeNull();
             expect(usersState.snapshot.selectedUser).toBeNull();
         });
 
-        it('should return null on select if user is not found', () => {
+        it('should return null on select if user is not found', async () => {
             usersService.setup(x => x.getUser('unknown'))
                 .returns(() => throwError(() => 'Service Error')).verifiable();
 
-            let userSelected: UserDto;
+            const userSelected = await firstValueFrom(usersState.select('unknown'));
 
-            usersState.select('unknown').pipe(onErrorResumeNext()).subscribe(x => {
-                userSelected = x!;
-            }).unsubscribe();
-
-            expect(userSelected!).toBeNull();
+            expect(userSelected).toBeNull();
             expect(usersState.snapshot.selectedUser).toBeNull();
         });
 

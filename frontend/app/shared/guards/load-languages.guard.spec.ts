@@ -6,7 +6,7 @@
  */
 
 import { LanguagesState } from '@app/shared';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { LoadLanguagesGuard } from './load-languages.guard';
 
@@ -19,15 +19,11 @@ describe('LoadLanguagesGuard', () => {
         languageGuard = new LoadLanguagesGuard(languagesState.object);
     });
 
-    it('should load languages', () => {
+    it('should load languages', async () => {
         languagesState.setup(x => x.load())
             .returns(() => of(null));
 
-        let result = false;
-
-        languageGuard.canActivate().subscribe(value => {
-            result = value;
-        });
+        const result = await firstValueFrom(languageGuard.canActivate());
 
         expect(result).toBeTruthy();
 

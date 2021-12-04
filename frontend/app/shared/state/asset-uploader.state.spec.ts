@@ -6,7 +6,7 @@
  */
 
 import { AssetDto, AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever, Types } from '@app/shared/internal';
-import { NEVER, of, throwError } from 'rxjs';
+import { lastValueFrom, NEVER, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock } from 'typemoq';
 import { createAsset } from './../services/assets.service.spec';
@@ -93,27 +93,19 @@ describe('AssetUploaderState', () => {
         expect(upload.progress).toBe(1);
     });
 
-    it('should update status if uploading file completes', (cb) => {
+    it('should update status if uploading file completes', async () => {
         const file: File = <any>{ name: 'my-file' };
 
         assetsService.setup(x => x.postAssetFile(app, file, undefined))
             .returns(() => of(10, 20, asset)).verifiable();
 
-        let uploadedAsset: AssetDto;
-
-        assetUploader.uploadFile(file).subscribe(dto => {
-            if (Types.is(dto, AssetDto)) {
-                uploadedAsset = dto;
-            }
-
-            cb();
-        });
+        const uploadedAsset = await lastValueFrom(assetUploader.uploadFile(file));
 
         const upload = assetUploader.snapshot.uploads[0];
 
         expect(upload.status).toBe('Completed');
         expect(upload.progress).toBe(100);
-        expect(uploadedAsset!).toEqual(asset);
+        expect(uploadedAsset).toEqual(asset);
     });
 
     it('should create initial state if uploading asset', () => {
@@ -158,7 +150,7 @@ describe('AssetUploaderState', () => {
         expect(upload.progress).toBe(1);
     });
 
-    it('should update status if uploading asset completes', () => {
+    it('should update status if uploading asset completes', async () => {
         const file: File = <any>{ name: 'my-file' };
 
         const updated = createAsset(1, undefined, '_new');
@@ -166,13 +158,7 @@ describe('AssetUploaderState', () => {
         assetsService.setup(x => x.putAssetFile(app, asset, file, asset.version))
             .returns(() => of(10, 20, updated)).verifiable();
 
-        let uploadedAsset: AssetDto;
-
-        assetUploader.uploadAsset(asset, file).subscribe(dto => {
-            if (Types.is(dto, AssetDto)) {
-                uploadedAsset = dto;
-            }
-        });
+        const uploadedAsset = await lastValueFrom(assetUploader.uploadFile(file));
 
         const upload = assetUploader.snapshot.uploads[0];
 

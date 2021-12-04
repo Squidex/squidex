@@ -7,7 +7,7 @@
 
 import { Router } from '@angular/router';
 import { AuthService, UIOptions } from '@app/shared';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { MustBeAuthenticatedGuard } from './must-be-authenticated.guard';
 
@@ -23,51 +23,39 @@ describe('MustBeAuthenticatedGuard', () => {
         authService = Mock.ofType<AuthService>();
     });
 
-    it('should navigate to default page if not authenticated', () => {
+    it('should navigate to default page if not authenticated', async () => {
         const authGuard = new MustBeAuthenticatedGuard(uiOptions, authService.object, router.object);
 
         authService.setup(x => x.userChanges)
             .returns(() => of(null));
 
-        let result: boolean;
+        const result = await firstValueFrom(authGuard.canActivate());
 
-        authGuard.canActivate().subscribe(x => {
-            result = x;
-        });
-
-        expect(result!).toBeFalsy();
+        expect(result).toBeFalsy();
 
         router.verify(x => x.navigate(['']), Times.once());
     });
 
-    it('should return true if authenticated', () => {
+    it('should return true if authenticated', async () => {
         const authGuard = new MustBeAuthenticatedGuard(uiOptions, authService.object, router.object);
 
         authService.setup(x => x.userChanges)
             .returns(() => of(<any>{}));
 
-        let result: boolean;
-
-        authGuard.canActivate().subscribe(x => {
-            result = x;
-        });
+        const result = await firstValueFrom(authGuard.canActivate());
 
         expect(result!).toBeTruthy();
 
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    it('should login redirect if redirect enabled', () => {
+    it('should login redirect if redirect enabled', async () => {
         const authGuard = new MustBeAuthenticatedGuard(uiOptionsRedirect, authService.object, router.object);
 
         authService.setup(x => x.userChanges)
             .returns(() => of(null));
 
-        let result: boolean;
-
-        authGuard.canActivate().subscribe(x => {
-            result = x;
-        });
+        const result = await firstValueFrom(authGuard.canActivate());
 
         expect(result!).toBeFalsy();
 
