@@ -8,7 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, sorted, StatefulControlComponent, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ResolveContents, DialogModel, sorted, StatefulControlComponent, Types } from '@app/shared';
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true,
@@ -58,8 +58,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     public contentSelectorDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
+        private readonly contentsResolver: ResolveContents,
     ) {
         super(changeDetector, { contentItems: [] });
     }
@@ -69,10 +68,10 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
             if (!Types.equals(obj, this.snapshot.contentItems.map(x => x.id))) {
                 const contentIds: string[] = obj;
 
-                this.contentsService.getAllContents(this.appsState.appName, { ids: contentIds })
+                this.contentsResolver.resolveMany(contentIds)
                     .subscribe({
-                        next: dtos => {
-                            this.setContentItems(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r));
+                        next: ({ items }) => {
+                            this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).filter(r => !!r));
 
                             if (this.snapshot.contentItems.length !== contentIds.length) {
                                 this.updateValue();

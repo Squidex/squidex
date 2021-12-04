@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ContentsDto } from '@app/shared';
-import { AppsState, ContentDto, ContentsService, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, Types, UIOptions, value$ } from '@app/shared/internal';
+import { ContentDto, ResolveContents, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, Types, value$ } from '@app/shared/internal';
 import { Observable } from 'rxjs';
 
 export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
@@ -37,7 +37,6 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> implements OnChanges {
-    private readonly itemCount: number;
     private readonly contents: ContentDto[] = [];
     private isOpenedBefore = false;
     private isLoadingFailed = false;
@@ -65,16 +64,13 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
 
     public control = new FormControl('');
 
-    constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
+    constructor(changeDetector: ChangeDetectorRef,
+        private readonly contentsResolver: ResolveContents,
         private readonly localizer: LocalizerService,
     ) {
         super(changeDetector, {
             contentNames: [],
         });
-
-        this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
         this.own(
             value$(this.control)
@@ -133,14 +129,14 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
         }
 
         this.isOpenedBefore = true;
-        this.loadMore(this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount }));
+        this.loadMore(this.contentsResolver.resolveAll(this.schemaId));
     }
 
     private selectContent(id: string | undefined) {
         const isNewId = !this.contents.find(x => x.id === id);
 
         if (id && isNewId) {
-            this.loadMore(this.contentsService.getAllContents(this.appsState.appName, { ids: [id] }));
+            this.loadMore(this.contentsResolver.resolveMany([id]));
         }
 
         this.control.setValue(id, NO_EMIT);
@@ -149,12 +145,12 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     private loadMore(observable: Observable<ContentsDto>) {
         observable
             .subscribe({
-                next: ({ items: newContents }) => {
-                    if (newContents.length === 0) {
+                next: ({ items }) => {
+                    if (items.length === 0) {
                         return;
                     }
 
-                    for (const content of newContents) {
+                    for (const content of items) {
                         const index = this.contents.findIndex(x => x.id === content.id);
 
                         if (index >= 0) {
