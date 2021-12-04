@@ -7,7 +7,7 @@
 
 import { CdkDragDrop, CdkDragStart } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { fadeAnimation, LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
+import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app/shared/internal';
 
 const ITEM_HEIGHT = 2.5;
 
@@ -15,9 +15,6 @@ const ITEM_HEIGHT = 2.5;
     selector: 'sqx-schema-category[schemaCategory]',
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchemaCategoryComponent implements OnChanges {

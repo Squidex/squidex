@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { fadeAnimation, ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
+import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Language } from './../../language-selector.component';
 
 export const SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR: any = {
@@ -27,9 +27,6 @@ interface State {
     templateUrl: './localized-input.component.html',
     providers: [
         SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR,
-    ],
-    animations: [
-        fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

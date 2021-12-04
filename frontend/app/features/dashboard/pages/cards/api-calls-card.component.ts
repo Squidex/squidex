@@ -6,16 +6,13 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { AppDto, CallsUsageDto, fadeAnimation, UsagesService } from '@app/shared';
+import { AppDto, CallsUsageDto, UsagesService } from '@app/shared';
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
     selector: 'sqx-api-calls-card[app][usage]',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiCallsCardComponent implements OnChanges {

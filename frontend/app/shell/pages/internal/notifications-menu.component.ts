@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
-import { AuthService, CommentDto, CommentsService, CommentsState, DialogService, fadeAnimation, LocalStoreService, ModalModel, ResourceOwner, UIOptions } from '@app/shared';
+import { AuthService, CommentDto, CommentsService, CommentsState, DialogService, LocalStoreService, ModalModel, ResourceOwner, UIOptions } from '@app/shared';
 
 const CONFIG_KEY = 'notifications.version';
 
@@ -16,9 +16,6 @@ const CONFIG_KEY = 'notifications.version';
     selector: 'sqx-notifications-menu',
     styleUrls: ['./notifications-menu.component.scss'],
     templateUrl: './notifications-menu.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsMenuComponent extends ResourceOwner implements OnInit {

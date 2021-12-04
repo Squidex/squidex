@@ -6,16 +6,13 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { AppDto, fadeAnimation, HistoryEventDto, HistoryService } from '@app/shared';
+import { AppDto, HistoryEventDto, HistoryService } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
     selector: 'sqx-history-card[app]',
     styleUrls: ['./history-card.component.scss'],
     templateUrl: './history-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoryCardComponent implements OnChanges {

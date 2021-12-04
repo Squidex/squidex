@@ -7,15 +7,12 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, fadeAnimation, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
+import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, LanguageDto, ModalModel, NestedFieldDto, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-field[field][languages][schema][settings]',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class FieldComponent implements OnChanges {
     @Input()

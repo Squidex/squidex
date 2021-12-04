@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, Renderer2, ViewChild } from '@angular/core';
-import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
+import { StatefulComponent } from '@app/framework/internal';
 
 interface State {
     // True when loading.
@@ -17,9 +17,6 @@ interface State {
     selector: 'sqx-list-view',
     styleUrls: ['./list-view.component.scss'],
     templateUrl: './list-view.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.Default,
 })
 export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {

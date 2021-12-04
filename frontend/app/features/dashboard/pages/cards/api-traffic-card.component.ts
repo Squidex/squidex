@@ -6,16 +6,13 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppDto, CallsUsageDto, fadeAnimation } from '@app/shared';
+import { AppDto, CallsUsageDto } from '@app/shared';
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
     selector: 'sqx-api-traffic-card[app][usage]',
     styleUrls: ['./api-traffic-card.component.scss'],
     templateUrl: './api-traffic-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiTrafficCardComponent implements OnChanges {

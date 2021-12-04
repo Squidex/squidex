@@ -6,16 +6,13 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { AppDto, fadeAnimation, StorageUsagePerDateDto } from '@app/shared';
+import { AppDto, StorageUsagePerDateDto } from '@app/shared';
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
     selector: 'sqx-asset-uploads-size-card[app][usage]',
     styleUrls: ['./asset-uploads-size-card.component.scss'],
     templateUrl: './asset-uploads-size-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetUploadsSizeCardComponent implements OnChanges {

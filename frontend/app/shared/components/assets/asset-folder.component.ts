@@ -6,15 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AssetFolderDto, AssetPathItem, DialogModel, fadeAnimation, ModalModel, Types } from '@app/shared/internal';
+import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-folder',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssetFolderComponent {
