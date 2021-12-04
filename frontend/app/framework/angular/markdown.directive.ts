@@ -59,7 +59,7 @@ export class MarkdownDirective implements OnChanges {
             html = marked(this.markdown, { renderer });
         }
 
-        if (!html || html === this.markdown) {
+        if (!html || html === this.markdown || html.indexOf('<') < 0) {
             this.renderer.setProperty(this.element.nativeElement, 'textContent', html);
         } else {
             this.renderer.setProperty(this.element.nativeElement, 'innerHTML', html);

@@ -2,4 +2,7 @@
     <ng-template let-content="$implicit" let-context="context">
         <span class="truncate" [innerHTML]="content.name | sqxHighlight:context | sqxSafeHtml"></span>
     </ng-template>
+    <ng-template let-content="$implicit" let-context="context">
+        <span class="truncate" [innerHTML]="content.name | sqxHighlight:context | sqxSafeHtml"></span>
+    </ng-template>
 </sqx-dropdown>

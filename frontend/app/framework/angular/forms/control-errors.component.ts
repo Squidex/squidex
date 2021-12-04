@@ -112,6 +112,10 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
+        if (errorMessages.length === 0 && this.snapshot.errorMessages.length === 0) {
+            return;
+        }
+
         this.next({ errorMessages });
     }
 }
