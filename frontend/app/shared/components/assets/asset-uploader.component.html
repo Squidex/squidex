@@ -9,7 +9,7 @@
                 </span>
 
                 <ng-container *sqxModal="modalMenu;onRoot:false">
-                    <div class="dropdown-menu container" (sqxDropFile)="addFiles($event)" @fade>
+                    <sqx-dropdown-menu class="container" (sqxDropFile)="addFiles($event)">
                         <div class="uploads">
                             <small class="uploads-empty text-muted" *ngIf="uploads.length === 0">
                                 {{ 'assets.uploaderUploadHere' | sqxTranslate }}
@@ -46,7 +46,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </sqx-dropdown-menu>
                 </ng-container>
             </li>
         </ul>

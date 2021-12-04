@@ -16,18 +16,18 @@
     </div>
 
     <ng-container *sqxModal="snapshot.suggestedItems.length > 0">
-        <div class="control-dropdown" [sqxAnchoredTo]="input" [scrollY]="true" [style.width]="dropdownWidth" [position]="dropdownPosition" #container @fade>
+        <sqx-dropdown-menu class="control-dropdown" [sqxAnchoredTo]="input" [scrollY]="true" [style.width]="dropdownWidth" [position]="dropdownPosition" #container>
             <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
                 (mousedown)="selectItem(item)"
                 (mouseover)="selectIndex(i)"
                 [sqxScrollActive]="i === snapshot.suggestedIndex"
-                [sqxScrollContainer]="container">
+                [sqxScrollContainer]="$any(container)">
 
                 <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
 
                 <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
             </div>
-        </div>
+        </sqx-dropdown-menu>
     </ng-container>
 </div>

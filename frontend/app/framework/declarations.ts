@@ -7,9 +7,11 @@
 
 export * from './angular/avatar.component';
 export * from './angular/code.component';
+export * from './angular/dropdown-menu.component';
 export * from './angular/external-link.directive';
 export * from './angular/forms/confirm-click.directive';
 export * from './angular/forms/control-errors.component';
+export * from './angular/forms/control-errors-messages.component';
 export * from './angular/forms/copy.directive';
 export * from './angular/forms/editable-title.component';
 export * from './angular/forms/editors/autocomplete.component';
@@ -45,6 +47,7 @@ export * from './angular/language-selector.component';
 export * from './angular/layout-container.directive';
 export * from './angular/layout.component';
 export * from './angular/list-view.component';
+export * from './angular/markdown.directive';
 export * from './angular/modals/dialog-renderer.component';
 export * from './angular/modals/modal-dialog.component';
 export * from './angular/modals/modal-placement.directive';

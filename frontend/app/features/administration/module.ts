@@ -41,6 +41,10 @@ const routes: Routes = [
                             },
                         ],
                     },
+                    {
+                        path: '',
+                        redirectTo: 'users',
+                    },
                 ],
             },
         ],

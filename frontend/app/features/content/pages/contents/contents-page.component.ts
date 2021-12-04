@@ -9,7 +9,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, fadeAnimation, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
 import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
@@ -20,9 +20,6 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
     templateUrl: './contents-page.component.html',
     providers: [
         Router2State,
-    ],
-    animations: [
-        fadeAnimation,
     ],
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {

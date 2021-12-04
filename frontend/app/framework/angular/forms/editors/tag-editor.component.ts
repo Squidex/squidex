@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { fadeAnimation, getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
+import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -36,9 +36,6 @@ interface State {
     templateUrl: './tag-editor.component.html',
     providers: [
         SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
-    animations: [
-        fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

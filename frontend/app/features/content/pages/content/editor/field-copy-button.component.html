@@ -4,7 +4,7 @@
     </button>
 
     <ng-container *sqxModal="dropdown">
-        <div class="dropdown-menu" [sqxAnchoredTo]="button" [scrollY]="true" @fade>
+        <sqx-dropdown-menu [sqxAnchoredTo]="button" [scrollY]="true">
             <div class="section d-flex justify-content-end">
                 <button type="button" class="btn btn-primary" (click)="copy()" tabindex="-1">
                     {{ 'common.copy' | sqxTranslate }}
@@ -32,6 +32,6 @@
                 
                 <sqx-checkbox-group [(ngModel)]="copyTargets" [values]="languageCodes" layout="Multiline"></sqx-checkbox-group>
             </div>
-        </div>
+        </sqx-dropdown-menu>
     </ng-container>
 </ng-container>

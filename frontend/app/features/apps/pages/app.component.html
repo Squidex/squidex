@@ -29,7 +29,7 @@
         </button>
 
         <ng-container *sqxModal="dropdown;closeAlways:true">
-            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>
+            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
                 <a class="dropdown-item dropdown-item-delete"
                     (sqxConfirmClick)="leave.emit(app)"
                     confirmTitle="i18n:apps.leaveConfirmTitle"
@@ -37,7 +37,7 @@
                     confirmRememberKey="leaveApp">
                     {{ 'apps.leave' | sqxTranslate }}
                 </a>
-            </div>
+            </sqx-dropdown-menu>
         </ng-container>
     </div>
 </div>

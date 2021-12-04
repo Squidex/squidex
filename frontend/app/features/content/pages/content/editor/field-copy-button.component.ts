@@ -6,15 +6,12 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, fadeAnimation, FieldForm, ModalModel } from '@app/shared';
+import { AppLanguageDto, FieldForm, ModalModel } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-copy-button[formModel][languages]',
     styleUrls: ['./field-copy-button.component.scss'],
     templateUrl: './field-copy-button.component.html',
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class FieldCopyButtonComponent implements OnChanges {
     @Input()

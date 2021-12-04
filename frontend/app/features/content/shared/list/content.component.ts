@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, fadeAnimation, ModalModel, PatchContentForm, RootFieldDto, TableField, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, RootFieldDto, TableField, Types } from '@app/shared';
 
 /* tslint:disable: component-selector */
 
@@ -14,9 +14,6 @@ import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, f
     selector: '[sqxContent][language][listFields]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentComponent implements OnChanges {

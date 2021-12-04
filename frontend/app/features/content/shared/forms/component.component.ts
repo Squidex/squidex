@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, EditContentForm, fadeAnimation, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, Types } from '@app/shared';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -14,9 +14,6 @@ import { ComponentSectionComponent } from './component-section.component';
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class ComponentComponent extends ResourceOwner implements OnChanges {
     @Input()

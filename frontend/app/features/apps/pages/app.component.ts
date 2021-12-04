@@ -6,15 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppDto, fadeAnimation, ModalModel } from '@app/shared';
+import { AppDto, ModalModel } from '@app/shared';
 
 @Component({
     selector: 'sqx-app[app]',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {

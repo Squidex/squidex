@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { defined, fadeAnimation, MessageBus, ModalModel, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
+import { defined, MessageBus, ModalModel, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 import { map } from 'rxjs/operators';
 import { SchemaCloning } from './../messages';
 
@@ -15,9 +15,6 @@ import { SchemaCloning } from './../messages';
     selector: 'sqx-schema-page',
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public readonly exact = { exact: true };

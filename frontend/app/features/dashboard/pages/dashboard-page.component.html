@@ -5,7 +5,7 @@
         <div class="dashboard-summary" *ngIf="!isScrolled" @fade>
             <h1 class="dashboard-title">{{ 'dashboard.welcomeTitle' | sqxTranslate: { user: user } }}</h1>
 
-            <div class="subtext" [innerHTML]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName } | sqxMarkdown"></div>
+            <div class="subtext" [innerHTML]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName } | sqxMarkdown | sqxSafeHtml"></div>
         </div>
 
         <gridster [options]="gridOptions" #grid>

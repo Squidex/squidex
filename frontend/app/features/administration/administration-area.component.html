@@ -2,14 +2,14 @@
 
 <div class="sidebar">
     <ul class="nav nav-panel flex-column">
-        <li class="nav-item" *ngIf="uiState.canReadEvents | async">
-            <a class="nav-link" routerLink="event-consumers" routerLinkActive="active">
-                <i class="nav-icon icon-time"></i> <div class="nav-text">{{ 'common.consumers' | sqxTranslate }}</div>
-            </a>
-        </li>
         <li class="nav-item" *ngIf="uiState.canReadUsers | async">
             <a class="nav-link" routerLink="users" routerLinkActive="active">
                 <i class="nav-icon icon-user-o"></i> <div class="nav-text">{{ 'common.users' | sqxTranslate }}</div>
+            </a>
+        </li>
+        <li class="nav-item" *ngIf="uiState.canReadEvents | async">
+            <a class="nav-link" routerLink="event-consumers" routerLinkActive="active">
+                <i class="nav-icon icon-time"></i> <div class="nav-text">{{ 'common.consumers' | sqxTranslate }}</div>
             </a>
         </li>
         <li class="nav-item" *ngIf="uiState.canRestore | async">

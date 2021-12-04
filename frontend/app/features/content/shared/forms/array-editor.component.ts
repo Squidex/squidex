@@ -7,7 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, fadeAnimation, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
@@ -17,9 +17,6 @@ import { ArrayItemComponent } from './array-item.component';
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class ArrayEditorComponent implements OnChanges {
     @Input()

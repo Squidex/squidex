@@ -81,7 +81,7 @@
                         [languages]="languages">
                     </sqx-query>
     
-                    <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown"></div>
+                    <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                 </div>
             </ng-container>
 

@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ResolveContents, ContentsState, defined, DialogService, EditContentForm, fadeAnimation, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version, ResolveAssets } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ResolveContents, ContentsState, defined, DialogService, EditContentForm, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version, ResolveAssets } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
 
@@ -15,9 +15,6 @@ import { filter, map, tap } from 'rxjs/operators';
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     providers: [
         ResolveAssets,
         ResolveContents,

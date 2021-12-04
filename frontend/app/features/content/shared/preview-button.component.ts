@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { ContentDto, fadeAnimation, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+import { ContentDto, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -22,9 +22,6 @@ interface State {
     selector: 'sqx-preview-button[content][schema]',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewButtonComponent extends StatefulComponent<State> implements OnInit {

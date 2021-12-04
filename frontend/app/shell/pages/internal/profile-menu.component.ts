@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ApiUrlConfig, AuthService, Cookies, fadeAnimation, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
+import { ApiUrlConfig, AuthService, Cookies, ModalModel, StatefulComponent, UILanguages, UIOptions, UIState } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -29,9 +29,6 @@ interface State {
     selector: 'sqx-profile-menu',
     styleUrls: ['./profile-menu.component.scss'],
     templateUrl: './profile-menu.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {

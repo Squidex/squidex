@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { fadeAnimation, ModalModel } from '@app/framework/internal';
+import { ModalModel } from '@app/framework/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
@@ -14,9 +14,6 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
     selector: 'sqx-language-selector[language][languages]',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LanguageSelectorComponent implements OnChanges, OnInit {

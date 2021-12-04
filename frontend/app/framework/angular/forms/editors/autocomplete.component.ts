@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { fadeAnimation, Keys, StatefulControlComponent, Types } from '@app/framework/internal';
+import { Keys, StatefulControlComponent, Types } from '@app/framework/internal';
 import { RelativePosition } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
@@ -42,9 +42,6 @@ const NO_EMIT = { emitEvent: false };
     templateUrl: './autocomplete.component.html',
     providers: [
         SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR,
-    ],
-    animations: [
-        fadeAnimation,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

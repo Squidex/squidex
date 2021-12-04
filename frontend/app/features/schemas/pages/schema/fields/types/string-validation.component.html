@@ -36,14 +36,14 @@
 
             <ng-container *ngIf="settings.patterns.length > 0 && (showPatternSuggestions | async)">
                 <ng-container *sqxModal="patternsModal">
-                    <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" [scrollY]="true" position="bottom-left" @fade>
+                    <sqx-dropdown-menu class="control-dropdown" [sqxAnchoredTo]="inputPattern" [scrollY]="true" position="bottom-left">
                         <h4>{{ 'schemas.fieldTypes.string.suggestions' | sqxTranslate }}</h4>
         
                         <div *ngFor="let pattern of settings.patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
                             <div class="truncate">{{pattern.name}}</div>
                             <div class="truncate text-muted">{{pattern.regex}}</div>
                         </div>
-                    </div>
+                    </sqx-dropdown-menu>
                 </ng-container>
             </ng-container>
 

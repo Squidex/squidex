@@ -225,6 +225,6 @@
     </div>
 
     <sqx-form-hint *ngIf="field.properties.hints && field.properties.hints.length > 0">
-        <span [innerHTML]="field.properties.hints | sqxMarkdownInline"></span>
+        <span [sqxMarkdown]="field.properties.hints" [optional]="true" [inline]="true"></span>
     </sqx-form-hint>
 </div>

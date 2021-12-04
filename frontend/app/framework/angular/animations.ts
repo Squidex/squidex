@@ -76,30 +76,6 @@ export function buildFadeAnimation(name = 'fade', timing = '150ms'): AnimationTr
     );
 }
 
-export function buildHeightAnimation(name = 'height', timing = '200ms'): AnimationTriggerMetadata {
-    return trigger(
-        name, [
-            transition(':enter', [
-                style({ height: '0px' }),
-                animate(timing, style({ height: '*' })),
-            ]),
-            transition(':leave', [
-                style({ height: '*' }),
-                animate(timing, style({ height: '0px' })),
-            ]),
-            state('true',
-                style({ height: '*' }),
-            ),
-            state('false',
-                style({ height: '0px' }),
-            ),
-            transition('1 => 0', animate(timing)),
-            transition('0 => 1', animate(timing)),
-        ],
-    );
-}
-
 export const fadeAnimation = buildFadeAnimation();
-export const heightAnimation = buildHeightAnimation();
 export const slideAnimation = buildSlideAnimation();
 export const slideRightAnimation = buildSlideRightAnimation();
