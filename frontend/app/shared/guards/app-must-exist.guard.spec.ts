@@ -7,7 +7,7 @@
 
 import { Router } from '@angular/router';
 import { AppsState } from '@app/shared';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { AppMustExistGuard } from './app-must-exist.guard';
 
@@ -30,33 +30,23 @@ describe('AppMustExistGuard', () => {
         appGuard = new AppMustExistGuard(appsState.object, router.object);
     });
 
-    it('should navigate to 404 page if app is not found', () => {
+    it('should navigate to 404 page if app is not found', async () => {
         appsState.setup(x => x.select('my-app'))
             .returns(() => of(null));
 
-        let result: boolean;
+        const result = await firstValueFrom(appGuard.canActivate(route));
 
-        appGuard.canActivate(route).subscribe(x => {
-            result = x;
-        });
+        expect(result).toBeFalsy();
 
-        expect(result!).toBeFalsy();
-
-        appsState.verify(x => x.select('my-app'), Times.once());
+        router.verify(x => x.navigate(['/404']), Times.once());
     });
 
-    it('should return true if app is found', () => {
+    it('should return true if app is found', async () => {
         appsState.setup(x => x.select('my-app'))
             .returns(() => of(<any>{}));
 
-        let result: boolean;
+        const result = await firstValueFrom(appGuard.canActivate(route));
 
-        appGuard.canActivate(route).subscribe(x => {
-            result = x;
-        });
-
-        expect(result!).toBeTruthy();
-
-        // router.verify(x => x.navigate(['/404']), Times.once());
+        expect(result).toBeTruthy();
     });
 });

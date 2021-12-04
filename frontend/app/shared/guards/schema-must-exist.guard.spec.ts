@@ -7,7 +7,7 @@
 
 import { Router } from '@angular/router';
 import { SchemaDto, SchemasState } from '@app/shared/internal';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { SchemaMustExistGuard } from './schema-must-exist.guard';
 
@@ -28,30 +28,22 @@ describe('SchemaMustExistGuard', () => {
         schemaGuard = new SchemaMustExistGuard(schemasState.object, router.object);
     });
 
-    it('should load schema and return true if found', () => {
+    it('should load schema and return true if found', async () => {
         schemasState.setup(x => x.select('123'))
             .returns(() => of(<SchemaDto>{}));
 
-        let result: boolean;
+        const result = await firstValueFrom(schemaGuard.canActivate(route));
 
-        schemaGuard.canActivate(route).subscribe(x => {
-            result = x;
-        }).unsubscribe();
-
-        expect(result!).toBeTruthy();
+        expect(result).toBeTruthy();
     });
 
-    it('should load schema and return false if not found', () => {
+    it('should load schema and return false if not found', async () => {
         schemasState.setup(x => x.select('123'))
             .returns(() => of(null));
 
-        let result: boolean;
+        const result = await firstValueFrom(schemaGuard.canActivate(route));
 
-        schemaGuard.canActivate(route).subscribe(x => {
-            result = x;
-        }).unsubscribe();
-
-        expect(result!).toBeFalsy();
+        expect(result).toBeFalsy();
 
         router.verify(x => x.navigate(['/404']), Times.once());
     });

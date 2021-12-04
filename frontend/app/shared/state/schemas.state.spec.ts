@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DialogService, FieldDto, SchemaDto, SchemasService, UpdateSchemaCategoryDto, versioned } from '@app/shared/internal';
-import { of, throwError } from 'rxjs';
+import { DialogService, SchemaDto, SchemasService, UpdateSchemaCategoryDto, versioned } from '@app/shared/internal';
+import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { createSchema } from './../services/schemas.service.spec';
@@ -151,29 +151,21 @@ describe('SchemasState', () => {
             expect().nothing();
         });
 
-        it('should return schema on select and reload always', () => {
+        it('should return schema on select and reload always', async () => {
             schemasService.setup(x => x.getSchema(app, schema1.name))
                 .returns(() => of(schema1)).verifiable();
 
-            let schemaSelected: SchemaDto;
+            const schemaSelected = await firstValueFrom(schemasState.select(schema1.name));
 
-            schemasState.select(schema1.name).subscribe(x => {
-                schemaSelected = x!;
-            });
-
-            expect(schemaSelected!).toBe(schema1);
+            expect(schemaSelected).toBe(schema1);
             expect(schemasState.snapshot.selectedSchema).toBe(schema1);
             expect(schemasState.snapshot.selectedSchema).toBe(<SchemaDto>schemasState.snapshot.schemas[0]);
         });
 
-        it('should return null on select if unselecting schema', () => {
-            let schemaSelected: SchemaDto;
+        it('should return null on select if unselecting schema', async () => {
+            const schemaSelected = await firstValueFrom(schemasState.select(null));
 
-            schemasState.select(null).subscribe(x => {
-                schemaSelected = x!;
-            });
-
-            expect(schemaSelected!).toBeNull();
+            expect(schemaSelected).toBeNull();
             expect(schemasState.snapshot.selectedSchema).toBeNull();
         });
 
@@ -325,7 +317,7 @@ describe('SchemasState', () => {
                 expect(schemasState.snapshot.selectedSchema).toBeNull();
             });
 
-            it('should update schema and selected schema if field added', () => {
+            it('should update schema and selected schema if field added', async () => {
                 const request = { ...schema1.fields[0] };
 
                 const updated = createSchema(1, '_new');
@@ -333,18 +325,14 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.postField(app, schema1, It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
 
-                let newField: FieldDto;
+                const schemaField = await firstValueFrom(schemasState.addField(schema1, request));
 
-                schemasState.addField(schema1, request).subscribe(result => {
-                    newField = result;
-                });
-
+                expect(schemaField).toBeDefined();
                 expect(schemasState.snapshot.schemas).toEqual([updated, schema2]);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
-                expect(newField!).toBeDefined();
             });
 
-            it('should update schema and selected schema if nested field added', () => {
+            it('should update schema and selected schema if nested field added', async () => {
                 const request = { ...schema1.fields[0].nested[0] };
 
                 const updated = createSchema(1, '_new');
@@ -352,15 +340,11 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.postField(app, schema1.fields[0], It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
 
-                let newField: FieldDto;
+                const schemaField = await firstValueFrom(schemasState.addField(schema1, request, schema1.fields[0]));
 
-                schemasState.addField(schema1, request, schema1.fields[0]).subscribe(result => {
-                    newField = result;
-                });
-
+                expect(schemaField).toBeDefined();
                 expect(schemasState.snapshot.schemas).toEqual([updated, schema2]);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
-                expect(newField!).toBeDefined();
             });
 
             it('should update schema and selected schema if field removed', () => {

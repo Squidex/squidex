@@ -7,7 +7,7 @@
 
 import { Router } from '@angular/router';
 import { ContentDto, ContentsState } from '@app/shared/internal';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ContentMustExistGuard } from './content-must-exist.guard';
 
@@ -22,11 +22,9 @@ describe('ContentMustExistGuard', () => {
         contentGuard = new ContentMustExistGuard(contentsState.object, router.object);
     });
 
-    it('should load content and return true if found', () => {
+    it('should load content and return true if found', async () => {
         contentsState.setup(x => x.select('123'))
             .returns(() => of(<ContentDto>{}));
-
-        let result: boolean;
 
         const route: any = {
             params: {
@@ -34,20 +32,16 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        contentGuard.canActivate(route).subscribe(x => {
-            result = x;
-        }).unsubscribe();
+        const result = await firstValueFrom(contentGuard.canActivate(route));
 
-        expect(result!).toBeTruthy();
+        expect(result).toBeTruthy();
 
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    it('should load content and return false if not found', () => {
+    it('should load content and return false if not found', async () => {
         contentsState.setup(x => x.select('123'))
             .returns(() => of(null));
-
-        let result: boolean;
 
         const route: any = {
             params: {
@@ -55,20 +49,16 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        contentGuard.canActivate(route).subscribe(x => {
-            result = x;
-        }).unsubscribe();
+        const result = await firstValueFrom(contentGuard.canActivate(route));
 
-        expect(result!).toBeFalsy();
+        expect(result).toBeFalsy();
 
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 
-    it('should unset content if content id is undefined', () => {
+    it('should unset content if content id is undefined', async () => {
         contentsState.setup(x => x.select(null))
             .returns(() => of(null));
-
-        let result: boolean;
 
         const route: any = {
             params: {
@@ -76,20 +66,16 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        contentGuard.canActivate(route).subscribe(x => {
-            result = x;
-        }).unsubscribe();
+        const result = await firstValueFrom(contentGuard.canActivate(route));
 
         expect(result!).toBeTruthy();
 
         contentsState.verify(x => x.select(null), Times.once());
     });
 
-    it('should unset content if content id is <new>', () => {
+    it('should unset content if content id is <new>', async () => {
         contentsState.setup(x => x.select(null))
             .returns(() => of(null));
-
-        let result: boolean;
 
         const route: any = {
             params: {
@@ -97,9 +83,7 @@ describe('ContentMustExistGuard', () => {
             },
         };
 
-        contentGuard.canActivate(route).subscribe(x => {
-            result = x;
-        }).unsubscribe();
+        const result = await firstValueFrom(contentGuard.canActivate(route));
 
         expect(result!).toBeTruthy();
 

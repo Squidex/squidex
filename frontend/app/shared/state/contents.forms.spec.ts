@@ -804,8 +804,8 @@ describe('ContentForm', () => {
 
             let value: any;
 
-            simpleForm.valueChanges.subscribe(v => {
-                value = v;
+            simpleForm.valueChanges.subscribe(result => {
+                value = result;
             });
 
             expect(value).toEqual({ field1: { iv: 'Change' } });

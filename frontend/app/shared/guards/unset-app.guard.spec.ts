@@ -6,7 +6,7 @@
  */
 
 import { AppsState } from '@app/shared/internal';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { UnsetAppGuard } from './unset-app.guard';
 
@@ -19,15 +19,11 @@ describe('UnsetAppGuard', () => {
         appGuard = new UnsetAppGuard(appsState.object);
     });
 
-    it('should unselect app', () => {
+    it('should unselect app', async () => {
         appsState.setup(x => x.select(null))
             .returns(() => of(null));
 
-        let result = false;
-
-        appGuard.canActivate().subscribe(value => {
-            result = value;
-        });
+        const result = await firstValueFrom(appGuard.canActivate());
 
         expect(result).toBeTruthy();
 

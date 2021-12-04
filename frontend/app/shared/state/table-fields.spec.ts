@@ -38,7 +38,7 @@ describe('TableFields', () => {
     ];
 
     INVALID_CONFIGS.forEach(test => {
-        it(`should provide default fields if config is ${test.case}`, () => {
+        it(`should provide default fields if config is ${test.case}`, async () => {
             let fields: ReadonlyArray<TableField>;
             let fieldNames: ReadonlyArray<string>;
 

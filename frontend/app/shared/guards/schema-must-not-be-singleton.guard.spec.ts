@@ -7,7 +7,7 @@
 
 import { Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
 import { SchemaDto, SchemasState } from '@app/shared/internal';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { SchemaMustNotBeSingletonGuard } from './schema-must-not-be-singleton.guard';
 
@@ -33,53 +33,41 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         schemaGuard = new SchemaMustNotBeSingletonGuard(schemasState.object, router.object);
     });
 
-    it('should subscribe to schema and return true if default', () => {
+    it('should subscribe to schema and return true if default', async () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
             .returns(() => of(<SchemaDto>{ id: '123', type: 'Default' }));
 
-        let result: boolean;
+        const result = await firstValueFrom(schemaGuard.canActivate(route, state));
 
-        schemaGuard.canActivate(route, state).subscribe(x => {
-            result = x;
-        }).unsubscribe();
-
-        expect(result!).toBeTruthy();
+        expect(result).toBeTruthy();
 
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
-    it('should redirect to content if singleton', () => {
+    it('should redirect to content if singleton', async () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
             .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
-        let result: boolean;
+        const result = await firstValueFrom(schemaGuard.canActivate(route, state));
 
-        schemaGuard.canActivate(route, state).subscribe(x => {
-            result = x;
-        }).unsubscribe();
-
-        expect(result!).toBeFalsy();
+        expect(result).toBeFalsy();
 
         router.verify(x => x.navigate([state.url, '123']), Times.once());
     });
 
-    it('should redirect to content if singleton on new page', () => {
+    it('should redirect to content if singleton on new page', async () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/new/' };
 
         schemasState.setup(x => x.selectedSchema)
             .returns(() => of(<SchemaDto>{ id: '123', type: 'Singleton' }));
 
-        let result: boolean;
+        const result = await firstValueFrom(schemaGuard.canActivate(route, state));
 
-        schemaGuard.canActivate(route, state).subscribe(x => {
-            result = x;
-        }).unsubscribe();
-
-        expect(result!).toBeFalsy();
+        expect(result).toBeFalsy();
 
         router.verify(x => x.navigate(['schemas/name/', '123']), Times.once());
     });

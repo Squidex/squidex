@@ -6,7 +6,7 @@
  */
 
 import { DialogService, RulesDto, RulesService, versioned } from '@app/shared/internal';
-import { of, throwError } from 'rxjs';
+import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { RuleDto } from './../services/rules.service';
@@ -52,13 +52,13 @@ describe('RulesState', () => {
             expect(rulesState.snapshot.isLoading).toBeFalsy();
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
 
-            let runningRule: RuleDto | undefined;
+            let ruleRunning: RuleDto | undefined;
 
             rulesState.runningRule.subscribe(result => {
-                runningRule = result;
+                ruleRunning = result;
             });
 
-            expect(runningRule).toBe(rule1);
+            expect(ruleRunning).toBe(rule1);
             expect(rulesState.snapshot.runningRuleId).toBe(rule1.id);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -93,25 +93,17 @@ describe('RulesState', () => {
             rulesState.load().subscribe();
         });
 
-        it('should return rule on select and not load if already loaded', () => {
-            let ruleSelected: RuleDto;
+        it('should return rule on select and not load if already loaded', async () => {
+            const ruleSelected = await firstValueFrom(rulesState.select(rule1.id));
 
-            rulesState.select(rule1.id).subscribe(x => {
-                ruleSelected = x!;
-            });
-
-            expect(ruleSelected!).toEqual(rule1);
+            expect(ruleSelected).toEqual(rule1);
             expect(rulesState.snapshot.selectedRule).toEqual(rule1);
         });
 
-        it('should return null on select if unselecting rule', () => {
-            let ruleSelected: RuleDto;
+        it('should return null on select if unselecting rule', async () => {
+            const ruleSelected = await firstValueFrom(rulesState.select(null));
 
-            rulesState.select(null).subscribe(x => {
-                ruleSelected = x!;
-            });
-
-            expect(ruleSelected!).toBeNull();
+            expect(ruleSelected).toBeNull();
             expect(rulesState.snapshot.selectedRule).toBeNull();
         });
 

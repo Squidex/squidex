@@ -58,6 +58,7 @@ export * from './state/languages.state';
 export * from './state/plans.state';
 export * from './state/queries';
 export * from './state/query';
+export * from './state/resolvers';
 export * from './state/roles.forms';
 export * from './state/roles.state';
 export * from './state/rule-events.state';

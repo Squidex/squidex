@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Types } from '@app/framework';
-import { AppsState, ContentDto, ContentsDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, UIOptions } from '@app/shared/internal';
+import { ContentDto, ContentsDto, ResolveContents, LanguageDto, LocalizerService, StatefulControlComponent } from '@app/shared/internal';
 import { Observable } from 'rxjs';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
@@ -33,7 +33,6 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnChanges {
-    private readonly itemCount: number;
     private readonly contents: ContentDto[] = [];
     private isOpenedBefore = false;
     private isLoadingFailed = false;
@@ -58,16 +57,13 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
     public control = new FormControl([]);
 
-    constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
+    constructor(changeDetector: ChangeDetectorRef,
+        private readonly contentsResolver: ResolveContents,
         private readonly localizer: LocalizerService,
     ) {
         super(changeDetector, {
             converter: new ReferencesTagsConverter(null!, [], localizer),
         });
-
-        this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
         this.own(
             this.control.valueChanges
@@ -108,7 +104,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         }
 
         this.isOpenedBefore = true;
-        this.loadMore(this.contentsService.getContents(this.appsState.appName, this.schemaId, { take: this.itemCount }));
+        this.loadMore(this.contentsResolver.resolveAll(this.schemaId));
     }
 
     public writeValue(obj: ReadonlyArray<string>) {
@@ -123,7 +119,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
         const newIds = ids?.filter(x => !this.contents?.find(y => y.id === x));
 
         if (newIds && newIds.length > 0) {
-            this.loadMore(this.contentsService.getAllContents(this.appsState.appName, { ids: newIds }));
+            this.loadMore(this.contentsResolver.resolveMany(newIds));
         }
 
         this.control.setValue(ids, NO_EMIT);
@@ -132,12 +128,12 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     private loadMore(observable: Observable<ContentsDto>) {
         observable
             .subscribe({
-                next: ({ items: newContents }) => {
-                    if (newContents.length === 0) {
+                next: ({ items }) => {
+                    if (items.length === 0) {
                         return;
                     }
 
-                    for (const content of newContents) {
+                    for (const content of items) {
                         const index = this.contents.findIndex(x => x.id === content.id);
 
                         if (index >= 0) {

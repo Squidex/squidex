@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AppDto, AppsService, AppsState, DialogService } from '@app/shared/internal';
-import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { AppsService, AppsState, DialogService } from '@app/shared/internal';
+import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { createApp, createAppSettings } from './../services/apps.service.spec';
 
@@ -43,14 +42,10 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps).toEqual([app1, app2]);
     });
 
-    it('should select app', () => {
-        let selectedApp: AppDto;
+    it('should select app', async () => {
+        const appSelect = await firstValueFrom(appsState.select(app1.name));
 
-        appsState.select(app1.name).subscribe(x => {
-            selectedApp = x!;
-        });
-
-        expect(selectedApp!).toBe(app1);
+        expect(appSelect).toBe(app1);
         expect(appsState.snapshot.selectedApp).toBe(app1);
         expect(appsState.snapshot.selectedSettings).not.toBeNull();
 
@@ -74,47 +69,35 @@ describe('AppsState', () => {
         expect().nothing();
     });
 
-    it('should return null on select if unselecting app', () => {
-        let appSelected: AppDto;
+    it('should return null on select if unselecting app', async () => {
+        const appSelected = await firstValueFrom(appsState.select(null));
 
-        appsState.select(null).subscribe(x => {
-            appSelected = x!;
-        });
-
-        expect(appSelected!).toBeNull();
+        expect(appSelected).toBeNull();
         expect(appsState.snapshot.selectedApp).toBeNull();
         expect(appsState.snapshot.selectedSettings).toBeNull();
 
         appsService.verify(x => x.getSettings(It.isAnyString()), Times.never());
     });
 
-    it('should return new app if loaded', () => {
+    it('should return null on select if app is not found', async () => {
+        appsService.setup(x => x.getApp('unknown'))
+            .returns(() => throwError(() => 'Service Error'));
+
+        const appSelected = await firstValueFrom(appsState.select('unknown'));
+
+        expect(appSelected).toBeNull();
+        expect(appsState.snapshot.selectedApp).toBeNull();
+    });
+
+    it('should return new app if loaded', async () => {
         const newApp = createApp(1, '_new');
 
         appsService.setup(x => x.getApp(app1.name))
             .returns(() => of(newApp));
 
-        let appSelected: AppDto;
+        const appSelected = await firstValueFrom(appsState.loadApp(app1.name));
 
-        appsState.loadApp(app1.name).subscribe(x => {
-            appSelected = x!;
-        });
-
-        expect(appSelected!).toEqual(newApp);
-        expect(appsState.snapshot.selectedApp).toBeNull();
-    });
-
-    it('should return null on select if app is not found', () => {
-        let appSelected: AppDto;
-
-        appsService.setup(x => x.getApp('unknown'))
-            .returns(() => throwError(() => 'Service Error'));
-
-        appsState.select('unknown').pipe(onErrorResumeNext()).subscribe(x => {
-            appSelected = x!;
-        });
-
-        expect(appSelected!).toBeNull();
+        expect(appSelected).toEqual(newApp);
         expect(appsState.snapshot.selectedApp).toBeNull();
     });
 

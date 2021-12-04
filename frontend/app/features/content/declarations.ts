@@ -35,5 +35,8 @@ export * from './shared/forms/stock-photo-editor.component';
 export * from './shared/list/content.component';
 export * from './shared/preview-button.component';
 export * from './shared/references/content-creator.component';
+export * from './shared/references/reference-dropdown.component';
 export * from './shared/references/reference-item.component';
+export * from './shared/references/references-checkboxes.component';
 export * from './shared/references/references-editor.component';
+export * from './shared/references/references-tags.component';

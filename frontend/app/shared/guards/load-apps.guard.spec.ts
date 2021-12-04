@@ -6,7 +6,7 @@
  */
 
 import { AppsState } from '@app/shared';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 import { LoadAppsGuard } from './load-apps.guard';
 
@@ -19,15 +19,11 @@ describe('LoadAppsGuard', () => {
         appGuard = new LoadAppsGuard(appsState.object);
     });
 
-    it('should load apps', () => {
+    it('should load apps', async () => {
         appsState.setup(x => x.load())
             .returns(() => of(null));
 
-        let result = false;
-
-        appGuard.canActivate().subscribe(value => {
-            result = value;
-        });
+        const result = await firstValueFrom(appGuard.canActivate());
 
         expect(result).toBeTruthy();
 
