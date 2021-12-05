@@ -8,7 +8,7 @@
             <div @slide class="onboarding-enter-leave">
                 <h1>{{ 'tour.welcome' | sqxTranslate }} <span class="header-focus">{{ 'tour.welcomeProduct' | sqxTranslate }}</span></h1>
 
-                <div [innerHTML]="'tour.step0Text' | sqxTranslate | sqxMarkdown"></div>
+                <div [innerHTML]="'tour.step0Text' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
 
                 <button (click)="next()" class="btn btn-success">{{ 'tour.step0Next' | sqxTranslate }}</button>
             </div>
@@ -19,7 +19,7 @@
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text" [innerHTML]="'tour.step1Text' | sqxTranslate | sqxMarkdown"></div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step1Text' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                     </div>
                     <div class="col col-image">
                         <img src="./images/onboarding-step1.png">
@@ -37,7 +37,7 @@
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text" [innerHTML]="'tour.step2Text' | sqxTranslate | sqxMarkdown"></div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step2Text' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                     </div>
                     <div class="col col-image">
                         <img src="./images/onboarding-step2.png">
@@ -55,7 +55,7 @@
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text" [innerHTML]="'tour.step3Text' | sqxTranslate | sqxMarkdown"></div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step3Text' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                     </div>
                     <div class="col col-image">
                         <img src="./images/onboarding-step3.png">
@@ -73,7 +73,7 @@
             <div @slide>
                 <div class="row">
                     <div class="col">
-                        <div class="onboarding-text" [innerHTML]="'tour.step4Text' | sqxTranslate | sqxMarkdown"></div>
+                        <div class="onboarding-text" [innerHTML]="'tour.step4Text' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
                     </div>
                     <div class="col col-image">
                         <img src="./images/onboarding-step4.png">
@@ -91,7 +91,7 @@
             <div @slide class="onboarding-enter-leave">
                 <h1>{{ 'tour.step5Title' | sqxTranslate }}</h1>
                 
-                <div [innerHTML]="'tour.step5Text' | sqxTranslate | sqxMarkdown"></div>
+                <div [innerHTML]="'tour.step5Text' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
 
                 <div>
                     <a class="btn btn-success" href="https://support.squidex.io" sqxExternalLink>

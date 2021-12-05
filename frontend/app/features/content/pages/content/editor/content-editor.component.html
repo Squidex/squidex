@@ -7,7 +7,7 @@
                 <a (click)="loadLatest.emit()">{{ 'contents.viewLatest' | sqxTranslate }}</a>
             </div>
 
-            <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline"></div>
+            <div [innerHTML]="'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml"></div>
         </div>
         
         <div *ngIf="isNew">

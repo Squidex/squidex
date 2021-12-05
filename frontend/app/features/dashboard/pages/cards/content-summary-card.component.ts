@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { AppDto, ContentsService, fadeAnimation, StatefulComponent, Types } from '@app/shared';
+import { AppDto, ContentsService, StatefulComponent, Types } from '@app/shared';
 
 interface State {
     // The number of items.
@@ -17,9 +17,6 @@ interface State {
     selector: 'sqx-content-summary-card',
     styleUrls: ['./content-summary-card.component.scss'],
     templateUrl: './content-summary-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentSummaryCardComponent extends StatefulComponent<State> implements OnInit {

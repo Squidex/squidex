@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppsState, ContentDto, ContentsState, defined, fadeAnimation, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemasState, switchSafe } from '@app/shared';
+import { AppsState, ContentDto, ContentsState, defined, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemasState, switchSafe } from '@app/shared';
 import { Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
@@ -16,9 +16,6 @@ import { ContentPageComponent } from './content-page.component';
     selector: 'sqx-history',
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class ContentHistoryPageComponent extends ResourceOwner implements OnInit {
     @ViewChild('dueTimeSelector', { static: false })

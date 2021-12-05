@@ -6,15 +6,12 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { AppDto, fadeAnimation } from '@app/shared';
+import { AppDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-iframe-card[app]',
     styleUrls: ['./iframe-card.component.scss'],
     templateUrl: './iframe-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IFrameCardComponent implements AfterViewInit {

@@ -6,16 +6,13 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { AppDto, CallsUsageDto, fadeAnimation } from '@app/shared';
+import { AppDto, CallsUsageDto } from '@app/shared';
 import { ChartHelpers, ChartOptions } from './shared';
 
 @Component({
     selector: 'sqx-api-performance-card[app][usage]',
     styleUrls: ['./api-performance-card.component.scss'],
     templateUrl: './api-performance-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ApiPerformanceCardComponent implements OnChanges {

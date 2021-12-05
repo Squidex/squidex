@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { fadeAnimation, getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
+import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -37,13 +37,11 @@ interface State {
     providers: [
         SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR,
     ],
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnChanges, OnInit {
     private latestValue: any;
+    private latestInput: string;
 
     @ViewChild('form', { static: false })
     public formElement: ElementRef<HTMLElement>;
@@ -104,6 +102,17 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     @Input()
     public set suggestions(value: ReadonlyArray<string | TagValue> | undefined | null) {
         this.suggestionsSorted = getTagValues(value);
+
+        if (this.addInput.value) {
+            const query = this.addInput.value;
+
+            const items = this.suggestionsSorted.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
+
+            this.next({
+                suggestedIndex: -1,
+                suggestedItems: items || [],
+            });
+        }
     }
 
     public suggestionsSorted: ReadonlyArray<TagValue> = [];
@@ -126,7 +135,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['converter']) {
-            this.writeValue(this.latestValue);
+            this.writeValue(this.latestValue, true);
         }
     }
 
@@ -146,7 +155,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                     tap(query => {
                         if (!query) {
                             this.resetAutocompletion();
+                        } else if (!this.latestInput) {
+                            this.open.emit();
                         }
+
+                        this.latestInput = query;
                     }),
                     distinctUntilChanged(),
                     map(query => {
@@ -158,19 +171,21 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                             return [];
                         }
                     }))
-                .subscribe(items => {
+                .subscribe(suggestedItems => {
                     this.next({
                         suggestedIndex: -1,
-                        suggestedItems: items || [],
+                        suggestedItems,
                     });
                 }));
     }
 
-    public writeValue(obj: any) {
+    public writeValue(obj: any, noForm = false) {
         this.latestValue = obj;
 
-        this.resetForm();
-        this.resetSize();
+        if (!noForm) {
+            this.resetForm();
+            this.resetSize();
+        }
 
         const items: any[] = [];
 

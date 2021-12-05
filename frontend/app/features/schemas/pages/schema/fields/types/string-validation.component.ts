@@ -7,16 +7,13 @@
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { AppSettingsDto, fadeAnimation, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
+import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
 import { Observable } from 'rxjs';
 
 @Component({
     selector: 'sqx-string-validation[field][fieldForm][properties][schema]',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class StringValidationComponent extends ResourceOwner implements OnChanges {
     public readonly contentTypes = STRING_CONTENT_TYPES;

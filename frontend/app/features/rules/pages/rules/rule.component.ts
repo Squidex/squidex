@@ -6,15 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ActionsDto, fadeAnimation, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
+import { ActionsDto, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-rule[rule][ruleActions][ruleTriggers]',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RuleComponent {

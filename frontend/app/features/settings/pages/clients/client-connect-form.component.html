@@ -34,7 +34,7 @@
                 <h3>{{ 'clients.connectWizard.step1Title' | sqxTranslate }}</h3>
 
                 <sqx-form-hint>
-                    <span [innerHTML]="'clients.connectWizard.postManDocs' | sqxTranslate | sqxMarkdownInline"></span>
+                    <span [innerHTML]="'clients.connectWizard.postManDocs' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
                 </sqx-form-hint>
         
                 <div class="section">
@@ -97,7 +97,7 @@
                 <div class="section step">
                     <h5><span class="badge rounded-pill badge-dark">1</span> {{ 'clients.connectWizard.cliStep1' | sqxTranslate }}</h5>
 
-                    <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown"></div>
+                    <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
 
                     <sqx-form-hint>
                         {{ 'clients.connectWizard.cliStep1Hint' | sqxTranslate }}
@@ -105,7 +105,7 @@
                 </div>
                 
                 <div class="section step">
-                    <h5><span class="badge rounded-pill badge-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline"></span></h5>
+                    <h5><span class="badge rounded-pill badge-dark">2</span> <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span></h5>
                 </div>
 
                 <div class="section step">
@@ -132,7 +132,7 @@
                 <div class="section step">
                     <h5><span class="badge rounded-pill badge-dark">1</span> {{ 'clients.connectWizard.sdkStep1' | sqxTranslate }}</h5>
 
-                    <div [innerHTML]="'clients.connectWizard.sdkStep1Download' | sqxTranslate | sqxMarkdown"></div>
+                    <div [innerHTML]="'clients.connectWizard.sdkStep1Download' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
 
                     <p>              
                         <sqx-code>dotnet add package Squidex.ClientLibrary</sqx-code>

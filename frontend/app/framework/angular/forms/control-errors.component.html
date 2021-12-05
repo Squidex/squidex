@@ -1,7 +1,1 @@
- <div class="errors-container" *ngIf="snapshot.errorMessages.length > 0" @fade>
-    <div class="errors">
-        <ng-container *ngFor="let message of snapshot.errorMessages">
-            {{message}}
-        </ng-container>
-    </div>
-</div>
+ <sqx-errors-messages [errorMessages]="snapshot.errorMessages" *ngIf="snapshot.errorMessages.length > 0"></sqx-errors-messages>

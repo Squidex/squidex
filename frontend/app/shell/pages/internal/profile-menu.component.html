@@ -9,7 +9,7 @@
 </ul>
 
 <ng-container *sqxModal="modalMenu;onRoot:false;closeAlways:true">
-    <div class="dropdown-menu" [sqxAnchoredTo]="button" [scrollY]="true" [offset]="10" @fade>
+    <sqx-dropdown-menu [sqxAnchoredTo]="button" [scrollY]="true" [offset]="10">
         <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
             <div>{{ 'profile.userEmail' | sqxTranslate }}</div>
     
@@ -43,5 +43,5 @@
         <a class="dropdown-item" (click)="logout()" sqxExternalLink>
             {{ 'common.logout' | sqxTranslate }}
         </a>
-    </div>
+    </sqx-dropdown-menu>
 </ng-container>

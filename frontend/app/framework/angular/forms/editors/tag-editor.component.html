@@ -29,22 +29,22 @@
     </div>
 
     <ng-container *sqxModal="snapshot.suggestedItems.length > 0">
-        <div class="control-dropdown" [sqxAnchoredTo]="form" [scrollY]="true" position="bottom-left" #container @fade>
+        <sqx-dropdown-menu class="control-dropdown" [sqxAnchoredTo]="form" [scrollY]="true" position="bottom-left" #container>
             <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
                 [class.separated]="separated"
                 (mousedown)="selectValue(item)" 
                 (mouseover)="selectIndex(i)"
                 [sqxScrollActive]="i === snapshot.suggestedIndex"
-                [sqxScrollContainer]="container">
+                [sqxScrollContainer]="container.nativeElement">
                 <ng-container>{{item}}</ng-container>
             </div>
-        </div>
+        </sqx-dropdown-menu>
     </ng-container>
 
     <ng-container *ngIf="allowOpen || suggestionsSorted.length > 0">
         <ng-container *sqxModal="suggestionsModal">
-            <div class="control-dropdown suggestions-dropdown" [sqxAnchoredTo]="form" position="bottom-left" @fade>
+            <sqx-dropdown-menu class="control-dropdown suggestions-dropdown" [sqxAnchoredTo]="form" position="bottom-left">
                 <div class="row">
                     <div class=" col-6" *ngFor="let item of suggestionsSorted; let i = index">
                         <div class="form-check form-check">
@@ -59,7 +59,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </sqx-dropdown-menu>
         </ng-container>
     </ng-container>
 </div>

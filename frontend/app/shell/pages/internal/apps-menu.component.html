@@ -12,7 +12,7 @@
 
         <ng-container *ngIf="appsState.apps | async; let apps">
             <ng-container *sqxModal="appsMenu;closeAlways:true;onRoot:false">
-                <div class="dropdown-menu" [sqxAnchoredTo]="button" [scrollY]="true" position="bottom-left" @fade>
+                <sqx-dropdown-menu [sqxAnchoredTo]="button" [scrollY]="true" position="bottom-left">
                     <a class="dropdown-item" routerLink="/app">
                         <div class="row g-0 align-items-center">
                             <div class="col">
@@ -43,7 +43,7 @@
                             </button>
                         </div>
                     </ng-container>
-                </div>
+                </sqx-dropdown-menu>
             </ng-container>
         </ng-container>
     </li>

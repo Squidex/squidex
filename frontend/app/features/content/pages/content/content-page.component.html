@@ -65,7 +65,7 @@
                         </button>
 
                         <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>
+                            <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">
                                 <a class="dropdown-item dropdown-item-delete"
                                     (sqxConfirmClick)="delete()"
                                     confirmTitle="i18n:contents.deleteConfirmTitle"
@@ -73,7 +73,7 @@
                                     confirmRememberKey="deleteContent">
                                     {{ 'common.delete' | sqxTranslate }}
                                 </a>
-                            </div>
+                            </sqx-dropdown-menu>
                         </ng-container>
                     </ng-container>
 

@@ -10,9 +10,9 @@
             <button type="button" class="btn btn-secondary dropdown-toggle" (click)="dropdown.toggle()"></button>
             
             <ng-container *sqxModal="dropdown;closeAlways:true">
-                <div class="dropdown-menu" [sqxAnchoredTo]="buttonGroup" [scrollY]="true" @fade>
+                <sqx-dropdown-menu [sqxAnchoredTo]="buttonGroup" [scrollY]="true">
                     <a *ngFor="let name of snapshot.previewNamesMore" class="dropdown-item" (click)="follow(name)">{{name}}</a>
-                </div>
+                </sqx-dropdown-menu>
             </ng-container>
         </div>
     </div>

@@ -7,7 +7,7 @@
         </ng-container>
     
         <ng-container content>
-            <span [innerHTML]="request.text | sqxTranslate | sqxMarkdown"></span>
+            <span [innerHTML]="request.text | sqxTranslate | sqxMarkdown | sqxSafeHtml"></span>
 
             <div class="form-check mt-4" *ngIf="request.canRemember">
                 <input class="form-check-input" type="checkbox" id="remember" [(ngModel)]="request.remember">
@@ -35,7 +35,7 @@
         <button type="button" class="btn-close" data-dismiss="alert" (close)="close(notification)"></button>
 
         <div class="shadow"></div>
-        <div class="shadowed" [innerHTML]="notification.message | sqxTranslate | sqxMarkdown"></div>
+        <div class="shadowed" [innerHTML]="notification.message | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
     </div>
 </div>
 

@@ -14,7 +14,7 @@
                     </button>
     
                     <ng-container *sqxModal="dropdown;closeAlways:true">
-                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" [scrollY]="true" @fade>  
+                        <sqx-dropdown-menu [sqxAnchoredTo]="buttonOptions" [scrollY]="true">  
                             <ng-container *ngIf="canUpdate">
                                 <a class="dropdown-item" (click)="editDialog.show()">
                                     {{ 'common.rename' | sqxTranslate }}
@@ -30,7 +30,7 @@
                                 confirmRememberKey="deleteAssetFolder">
                                 {{ 'common.delete' | sqxTranslate }}
                             </a>
-                        </div>
+                        </sqx-dropdown-menu>
                     </ng-container>
                 </ng-container>
             </div>

@@ -6,15 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AppDto, fadeAnimation } from '@app/shared';
+import { AppDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-github-card[app]',
     styleUrls: ['./github-card.component.scss'],
     templateUrl: './github-card.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GithubCardComponent {

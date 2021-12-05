@@ -74,11 +74,11 @@
                     </button>
                     
                     <ng-container *sqxModal="schemasDropdown;closeAlways:true">
-                        <div class="dropdown-menu" [sqxAnchoredTo]="buttonSelect" [scrollY]="true" @fade>
+                        <sqx-dropdown-menu [sqxAnchoredTo]="buttonSelect" [scrollY]="true">
                             <a class="dropdown-item" *ngFor="let schema of schemasList" (click)="addComponent(schema)">
                                 {{schema.displayName}}
                             </a>
-                        </div>
+                        </sqx-dropdown-menu>
                     </ng-container>
                 </ng-container>
                 <ng-container *ngIf="schemasList.length === 1">

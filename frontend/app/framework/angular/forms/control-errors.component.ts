@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
-import { fadeAnimation, LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
+import { LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
 import { touchedChange$ } from './forms-helper';
 import { formatError } from './error-formatting';
@@ -21,9 +21,6 @@ interface State {
     selector: 'sqx-control-errors[for]',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
@@ -113,6 +110,10 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
                     }
                 }
             }
+        }
+
+        if (errorMessages.length === 0 && this.snapshot.errorMessages.length === 0) {
+            return;
         }
 
         this.next({ errorMessages });

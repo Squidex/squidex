@@ -6,8 +6,8 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, fadeAnimation, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ArrayItemComponent } from './array-item.component';
@@ -17,11 +17,8 @@ import { ArrayItemComponent } from './array-item.component';
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [
-        fadeAnimation,
-    ],
 })
-export class ArrayEditorComponent implements OnChanges {
+export class ArrayEditorComponent implements OnChanges, OnInit {
     @Input()
     public form: EditContentForm;
 
@@ -65,6 +62,10 @@ export class ArrayEditorComponent implements OnChanges {
     ) {
     }
 
+    public ngOnInit() {
+        this.isCollapsedInitial = this.formLevel > 0;
+    }
+
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
             const maxItems = this.formModel.field.properties['maxItems'] || Number.MAX_VALUE;
@@ -84,7 +85,9 @@ export class ArrayEditorComponent implements OnChanges {
                 return disabled || items.length >= maxItems;
             }));
 
-            this.isCollapsedInitial = this.formLevel > 0 || this.localStore.getBoolean(this.expandedKey());
+            if (this.formLevel === 0) {
+                this.isCollapsedInitial = this.localStore.getBoolean(this.expandedKey());
+            }
         }
     }
 
@@ -125,7 +128,9 @@ export class ArrayEditorComponent implements OnChanges {
             child.collapse();
         });
 
-        this.localStore.setBoolean(this.expandedKey(), true);
+        if (this.formLevel === 0) {
+            this.localStore.setBoolean(this.expandedKey(), true);
+        }
     }
 
     public expandAll() {
@@ -133,7 +138,9 @@ export class ArrayEditorComponent implements OnChanges {
             child.expand();
         });
 
-        this.localStore.setBoolean(this.expandedKey(), false);
+        if (this.formLevel === 0) {
+            this.localStore.setBoolean(this.expandedKey(), false);
+        }
     }
 
     private reset() {

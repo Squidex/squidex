@@ -5,7 +5,7 @@
                 <i class="icon-close"></i>
             </span>
 
-            <div [innerHTML]="error | sqxTranslate | sqxMarkdown"></div>
+            <div [innerHTML]="error | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
         </div>
     </div>
 </ng-container>

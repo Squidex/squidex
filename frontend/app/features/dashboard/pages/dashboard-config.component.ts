@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppDto, AppsState, AuthService, DialogModel, DialogService, fadeAnimation, LocalizerService, ModalModel, Types, UIState } from '@app/shared';
+import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, Types, UIState } from '@app/shared';
 import { GridsterItem } from 'angular-gridster2';
 import { take } from 'rxjs/operators';
 
@@ -14,9 +14,6 @@ import { take } from 'rxjs/operators';
     selector: 'sqx-dashboard-config',
     styleUrls: ['./dashboard-config.component.scss'],
     templateUrl: './dashboard-config.component.html',
-    animations: [
-        fadeAnimation,
-    ],
 })
 export class DashboardConfigComponent implements OnChanges {
     @Input()

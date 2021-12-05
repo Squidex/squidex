@@ -10,7 +10,7 @@
                     <div class="user-ref">{{comment.user | sqxUserNameRef}}</div>
                 </div>
     
-                <div [innerHTML]="comment.text | sqxMarkdown"></div>
+                <div [innerHTML]="comment.text | sqxMarkdown | sqxSafeHtml"></div>
     
                 <div class="comment-created text-muted">
                     <ng-container *ngIf="canFollow && comment.url">
