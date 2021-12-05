@@ -51,6 +51,8 @@
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.RulesetToEditorconfigConverter" Version="3.3.3" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.5" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.14.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.14.1" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.9.4" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="3.5.1" />
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.5.1" />
