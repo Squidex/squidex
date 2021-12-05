@@ -49,6 +49,11 @@ namespace Squidex.Infrastructure
             return value.ToHashed(SHA256.Create());
         }
 
+        public static string ToSha512(this string value)
+        {
+            return value.ToHashed(SHA512.Create());
+        }
+
         public static string ToSha256(this byte[] bytes)
         {
             return bytes.ToHashed(SHA256.Create());

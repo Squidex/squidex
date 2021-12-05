@@ -28,6 +28,18 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         };
 
+        private readonly Func<string, JsValue> sha512 = (text) =>
+        {
+            try
+            {
+                return text.ToSha512();
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
+        };
+
         private readonly Func<string, JsValue> md5 = (text) =>
         {
             try
@@ -100,13 +112,21 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             }
         };
 
+        private readonly Func<string> guid = () =>
+        {
+            return Guid.NewGuid().ToString();
+        };
+
         public Func<string, JsValue> Html2Text => html2Text;
 
         public void Extend(Engine engine)
         {
             engine.SetValue("slugify", slugify);
 
+            engine.SetValue("guid", guid);
+
             engine.SetValue("sha256", sha256);
+            engine.SetValue("sha512", sha512);
             engine.SetValue("md5", md5);
 
             engine.SetValue("toCamelCase", toCamelCase);

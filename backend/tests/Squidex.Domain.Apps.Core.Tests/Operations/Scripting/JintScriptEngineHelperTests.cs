@@ -198,6 +198,23 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
+        public void Should_compute_sha512_hash()
+        {
+            const string script = @"
+                return sha512(value);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["value"] = "HelloWorld"
+            };
+
+            var result = sut.Execute(vars, script).ToString();
+
+            Assert.Equal("HelloWorld".ToSha512(), result);
+        }
+
+        [Fact]
         public void Should_compute_md5_hash()
         {
             const string script = @"
@@ -212,6 +229,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var result = sut.Execute(vars, script).ToString();
 
             Assert.Equal("HelloWorld".ToMD5(), result);
+        }
+
+        [Fact]
+        public void Should_compute_guid()
+        {
+            const string script = @"
+                return guid();
+            ";
+
+            var vars = new ScriptVars
+            {
+            };
+
+            var result = sut.Execute(vars, script).ToString();
+
+            Assert.True(Guid.TryParse(result, out _));
         }
 
         [Fact]
