@@ -12,8 +12,11 @@ import { map } from 'rxjs/operators';
 import { ComponentSectionComponent } from './component-section.component';
 
 interface State {
-    // The when the section is collapsed.
-    isCollapsed: boolean;
+    // True when the item is expanded.
+    isExpanded: boolean;
+
+    // True when the item is expanded at least once.
+    isExpandedOnce: boolean;
 }
 
 @Component({
@@ -80,12 +83,15 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     constructor(changeDetector: ChangeDetectorRef,
     ) {
         super(changeDetector, {
-            isCollapsed: false,
+            isExpanded: false,
+            isExpandedOnce: false,
         });
     }
 
     public ngOnInit() {
-        this.next({ isCollapsed: this.isCollapsedInitial });
+        if (!this.isCollapsedInitial) {
+            this.expand();
+        }
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -103,11 +109,11 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     }
 
     public collapse() {
-        this.next({ isCollapsed: true });
+        this.next({ isExpanded: false });
     }
 
     public expand() {
-        this.next({ isCollapsed: false });
+        this.next({ isExpanded: true, isExpandedOnce: true });
     }
 
     public moveTop() {
