@@ -54,7 +54,7 @@ namespace Squidex.Extensions.APM.Stackdriver
         {
             try
             {
-                if (exception != null && exception is not DomainException)
+                if (exception != null && exception is not DomainException && exception is not OperationCanceledException)
                 {
                     logger.Log(exception, httpContextWrapper);
                 }
