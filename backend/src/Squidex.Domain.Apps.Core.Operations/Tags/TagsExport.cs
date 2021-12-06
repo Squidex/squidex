@@ -7,9 +7,9 @@
 
 namespace Squidex.Domain.Apps.Core.Tags
 {
-    public class TagsExport
+    public sealed class TagsExport
     {
-        public Dictionary<string, Tag> Tags { get; set; }
+        public Dictionary<string, Tag>? Tags { get; set; }
 
         public Dictionary<string, string>? Alias { get; set; }
 
@@ -22,7 +22,12 @@ namespace Squidex.Domain.Apps.Core.Tags
                 alias = new Dictionary<string, string>(Alias);
             }
 
-            var tags = new Dictionary<string, Tag>(Tags);
+            var tags = (Dictionary<string, Tag>?)null;
+
+            if (Tags != null)
+            {
+                tags = new Dictionary<string, Tag>(Tags);
+            }
 
             return new TagsExport { Alias = alias, Tags = tags };
         }
