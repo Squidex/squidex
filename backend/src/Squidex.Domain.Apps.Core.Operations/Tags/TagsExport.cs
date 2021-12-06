@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Tags
 {
-    public sealed class TagsExport
+    public class TagsExport
     {
         public Dictionary<string, Tag>? Tags { get; set; }
 
