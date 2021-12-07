@@ -75,7 +75,7 @@ class PatternTemplate {
     public static readonly INSTANCE = new PatternTemplate();
 
     public createControl() {
-        return new FormControl({
+        return new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),
@@ -93,7 +93,7 @@ class EditorTemplate {
     public static readonly INSTANCE = new EditorTemplate();
 
     public createControl() {
-        return new FormControl({
+        return new ExtendedFormGroup({
             name: new FormControl('',
                 Validators.required,
             ),
