@@ -69,11 +69,11 @@ namespace Squidex.Infrastructure.Commands
             return (null, false);
         }
 
-        public bool Contains(long version)
+        public bool ContainsThisAndNewer(long version)
         {
             var index = GetIndex(version);
 
-            return items.ElementAtOrDefault(index) != null;
+            return items.Skip(index).All(x => x != null);
         }
 
         public void Add(T snapshot, long version, bool clean = false)

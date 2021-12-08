@@ -44,7 +44,6 @@ namespace Squidex.Infrastructure.EventSourcing
             Guard.NotEmpty(commitId, nameof(commitId));
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
             Guard.NotNull(events, nameof(events));
-            Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
             Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/AppendAsync"))

@@ -67,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
         public BulkUpdateJob ToJob()
         {
-            return SimpleMapper.Map(this, new BulkUpdateJob());
+            return SimpleMapper.Map(this, new BulkUpdateJob { Query = Query });
         }
     }
 }

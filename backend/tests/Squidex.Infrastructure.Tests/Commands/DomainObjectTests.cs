@@ -453,15 +453,18 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new CreateAuto { Value = 3 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 4 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = 5 });
 
             var version_Empty = await sut.GetSnapshotAsync(EtagVersion.Empty);
             var version_0 = await sut.GetSnapshotAsync(0);
             var version_1 = await sut.GetSnapshotAsync(1);
+            var version_2 = await sut.GetSnapshotAsync(2);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(version_Empty, 0, EtagVersion.Empty);
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_2, 5, 2);
 
             A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .MustNotHaveHappened();
@@ -477,18 +480,21 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new CreateAuto { Value = 3 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 4 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = 5 });
 
             var version_Empty = await sut.GetSnapshotAsync(EtagVersion.Empty);
             var version_0 = await sut.GetSnapshotAsync(0);
             var version_1 = await sut.GetSnapshotAsync(1);
+            var version_2 = await sut.GetSnapshotAsync(2);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(version_Empty, 0, EtagVersion.Empty);
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_2, 5, 2);
 
             A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
-                .MustHaveHappened();
+                .MustHaveHappenedOnceExactly();
         }
 
         private static void AssertSnapshot(MyDomainState state, int value, long version, bool isDeleted = false)
