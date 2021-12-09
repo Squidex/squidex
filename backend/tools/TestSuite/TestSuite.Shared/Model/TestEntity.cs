@@ -15,7 +15,7 @@ namespace TestSuite.Model
     {
         public const int ScriptTrigger = -99;
 
-        public static async Task<SchemaDetailsDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
+        public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
         {
             var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
             {

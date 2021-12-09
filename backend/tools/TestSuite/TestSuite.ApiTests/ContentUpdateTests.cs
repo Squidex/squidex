@@ -12,6 +12,7 @@ using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
@@ -693,6 +694,46 @@ namespace TestSuite.ApiTests
             });
 
             Assert.Equal("singleton", content_2.Data["my-field"]["iv"]);
+        }
+
+        [Fact]
+        public async Task Should_get_content_by_version()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, true);
+
+
+                // STEP 2: Update content.
+                content = await _.Contents.UpdateAsync(content.Id, new TestEntityData { Number = 2 });
+
+
+                // STEP 3: Get current version.
+                var content_latest = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, content_latest.Data.Number);
+
+
+                // STEP 4: Get current version.
+                var data_2 = await _.Contents.GetDataAsync(content.Id, content.Version);
+
+                Assert.Equal(2, data_2.Number);
+
+
+                // STEP 4: Get previous version
+                var data_1 = await _.Contents.GetDataAsync(content.Id, content.Version - 1);
+
+                Assert.Equal(1, data_1.Number);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
         }
     }
 }

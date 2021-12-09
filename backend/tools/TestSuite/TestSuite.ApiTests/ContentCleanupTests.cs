@@ -43,7 +43,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Delete a field from schema.
-            await _.Schemas.DeleteFieldAsync(_.AppName, schema.Name, schema.Fields.ElementAt(1).FieldId);
+            await _.Schemas.DeleteFieldAsync(_.AppName, schema.Name, schema.Fields[1].FieldId);
 
 
             // STEP 4: Make any update.
