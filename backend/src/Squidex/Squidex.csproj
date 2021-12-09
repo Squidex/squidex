@@ -58,7 +58,7 @@
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.5.1" />
     <PackageReference Include="Microsoft.Orleans.Hosting.Kubernetes" Version="3.5.1" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.5.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.13.3" />
     <PackageReference Include="Namotion.Reflection" Version="2.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NJsonSchema" Version="10.5.2" />
