@@ -14,13 +14,14 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
-    public sealed class AppWorkflowsTests : IClassFixture<CreatedAppFixture>
+    public sealed class AppWorkflowsTests : IClassFixture<ClientFixture>
     {
+        private readonly string appName = Guid.NewGuid().ToString();
         private readonly string name = Guid.NewGuid().ToString();
 
-        public CreatedAppFixture _ { get; }
+        public ClientFixture _ { get; }
 
-        public AppWorkflowsTests(CreatedAppFixture fixture)
+        public AppWorkflowsTests(ClientFixture fixture)
         {
             _ = fixture;
         }
@@ -29,6 +30,10 @@ namespace TestSuite.ApiTests
         public async Task Should_create_workflow()
         {
             // STEP 0: Create workflow.
+            await CreateAppAsync();
+
+
+            // STEP 1: Create workflow.
             var workflow = await CreateAsync();
 
             Assert.NotNull(workflow);
@@ -39,6 +44,10 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_update_workflow()
         {
+            // STEP 0: Create workflow.
+            await CreateAppAsync();
+
+
             // STEP 0: Create workflow.
             var workflow = await CreateAsync();
 
@@ -61,7 +70,7 @@ namespace TestSuite.ApiTests
                 Name = name
             };
 
-            var workflows_2 = await _.Apps.PutWorkflowAsync(_.AppName, workflow.Id, updateRequest);
+            var workflows_2 = await _.Apps.PutWorkflowAsync(appName, workflow.Id, updateRequest);
             var workflow_2 = workflows_2.Items.Find(x => x.Name == name);
 
             Assert.NotNull(workflow_2);
@@ -73,13 +82,16 @@ namespace TestSuite.ApiTests
         public async Task Should_delete_workflow()
         {
             // STEP 0: Create workflow.
+            await CreateAppAsync();
+
+
+            // STEP 0: Create workflow.
             var workflow = await CreateAsync();
 
 
             // STEP 1: Delete workflow.
-            var workflows_2 = await _.Apps.DeleteWorkflowAsync(_.AppName, workflow.Id);
+            var workflows_2 = await _.Apps.DeleteWorkflowAsync(appName, workflow.Id);
 
-            // Should not return deleted workflow.
             Assert.DoesNotContain(workflows_2.Items, x => x.Name == name);
         }
 
@@ -90,10 +102,20 @@ namespace TestSuite.ApiTests
                 Name = name
             };
 
-            var workflows = await _.Apps.PostWorkflowAsync(_.AppName, createRequest);
+            var workflows = await _.Apps.PostWorkflowAsync(appName, createRequest);
             var workflow = workflows.Items.Find(x => x.Name == name);
 
             return workflow;
+        }
+
+        private async Task CreateAppAsync()
+        {
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
+
+            await _.Apps.PostAppAsync(createRequest);
         }
     }
 }

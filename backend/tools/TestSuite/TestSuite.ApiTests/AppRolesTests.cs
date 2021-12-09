@@ -31,7 +31,7 @@ namespace TestSuite.ApiTests
         public async Task Should_create_role()
         {
             // STEP 1: Add role.
-            var role = await CreateRoleAsync();
+            var role = await CreateRoleAsync(roleName);
 
             // Should return role with correct name.
             Assert.Empty(role.Permissions);
@@ -51,7 +51,7 @@ namespace TestSuite.ApiTests
         public async Task Should_update_role()
         {
             // STEP 1: Add role.
-            var role = await CreateRoleAsync();
+            var role = await CreateRoleAsync(roleName);
 
 
             // STEP 2: Update role.
@@ -71,7 +71,7 @@ namespace TestSuite.ApiTests
         public async Task Should_prevent_deletion_if_client_assigned()
         {
             // STEP 1: Add role.
-            var role = await CreateRoleAsync();
+            var role = await CreateRoleAsync(roleName);
 
 
             // STEP 2 Assign client and contributor.
@@ -108,7 +108,7 @@ namespace TestSuite.ApiTests
         public async Task Should_prevent_deletion_if_contributor_assigned()
         {
             // STEP 1: Add role.
-            var role = await CreateRoleAsync();
+            var role = await CreateRoleAsync(roleName);
 
 
             // STEP 2 Assign contributor.
@@ -159,11 +159,11 @@ namespace TestSuite.ApiTests
             await _.Apps.PutClientAsync(_.AppName, client, updateRequest);
         }
 
-        private async Task<RoleDto> CreateRoleAsync(string name = null)
+        private async Task<RoleDto> CreateRoleAsync(string name)
         {
             var createRequest = new AddRoleDto
             {
-                Name = name ?? roleName
+                Name = name
             };
 
             var roles = await _.Apps.PostRoleAsync(_.AppName, createRequest);

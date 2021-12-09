@@ -149,7 +149,6 @@ namespace TestSuite.ApiTests
             // Fallback language must be removed.
             Assert.Empty(language_2_IT.Fallback);
 
-            // Language is actually removed.
             Assert.Equal(new string[] { "en", "it" }, languages_2.Items.Select(x => x.Iso2Code).ToArray());
         }
 
