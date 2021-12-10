@@ -209,21 +209,21 @@ namespace Squidex.Web
         {
             if (app == Permission.Any)
             {
-                var falback = App;
+                var fallback = App;
 
-                if (!string.IsNullOrWhiteSpace(falback))
+                if (!string.IsNullOrWhiteSpace(fallback))
                 {
-                    app = falback;
+                    app = fallback;
                 }
             }
 
             if (schema == Permission.Any)
             {
-                var falback = Controller.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
+                var fallback = Controller.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
 
-                if (!string.IsNullOrWhiteSpace(falback))
+                if (!string.IsNullOrWhiteSpace(fallback))
                 {
-                    schema = falback;
+                    schema = fallback;
                 }
             }
 

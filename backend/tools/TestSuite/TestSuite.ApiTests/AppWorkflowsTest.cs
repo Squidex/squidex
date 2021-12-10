@@ -29,7 +29,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_create_workflow()
         {
-            // STEP 0: Create workflow.
+            // STEP 0: Create app.
             await CreateAppAsync();
 
 
@@ -44,7 +44,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_update_workflow()
         {
-            // STEP 0: Create workflow.
+            // STEP 0: Create app.
             await CreateAppAsync();
 
 
@@ -81,7 +81,7 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_delete_workflow()
         {
-            // STEP 0: Create workflow.
+            // STEP 0: Create app.
             await CreateAppAsync();
 
 
