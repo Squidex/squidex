@@ -135,7 +135,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var tags = await tagService.GetExportableTagsAsync(context.AppId, TagGroups.Assets);
 
-            await context.Writer.WriteJsonAsync(TagsFile, tags.Tags, ct);
+            if (tags.Tags != null)
+            {
+                await context.Writer.WriteJsonAsync(TagsFile, tags.Tags, ct);
+            }
 
             if (tags.Alias?.Count > 0)
             {
