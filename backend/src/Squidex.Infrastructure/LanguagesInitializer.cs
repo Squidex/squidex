@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
                 {
                     if (!Language.TryGetLanguage(key, out _))
                     {
-                        Language.AddLanguage(key, value);
+                        Language.AddLanguage(key, value, value);
                     }
                 }
             }

@@ -25,6 +25,12 @@ namespace Squidex.Areas.Api.Controllers
         [LocalizedRequired]
         public string EnglishName { get; set; }
 
+        /// <summary>
+        /// The native name of the language.
+        /// </summary>
+        [LocalizedRequired]
+        public string NativeName { get; set; }
+
         public static LanguageDto FromLanguage(Language language)
         {
             return SimpleMapper.Map(language, new LanguageDto());
