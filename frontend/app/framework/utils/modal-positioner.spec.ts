@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computeAnchors, PositionRequest, SimplePosition } from '@app/shared';
-import { positionModal } from './modal-positioner';
+import { computeAnchors, positionModal, PositionRequest, SimplePosition } from './modal-positioner';
 
 describe('position', () => {
     function buildRect(x: number, y: number, w: number, h: number): any {
