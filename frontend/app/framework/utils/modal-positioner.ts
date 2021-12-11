@@ -5,7 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export type RelativePosition =
+import { Types } from './types';
+
+export type AnchorX =
+    'center' |
+    'left-to-right' |
+    'left-to-left' |
+    'right-to-left' |
+    'right-to-right';
+export type AnchorY =
+    'bottom-to-bottom' |
+    'bottom-to-top' |
+    'center' |
+    'top-to-bottom' |
+    'top-to-top';
+
+export type RelativePosition = SimplePosition | [AnchorX, AnchorY];
+
+export type SimplePosition =
     'bottom-center' |
     'bottom-left' |
     'bottom-right' |
@@ -19,151 +36,208 @@ export type RelativePosition =
     'top-left' |
     'top-right';
 
-const POSITION_BOTTOM_CENTER = 'bottom-center';
-const POSITION_BOTTOM_LEFT = 'bottom-left';
-const POSITION_BOTTOM_RIGHT = 'bottom-right';
-const POSITION_LEFT_BOTTOM = 'left-bottom';
-const POSITION_LEFT_CENTER = 'left-center';
-const POSITION_LEFT_TOP = 'left-top';
-const POSITION_RIGHT_BOTTOM = 'right-bottom';
-const POSITION_RIGHT_CENTER = 'right-center';
-const POSITION_RIGHT_TOP = 'right-top';
-const POSITION_TOP_CENTER = 'top-center';
-const POSITION_TOP_LEFT = 'top-left';
-const POSITION_TOP_RIGHT = 'top-right';
+export function computeAnchors(value: RelativePosition): [AnchorX, AnchorY] {
+    if (Types.isArray(value)) {
+        return value;
+    }
+
+    switch (value) {
+        case 'bottom-center':
+            return ['center', 'top-to-bottom'];
+        case 'bottom-left':
+            return ['left-to-left', 'top-to-bottom'];
+        case 'bottom-right':
+            return ['right-to-right', 'top-to-bottom'];
+        case 'left-bottom':
+            return ['right-to-left', 'bottom-to-bottom'];
+        case 'left-center':
+            return ['right-to-left', 'center'];
+        case 'left-top':
+            return ['right-to-left', 'top-to-top'];
+        case 'right-bottom':
+            return ['left-to-right', 'bottom-to-bottom'];
+        case 'right-center':
+            return ['left-to-right', 'center'];
+        case 'right-top':
+            return ['left-to-right', 'top-to-top'];
+        case 'top-center':
+            return ['center', 'bottom-to-top'];
+        case 'top-left':
+            return ['left-to-left', 'bottom-to-top'];
+        case 'top-right':
+            return ['right-to-right', 'bottom-to-top'];
+        default:
+            return ['center', 'center'];
+    }
+}
 
 export type PositionResult = {
+    height?: number;
+    maxHeight: number;
+    maxWidth: number;
+    width?: number;
     x: number;
     y: number;
-    xMax: number;
-    yMax: number;
 };
 
-export function positionModal(targetRect: DOMRect, modalRect: DOMRect, relativePosition: RelativePosition, offset: number, fix: boolean, clientWidth: number, clientHeight: number): PositionResult {
-    let y = 0;
+export type PositionRequest = {
+    adjust?: boolean;
+    anchorX: AnchorX;
+    anchorY: AnchorY;
+    clientHeight: number;
+    clientWidth: number;
+    computeHeight?: boolean;
+    computeWidth?: boolean;
+    modalRect: DOMRect;
+    offsetX?: number;
+    offsetY?: number;
+    spaceX?: number;
+    spaceY?: number;
+    targetRect: DOMRect;
+};
+
+export function positionModal(request: PositionRequest): PositionResult {
+    const {
+        adjust,
+        anchorX,
+        anchorY,
+        clientHeight,
+        clientWidth,
+        computeHeight,
+        computeWidth,
+        modalRect,
+        offsetX,
+        offsetY,
+        spaceX,
+        spaceY,
+        targetRect,
+    } = request;
+
+    const actualOffsetX = offsetX || 0;
+    const actualOffsetY = offsetY || 0;
+
+    let height = 0;
+    let maxHeight = 0;
+    let maxWidth = 0;
+    let width = 0;
     let x = 0;
+    let y = 0;
 
-    // Available space in x/y direction.
-    let xMax = 0;
-    let yMax = 0;
-
-    switch (relativePosition) {
-        case POSITION_LEFT_TOP:
-        case POSITION_RIGHT_TOP: {
-            y = targetRect.top;
+    switch (anchorY) {
+        case 'center':
+            y = targetRect.top + targetRect.height * 0.5 - modalRect.height * 0.5;
+            break;
+        case 'top-to-top': {
+            y = targetRect.top + actualOffsetY;
             break;
         }
-        case POSITION_LEFT_BOTTOM:
-        case POSITION_RIGHT_BOTTOM: {
-            y = targetRect.bottom - modalRect.height;
-            break;
-        }
-        case POSITION_BOTTOM_CENTER:
-        case POSITION_BOTTOM_LEFT:
-        case POSITION_BOTTOM_RIGHT: {
-            y = targetRect.bottom + offset;
+        case 'top-to-bottom': {
+            y = targetRect.bottom + actualOffsetY;
 
-            yMax = clientHeight - y;
-            // Unset yMax if we have enough space.
-            if (modalRect.height <= yMax) {
-                yMax = 0;
-            } else if (fix) {
+            maxHeight = clientHeight - y;
+
+            if (modalRect.height <= maxHeight) {
+                // Unset maxHeight if we have enough space.
+                maxHeight = 0;
+            } else if (adjust) {
                 // Find a position at the other side of the rect (top).
-                const candidate = targetRect.top - modalRect.height - offset;
+                const candidate = targetRect.top - modalRect.height - actualOffsetY;
 
                 if (candidate > 0) {
                     y = candidate;
-                    // Reset space to zero (full space), becuase we fix only if we have the space.
-                    yMax = 0;
+                    // Reset space to zero (full space), because we fix only if we have the space.
+                    maxHeight = 0;
                 }
             }
             break;
         }
-        case POSITION_TOP_CENTER:
-        case POSITION_TOP_LEFT:
-        case POSITION_TOP_RIGHT: {
-            y = targetRect.top - modalRect.height - offset;
+        case 'bottom-to-bottom': {
+            y = targetRect.bottom - modalRect.height - actualOffsetY;
+            break;
+        }
+        case 'bottom-to-top': {
+            y = targetRect.top - modalRect.height - actualOffsetY;
 
-            yMax = targetRect.top - offset;
-            // Unset yMax if we have enough space.
-            if (modalRect.height <= yMax) {
-                yMax = 0;
-            } else if (fix) {
+            maxHeight = targetRect.top - actualOffsetY;
+
+            if (modalRect.height <= maxHeight) {
+                // Unset maxHeight if we have enough space.
+                maxHeight = 0;
+            } else if (adjust) {
                 // Find a position at the other side of the rect (bottom).
-                const candidate = targetRect.bottom + offset;
+                const candidate = targetRect.bottom + actualOffsetY;
 
                 if (candidate + modalRect.height < clientHeight) {
                     y = candidate;
-                    // Reset space to zero (full space), becuase we fix only if we have the space.
-                    yMax = 0;
+                    // Reset space to zero (full space), because we fix only if we have the space.
+                    maxHeight = 0;
                 }
             }
             break;
         }
-        case POSITION_LEFT_CENTER:
-        case POSITION_RIGHT_CENTER:
-            y = targetRect.top + targetRect.height * 0.5 - modalRect.height * 0.5;
-            break;
     }
 
-    switch (relativePosition) {
-        case POSITION_TOP_LEFT:
-        case POSITION_BOTTOM_LEFT: {
-            x = targetRect.left;
+    switch (anchorX) {
+        case 'center':
+            x = targetRect.left + targetRect.width * 0.5 - modalRect.width * 0.5;
+            break;
+        case 'left-to-left': {
+            x = targetRect.left + actualOffsetX;
             break;
         }
-        case POSITION_TOP_RIGHT:
-        case POSITION_BOTTOM_RIGHT: {
-            x = targetRect.right - modalRect.width;
-            break;
-        }
-        case POSITION_RIGHT_CENTER:
-        case POSITION_RIGHT_TOP:
-        case POSITION_RIGHT_BOTTOM: {
-            x = targetRect.right + offset;
+        case 'left-to-right': {
+            x = targetRect.right + actualOffsetX;
 
-            xMax = clientWidth - x;
-            // Unset xMax if we have enough space.
-            if (modalRect.width <= xMax) {
-                xMax = 0;
-            } else if (fix) {
+            maxWidth = clientWidth - x;
+
+            if (modalRect.width <= maxWidth) {
+                // Unset maxWidth if we have enough space.
+                maxWidth = 0;
+            } else if (adjust) {
                 // Find a position at the other side of the rect (left).
-                const candidate = targetRect.left - modalRect.width - offset;
+                const candidate = targetRect.left - modalRect.width - actualOffsetX;
 
                 if (candidate > 0) {
                     x = candidate;
-                    // Reset space to zero (full space), becuase we fix only if we have the space.
-                    xMax = 0;
+                    // Reset space to zero (full space), because we fix only if we have the space.
+                    maxWidth = 0;
                 }
             }
             break;
         }
-        case POSITION_LEFT_CENTER:
-        case POSITION_LEFT_TOP:
-        case POSITION_LEFT_BOTTOM: {
-            x = targetRect.left - modalRect.width - offset;
+        case 'right-to-right': {
+            x = targetRect.right - modalRect.width - actualOffsetX;
+            break;
+        }
+        case 'right-to-left': {
+            x = targetRect.left - modalRect.width - actualOffsetX;
 
-            xMax = targetRect.left - offset;
-            // Unset xMax if we have enough space.
-            if (modalRect.width <= xMax) {
-                xMax = 0;
-            } else if (fix) {
+            maxWidth = targetRect.left - actualOffsetX;
+
+            if (modalRect.width <= maxWidth) {
+                // Unset maxWidth if we have enough space.
+                maxWidth = 0;
+            } else if (adjust) {
                 // Find a position at the other side of the rect (right).
-                const candidate = targetRect.right + offset;
+                const candidate = targetRect.right + actualOffsetX;
 
                 if (candidate + modalRect.width < clientWidth) {
                     x = candidate;
-                    // Reset space to zero (full space), becuase we fix only if we have the space.
-                    xMax = 0;
+                    // Reset space to zero (full space), because we fix only if we have the space.
+                    maxWidth = 0;
                 }
             }
             break;
         }
-        case POSITION_TOP_CENTER:
-        case POSITION_BOTTOM_CENTER:
-            x = targetRect.left + targetRect.width * 0.5 - modalRect.width * 0.5;
-            break;
     }
 
-    return { x, y, xMax, yMax };
+    if (computeWidth) {
+        width = targetRect.width + 2 * (spaceX || 0);
+    }
+
+    if (computeHeight) {
+        height = targetRect.height + 2 * (spaceY || 0);
+    }
+
+    return { x, y, maxWidth, maxHeight, width, height };
 }

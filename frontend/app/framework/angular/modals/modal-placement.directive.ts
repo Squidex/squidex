@@ -6,8 +6,7 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, Renderer2 } from '@angular/core';
-import { positionModal, ResourceOwner } from '@app/framework/internal';
-import { RelativePosition } from '@app/shared';
+import { AnchorX, AnchorY, computeAnchors, positionModal, PositionRequest, RelativePosition, ResourceOwner } from '@app/framework/internal';
 import { timer } from 'rxjs';
 
 @Directive({
@@ -25,16 +24,35 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
 
             if (element) {
                 this.listenToElement(element);
-                this.updatePosition();
             }
+
+            this.updatePosition();
         }
     }
 
     @Input()
-    public offset = 2;
+    public offsetX = 0;
 
     @Input()
-    public position: RelativePosition | 'full' = 'bottom-right';
+    public offsetY = 2;
+
+    @Input()
+    public spaceX = 0;
+
+    @Input()
+    public spaceY = 0;
+
+    @Input()
+    public anchorX: AnchorX = 'right-to-right';
+
+    @Input()
+    public anchorY: AnchorY = 'top-to-bottom';
+
+    @Input()
+    public adjustWidth = false;
+
+    @Input()
+    public adjustHeight = false;
 
     @Input()
     public scrollX = false;
@@ -47,6 +65,14 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
 
     @Input()
     public update = true;
+
+    @Input()
+    public set position(value: RelativePosition) {
+        const [anchorX, anchorY] = computeAnchors(value);
+
+        this.anchorX = anchorX;
+        this.anchorY = anchorY;
+    }
 
     constructor(
         private readonly renderer: Renderer2,
@@ -94,59 +120,69 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         const modalRef = this.element.nativeElement;
         const modalRect = this.element.nativeElement.getBoundingClientRect();
 
-        if ((modalRect.width === 0 || modalRect.height === 0) && this.position !== 'full') {
+        if ((modalRect.width === 0 && !this.adjustWidth) || (modalRect.height === 0 && !this.adjustHeight)) {
             return;
         }
 
         const targetRect = this.targetElement.getBoundingClientRect();
 
-        let y: number;
-        let x: number;
-
-        if (this.position === 'full') {
-            x = -this.offset + targetRect.left;
-            y = -this.offset + targetRect.top;
-
-            const w = 2 * this.offset + targetRect.width;
-            const h = 2 * this.offset + targetRect.height;
-
-            this.renderer.setStyle(modalRef, 'width', `${w}px`);
-            this.renderer.setStyle(modalRef, 'height', `${h}px`);
-        } else {
-            if (this.scrollX) {
-                modalRect.width = modalRef.scrollWidth;
-            }
-
-            if (this.scrollY) {
-                modalRect.height = modalRef.scrollHeight;
-            }
-
-            const viewportHeight = document.documentElement!.clientHeight;
-            const viewportWidth = document.documentElement!.clientWidth;
-
-            const position = positionModal(targetRect, modalRect, this.position, this.offset, this.update, viewportWidth, viewportHeight);
-
-            x = position.x;
-            y = position.y;
-
-            if (this.scrollX) {
-                const maxWidth = position.xMax > 0 ? `${position.xMax - 10}px` : 'none';
-
-                this.renderer.setStyle(modalRef, 'overflow-x', 'auto');
-                this.renderer.setStyle(modalRef, 'max-width', maxWidth);
-                this.renderer.setStyle(modalRef, 'min-width', 0);
-            }
-
-            if (this.scrollY) {
-                const maxHeight = position.yMax > 0 ? `${position.yMax - 10}px` : 'none';
-
-                this.renderer.setStyle(modalRef, 'overflow-y', 'auto');
-                this.renderer.setStyle(modalRef, 'max-height', maxHeight);
-                this.renderer.setStyle(modalRef, 'min-height', 0);
-            }
+        if (this.scrollX) {
+            modalRect.width = modalRef.scrollWidth;
         }
 
-        this.renderer.setStyle(modalRef, 'top', `${y}px`);
-        this.renderer.setStyle(modalRef, 'left', `${x}px`);
+        if (this.scrollY) {
+            modalRect.height = modalRef.scrollHeight;
+        }
+
+        const clientHeight = document.documentElement!.clientHeight;
+        const clientWidth = document.documentElement!.clientWidth;
+
+        const request: PositionRequest = {
+            adjust: this.update,
+            anchorX: this.anchorX,
+            anchorY: this.anchorY,
+            clientHeight,
+            clientWidth,
+            computeHeight: this.adjustHeight,
+            computeWidth: this.adjustWidth,
+            modalRect,
+            offsetX: this.offsetX,
+            offsetY: this.offsetY,
+            targetRect,
+        };
+
+        const position = positionModal(request);
+
+        if (this.scrollX) {
+            const maxWidth = position.maxWidth > 0 ? `${position.maxWidth - this.scrollMargin}px` : 'none';
+
+            this.renderer.setStyle(modalRef, 'overflow-x', 'auto');
+            this.renderer.setStyle(modalRef, 'overflow-y', 'none');
+            this.renderer.setStyle(modalRef, 'max-width', maxWidth);
+        }
+
+        if (this.scrollY) {
+            const maxHeight = position.maxHeight > 0 ? `${position.maxHeight - this.scrollMargin}px` : 'none';
+
+            this.renderer.setStyle(modalRef, 'overflow-x', 'none');
+            this.renderer.setStyle(modalRef, 'overflow-y', 'auto');
+            this.renderer.setStyle(modalRef, 'max-height', maxHeight);
+        }
+
+        if (position.width) {
+            this.renderer.setStyle(modalRef, 'width', `${position.width}px`);
+        }
+
+        if (position.height) {
+            this.renderer.setStyle(modalRef, 'height', `${position.height}px`);
+        }
+
+        if (position.x) {
+            this.renderer.setStyle(modalRef, 'left', `${position.x}px`);
+        }
+
+        if (position.y) {
+            this.renderer.setStyle(modalRef, 'top', `${position.y}px`);
+        }
     }
 }
