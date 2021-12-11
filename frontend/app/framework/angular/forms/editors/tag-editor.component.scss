@@ -24,6 +24,7 @@ $inner-height: 1.75rem;
     position: relative;
     text-align: left;
     text-decoration: none;
+    user-select: none;
 
     &.suggested {
         padding-right: 2rem;

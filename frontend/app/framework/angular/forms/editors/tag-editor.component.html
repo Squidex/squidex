@@ -1,5 +1,7 @@
 <div class="form-container">
-    <div class="form-control tags" #form (click)="input.focus()"
+    <div class="form-control tags" tabindex="0" #form 
+        (mousedown)="focusInput($event)"
+        (focus)="focusInput($event)"
         [class.blank]="styleBlank" 
         [class.singleline]="singleLine"
         [class.readonly]="readonly"
@@ -8,7 +10,6 @@
         [class.focus]="snapshot.hasFocus" 
         [class.disabled]="snapshot.isDisabled"
         [class.dashed]="dashed && !(snapshot.items.length > 0)">
-
         <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
             {{item}} <i class="icon-close" (click)="remove(i)"></i>
         </span>
@@ -30,10 +31,11 @@
 
     <ng-container *sqxModal="snapshot.suggestedItems.length > 0">
         <sqx-dropdown-menu class="control-dropdown" 
-            [sqxAnchoredTo]="input"
-            [offsetX]="-8"
-            [offsetY]="6"
+            [sqxAnchoredTo]="form"
+            [adjustWidth]="true"
+            [adjustHeight]="false"
             [scrollY]="true" 
+            [style.minWidth]="dropdownWidth"
             position="bottom-left" #container>
             <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
@@ -47,9 +49,14 @@
         </sqx-dropdown-menu>
     </ng-container>
 
-    <ng-container *ngIf="allowOpen || suggestionsSorted.length > 0">
+    <ng-container *ngIf="allowOpen && suggestionsSorted.length > 0">
         <ng-container *sqxModal="suggestionsModal">
-            <sqx-dropdown-menu class="control-dropdown suggestions-dropdown" [sqxAnchoredTo]="form" position="bottom-left">
+            <sqx-dropdown-menu class="control-dropdown suggestions-dropdown"
+                [sqxAnchoredTo]="form"
+                [adjustWidth]="false"
+                [adjustHeight]="false"
+                [scrollY]="true" 
+                position="bottom-left">
                 <div class="row">
                     <div class=" col-6" *ngFor="let item of suggestionsSorted; let i = index">
                         <div class="form-check form-check">
@@ -58,7 +65,7 @@
                                 (ngModelChange)="toggleValue($event, item)"
                             />
 
-                            <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" [titlePosition]="['left-to-left', 'bottom-to-top']">
+                            <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
                                 <span class="truncate">{{item.name}}</span>
                             </label>
                         </div>
