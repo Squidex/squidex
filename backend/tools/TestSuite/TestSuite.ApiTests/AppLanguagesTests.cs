@@ -42,6 +42,22 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_add_custom_language()
+        {
+            // STEP 0: Add app.
+            await CreateAppAsync();
+
+
+            // STEP 1: Add languages.
+            await AddLanguageAsync("abc");
+            await AddLanguageAsync("xyz");
+
+            var languages_1 = await _.Apps.GetLanguagesAsync(appName);
+
+            Assert.Equal(new string[] { "en", "abc", "xyz" }, languages_1.Items.Select(x => x.Iso2Code).ToArray());
+        }
+
+        [Fact]
         public async Task Should_update_language()
         {
             // STEP 0: Add app.
