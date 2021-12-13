@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_upsert_content_with_with_resolved_id()
+        public async Task Should_upsert_content_with_resolved_id()
         {
             var requestContext = SetupContext(Permissions.AppContentsUpsert);
 
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
-        public async Task Should_upsert_content_with_with_resolved_ids()
+        public async Task Should_upsert_content_with_resolved_ids()
         {
             var requestContext = SetupContext(Permissions.AppContentsUpsert);
 
@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             SetupContext(Permissions.AppContentsUpsert);
 
-            var (_, data, query) = CreateTestData(false);
+            var (_, data, query) = CreateTestData(true);
 
             var command = BulkCommand(BulkUpdateContentType.Upsert, query: query, data: data);
 

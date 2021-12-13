@@ -308,6 +308,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     throw new DomainException(T.Get("contents.bulkInsertQueryNotUnique"));
                 }
 
+                if (existing.Count == 0 && task.CommandJob.Type == BulkUpdateContentType.Upsert)
+                {
+                    return new[] { DomainId.NewGuid() };
+                }
+
                 return existing.Select(x => x.Id).ToArray();
             }
 
