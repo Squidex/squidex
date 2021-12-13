@@ -27,9 +27,27 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_throw_exception_if_getting_by_unsupported_language()
+        public void Should_provide_custom_language()
         {
-            Assert.Throws<NotSupportedException>(() => Language.GetLanguage("xy"));
+            var result = Language.GetLanguage("xy");
+
+            Assert.Equal("xy", result.Iso2Code);
+        }
+
+        [Fact]
+        public void Should_trim_custom_language()
+        {
+            var result = Language.GetLanguage("xy ");
+
+            Assert.Equal("xy", result.Iso2Code);
+        }
+
+        [Fact]
+        public void Should_provide_default_language()
+        {
+            var result = Language.GetLanguage("de");
+
+            Assert.Same(Language.DE, result);
         }
 
         [Fact]
@@ -39,15 +57,15 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_return_true_for_valid_language()
+        public void Should_return_true_for_default_language()
         {
-            Assert.True(Language.IsValidLanguage("de"));
+            Assert.True(Language.IsDefault("de"));
         }
 
         [Fact]
-        public void Should_return_false_for_invalid_language()
+        public void Should_return_false_for_custom_language()
         {
-            Assert.False(Language.IsValidLanguage("xx"));
+            Assert.False(Language.IsDefault("xx"));
         }
 
         [Fact]

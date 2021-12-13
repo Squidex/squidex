@@ -95,6 +95,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public inputName = 'tag-editor';
 
     @Input()
+    public dropdownWidth = '18rem';
+
+    @Input()
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
@@ -414,6 +417,12 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         this.blur.next(true);
 
         super.callTouched();
+    }
+
+    public focusInput(event: Event) {
+        this.inputElement.nativeElement.focus();
+
+        event?.preventDefault();
     }
 
     public onCut(event: ClipboardEvent) {

@@ -122,8 +122,8 @@ export class LanguagesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public add(language: LanguageDto): Observable<any> {
-        return this.appLanguagesService.postLanguage(this.appName, { language: language.iso2Code }, this.version).pipe(
+    public add(language: string): Observable<any> {
+        return this.appLanguagesService.postLanguage(this.appName, { language }, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceLanguages(payload, version);
             }),

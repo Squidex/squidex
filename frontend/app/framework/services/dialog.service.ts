@@ -61,7 +61,7 @@ export class Tooltip {
     constructor(
         public readonly target: any,
         public readonly text: string | null | undefined,
-        public readonly position: RelativePosition,
+        public readonly textPosition: RelativePosition,
         public readonly multiple?: boolean,
         public readonly shortcut?: string,
     ) {

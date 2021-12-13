@@ -20,12 +20,12 @@ namespace Squidex.Infrastructure
         {
             Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
 
-            if (!LanguageByCode.TryGetValue(iso2Code, out var result))
+            if (LanguageByCode.TryGetValue(iso2Code, out var result))
             {
-                throw new NotSupportedException($"Language {iso2Code} is not supported");
+                return result;
             }
 
-            return result;
+            return new Language(iso2Code.Trim());
         }
 
         public static IReadOnlyCollection<Language> AllLanguages
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure
             Iso2Code = iso2Code;
         }
 
-        public static bool IsValidLanguage(string iso2Code)
+        public static bool IsDefault(string iso2Code)
         {
             Guard.NotNull(iso2Code, nameof(iso2Code));
 

@@ -7,7 +7,7 @@
 
 import { Component, Injectable, Input, OnChanges } from '@angular/core';
 import { AssignContributorForm, AutocompleteSource, ContributorsState, DialogModel, DialogService, RoleDto, UsersService } from '@app/shared';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
 
 @Injectable()
@@ -19,6 +19,10 @@ export class UsersDataSource implements AutocompleteSource {
     }
 
     public find(query: string): Observable<ReadonlyArray<any>> {
+        if (!query) {
+            return of([]);
+        }
+
         return this.usersService.getUsers(query).pipe(
             withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
                 const results: any[] = [];

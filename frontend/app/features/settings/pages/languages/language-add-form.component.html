@@ -4,9 +4,11 @@
     <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
         <div class="row gx-2">
             <div class="col">
-                <select class="form-select" formControlName="language">
-                    <option *ngFor="let language of newLanguages" [ngValue]="language">{{language.englishName}}</option>
-                </select>
+                <sqx-autocomplete formControlName="language" displayProperty="iso2Code" [source]="addLanguagesSource">
+                    <ng-template let-language="$implicit">
+                        {{language.iso2Code}} ({{language.englishName}})
+                    </ng-template>
+                </sqx-autocomplete>
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-success">

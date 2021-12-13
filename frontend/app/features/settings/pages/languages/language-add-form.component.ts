@@ -5,8 +5,38 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { AddLanguageForm, LanguageDto, LanguagesState } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { AddLanguageForm, AutocompleteSource, LanguageDto, LanguagesState } from '@app/shared';
+import { Observable, of } from 'rxjs';
+
+class LanguageSource implements AutocompleteSource {
+    constructor(
+        private readonly languages: ReadonlyArray<LanguageDto>,
+    ) {
+    }
+
+    public find(query: string): Observable<ReadonlyArray<any>> {
+        if (!query) {
+            return of(this.languages);
+        }
+
+        const regex = new RegExp(query, 'i');
+
+        const results: LanguageDto[] = [];
+        const result = this.languages.find(x => x.iso2Code === query);
+
+        if (result) {
+            results.push(result);
+        }
+
+        results.push(...this.languages.filter(x =>
+            x.iso2Code !== query && (
+            regex.test(x.iso2Code) ||
+            regex.test(x.englishName))));
+
+        return of(results);
+    }
+}
 
 @Component({
     selector: 'sqx-language-add-form',
@@ -14,23 +44,18 @@ import { AddLanguageForm, LanguageDto, LanguagesState } from '@app/shared';
     templateUrl: './language-add-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LanguageAddFormComponent implements OnChanges {
+export class LanguageAddFormComponent {
     @Input()
-    public newLanguages: ReadonlyArray<LanguageDto>;
+    public set newLanguages(value: ReadonlyArray<LanguageDto>) {
+        this.addLanguagesSource = new LanguageSource(value);
+    }
 
+    public addLanguagesSource = new LanguageSource([]);
     public addLanguageForm = new AddLanguageForm();
 
     constructor(
         private readonly languagesState: LanguagesState,
     ) {
-    }
-
-    public ngOnChanges() {
-        if (this.newLanguages.length > 0) {
-            const language = this.newLanguages[0];
-
-            this.addLanguageForm.load({ language });
-        }
     }
 
     public addLanguage() {
