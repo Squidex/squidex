@@ -7,10 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Keys, StatefulControlComponent, Types } from '@app/framework/internal';
-import { RelativePosition } from '@app/shared';
-import { Observable, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, finalize, map, switchMap, tap } from 'rxjs/operators';
+import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
+import { merge, Observable, of, Subject } from 'rxjs';
+import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
@@ -46,6 +45,7 @@ const NO_EMIT = { emitEvent: false };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
+    private readonly modalStream = new Subject<string>();
     private timer: any;
 
     @Input()
@@ -56,6 +56,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     @Input()
     public inputStyle: 'underlined' | 'empty';
+
+    @Input()
+    public allowOpen?: boolean | null = true;
 
     @Input()
     public displayProperty: string;
@@ -89,6 +92,8 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @ViewChild('input', { static: false })
     public inputControl: ElementRef<HTMLInputElement>;
 
+    public suggestionsModal = new ModalModel();
+
     public queryInput = new FormControl();
 
     constructor(changeDetector: ChangeDetectorRef) {
@@ -103,41 +108,51 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public ngOnInit() {
-        this.own(
-            this.queryInput.valueChanges.pipe(
-                    tap(query => {
-                        this.callChange(query);
-                    }),
-                    map(query => {
-                        if (Types.isString(query)) {
-                            return query.trim();
-                        } else {
-                            return '';
-                        }
-                    }),
-                    debounceTime(this.debounceTime),
-                    distinctUntilChanged(),
-                    switchMap(query => {
-                        if (!query || !this.source) {
-                            return of([]);
-                        } else {
-                            this.setLoading(true);
+        this.changes.subscribe(state => {
+            if (state.suggestedItems.length > 0) {
+                this.suggestionsModal.show();
+            } else {
+                this.suggestionsModal.hide();
+            }
+        });
 
-                            return this.source.find(query).pipe(
-                                finalize(() => {
-                                    this.setLoading(false);
-                                }),
-                                catchError(() => of([])),
-                            );
-                        }
-                    }))
-                .subscribe(items => {
-                    this.next({
-                        suggestedIndex: -1,
-                        suggestedItems: items || [],
-                        isSearching: false,
-                    });
-                }));
+        const inputStream =
+            this.queryInput.valueChanges.pipe(
+                tap(query => {
+                    this.callChange(query);
+                }),
+                map(query => {
+                    if (Types.isString(query)) {
+                        return query.trim();
+                    } else {
+                        return '';
+                    }
+                }),
+                debounceTime(this.debounceTime));
+
+        this.own(
+            merge(inputStream, this.modalStream).pipe(
+                switchMap(query => {
+                    if (!this.source) {
+                        return of([]);
+                    } else {
+                        this.setLoading(true);
+
+                        return this.source.find(query).pipe(
+                            finalize(() => {
+                                this.setLoading(false);
+                            }),
+                            catchError(() => of([])),
+                        );
+                    }
+                }))
+            .subscribe(items => {
+                this.next({
+                    suggestedIndex: -1,
+                    suggestedItems: items || [],
+                    isSearching: false,
+                });
+            }));
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -179,6 +194,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         }
     }
 
+    public openModal() {
+        this.modalStream.next('');
+    }
+
     public reset() {
         this.resetState();
 
@@ -206,24 +225,30 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             selection = this.snapshot.suggestedItems[0];
         }
 
-        if (selection) {
-            try {
-                if (this.displayProperty && this.displayProperty.length > 0) {
-                    this.queryInput.setValue(selection[this.displayProperty], NO_EMIT);
-                } else {
-                    this.queryInput.setValue(selection.toString(), NO_EMIT);
-                }
-
-                this.callChange(selection);
-                this.callTouched();
-            } finally {
-                this.resetState();
-            }
-
-            return true;
+        if (!selection) {
+            return false;
         }
 
-        return false;
+        try {
+            if (this.displayProperty && this.displayProperty.length > 0) {
+                this.queryInput.setValue(selection[this.displayProperty], NO_EMIT);
+            } else {
+                this.queryInput.setValue(selection.toString(), NO_EMIT);
+            }
+
+            let value = selection;
+
+            if (this.displayProperty) {
+                value = selection[this.displayProperty];
+            }
+
+            this.callChange(value);
+            this.callTouched();
+        } finally {
+            this.resetState();
+        }
+
+        return true;
     }
 
     private setLoading(value: boolean) {

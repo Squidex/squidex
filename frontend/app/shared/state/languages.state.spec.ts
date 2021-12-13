@@ -104,7 +104,7 @@ describe('LanguagesState', () => {
             languagesService.setup(x => x.postLanguage(app, It.isAny(), version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            languagesState.add(languageIT).subscribe();
+            languagesState.add('it').subscribe();
 
             expectNewLanguages(updated);
         });

@@ -8,7 +8,6 @@
 import { FormControl, Validators } from '@angular/forms';
 import { Form, ExtendedFormGroup, value$ } from '@app/framework';
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
-import { LanguageDto } from './../services/languages.service';
 
 export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateAppLanguageDto, AppLanguageDto> {
     public get isMaster() {
@@ -45,7 +44,7 @@ export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateAppLanguageD
     }
 }
 
-type AddLanguageFormType = { language: LanguageDto };
+type AddLanguageFormType = { language: string };
 
 export class AddLanguageForm extends Form<ExtendedFormGroup, AddLanguageFormType> {
     constructor() {

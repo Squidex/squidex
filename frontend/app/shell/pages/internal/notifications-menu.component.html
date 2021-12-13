@@ -11,7 +11,7 @@
         </li>
     
         <ng-container *sqxModal="modalMenu;onRoot:false">
-            <sqx-dropdown-menu [scrollTop]="scrollMe.nativeElement.scrollHeight" [sqxAnchoredTo]="button" [offset]="10" #scrollMe>
+            <sqx-dropdown-menu [scrollTop]="scrollMe.nativeElement.scrollHeight" [sqxAnchoredTo]="button" [offsetY]="10" #scrollMe>
                 <ng-container *ngIf="commentsState.comments | async; let comments">
                     <small class="text-muted" *ngIf="comments.length === 0">
                         {{ 'notifications.empty' | sqxTranslate}}

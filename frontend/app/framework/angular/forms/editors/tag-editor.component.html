@@ -1,5 +1,7 @@
 <div class="form-container">
-    <div class="form-control tags" #form (click)="input.focus()"
+    <div class="form-control tags" tabindex="0" #form 
+        (mousedown)="focusInput($event)"
+        (focus)="focusInput($event)"
         [class.blank]="styleBlank" 
         [class.singleline]="singleLine"
         [class.readonly]="readonly"
@@ -8,7 +10,6 @@
         [class.focus]="snapshot.hasFocus" 
         [class.disabled]="snapshot.isDisabled"
         [class.dashed]="dashed && !(snapshot.items.length > 0)">
-
         <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
             {{item}} <i class="icon-close" (click)="remove(i)"></i>
         </span>
@@ -24,12 +25,18 @@
             [formControl]="addInput">
     </div>
 
-    <div class="btn btn-sm" (click)="openModal()" sqxStopClick *ngIf="allowOpen || suggestionsSorted.length > 0">
+    <div class="btn btn-sm" (click)="openModal()" sqxStopClick *ngIf="!readonly && (allowOpen || suggestionsSorted.length > 0)">
         <i class="icon-caret-down"></i>
     </div>
 
     <ng-container *sqxModal="snapshot.suggestedItems.length > 0">
-        <sqx-dropdown-menu class="control-dropdown" [sqxAnchoredTo]="form" [scrollY]="true" position="bottom-left" #container>
+        <sqx-dropdown-menu class="control-dropdown" 
+            [sqxAnchoredTo]="form"
+            [adjustWidth]="true"
+            [adjustHeight]="false"
+            [scrollY]="true" 
+            [style.minWidth]="dropdownWidth"
+            position="bottom-left" #container>
             <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
                 [class.separated]="separated"
@@ -42,9 +49,14 @@
         </sqx-dropdown-menu>
     </ng-container>
 
-    <ng-container *ngIf="allowOpen || suggestionsSorted.length > 0">
+    <ng-container *ngIf="allowOpen && suggestionsSorted.length > 0">
         <ng-container *sqxModal="suggestionsModal">
-            <sqx-dropdown-menu class="control-dropdown suggestions-dropdown" [sqxAnchoredTo]="form" position="bottom-left">
+            <sqx-dropdown-menu class="control-dropdown suggestions-dropdown"
+                [sqxAnchoredTo]="form"
+                [adjustWidth]="false"
+                [adjustHeight]="false"
+                [scrollY]="true" 
+                position="bottom-left">
                 <div class="row">
                     <div class=" col-6" *ngFor="let item of suggestionsSorted; let i = index">
                         <div class="form-check form-check">

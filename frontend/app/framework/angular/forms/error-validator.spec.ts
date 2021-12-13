@@ -6,7 +6,7 @@
  */
 
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
-import { ErrorDto } from '@app/shared';
+import { ErrorDto } from '@app/framework/internal';
 import { ErrorValidator } from './error-validator';
 
 describe('ErrorValidator', () => {
