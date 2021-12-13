@@ -19,12 +19,12 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.676">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.680">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.13.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
