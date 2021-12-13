@@ -43,7 +43,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleImage_150kb.gif", "image/gif");
 
-            await AssetImageAsync(asset);
+            await AssertImageAsync(asset);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.png", "image/png");
 
-            await AssetImageAsync(asset);
+            await AssertImageAsync(asset);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleImage_62kb.jpg", "image/jpg");
 
-            await AssetImageAsync(asset);
+            await AssertImageAsync(asset);
 
             Assert.Equal(79L, asset.Metadata["imageQuality"]);
         }
@@ -69,7 +69,7 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleImage_100kb.webp", "image/jpg");
 
-            await AssetImageAsync(asset);
+            await AssertImageAsync(asset);
         }
 
         [Fact]
@@ -77,18 +77,18 @@ namespace TestSuite.ApiTests
         {
             var asset = await _.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpg");
 
-            await AssetImageAsync(asset);
+            await AssertImageAsync(asset);
         }
 
-        [Fact(Skip = "Not supported yet.")]
+        [Fact]
         public async Task Should_upload_image_tga_and_resize()
         {
-            var asset = await _.UploadFileAsync("Assets/SampleImage_600kb.tga", "image/jpg");
+            var asset = await _.UploadFileAsync("Assets/SampleImage_600kb.tga", "image/x-tga");
 
-            await AssetImageAsync(asset);
+            await AssertImageAsync(asset);
         }
 
-        private async Task AssetImageAsync(AssetDto asset)
+        private async Task AssertImageAsync(AssetDto asset)
         {
             // Should parse image metadata.
             Assert.True(asset.IsImage);

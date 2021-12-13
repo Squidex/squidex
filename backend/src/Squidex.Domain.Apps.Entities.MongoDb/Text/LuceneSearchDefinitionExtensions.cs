@@ -8,6 +8,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 {
@@ -47,7 +48,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
 
             public override RenderedPipelineStageDefinition<TOutput> Render(
                 IBsonSerializer<TInput> inputSerializer,
-                IBsonSerializerRegistry serializerRegistry)
+                IBsonSerializerRegistry serializerRegistry,
+                LinqProvider linqProvider)
             {
                 return renderer(inputSerializer);
             }
