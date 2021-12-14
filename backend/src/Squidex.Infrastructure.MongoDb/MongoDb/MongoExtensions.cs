@@ -132,11 +132,11 @@ namespace Squidex.Infrastructure.MongoDb
                 {
                     var field = Field.Of<T>(x => nameof(x.Version));
 
-                    throw new InconsistentStateException(existingVersion[field].AsInt64, oldVersion, ex);
+                    throw new InconsistentStateException(existingVersion[field].AsInt64, oldVersion);
                 }
                 else
                 {
-                    throw new InconsistentStateException(EtagVersion.Any, oldVersion, ex);
+                    throw new InconsistentStateException(EtagVersion.Any, oldVersion);
                 }
             }
         }

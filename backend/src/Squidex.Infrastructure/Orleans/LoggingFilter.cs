@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Orleans;
+using Squidex.Infrastructure.States;
 using Squidex.Log;
 
 namespace Squidex.Infrastructure.Orleans
@@ -37,7 +38,6 @@ namespace Squidex.Infrastructure.Orleans
             catch (Exception ex)
             {
                 Log(context, ex);
-
                 throw;
             }
         }

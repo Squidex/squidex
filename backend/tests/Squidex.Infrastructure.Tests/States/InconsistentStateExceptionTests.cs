@@ -22,8 +22,8 @@ namespace Squidex.Infrastructure.States
 
             Assert.Equal("Inner", result.InnerException?.Message);
 
-            Assert.Equal(result.ExpectedVersion, source.ExpectedVersion);
-            Assert.Equal(result.CurrentVersion, source.CurrentVersion);
+            Assert.Equal(result.VersionExpected, source.VersionExpected);
+            Assert.Equal(result.VersionCurrent, source.VersionCurrent);
 
             Assert.Equal(result.Message, source.Message);
         }
