@@ -73,9 +73,19 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 if (value != null && isValidOperator)
                 {
-                    if (value.IsList && nodeIn.Operator != CompareOperator.In)
+                    if (nodeIn.Operator == CompareOperator.In)
                     {
-                        args.Errors.Add($"Array value is not allowed for '{nodeIn.Operator}' operator and path '{nodeIn.Path}'.");
+                        if (!value.IsList)
+                        {
+                            value = value.ToList();
+                        }
+                    }
+                    else
+                    {
+                        if (value.IsList)
+                        {
+                            args.Errors.Add($"Array value is not allowed for '{nodeIn.Operator}' operator and path '{nodeIn.Path}'.");
+                        }
                     }
 
                     if (nodeIn.Operator == CompareOperator.Matchs && value.Value?.ToString()?.IsValidRegex() != true)
