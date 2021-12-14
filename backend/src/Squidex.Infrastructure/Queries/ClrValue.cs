@@ -64,6 +64,11 @@ namespace Squidex.Infrastructure.Queries
             return value != null ? new ClrValue(value, ClrValueType.String, false) : Null;
         }
 
+        public static implicit operator ClrValue(List<FilterSphere> value)
+        {
+            return value != null ? new ClrValue(value, ClrValueType.Sphere, true) : Null;
+        }
+
         public static implicit operator ClrValue(List<Instant> value)
         {
             return value != null ? new ClrValue(value, ClrValueType.Instant, true) : Null;
@@ -107,6 +112,45 @@ namespace Squidex.Infrastructure.Queries
         public static implicit operator ClrValue(List<object?> value)
         {
             return value != null ? new ClrValue(value, ClrValueType.Dynamic, true) : Null;
+        }
+
+        public ClrValue ToList()
+        {
+            var value = Value;
+
+            if (IsList || ValueType == ClrValueType.Null || value == null)
+            {
+                return this;
+            }
+
+            ClrValue BuildList<T>(T value)
+            {
+                return new ClrValue(new List<T> { value }, ValueType, true);
+            }
+
+            switch (value)
+            {
+                case FilterSphere typed:
+                    return BuildList(typed);
+                case Instant typed:
+                    return BuildList(typed);
+                case Guid typed:
+                    return BuildList(typed);
+                case bool typed:
+                    return BuildList(typed);
+                case float typed:
+                    return BuildList(typed);
+                case double typed:
+                    return BuildList(typed);
+                case int typed:
+                    return BuildList(typed);
+                case long typed:
+                    return BuildList(typed);
+                case string typed:
+                    return BuildList(typed);
+            }
+
+            return this;
         }
 
         public override string ToString()
