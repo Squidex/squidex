@@ -59,10 +59,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
             foreach (var (key, value) in obj)
             {
-                target.FastAddProperty(key, Map(value, engine), false, true, true);
+                target.FastAddProperty(key, Map(value, engine), true, true, true);
             }
-
-            target.PreventExtensions();
 
             return target;
         }

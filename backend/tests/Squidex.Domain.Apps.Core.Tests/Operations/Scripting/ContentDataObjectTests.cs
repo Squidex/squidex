@@ -173,19 +173,61 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var original =
                 new ContentData()
-                    .AddField("number",
+                    .AddField("geo",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Object().Add("lat", 1.0)));
 
             var expected =
                 new ContentData()
-                    .AddField("number",
+                    .AddField("geo",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Object().Add("lat", 1.0).Add("lon", 4.0)));
 
-            var result = ExecuteScript(original, @"data.number.iv = { lat: data.number.iv.lat, lon: data.number.iv.lat + 3 }");
+            var result = ExecuteScript(original, @"data.geo.iv = { lat: data.geo.iv.lat, lon: data.geo.iv.lat + 3 }");
 
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_update_data_if_changing_nested_field()
+        {
+            var original =
+                new ContentData()
+                    .AddField("geo",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Object().Add("lat", 1.0)));
+
+            var expected =
+                new ContentData()
+                    .AddField("geo",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Object().Add("lat", 2.0).Add("lon", 4.0)));
+
+            var result = ExecuteScript(original, @"
+                var nested = data.geo.iv;
+                nested.lat = 2;
+                nested.lon = 4;
+                data.geo.iv = nested");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_not_update_data_if_not_changing_nested_field()
+        {
+            var original =
+                new ContentData()
+                    .AddField("geo",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Object().Add("lat", 2.0).Add("lon", 4.0)));
+
+            var result = ExecuteScript(original, @"
+                var nested = data.geo.iv;
+                nested.lat = 2;
+                nested.lon = 4;
+                data.geo.iv = nested");
+
+            Assert.Same(original, result);
         }
 
         [Fact]
@@ -256,19 +298,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 result;").ToObject();
 
             Assert.Equal(new[] { "1", "2", "3", "4" }, result);
-        }
-
-        [Fact]
-        public void Should_throw_exceptions_if_changing_objects()
-        {
-            var original =
-                new ContentData()
-                    .AddField("obj",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("readonly", 1)));
-
-            Assert.Throws<JavaScriptException>(() => ExecuteScript(original, "data.obj.iv.invalid = 1"));
-            Assert.Throws<JavaScriptException>(() => ExecuteScript(original, "data.obj.iv.readonly = 2"));
         }
 
         [Fact]
