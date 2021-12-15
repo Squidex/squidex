@@ -8,6 +8,7 @@
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
@@ -125,15 +126,13 @@ namespace Squidex.Domain.Users
         public async Task<List<IUser>> QueryByEmailAsync(string email,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(email, nameof(email));
-
             await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
                 var result = await userService.QueryAsync(email, ct: ct);
 
-                return result.ToList();
+                return result.Where(x => !x.Claims.IsHidden()).ToList();
             }
         }
 

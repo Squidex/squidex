@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             {
                 var users = await userResolver.QueryByEmailAsync(query, HttpContext.RequestAborted);
 
-                var response = users.Where(x => !x.Claims.IsHidden()).Select(x => UserDto.FromUser(x, Resources)).ToArray();
+                var response = users.Select(x => UserDto.FromUser(x, Resources)).ToArray();
 
                 return Ok(response);
             }
