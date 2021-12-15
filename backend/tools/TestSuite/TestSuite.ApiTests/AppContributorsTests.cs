@@ -14,8 +14,9 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
-    public sealed class AppContributorsTests : IClassFixture<CreatedAppFixture>
+    public sealed class AppContributorsTests : IClassFixture<ClientFixture>
     {
+        private readonly string appName = Guid.NewGuid().ToString();
         private readonly string email = $"{Guid.NewGuid()}@squidex.io";
 
         public CreatedAppFixture _ { get; }
@@ -28,12 +29,16 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_not_invite_contributor_if_flag_is_false()
         {
-            // STEP 0:  Do not invite contributors when flag is false.
+            // STEP 0: Create app.
+            await CreateAppAsync();
+
+
+            // STEP 1:  Do not invite contributors when flag is false.
             var createRequest = new AssignContributorDto { ContributorId = "test@squidex.io" };
 
             var ex = await Assert.ThrowsAsync<SquidexManagementException>(() =>
             {
-                return _.Apps.PostContributorAsync(_.AppName, createRequest);
+                return _.Apps.PostContributorAsync(appName, createRequest);
             });
 
             Assert.Equal(404, ex.StatusCode);
@@ -42,6 +47,10 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_invite_contributor()
         {
+            // STEP 0: Create app.
+            await CreateAppAsync();
+
+
             // STEP 1: Assign contributor.
             ContributorDto contributor_1 = await InviteAsync();
 
@@ -51,7 +60,11 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_update_contributor()
         {
-            // STEP 0: Assign contributor.
+            // STEP 0: Create app.
+            await CreateAppAsync();
+
+
+            // STEP 1: Assign contributor.
             var contributor = await InviteAsync();
 
 
@@ -61,7 +74,7 @@ namespace TestSuite.ApiTests
                 ContributorId = email, Role = "Owner"
             };
 
-            var contributors_2 = await _.Apps.PostContributorAsync(_.AppName, updateRequest);
+            var contributors_2 = await _.Apps.PostContributorAsync(appName, updateRequest);
             var contributor_2 = contributors_2.Items.Find(x => x.ContributorId == contributor.ContributorId);
 
             Assert.Equal(updateRequest.Role, contributor_2?.Role);
@@ -70,12 +83,16 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_remove_contributor()
         {
-            // STEP 0: Assign contributor.
+            // STEP 0: Create app.
+            await CreateAppAsync();
+
+
+            // STEP 1: Assign contributor.
             var contributor = await InviteAsync();
 
 
             // STEP 1: Remove contributor.
-            var contributors_2 = await _.Apps.DeleteContributorAsync(_.AppName, contributor.ContributorId);
+            var contributors_2 = await _.Apps.DeleteContributorAsync(appName, contributor.ContributorId);
 
             Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor.ContributorId);
         }
@@ -88,10 +105,20 @@ namespace TestSuite.ApiTests
                 Invite = true
             };
 
-            var contributors = await _.Apps.PostContributorAsync(_.AppName, createInviteRequest);
+            var contributors = await _.Apps.PostContributorAsync(appName, createInviteRequest);
             var contributor = contributors.Items.Find(x => x.ContributorName == email);
 
             return contributor;
+        }
+
+        private async Task CreateAppAsync()
+        {
+            var createRequest = new CreateAppDto
+            {
+                Name = appName
+            };
+
+            await _.Apps.PostAppAsync(createRequest);
         }
     }
 }
