@@ -70,28 +70,28 @@ namespace Squidex.Infrastructure.Json.Objects
 
             switch (value)
             {
-                case string s:
-                    return Create(s);
-                case bool b:
-                    return Create(b);
-                case float f:
-                    return Create(f);
-                case double d:
-                    return Create(d);
-                case int i:
-                    return Create(i);
-                case long l:
-                    return Create(l);
-                case Guid g:
-                    return Create(g);
-                case DomainId i:
-                    return Create(i);
-                case Instant i:
-                    return Create(i);
-                case object[] array:
-                    return Array(array);
-                case IReadOnlyDictionary<string, object?> obj:
-                    return Object(obj);
+                case string typed:
+                    return Create(typed);
+                case bool typed:
+                    return Create(typed);
+                case float typed:
+                    return Create(typed);
+                case double typed:
+                    return Create(typed);
+                case int typed:
+                    return Create(typed);
+                case long typed:
+                    return Create(typed);
+                case Guid typed:
+                    return Create(typed);
+                case DomainId typed:
+                    return Create(typed);
+                case Instant typed:
+                    return Create(typed);
+                case object[] typed:
+                    return Array(typed);
+                case IReadOnlyDictionary<string, object?> typed:
+                    return Object(typed);
             }
 
             throw new ArgumentException("Invalid json type", nameof(value));

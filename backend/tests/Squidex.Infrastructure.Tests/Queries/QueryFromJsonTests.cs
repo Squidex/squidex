@@ -491,6 +491,14 @@ namespace Squidex.Infrastructure.Queries
 
                 AssertErrors(json, "Array value is not allowed for 'Equals' operator and path 'string'.");
             }
+
+            [Fact]
+            public void Should_convert_single_value_to_list_for_in_operator()
+            {
+                var json = new { path = "string", op = "in", value = "Hello" };
+
+                AssertFilter(json, "string in ['Hello']");
+            }
         }
 
         [Fact]
