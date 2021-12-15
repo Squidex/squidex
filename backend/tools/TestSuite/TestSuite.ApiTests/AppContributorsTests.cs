@@ -19,9 +19,9 @@ namespace TestSuite.ApiTests
         private readonly string appName = Guid.NewGuid().ToString();
         private readonly string email = $"{Guid.NewGuid()}@squidex.io";
 
-        public CreatedAppFixture _ { get; }
+        public ClientFixture _ { get; }
 
-        public AppContributorsTests(CreatedAppFixture fixture)
+        public AppContributorsTests(ClientFixture fixture)
         {
             _ = fixture;
         }
