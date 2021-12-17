@@ -35,8 +35,9 @@ namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
-        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        private static JsonSerializerSettings ConfigureJson(TypeNameHandling typeNameHandling, JsonSerializerSettings? settings = null)
         {
+            settings ??= new JsonSerializerSettings();
             settings.Converters.Add(new StringEnumConverter());
 
             settings.ContractResolver = new ConverterContractResolver(
@@ -86,9 +87,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<NewtonsoftJsonSerializer>()
                 .As<IJsonSerializer>();
 
-            services.AddSingletonAs<SerializationInitializer>()
-                .AsSelf();
-
             services.AddSingletonAs<TypeNameRegistry>()
                 .AsSelf();
 
@@ -97,7 +95,7 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs(c =>
                 {
-                    var serializerSettings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.Auto);
+                    var serializerSettings = ConfigureJson(TypeNameHandling.Auto, new JsonSerializerSettings());
 
                     var typeNameRegistry = c.GetService<TypeNameRegistry>();
 
@@ -118,7 +116,7 @@ namespace Squidex.Config.Domain
             {
                 options.AllowInputFormatterExceptionMessages = false;
 
-                ConfigureJson(options.SerializerSettings, TypeNameHandling.None);
+                ConfigureJson(TypeNameHandling.None, options.SerializerSettings);
             });
 
             return builder;
@@ -128,9 +126,7 @@ namespace Squidex.Config.Domain
         {
             builder.Services.AddSingleton<IDocumentWriter>(c =>
             {
-                var settings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.None);
-
-                var serializer = new NewtonsoftJsonSerializer(settings);
+                var serializer = new NewtonsoftJsonSerializer(ConfigureJson(TypeNameHandling.None));
 
                 return new DefaultDocumentWriter(serializer);
             });

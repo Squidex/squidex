@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Squidex.Areas.Api.Controllers.Images.Models;
+using Squidex.Areas.Api.Controllers.Images.Service;
 using Squidex.Assets;
 using Squidex.Config;
 using Squidex.Domain.Users;
@@ -26,12 +28,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
     [Authorize]
     public sealed class ProfileController : IdentityServerController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions
-        {
-            TargetWidth = 128,
-            TargetHeight = 128,
-            Mode = ResizeMode.Crop
-        };
+        private readonly IImageResizer imageResizer;
+        private readonly IAssetStore assetStore;
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserService userService;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -39,11 +37,15 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         public ProfileController(
             IOptions<MyIdentityOptions> identityOptions,
+            IImageResizer imageResizer,
+            IAssetStore assetStore,
             IUserPictureStore userPictureStore,
             IUserService userService,
             IAssetThumbnailGenerator assetThumbnailGenerator)
         {
             this.identityOptions = identityOptions.Value;
+            this.imageResizer = imageResizer;
+            this.assetStore = assetStore;
             this.userPictureStore = userPictureStore;
             this.userService = userService;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -156,29 +158,49 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 throw new ValidationException(T.Get("validation.onlyOneFile"));
             }
 
-            using (var thumbnailStream = new MemoryStream())
+            var tempName = Guid.NewGuid().ToString();
+
+            await using (var stream = files[0].OpenReadStream())
             {
-                try
-                {
-                    var file = files[0];
-
-                    await using (var stream = file.OpenReadStream())
-                    {
-                        await assetThumbnailGenerator.CreateThumbnailAsync(stream, file.ContentType, thumbnailStream, ResizeOptions,
-                            HttpContext.RequestAborted);
-                    }
-
-                    thumbnailStream.Position = 0;
-                }
-                catch
-                {
-                    throw new ValidationException(T.Get("validation.notAnImage"));
-                }
-
-                await userPictureStore.UploadAsync(id, thumbnailStream, HttpContext.RequestAborted);
+                await assetStore.UploadAsync(tempName, stream, true, HttpContext.RequestAborted);
             }
 
-            var update = new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore };
+            var targetPath = userPictureStore.GetPath(id);
+
+            try
+            {
+                var request = new ResizeRequest
+                {
+                    SourcePath = tempName,
+                    SourceMimeType = files[0].ContentType,
+                    TargetPath = targetPath,
+                    ResizeOptions = new ResizeOptions
+                    {
+                        TargetWidth = 128,
+                        TargetHeight = 128,
+                        Mode = ResizeMode.Crop
+                    },
+                    Overwrite = true
+                };
+
+                await imageResizer.ResizeAsync(request, HttpContext.RequestAborted);
+            }
+            catch
+            {
+                throw new ValidationException(T.Get("validation.notAnImage"));
+            }
+            finally
+            {
+#pragma warning disable MA0040 // Flow the cancellation token
+                await assetStore.DeleteAsync(tempName);
+#pragma warning restore MA0040 // Flow the cancellation token
+
+            }
+
+            var update = new UserValues
+            {
+                PictureUrl = SquidexClaimTypes.PictureUrlStore
+            };
 
             await userService.UpdateAsync(id, update, ct: HttpContext.RequestAborted);
         }

@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Assets.Models;
+using Squidex.Areas.Api.Controllers.Images.Models;
+using Squidex.Areas.Api.Controllers.Images.Service;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities;
@@ -26,23 +28,26 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetContentController : ApiController
     {
+        private readonly IImageResizer imageResizer;
         private readonly IAssetFileStore assetFileStore;
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetLoader assetLoader;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+        private readonly IAssetStore assetStore;
 
         public AssetContentController(
             ICommandBus commandBus,
+            IImageResizer imageResizer,
             IAssetFileStore assetFileStore,
             IAssetQueryService assetQuery,
             IAssetLoader assetLoader,
-            IAssetThumbnailGenerator assetThumbnailGenerator)
+            IAssetStore assetStore)
             : base(commandBus)
         {
+            this.imageResizer = imageResizer;
             this.assetFileStore = assetFileStore;
             this.assetQuery = assetQuery;
             this.assetLoader = assetLoader;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
+            this.assetStore = assetStore;
         }
 
         /// <summary>
@@ -148,25 +153,30 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var contentLength = (long?)null;
 
+            var targetSuffix = resizeOptions.ToString();
+            var targetPath = assetFileStore.GetPath(asset.AppId.Id, asset.Id, asset.FileVersion, targetSuffix);
+
             if (asset.Type == AssetType.Image && resizeOptions.IsValid)
             {
                 callback = async (bodyStream, range, ct) =>
                 {
                     if (request.ForceResize)
                     {
-                        await ResizeAsync(asset, bodyStream, resizeOptions, true, ct);
+                        await ResizeAsync(asset, targetPath, resizeOptions, true, ct);
+
+                        await assetStore.DownloadAsync(targetPath, bodyStream, range, ct: ct);
                     }
                     else
                     {
                         try
                         {
-                            var suffix = resizeOptions.ToString();
-
-                            await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, suffix, bodyStream, ct: ct);
+                            await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, targetSuffix, bodyStream, ct: ct);
                         }
                         catch (AssetNotFoundException)
                         {
-                            await ResizeAsync(asset, bodyStream, resizeOptions, false, ct);
+                            await ResizeAsync(asset, targetPath, resizeOptions, true, ct);
+
+                            await assetStore.DownloadAsync(targetPath, bodyStream, range, ct: ct);
                         }
                     }
                 };
@@ -192,78 +202,17 @@ namespace Squidex.Areas.Api.Controllers.Assets
             };
         }
 
-        private async Task ResizeAsync(IAssetEntity asset, Stream bodyStream, ResizeOptions resizeOptions, bool overwrite,
+        private Task ResizeAsync(IAssetEntity asset, string targetPath, ResizeOptions resizeOptions, bool overwrite,
             CancellationToken ct)
         {
-            using (Telemetry.Activities.StartActivity("Resize"))
+            return imageResizer.ResizeAsync(new ResizeRequest
             {
-                await using (var destinationStream = GetTempStream())
-                {
-                    // Do not use cancellation for the resize process because it is valuable to complete it.
-                    await ResizeAsync(asset, resizeOptions, destinationStream, overwrite);
-
-                    await destinationStream.CopyToAsync(bodyStream, ct);
-                }
-            }
-        }
-
-        private async Task ResizeAsync(IAssetEntity asset, ResizeOptions resizeOptions, FileStream stream,  bool overwrite)
-        {
-#pragma warning disable MA0040 // Flow the cancellation token
-            var suffix = resizeOptions.ToString();
-
-            await using (var sourceStream = GetTempStream())
-            {
-                using (Telemetry.Activities.StartActivity("ResizeDownload"))
-                {
-                    await assetFileStore.DownloadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, null, sourceStream);
-                    sourceStream.Position = 0;
-                }
-
-                using (Telemetry.Activities.StartActivity("ResizeImage"))
-                {
-                    try
-                    {
-                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, asset.MimeType, stream, resizeOptions);
-                        stream.Position = 0;
-                    }
-                    catch
-                    {
-                        sourceStream.Position = 0;
-                        await sourceStream.CopyToAsync(stream);
-                    }
-                }
-
-                try
-                {
-                    using (Telemetry.Activities.StartActivity("ResizeUpload"))
-                    {
-                        await assetFileStore.UploadAsync(asset.AppId.Id, asset.Id, asset.FileVersion, suffix, stream, overwrite);
-                        stream.Position = 0;
-                    }
-                }
-                catch (AssetAlreadyExistsException)
-                {
-                    stream.Position = 0;
-                }
-            }
-#pragma warning restore MA0040 // Flow the cancellation token
-        }
-
-        private static FileStream GetTempStream()
-        {
-            var tempFileName = Path.GetTempFileName();
-
-            const int bufferSize = 16 * 1024;
-
-            return new FileStream(tempFileName,
-                FileMode.Create,
-                FileAccess.ReadWrite,
-                FileShare.Delete,
-                bufferSize,
-                FileOptions.Asynchronous |
-                FileOptions.DeleteOnClose |
-                FileOptions.SequentialScan);
+                ResizeOptions = resizeOptions,
+                SourcePath = assetFileStore.GetPath(asset.AppId.Id, asset.Id, asset.Version, null),
+                SourceMimeType = asset.MimeType,
+                TargetPath = targetPath,
+                Overwrite = overwrite,
+            }, ct);
         }
     }
 }

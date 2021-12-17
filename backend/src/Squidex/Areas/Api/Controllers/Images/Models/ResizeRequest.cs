@@ -5,18 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Assets;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Areas.Api.Controllers.Images.Models
 {
-    public interface IAppImageStore
+    public sealed class ResizeRequest
     {
-        Task UploadAsync(DomainId appId, Stream stream,
-            CancellationToken ct = default);
+        public string SourcePath { get; set; }
 
-        Task DownloadAsync(DomainId appId, Stream stream,
-            CancellationToken ct = default);
+        public string SourceMimeType { get; set; }
 
-        string GetPath(DomainId appId);
+        public string TargetPath { get; set; }
+
+        public bool Overwrite { get; set; }
+
+        public ResizeOptions ResizeOptions { get; set; }
     }
 }

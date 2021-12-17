@@ -27,9 +27,6 @@ namespace Squidex.Config.Web
     {
         public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDefaultWebServices(config);
-            services.AddDefaultForwardRules();
-
             services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
                 .AsSelf();
 

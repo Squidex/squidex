@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Config.Domain
 {
@@ -39,6 +40,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AppUsageDeleter>()
                 .As<IDeleter>();
+
+            services.AddSingletonAs<DefaultAppLogStore>()
+                .As<IAppLogStore>().As<IDeleter>();
 
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();

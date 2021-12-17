@@ -25,6 +25,7 @@ using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
@@ -59,6 +60,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
                 .AsSelf();
+
+            services.AddSingletonAs<BackgroundRequestLogStore>()
+                .AsOptional<IRequestLogStore>();
 
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();

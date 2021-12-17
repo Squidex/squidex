@@ -9,11 +9,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Areas.Api.Controllers.Images.Models;
+using Squidex.Areas.Api.Controllers.Images.Service;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
@@ -29,28 +30,22 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions
-        {
-            TargetWidth = 50,
-            TargetHeight = 50,
-            Mode = ResizeMode.Crop
-        };
         private readonly IAppImageStore appImageStore;
         private readonly IAppProvider appProvider;
         private readonly IAssetStore assetStore;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+        private readonly IImageResizer imageResizer;
 
         public AppsController(ICommandBus commandBus,
+            IImageResizer imageResizer,
             IAppImageStore appImageStore,
             IAppProvider appProvider,
-            IAssetStore assetStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator)
+            IAssetStore assetStore)
             : base(commandBus)
         {
+            this.imageResizer = imageResizer;
             this.appImageStore = appImageStore;
             this.appProvider = appProvider;
             this.assetStore = assetStore;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
         /// <summary>
@@ -211,22 +206,38 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var callback = new FileCallback(async (body, range, ct) =>
             {
-                var resizedAsset = $"{App.Id}_{etag}_Resized";
+                var sourcePath = appImageStore.GetPath(App.Id);
+
+                var resizedPath = $"{App.Id}_{etag}_Resized";
 
                 try
                 {
-                    await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
+                    await assetStore.DownloadAsync(resizedPath, body, ct: ct);
                 }
                 catch (AssetNotFoundException)
                 {
-                    using (Telemetry.Activities.StartActivity("Resize"))
+                    try
                     {
-                        await using (var destinationStream = GetTempStream())
+                        var request = new ResizeRequest
                         {
-                            await ResizeAsync(resizedAsset, App.Image.MimeType, destinationStream);
+                            SourcePath = appImageStore.GetPath(App.Id),
+                            SourceMimeType = App.Image.MimeType,
+                            TargetPath = resizedPath,
+                            ResizeOptions = new ResizeOptions
+                            {
+                                TargetWidth = 50,
+                                TargetHeight = 50,
+                                Mode = ResizeMode.Crop
+                            }
+                        };
 
-                            await destinationStream.CopyToAsync(body, ct);
-                        }
+                        var path = await imageResizer.ResizeAsync(request, ct);
+
+                        await assetStore.DownloadAsync(path, body, ct: ct);
+                    }
+                    catch
+                    {
+                        await assetStore.DownloadAsync(sourcePath, body, ct: ct);
                     }
                 }
             });
@@ -235,32 +246,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 ErrorAs404 = true
             };
-        }
-
-        private async Task ResizeAsync(string resizedAsset, string mimeType, FileStream destinationStream)
-        {
-#pragma warning disable MA0040 // Flow the cancellation token
-            await using (var sourceStream = GetTempStream())
-            {
-                using (Telemetry.Activities.StartActivity("ResizeDownload"))
-                {
-                    await appImageStore.DownloadAsync(App.Id, sourceStream);
-                    sourceStream.Position = 0;
-                }
-
-                using (Telemetry.Activities.StartActivity("ResizeImage"))
-                {
-                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, mimeType, destinationStream, ResizeOptions);
-                    destinationStream.Position = 0;
-                }
-
-                using (Telemetry.Activities.StartActivity("ResizeUpload"))
-                {
-                    await assetStore.UploadAsync(resizedAsset, destinationStream);
-                    destinationStream.Position = 0;
-                }
-            }
-#pragma warning restore MA0040 // Flow the cancellation token
         }
 
         /// <summary>
@@ -334,19 +319,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
 
             return new UploadAppImage { File = file.ToAssetFile() };
-        }
-
-        private static FileStream GetTempStream()
-        {
-            var tempFileName = Path.GetTempFileName();
-
-            return new FileStream(tempFileName,
-                FileMode.Create,
-                FileAccess.ReadWrite,
-                FileShare.Delete, 1024 * 16,
-                FileOptions.Asynchronous |
-                FileOptions.DeleteOnClose |
-                FileOptions.SequentialScan);
         }
     }
 }

@@ -25,6 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.options = options.Value;
         }
 
+        public string GetPath(DomainId appId)
+        {
+            return GetFileName(appId);
+        }
+
         public Task DownloadAsync(DomainId appId, Stream stream,
             CancellationToken ct = default)
         {

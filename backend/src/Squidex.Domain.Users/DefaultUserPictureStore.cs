@@ -18,10 +18,15 @@ namespace Squidex.Domain.Users
             this.assetStore = assetStore;
         }
 
+        public string GetPath(string userId)
+        {
+            return $"{userId}_0_picture";
+        }
+
         public Task UploadAsync(string userId, Stream stream,
             CancellationToken ct = default)
         {
-            var fileName = GetFileName(userId);
+            var fileName = GetPath(userId);
 
             return assetStore.UploadAsync(fileName, stream, true, ct);
         }
@@ -29,14 +34,9 @@ namespace Squidex.Domain.Users
         public Task DownloadAsync(string userId, Stream stream,
             CancellationToken ct = default)
         {
-            var fileName = GetFileName(userId);
+            var fileName = GetPath(userId);
 
             return assetStore.DownloadAsync(fileName, stream, default, ct);
-        }
-
-        private static string GetFileName(string userId)
-        {
-            return $"{userId}_0_picture";
         }
     }
 }

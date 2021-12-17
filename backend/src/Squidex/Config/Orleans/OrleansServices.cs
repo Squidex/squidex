@@ -17,6 +17,7 @@ using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Web;
 
@@ -28,18 +29,23 @@ namespace Squidex.Config.Orleans
         {
             builder.AddOrleansPubSub();
 
-            builder.ConfigureServices(siloServices =>
+            builder.ConfigureServices(services =>
             {
-                siloServices.AddSingletonAs<DefaultMongoClientFactory>()
+                services.AddScoped(typeof(IGrainState<>), typeof(Infrastructure.Orleans.GrainState<>));
+
+                services.AddSingletonAs<DefaultMongoClientFactory>()
                     .As<IMongoClientFactory>();
 
-                siloServices.AddSingletonAs<ActivationLimiter>()
+                services.AddSingletonAs<ActivationLimiter>()
                     .As<IActivationLimiter>();
 
-                siloServices.AddScopedAs<ActivationLimit>()
+                services.AddScopedAs<ActivationLimit>()
                     .As<IActivationLimit>();
 
-                siloServices.AddScoped(typeof(IGrainState<>), typeof(Infrastructure.Orleans.GrainState<>));
+                services.AddInitializer<IJsonSerializer>("Serializer (Orleans)", serializer =>
+                {
+                    J.DefaultSerializer = serializer;
+                }, -1);
             });
 
             builder.ConfigureApplicationParts(parts =>
@@ -178,6 +184,15 @@ namespace Squidex.Config.Orleans
         {
             options.ClusterId = Constants.OrleansClusterId;
             options.ServiceId = Constants.OrleansClusterId;
+        }
+
+        public static void AddOrleans(this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment, Action<ISiloBuilder> action)
+        {
+            var builder = new CustomSiloBuilder(config, environment);
+
+            action(builder);
+
+            builder.Build(services);
         }
     }
 }

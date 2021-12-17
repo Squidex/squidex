@@ -15,13 +15,13 @@ namespace Squidex.Areas.OrleansDashboard
     {
         public static void ConfigureOrleansDashboard(this IApplicationBuilder app)
         {
-            app.Map(Constants.PrefixOrleans, orleansApp =>
+            app.Map(Constants.PrefixOrleans, builder =>
             {
-                orleansApp.UseAuthentication();
-                orleansApp.UseAuthorization();
+                builder.UseAuthentication();
+                builder.UseAuthorization();
 
-                orleansApp.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
-                orleansApp.UseOrleansDashboard();
+                builder.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
+                builder.UseOrleansDashboard();
             });
         }
     }

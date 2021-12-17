@@ -7,8 +7,6 @@
 
 #define LOG_ALL_IDENTITY_SERVER_NONE
 
-using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Log;
 using Squidex.Log;
 using Squidex.Web.Pipeline;
@@ -43,12 +41,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ActionContextLogAppender>()
                 .As<ILogAppender>();
-
-            services.AddSingletonAs<DefaultAppLogStore>()
-                .As<IAppLogStore>().As<IDeleter>();
-
-            services.AddSingletonAs<BackgroundRequestLogStore>()
-                .AsOptional<IRequestLogStore>();
         }
 
         private static void AddFilters(this ILoggingBuilder builder)

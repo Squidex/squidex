@@ -15,18 +15,18 @@ namespace Squidex.Areas.Api
     {
         public static void ConfigureApi(this IApplicationBuilder app)
         {
-            app.Map(Constants.PrefixApi, appApi =>
+            app.Map(Constants.PrefixApi, builder =>
             {
-                appApi.UseAccessTokenQueryString();
+                builder.UseAccessTokenQueryString();
 
-                appApi.UseRouting();
+                builder.UseRouting();
 
-                appApi.UseAuthentication();
-                appApi.UseAuthorization();
+                builder.UseAuthentication();
+                builder.UseAuthorization();
 
-                appApi.UseSquidexOpenApi();
+                builder.UseSquidexOpenApi();
 
-                appApi.UseEndpoints(endpoints =>
+                builder.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
                 });

@@ -44,11 +44,23 @@ namespace Squidex.Config.Web
             return app;
         }
 
-        public static IApplicationBuilder UseSquidexTracking(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSquidexLogging(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<RequestLogPerformanceMiddleware>();
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseSquidexUsage(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<UsageMiddleware>();
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseSquidexExceptionHandling(this IApplicationBuilder app)
         {
             app.UseMiddleware<RequestExceptionMiddleware>();
-            app.UseMiddleware<RequestLogPerformanceMiddleware>();
-            app.UseMiddleware<UsageMiddleware>();
 
             return app;
         }
