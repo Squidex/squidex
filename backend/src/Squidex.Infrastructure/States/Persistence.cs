@@ -69,12 +69,18 @@ namespace Squidex.Infrastructure.States
         {
             if (UseSnapshots)
             {
-                await snapshotStore.RemoveAsync(ownerKey);
+                using (Telemetry.Activities.StartActivity("Persistence/ReadState"))
+                {
+                    await snapshotStore.RemoveAsync(ownerKey);
+                }
             }
 
             if (UseEventSourcing)
             {
-                await eventStore.DeleteStreamAsync(streamName.Value);
+                using (Telemetry.Activities.StartActivity("Persistence/ReadEvents"))
+                {
+                    await eventStore.DeleteStreamAsync(streamName.Value);
+                }
             }
         }
 
@@ -171,7 +177,10 @@ namespace Squidex.Infrastructure.States
                 return;
             }
 
-            await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion);
+            using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
+            {
+                await snapshotStore.WriteAsync(ownerKey, state, oldVersion, newVersion);
+            }
 
             versionSnapshot = newVersion;
 
@@ -194,7 +203,10 @@ namespace Squidex.Infrastructure.States
 
             try
             {
-                await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData);
+                using (Telemetry.Activities.StartActivity("Persistence/WriteEvents"))
+                {
+                    await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData);
+                }
             }
             catch (WrongEventVersionException ex)
             {

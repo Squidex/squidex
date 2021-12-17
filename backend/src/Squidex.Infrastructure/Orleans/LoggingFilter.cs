@@ -22,23 +22,28 @@ namespace Squidex.Infrastructure.Orleans
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
-            try
-            {
-                await context.Invoke();
-            }
-            catch (DomainException ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    Log(context, ex.InnerException);
-                }
+            var name = $"Grain/{context.Grain?.GetType().Name}/{context.ImplementationMethod?.Name}";
 
-                throw;
-            }
-            catch (Exception ex)
+            using (Telemetry.Activities.StartActivity(name))
             {
-                Log(context, ex);
-                throw;
+                try
+                {
+                    await context.Invoke();
+                }
+                catch (DomainException ex)
+                {
+                    if (ex.InnerException != null)
+                    {
+                        Log(context, ex.InnerException);
+                    }
+
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Log(context, ex);
+                    throw;
+                }
             }
         }
 
