@@ -185,14 +185,5 @@ namespace Squidex.Config.Orleans
             options.ClusterId = Constants.OrleansClusterId;
             options.ServiceId = Constants.OrleansClusterId;
         }
-
-        public static void AddOrleans(this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment, Action<ISiloBuilder> action)
-        {
-            var builder = new CustomSiloBuilder(config, environment);
-
-            action(builder);
-
-            builder.Build(services);
-        }
     }
 }

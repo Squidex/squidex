@@ -5,13 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Areas.Api.Controllers.Images.Models;
-using Squidex.Areas.Api.Controllers.Images.Service;
-using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -30,22 +26,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
-        private readonly IAppImageStore appImageStore;
         private readonly IAppProvider appProvider;
-        private readonly IAssetStore assetStore;
-        private readonly IImageResizer imageResizer;
 
-        public AppsController(ICommandBus commandBus,
-            IImageResizer imageResizer,
-            IAppImageStore appImageStore,
-            IAppProvider appProvider,
-            IAssetStore assetStore)
+        public AppsController(ICommandBus commandBus, IAppProvider appProvider)
             : base(commandBus)
         {
-            this.imageResizer = imageResizer;
-            this.appImageStore = appImageStore;
             this.appProvider = appProvider;
-            this.assetStore = assetStore;
         }
 
         /// <summary>
@@ -178,74 +164,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var response = await InvokeCommandAsync(CreateCommand(file));
 
             return Ok(response);
-        }
-
-        /// <summary>
-        /// Get the app image.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => App image found and content or (resized) image returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-        [AllowAnonymous]
-        [ApiCosts(0)]
-        public IActionResult GetImage(string app)
-        {
-            if (App.Image == null)
-            {
-                return NotFound();
-            }
-
-            var etag = App.Image.Etag;
-
-            Response.Headers[HeaderNames.ETag] = etag;
-
-            var callback = new FileCallback(async (body, range, ct) =>
-            {
-                var sourcePath = appImageStore.GetPath(App.Id);
-
-                var resizedPath = $"{App.Id}_{etag}_Resized";
-
-                try
-                {
-                    await assetStore.DownloadAsync(resizedPath, body, ct: ct);
-                }
-                catch (AssetNotFoundException)
-                {
-                    try
-                    {
-                        var request = new ResizeRequest
-                        {
-                            SourcePath = appImageStore.GetPath(App.Id),
-                            SourceMimeType = App.Image.MimeType,
-                            TargetPath = resizedPath,
-                            ResizeOptions = new ResizeOptions
-                            {
-                                TargetWidth = 50,
-                                TargetHeight = 50,
-                                Mode = ResizeMode.Crop
-                            }
-                        };
-
-                        var path = await imageResizer.ResizeAsync(request, ct);
-
-                        await assetStore.DownloadAsync(path, body, ct: ct);
-                    }
-                    catch
-                    {
-                        await assetStore.DownloadAsync(sourcePath, body, ct: ct);
-                    }
-                }
-            });
-
-            return new FileCallbackResult(App.Image.MimeType, callback)
-            {
-                ErrorAs404 = true
-            };
         }
 
         /// <summary>

@@ -22,25 +22,15 @@ services:
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - GRAPHQL__CACHEDURATION=0
       - ASSETS_RESIZERURL=http://resizer:8081
-    volumes:
-      - /etc/squidex/assets:/app/Assets
     networks:
       - internal
     depends_on:
       - mongo
 
   resizer:
-    image: squidex
+    image: squidex/resizer:dev-2
     ports:
       - "8081:80"
-    environment:
-      - URLS__BASEURL=http://localhost:8080
-      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
-      - STORE__TYPE=MongoDB
-      - ASSETS_RESIZER=true
-    volumes:
-      - /etc/squidex/assets:/app/Assets
     networks:
       - internal
     depends_on:

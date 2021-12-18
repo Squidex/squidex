@@ -14,10 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         string? GeneratePublicUrl(DomainId appId, DomainId id, long fileVersion, string? suffix);
 
-        string GetPath(DomainId id, long fileVersion, string? suffix);
-
-        string GetPath(DomainId appId, DomainId id, long fileVersion, string? suffix);
-
         Task<long> GetFileSizeAsync(DomainId appId, DomainId id, long fileVersion, string? suffix,
             CancellationToken ct = default);
 

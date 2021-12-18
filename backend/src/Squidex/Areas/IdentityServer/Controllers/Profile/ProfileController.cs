@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Squidex.Areas.Api.Controllers.Images.Models;
-using Squidex.Areas.Api.Controllers.Images.Service;
 using Squidex.Assets;
 using Squidex.Config;
 using Squidex.Domain.Users;
@@ -22,14 +20,13 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     [Authorize]
     public sealed class ProfileController : IdentityServerController
     {
-        private readonly IImageResizer imageResizer;
-        private readonly IAssetStore assetStore;
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserService userService;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -37,15 +34,11 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         public ProfileController(
             IOptions<MyIdentityOptions> identityOptions,
-            IImageResizer imageResizer,
-            IAssetStore assetStore,
             IUserPictureStore userPictureStore,
             IUserService userService,
             IAssetThumbnailGenerator assetThumbnailGenerator)
         {
             this.identityOptions = identityOptions.Value;
-            this.imageResizer = imageResizer;
-            this.assetStore = assetStore;
             this.userPictureStore = userPictureStore;
             this.userService = userService;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -158,44 +151,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 throw new ValidationException(T.Get("validation.onlyOneFile"));
             }
 
-            var tempName = Guid.NewGuid().ToString();
-
-            await using (var stream = files[0].OpenReadStream())
-            {
-                await assetStore.UploadAsync(tempName, stream, true, HttpContext.RequestAborted);
-            }
-
-            var targetPath = userPictureStore.GetPath(id);
-
-            try
-            {
-                var request = new ResizeRequest
-                {
-                    SourcePath = tempName,
-                    SourceMimeType = files[0].ContentType,
-                    TargetPath = targetPath,
-                    ResizeOptions = new ResizeOptions
-                    {
-                        TargetWidth = 128,
-                        TargetHeight = 128,
-                        Mode = ResizeMode.Crop
-                    },
-                    Overwrite = true
-                };
-
-                await imageResizer.ResizeAsync(request, HttpContext.RequestAborted);
-            }
-            catch
-            {
-                throw new ValidationException(T.Get("validation.notAnImage"));
-            }
-            finally
-            {
-#pragma warning disable MA0040 // Flow the cancellation token
-                await assetStore.DeleteAsync(tempName);
-#pragma warning restore MA0040 // Flow the cancellation token
-
-            }
+            await UploadResizedAsync(files[0], id, HttpContext.RequestAborted);
 
             var update = new UserValues
             {
@@ -203,6 +159,38 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             };
 
             await userService.UpdateAsync(id, update, ct: HttpContext.RequestAborted);
+        }
+
+        private async Task UploadResizedAsync(IFormFile file, string id,
+            CancellationToken ct)
+        {
+            await using var assetResized = new TempAssetFile(file.ToAssetFile());
+
+            var resizeOptions = new ResizeOptions
+            {
+                TargetWidth = 128,
+                TargetHeight = 128
+            };
+
+            try
+            {
+                await using (var originalStream = file.OpenReadStream())
+                {
+                    await using (var resizeStream = assetResized.OpenWrite())
+                    {
+                        await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, file.ContentType, resizeStream, resizeOptions, ct);
+                    }
+                }
+            }
+            catch
+            {
+                throw new ValidationException(T.Get("validation.notAnImage"));
+            }
+
+            await using (var resizeStream = assetResized.OpenWrite())
+            {
+                await userPictureStore.UploadAsync(id, resizeStream, ct);
+            }
         }
 
         private async Task<IActionResult> MakeChangeAsync<TModel>(Func<string, Task> action, string successMessage, TModel? model = null) where TModel : class

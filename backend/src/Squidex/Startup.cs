@@ -14,8 +14,6 @@ using Squidex.Areas.OrleansDashboard;
 using Squidex.Areas.Portal;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
-using Squidex.Config.Orleans;
-using Squidex.Config.Startup;
 using Squidex.Config.Web;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web.Pipeline;
@@ -24,17 +22,11 @@ namespace Squidex
 {
     public sealed class Startup
     {
-        private readonly bool isResizer;
         private readonly IConfiguration config;
-        private readonly IWebHostEnvironment environment;
 
-        public Startup(IConfiguration config, IWebHostEnvironment environment)
+        public Startup(IConfiguration config)
         {
             this.config = config;
-
-            this.environment = environment;
-
-            isResizer = config.GetValue<bool>("assets:resizer");
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -46,23 +38,10 @@ namespace Squidex
             services.AddDefaultWebServices(config);
             services.AddDefaultForwardRules();
 
-            // Step 0: Log all configuration.
-            services.AddHostedService<LogConfigurationHost>();
-
-            // Step 1: Initialize all services.
-            services.AddInitializer();
-
             services.AddSquidexImageResizing(config);
             services.AddSquidexAssetInfrastructure(config);
             services.AddSquidexSerializers();
-
-            if (isResizer)
-            {
-                return;
-            }
-
             services.AddSquidexMvcWithPlugins(config);
-
             services.AddSquidexApps(config);
             services.AddSquidexAssets(config);
             services.AddSquidexAuthentication(config);
@@ -92,18 +71,6 @@ namespace Squidex
             services.AddSquidexTelemetry(config);
             services.AddSquidexTranslation(config);
             services.AddSquidexUsageTracking(config);
-
-            // Step 3: Start Orleans.
-            services.AddOrleans(config, environment, builder => builder.ConfigureForSquidex(config));
-
-            // Step 4: Run migration.
-            services.AddHostedService<MigratorHost>();
-
-            // Step 5: Run rebuild processes.
-            services.AddHostedService<MigrationRebuilderHost>();
-
-            // Step 6: Start background processes.
-            services.AddBackgroundProcesses();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -113,14 +80,7 @@ namespace Squidex
             app.UseDefaultPathBase();
             app.UseDefaultForwardRules();
 
-            app.UseSquidexImageResizing();
             app.UseSquidexHealthCheck();
-
-            if (isResizer)
-            {
-                return;
-            }
-
             app.UseSquidexRobotsTxt();
             app.UseSquidexCacheKeys();
             app.UseSquidexExceptionHandling();

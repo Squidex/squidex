@@ -14,7 +14,5 @@ namespace Squidex.Domain.Users
 
         Task DownloadAsync(string userId, Stream stream,
             CancellationToken ct = default);
-
-        string GetPath(string userId);
     }
 }

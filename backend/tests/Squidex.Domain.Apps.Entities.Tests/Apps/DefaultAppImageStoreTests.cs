@@ -65,20 +65,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .MustHaveHappened();
         }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Should_get_file_name(bool folderPerApp)
-        {
-            options.FolderPerApp = folderPerApp;
-
-            var fileName = GetFileName(folderPerApp);
-
-            var result = sut.GetPath(appId);
-
-            Assert.Equal(fileName, result);
-        }
-
         private string GetFileName(bool folderPerApp)
         {
             return folderPerApp ? fileNameFolder : fileNameDefault;

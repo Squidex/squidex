@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Areas.Api.Controllers.Images;
-using Squidex.Areas.Api.Controllers.Images.Service;
+using Squidex.Assets;
+using Squidex.Assets.ImageMagick;
+using Squidex.Assets.ImageSharp;
+using Squidex.Assets.Remote;
 
 namespace Squidex.Config.Domain
 {
@@ -14,32 +16,30 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexImageResizing(this IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs<ImagesMiddleware>()
-                    .AsSelf();
-
-            services.AddSingletonAs<InProcessImageResizer>()
-                .AsSelf().As<IImageResizer>();
+            var thumbnailGenerator = new CompositeThumbnailGenerator(
+                new IAssetThumbnailGenerator[]
+                {
+                    new ImageSharpThumbnailGenerator(),
+                    new ImageMagickThumbnailGenerator()
+                });
 
             var resizerUrl = config.GetValue<string>("assets:resizerUrl");
 
             if (!string.IsNullOrWhiteSpace(resizerUrl))
             {
-                services.AddHttpClient("ImageResizer", options =>
+                services.AddHttpClient("Resize", options =>
                 {
                     options.BaseAddress = new Uri(resizerUrl);
                 });
 
-                services.AddSingletonAs<RemoteImageResizer>()
-                    .As<IImageResizer>();
+                services.AddSingletonAs(c => new RemoteThumbnailGenerator(c.GetRequiredService<IHttpClientFactory>(), thumbnailGenerator))
+                    .As<IAssetThumbnailGenerator>();
             }
-        }
-
-        public static void UseSquidexImageResizing(this IApplicationBuilder app)
-        {
-            app.Map("/images/resize", builder =>
+            else
             {
-                builder.UseMiddleware<ImagesMiddleware>();
-            });
+                services.AddSingletonAs(c => thumbnailGenerator)
+                    .As<IAssetThumbnailGenerator>();
+            }
         }
     }
 }

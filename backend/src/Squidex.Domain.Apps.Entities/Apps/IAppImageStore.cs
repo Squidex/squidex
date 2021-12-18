@@ -16,7 +16,5 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         Task DownloadAsync(DomainId appId, Stream stream,
             CancellationToken ct = default);
-
-        string GetPath(DomainId appId);
     }
 }
