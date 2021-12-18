@@ -20,18 +20,13 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     [Authorize]
     public sealed class ProfileController : IdentityServerController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions
-        {
-            TargetWidth = 128,
-            TargetHeight = 128,
-            Mode = ResizeMode.Crop
-        };
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserService userService;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
@@ -156,31 +151,46 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 throw new ValidationException(T.Get("validation.onlyOneFile"));
             }
 
-            using (var thumbnailStream = new MemoryStream())
+            await UploadResizedAsync(files[0], id, HttpContext.RequestAborted);
+
+            var update = new UserValues
             {
-                try
-                {
-                    var file = files[0];
-
-                    await using (var stream = file.OpenReadStream())
-                    {
-                        await assetThumbnailGenerator.CreateThumbnailAsync(stream, file.ContentType, thumbnailStream, ResizeOptions,
-                            HttpContext.RequestAborted);
-                    }
-
-                    thumbnailStream.Position = 0;
-                }
-                catch
-                {
-                    throw new ValidationException(T.Get("validation.notAnImage"));
-                }
-
-                await userPictureStore.UploadAsync(id, thumbnailStream, HttpContext.RequestAborted);
-            }
-
-            var update = new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore };
+                PictureUrl = SquidexClaimTypes.PictureUrlStore
+            };
 
             await userService.UpdateAsync(id, update, ct: HttpContext.RequestAborted);
+        }
+
+        private async Task UploadResizedAsync(IFormFile file, string id,
+            CancellationToken ct)
+        {
+            await using var assetResized = new TempAssetFile(file.ToAssetFile());
+
+            var resizeOptions = new ResizeOptions
+            {
+                TargetWidth = 128,
+                TargetHeight = 128
+            };
+
+            try
+            {
+                await using (var originalStream = file.OpenReadStream())
+                {
+                    await using (var resizeStream = assetResized.OpenWrite())
+                    {
+                        await assetThumbnailGenerator.CreateThumbnailAsync(originalStream, file.ContentType, resizeStream, resizeOptions, ct);
+                    }
+                }
+            }
+            catch
+            {
+                throw new ValidationException(T.Get("validation.notAnImage"));
+            }
+
+            await using (var resizeStream = assetResized.OpenWrite())
+            {
+                await userPictureStore.UploadAsync(id, resizeStream, ct);
+            }
         }
 
         private async Task<IActionResult> MakeChangeAsync<TModel>(Func<string, Task> action, string successMessage, TModel? model = null) where TModel : class

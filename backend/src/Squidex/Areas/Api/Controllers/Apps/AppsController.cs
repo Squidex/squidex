@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
@@ -29,28 +26,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions
-        {
-            TargetWidth = 50,
-            TargetHeight = 50,
-            Mode = ResizeMode.Crop
-        };
-        private readonly IAppImageStore appImageStore;
         private readonly IAppProvider appProvider;
-        private readonly IAssetStore assetStore;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
-        public AppsController(ICommandBus commandBus,
-            IAppImageStore appImageStore,
-            IAppProvider appProvider,
-            IAssetStore assetStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator)
+        public AppsController(ICommandBus commandBus, IAppProvider appProvider)
             : base(commandBus)
         {
-            this.appImageStore = appImageStore;
             this.appProvider = appProvider;
-            this.assetStore = assetStore;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
         /// <summary>
@@ -186,84 +167,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Get the app image.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => App image found and content or (resized) image returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-        [AllowAnonymous]
-        [ApiCosts(0)]
-        public IActionResult GetImage(string app)
-        {
-            if (App.Image == null)
-            {
-                return NotFound();
-            }
-
-            var etag = App.Image.Etag;
-
-            Response.Headers[HeaderNames.ETag] = etag;
-
-            var callback = new FileCallback(async (body, range, ct) =>
-            {
-                var resizedAsset = $"{App.Id}_{etag}_Resized";
-
-                try
-                {
-                    await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
-                }
-                catch (AssetNotFoundException)
-                {
-                    using (Telemetry.Activities.StartActivity("Resize"))
-                    {
-                        await using (var destinationStream = GetTempStream())
-                        {
-                            await ResizeAsync(resizedAsset, App.Image.MimeType, destinationStream);
-
-                            await destinationStream.CopyToAsync(body, ct);
-                        }
-                    }
-                }
-            });
-
-            return new FileCallbackResult(App.Image.MimeType, callback)
-            {
-                ErrorAs404 = true
-            };
-        }
-
-        private async Task ResizeAsync(string resizedAsset, string mimeType, FileStream destinationStream)
-        {
-#pragma warning disable MA0040 // Flow the cancellation token
-            await using (var sourceStream = GetTempStream())
-            {
-                using (Telemetry.Activities.StartActivity("ResizeDownload"))
-                {
-                    await appImageStore.DownloadAsync(App.Id, sourceStream);
-                    sourceStream.Position = 0;
-                }
-
-                using (Telemetry.Activities.StartActivity("ResizeImage"))
-                {
-                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, mimeType, destinationStream, ResizeOptions);
-                    destinationStream.Position = 0;
-                }
-
-                using (Telemetry.Activities.StartActivity("ResizeUpload"))
-                {
-                    await assetStore.UploadAsync(resizedAsset, destinationStream);
-                    destinationStream.Position = 0;
-                }
-            }
-#pragma warning restore MA0040 // Flow the cancellation token
-        }
-
-        /// <summary>
         /// Remove the app image.
         /// </summary>
         /// <param name="app">The name of the app to update.</param>
@@ -334,19 +237,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
 
             return new UploadAppImage { File = file.ToAssetFile() };
-        }
-
-        private static FileStream GetTempStream()
-        {
-            var tempFileName = Path.GetTempFileName();
-
-            return new FileStream(tempFileName,
-                FileMode.Create,
-                FileAccess.ReadWrite,
-                FileShare.Delete, 1024 * 16,
-                FileOptions.Asynchronous |
-                FileOptions.DeleteOnClose |
-                FileOptions.SequentialScan);
         }
     }
 }

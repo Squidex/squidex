@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             var file = new NoopAssetFile();
 
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
-                .Returns(new ImageInfo(100, 100, false, ImageFormat.PNG));
+                .Returns(new ImageInfo(100, 100, ImageOrientation.None, ImageFormat.PNG));
 
             await HandleAsync(new UploadAppImage { File = file }, None.Value);
 

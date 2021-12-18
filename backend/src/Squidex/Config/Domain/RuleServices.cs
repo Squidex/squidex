@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Extensions;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -102,6 +103,11 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
                 .AsSelf();
+
+            services.AddInitializer<RuleRegistry>("Serializer (Rules)", registry =>
+            {
+                RuleActionConverter.Mapping = registry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
+            }, -1);
         }
     }
 }

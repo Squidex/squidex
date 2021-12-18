@@ -8,24 +8,31 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {
     public sealed class ActionContextLogAppender : ILogAppender
     {
-        private readonly IActionContextAccessor actionContextAccessor;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IServiceProvider services;
 
-        public ActionContextLogAppender(IActionContextAccessor actionContextAccessor, IHttpContextAccessor httpContextAccessor)
+        public ActionContextLogAppender(IServiceProvider services)
         {
-            this.actionContextAccessor = actionContextAccessor;
-
-            this.httpContextAccessor = httpContextAccessor;
+            this.services = services;
         }
 
         public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
         {
+            var httpContextAccessor = services.GetService<IHttpContextAccessor>();
+
+            if (string.IsNullOrEmpty(httpContextAccessor?.HttpContext?.Request?.Method))
+            {
+                return;
+            }
+
+            var actionContext = services.GetRequiredService<IActionContextAccessor>()?.ActionContext;
+
             try
             {
                 var httpContext = httpContextAccessor.HttpContext;
@@ -37,7 +44,7 @@ namespace Squidex.Web.Pipeline
 
                 var requestId = GetRequestId(httpContext);
 
-                var logContext = (requestId, context: httpContext, actionContextAccessor);
+                var logContext = (requestId, context: httpContext, actionContext);
 
                 writer.WriteObject("web", logContext, (ctx, w) =>
                 {
@@ -45,7 +52,7 @@ namespace Squidex.Web.Pipeline
                     w.WriteProperty("requestPath", ctx.context.Request.Path);
                     w.WriteProperty("requestMethod", ctx.context.Request.Method);
 
-                    var actionContext = ctx.actionContextAccessor.ActionContext;
+                    var actionContext = ctx.actionContext;
 
                     if (actionContext != null)
                     {

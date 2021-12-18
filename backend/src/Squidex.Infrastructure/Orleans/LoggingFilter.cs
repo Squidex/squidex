@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Orleans;
-using Squidex.Infrastructure.States;
 using Squidex.Log;
 
 namespace Squidex.Infrastructure.Orleans

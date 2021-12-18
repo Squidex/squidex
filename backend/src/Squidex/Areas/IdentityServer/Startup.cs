@@ -15,23 +15,23 @@ namespace Squidex.Areas.IdentityServer
         {
             var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
-            app.Map(Constants.PrefixIdentityServer, identityApp =>
+            app.Map(Constants.PrefixIdentityServer, builder =>
             {
                 if (environment.IsDevelopment())
                 {
-                    identityApp.UseDeveloperExceptionPage();
+                    builder.UseDeveloperExceptionPage();
                 }
                 else
                 {
-                    identityApp.UseExceptionHandler("/error");
+                    builder.UseExceptionHandler("/error");
                 }
 
-                identityApp.UseRouting();
+                builder.UseRouting();
 
-                identityApp.UseAuthentication();
-                identityApp.UseAuthorization();
+                builder.UseAuthentication();
+                builder.UseAuthorization();
 
-                identityApp.UseEndpoints(endpoints =>
+                builder.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
                 });

@@ -14,13 +14,13 @@ namespace Squidex.Areas.Portal
     {
         public static void ConfigurePortal(this IApplicationBuilder app)
         {
-            app.Map(Constants.PrefixPortal, portalApp =>
+            app.Map(Constants.PrefixPortal, builder =>
             {
-                portalApp.UseAuthentication();
-                portalApp.UseAuthorization();
+                builder.UseAuthentication();
+                builder.UseAuthorization();
 
-                portalApp.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
-                portalApp.UseMiddleware<PortalRedirectMiddleware>();
+                builder.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
+                builder.UseMiddleware<PortalRedirectMiddleware>();
             });
         }
     }

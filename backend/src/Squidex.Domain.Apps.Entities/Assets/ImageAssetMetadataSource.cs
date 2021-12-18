@@ -20,37 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
 
-        private sealed class TempAssetFile : AssetFile, IDisposable
-        {
-            public Stream Stream { get; }
-
-            public TempAssetFile(AssetFile source)
-                : base(source.FileName, source.MimeType, source.FileSize)
-            {
-                var tempPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
-
-                var tempStream = new FileStream(tempPath,
-                    FileMode.Create,
-                    FileAccess.ReadWrite,
-                    FileShare.None, 4096,
-                    FileOptions.DeleteOnClose);
-
-                Stream = tempStream;
-            }
-
-            public override void Dispose()
-            {
-                Stream.Dispose();
-            }
-
-            public override Stream OpenRead()
-            {
-                Stream.Position = 0;
-
-                return Stream;
-            }
-        }
-
         public async Task EnhanceAsync(UploadAssetCommand command)
         {
             if (command.Type == AssetType.Unknown || command.Type == AssetType.Image)
@@ -66,18 +35,27 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 if (imageInfo != null)
                 {
-                    var isSwapped = imageInfo.IsRotatedOrSwapped;
+                    var isSwapped = imageInfo.Orientation > ImageOrientation.TopLeft;
 
-                    if (isSwapped)
+                    if (command.File != null && isSwapped)
                     {
                         var tempFile = new TempAssetFile(command.File);
 
                         await using (var uploadStream = command.File.OpenRead())
                         {
-                            imageInfo = await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempFile.Stream);
+                            await using (var tempStream = tempFile.OpenWrite())
+                            {
+                                await assetThumbnailGenerator.FixOrientationAsync(uploadStream, mimeType, tempStream);
+                            }
                         }
 
-                        command.File.Dispose();
+                        await using (var tempStream = tempFile.OpenRead())
+                        {
+                            imageInfo = await assetThumbnailGenerator.GetImageInfoAsync(tempStream, mimeType) ?? imageInfo;
+                        }
+
+                        await command.File.DisposeAsync();
+
                         command.File = tempFile;
                     }
 

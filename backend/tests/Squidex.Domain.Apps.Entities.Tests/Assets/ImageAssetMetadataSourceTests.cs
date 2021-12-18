@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var command = new CreateAsset { File = file };
 
             A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, default))
-                .Returns(new ImageInfo(800, 600, false, ImageFormat.PNG));
+                .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
 
             await sut.EnhanceAsync(command);
 
@@ -72,11 +72,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file };
 
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, default))
-                .Returns(new ImageInfo(600, 800, true, ImageFormat.PNG));
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(A<Stream>._, file.MimeType, default))
+                .Returns(new ImageInfo(800, 600, ImageOrientation.None, ImageFormat.PNG));
 
-            A.CallTo(() => assetThumbnailGenerator.FixOrientationAsync(stream, file.MimeType, A<Stream>._, default))
-                .Returns(new ImageInfo(800, 600, true, ImageFormat.PNG));
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream, file.MimeType, default))
+                .Returns(new ImageInfo(600, 800, ImageOrientation.BottomRight, ImageFormat.PNG)).Once();
 
             await sut.EnhanceAsync(command);
 

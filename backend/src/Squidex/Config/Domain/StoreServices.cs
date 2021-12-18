@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Identity;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
@@ -38,6 +39,7 @@ using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -160,12 +162,19 @@ namespace Squidex.Config.Domain
                         services.AddSingletonAs<MongoTextIndex>()
                             .AsOptional<ITextIndex>().As<IDeleter>();
                     }
+
+                    services.AddInitializer<JsonSerializer>("Serializer (BSON)", jsonNetSerializer =>
+                    {
+                        BsonJsonConvention.Register(jsonNetSerializer);
+                    }, -1);
                 }
             });
 
-            services.AddSingleton(typeof(IStore<>), typeof(Store<>));
+            services.AddSingleton(typeof(IStore<>),
+                typeof(Store<>));
 
-            services.AddSingleton(typeof(IPersistenceFactory<>), typeof(Store<>));
+            services.AddSingleton(typeof(IPersistenceFactory<>),
+                typeof(Store<>));
         }
 
         private static IMongoClient GetClient(string configuration)

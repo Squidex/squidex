@@ -33,12 +33,16 @@ namespace Squidex
         {
             services.AddHttpClient();
             services.AddMemoryCache();
+            services.AddHealthChecks();
             services.AddNonBreakingSameSiteCookies();
+            services.AddDefaultWebServices(config);
+            services.AddDefaultForwardRules();
 
-            services.AddSquidexMvcWithPlugins(config);
-
-            services.AddSquidexApps(config);
+            services.AddSquidexImageResizing(config);
             services.AddSquidexAssetInfrastructure(config);
+            services.AddSquidexSerializers();
+            services.AddSquidexMvcWithPlugins(config);
+            services.AddSquidexApps(config);
             services.AddSquidexAssets(config);
             services.AddSquidexAuthentication(config);
             services.AddSquidexBackups();
@@ -62,7 +66,6 @@ namespace Squidex
             services.AddSquidexRules(config);
             services.AddSquidexSchemas();
             services.AddSquidexSearch();
-            services.AddSquidexSerializers();
             services.AddSquidexStoreServices(config);
             services.AddSquidexSubscriptions(config);
             services.AddSquidexTelemetry(config);
@@ -77,10 +80,12 @@ namespace Squidex
             app.UseDefaultPathBase();
             app.UseDefaultForwardRules();
 
-            app.UseSquidexCacheKeys();
             app.UseSquidexHealthCheck();
             app.UseSquidexRobotsTxt();
-            app.UseSquidexTracking();
+            app.UseSquidexCacheKeys();
+            app.UseSquidexExceptionHandling();
+            app.UseSquidexUsage();
+            app.UseSquidexLogging();
             app.UseSquidexLocalization();
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
