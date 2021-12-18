@@ -47,6 +47,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
+        public string GetPath(DomainId id, long fileVersion, string? suffix)
+        {
+            var path = GetFileName(id, fileVersion, suffix);
+
+            return path;
+        }
+
         public string GetPath(DomainId appId, DomainId id, long fileVersion, string? suffix)
         {
             var path = GetFileName(appId, id, fileVersion, suffix);

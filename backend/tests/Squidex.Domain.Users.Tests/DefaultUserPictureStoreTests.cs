@@ -46,5 +46,13 @@ namespace Squidex.Domain.Users
             A.CallTo(() => assetStore.DownloadAsync(file, stream, default, CancellationToken.None))
                 .MustHaveHappened();
         }
+
+        [Fact]
+        public void Should_get_path()
+        {
+            var result = sut.GetPath(userId);
+
+            Assert.Equal(file, result);
+        }
     }
 }

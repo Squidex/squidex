@@ -68,6 +68,32 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Theory]
+        [MemberData(nameof(PathCasesOld))]
+        public void Should_get_old_path(bool folderPerApp, string? suffix, string fileName)
+        {
+            var fullName = GetFullName(fileName);
+
+            options.FolderPerApp = folderPerApp;
+
+            var result = sut.GetPath(assetId, assetFileVersion, suffix);
+
+            Assert.Equal(fullName, result);
+        }
+
+        [Theory]
+        [MemberData(nameof(PathCases))]
+        public void Should_get_path(bool folderPerApp, string? suffix, string fileName)
+        {
+            var fullName = GetFullName(fileName);
+
+            options.FolderPerApp = folderPerApp;
+
+            var result = sut.GetPath(appId, assetId, assetFileVersion, suffix);
+
+            Assert.Equal(fullName, result);
+        }
+
+        [Theory]
         [MemberData(nameof(PathCases))]
         public async Task Should_get_file_size_from_store(bool folderPerApp, string? suffix, string fileName)
         {
@@ -105,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_upload_temporary_filet_to_store()
+        public async Task Should_upload_temporary_file_to_store()
         {
             var stream = new MemoryStream();
 
