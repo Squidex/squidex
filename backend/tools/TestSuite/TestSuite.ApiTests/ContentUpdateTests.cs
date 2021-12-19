@@ -485,15 +485,46 @@ namespace TestSuite.ApiTests
             try
             {
                 // STEP 1: Create a new item.
-                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, true);
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "test" }, true);
 
 
-                // STEP 2: Update the item and ensure that the data has changed.
+                // STEP 2: Path an item.
+                await _.Contents.PatchAsync(content.Id, new TestEntityData { Number = 1 });
+
+
+                // STEP 3: Update the item and ensure that the data has changed.
                 await _.Contents.PatchAsync(content.Id, new TestEntityData { Number = 2 });
 
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal(2, updated.Data.Number);
+                Assert.Equal("test", updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_patch_id_data_value()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { Id = "id1" }, true);
+
+
+                // STEP 2: Update the item and ensure that the data has changed.
+                await _.Contents.PatchAsync(content.Id, new TestEntityData { Id = "id2" });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal("id2", updated.Data.Id);
             }
             finally
             {

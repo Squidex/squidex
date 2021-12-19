@@ -54,7 +54,15 @@ namespace TestSuite.Model
                         {
                             DefaultValue = "default"
                         }
-                    }
+                    },
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = TestEntityData.IdField,
+                        Properties = new StringFieldPropertiesDto
+                        {
+                            IsRequired = false
+                        }
+                    },
                 },
                 Scripts = new SchemaScriptsDto
                 {
@@ -81,10 +89,15 @@ namespace TestSuite.Model
 
         public static readonly string GeoField = nameof(Geo).ToLowerInvariant();
 
+        public static readonly string IdField = nameof(Id).ToLowerInvariant();
+
         public Dictionary<string, string> Localized { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public int Number { get; set; }
+
+        [JsonConverter(typeof(InvariantConverter))]
+        public string Id { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public string String { get; set; }
