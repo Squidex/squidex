@@ -54,27 +54,17 @@ namespace Squidex.Infrastructure.Orleans
         [SerializerMethod]
         public static void Serialize(object? input, ISerializationContext context, Type? expected)
         {
-            using (Telemetry.Activities.StartActivity("JsonSerializer/Serialize"))
-            {
-                var jsonSerializer = GetSerializer(context);
+            var stream = new StreamWriterWrapper(context.StreamWriter);
 
-                var stream = new StreamWriterWrapper(context.StreamWriter);
-
-                jsonSerializer.Serialize(input, stream);
-            }
+            GetSerializer(context).Serialize(input, stream);
         }
 
         [DeserializerMethod]
         public static object? Deserialize(Type expected, IDeserializationContext context)
         {
-            using (Telemetry.Activities.StartActivity("JsonSerializer/Deserialize"))
-            {
-                var jsonSerializer = GetSerializer(context);
+            var stream = new StreamReaderWrapper(context.StreamReader);
 
-                var stream = new StreamReaderWrapper(context.StreamReader);
-
-                return jsonSerializer.Deserialize<object>(stream, expected);
-            }
+            return GetSerializer(context).Deserialize<object>(stream, expected);
         }
 
         private static IJsonSerializer GetSerializer(ISerializerContext context)

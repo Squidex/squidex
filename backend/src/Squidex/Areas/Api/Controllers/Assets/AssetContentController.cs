@@ -203,7 +203,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private async Task ResizeAsync(IAssetEntity asset, string suffix, Stream target, ResizeOptions resizeOptions, bool overwrite,
             CancellationToken ct)
         {
-#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods
 #pragma warning disable MA0040 // Flow the cancellation token
             using var activity = Telemetry.Activities.StartActivity("Resize");
 
@@ -264,7 +263,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
                     await resizeStream.CopyToAsync(target, ct);
                 }
             }
-#pragma warning restore CA2016 // Forward the 'CancellationToken' parameter to methods
 #pragma warning restore MA0040 // Flow the cancellation token
         }
     }
