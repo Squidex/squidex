@@ -498,6 +498,8 @@ namespace TestSuite.ApiTests
                 var updated = await _.Contents.GetAsync(content.Id);
 
                 Assert.Equal(2, updated.Data.Number);
+
+                // Should not change other value with patch.
                 Assert.Equal("test", updated.Data.String);
             }
             finally
