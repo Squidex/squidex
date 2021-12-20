@@ -3,6 +3,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.4.0] - 2021-12-20
+
+### Fixed
+
+* **Database**: Fix to support duplicate entries in the database (database is corrupt).
+* **EventConsumer**: Fixed a swallowed exception in the event consumer.
+* **UI**: Fixed a bug in the UI settings page.
+* **UI**: Several styling fixes.
+* **Users**: User endpoint should not throw exception when search string is null.
+
+### Changed
+
+* **Queries**: Also accept single values for IN operator and convert them to a arrays.
+* **Scriping**: Allow to set nested content values in scripts.
+* **Telemetry**: Remove telemetry for Orleans serialization and deserialization because it was detected as root span.
+* **UI**: Automatically add scrollbars for large dropdowns.
+* **UI**: Automatically collapse deeply nested UI components in the content page to improve performance.
+* **UI**: Big refactoring of Angular forms to simplify code.
+* **UI**: Do not load total count when moving to next page for lists like contents or assets.
+* **UI**: Load referenced assets and contents in batches in the content page.
+
+### Added
+
+* **Assets**: Integrated ImageMagick for TGA support.
+* **Assets**: Integrated ImageMagick for Webpack support.
+* **Assets**: Support for a resizer server to outsource image resizing to a microservice.
+* **Languages**: Expose native language names over API.
+* **Scripting**: New function to generate guid values in scripts.
+* **Tests**: New API tests to improve overall quality.
+
 ## [6.3.0] - 2021-11-22
 
 ### Fixed
