@@ -298,6 +298,7 @@
   "common.label": "标签",
   "common.language": "语言",
   "common.languages": "语言",
+  "common.lastExecuted": "Last Executed",
   "common.latitudeShort": "纬度",
   "common.loading": "正在加载",
   "common.logout": "注销",

@@ -298,6 +298,7 @@
   "common.label": "Label",
   "common.language": "Language",
   "common.languages": "Languages",
+  "common.lastExecuted": "Last Executed",
   "common.latitudeShort": "Lat",
   "common.loading": "Loading",
   "common.logout": "Logout",

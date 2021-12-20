@@ -107,7 +107,7 @@
                 <span class="badge badge-danger rounded-pill" *ngIf="rule.numFailed > 0">{{rule.numFailed}}</span>
             </div>
             <div class="col">
-                {{ 'common.executed' | sqxTranslate }}: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>
+                {{ 'common.lastExecuted' | sqxTranslate }}: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>
             </div>
             <div class="col-auto">
                 <a routerLink="events" [queryParams]="{ ruleId: rule.id }" *ngIf="rule.canTrigger">
