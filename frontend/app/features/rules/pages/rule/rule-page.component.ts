@@ -86,21 +86,25 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     }
 
     public selectAction(type: string, values = {}) {
-        const form = new ActionForm(this.supportedActions[type], type);
+        if (this.currentAction?.type !== type) {
+            const form = new ActionForm(this.supportedActions[type], type);
 
-        form.setEnabled(this.isEditable);
-        form.load(values);
+            this.currentAction = { form, type, values };
+            this.currentAction.form.setEnabled(this.isEditable);
+        }
 
-        this.currentAction = { form, type, values };
+        this.currentAction.form.load(values);
     }
 
     public selectTrigger(type: string, values = {}) {
-        const form = new TriggerForm(type);
+        if (this.currentTrigger?.type !== type) {
+            const form = new TriggerForm(type);
 
-        form.setEnabled(this.isEditable);
-        form.load(values);
+            this.currentTrigger = { form, type, values };
+            this.currentTrigger.form.setEnabled(this.isEditable);
+        }
 
-        this.currentTrigger = { form, type, values };
+        this.currentTrigger.form.load(values);
     }
 
     public resetAction() {
@@ -136,19 +140,25 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
 
         if (this.rule) {
             this.rulesState.update(this.rule, request)
-                .subscribe(() => {
-                    this.submitCompleted();
-                }, error => {
-                    this.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.submitCompleted();
+                    },
+                    error: error => {
+                        this.submitFailed(error);
+                    },
                 });
         } else {
             this.rulesState.create(request)
-                .subscribe(rule => {
-                    this.submitCompleted();
+                .subscribe({
+                    next: rule => {
+                        this.submitCompleted();
 
-                    this.router.navigate([rule.id], { relativeTo: this.route.parent, replaceUrl: true });
-                }, error => {
-                    this.submitFailed(error);
+                        this.router.navigate([rule.id], { relativeTo: this.route.parent, replaceUrl: true });
+                    },
+                    error: error => {
+                        this.submitFailed(error);
+                    },
                 });
         }
     }

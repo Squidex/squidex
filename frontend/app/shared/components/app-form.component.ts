@@ -40,10 +40,13 @@ export class AppFormComponent {
             const request = { ...value, template: this.template };
 
             this.appsStore.create(request)
-                .subscribe(() => {
-                    this.emitComplete();
-                }, error => {
-                    this.createForm.submitFailed(error);
+                .subscribe({
+                    next: () => {
+                        this.emitComplete();
+                    },
+                    error: error => {
+                        this.createForm.submitFailed(error);
+                    },
                 });
         }
     }
