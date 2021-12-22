@@ -164,7 +164,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         private async Task UploadResizedAsync(IFormFile file, string id,
             CancellationToken ct)
         {
-            await using var assetResized = new TempAssetFile(file.ToAssetFile());
+            await using var assetResized = TempAssetFile.Create(file.ToAssetFile());
 
             var resizeOptions = new ResizeOptions
             {

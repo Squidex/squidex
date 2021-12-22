@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     if (command.File != null && isSwapped)
                     {
-                        var tempFile = new TempAssetFile(command.File);
+                        var tempFile = TempAssetFile.Create(command.File);
 
                         await using (var uploadStream = command.File.OpenRead())
                         {
