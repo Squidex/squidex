@@ -14,8 +14,8 @@ type Transform = (value: string) => string;
 
 export const TransformNoop: Transform = value => value;
 export const TransformLowerCase: Transform = value => value.toLowerCase();
-export const TransformSlugify: Transform = value => slugify(value, { lower: true });
-export const TransformSlugifyCased: Transform = value => slugify(value, { lower: false });
+export const TransformSlugify: Transform = value => slugify(value, { lower: true, trim: false });
+export const TransformSlugifyCased: Transform = value => slugify(value, { lower: false, trim: false });
 export const TransformUpperCase: Transform = value => value.toUpperCase();
 
 export const SQX_TRANSFORM_INPUT_VALUE_ACCESSOR: any = {
