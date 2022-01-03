@@ -16,5 +16,5 @@ import { AppDto } from '@app/shared';
 })
 export class ApiCardComponent {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 }

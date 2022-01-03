@@ -42,13 +42,13 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     private isLoadingFailed = false;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public schemaId: string;
+    public schemaId!: string;
 
     @Input()
     public mode: 'Array' | 'Single' = 'Single';

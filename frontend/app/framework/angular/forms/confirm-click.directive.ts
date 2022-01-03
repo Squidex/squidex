@@ -21,7 +21,7 @@ export class ConfirmClickDirective {
     public confirmText: string | undefined | null;
 
     @Input()
-    public confirmRememberKey: string;
+    public confirmRememberKey = '';
 
     @Input()
     public confirmRequired?: boolean | null = true;

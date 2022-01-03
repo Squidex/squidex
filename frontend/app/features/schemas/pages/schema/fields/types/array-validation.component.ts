@@ -16,13 +16,13 @@ import { ArrayFieldPropertiesDto, FieldDto, SchemaTagSource } from '@app/shared'
 })
 export class ArrayValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: ArrayFieldPropertiesDto;
+    public properties!: ArrayFieldPropertiesDto;
 
     constructor(
         public readonly schemasSource: SchemaTagSource,

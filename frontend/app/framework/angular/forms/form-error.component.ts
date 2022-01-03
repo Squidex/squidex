@@ -24,7 +24,7 @@ export class FormErrorComponent implements OnChanges {
     @Input()
     public closeable?: boolean | null;
 
-    public show: boolean;
+    public show = false;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['error']) {

@@ -15,7 +15,7 @@ import { SchemaDto, SchemasState } from '@app/shared';
 })
 export class SchemaUIFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public selectedTab = 0;
 

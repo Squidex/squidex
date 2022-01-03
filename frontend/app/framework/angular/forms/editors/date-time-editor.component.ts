@@ -37,14 +37,14 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     private readonly hideDateButtonsSettings: boolean;
     private readonly hideDateTimeModeButtonSetting: boolean;
     private picker: any;
-    private dateTime: DateTime | null;
+    private dateTime?: DateTime | null;
     private suppressEvents = false;
 
     @Output()
     public blur = new EventEmitter();
 
     @Input()
-    public mode: 'DateTime' | 'Date';
+    public mode: 'DateTime' | 'Date' = 'Date';
 
     @Input()
     public enforceTime?: boolean | null;
@@ -67,7 +67,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     }
 
     @ViewChild('dateInput', { static: false })
-    public dateInput: ElementRef<HTMLInputElement>;
+    public dateInput!: ElementRef<HTMLInputElement>;
 
     public timeControl = new FormControl();
     public dateControl = new FormControl();

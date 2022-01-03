@@ -40,9 +40,9 @@ export class SearchSource implements AutocompleteSource {
 })
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })
-    public searchControl: AutocompleteComponent;
+    public searchControl!: AutocompleteComponent;
 
-    public searchResult: SearchResultDto;
+    public searchResult?: SearchResultDto;
 
     constructor(
         private readonly router: Router,

@@ -15,7 +15,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class FormAlertComponent {
     @Input()
-    public class: string;
+    public class = '';
 
     @Input()
     public marginTop: number | string | undefined | null = 2;

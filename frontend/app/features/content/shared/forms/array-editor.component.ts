@@ -20,38 +20,38 @@ import { ArrayItemComponent } from './array-item.component';
 })
 export class ArrayEditorComponent implements OnChanges, OnInit {
     @Input()
-    public form: EditContentForm;
+    public form!: EditContentForm;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public formLevel: number;
+    public formLevel!: number;
 
     @Input()
-    public formModel: FieldArrayForm;
+    public formModel!: FieldArrayForm;
 
     @Input()
     public canUnset?: boolean | null;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(ArrayItemComponent)
-    public children: QueryList<ArrayItemComponent>;
+    public children!: QueryList<ArrayItemComponent>;
 
     public isArray = false;
 
     public schemasDropdown = new ModalModel();
-    public schemasList: ReadonlyArray<SchemaDto>;
+    public schemasList: ReadonlyArray<SchemaDto> = [];
 
-    public isDisabled: Observable<boolean>;
+    public isDisabled?: Observable<boolean>;
     public isCollapsedInitial = false;
 
-    public isFull: Observable<boolean>;
+    public isFull?: Observable<boolean>;
 
     public get hasField() {
         return this.formModel.field['nested']?.length > 0;

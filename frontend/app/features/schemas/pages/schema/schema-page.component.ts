@@ -19,7 +19,7 @@ import { SchemaCloning } from './../messages';
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public readonly exact = { exact: true };
 
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
     public schemaTab = this.route.queryParams.pipe(map(x => x['tab'] || 'fields'));
 
     public editOptionsDropdown = new ModalModel();

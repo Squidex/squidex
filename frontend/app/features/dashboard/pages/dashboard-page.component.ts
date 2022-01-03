@@ -19,18 +19,18 @@ import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angul
 })
 export class DashboardPageComponent extends ResourceOwner implements AfterViewInit, OnInit {
     @ViewChild('grid')
-    public grid: GridsterComponent;
+    public grid!: GridsterComponent;
 
     public selectedApp = this.appsState.selectedApp.pipe(defined());
 
-    public isStacked: boolean;
+    public isStacked = false;
 
-    public storageCurrent: CurrentStorageDto;
-    public storageUsage: ReadonlyArray<StorageUsagePerDateDto>;
+    public storageCurrent?: CurrentStorageDto;
+    public storageUsage?: ReadonlyArray<StorageUsagePerDateDto>;
 
-    public callsUsage: CallsUsageDto;
+    public callsUsage?: CallsUsageDto;
 
-    public gridConfig: GridsterItem[];
+    public gridConfig?: GridsterItem[];
     public gridOptions = DEFAULT_OPTIONS;
 
     public isScrolled = false;

@@ -86,7 +86,7 @@ export class ContentListWidthPipe implements PipeTransform {
 })
 export class ContentListCellDirective implements OnChanges {
     @Input('sqxContentListCell')
-    public field: TableField;
+    public field!: TableField;
 
     constructor(
         private readonly element: ElementRef,

@@ -16,10 +16,10 @@ import { RuleEventDto } from '@app/shared';
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')
-    public event: RuleEventDto;
+    public event!: RuleEventDto;
 
     @Input()
-    public expanded: boolean;
+    public expanded = false;
 
     @Output()
     public expandedChange = new EventEmitter<any>();

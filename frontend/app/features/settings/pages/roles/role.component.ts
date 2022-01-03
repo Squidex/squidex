@@ -39,16 +39,16 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
 })
 export class RoleComponent implements OnChanges {
     @Input()
-    public role: RoleDto;
+    public role!: RoleDto;
 
     @Input()
-    public allPermissions: AutocompleteSource;
+    public allPermissions!: AutocompleteSource;
 
     @Input()
-    public schemas: ReadonlyArray<SchemaDto>;
+    public schemas!: ReadonlyArray<SchemaDto>;
 
     @ViewChild('addInput', { static: false })
-    public addPermissionInput: AutocompleteComponent;
+    public addPermissionInput!: AutocompleteComponent;
 
     public get halfSchemas() {
         return Math.ceil(this.schemas.length / 2);
@@ -57,7 +57,7 @@ export class RoleComponent implements OnChanges {
     public descriptions = DESCRIPTIONS;
 
     public propertiesList = Settings.AppProperties;
-    public properties: {};
+    public properties!: {};
     public propertiesSimple = SIMPLE_PROPERTIES;
 
     public isEditing = false;

@@ -35,10 +35,10 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
     public schemaIds?: ReadonlyArray<string>;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public mode: 'Array' | 'Single' = 'Single';

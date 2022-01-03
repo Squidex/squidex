@@ -17,13 +17,13 @@ import Cropper from 'cropperjs';
 })
 export class ImageCropperComponent implements AfterViewInit, OnDestroy, OnChanges {
     private cropper: Cropper | null = null;
-    private data: Cropper.Data;
+    private data?: Cropper.Data;
 
     @Input()
-    public imageSource: string;
+    public imageSource = '';
 
     @ViewChild('editor', { static: false })
-    public editor: ElementRef<HTMLCanvasElement>;
+    public editor!: ElementRef<HTMLCanvasElement>;
 
     public ngOnDestroy() {
         if (this.cropper) {

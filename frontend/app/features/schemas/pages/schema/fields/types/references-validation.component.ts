@@ -10,22 +10,22 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/shared';
 
 @Component({
-    selector: 'sqx-references-validation[field][fieldForm][properties]',
+    selector: 'sqx-references-validation[field][fieldForm][languages][properties]',
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',
 })
 export class ReferencesValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: ReferencesFieldPropertiesDto;
+    public properties!: ReferencesFieldPropertiesDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;

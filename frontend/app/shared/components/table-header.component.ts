@@ -22,13 +22,13 @@ export class TableHeaderComponent implements OnChanges {
     public query: Query | undefined | null;
 
     @Input()
-    public text: string;
+    public text = '';
 
     @Input()
     public fieldPath?: string | undefined | null;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
     public sortable?: boolean | null;

@@ -49,25 +49,25 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     private timer: any;
 
     @Input()
-    public source: AutocompleteSource;
+    public source!: AutocompleteSource;
 
     @Input()
     public inputName = 'autocompletion';
 
     @Input()
-    public inputStyle: 'underlined' | 'empty';
+    public inputStyle?: 'underlined' | 'empty';
 
     @Input()
     public allowOpen?: boolean | null = true;
 
     @Input()
-    public displayProperty: string;
+    public displayProperty = '';
 
     @Input()
     public placeholder = '';
 
     @Input()
-    public icon: string;
+    public icon = '';
 
     @Input()
     public autoFocus?: boolean | null;
@@ -87,10 +87,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     @ContentChild(TemplateRef, { static: false })
-    public itemTemplate: TemplateRef<any>;
+    public itemTemplate!: TemplateRef<any>;
 
     @ViewChild('input', { static: false })
-    public inputControl: ElementRef<HTMLInputElement>;
+    public inputControl!: ElementRef<HTMLInputElement>;
 
     public suggestionsModal = new ModalModel();
 

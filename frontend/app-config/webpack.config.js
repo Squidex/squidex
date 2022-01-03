@@ -28,7 +28,7 @@ const plugins = {
     // https://www.npmjs.com/package/@ngtools/webpack
     NgToolsWebpack: require('@ngtools/webpack'),
     // https://github.com/NMFR/optimize-css-assets-webpack-plugin
-    OptimizeCSSAssetsPlugin: require('optimize-css-assets-webpack-plugin'),
+    CssMinimizerPlugin: require('css-minimizer-webpack-plugin'),
     // https://webpack.js.org/plugins/eslint-webpack-plugin/
     ESLintPlugin: require('eslint-webpack-plugin'),
     // https://github.com/webpack-contrib/stylelint-webpack-plugin
@@ -53,7 +53,7 @@ module.exports = function calculateConfig(env) {
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 
     // eslint-disable-next-line no-console
-    console.log(`Use ${configFile}, Production: ${!!isProduction}, DevServer: ${isDevServer}`);
+    console.log(`Use ${configFile}, Production: ${!!isProduction}, DevServer: ${!!isDevServer}`);
 
     const config = {
         mode: isProduction ? 'production' : 'development',
@@ -401,7 +401,7 @@ module.exports = function calculateConfig(env) {
                     extractComments: true,
                 }),
 
-                new plugins.OptimizeCSSAssetsPlugin({}),
+                new plugins.CssMinimizerPlugin({}),
             ],
         };
 

@@ -18,7 +18,7 @@ export class NewsDialogComponent {
     public close = new EventEmitter();
 
     @Input()
-    public features: ReadonlyArray<FeatureDto>;
+    public features!: ReadonlyArray<FeatureDto>;
 
     public trackByFeature(_index: number, feature: FeatureDto) {
         return feature;

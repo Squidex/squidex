@@ -22,10 +22,10 @@ export class EditableTitleComponent {
     public disabled?: boolean | null;
 
     @Input()
-    public fallback: string;
+    public fallback = '';
 
     @Input()
-    public name: string;
+    public name!: string;
 
     @Input()
     public maxLength = 20;

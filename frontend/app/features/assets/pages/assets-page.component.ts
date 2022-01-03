@@ -22,7 +22,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
 
     public addAssetFolderDialog = new DialogModel();
 
-    public isListView: boolean;
+    public isListView = false;
 
     constructor(
         public readonly assetsRoute: Router2State,

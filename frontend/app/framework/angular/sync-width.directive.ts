@@ -13,7 +13,7 @@ import { ResizeListener, ResizeService, ResourceOwner } from '@app/framework/int
 })
 export class SyncWidthDirective extends ResourceOwner implements AfterViewInit, ResizeListener {
     @Input('sqxSyncWidth')
-    public target: HTMLElement;
+    public target!: HTMLElement;
 
     constructor(
         private readonly element: ElementRef<HTMLElement>,

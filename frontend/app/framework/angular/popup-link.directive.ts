@@ -12,7 +12,7 @@ import { Directive, HostListener, Input } from '@angular/core';
 })
 export class PopupLinkDirective {
     @Input('sqxPopupLink')
-    public url: string;
+    public url!: string;
 
     @HostListener('click')
     public onClick(): boolean {

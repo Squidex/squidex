@@ -17,22 +17,22 @@ import { FieldEditorComponent } from './field-editor.component';
 })
 export class ComponentSectionComponent {
     @Input()
-    public form: EditContentForm;
+    public form!: EditContentForm;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public formLevel: number;
+    public formLevel!: number;
 
     @Input()
-    public formSection: FieldSection<FieldDto, any>;
+    public formSection!: FieldSection<FieldDto, any>;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public index: number | null | undefined;
@@ -41,7 +41,7 @@ export class ComponentSectionComponent {
     public canUnset?: boolean | null;
 
     @ViewChildren(FieldEditorComponent)
-    public editors: QueryList<FieldEditorComponent>;
+    public editors!: QueryList<FieldEditorComponent>;
 
     public reset() {
         this.editors.forEach(editor => {

@@ -11,10 +11,10 @@ import { Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 class UserAsyncPipe {
-    private lastUserId: string;
+    private lastUserId?: string;
     private lastValue: string | undefined = undefined;
-    private subscription: Subscription;
-    private current: Observable<string | null>;
+    private subscription?: Subscription;
+    private current?: Observable<string | null>;
 
     constructor(loading: string,
         private readonly users: UsersProviderService,

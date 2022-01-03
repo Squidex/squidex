@@ -53,7 +53,7 @@ type LanguageResultList = ReadonlyArray<SnapshotLanguage>;
 
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
-    private cachedLanguage$: Observable<ReadonlyArray<LanguageDto>>;
+    private cachedLanguage$?: Observable<ReadonlyArray<LanguageDto>>;
 
     public languages =
         this.project(x => x.languages);

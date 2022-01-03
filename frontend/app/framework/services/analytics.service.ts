@@ -15,7 +15,7 @@ import { ResourceLoaderService } from './resource-loader.service';
 @Injectable()
 export class AnalyticsService {
     private readonly gtag: any;
-    private readonly analyticsId: string;
+    private readonly analyticsId?: string;
 
     constructor(
         private readonly uiOptions?: UIOptions,

@@ -27,7 +27,7 @@ export class DialogRequest {
         return !!this.rememberKey;
     }
 
-    public remember: boolean;
+    public remember = false;
 
     constructor(
         public readonly title: string,

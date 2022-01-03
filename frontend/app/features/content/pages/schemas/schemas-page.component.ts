@@ -41,7 +41,7 @@ export class SchemasPageComponent {
             return getCategoryTree(schemas, categories, filter);
         });
 
-    public isCollapsed: boolean;
+    public isCollapsed = false;
 
     public get width() {
         return this.isCollapsed ? '4rem' : '16rem';

@@ -21,10 +21,10 @@ export class AppsPageComponent implements OnInit {
 
     public onboardingDialog = new DialogModel();
 
-    public newsFeatures: ReadonlyArray<FeatureDto>;
+    public newsFeatures?: ReadonlyArray<FeatureDto>;
     public newsDialog = new DialogModel();
 
-    public info: string;
+    public info = '';
 
     constructor(
         public readonly appsState: AppsState,

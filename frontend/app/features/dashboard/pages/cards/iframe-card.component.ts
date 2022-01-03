@@ -16,13 +16,13 @@ import { AppDto } from '@app/shared';
 })
 export class IFrameCardComponent implements AfterViewInit {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Input()
     public options: any;
 
     @ViewChild('iframe', { static: false })
-    public iframe: ElementRef<HTMLIFrameElement>;
+    public iframe!: ElementRef<HTMLIFrameElement>;
 
     public ngAfterViewInit() {
         this.iframe.nativeElement.src = this.options?.src;

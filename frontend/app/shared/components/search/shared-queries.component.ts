@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { Queries, Query } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-shared-queries',
+    selector: 'sqx-shared-queries[queries][types]',
     styleUrls: ['./shared-queries.component.scss'],
     templateUrl: './shared-queries.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,8 +22,8 @@ export class SavedQueriesComponent {
     public queryUsed: Query | undefined | null;
 
     @Input()
-    public queries: Queries;
+    public queries!: Queries;
 
     @Input()
-    public types: string;
+    public types = '';
 }

@@ -16,13 +16,13 @@ import { ContributorDto, ContributorsState, RoleDto } from '@app/shared';
 })
 export class ContributorComponent {
     @Input()
-    public roles: ReadonlyArray<RoleDto>;
+    public roles!: ReadonlyArray<RoleDto>;
 
     @Input()
     public search?: string | RegExp | null;
 
     @Input('sqxContributor')
-    public contributor: ContributorDto;
+    public contributor!: ContributorDto;
 
     constructor(
         private readonly contributorsState: ContributorsState,

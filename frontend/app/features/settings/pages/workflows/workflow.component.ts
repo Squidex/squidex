@@ -17,15 +17,15 @@ export class WorkflowComponent implements OnChanges {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     @Input()
-    public workflow: WorkflowDto;
+    public workflow!: WorkflowDto;
 
     @Input()
-    public roles: ReadonlyArray<string>;
+    public roles!: ReadonlyArray<string>;
 
     @Input()
-    public schemasSource: SchemaTagSource;
+    public schemasSource!: SchemaTagSource;
 
-    public error: ErrorDto | null;
+    public error?: ErrorDto | null;
 
     public isEditing = false;
     public isEditable = false;

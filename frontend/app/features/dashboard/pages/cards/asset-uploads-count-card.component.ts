@@ -17,10 +17,10 @@ import { ChartHelpers, ChartOptions } from './shared';
 })
 export class AssetUploadsCountCardComponent implements OnChanges {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Input()
-    public usage: ReadonlyArray<StorageUsagePerDateDto>;
+    public usage?: ReadonlyArray<StorageUsagePerDateDto>;
 
     public chartData: any;
     public chartOptions = ChartOptions.Default;

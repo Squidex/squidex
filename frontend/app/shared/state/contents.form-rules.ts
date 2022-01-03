@@ -60,7 +60,7 @@ const EMPTY_RULES: CompiledRule[] = [];
 const EMPTY_RULES_STATIC = { rules: EMPTY_RULES };
 
 class ComponentRules implements ComponentRules {
-    private previouSchema: SchemaDto;
+    private previouSchema?: SchemaDto;
     private compiledRules: ReadonlyArray<CompiledRule> = [];
 
     public get rules() {

@@ -14,7 +14,7 @@ import { ALL_TRIGGERS, RuleDto, RuleElementDto, RulesService, RulesState, Schema
     templateUrl: './rules-page.component.html',
 })
 export class RulesPageComponent implements OnInit {
-    public supportedActions: { [name: string]: RuleElementDto };
+    public supportedActions?: { [name: string]: RuleElementDto };
     public supportedTriggers = ALL_TRIGGERS;
 
     constructor(

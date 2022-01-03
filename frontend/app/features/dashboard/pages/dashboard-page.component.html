@@ -74,7 +74,7 @@
 
         <div class="dashboard-settings" *ngIf="grid">
             <sqx-dashboard-config [app]="app" [needsAttention]="isScrolled" 
-                [config]="gridConfig" 
+                [config]="gridConfig!" 
                 (configChange)="changeConfig($event)">
             </sqx-dashboard-config>
         </div>

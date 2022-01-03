@@ -20,13 +20,13 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
     private player: any;
 
     @Input()
-    public source: string;
+    public source = '';
 
     @Input()
-    public mimeType: string;
+    public mimeType = '';
 
     @ViewChild('video', { static: false })
-    public video: ElementRef<HTMLVideoElement>;
+    public video!: ElementRef<HTMLVideoElement>;
 
     constructor(
         private readonly resourceLoader: ResourceLoaderService,

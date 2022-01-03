@@ -16,14 +16,14 @@ import { RuleElementDto } from '@app/shared';
 })
 export class RuleElementComponent {
     @Input()
-    public type: string;
+    public type!: string;
 
     @Input()
-    public element: RuleElementDto;
+    public element!: RuleElementDto;
 
     @Input()
     public isSmall?: boolean | null = true;
 
     @Input()
-    public disabled: boolean;
+    public disabled = false;
 }

@@ -67,12 +67,12 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     }
 
     @ContentChildren(TemplateRef)
-    public templates: QueryList<any>;
+    public templates!: QueryList<any>;
 
     public dropdown = new ModalModel();
 
-    public templateSelection: TemplateRef<any>;
-    public templateItem: TemplateRef<any>;
+    public templateSelection!: TemplateRef<any>;
+    public templateItem!: TemplateRef<any>;
 
     public queryInput = new FormControl();
 

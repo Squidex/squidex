@@ -17,7 +17,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
     templateUrl: './due-time-selector.component.html',
 })
 export class DueTimeSelectorComponent {
-    private dueTimeResult: Subject<string | null>;
+    private dueTimeResult?: Subject<string | null>;
 
     @Input()
     public disabled?: boolean | null;
@@ -42,8 +42,8 @@ export class DueTimeSelectorComponent {
     public confirmStatusChange() {
         const result = this.dueTimeMode === OPTION_IMMEDIATELY ? null : this.dueTime;
 
-        this.dueTimeResult.next(result);
-        this.dueTimeResult.complete();
+        this.dueTimeResult?.next(result);
+        this.dueTimeResult?.complete();
 
         this.cancelStatusChange();
     }

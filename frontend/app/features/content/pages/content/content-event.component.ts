@@ -22,12 +22,12 @@ export class ContentEventComponent implements OnChanges {
     public dataCompare = new EventEmitter();
 
     @Input()
-    public event: HistoryEventDto;
+    public event!: HistoryEventDto;
 
     @Input()
-    public content: ContentDto;
+    public content!: ContentDto;
 
-    public canLoadOrCompare: boolean;
+    public canLoadOrCompare = false;
 
     public ngOnChanges() {
         this.canLoadOrCompare =

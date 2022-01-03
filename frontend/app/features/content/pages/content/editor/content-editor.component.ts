@@ -27,28 +27,28 @@ export class ContentEditorComponent {
     public isNew = false;
 
     @Input()
-    public contentId: string;
+    public contentId!: string;
 
     @Input()
-    public contentForm: EditContentForm;
+    public contentForm!: EditContentForm;
 
     @Input()
-    public contentVersion: Version | null;
+    public contentVersion?: Version | null;
 
     @Input()
     public contentFormCompare?: EditContentForm | null;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     public trackBySection(_index: number, section: FieldSection<RootFieldDto, FieldForm>) {
         return section.separator?.fieldId;

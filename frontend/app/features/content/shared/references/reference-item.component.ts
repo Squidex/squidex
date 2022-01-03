@@ -24,7 +24,7 @@ export class ReferenceItemComponent implements OnChanges {
     public clone = new EventEmitter();
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
     public canRemove?: boolean | null = true;
@@ -36,7 +36,7 @@ export class ReferenceItemComponent implements OnChanges {
     public isDisabled?: boolean | null;
 
     @Input()
-    public validations: { [id: string]: boolean };
+    public validations?: { [id: string]: boolean };
 
     @Input()
     public validityVisible?: boolean | null;
@@ -45,7 +45,7 @@ export class ReferenceItemComponent implements OnChanges {
     public columns = 0;
 
     @Input('sqxReferenceItem')
-    public content: ContentDto;
+    public content!: ContentDto;
 
     public get valid() {
         return !this.validations ? undefined : this.validations[this.content.id];

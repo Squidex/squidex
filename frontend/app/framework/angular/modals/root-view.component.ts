@@ -15,5 +15,5 @@ import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from 
 })
 export class RootViewComponent {
     @ViewChild('element', { read: ViewContainerRef, static: false })
-    public viewContainer: ViewContainerRef;
+    public viewContainer!: ViewContainerRef;
 }

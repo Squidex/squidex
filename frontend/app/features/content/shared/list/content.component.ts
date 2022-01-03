@@ -33,10 +33,10 @@ export class ContentComponent implements OnChanges {
     public selected = false;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public listFields: ReadonlyArray<TableField>;
+    public listFields!: ReadonlyArray<TableField>;
 
     @Input()
     public cloneable?: boolean | null;
@@ -45,12 +45,12 @@ export class ContentComponent implements OnChanges {
     public link: any = null;
 
     @Input('sqxContent')
-    public content: ContentDto;
+    public content!: ContentDto;
 
     @ViewChildren(ContentListFieldComponent)
-    public fields: QueryList<ContentListFieldComponent>;
+    public fields!: QueryList<ContentListFieldComponent>;
 
-    public patchForm: PatchContentForm;
+    public patchForm?: PatchContentForm;
     public patchAllowed?: boolean | null;
 
     public dropdown = new ModalModel();
@@ -76,7 +76,7 @@ export class ContentComponent implements OnChanges {
     }
 
     public save() {
-        if (!this.content.canUpdate) {
+        if (!this.content.canUpdate || !this.patchForm) {
             return;
         }
 
@@ -86,12 +86,12 @@ export class ContentComponent implements OnChanges {
             this.contentsState.patch(this.content, value)
                 .subscribe({
                     next: () => {
-                        this.patchForm.submitCompleted({ noReset: true });
+                        this.patchForm!.submitCompleted({ noReset: true });
 
                         this.changeDetector.detectChanges();
                     },
                     error: error => {
-                        this.patchForm.submitFailed(error);
+                        this.patchForm!.submitFailed(error);
 
                         this.changeDetector.detectChanges();
                     },
@@ -108,7 +108,7 @@ export class ContentComponent implements OnChanges {
     }
 
     public cancel() {
-        this.patchForm.submitCompleted();
+        this.patchForm?.submitCompleted();
 
         this.fields.forEach(x => x.reset());
     }

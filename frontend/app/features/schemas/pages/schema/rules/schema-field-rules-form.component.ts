@@ -15,11 +15,11 @@ import { ConfigureFieldRulesForm, FIELD_RULE_ACTIONS, SchemaDto, SchemasState } 
 })
 export class SchemaFieldRulesFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public editForm = new ConfigureFieldRulesForm();
 
-    public fieldNames: ReadonlyArray<string>;
+    public fieldNames!: ReadonlyArray<string>;
     public fieldActions = FIELD_RULE_ACTIONS;
 
     public isEditable = false;

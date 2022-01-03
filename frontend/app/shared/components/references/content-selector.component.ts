@@ -30,10 +30,10 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public schemaIds?: ReadonlyArray<string>;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public allowDuplicates?: boolean | null;
@@ -41,10 +41,10 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public alreadySelected: ReadonlyArray<ContentDto> | undefined | null;
 
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
 
-    public queryModel: QueryModel;
+    public queryModel!: QueryModel;
 
     public selectedItems: { [id: string]: ContentDto } = {};
     public selectionCount = 0;

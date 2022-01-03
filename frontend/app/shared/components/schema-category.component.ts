@@ -22,7 +22,7 @@ export class SchemaCategoryComponent implements OnChanges {
     public remove = new EventEmitter<string>();
 
     @Input()
-    public schemaCategory: SchemaCategory;
+    public schemaCategory!: SchemaCategory;
 
     @Input()
     public schemaTarget?: 'Schema' | 'Contents';

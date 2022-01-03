@@ -41,13 +41,13 @@ interface State {
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnChanges, OnInit {
     private latestValue: any;
-    private latestInput: string;
+    private latestInput?: string;
 
     @ViewChild('form', { static: false })
-    public formElement: ElementRef<HTMLElement>;
+    public formElement!: ElementRef<HTMLElement>;
 
     @ViewChild('input', { static: false })
-    public inputElement: ElementRef<HTMLInputElement>;
+    public inputElement!: ElementRef<HTMLInputElement>;
 
     @Output()
     public open = new EventEmitter();

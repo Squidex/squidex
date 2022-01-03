@@ -31,7 +31,7 @@ export const SQX_TRANSFORM_INPUT_VALUE_ACCESSOR: any = {
 export class TransformInputDirective implements ControlValueAccessor {
     private callChange = (_: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
-    private transformer: Transform;
+    private transformer = TransformNoop;
 
     @Input('sqxTransformInput')
     public set transform(value: Transform | string) {

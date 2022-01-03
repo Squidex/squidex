@@ -41,7 +41,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     public readonly controlId = MathHelper.guid();
 
     @ViewChild('container', { static: false })
-    public containerElement: ElementRef<HTMLDivElement>;
+    public containerElement!: ElementRef<HTMLDivElement>;
 
     @Input()
     public layout: 'Auto' | 'Singletine' | 'Multiline' = 'Auto';

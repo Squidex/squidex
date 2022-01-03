@@ -16,7 +16,7 @@ import { EMPTY, Observable } from 'rxjs';
 })
 export class SchemaScriptsFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public schemaScript = 'query';
     public schemaCompletions: Observable<SchemaCompletions> = EMPTY;

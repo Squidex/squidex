@@ -19,10 +19,10 @@ import { ContentPageComponent } from './content-page.component';
 })
 export class ContentHistoryPageComponent extends ResourceOwner implements OnInit {
     @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector: DueTimeSelectorComponent;
+    public dueTimeSelector!: DueTimeSelectorComponent;
 
-    public content: ContentDto;
-    public contentEvents: Observable<ReadonlyArray<HistoryEventDto>>;
+    public content!: ContentDto;
+    public contentEvents?: Observable<ReadonlyArray<HistoryEventDto>>;
 
     public dropdown = new ModalModel();
     public dropdownNew = new ModalModel();

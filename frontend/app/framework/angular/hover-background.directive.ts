@@ -11,10 +11,10 @@ import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/
     selector: '[sqxHoverBackground]',
 })
 export class HoverBackgroundDirective {
-    private previousBackground: string | null;
+    private previousBackground?: string | null;
 
     @Input('sqxHoverBackground')
-    public background: string;
+    public background!: string;
 
     constructor(
         private readonly element: ElementRef<HTMLElement>,

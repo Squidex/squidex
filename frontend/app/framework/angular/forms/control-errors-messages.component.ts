@@ -19,5 +19,5 @@ import { fadeAnimation } from '@app/framework/internal';
 })
 export class ControlErrorsMessagesComponent {
     @Input()
-    public errorMessages: ReadonlyArray<string>;
+    public errorMessages?: ReadonlyArray<string>;
 }

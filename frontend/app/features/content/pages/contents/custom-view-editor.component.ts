@@ -19,12 +19,12 @@ export class CustomViewEditorComponent implements OnChanges {
     public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
 
     @Input()
-    public fieldNames: string[];
+    public fieldNames!: string[];
 
     @Input()
-    public allFields: ReadonlyArray<string>;
+    public allFields!: ReadonlyArray<string>;
 
-    public fieldsNotAdded: ReadonlyArray<string>;
+    public fieldsNotAdded!: ReadonlyArray<string>;
 
     public ngOnChanges() {
         this.fieldsNotAdded = this.allFields.filter(n => this.fieldNames.indexOf(n) < 0);

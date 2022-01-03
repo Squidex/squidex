@@ -15,7 +15,7 @@ import { ApiUrlConfig, PlanDto, PlansState } from '@app/shared';
     templateUrl: './plans-page.component.html',
 })
 export class PlansPageComponent implements OnInit {
-    private overridePlanId: string;
+    private overridePlanId?: string;
 
     public portalUrl = this.apiUrl.buildUrl('/portal/');
 

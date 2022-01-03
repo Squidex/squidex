@@ -16,7 +16,7 @@ import { LanguageDto, MetaFields, Query, RootFieldDto, TableField, Types } from 
 })
 export class ContentListHeaderComponent {
     @Input()
-    public field: TableField;
+    public field!: TableField;
 
     @Output()
     public queryChange = new EventEmitter<Query>();
@@ -25,7 +25,7 @@ export class ContentListHeaderComponent {
     public query: Query | undefined;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     public get metaFields() {
         return MetaFields;

@@ -16,10 +16,10 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
 })
 export class AssetFolderDropdownItemComponent {
     @Input()
-    public appName: string;
+    public appName!: string;
 
     @Input()
-    public node: AssetFolderDropdowNode;
+    public node!: AssetFolderDropdowNode;
 
     @Input()
     public nodeLevel = 0;

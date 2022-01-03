@@ -6,10 +6,10 @@
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, DialogService, RoleDto } from '@app/shared';
+import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, DialogService } from '@app/shared';
 
 @Component({
-    selector: 'sqx-client-connect-form',
+    selector: 'sqx-client-connect-form[client]',
     styleUrls: ['./client-connect-form.component.scss'],
     templateUrl: './client-connect-form.component.html',
 })
@@ -18,16 +18,13 @@ export class ClientConnectFormComponent implements OnInit {
     public complete = new EventEmitter();
 
     @Input()
-    public client: ClientDto;
+    public client!: ClientDto;
 
-    @Input()
-    public clientRoles: ReadonlyArray<RoleDto>;
+    public appName!: string;
 
-    public appName: string;
-
-    public connectToken: AccessTokenDto;
-    public connectHttpText: string;
-    public connectLibraryText: string;
+    public connectToken?: AccessTokenDto;
+    public connectHttpText = '';
+    public connectLibraryText = '';
 
     public step = 'Start';
 

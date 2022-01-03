@@ -7,7 +7,7 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, Input, OnInit } from '@angular/core';
-import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, SchemaDto, SchemasState, sorted } from '@app/shared';
+import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, RootFieldDto, SchemaDto, SchemasState, sorted } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-fields[schema]',
@@ -18,7 +18,7 @@ export class SchemaFieldsComponent implements OnInit {
     public fieldTypes = fieldTypes;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public addFieldDialog = new DialogModel();
 
@@ -36,7 +36,7 @@ export class SchemaFieldsComponent implements OnInit {
         this.languageState.load();
     }
 
-    public sortFields(event: CdkDragDrop<ReadonlyArray<FieldDto>>) {
+    public sortFields(event: CdkDragDrop<ReadonlyArray<RootFieldDto>>) {
         this.schemasState.orderFields(this.schema, sorted(event)).subscribe();
     }
 

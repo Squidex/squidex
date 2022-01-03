@@ -19,8 +19,8 @@ export class QueryPathComponent {
     public pathChange = new EventEmitter<string>();
 
     @Input()
-    public path: string;
+    public path = '';
 
     @Input()
-    public model: QueryModel;
+    public model!: QueryModel;
 }

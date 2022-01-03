@@ -16,7 +16,7 @@ import { AppDto, Settings } from '@app/shared';
 })
 export class LeftMenuComponent {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     public isAssetsHidden(app: AppDto) {
         return app.roleProperties[Settings.AppProperties.HIDE_ASSETS] === true;

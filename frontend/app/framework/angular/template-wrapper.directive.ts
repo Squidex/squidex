@@ -15,15 +15,15 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     public item: any;
 
     @Input()
-    public index: number;
+    public index = 0;
 
     @Input()
     public context: any;
 
     @Input('sqxTemplateWrapper')
-    public templateRef: TemplateRef<any>;
+    public templateRef!: TemplateRef<any>;
 
-    public view: EmbeddedViewRef<any>;
+    public view?: EmbeddedViewRef<any>;
 
     public constructor(
         private readonly viewContainer: ViewContainerRef,

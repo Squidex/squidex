@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
 
  @Component({
-     selector: 'sqx-sorting',
+     selector: 'sqx-sorting[model][sorting]',
      styleUrls: ['./sorting.component.scss'],
      templateUrl: './sorting.component.html',
      changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,10 +22,10 @@ export class SortingComponent {
     public remove = new EventEmitter();
 
     @Input()
-    public model: QueryModel;
+    public model!: QueryModel;
 
     @Input()
-    public sorting: QuerySorting;
+    public sorting!: QuerySorting;
 
     public modes = SORT_MODES;
 

@@ -32,7 +32,7 @@ interface State {
 })
 export class MarkdownEditorComponent extends StatefulControlComponent<State, string> implements AfterViewInit {
     private simplemde: any;
-    private value: string;
+    private value?: string;
 
     @Input()
     public folderId?: string;
@@ -43,13 +43,13 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     @ViewChild('editor', { static: false })
-    public editor: ElementRef;
+    public editor!: ElementRef;
 
     @ViewChild('container', { static: false })
-    public container: ElementRef;
+    public container!: ElementRef;
 
     @ViewChild('inner', { static: false })
-    public inner: ElementRef;
+    public inner!: ElementRef;
 
     public assetsDialog = new DialogModel();
 

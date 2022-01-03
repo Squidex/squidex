@@ -16,10 +16,10 @@ import { AppDto, CallsUsageDto } from '@app/shared';
 })
 export class ApiCallsSummaryCardComponent implements OnChanges {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Input()
-    public usage: CallsUsageDto;
+    public usage?: CallsUsageDto;
 
     public callsMonth = 0;
     public callsAllowed = 0;

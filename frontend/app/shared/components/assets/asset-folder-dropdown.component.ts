@@ -36,7 +36,7 @@ export class AssetFolderDropdownComponent extends StatefulControlComponent<any, 
     public root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
 
     public selection = this.root;
-    public selectionPath: string;
+    public selectionPath = '';
 
     public dropdown = new ModalModel();
 

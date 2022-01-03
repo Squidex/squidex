@@ -16,10 +16,10 @@ import { AppDto, CurrentStorageDto } from '@app/shared';
 })
 export class AssetUploadsSizeSummaryCardComponent implements OnChanges {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Input()
-    public usage: CurrentStorageDto;
+    public usage?: CurrentStorageDto;
 
     public storageCurrent = 0;
     public storageAllowed = 0;

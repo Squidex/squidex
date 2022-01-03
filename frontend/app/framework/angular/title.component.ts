@@ -23,7 +23,7 @@ export class TitleComponent implements OnDestroy, OnChanges {
     public url: any[] = ['./'];
 
     @Input()
-    public message: string;
+    public message!: string;
 
     constructor(
         private readonly route: ActivatedRoute,

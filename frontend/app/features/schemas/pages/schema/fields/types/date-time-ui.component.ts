@@ -19,11 +19,11 @@ export class DateTimeUIComponent {
     public readonly editors = DATETIME_FIELD_EDITORS;
 
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: DateTimeFieldPropertiesDto;
+    public properties!: DateTimeFieldPropertiesDto;
 }

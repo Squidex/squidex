@@ -23,13 +23,13 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     private timer: any;
 
     @ViewChild('headerElement', { static: false })
-    public headerElement: ElementRef<ParentNode>;
+    public headerElement!: ElementRef<ParentNode>;
 
     @ViewChild('footerElement', { static: false })
-    public footerElement: ElementRef<ParentNode>;
+    public footerElement!: ElementRef<ParentNode>;
 
     @ViewChild('contentElement', { static: false })
-    public contentElement: ElementRef<ParentNode>;
+    public contentElement!: ElementRef<ParentNode>;
 
     @Input() @HostBinding('class.overflow')
     public overflow?: boolean | null;

@@ -20,16 +20,16 @@ export class NumberUIComponent extends ResourceOwner implements OnChanges {
     public readonly editors = NUMBER_FIELD_EDITORS;
 
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: NumberFieldPropertiesDto;
+    public properties!: NumberFieldPropertiesDto;
 
-    public hideAllowedValues: Observable<boolean>;
-    public hideInlineEditable: Observable<boolean>;
+    public hideAllowedValues?: Observable<boolean>;
+    public hideInlineEditable?: Observable<boolean>;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {

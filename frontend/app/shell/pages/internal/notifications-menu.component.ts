@@ -26,13 +26,13 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
     public versionRead = -1;
     public versionReceived = -1;
 
-    public userToken: string;
+    public userToken = '';
 
     public get unread() {
         return Math.max(0, this.versionReceived - this.versionRead);
     }
 
-    public isNotifoConfigured: boolean;
+    public isNotifoConfigured = false;
 
     constructor(authService: AuthService, commentsService: CommentsService, dialogs: DialogService, uiOptions: UIOptions,
         private readonly changeDetector: ChangeDetectorRef,

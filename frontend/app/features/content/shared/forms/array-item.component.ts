@@ -20,7 +20,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-array-item[form][formContext][formLevel][language][languages][index]',
+    selector: 'sqx-array-item[form][formContext][formLevel][formModel][index][language][languages]',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,16 +36,16 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public clone = new EventEmitter();
 
     @Input()
-    public form: EditContentForm;
+    public form!: EditContentForm;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public formLevel: number;
+    public formLevel!: number;
 
     @Input()
-    public formModel: ObjectFormBase;
+    public formModel!: ObjectFormBase;
 
     @Input()
     public canUnset?: boolean | null;
@@ -63,22 +63,22 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public isDisabled?: boolean | null;
 
     @Input()
-    public index: number;
+    public index!: number;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(ComponentSectionComponent)
-    public sections: QueryList<ComponentSectionComponent>;
+    public sections!: QueryList<ComponentSectionComponent>;
 
     public isCollapsed = false;
-    public isInvalid: Observable<boolean>;
-    public isInvalidComponent: Observable<boolean>;
+    public isInvalid?: Observable<boolean>;
+    public isInvalidComponent?: Observable<boolean>;
 
-    public title: Observable<string>;
+    public title?: Observable<string>;
 
     constructor(changeDetector: ChangeDetectorRef,
     ) {

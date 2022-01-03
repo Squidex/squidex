@@ -15,5 +15,5 @@ import { TriggerForm } from '@app/shared';
 })
 export class AssetChangedTriggerComponent {
     @Input()
-    public triggerForm: TriggerForm;
+    public triggerForm!: TriggerForm;
 }

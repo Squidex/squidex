@@ -38,13 +38,13 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     private isLoadingFailed = false;
 
     @Input()
-    public schemaId: string;
+    public schemaId!: string;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public set disabled(value: boolean | undefined | null) {

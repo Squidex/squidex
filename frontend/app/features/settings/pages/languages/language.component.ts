@@ -16,15 +16,15 @@ import { AppLanguageDto, EditLanguageForm, LanguageDto, LanguagesState, sorted }
 })
 export class LanguageComponent implements OnChanges {
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public fallbackLanguages: ReadonlyArray<LanguageDto>;
+    public fallbackLanguages!: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public fallbackLanguagesNew: ReadonlyArray<LanguageDto>;
+    public fallbackLanguagesNew!: ReadonlyArray<LanguageDto>;
 
-    public otherLanguage: LanguageDto;
+    public otherLanguage!: LanguageDto;
 
     public isEditing?: boolean | null;
     public isEditable = false;

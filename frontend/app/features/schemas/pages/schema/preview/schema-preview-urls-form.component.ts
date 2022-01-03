@@ -15,7 +15,7 @@ import { ConfigurePreviewUrlsForm, SchemaDto, SchemasState } from '@app/shared';
 })
 export class SchemaPreviewUrlsFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public editForm = new ConfigurePreviewUrlsForm();
 

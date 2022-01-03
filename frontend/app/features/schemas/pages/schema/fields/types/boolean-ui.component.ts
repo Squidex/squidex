@@ -18,11 +18,11 @@ export class BooleanUIComponent {
     public readonly editors = BOOLEAN_FIELD_EDITORS;
 
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: BooleanFieldPropertiesDto;
+    public properties!: BooleanFieldPropertiesDto;
 }

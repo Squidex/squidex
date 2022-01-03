@@ -19,7 +19,7 @@ import { LayoutContainerDirective } from './layout-container.directive';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
-    private widthPrevious: string;
+    private widthPrevious?: string;
     private widthToRender = 0;
     private isViewInitField = false;
 
@@ -27,13 +27,13 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public closeQueryParamsHandling: QueryParamsHandling = 'preserve';
 
     @Input()
-    public titleText: string;
+    public titleText = '';
 
     @Input()
-    public titleIcon: string;
+    public titleIcon = '';
 
     @Input()
-    public titleCollapsed: string;
+    public titleCollapsed = '';
 
     @Input()
     public layout: 'simple' | 'left' | 'main' = 'simple';
@@ -63,10 +63,10 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public padding = false;
 
     @Input()
-    public customHeader: boolean;
+    public customHeader = false;
 
     @ViewChild('panel', { static: false })
-    public panel: ElementRef<HTMLElement>;
+    public panel!: ElementRef<HTMLElement>;
 
     public get desiredWidth() {
         return this.isCollapsed ? 3 : this.width;
