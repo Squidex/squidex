@@ -6,7 +6,7 @@
  */
 
 import { Directive, ElementRef, Input, OnChanges, Renderer2 } from '@angular/core';
-import marked from 'marked';
+import { marked } from 'marked';
 
 const RENDERER_DEFAULT = new marked.Renderer();
 const RENDERER_INLINE = new marked.Renderer();

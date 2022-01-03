@@ -53,7 +53,7 @@ module.exports = function calculateConfig(env) {
     const configFile = isTests ? 'tsconfig.spec.json' : 'tsconfig.app.json';
 
     // eslint-disable-next-line no-console
-    console.log(`Use ${configFile}, Production: ${!!isProduction}`);
+    console.log(`Use ${configFile}, Production: ${!!isProduction}, DevServer: ${isDevServer}`);
 
     const config = {
         mode: isProduction ? 'production' : 'development',
@@ -128,6 +128,11 @@ module.exports = function calculateConfig(env) {
                     loader: 'ignore-loader',
                 }],
                 include: [/node_modules/],
+            }, {
+                test: /\.html$/,
+                use: [{
+                    loader: 'raw-loader',
+                }],
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
@@ -427,7 +432,7 @@ module.exports = function calculateConfig(env) {
         config.module.rules.push({
             test: /\.[jt]sx?$/,
             use: [{
-                loader: 'istanbul-instrumenter-loader',
+                loader: '@jsdevtools/coverage-istanbul-loader',
                 options: {
                     esModules: true,
                 },

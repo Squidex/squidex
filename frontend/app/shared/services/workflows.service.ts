@@ -20,7 +20,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
     public readonly displayName: string;
 
     constructor(
-        links: ResourceLinks = {},
+        links: ResourceLinks,
         public readonly id: string,
         public readonly name: string | null = null,
         public readonly initial: string | null = null,
