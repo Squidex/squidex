@@ -49,6 +49,7 @@ export class FieldEditorComponent implements OnChanges {
     public editor!: ElementRef;
 
     public isEmpty?: Observable<boolean>;
+    public isFullscreen = false;
 
     public get field() {
         return this.formModel.field;
@@ -76,6 +77,10 @@ export class FieldEditorComponent implements OnChanges {
                 this.editor['reset']();
             }
         }
+    }
+
+    public toggleFullscreen() {
+        this.isFullscreen = !this.isFullscreen;
     }
 
     public unset() {

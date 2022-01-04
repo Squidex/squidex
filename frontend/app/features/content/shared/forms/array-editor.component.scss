@@ -8,8 +8,7 @@
     background: $color-border-lighter;
     margin: 0;
     margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    position: relative;
+    padding: .5rem 0;
 }
 
 .drag-container {
@@ -21,5 +20,5 @@ cdk-virtual-scroll-viewport {
 }
 
 .item {
-    padding: 1rem 1rem 0;
+    margin: .25rem 1rem;
 }

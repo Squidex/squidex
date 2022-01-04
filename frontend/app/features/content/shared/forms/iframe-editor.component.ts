@@ -11,18 +11,13 @@ import { Router } from '@angular/router';
 import { DialogModel, DialogService, disabled$, StatefulComponent, Types, value$ } from '@app/framework';
 import { AppsState, AssetDto, computeEditorUrl } from '@app/shared';
 
-interface State {
-    // True, when the editor is shown as fullscreen.
-    isFullscreen: boolean;
-}
-
 @Component({
-    selector: 'sqx-iframe-editor[context][formValue][formControlBinding]',
+    selector: 'sqx-iframe-editor[context][formField][formIndex][formValue][formControlBinding]',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IFrameEditorComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
+export class IFrameEditorComponent extends StatefulComponent<{}> implements OnChanges, OnDestroy {
     private value: any;
     private isInitialized = false;
     private isDisabled = false;
@@ -31,17 +26,14 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     @ViewChild('iframe', { static: false })
     public iframe!: ElementRef<HTMLIFrameElement>;
 
-    @ViewChild('container', { static: false })
-    public container!: ElementRef<HTMLElement>;
-
-    @ViewChild('inner', { static: false })
-    public inner!: ElementRef<HTMLElement>;
-
     @Input()
     public context: any = {};
 
     @Input()
     public formValue!: any;
+
+    @Input()
+    public formField = '';
 
     @Input()
     public formIndex?: number | null;
@@ -72,15 +64,11 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         private readonly renderer: Renderer2,
         private readonly router: Router,
     ) {
-        super(changeDetector, {
-            isFullscreen: false,
-        });
+        super(changeDetector, {});
     }
 
     public ngOnDestroy() {
         super.ngOnDestroy();
-
-        this.toggleFullscreen(false);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -124,7 +112,6 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
                 this.isInitialized = true;
 
                 this.sendInit();
-                this.sendFullscreen();
                 this.sendFormValue();
                 this.sendLanguage();
                 this.sendDisabled();
@@ -138,12 +125,6 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
                 const { url } = event.data;
 
                 this.router.navigateByUrl(url);
-            } else if (type === 'fullscreen') {
-                const { mode } = event.data;
-
-                if (mode !== this.snapshot.isFullscreen) {
-                    this.toggleFullscreen(mode);
-                }
             } else if (type === 'valueChanged') {
                 const { value } = event.data;
 
@@ -218,15 +199,11 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     }
 
     private sendInit() {
-        this.sendMessage('init', { context: this.context || {} });
+        this.sendMessage('init', { context: { ...this.context || {}, field: this.formField } });
     }
 
     private sendValue() {
         this.sendMessage('valueChanged', { value: this.value });
-    }
-
-    private sendFullscreen() {
-        this.sendMessage('fullscreenChanged', { fullscreen: this.snapshot.isFullscreen });
     }
 
     private sendDisabled() {
@@ -249,20 +226,6 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         if (Types.isNumber(this.formIndex)) {
             this.sendMessage('moved', { index: this.formIndex });
         }
-    }
-
-    private toggleFullscreen(isFullscreen: boolean) {
-        this.next({ isFullscreen });
-
-        let target = this.container.nativeElement;
-
-        if (isFullscreen) {
-            target = document.body;
-        }
-
-        this.renderer.appendChild(target, this.inner.nativeElement);
-
-        this.sendFullscreen();
     }
 
     private sendMessage(type: string, payload: any) {

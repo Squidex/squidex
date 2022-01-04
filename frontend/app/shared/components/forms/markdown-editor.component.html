@@ -1,9 +1,7 @@
-<div #container class="drop-container"
+<div class="drop-container"
     (sqxDropFile)="insertFiles($event)"
     [sqxDropOnlyImages]="true">
-    <div #inner [class.fullscreen]="snapshot.isFullscreen">
-        <textarea class="form-control editor" #editor></textarea>
-    </div>
+    <textarea class="form-control editor" #editor></textarea>
 </div>
 
 <ng-container *sqxModal="assetsDialog">

@@ -1,6 +1,7 @@
 .table-items-row {
     border-left-width: 4px;
-    position: relative;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .languages {
@@ -8,16 +9,26 @@
         position: relative;
     }
 
-    &-buttons {
-        @include absolute(-.6rem, 2rem);
+    &-buttons,
+    &-buttons-compare {
+        @include absolute(-.5rem, 4.25rem);
         background: $color-white;
-        z-index: 1000;
+        display: flex;
+        flex-grow: 1;
+        flex-wrap: nowrap;
+        justify-content: right;
+        margin: 0;
+        margin-top: -1px;
+        white-space: nowrap;
+        z-index: 1;
+    }
+
+    &-buttons {
+        @include absolute(-.5rem, 4.25rem);
     }
 
     &-buttons-compare {
-        @include absolute(-.6rem, 0);
-        background: $color-white;
-        z-index: 1000;
+        @include absolute(-.5rem, 0);
     }
 }
 
@@ -29,7 +40,7 @@
     }
 }
 
-.col-right {
+.copy-button-container {
     position: relative;
 }
 

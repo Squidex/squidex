@@ -7,8 +7,9 @@
 }
 
 .card {
-    border: 1px solid darken($color-border, 5%);
+    border: 1px solid $color-border;
     border-left-width: 4px;
+    position: static;
 
     &-header {
         line-height: 2.2rem;

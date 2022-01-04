@@ -1,4 +1,21 @@
-<div class="field" *ngIf="formModel">
+<div class="field" [class.fullscreen]="isFullscreen" *ngIf="formModel">
+    <div class="buttons-container" *ngIf="canUnset">
+        <div class="buttons">
+            <button type="button" class="btn btn-sm btn-outline-secondary force" (click)="toggleFullscreen()">
+                <i class="icon-fullscreen"></i>
+            </button>
+    
+            <button type="button" class="btn btn-sm btn-outline-secondary btn-clear force ms-1" [disabled]="isEmpty | async"
+                (sqxConfirmClick)="unset()"
+                confirmTitle="i18n:contents.unsetValueConfirmTitle"
+                confirmText="i18n:contents.unsetValueConfirmText"
+                confirmRememberKey="unsetValue"
+                title="i18n:contents.unsetValue">
+                <i class="icon-close"></i>
+            </button>
+        </div>
+    </div>
+
     <label>
         {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
@@ -14,6 +31,7 @@
                 [formControlBinding]="$any(fieldForm)"
                 [formValue]="form.valueChanges | async"
                 [formIndex]="index"
+                [formField]="formModel.field.name"
                 [language]="language?.iso2Code">
             </sqx-iframe-editor>
 		</ng-container>
@@ -211,17 +229,6 @@
                 </ng-container>
 			</ng-container>
 		</ng-template>
-    </div>
-
-    <div *ngIf="canUnset" class="unset" >
-        <button type="button" class="btn btn-sm btn-text-secondary force" [disabled]="isEmpty | async"
-            (sqxConfirmClick)="unset()"
-            confirmTitle="i18n:contents.unsetValueConfirmTitle"
-            confirmText="i18n:contents.unsetValueConfirmText"
-            confirmRememberKey="unsetValue"
-            title="i18n:contents.unsetValue">
-            <i class="icon-close"></i>
-        </button>
     </div>
 
     <sqx-form-hint *ngIf="field.properties.hints && field.properties.hints.length > 0">

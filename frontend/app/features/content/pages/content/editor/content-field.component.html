@@ -50,9 +50,11 @@
     </div>
 
     <div class="col-6 col-right" *ngIf="formModelCompare && formCompare">
-        <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()" *ngIf="isDifferent | async">
-            <i class="icon-arrow_back"></i>
-        </button>
+        <div class="copy-button-container">
+            <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()" *ngIf="isDifferent | async">
+                <i class="icon-arrow_back"></i>
+            </button>
+        </div>
 
         <div class="table-items-row table-items-row-summary" *ngIf="!(formModelCompare!.hiddenChanges | async)">
             <div class="languages-container">

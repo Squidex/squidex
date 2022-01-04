@@ -1,6 +1,6 @@
 <ng-container *ngIf="formModel.itemChanges | async; let items">
     <div class="array-container" *ngIf="items.length > 0">
-        <div class="cdk-container" *ngIf="items.length <= 50;"
+        <div class="cdk-container" *ngIf="items.length <= 5;"
             cdkDropList
             [cdkDropListDisabled]="false"
             [cdkDropListData]="items"
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <cdk-virtual-scroll-viewport autosize *ngIf="items.length > 50">
+        <cdk-virtual-scroll-viewport autosize *ngIf="items.length > 5">
             <div *cdkVirtualFor="let itemForm of items; index as i; last as isLast; first as isFirst" class="table-drag item">
                 <sqx-array-item
                     [canUnset]="canUnset"
