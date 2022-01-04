@@ -16,5 +16,5 @@ import { ActionForm } from '@app/shared';
 })
 export class GenericActionComponent {
     @Input()
-    public actionForm: ActionForm;
+    public actionForm!: ActionForm;
 }

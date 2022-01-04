@@ -15,5 +15,5 @@ import { TriggerForm } from '@app/shared';
 })
 export class SchemaChangedTriggerComponent {
     @Input()
-    public triggerForm: TriggerForm;
+    public triggerForm!: TriggerForm;
 }

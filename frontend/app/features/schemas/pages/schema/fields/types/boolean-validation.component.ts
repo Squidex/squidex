@@ -11,27 +11,27 @@ import { BooleanFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-boolean-validation[field][fieldForm][properties]',
+    selector: 'sqx-boolean-validation[field][fieldForm][languages][properties]',
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html',
 })
 export class BooleanValidationComponent implements OnChanges {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: BooleanFieldPropertiesDto;
+    public properties!: BooleanFieldPropertiesDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;
 
-    public showDefaultValue: Observable<boolean>;
+    public showDefaultValue?: Observable<boolean>;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {

@@ -21,16 +21,16 @@ export class ContentInspectionComponent implements OnChanges, OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);
 
     @Input()
-    public appName: string;
+    public appName!: string;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public content: ContentDto;
+    public content!: ContentDto;
 
     public mode = new BehaviorSubject<Mode>('Content');
 

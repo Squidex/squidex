@@ -29,21 +29,21 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
     public schemaName?: string | null;
 
     @Input()
-    public schemaIds: ReadonlyArray<string>;
+    public schemaIds?: ReadonlyArray<string>;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
 
-    public contentForm: EditContentForm;
+    public contentForm!: EditContentForm;
 
     constructor(
         private readonly contentsState: ComponentContentsState,
@@ -56,7 +56,7 @@ export class ContentCreatorComponent extends ResourceOwner implements OnInit {
         this.schemas = this.schemasState.snapshot.schemas.filter(x => x.canContentsCreate);
 
         if (this.schemaIds && this.schemaIds.length > 0) {
-            this.schemas = this.schemas.filter(x => this.schemaIds.indexOf(x.id) >= 0);
+            this.schemas = this.schemas.filter(x => this.schemaIds!.indexOf(x.id) >= 0);
         }
 
         const selectedSchema = this.schemas.find(x => x.name === this.schemaName) || this.schemas[0];

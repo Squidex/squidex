@@ -21,20 +21,20 @@ export class ContentExtensionComponent extends ResourceOwner implements OnChange
     private isInitialized = false;
 
     @ViewChild('iframe', { static: false })
-    public iframe: ElementRef<HTMLIFrameElement>;
+    public iframe!: ElementRef<HTMLIFrameElement>;
 
     @Input()
     public content?: ContentDto | null;
 
     @Input()
-    public contentSchema: SchemaDto;
+    public contentSchema!: SchemaDto;
 
     @Input()
     public set url(value: string | undefined | null) {
         this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
     }
 
-    public computedUrl: string;
+    public computedUrl = '';
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         private readonly appsState: AppsState,

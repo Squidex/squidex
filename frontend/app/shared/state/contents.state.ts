@@ -432,7 +432,7 @@ export class ContentsState extends ContentsStateBase {
 
 @Injectable()
 export class ComponentContentsState extends ContentsStateBase {
-    public schema: { name: string };
+    public schema!: { name: string };
 
     constructor(
         appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,

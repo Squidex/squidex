@@ -17,13 +17,13 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
 })
 export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput', { static: false })
-    public nameInput: ElementRef<HTMLElement>;
+    public nameInput!: ElementRef<HTMLElement>;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public settings: AppSettingsDto;
+    public settings!: AppSettingsDto;
 
     @Input()
     public parent: RootFieldDto | null | undefined;
@@ -36,7 +36,7 @@ export class FieldWizardComponent implements OnInit {
     }
 
     public fieldTypes = fieldTypes;
-    public field: FieldDto;
+    public field!: FieldDto;
 
     public addFieldForm = new AddFieldForm();
 

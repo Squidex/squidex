@@ -173,8 +173,8 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 }
 
 class Deferred<T> {
-    private handleResolve: Function;
-    private handleReject: Function;
+    private handleResolve?: Function;
+    private handleReject?: Function;
     private isHandled = false;
 
     public readonly promise: Promise<T>;
@@ -192,7 +192,7 @@ class Deferred<T> {
         }
 
         this.isHandled = true;
-        this.handleResolve(value);
+        this.handleResolve?.(value);
     }
 
     public reject(reason?: any) {
@@ -201,6 +201,6 @@ class Deferred<T> {
         }
 
         this.isHandled = true;
-        this.handleReject(reason);
+        this.handleReject?.(reason);
     }
 }

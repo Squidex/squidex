@@ -163,7 +163,7 @@ export interface StateSynchronizerMap<T> {
 
 @Injectable()
 export class Router2State implements OnDestroy, StateSynchronizer {
-    private mapper: Router2StateMap<any>;
+    private mapper?: Router2StateMap<any>;
 
     constructor(
         private readonly route: ActivatedRoute,
@@ -198,8 +198,8 @@ export class Router2State implements OnDestroy, StateSynchronizer {
 
 export class Router2StateMap<T extends {}> implements StateSynchronizerMap<T> {
     private readonly syncs: RouteSynchronizer[] = [];
-    private lastSyncedQuery: QueryParams;
-    private stateSubscription: Subscription;
+    private lastSyncedQuery?: QueryParams;
+    private stateSubscription?: Subscription;
 
     constructor(
         private readonly state: State<T>,

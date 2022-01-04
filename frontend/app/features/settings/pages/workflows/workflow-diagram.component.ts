@@ -19,10 +19,10 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy, OnCha
     private network: any;
 
     @ViewChild('chartContainer', { static: false })
-    public chartContainer: ElementRef;
+    public chartContainer!: ElementRef;
 
     @Input()
-    public workflow: WorkflowDto;
+    public workflow!: WorkflowDto;
 
     public isLoaded = false;
 

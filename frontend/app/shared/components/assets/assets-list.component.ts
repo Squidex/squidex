@@ -15,7 +15,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-assets-list',
+    selector: 'sqx-assets-list[assetsState]',
     styleUrls: ['./assets-list.component.scss'],
     templateUrl: './assets-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +25,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public select = new EventEmitter<AssetDto>();
 
     @Input()
-    public assetsState: AssetsState;
+    public assetsState!: AssetsState;
 
     @Input()
     public isDisabled?: boolean | null;
@@ -37,7 +37,7 @@ export class AssetsListComponent extends StatefulComponent<State> {
     public indicateLoading?: boolean | null;
 
     @Input()
-    public selectedIds: {};
+    public selectedIds?: {};
 
     @Input()
     public showPager?: boolean | null = true;

@@ -22,10 +22,10 @@ interface State {
 })
 export class ContentListFieldComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
-    public field: TableField;
+    public field!: TableField;
 
     @Input()
-    public content: ContentDto;
+    public content!: ContentDto;
 
     @Input()
     public patchAllowed?: boolean | null;
@@ -34,7 +34,7 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
     public patchForm?: FormGroup | null;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {

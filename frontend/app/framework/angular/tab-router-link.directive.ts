@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class TabRouterlinkDirective {
     @Input('sqxTabRouterLink')
-    public commands: any[];
+    public commands!: any[];
 
     constructor(
         private readonly router: Router,

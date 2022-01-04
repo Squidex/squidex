@@ -16,12 +16,12 @@ import { AppsState, ClientDto, ClientsState, DialogModel, RoleDto } from '@app/s
 })
 export class ClientComponent implements OnChanges {
     @Input()
-    public client: ClientDto;
+    public client!: ClientDto;
 
     @Input()
-    public clientRoles: ReadonlyArray<RoleDto>;
+    public clientRoles!: ReadonlyArray<RoleDto>;
 
-    public apiCallsLimit: number;
+    public apiCallsLimit = 0;
 
     public connectDialog = new DialogModel();
 

@@ -15,7 +15,7 @@ export interface ResizeListener {
 @Injectable()
 export class ResizeService implements OnDestroy {
     private readonly listeners = new WeakMap<Element, ResizeListener>();
-    private observer: ResizeObserver;
+    private observer?: ResizeObserver;
 
     public ngOnDestroy() {
         if (this.observer) {
@@ -48,6 +48,6 @@ export class ResizeService implements OnDestroy {
     }
 
     public unlisten(target: Element) {
-        this.observer.unobserve(target);
+        this.observer?.unobserve(target);
     }
 }

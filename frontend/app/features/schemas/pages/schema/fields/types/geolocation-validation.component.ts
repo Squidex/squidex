@@ -16,11 +16,11 @@ import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 })
 export class GeolocationValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: GeolocationFieldPropertiesDto;
+    public properties!: GeolocationFieldPropertiesDto;
 }

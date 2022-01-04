@@ -16,7 +16,7 @@ import { HtmlValue, Types } from '@app/shared/internal';
 })
 export class ContentValueComponent {
     @Input()
-    public value: any;
+    public value!: any;
 
     public get isPlain() {
         return !Types.is(this.value, HtmlValue);

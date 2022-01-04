@@ -16,11 +16,11 @@ import { FieldDto, SchemaDto } from '@app/shared';
 })
 export class FieldFormUIComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 }

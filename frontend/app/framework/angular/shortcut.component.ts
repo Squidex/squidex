@@ -19,7 +19,7 @@ export class ShortcutComponent implements OnDestroy, OnInit {
     public trigger = new EventEmitter();
 
     @Input()
-    public keys: string;
+    public keys = '';
 
     @Input()
     public disabled?: boolean | null;

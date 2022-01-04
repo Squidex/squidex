@@ -26,13 +26,13 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
-    private value: string;
+    private value?: string;
 
     @Output()
     public assetPluginClick = new EventEmitter<any>();
 
     @Input()
-    public folderId: string;
+    public folderId = '';
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
@@ -40,7 +40,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     @ViewChild('editor', { static: false })
-    public editor: ElementRef;
+    public editor!: ElementRef;
 
     public assetsDialog = new DialogModel();
 

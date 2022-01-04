@@ -15,7 +15,7 @@ import { SchemaDto, SchemasState, SynchronizeSchemaForm } from '@app/shared';
 })
 export class SchemaExportFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public synchronizeForm = new SynchronizeSchemaForm();
 

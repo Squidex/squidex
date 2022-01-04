@@ -17,10 +17,10 @@ import { ChartHelpers, ChartOptions } from './shared';
 })
 export class ApiTrafficCardComponent implements OnChanges {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Input()
-    public usage: CallsUsageDto;
+    public usage?: CallsUsageDto;
 
     @Input()
     public isStacked?: boolean | null;

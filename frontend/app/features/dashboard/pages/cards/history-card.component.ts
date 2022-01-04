@@ -17,9 +17,9 @@ import { Observable } from 'rxjs';
 })
 export class HistoryCardComponent implements OnChanges {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
-    public history: Observable<ReadonlyArray<HistoryEventDto>>;
+    public history?: Observable<ReadonlyArray<HistoryEventDto>>;
 
     constructor(
         private readonly historyService: HistoryService,

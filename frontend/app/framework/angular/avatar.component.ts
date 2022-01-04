@@ -24,7 +24,7 @@ export class AvatarComponent implements OnChanges {
     @Input()
     public size = 50;
 
-    public imageSource: string | null;
+    public imageSource?: string | null;
     public imageSize = '50px';
 
     public ngOnChanges(changes: SimpleChanges) {

@@ -12,7 +12,7 @@ import { MetaFields, SchemaDto } from '@app/shared';
 const META_FIELD_NAMES = Object.values(MetaFields);
 
 @Component({
-    selector: 'sqx-field-list',
+    selector: 'sqx-field-list[fieldNames][schema]',
     styleUrls: ['./field-list.component.scss'],
     templateUrl: './field-list.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,10 +22,10 @@ export class FieldListComponent implements OnChanges {
     public emptyText = '';
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public fieldNames: ReadonlyArray<string>;
+    public fieldNames!: ReadonlyArray<string>;
 
     @Input()
     public withMetaFields = false;
@@ -33,8 +33,8 @@ export class FieldListComponent implements OnChanges {
     @Output()
     public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
 
-    public fieldsAdded: string[];
-    public fieldsNotAdded: string[];
+    public fieldsAdded!: string[];
+    public fieldsNotAdded!: string[];
 
     public ngOnChanges() {
         let allFields = this.schema.contentFields.map(x => x.name);

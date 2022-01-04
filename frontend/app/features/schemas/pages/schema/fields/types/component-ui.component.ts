@@ -16,11 +16,11 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 })
 export class ComponentUIComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: ReferencesFieldPropertiesDto;
+    public properties!: ReferencesFieldPropertiesDto;
 }

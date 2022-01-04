@@ -13,7 +13,7 @@ import { Types } from '@app/framework/internal';
 })
 export class FocusOnInitDirective implements AfterViewInit {
     @Input()
-    public select: boolean;
+    public select = false;
 
     @Input('sqxFocusOnInit')
     public enabled?: string | boolean | null = true;

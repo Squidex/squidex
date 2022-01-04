@@ -35,7 +35,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     private completions: ReadonlyArray<{ name: string; value: string }> = [];
 
     @ViewChild('editor', { static: false })
-    public editor: ElementRef;
+    public editor!: ElementRef;
 
     @Input()
     public borderless?: boolean | null;
@@ -44,7 +44,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public mode = 'ace/mode/javascript';
 
     @Input()
-    public valueFile: string;
+    public valueFile = '';
 
     @Input()
     public valueMode: 'String' | 'Json' = 'String';
@@ -53,7 +53,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public maxLines: number | undefined;
 
     @Input()
-    public wordWrap: boolean;
+    public wordWrap = false;
 
     @Input()
     public height: number | 'auto' | 'full' = 'full';

@@ -16,13 +16,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } 
 })
 export class AssetTextEditorComponent implements OnInit {
     @Input()
-    public fileSource: string;
+    public fileSource = '';
 
     @Input()
-    public fileName: string;
+    public fileName = '';
 
     @Input()
-    public mimeType: string;
+    public mimeType = '';
 
     public text = '';
 

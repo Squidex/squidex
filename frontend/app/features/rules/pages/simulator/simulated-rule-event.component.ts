@@ -35,10 +35,10 @@ const ERRORS_FAILED = [
 })
 export class SimulatedRuleEventComponent {
     @Input('sqxSimulatedRuleEvent')
-    public event: SimulatedRuleEventDto;
+    public event!: SimulatedRuleEventDto;
 
     @Input()
-    public expanded: boolean;
+    public expanded = false;
 
     @Output()
     public expandedChange = new EventEmitter<any>();

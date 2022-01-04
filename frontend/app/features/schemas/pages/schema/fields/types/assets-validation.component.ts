@@ -10,22 +10,22 @@ import { FormGroup } from '@angular/forms';
 import { AssetsFieldPropertiesDto, FieldDto, LanguageDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-assets-validation[field][fieldForm][properties]',
+    selector: 'sqx-assets-validation[field][fieldForm][languages][properties]',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
 })
 export class AssetsValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: AssetsFieldPropertiesDto;
+    public properties!: AssetsFieldPropertiesDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;

@@ -38,21 +38,21 @@ export class WorkflowStepComponent implements OnChanges {
     public remove = new EventEmitter();
 
     @Input()
-    public workflow: WorkflowDto;
+    public workflow!: WorkflowDto;
 
     @Input()
-    public step: WorkflowStep;
+    public step!: WorkflowStep;
 
     @Input()
-    public roles: ReadonlyArray<string>;
+    public roles!: ReadonlyArray<string>;
 
     @Input()
     public disabled?: boolean | null;
 
-    public openSteps: ReadonlyArray<WorkflowStep>;
-    public openStep: WorkflowStep;
+    public openSteps!: ReadonlyArray<WorkflowStep>;
+    public openStep!: WorkflowStep;
 
-    public transitions: ReadonlyArray<WorkflowTransitionView>;
+    public transitions!: ReadonlyArray<WorkflowTransitionView>;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['workflow'] || changes['step']) {

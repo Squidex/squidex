@@ -32,16 +32,16 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     private value?: string;
 
     @Input()
-    public type: 'Text' | 'Code';
+    public type: 'Text' | 'Code' = 'Text';
 
     @Input()
     public formattable = true;
 
     @ViewChild(DefaultValueAccessor)
-    public inputEditor: DefaultValueAccessor;
+    public inputEditor!: DefaultValueAccessor;
 
     @ViewChild(CodeEditorComponent)
-    public codeEditor: CodeEditorComponent;
+    public codeEditor!: CodeEditorComponent;
 
     public disabled = false;
 

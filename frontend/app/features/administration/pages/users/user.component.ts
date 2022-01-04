@@ -16,7 +16,7 @@ import { UserDto, UsersState } from '@app/features/administration/internal';
 })
 export class UserComponent {
     @Input('sqxUser')
-    public user: UserDto;
+    public user!: UserDto;
 
     constructor(
         private readonly usersState: UsersState,

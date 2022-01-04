@@ -19,16 +19,16 @@ export class StringUIComponent extends ResourceOwner implements OnChanges {
     public readonly editors = STRING_FIELD_EDITORS;
 
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: StringFieldPropertiesDto;
+    public properties!: StringFieldPropertiesDto;
 
-    public hideAllowedValues: Observable<boolean>;
-    public hideInlineEditable: Observable<boolean>;
+    public hideAllowedValues?: Observable<boolean>;
+    public hideInlineEditable?: Observable<boolean>;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {

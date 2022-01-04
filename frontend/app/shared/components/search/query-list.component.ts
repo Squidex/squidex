@@ -31,7 +31,7 @@ export class QueryListComponent {
     public canRemove?: boolean | null;
 
     @Input()
-    public types: string;
+    public types = '';
 
     public isSelectedQuery(saved: SavedQuery) {
         return equalsQuery(saved.query, this.queryUsed);

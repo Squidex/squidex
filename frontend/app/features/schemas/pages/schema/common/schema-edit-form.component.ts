@@ -15,7 +15,7 @@ import { EditSchemaForm, SchemaDto, SchemasState } from '@app/shared';
 })
 export class SchemaEditFormComponent implements OnChanges {
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public fieldForm = new EditSchemaForm();
 

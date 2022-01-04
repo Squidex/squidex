@@ -23,7 +23,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
     public for: any;
 
     @Input()
-    public helpId: string;
+    public helpId = '';
 
     @Input()
     public after = 1000;

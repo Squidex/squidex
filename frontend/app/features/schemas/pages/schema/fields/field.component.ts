@@ -16,19 +16,19 @@ import { AppSettingsDto, createProperties, DialogModel, EditFieldForm, LanguageD
 })
 export class FieldComponent implements OnChanges {
     @Input()
-    public field: NestedFieldDto | RootFieldDto;
+    public field!: NestedFieldDto | RootFieldDto;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public parent: RootFieldDto;
+    public parent?: RootFieldDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public settings: AppSettingsDto;
+    public settings!: AppSettingsDto;
 
     public get isLocalizable() {
         return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
@@ -41,7 +41,7 @@ export class FieldComponent implements OnChanges {
     public isEditing = false;
     public isEditable?: boolean | null;
 
-    public editForm: EditFieldForm;
+    public editForm!: EditFieldForm;
 
     public addFieldDialog = new DialogModel();
 

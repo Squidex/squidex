@@ -19,7 +19,7 @@ export class WatchingUsersComponent {
     private appName: string;
 
     @Input()
-    public resource: string;
+    public resource!: string;
 
     public users =
         timer(0, 5000).pipe(

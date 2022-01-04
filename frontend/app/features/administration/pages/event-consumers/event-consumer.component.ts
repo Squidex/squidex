@@ -19,7 +19,7 @@ export class EventConsumerComponent {
     public error = new EventEmitter();
 
     @Input('sqxEventConsumer')
-    public eventConsumer: EventConsumerDto;
+    public eventConsumer!: EventConsumerDto;
 
     constructor(
         private readonly eventConsumersState: EventConsumersState,

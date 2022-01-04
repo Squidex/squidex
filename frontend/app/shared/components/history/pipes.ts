@@ -14,8 +14,8 @@ import { Subscription } from 'rxjs';
     pure: false,
 })
 export class HistoryMessagePipe implements OnDestroy, PipeTransform {
-    private subscription: Subscription;
-    private lastMessage: string;
+    private subscription?: Subscription;
+    private lastMessage?: string;
     private lastValue: string | null = null;
 
     constructor(

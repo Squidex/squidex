@@ -10,25 +10,25 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto, LanguageDto, NumberFieldPropertiesDto, RootFieldDto, SchemaDto, Types } from '@app/shared';
 
 @Component({
-    selector: 'sqx-number-validation[field][fieldForm][properties][schema]',
+    selector: 'sqx-number-validation[field][fieldForm][languages][properties][schema]',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
 })
 export class NumberValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public properties: NumberFieldPropertiesDto;
+    public properties!: NumberFieldPropertiesDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;

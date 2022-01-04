@@ -25,7 +25,7 @@ export class SearchFormComponent implements OnChanges {
     public placeholder = '';
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
     public languages: ReadonlyArray<LanguageDto> = [];
@@ -40,7 +40,7 @@ export class SearchFormComponent implements OnChanges {
     public queries?: Queries | null;
 
     @Input()
-    public queriesTypes: string;
+    public queriesTypes = '';
 
     @Input()
     public enableShortcut?: boolean | null;
@@ -50,13 +50,13 @@ export class SearchFormComponent implements OnChanges {
 
     public showQueries = false;
 
-    public saveKey: Observable<string | undefined>;
+    public saveKey!: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
     public saveQueryForm = new SaveQueryForm();
 
     public searchDialog = new DialogModel(false);
 
-    public hasFilter: boolean;
+    public hasFilter = false;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['query'] || changes['queries']) {

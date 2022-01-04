@@ -21,7 +21,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public languageChange = new EventEmitter<any>();
 
     @Input()
-    public language: Language;
+    public language!: Language;
 
     @Input()
     public languages: ReadonlyArray<Language> = [];

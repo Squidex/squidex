@@ -13,28 +13,28 @@ import { Observable } from 'rxjs';
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
 @Component({
-    selector: 'sqx-date-time-validation[field][fieldForm][properties]',
+    selector: 'sqx-date-time-validation[field][fieldForm][languages][properties]',
     styleUrls: ['date-time-validation.component.scss'],
     templateUrl: 'date-time-validation.component.html',
 })
 export class DateTimeValidationComponent implements OnChanges {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: DateTimeFieldPropertiesDto;
+    public properties!: DateTimeFieldPropertiesDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;
 
-    public showDefaultValues: Observable<boolean>;
-    public showDefaultValue: Observable<boolean>;
+    public showDefaultValues?: Observable<boolean>;
+    public showDefaultValue?: Observable<boolean>;
 
     public calculatedDefaultValues = CALCULATED_DEFAULT_VALUES;
 

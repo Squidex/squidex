@@ -13,13 +13,13 @@ import { ResourceOwner } from '@app/framework/internal';
     selector: '[sqxParentLink]',
 })
 export class ParentLinkDirective extends ResourceOwner implements OnInit {
-    private url: string;
+    private url?: string;
 
     @Input()
     public isLazyLoaded?: boolean | null;
 
     @Input()
-    public queryParamsHandling: QueryParamsHandling;
+    public queryParamsHandling?: QueryParamsHandling;
 
     constructor(
         private readonly router: Router,
@@ -48,7 +48,9 @@ export class ParentLinkDirective extends ResourceOwner implements OnInit {
 
     @HostListener('click')
     public onClick(): boolean {
-        this.router.navigateByUrl(this.url);
+        if (this.url) {
+            this.router.navigateByUrl(this.url);
+        }
 
         return false;
     }

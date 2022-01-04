@@ -15,15 +15,15 @@ import { AppLanguageDto, FieldForm, ModalModel } from '@app/shared';
 })
 export class FieldCopyButtonComponent implements OnChanges {
     @Input()
-    public formModel: FieldForm;
+    public formModel!: FieldForm;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
-    public languageCodes: ReadonlyArray<string>;
+    public languageCodes: ReadonlyArray<string> = [];
 
-    public copySource: string;
-    public copyTargets: ReadonlyArray<string>;
+    public copySource = '';
+    public copyTargets?: ReadonlyArray<string>;
 
     public dropdown = new ModalModel();
 
@@ -45,7 +45,7 @@ export class FieldCopyButtonComponent implements OnChanges {
     }
 
     public copy() {
-        if (this.copySource && this.copyTargets?.length > 0) {
+        if (this.copySource && this.copyTargets && this.copyTargets?.length > 0) {
             const source = this.formModel.get(this.copySource).form.value;
 
             for (const target of this.copyTargets) {

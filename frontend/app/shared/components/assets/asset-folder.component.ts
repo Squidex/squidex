@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-asset-folder',
+    selector: 'sqx-asset-folder[assetPathItem]',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,7 +22,7 @@ export class AssetFolderComponent {
     public delete = new EventEmitter<AssetFolderDto>();
 
     @Input()
-    public assetPathItem: AssetPathItem;
+    public assetPathItem!: AssetPathItem;
 
     public dropdown = new ModalModel();
 

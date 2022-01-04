@@ -16,7 +16,7 @@ import { ImageCropperComponent } from './image-cropper.component';
 import { ImageFocusPointComponent } from './image-focus-point.component';
 
 @Component({
-    selector: 'sqx-asset-dialog',
+    selector: 'sqx-asset-dialog[allTags][asset]',
     styleUrls: ['./asset-dialog.component.scss'],
     templateUrl: './asset-dialog.component.html',
 })
@@ -28,21 +28,21 @@ export class AssetDialogComponent implements OnChanges {
     public changed = new EventEmitter<AssetDto>();
 
     @Input()
-    public asset: AssetDto;
+    public asset!: AssetDto;
 
     @Input()
-    public allTags: ReadonlyArray<string>;
+    public allTags!: ReadonlyArray<string>;
 
     @ViewChildren(ImageCropperComponent)
-    public imageCropper: QueryList<ImageCropperComponent>;
+    public imageCropper!: QueryList<ImageCropperComponent>;
 
     @ViewChildren(ImageFocusPointComponent)
-    public imageFocus: QueryList<ImageFocusPointComponent>;
+    public imageFocus!: QueryList<ImageFocusPointComponent>;
 
     @ViewChildren(AssetTextEditorComponent)
-    public textEditor: QueryList<AssetTextEditorComponent>;
+    public textEditor!: QueryList<AssetTextEditorComponent>;
 
-    public path: Observable<ReadonlyArray<AssetPathItem>>;
+    public path!: Observable<ReadonlyArray<AssetPathItem>>;
 
     public isEditable = false;
     public isEditableAny = false;

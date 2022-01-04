@@ -13,15 +13,15 @@ import { map } from 'rxjs/operators';
 interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 
 @Component({
-    selector: 'sqx-asset-history',
+    selector: 'sqx-asset-history[asset]',
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
 })
 export class AssetHistoryComponent implements OnChanges {
     @Input()
-    public asset: AssetDto;
+    public asset!: AssetDto;
 
-    public assetEvents: Observable<ReadonlyArray<AssetEvent>>;
+    public assetEvents!: Observable<ReadonlyArray<AssetEvent>>;
 
     constructor(
         private readonly appsState: AppsState,

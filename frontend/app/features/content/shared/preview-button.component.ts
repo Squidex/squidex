@@ -29,10 +29,10 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     public confirm?: () => Observable<boolean>;
 
     @Input()
-    public content: ContentDto;
+    public content!: ContentDto;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public dropdown = new ModalModel();
 

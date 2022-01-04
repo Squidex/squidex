@@ -22,31 +22,31 @@ export class ContentFieldComponent implements OnChanges {
     public isCompact?: boolean | null;
 
     @Input()
-    public form: EditContentForm;
+    public form!: EditContentForm;
 
     @Input()
     public formCompare?: EditContentForm | null;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public formLevel: number;
+    public formLevel!: number;
 
     @Input()
-    public formModel: FieldForm;
+    public formModel!: FieldForm;
 
     @Input()
     public formModelCompare?: FieldForm;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @HostBinding('class')
     public get class() {
@@ -63,8 +63,8 @@ export class ContentFieldComponent implements OnChanges {
 
     public showAllControls = false;
 
-    public isDifferent: Observable<boolean>;
-    public isInvalid: Observable<boolean>;
+    public isDifferent?: Observable<boolean>;
+    public isInvalid?: Observable<boolean>;
 
     constructor(
         private readonly appsState: AppsState,

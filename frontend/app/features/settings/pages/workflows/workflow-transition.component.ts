@@ -23,10 +23,10 @@ export class WorkflowTransitionComponent {
     public remove = new EventEmitter();
 
     @Input()
-    public transition: WorkflowTransitionView;
+    public transition!: WorkflowTransitionView;
 
     @Input()
-    public roles: ReadonlyArray<string>;
+    public roles!: ReadonlyArray<string>;
 
     @Input()
     public disabled?: boolean | null;

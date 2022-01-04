@@ -15,11 +15,11 @@ import { AppDto, AppsState, defined, ResourceOwner, Types, UpdateAppForm } from 
     templateUrl: './more-page.component.html',
 })
 export class MorePageComponent extends ResourceOwner implements OnInit {
-    public app: AppDto;
+    public app!: AppDto;
 
     public isEditable = false;
-    public isImageEditable: boolean;
-    public isDeletable: boolean;
+    public isImageEditable = false;
+    public isDeletable = false;
 
     public uploading = false;
     public uploadProgress = 10;

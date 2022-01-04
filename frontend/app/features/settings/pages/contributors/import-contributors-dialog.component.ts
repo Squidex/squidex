@@ -18,7 +18,7 @@ type ImportStatus = {
 };
 
 @Component({
-    selector: 'sqx-import-contributors-dialog',
+    selector: 'sqx-import-contributors-dialog[roles]',
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
 })
@@ -27,7 +27,7 @@ export class ImportContributorsDialogComponent {
     public close = new EventEmitter();
 
     @Input()
-    public roles: ReadonlyArray<RoleDto>;
+    public roles!: ReadonlyArray<RoleDto>;
 
     public importForm = new ImportContributorsForm();
     public importStatus: ReadonlyArray<ImportStatus> = [];

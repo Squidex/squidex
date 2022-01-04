@@ -30,7 +30,7 @@ RENDERER_INLINE.link = RENDERER_DEFAULT.link;
 })
 export class MarkdownDirective implements OnChanges {
     @Input('sqxMarkdown')
-    public markdown: string;
+    public markdown!: string;
 
     @Input()
     public inline = true;

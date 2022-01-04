@@ -18,11 +18,11 @@ export class ReferencesUIComponent {
     public readonly editors = REFERENCES_FIELD_EDITORS;
 
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: ReferencesFieldPropertiesDto;
+    public properties!: ReferencesFieldPropertiesDto;
 }

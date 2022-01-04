@@ -20,10 +20,10 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
     private readonly notifoApiKey: string | undefined;
 
     @Input()
-    public topic: string;
+    public topic = '';
 
     @ViewChild('element', { static: false })
-    public element: ElementRef<Element>;
+    public element!: ElementRef<Element>;
 
     public get isConfigured() {
         return !!this.notifoApiKey && !!this.notifoApiUrl;

@@ -29,19 +29,19 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     private assetsCorrelationId: any;
 
     @ViewChild('iframe', { static: false })
-    public iframe: ElementRef<HTMLIFrameElement>;
+    public iframe!: ElementRef<HTMLIFrameElement>;
 
     @ViewChild('container', { static: false })
-    public container: ElementRef<HTMLElement>;
+    public container!: ElementRef<HTMLElement>;
 
     @ViewChild('inner', { static: false })
-    public inner: ElementRef<HTMLElement>;
+    public inner!: ElementRef<HTMLElement>;
 
     @Input()
     public context: any = {};
 
     @Input()
-    public formValue: any;
+    public formValue!: any;
 
     @Input()
     public formIndex?: number | null;
@@ -50,7 +50,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     public language?: string | null;
 
     @Input()
-    public formControlBinding: AbstractControl;
+    public formControlBinding!: AbstractControl;
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
@@ -62,7 +62,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         this.computedUrl = computeEditorUrl(value, this.appsState.snapshot.selectedSettings);
     }
 
-    public computedUrl: string;
+    public computedUrl = '';
 
     public assetsDialog = new DialogModel();
 

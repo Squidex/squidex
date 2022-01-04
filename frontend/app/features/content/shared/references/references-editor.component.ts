@@ -33,16 +33,16 @@ interface State {
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     @Input()
-    public schemaIds: ReadonlyArray<string>;
+    public schemaIds!: ReadonlyArray<string>;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
     public allowDuplicates?: boolean | null = true;

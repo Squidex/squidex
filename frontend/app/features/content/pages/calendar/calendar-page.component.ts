@@ -19,19 +19,19 @@ type ViewMode = 'day' | 'week' | 'month';
 })
 export class CalendarPageComponent implements AfterViewInit, OnDestroy {
     private calendar: any;
-    private language: LanguageDto;
+    private language!: LanguageDto;
 
     @ViewChild('calendarContainer', { static: false })
-    public calendarContainer: ElementRef;
+    public calendarContainer!: ElementRef;
 
     public view: ViewMode = 'month';
 
     public content?: ContentDto;
     public contentDialog = new DialogModel();
 
-    public title: string;
+    public title = '';
 
-    public isLoading: boolean;
+    public isLoading = false;
 
     constructor(
         private readonly appsState: AppsState,

@@ -17,7 +17,7 @@ type ComponentState<T> = { type: string; values: any; form: T };
     templateUrl: './rule-page.component.html',
 })
 export class RulePageComponent extends ResourceOwner implements OnInit {
-    public supportedActions: { [name: string]: RuleElementDto };
+    public supportedActions: { [name: string]: RuleElementDto } = {};
     public supportedTriggers = ALL_TRIGGERS;
 
     public rule?: RuleDto | null;
@@ -33,7 +33,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     }
 
     public get actionElement() {
-        return this.supportedActions[this.currentAction?.type || ''];
+        return this.supportedActions![this.currentAction?.type || ''];
     }
 
     public get triggerElement() {
@@ -86,14 +86,14 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
     }
 
     public selectAction(type: string, values = {}) {
-        if (this.currentAction?.type !== type) {
+        if (this.currentAction?.type !== type && this.supportedActions) {
             const form = new ActionForm(this.supportedActions[type], type);
 
             this.currentAction = { form, type, values };
             this.currentAction.form.setEnabled(this.isEditable);
         }
 
-        this.currentAction.form.load(values);
+        this.currentAction!.form.load(values);
     }
 
     public selectTrigger(type: string, values = {}) {

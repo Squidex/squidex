@@ -137,13 +137,13 @@ export function touchedChange$(form: AbstractControl) {
         const previousMarkedAsUntouched = form.markAsUntouched;
 
         form['markAsTouched'] = function markAsTouched(...args: any[]) {
-            previousMarkedAsTouched.apply(this, args);
+            previousMarkedAsTouched.apply(this, args as any);
 
             updateTouched(form.touched);
         };
 
         form['markAsUntouched'] = function markAsTouched(...args: any[]) {
-            previousMarkedAsUntouched.apply(this, args);
+            previousMarkedAsUntouched.apply(this, args as any);
 
             updateTouched(form.touched);
         };

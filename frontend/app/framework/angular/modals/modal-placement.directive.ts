@@ -13,7 +13,7 @@ import { timer } from 'rxjs';
     selector: '[sqxAnchoredTo]',
 })
 export class ModalPlacementDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
-    private targetElement: Element;
+    private targetElement?: Element;
 
     @Input('sqxAnchoredTo')
     public set target(element: Element) {

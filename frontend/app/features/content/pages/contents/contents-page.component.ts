@@ -24,11 +24,11 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     @ViewChild('dueTimeSelector', { static: false })
-    public dueTimeSelector: DueTimeSelectorComponent;
+    public dueTimeSelector!: DueTimeSelectorComponent;
 
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
-    public tableView: TableFields;
+    public tableView!: TableFields;
     public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
@@ -39,8 +39,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public selectionCanDelete = false;
     public selectionStatuses: { [name: string]: string } = {};
 
-    public language: AppLanguageDto;
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public language!: AppLanguageDto;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     public get disableScheduler() {
         return this.appsState.snapshot.selectedSettings?.hideScheduler === true;

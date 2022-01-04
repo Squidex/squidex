@@ -12,10 +12,10 @@ import { ShortcutService } from '@app/framework/internal';
     selector: '[shortcut]',
 })
 export class ShortcutDirective implements OnDestroy, OnInit {
-    private subscription: Function;
+    private subscription?: Function;
 
     @Input()
-    public shortcut: string;
+    public shortcut!: string;
 
     @Input()
     public shortcutAction: 'focus' | 'click' | 'none' = 'click';

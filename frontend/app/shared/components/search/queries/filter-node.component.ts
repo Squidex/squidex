@@ -15,7 +15,7 @@ import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel } 
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilterNodeComponent {
-    public comparison: FilterComparison;
+    public comparison?: FilterComparison;
 
     @Output()
     public change = new EventEmitter();
@@ -24,16 +24,16 @@ export class FilterNodeComponent {
     public remove = new EventEmitter();
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public level: number;
+    public level = 0;
 
     @Input()
-    public model: QueryModel;
+    public model!: QueryModel;
 
     @Input()
     public set filter(value: FilterNode) {
@@ -44,5 +44,5 @@ export class FilterNodeComponent {
         }
     }
 
-    public logical: FilterLogical;
+    public logical?: FilterLogical;
 }

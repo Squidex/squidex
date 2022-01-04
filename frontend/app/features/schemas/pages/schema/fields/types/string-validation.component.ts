@@ -11,7 +11,7 @@ import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalMod
 import { Observable } from 'rxjs';
 
 @Component({
-    selector: 'sqx-string-validation[field][fieldForm][properties][schema]',
+    selector: 'sqx-string-validation[field][fieldForm][languages][properties][schema][settings]',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
 })
@@ -19,30 +19,30 @@ export class StringValidationComponent extends ResourceOwner implements OnChange
     public readonly contentTypes = STRING_CONTENT_TYPES;
 
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public properties: StringFieldPropertiesDto;
+    public properties!: StringFieldPropertiesDto;
 
     @Input()
-    public settings: AppSettingsDto;
+    public settings!: AppSettingsDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;
 
-    public showPatternMessage: Observable<boolean>;
-    public showPatternSuggestions: Observable<boolean>;
+    public showPatternMessage?: Observable<boolean>;
+    public showPatternSuggestions?: Observable<boolean>;
 
-    public patternName: string;
+    public patternName = '';
     public patternsModal = new ModalModel();
 
     public get showUnique() {

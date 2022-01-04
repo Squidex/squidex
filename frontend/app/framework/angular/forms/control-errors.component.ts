@@ -24,11 +24,11 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
-    private displayFieldName: string;
+    private controlDisplayName = '';
     private control: AbstractControl | null = null;
 
     @Input()
-    public for: string | AbstractControl;
+    public for!: string | AbstractControl;
 
     @Input()
     public fieldName: string | null | undefined;
@@ -50,7 +50,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         const previousControl = this.control;
 
         if (this.fieldName) {
-            this.displayFieldName = this.fieldName;
+            this.controlDisplayName = this.fieldName;
         } else if (this.for) {
             if (Types.isString(this.for)) {
                 let translation = this.localizer.get(`common.${this.for}`)!;
@@ -59,9 +59,9 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
                     translation = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
                 }
 
-                this.displayFieldName = translation;
+                this.controlDisplayName = translation;
             } else {
-                this.displayFieldName = this.localizer.get('common.field')!;
+                this.controlDisplayName = this.localizer.get('common.field')!;
             }
         }
 
@@ -99,7 +99,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
             for (const key in this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
-                    const message = formatError(this.localizer, this.displayFieldName, key, this.control.errors[key], this.control.value);
+                    const message = formatError(this.localizer, this.controlDisplayName, key, this.control.errors[key], this.control.value);
 
                     if (Types.isString(message)) {
                         errorMessages.push(message);

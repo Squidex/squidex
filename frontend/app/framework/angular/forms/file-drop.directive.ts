@@ -15,13 +15,13 @@ export class FileDropDirective {
     private dragCounter = 0;
 
     @Input()
-    public allowedFiles: ReadonlyArray<string>;
+    public allowedFiles?: ReadonlyArray<string>;
 
     @Input('sqxDropOnlyImages')
-    public onlyImages: boolean;
+    public onlyImages!: boolean;
 
     @Input('sqxDropNoPaste')
-    public noPaste: boolean;
+    public noPaste!: boolean;
 
     @Input('sqxDropDisabled')
     public disabled = false;

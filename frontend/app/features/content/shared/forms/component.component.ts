@@ -20,28 +20,28 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
     public canUnset?: boolean | null;
 
     @Input()
-    public form: EditContentForm;
+    public form!: EditContentForm;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public formLevel: number;
+    public formLevel!: number;
 
     @Input()
-    public formModel: ComponentForm;
+    public formModel!: ComponentForm;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @ViewChildren(ComponentSectionComponent)
-    public sections: QueryList<ComponentSectionComponent>;
+    public sections!: QueryList<ComponentSectionComponent>;
 
     public schemasDropdown = new ModalModel();
-    public schemasList: ReadonlyArray<SchemaDto>;
+    public schemasList: ReadonlyArray<SchemaDto> = [];
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,

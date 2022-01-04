@@ -39,13 +39,13 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public selectFolder = new EventEmitter<string>();
 
     @Input()
-    public assetFile: File;
+    public assetFile?: File;
 
     @Input()
-    public asset: AssetDto;
+    public asset?: AssetDto;
 
     @Input()
-    public assetsState: AssetsState;
+    public assetsState!: AssetsState;
 
     @Input()
     public folderId?: string;
@@ -69,7 +69,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public isListView?: boolean | null;
 
     @Input()
-    public allTags: ReadonlyArray<string>;
+    public allTags!: ReadonlyArray<string>;
 
     public editDialog = new DialogModel();
 
@@ -109,13 +109,15 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     }
 
     public updateFile(files: ReadonlyArray<File>) {
-        if (files.length === 1 && this.asset.canUpload) {
+        const asset = this.asset;
+
+        if (files.length === 1 && asset?.canUpload) {
             this.dialogs.confirm('i18n:assets.replaceConfirmTitle', 'i18n:assets.replaceConfirmText')
                 .subscribe(confirmed => {
                     if (confirmed) {
                         this.setProgress(1);
 
-                        this.assetUploader.uploadAsset(this.asset, files[0])
+                        this.assetUploader.uploadAsset(asset, files[0])
                             .subscribe({
                                 next: asset => {
                                     if (Types.isNumber(asset)) {

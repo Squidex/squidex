@@ -20,8 +20,8 @@ export class ModalDirective implements OnDestroy {
     private static backdrop: any;
     private currentModel: DialogModel | ModalModel | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
-    private renderRoots: ReadonlyArray<HTMLElement> | null;
-    private isOpen: boolean;
+    private renderRoots: ReadonlyArray<HTMLElement> | null = null;
+    private isOpen = false;
 
     @Input('sqxModal')
     public set model(value: Model) {

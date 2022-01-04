@@ -17,10 +17,10 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
 })
 export class ContentValueEditorComponent {
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public form: FormGroup;
+    public form!: FormGroup;
 
     public readonly uniqueId = MathHelper.guid();
 }

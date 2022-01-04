@@ -11,16 +11,16 @@ import { GridsterItem } from 'angular-gridster2';
 import { take } from 'rxjs/operators';
 
 @Component({
-    selector: 'sqx-dashboard-config',
+    selector: 'sqx-dashboard-config[app][config]',
     styleUrls: ['./dashboard-config.component.scss'],
     templateUrl: './dashboard-config.component.html',
 })
 export class DashboardConfigComponent implements OnChanges {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Input()
-    public config: GridsterItem[];
+    public config!: GridsterItem[];
 
     @Input()
     public needsAttention?: boolean | null;
@@ -31,7 +31,7 @@ export class DashboardConfigComponent implements OnChanges {
     public configOptions: ReadonlyArray<GridsterItem>;
 
     public expertDialog = new DialogModel();
-    public expertConfig: GridsterItem[];
+    public expertConfig?: GridsterItem[];
 
     public dropdownModal = new ModalModel();
 

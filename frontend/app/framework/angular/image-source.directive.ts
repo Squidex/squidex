@@ -20,13 +20,13 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
     private loadQuery: string | null = null;
 
     @Input('sqxImageSource')
-    public imageSource: string;
+    public imageSource!: string;
 
     @Input()
     public retryCount = 0;
 
     @Input()
-    public layoutKey: string;
+    public layoutKey = '';
 
     @Input()
     public parent: any = null;

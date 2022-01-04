@@ -16,16 +16,16 @@ import { FieldDto, LanguageDto, TagsFieldPropertiesDto } from '@app/shared';
 })
 export class TagsValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: TagsFieldPropertiesDto;
+    public properties!: TagsFieldPropertiesDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;

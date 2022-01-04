@@ -20,7 +20,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class GraphQLPageComponent implements AfterViewInit {
     @ViewChild('graphiQLContainer', { static: false })
-    public graphiQLContainer: ElementRef;
+    public graphiQLContainer!: ElementRef;
 
     constructor(
         private readonly appsState: AppsState,

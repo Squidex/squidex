@@ -16,5 +16,5 @@ import { AppDto } from '@app/shared';
 })
 export class GithubCardComponent {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 }

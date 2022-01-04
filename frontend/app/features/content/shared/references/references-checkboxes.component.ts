@@ -38,7 +38,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     public schemaId: string | undefined | null;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
     public set disabled(value: boolean | undefined | null) {

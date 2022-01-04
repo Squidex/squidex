@@ -24,15 +24,15 @@ export class ContentChangedTriggerComponent implements OnChanges {
     public schemas?: ReadonlyArray<SchemaDto> | null;
 
     @Input()
-    public trigger: any;
+    public trigger!: any;
 
     @Input()
-    public triggerForm: TriggerForm;
+    public triggerForm!: TriggerForm;
 
     public triggerSchemas: TriggerSchemaForm[] = [];
 
-    public schemaToAdd: SchemaDto;
-    public schemasToAdd: ReadonlyArray<SchemaDto>;
+    public schemaToAdd!: SchemaDto;
+    public schemasToAdd!: ReadonlyArray<SchemaDto>;
 
     public get hasSchema() {
         return !!this.schemaToAdd;

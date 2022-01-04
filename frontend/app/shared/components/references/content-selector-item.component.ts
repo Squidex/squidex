@@ -27,13 +27,13 @@ export class ContentSelectorItemComponent {
     public selectable?: boolean | null = true;
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input('sqxContentSelectorItem')
-    public content: ContentDto;
+    public content!: ContentDto;
 
     public toggle() {
         if (this.selectable) {

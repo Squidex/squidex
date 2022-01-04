@@ -16,7 +16,7 @@ import { ApiUrlConfig, BackupDto, BackupsState, Duration } from '@app/shared';
 })
 export class BackupComponent {
     @Input()
-    public backup: BackupDto;
+    public backup!: BackupDto;
 
     public get duration() {
         return Duration.create(this.backup.started, this.backup.stopped!).toString();

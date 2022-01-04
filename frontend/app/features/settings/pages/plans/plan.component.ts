@@ -16,7 +16,7 @@ import { PlanInfo, PlansState } from '@app/shared';
 })
 export class PlanComponent {
     @Input()
-    public planInfo: PlanInfo;
+    public planInfo!: PlanInfo;
 
     constructor(
         public readonly plansState: PlansState,

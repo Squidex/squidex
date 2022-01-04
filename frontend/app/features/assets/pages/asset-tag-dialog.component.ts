@@ -18,7 +18,7 @@ export class AssetTagDialogComponent implements OnInit {
     public complete = new EventEmitter();
 
     @Input()
-    public tagName: string;
+    public tagName!: string;
 
     public editForm = new RenameAssetTagForm();
 

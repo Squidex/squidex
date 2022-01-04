@@ -27,28 +27,28 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
     public isCompact?: boolean | null;
 
     @Input()
-    public form: EditContentForm;
+    public form!: EditContentForm;
 
     @Input()
     public formCompare?: EditContentForm | null;
 
     @Input()
-    public formLevel: number;
+    public formLevel!: number;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public formSection: FieldSection<RootFieldDto, FieldForm>;
+    public formSection!: FieldSection<RootFieldDto, FieldForm>;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly localStore: LocalStoreService,

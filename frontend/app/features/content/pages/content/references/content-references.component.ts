@@ -19,13 +19,13 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, QuerySynchronizer, 
 })
 export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy {
     @Input()
-    public content: ContentDto;
+    public content!: ContentDto;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public mode: 'references' | 'referencing' = 'references';

@@ -16,7 +16,7 @@ import { AppDto, ModalModel } from '@app/shared';
 })
 export class AppComponent {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Output()
     public leave = new EventEmitter<AppDto>();

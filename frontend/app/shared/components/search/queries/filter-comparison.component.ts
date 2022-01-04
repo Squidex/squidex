@@ -10,7 +10,7 @@ import { FilterComparison, LanguageDto, QueryFieldModel, QueryModel } from '@app
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
 @Component({
-    selector: 'sqx-filter-comparison',
+    selector: 'sqx-filter-comparison[filter][language][languages][model]',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,18 +23,18 @@ export class FilterComparisonComponent implements OnChanges {
     public remove = new EventEmitter();
 
     @Input()
-    public language: LanguageDto;
+    public language!: LanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
-    public model: QueryModel;
+    public model!: QueryModel;
 
     @Input()
-    public filter: FilterComparison;
+    public filter!: FilterComparison;
 
-    public fieldModel: QueryFieldModel;
+    public fieldModel?: QueryFieldModel;
 
     public noValue = false;
 

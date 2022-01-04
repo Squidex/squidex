@@ -14,7 +14,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-comment',
+    selector: 'sqx-comment[comment][commentsState]',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,26 +30,26 @@ export class CommentComponent extends StatefulComponent<State> implements OnChan
     public canEdit?: boolean | null;
 
     @Input()
-    public commentsState: CommentsState;
+    public commentsState!: CommentsState;
 
     @Input()
     public confirmDelete?: boolean | null = true;
 
     @Input()
-    public comment: CommentDto;
+    public comment!: CommentDto;
 
     @Input()
-    public userToken: string;
+    public userToken = '';
 
     @Input()
-    public mentionUsers: ReadonlyArray<ContributorDto>;
+    public mentionUsers?: ReadonlyArray<ContributorDto>;
 
     public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
 
     public isDeletable = false;
     public isEditable = false;
 
-    public editingText: string;
+    public editingText = '';
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,

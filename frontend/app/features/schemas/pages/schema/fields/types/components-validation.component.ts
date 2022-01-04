@@ -16,13 +16,13 @@ import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource } from '@app/sh
 })
 export class ComponentsValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public properties: ReferencesFieldPropertiesDto;
+    public properties!: ReferencesFieldPropertiesDto;
 
     constructor(
         public readonly schemasSource: SchemaTagSource,

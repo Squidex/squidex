@@ -15,7 +15,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class FormHintComponent {
     @Input()
-    public class: string;
+    public class = '';
 
     @Input()
     public marginTop: number | string = 0;

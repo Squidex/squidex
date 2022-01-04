@@ -16,10 +16,10 @@ import { ScheduleDto } from '@app/shared';
 })
 export class ContentStatusComponent {
     @Input()
-    public status: string;
+    public status!: string;
 
     @Input()
-    public statusColor: string;
+    public statusColor!: string;
 
     @Input()
     public scheduled?: ScheduleDto | null;

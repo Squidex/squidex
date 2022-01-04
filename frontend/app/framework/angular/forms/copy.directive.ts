@@ -13,7 +13,7 @@ import { DialogService, Types } from '@app/framework/internal';
 })
 export class CopyDirective {
     @Input('sqxCopy')
-    public inputElement: any;
+    public inputElement!: any;
 
     constructor(
         private readonly dialogs: DialogService,

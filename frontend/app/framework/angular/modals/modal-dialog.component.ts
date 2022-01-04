@@ -43,10 +43,10 @@ export class ModalDialogComponent implements AfterViewInit {
     public fullHeight?: boolean | null;
 
     @ViewChild('tabsElement', { static: false })
-    public tabsElement: ElementRef<ParentNode>;
+    public tabsElement!: ElementRef<ParentNode>;
 
     @ViewChild('footerElement', { static: false })
-    public footerElement: ElementRef<ParentNode>;
+    public footerElement!: ElementRef<ParentNode>;
 
     constructor(
         private readonly renderer: Renderer2,

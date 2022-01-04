@@ -22,7 +22,7 @@ interface State {
 }
 
 @Component({
-    selector: 'sqx-localized-input',
+    selector: 'sqx-localized-input[languages]',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
     providers: [
@@ -34,16 +34,16 @@ export class LocalizedInputComponent extends StatefulControlComponent<State, { [
     private value: { [key: string]: any } | undefined;
 
     @Input()
-    public languages: ReadonlyArray<Language>;
+    public languages!: ReadonlyArray<Language>;
 
     @Input()
     public type: 'text' | 'boolean' | 'datetime' | 'date' | 'tags' | 'number' = 'text';
 
     @Input()
-    public name: string;
+    public name = '';
 
     @Input()
-    public id: string;
+    public id = '';
 
     @Input()
     public set disabled(value: boolean | undefined | null) {

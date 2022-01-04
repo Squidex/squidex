@@ -16,10 +16,10 @@ import { AppDto, CallsUsageDto } from '@app/shared';
 })
 export class ApiTrafficSummaryCardComponent implements OnChanges {
     @Input()
-    public app: AppDto;
+    public app!: AppDto;
 
     @Input()
-    public usage: CallsUsageDto;
+    public usage?: CallsUsageDto;
 
     public bytesMonth = 0;
     public bytesAllowed = 0;

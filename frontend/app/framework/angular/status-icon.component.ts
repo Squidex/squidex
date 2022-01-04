@@ -15,7 +15,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 })
 export class StatusIconComponent {
     @Input()
-    public status: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending';
+    public status?: 'Started' | 'Failed' | 'Success' | 'Completed' | 'Pending';
 
     @Input()
     public statusText: string | undefined | null;

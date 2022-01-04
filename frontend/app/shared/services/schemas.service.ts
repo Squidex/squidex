@@ -52,10 +52,10 @@ export class SchemaDto {
 
     public readonly displayName: string;
 
-    public readonly contentFields: ReadonlyArray<RootFieldDto>;
+    public readonly contentFields: ReadonlyArray<RootFieldDto> = [];
 
-    public readonly defaultListFields: ReadonlyArray<TableField>;
-    public readonly defaultReferenceFields: ReadonlyArray<TableField>;
+    public readonly defaultListFields: ReadonlyArray<TableField> = [];
+    public readonly defaultReferenceFields: ReadonlyArray<TableField> = [];
 
     constructor(links: ResourceLinks,
         public readonly id: string,

@@ -18,7 +18,7 @@ export class AssetFolderDialogComponent implements OnInit {
     public complete = new EventEmitter();
 
     @Input()
-    public assetFolder: AssetFolderDto;
+    public assetFolder?: AssetFolderDto;
 
     public editForm = new RenameAssetFolderForm();
 

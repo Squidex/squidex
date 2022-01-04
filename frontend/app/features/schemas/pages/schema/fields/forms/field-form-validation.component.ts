@@ -16,19 +16,19 @@ import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto } from '@app/shared';
 })
 export class FieldFormValidationComponent {
     @Input()
-    public fieldForm: FormGroup;
+    public fieldForm!: FormGroup;
 
     @Input()
-    public field: FieldDto;
+    public field!: FieldDto;
 
     @Input()
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     @Input()
-    public settings: AppSettingsDto;
+    public settings!: AppSettingsDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
     public isLocalizable?: boolean | null;

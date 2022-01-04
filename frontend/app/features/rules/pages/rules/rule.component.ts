@@ -16,13 +16,13 @@ import { ActionsDto, ModalModel, RuleDto, RulesState, TriggersDto } from '@app/s
 })
 export class RuleComponent {
     @Input()
-    public ruleTriggers: TriggersDto;
+    public ruleTriggers!: TriggersDto;
 
     @Input()
-    public ruleActions: ActionsDto;
+    public ruleActions!: ActionsDto;
 
     @Input()
-    public rule: RuleDto;
+    public rule!: RuleDto;
 
     public dropdown = new ModalModel();
 

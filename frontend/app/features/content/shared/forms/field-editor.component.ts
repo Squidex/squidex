@@ -19,22 +19,22 @@ export class FieldEditorComponent implements OnChanges {
     public readonly uniqueId = MathHelper.guid();
 
     @Input()
-    public form: EditContentForm;
+    public form!: EditContentForm;
 
     @Input()
-    public formContext: any;
+    public formContext!: any;
 
     @Input()
-    public formLevel: number;
+    public formLevel!: number;
 
     @Input()
-    public formModel: AbstractContentForm<FieldDto, AbstractControl>;
+    public formModel!: AbstractContentForm<FieldDto, AbstractControl>;
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public index: number | null | undefined;
@@ -43,12 +43,12 @@ export class FieldEditorComponent implements OnChanges {
     public canUnset?: boolean | null;
 
     @Input()
-    public displaySuffix: string;
+    public displaySuffix = '';
 
     @ViewChild('editor', { static: false })
-    public editor: ElementRef;
+    public editor!: ElementRef;
 
-    public isEmpty: Observable<boolean>;
+    public isEmpty?: Observable<boolean>;
 
     public get field() {
         return this.formModel.field;

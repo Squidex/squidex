@@ -17,7 +17,7 @@ export class SettingsPageComponent extends ResourceOwner implements OnInit {
     public isEditable = false;
 
     public editForm = new EditAppSettingsForm();
-    public editingSettings: AppSettingsDto;
+    public editingSettings?: AppSettingsDto;
 
     constructor(
         private readonly appsState: AppsState,
@@ -47,7 +47,7 @@ export class SettingsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public save() {
-        if (!this.isEditable) {
+        if (!this.isEditable || !this.editingSettings) {
             return;
         }
 

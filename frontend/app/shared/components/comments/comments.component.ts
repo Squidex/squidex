@@ -20,22 +20,22 @@ import { CommentComponent } from './comment.component';
 })
 export class CommentsComponent extends ResourceOwner implements OnChanges {
     @ViewChild('commentsList', { static: false })
-    public commentsList: ElementRef<HTMLDivElement>;
+    public commentsList!: ElementRef<HTMLDivElement>;
 
     @ViewChildren(CommentComponent)
-    public children: QueryList<CommentComponent>;
+    public children!: QueryList<CommentComponent>;
 
     @Input()
-    public commentsId: string;
+    public commentsId = '';
 
-    public commentsUrl: string;
-    public commentsState: CommentsState;
+    public commentsUrl!: string;
+    public commentsState!: CommentsState;
     public commentForm = new UpsertCommentForm();
 
     public mentionUsers = this.contributorsState.contributors;
     public mentionConfig: MentionConfig = { dropUp: true, labelKey: 'contributorEmail' };
 
-    public userToken: string;
+    public userToken = '';
 
     constructor(authService: AuthService,
         private readonly appsState: AppsState,

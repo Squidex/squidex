@@ -22,7 +22,7 @@ export const SQX_INDETERMINATE_VALUE_CONTROL_VALUE_ACCESSOR: any = {
 export class IndeterminateValueDirective implements ControlValueAccessor {
     private callChange = (_: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
-    private isChecked: boolean | null;
+    private isChecked?: boolean | null;
 
     @Input()
     public threeStates = true;

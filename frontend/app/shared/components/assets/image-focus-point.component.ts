@@ -23,22 +23,22 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy, OnCha
     private y = 0;
 
     @Input()
-    public imageSource: string;
+    public imageSource = '';
 
     @Input()
     public focusPoint: any;
 
     @ViewChild('image', { static: false })
-    public image: ElementRef<HTMLImageElement>;
+    public image!: ElementRef<HTMLImageElement>;
 
     @ViewChild('previewWide', { static: false })
-    public previewWide: ElementRef<HTMLImageElement>;
+    public previewWide!: ElementRef<HTMLImageElement>;
 
     @ViewChild('previewSmall', { static: false })
-    public previewSmall: ElementRef<HTMLImageElement>;
+    public previewSmall!: ElementRef<HTMLImageElement>;
 
     @ViewChild('previewNormal', { static: false })
-    public previewNormal: ElementRef<HTMLImageElement>;
+    public previewNormal!: ElementRef<HTMLImageElement>;
 
     public ngOnDestroy() {
         if (this.focusPicker) {

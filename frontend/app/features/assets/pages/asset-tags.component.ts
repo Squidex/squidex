@@ -24,15 +24,15 @@ export class AssetTagsComponent {
     public toggle = new EventEmitter<string>();
 
     @Input()
-    public tags: ReadonlyArray<TagItem>;
+    public tags!: ReadonlyArray<TagItem>;
 
     @Input()
-    public tagsSelected: TagsSelected;
+    public tagsSelected!: TagsSelected;
 
     @Input()
-    public canRename: boolean;
+    public canRename = false;
 
-    public tagRenaming: TagItem;
+    public tagRenaming?: TagItem;
     public tagRenameDialog = new DialogModel();
 
     public isEmpty() {

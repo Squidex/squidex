@@ -22,23 +22,23 @@ import { filter, map, tap } from 'rxjs/operators';
     ],
 })
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
-    private autoSaveKey: AutoSaveKey;
+    private autoSaveKey!: AutoSaveKey;
 
-    public schema: SchemaDto;
+    public schema!: SchemaDto;
 
     public formContext: any;
 
     public contentTab = this.route.queryParams.pipe(map(x => x['tab'] || 'editor'));
     public content?: ContentDto | null;
     public contentId = '';
-    public contentVersion: Version | null;
-    public contentForm: EditContentForm;
+    public contentVersion: Version | null = null;
+    public contentForm!: EditContentForm;
     public contentFormCompare: EditContentForm | null = null;
 
     public dropdown = new ModalModel();
 
-    public language: AppLanguageDto;
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public language!: AppLanguageDto;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     public confirmPreview = () => {
         return this.checkPendingChangesBeforePreview();

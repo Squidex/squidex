@@ -25,13 +25,13 @@ export class FieldLanguagesComponent {
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     @Input()
-    public language: AppLanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<AppLanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public field: RootFieldDto;
+    public field!: RootFieldDto;
 
     public toggleShowAllControls() {
         this.showAllControlsChange.emit(!this.showAllControls);
