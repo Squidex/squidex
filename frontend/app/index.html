@@ -20,9 +20,9 @@
         </style>
     </noscript>
 
-    <link rel="stylesheet" type="text/css" href="./scripts/outdatedbrowser/outdatedbrowser.min.css">
+    <link rel="stylesheet" type="text/css" href="scripts/outdatedbrowser/outdatedbrowser.min.css">
 
-    <script src="./scripts/outdatedbrowser/outdatedbrowser.min.js"></script>
+    <script src="scripts/outdatedbrowser/outdatedbrowser.min.js"></script>
     <script> 
         function addLoadEvent(callback) {
             var oldOnload = window.onload;
@@ -42,7 +42,8 @@
         addLoadEvent(function () {
             outdatedBrowser({ 
                 lowerThan: 'object-fit', 
-                languagePath: './scripts/outdatedbrowser/lang/en.html'
+                language: 'en',
+                languagePath: 'scripts/outdatedbrowser/lang/en.html'
             });
         });
     </script>

@@ -48,6 +48,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.RulesetToEditorconfigConverter" Version="3.3.3" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.5" />
@@ -79,18 +80,23 @@
     <PackageReference Include="Squidex.Assets.S3" Version="2.6.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="7.7.0" />
-    <PackageReference Include="Squidex.Hosting" Version="2.4.0" />
+    <PackageReference Include="Squidex.Hosting" Version="2.8.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="6.0.0" GeneratePathProperty="true" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
+	
+  <Target Name="CopySystemSecurityCryptographyPkcs" AfterTargets="Build">
+	<Copy SourceFiles="$(PkgSystem_Security_Cryptography_Pkcs)\lib\net6.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutDir)" />
+  </Target>
+	
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
@@ -126,6 +132,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Frontend\Resources\" />
+    <Folder Include="wwwroot\build\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -156,6 +163,4 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605;IDE0060</NoWarn>
   </PropertyGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/bamboo-spec.json" /></VisualStudio></ProjectExtensions>
 </Project>
