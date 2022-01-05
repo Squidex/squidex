@@ -44,13 +44,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Setup
         }
 
         [HttpGet]
-        [Route("webpack/")]
-        public IActionResult Webpack()
-        {
-            return View();
-        }
-
-        [HttpGet]
         [Route("setup/")]
         public async Task<IActionResult> Setup()
         {

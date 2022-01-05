@@ -90,7 +90,6 @@ namespace Squidex
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
 
-            app.ConfigureDev();
             app.ConfigureApi();
             app.ConfigurePortal();
             app.ConfigureOrleansDashboard();
