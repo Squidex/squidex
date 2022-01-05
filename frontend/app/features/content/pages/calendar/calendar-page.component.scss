@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 :host ::ng-deep {
     .tui-full-calendar-weekday-schedule-bullet {
         top: 10px !important;

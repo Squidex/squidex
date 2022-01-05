@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .title {
     @include hover-visible('.title-edit', inline);
     position: relative;

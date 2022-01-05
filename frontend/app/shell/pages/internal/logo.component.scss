@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .loader {
     @include absolute(50%, null, null, 50%);
     margin-left: -14px;

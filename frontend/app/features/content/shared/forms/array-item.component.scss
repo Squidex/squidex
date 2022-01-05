@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 :host ::ng-deep {
     .ui-separator {
         border-color: $color-border !important;

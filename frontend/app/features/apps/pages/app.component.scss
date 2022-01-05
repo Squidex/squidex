@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .btn {
     @include absolute(1rem, 1rem);
 }

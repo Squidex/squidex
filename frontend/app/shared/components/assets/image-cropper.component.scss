@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 :host {
     background: $color-black;
     display: flex;

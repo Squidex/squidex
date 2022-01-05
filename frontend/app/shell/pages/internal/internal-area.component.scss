@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .navbar {
     @include box-shadow-outer(0, 2px, 3px, .13);
     padding-left: $size-sidebar-width + 2rem;

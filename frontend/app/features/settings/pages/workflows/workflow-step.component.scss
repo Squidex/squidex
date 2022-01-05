@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 :host ::ng-deep {
     .dashed {
         @include placeholder-color($color-theme-secondary);
