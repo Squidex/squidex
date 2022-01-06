@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .plan {
     &-price {
         color: $color-theme-brand;

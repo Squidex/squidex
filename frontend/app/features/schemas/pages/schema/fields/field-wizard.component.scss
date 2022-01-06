@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 $icon-size: 4.5rem;
 
 :host ::ng-deep {

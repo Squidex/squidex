@@ -156,10 +156,6 @@ module.exports = function calculateConfig(env) {
                 }, {
                     loader: 'sass-loader',
                     options: {
-                        additionalData: `
-                                @import '_vars';
-                                @import '_mixins';
-                            `,
                         sassOptions: {
                             includePaths: [helpers.root('app', 'theme')],
                         },

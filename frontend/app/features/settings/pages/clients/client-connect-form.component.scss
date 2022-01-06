@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .badge {
     @include circle(1.3rem);
     font-size: $font-smallest;

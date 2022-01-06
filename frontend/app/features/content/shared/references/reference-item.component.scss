@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .reference-edit {
     @include hover-visible('.reference-menu');
     position: relative;

@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .notification-container {
     @include force-width(30rem);
     @include fixed;

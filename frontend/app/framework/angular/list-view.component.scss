@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 :host {
     display: flex;
     flex-direction: column;

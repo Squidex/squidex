@@ -1,3 +1,6 @@
+@import 'mixins';
+@import 'vars';
+
 .app {
     &-image {
         min-height: 150px;
