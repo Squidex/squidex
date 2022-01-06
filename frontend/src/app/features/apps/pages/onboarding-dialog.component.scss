@@ -1,0 +1,87 @@
+@import 'mixins';
+@import 'vars';
+
+$size-width: 825px;
+$size-height: 576px;
+$size-image: 476px;
+
+h1 {
+    font-size: 1.6rem;
+}
+
+p {
+    line-height: 1.8rem;
+}
+
+.col-image {
+    @include force-width(489px);
+}
+
+:host ::ng-deep {
+    .modal {
+        &-content,
+        &-dialog {
+            @include force-width($size-width);
+            @include force-height($size-height);
+        }
+
+        &-content {
+            background-color: $color-dark-onboarding;
+            background-image: url('../../../assets/onboarding-background.png');
+            color: $color-white;
+            position: relative;
+        }
+
+        &-body,
+        &-content {
+            overflow: hidden;
+        }
+
+        &-footer {
+            border: 0;
+        }
+
+        &-close {
+            color: $color-white;
+            cursor: pointer;
+            text-decoration: underline !important;
+        }
+    }
+}
+
+.header-focus {
+    color: $color-theme-brand;
+}
+
+.header-left {
+    @include absolute($t: -70px, $l: 2rem);
+}
+
+.header-right {
+    @include absolute($t: 2rem, $r: 2rem);
+}
+
+.footer {
+    @include absolute($t: 18rem, $l: 2rem);
+}
+
+.onboarding {
+    &-enter-leave {
+        @include force-width(28rem);
+        margin: 4rem auto 0;
+        text-align: center;
+        text-decoration: none;
+
+        p {
+            margin: 2rem 0;
+        }
+    }
+
+    &-text {
+        padding-left: 2rem;
+    }
+
+    &-step {
+        @include absolute($size-height - $size-image, 0, 0, 0);
+    }
+}
