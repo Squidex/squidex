@@ -7,7 +7,7 @@
     "postinstall": "npx patch-package",
     "start": "ng serve",
     "test": "ng test",
-    "test:coverage": "ng test --no-watch --code-coverage --browsers=ChromeHeadless",
+    "test:coverage": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessNoSandbox",
     "watch": "ng build --watch --configuration development"
   },
   "private": true,
