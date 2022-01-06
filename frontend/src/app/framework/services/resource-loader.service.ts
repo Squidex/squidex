@@ -61,14 +61,10 @@ export class ResourceLoaderService {
     }
 
     public loadLocalScript(url: string): Promise<any> {
-        return process.env.NODE_ENV !== 'production' ?
-            this.loadScript(`https://localhost:3000/${url}`) :
-            this.loadScript(`build/${url}`);
+        return this.loadScript(url);
     }
 
     public loadLocalStyle(url: string): Promise<any> {
-        return process.env.NODE_ENV !== 'production' ?
-            this.loadStyle(`https://localhost:3000/${url}`) :
-            this.loadStyle(`build/${url}`);
+        return this.loadStyle(url);
     }
 }

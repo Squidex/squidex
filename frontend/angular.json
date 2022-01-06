@@ -110,6 +110,9 @@
             "styles": [
               "src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["./src/app/theme"]
+            },
             "scripts": []
           }
         }
