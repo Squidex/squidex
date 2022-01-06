@@ -17,8 +17,8 @@ export class LocalizerService {
     ) {
     }
 
-    public logMissingKeys() {
-        this.shouldLog = true;
+    public logMissingKeys(shouldLog = true) {
+        this.shouldLog = shouldLog;
 
         return this;
     }

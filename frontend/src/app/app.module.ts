@@ -60,13 +60,7 @@ function configCurrency() {
 }
 
 function configLocalizerService() {
-    if (environment.production) {
-        return new LocalizerService(window['texts']);
-    } else {
-        const culture = DateHelper.getLocale();
-
-        return new LocalizerService(require(`./../../../backend/i18n/frontend_${culture}.json`)).logMissingKeys();
-    }
+    return new LocalizerService(environment.textResolver()).logMissingKeys(environment.textLogger);
 }
 
 export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {

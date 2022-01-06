@@ -1,3 +1,7 @@
 export const environment = {
-  production: true
+    production: true,
+    textLogger: false,
+    textResolver: () => {
+        return window['texts'];
+    },
 };

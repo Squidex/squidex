@@ -3,7 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+    production: false,
+    textLogger: true,
+    textResolver: () => {
+        const culture = window['options']?.more?.culture || 'en';
+
+        return require(`./../../../backend/i18n/frontend_${culture}.json`);
+    },
 };
 
 /*
