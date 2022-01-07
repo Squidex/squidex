@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="/">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Squidex Headless CMS</title>
+    <style>
+        #outdated {
+            display: none;
+        }
+    </style>
+    <noscript>
+        <style>
+            .loading {
+                display: none;
+            }
+        </style>
+    </noscript>
+
+    <link rel="stylesheet" type="text/css" href="./scripts/outdatedbrowser/outdatedbrowser.min.css">
+
+    <script src="./scripts/outdatedbrowser/outdatedbrowser.min.js"></script>
+    <script> 
+        function addLoadEvent(callback) {
+            var oldOnload = window.onload;
+
+            if (typeof window.onload != 'function') {
+                window.onload = callback;
+            } else {
+                window.onload = function () {
+                    if (oldOnload) {
+                        oldOnload();
+                    }
+                    callback();
+                }
+            }
+        }
+
+        addLoadEvent(function () {
+            outdatedBrowser({ 
+                lowerThan: 'object-fit', 
+                languagePath: './scripts/outdatedbrowser/lang/en.html'
+            });
+        });
+    </script>
+</head>
+<body>
+    <sqx-app>
+        <div class="loading">
+            <img src="./images/loader.svg">
+
+            <div>Loading Squidex</div>
+        </div>
+    </sqx-app>
+    
+    <div id="outdated"></div>
+</body>
+</html>
