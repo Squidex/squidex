@@ -64,6 +64,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public displayProperty = '';
 
     @Input()
+    public valueProperty = '';
+
+    @Input()
     public placeholder = '';
 
     @Input()
@@ -238,8 +241,8 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
             let value = selection;
 
-            if (this.displayProperty) {
-                value = selection[this.displayProperty];
+            if (this.valueProperty) {
+                value = selection[this.valueProperty];
             }
 
             this.callChange(value);
