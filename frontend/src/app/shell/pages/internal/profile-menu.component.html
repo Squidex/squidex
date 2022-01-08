@@ -9,7 +9,7 @@
 </ul>
 
 <ng-container *sqxModal="modalMenu;onRoot:false;closeAlways:true">
-    <sqx-dropdown-menu [sqxAnchoredTo]="button" [scrollY]="true" [offsetY]="10">
+    <sqx-dropdown-menu [sqxAnchoredTo]="button" [offsetY]="10">
         <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
             <div>{{ 'profile.userEmail' | sqxTranslate }}</div>
     
