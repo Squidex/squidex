@@ -11,7 +11,7 @@ import { AbstractControl, FormArray } from '@angular/forms';
 import { MathHelper } from '@app/framework';
 import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, RootFieldDto } from '@app/shared/internal';
 import { FieldRule, SchemaDto } from './../services/schemas.service';
-import { FieldArrayForm } from './contents.forms';
+import { ComponentForm, FieldArrayForm } from './contents.forms';
 import { PartitionConfig } from './contents.forms-helpers';
 import { TestValues } from './_test-helpers';
 
@@ -502,6 +502,61 @@ describe('ContentForm', () => {
             // Should hide fields.
             expect(array.get(0)!.get('field1')!.hidden).toBeTruthy();
             expect(array.get(1)!.get('field1')!.hidden).toBeFalsy();
+        });
+
+        it('should add component with default values', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                id: 1,
+                fields: [
+                    createField({
+                        id: 11,
+                        properties: createProperties('String', {
+                            defaultValue: 'Initial',
+                        }),
+                        partitioning: 'invariant',
+                    }),
+                    createField({
+                        id: 12,
+                        properties: createProperties('Number', {
+                            defaultValue: 12,
+                        }),
+                        partitioning: 'invariant',
+                    }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({
+                    id: 4,
+                    properties: createProperties('Component'),
+                    partitioning: 'invariant',
+                }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            contentForm.load({});
+
+            // Should be undefined by default.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: undefined,
+                },
+            });
+
+            (contentForm.get('field4')?.get('iv') as ComponentForm).selectSchema(componentId);
+
+            // Should add field from component.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: {
+                        schemaId: componentId,
+                        field11: 'Initial',
+                        field12: 12,
+                    },
+                },
+            });
         });
 
         it('should replace component with new fields', () => {

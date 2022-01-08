@@ -4,7 +4,7 @@
             {{schema.displayName}}
         </sqx-form-hint>
 
-        <div class="form-group" *ngFor="let section of formModel.fieldSectionsChanges | async">
+        <div class="form-group" *ngFor="let section of formModel.sectionsChanges | async">
             <sqx-component-section
                 [canUnset]="canUnset"
                 [form]="form"

@@ -326,7 +326,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         return this.item$.value;
     }
 
-    public set items(value: ReadonlyArray<ObjectFormBase>) {
+    public set internalItems(value: ReadonlyArray<ObjectFormBase>) {
         this.item$.next(value);
     }
 
@@ -367,7 +367,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         children.splice(children.indexOf(item), 1);
         children.splice(index, 0, item);
 
-        this.items = children;
+        this.internalItems = children;
 
         this.sort(children);
     }
@@ -400,17 +400,17 @@ class ArrayTemplate implements FormArrayTemplate {
             this.createComponent() :
             this.createItem();
 
-        this.model.items = [...this.model.items, child];
+        this.model.internalItems = [...this.model.items, child];
 
         return child.form;
     }
 
     public removeControl(index: number) {
-        this.model.items = this.model.items.filter((_, i) => i !== index);
+        this.model.internalItems = this.model.items.filter((_, i) => i !== index);
     }
 
     public clearControls() {
-        this.model.items = [];
+        this.model.internalItems = [];
     }
 
     private createItem() {
@@ -439,19 +439,19 @@ export type FieldItemForm = ComponentForm | FieldValueForm | FieldArrayForm;
 type FieldMap = { [name: string]: FieldItemForm };
 
 export class ObjectFormBase<TField extends FieldDto = FieldDto> extends AbstractContentForm<TField, TemplatedFormGroup> {
-    private readonly fieldSections$ = new BehaviorSubject<ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>>([]);
+    private readonly sections$ = new BehaviorSubject<ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>>([]);
     private readonly fields$ = new BehaviorSubject<FieldMap>({});
 
-    public get fieldSectionsChanges(): Observable<ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>> {
-        return this.fieldSections$;
+    public get sectionsChanges(): Observable<ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>> {
+        return this.sections$;
     }
 
-    public get fieldSections() {
-        return this.fieldSections$.value;
+    public get sections() {
+        return this.sections$.value;
     }
 
-    public set fieldSections(value: ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>) {
-        this.fieldSections$.next(value);
+    public set internalFieldSections(value: ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>) {
+        this.sections$.next(value);
     }
 
     public get fieldsChanges(): Observable<FieldMap> {
@@ -462,7 +462,7 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
         return this.fields$.value;
     }
 
-    public set fields(value: FieldMap) {
+    public set internalFieldByName(value: FieldMap) {
         this.fields$.next(value);
     }
 
@@ -483,7 +483,7 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
             field.updateState(context, this.form.value, state);
         }
 
-        for (const section of this.fieldSections) {
+        for (const section of this.sections) {
             section.updateHidden();
         }
     }
@@ -529,8 +529,8 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
         }
     }
 
-    protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: T, form: FormGroup) {
-        const fieldMap: FieldMap = {};
+    protected setControlsCore(schema: ReadonlyArray<FieldDto>, _: any, model: T, form: FormGroup) {
+        const fieldByName: FieldMap = {};
         const fieldSections: FieldSection<FieldDto, FieldItemForm>[] = [];
 
         for (const { separator, fields } of groupFields(schema)) {
@@ -549,14 +549,14 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
 
                 forms.push(childForm);
 
-                fieldMap[field.name] = childForm;
+                fieldByName[field.name] = childForm;
             }
 
             fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(separator, forms));
         }
 
-        model.fields = fieldMap;
-        model.fieldSections = fieldSections;
+        model.internalFieldByName = fieldByName;
+        model.internalFieldSections = fieldSections;
     }
 
     protected clearControlsCore(model: T) {
@@ -564,8 +564,8 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
             model.form.removeControl(name);
         }
 
-        model.fields = {};
-        model.fieldSections = [];
+        model.internalFieldByName = {};
+        model.internalFieldSections = [];
     }
 }
 
@@ -595,7 +595,7 @@ export class ComponentForm extends ObjectFormBase {
         return this.schema$.value;
     }
 
-    public set schema(value: SchemaDto | undefined) {
+    public set internalSchema(value: SchemaDto | undefined) {
         this.schema$.next(value);
     }
 
@@ -610,11 +610,10 @@ export class ComponentForm extends ObjectFormBase {
             partition);
 
         this.form.reset(undefined);
-        this.form.build();
     }
 
     public selectSchema(schemaId: string) {
-        this.form.reset({ schemaId });
+        this.form.patchValue({ schemaId });
     }
 }
 
@@ -626,13 +625,13 @@ class ComponentTemplate extends ObjectTemplate<ComponentForm> {
     protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: ComponentForm, form: FormGroup) {
         form.setControl('schemaId', new FormControl());
 
-        this.model.schema = model.globals.schemas[value?.schemaId];
+        this.model.internalSchema = model.globals.schemas[value?.schemaId];
 
         super.setControlsCore(schema, value, model, form);
     }
 
     protected clearControlsCore(model: ComponentForm) {
-        this.model.schema = undefined;
+        this.model.internalSchema = undefined;
 
         super.clearControlsCore(model);
     }
