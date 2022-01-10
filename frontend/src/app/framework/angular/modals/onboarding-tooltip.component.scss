@@ -1,0 +1,31 @@
+@import 'mixins';
+@import 'vars';
+
+$hide-shadow: rgba(0, 0, 0, 50%);
+
+:host {
+    display: none;
+}
+
+.onboarding {
+    &-help {
+        background: $color-tooltip;
+        border: 0;
+        border-radius: $border-radius;
+        max-width: 20rem;
+        min-width: 10rem;
+        padding: .75rem 1rem;
+    }
+
+    &-text {
+        color: $color-white;
+    }
+
+    &-buttons {
+        margin: .8rem -.5rem 0;
+    }
+
+    &-rect {
+        box-shadow: 0 0 0 9999px $hide-shadow;
+    }
+}

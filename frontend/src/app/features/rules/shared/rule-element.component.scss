@@ -1,0 +1,69 @@
+@import 'mixins';
+@import 'vars';
+
+.root {
+    cursor: pointer;
+
+    &.disabled {
+        cursor: default;
+    }
+}
+
+.small {
+    @include force-height(3rem);
+    position: relative;
+    transition: background-color .4s ease;
+
+    &-text {
+        @include absolute(0, 0, 0, 3rem);
+        @include truncate;
+        color: $color-white;
+        line-height: 3rem;
+        padding: 0 .8rem;
+    }
+
+    &-icon {
+        @include absolute(0, auto, 0, 0);
+        color: $color-white;
+        font-size: 1.2rem;
+        font-weight: normal;
+        line-height: 3.2rem;
+        padding: 0 .8rem;
+    }
+}
+
+.large {
+    @include force-height(100px);
+
+    &.editable {
+        cursor: pointer;
+    }
+
+    &-link {
+        font-size: $font-small;
+        font-weight: normal;
+    }
+
+    &-title {
+        font-style: normal;
+        font-weight: 500;
+        line-height: 1;
+    }
+
+    &-text {
+        font-size: $font-small;
+        font-weight: normal;
+        margin-bottom: .125rem;
+        margin-top: .25rem;
+    }
+
+    &-icon {
+        color: $color-white;
+        display: inline-block;
+        line-height: 1px;
+        margin: 0;
+        margin-right: .5rem;
+        padding: 1rem;
+        position: relative;
+    }
+}

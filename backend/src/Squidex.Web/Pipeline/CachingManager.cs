@@ -146,7 +146,7 @@ namespace Squidex.Web.Pipeline
 
                 if (headers.Count > 0)
                 {
-                    response.Headers.Add(HeaderNames.Vary, new StringValues(headers.ToArray()));
+                    response.Headers[HeaderNames.Vary] = new StringValues(headers.ToArray());
                 }
             }
 

@@ -1,0 +1,13 @@
+@import 'mixins';
+@import 'vars';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-height: 100%;
+}
+
+.table {
+    margin: 1rem 0;
+}

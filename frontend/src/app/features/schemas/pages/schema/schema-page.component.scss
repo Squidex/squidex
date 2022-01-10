@@ -1,0 +1,23 @@
+@import 'mixins';
+@import 'vars';
+
+.btn-publishing {
+    &.disabled,
+    &:disabled {
+        opacity: 1;
+    }
+}
+
+.cards {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: $panel-padding;
+}
+
+.nav-tabs2 {
+    @include absolute(auto, auto, 0, auto);
+
+    a {
+        padding-bottom: 1.5rem;
+    }
+}

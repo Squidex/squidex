@@ -1,0 +1,43 @@
+@import 'mixins';
+@import 'vars';
+
+.summary-row {
+    @include force-height(4rem);
+
+    h3 {
+        margin: 0;
+    }
+
+    .col-syntax {
+        width: 4rem;
+    }
+
+    .col-icon {
+        max-width: 15rem;
+    }
+}
+
+.title {
+    display: inline-block;
+    margin-left: 2rem;
+}
+
+.card {
+    &-header {
+        margin-bottom: -1px;
+    }
+
+    &-body {
+        &:empty {
+            display: none;
+        }
+    }
+}
+
+.btn-run {
+    color: $color-theme-brand !important;
+}
+
+.btn-enabled {
+    border-color: $color-border;
+}

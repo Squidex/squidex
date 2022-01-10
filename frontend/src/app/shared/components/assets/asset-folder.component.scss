@@ -1,0 +1,35 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .cdk-drag-placeholder {
+        display: none;
+    }
+}
+
+img {
+    height: 1.5rem;
+    margin-bottom: .25rem;
+    margin-right: 1rem;
+}
+
+.card {
+    border-width: 1px;
+    border-bottom-width: 1px;
+    cursor: pointer;
+    width: $asset-width;
+
+    &-body {
+        font-size: 1.1rem;
+        line-height: 2.2rem;
+        padding-bottom: .75rem;
+        padding-right: .5rem;
+        padding-top: .75rem;
+    }
+}
+
+.icon-folder {
+    color: $color-text;
+    margin-right: .5rem;
+    margin-top: 0;
+}

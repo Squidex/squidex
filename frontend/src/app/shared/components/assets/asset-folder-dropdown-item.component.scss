@@ -1,0 +1,19 @@
+@import 'mixins';
+@import 'vars';
+
+.loader {
+    font-size: 60%;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-right: .25rem;
+}
+
+.btn {
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 1.5rem;
+    text-align: center;
+}

@@ -1,0 +1,24 @@
+@import 'mixins';
+@import 'vars';
+
+.html-value {
+    position: relative;
+}
+
+:host ::ng-deep {
+    img {
+        margin-top: -25px;
+        max-height: 50px;
+        min-height: 50px;
+        position: absolute;
+        top: 50%;
+    }
+
+    span {
+        @include truncate;
+    }
+
+    img + span {
+        padding-left: 60px;
+    }
+}

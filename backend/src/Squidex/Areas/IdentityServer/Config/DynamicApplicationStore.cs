@@ -155,8 +155,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 RedirectUris =
                 {
                     new Uri(urlGenerator.BuildUrl("login;")),
-                    new Uri(urlGenerator.BuildUrl("client-callback-silent", false)),
-                    new Uri(urlGenerator.BuildUrl("client-callback-popup", false))
+                    new Uri(urlGenerator.BuildUrl("client-callback-silent.html", false)),
+                    new Uri(urlGenerator.BuildUrl("client-callback-popup.html", false))
                 },
                 PostLogoutRedirectUris =
                 {

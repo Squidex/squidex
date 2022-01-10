@@ -1,0 +1,68 @@
+@import 'mixins';
+@import 'vars';
+
+$icon-size: 4.5rem;
+
+.btn-text {
+    margin-left: -.5rem;
+    margin-top: -1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.name-group {
+    margin-bottom: 1.5rem;
+}
+
+.type {
+    margin-bottom: .5rem;
+
+    &-title {
+        font-weight: bold;
+    }
+
+    &-text {
+        font-size: $font-small;
+    }
+
+    &-icon {
+        background: transparent;
+        border: 1px solid $color-border;
+        border-radius: $border-radius;
+        color: $color-theme-brand;
+        cursor: pointer;
+        font-size: 1.75rem;
+        font-weight: normal;
+        height: $icon-size;
+        line-height: $icon-size;
+        margin-right: .5rem;
+        text-align: center;
+        text-decoration: none;
+        width: $icon-size;
+
+        .radio-input {
+            display: none;
+        }
+
+        &.active {
+            @include box-shadow-outer(0, 0, 10px, .5);
+            background: $color-theme-brand;
+            border-color: $color-theme-brand;
+            color: $color-white;
+
+            &:hover {
+                color: $color-white;
+            }
+        }
+
+        &:hover {
+            border-color: $color-border-dark;
+        }
+    }
+
+    .radio-input {
+        display: none;
+    }
+}

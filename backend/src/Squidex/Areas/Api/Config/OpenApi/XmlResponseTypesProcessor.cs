@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {
-        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) =&gt; (?<Description>.*)", RegexOptions.Compiled);
+        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3})[\\s]*=((&gt;)|>)[\\s]*(?<Description>.*)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         public bool Process(OperationProcessorContext context)
         {

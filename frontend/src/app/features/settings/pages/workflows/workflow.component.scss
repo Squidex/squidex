@@ -1,0 +1,35 @@
+@import 'mixins';
+@import 'vars';
+
+.table-items-row-details {
+    &::before {
+        right: 4.55rem;
+    }
+}
+
+.workflow {
+    &-name {
+        @include truncate;
+    }
+}
+
+.col-form-label {
+    @include force-width(4rem);
+}
+
+.col-tags {
+    padding: .375rem 1rem 0;
+}
+
+.col-options {
+    width: 8rem;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+    margin-left: 2rem;
+}
+
+.btn-success {
+    margin-left: 2rem;
+}

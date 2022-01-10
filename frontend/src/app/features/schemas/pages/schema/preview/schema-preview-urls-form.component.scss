@@ -1,0 +1,15 @@
+@import 'mixins';
+@import 'vars';
+
+.content {
+    margin-top: 1rem;
+}
+
+.card-header,
+.card-footer {
+    padding: 1.25rem;
+}
+
+.col-name {
+    @include force-width(14rem);
+}

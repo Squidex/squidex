@@ -1,0 +1,22 @@
+@import 'mixins';
+@import 'vars';
+
+.btn-remove {
+    visibility: hidden;
+
+    i {
+        margin: 0;
+    }
+}
+
+.nav-item {
+    &:hover {
+        .btn-remove {
+            visibility: visible;
+        }
+    }
+}
+
+a {
+    text-decoration: none;
+}

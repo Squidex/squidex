@@ -1,0 +1,69 @@
+@import 'mixins';
+@import 'vars';
+
+/* stylelint-disable no-descending-specificity */
+
+.actions {
+    @include absolute(-5px, -15px, auto, auto);
+    background: $color-white;
+    border: 0;
+    border-radius: 0;
+    display: none;
+    width: auto;
+}
+
+.user-ref {
+    font-weight: bold;
+}
+
+.user-picture {
+    margin-top: .25rem;
+}
+
+.user-row {
+    position: relative;
+}
+
+.col-text {
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+}
+
+.comment {
+    font-size: $font-small;
+    font-weight: normal;
+    line-height: 1.25rem;
+    margin: 0;
+    margin-bottom: .75rem;
+    position: relative;
+
+    &-message {
+        margin-bottom: .375rem;
+    }
+
+    &-created {
+        font-size: $font-smallest;
+    }
+
+    &:hover {
+        .actions {
+            display: block;
+        }
+    }
+}
+
+:host {
+    &:last-child {
+        .comment {
+            margin-bottom: 0;
+        }
+    }
+}
+
+:host ::ng-deep {
+    p {
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}

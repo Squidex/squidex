@@ -1,0 +1,27 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .cdk-virtual-scroll-content-wrapper {
+        right: 0;
+    }
+}
+
+.array-container {
+    background: $color-border-lighter;
+    margin: 0;
+    margin-bottom: 1rem;
+    padding: .5rem 0;
+}
+
+.drag-container {
+    position: relative;
+}
+
+cdk-virtual-scroll-viewport {
+    height: 1000px;
+}
+
+.item {
+    margin: .25rem 1rem;
+}

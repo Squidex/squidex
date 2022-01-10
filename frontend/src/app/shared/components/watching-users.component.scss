@@ -1,0 +1,34 @@
+@import 'mixins';
+@import 'vars';
+
+:host {
+    display: flex;
+    align-items: center;
+    margin-right: .5rem;
+}
+
+.user-item {
+    display: inline-block;
+    margin-right: 0;
+    margin-left: -1.1rem;
+    position: relative;
+
+    &:hover {
+        z-index: 1000 !important;
+    }
+
+    .user-picture,
+    .user-more {
+        @include circle(2.3rem);
+        border: 2px solid $color-white;
+    }
+
+    .user-more {
+        background: $color-border;
+        font-size: 90%;
+        font-weight: bolder;
+        line-height: 2rem;
+        text-align: center;
+        z-index: 6;
+    }
+}

@@ -1,0 +1,12 @@
+@import 'mixins';
+@import 'vars';
+
+.section {
+    border-top: 1px solid $color-border;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+}
+
+.form-check {
+    margin-top: 1rem;
+}

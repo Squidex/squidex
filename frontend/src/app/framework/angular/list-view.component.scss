@@ -1,0 +1,111 @@
+@import 'mixins';
+@import 'vars';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    padding: 0;
+}
+
+.inner {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 $panel-padding;
+
+    &.tabled {
+        padding-bottom: .5rem !important;
+        padding-top: .5rem !important;
+    }
+}
+
+%transition-opacity {
+    transition: opacity .2s ease;
+}
+
+.list {
+    &-content {
+        @extend %transition-opacity;
+        flex-direction: column;
+        flex-grow: 1;
+
+        &.normal {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .inner {
+            &.normal {
+                padding: $panel-padding;
+            }
+        }
+
+        &.synced {
+            overflow-x: auto;
+            overflow-y: auto;
+
+            .inner {
+                padding-right: 0;
+            }
+        }
+    }
+
+    &-header {
+        @extend %transition-opacity;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        flex-shrink: 0;
+        overflow-x: hidden;
+        overflow-y: hidden;
+
+        .sync-inner {
+            display: table-cell;
+        }
+
+        ::ng-deep {
+            th {
+                padding: .75rem;
+            }
+
+            table {
+                margin: 0;
+            }
+
+            .table-items {
+                margin: 0;
+            }
+        }
+    }
+
+    &-footer {
+        @extend %transition-opacity;
+        border: 0;
+        border-top: 1px solid $color-border;
+        flex-shrink: 0;
+
+        ::ng-deep {
+            .pagination {
+                margin: .25rem 0;
+            }
+        }
+    }
+}
+
+:host(.overflow) {
+    overflow: visible;
+}
+
+%disabled {
+    pointer-events: none;
+}
+
+.loading-indicator {
+    @extend %disabled;
+    opacity: .5;
+}
+
+.loader {
+    @include absolute(20%, 0, auto, 0);
+    @extend %disabled;
+}

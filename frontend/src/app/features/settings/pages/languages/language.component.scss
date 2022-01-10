@@ -1,0 +1,48 @@
+@import 'mixins';
+@import 'vars';
+
+$field-header: #e7ebef;
+
+.language {
+    &-master {
+        font-weight: bold;
+    }
+
+    &-optional {
+        color: $color-text-decent;
+    }
+}
+
+.fallback {
+    &-languages {
+        background: $color-border;
+        border-bottom: 1px solid $color-border;
+        border-radius: $border-radius;
+        border-top: .5rem solid $color-border;
+        padding: 0 .5rem;
+    }
+
+    &-language {
+        background: $color-white;
+        border: 0;
+        border-radius: $border-radius;
+        line-height: 2rem;
+        margin: 0;
+        margin-bottom: .5rem;
+        padding: .5rem;
+    }
+
+    &-label {
+        margin-top: .4rem;
+    }
+
+    &-form {
+        margin-top: .5rem;
+    }
+}
+
+.table-items-row-details {
+    &::before {
+        right: 4.55rem;
+    }
+}

@@ -1,0 +1,53 @@
+@import 'mixins';
+@import 'vars';
+
+.content {
+    cursor: pointer;
+}
+
+.alert {
+    border-radius: 0;
+}
+
+.table-container {
+    display: inline-block;
+    min-width: 100%;
+    padding: 0;
+    padding-right: 1.5rem;
+
+    .table-items {
+        margin: 0;
+    }
+}
+
+.icon-plus {
+    font-size: $font-smallest;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.settings {
+    &-container {
+        position: relative;
+    }
+
+    &-button {
+        @include absolute(null, 1rem, -2.375rem);
+        background-color: $color-background;
+        border: 0;
+        border-radius: 4px;
+        z-index: 1000;
+    }
+}
+
+.btn-status {
+    background: $color-white;
+}
+
+.selection {
+    border-bottom: 1px solid $color-border;
+    border-radius: 0;
+    padding: .25 * $panel-padding $panel-padding;
+}
