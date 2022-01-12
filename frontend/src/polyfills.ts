@@ -17,6 +17,8 @@
 /***************************************************************************************************
  * BROWSER POLYFILLS
  */
+// Global for graphiql.
+(window as any).global = window;
 
 /**
  * By default, zone.js will patch all possible macroTask and DomEvents
