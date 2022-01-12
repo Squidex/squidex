@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using Newtonsoft.Json.Linq;
 using TestSuite.Model;
 
 namespace TestSuite.Fixtures
@@ -30,7 +31,19 @@ namespace TestSuite.Fixtures
                 {
                     var text = i.ToString(CultureInfo.InvariantCulture);
 
-                    var data = new TestEntityData { Number = i, String = text };
+                    var data = new TestEntityData
+                    {
+                        String = text,
+                        Number1 = i,
+                        Number2 = i,
+                        Json = JObject.FromObject(new
+                        {
+                            nested1 = new
+                            {
+                                nested2 = i
+                            }
+                        })
+                    };
 
                     if (i % 2 == 0)
                     {

@@ -46,7 +46,7 @@ namespace TestSuite.ApiTests
         {
             var items = await _.Contents.GetAsync(new ContentQuery
             {
-                OrderBy = "data/number/iv asc"
+                OrderBy = "data/number1/iv asc"
             });
 
             var itemsById = await _.Contents.GetAsync(new HashSet<string>(items.Items.Take(3).Select(x => x.Id)));
@@ -66,7 +66,7 @@ namespace TestSuite.ApiTests
         {
             var items = await _.Contents.GetAsync(new ContentQuery
             {
-                OrderBy = "data/number/iv asc"
+                OrderBy = "data/number1/iv asc"
             });
 
             AssertItems(items, 10, new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
@@ -83,7 +83,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number1.iv", order = "ascending"
                         }
                     }
                 }
@@ -97,7 +97,7 @@ namespace TestSuite.ApiTests
         {
             var items = await _.Contents.GetAsync(new ContentQuery
             {
-                Skip = 5, OrderBy = "data/number/iv asc"
+                Skip = 5, OrderBy = "data/number1/iv asc"
             });
 
             AssertItems(items, 10, new[] { 6, 7, 8, 9, 10 });
@@ -114,7 +114,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number1.iv", order = "ascending"
                         }
                     },
                     skip = 5
@@ -129,7 +129,7 @@ namespace TestSuite.ApiTests
         {
             var items = await _.Contents.GetAsync(new ContentQuery
             {
-                Skip = 2, Top = 5, OrderBy = "data/number/iv asc"
+                Skip = 2, Top = 5, OrderBy = "data/number1/iv asc"
             });
 
             AssertItems(items, 10, new[] { 3, 4, 5, 6, 7 });
@@ -146,7 +146,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number1.iv", order = "ascending"
                         }
                     },
                     skip = 2, top = 5
@@ -161,7 +161,7 @@ namespace TestSuite.ApiTests
         {
             var items = await _.Contents.GetAsync(new ContentQuery
             {
-                Filter = "data/number/iv gt 3 and data/number/iv lt 7", OrderBy = "data/number/iv asc"
+                Filter = "data/number1/iv gt 3 and data/number1/iv lt 7", OrderBy = "data/number1/iv asc"
             });
 
             AssertItems(items, 3, new[] { 4, 5, 6 });
@@ -178,7 +178,7 @@ namespace TestSuite.ApiTests
                     {
                         new
                         {
-                            path = "data.number.iv", order = "ascending"
+                            path = "data.number1.iv", order = "ascending"
                         }
                     },
                     filter = new
@@ -187,13 +187,51 @@ namespace TestSuite.ApiTests
                         {
                             new
                             {
-                                path = "data.number.iv",
+                                path = "data.number1.iv",
                                 op = "gt",
                                 value = 3
                             },
                             new
                             {
-                                path = "data.number.iv",
+                                path = "data.number1.iv",
+                                op = "lt",
+                                value = 7
+                            }
+                        }
+                    }
+                }
+            });
+
+            AssertItems(items, 3, new[] { 4, 5, 6 });
+        }
+
+        [Fact]
+        public async Task Should_return_items_by_json_filter_with_json()
+        {
+            var items = await _.Contents.GetAsync(new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    sort = new[]
+                    {
+                        new
+                        {
+                            path = "data.json.iv.nested1.nested2", order = "ascending"
+                        }
+                    },
+                    filter = new
+                    {
+                        and = new[]
+                        {
+                            new
+                            {
+                                path = "data.json.iv.nested1.nested2",
+                                op = "gt",
+                                value = 3
+                            },
+                            new
+                            {
+                                path = "data.json.iv.nested1.nested2",
                                 op = "lt",
                                 value = 7
                             }
@@ -380,13 +418,19 @@ namespace TestSuite.ApiTests
                 query = @"
                     mutation {
                         createMyReadsContent(data: {
-                            number: {
-                                iv: 999
+                            number1: {
+                                iv: 555
+                            },
+                            number2: {
+                                iv: 556
                             }
                         }) {
                             id,
                             data {
-                                number {
+                                number1 {
+                                    iv
+                                },
+                                number2 {
                                     iv
                                 }
                             }
@@ -396,9 +440,11 @@ namespace TestSuite.ApiTests
 
             var result = await _.Contents.GraphQlAsync<JObject>(query);
 
-            var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+            var value1 = result["createMyReadsContent"]["data"]["number1"]["iv"].Value<int>();
+            var value2 = result["createMyReadsContent"]["data"]["number2"]["iv"].Value<int>();
 
-            Assert.Equal(999, value);
+            Assert.Equal(555, value1);
+            Assert.Equal(556, value2);
         }
 
         [Fact]
@@ -411,7 +457,10 @@ namespace TestSuite.ApiTests
                         createMyReadsContent(data: $data) {
                             id,
                             data {
-                                number {
+                                number1 {
+                                    iv
+                                }
+                                number2 {
                                     iv
                                 }
                             }
@@ -421,9 +470,13 @@ namespace TestSuite.ApiTests
                 {
                     data = new
                     {
-                        number = new
+                        number1 = new
                         {
                             iv = 998
+                        },
+                        number2 = new
+                        {
+                            iv = 999
                         }
                     }
                 }
@@ -431,9 +484,11 @@ namespace TestSuite.ApiTests
 
             var result = await _.Contents.GraphQlAsync<JObject>(query);
 
-            var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
+            var value1 = result["createMyReadsContent"]["data"]["number1"]["iv"].Value<int>();
+            var value2 = result["createMyReadsContent"]["data"]["number2"]["iv"].Value<int>();
 
-            Assert.Equal(998, value);
+            Assert.Equal(998, value1);
+            Assert.Equal(999, value2);
         }
 
         [Fact]
@@ -443,10 +498,10 @@ namespace TestSuite.ApiTests
             {
                 query = @"
                     query ContentsQuery($filter: String!) {
-                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number1/iv asc"") {
                             id,
                             data {
-                                number {
+                                number1 {
                                     iv
                                 }
                             }
@@ -454,7 +509,7 @@ namespace TestSuite.ApiTests
                     }",
                 variables = new
                 {
-                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
+                    filter = @"data/number1/iv gt 3 and data/number1/iv lt 7"
                 }
             };
 
@@ -462,10 +517,10 @@ namespace TestSuite.ApiTests
             {
                 query = @"
                     query ContentsQuery($filter: String!) {
-                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number1/iv asc"") {
                             id,
                             data {
-                                number {
+                                number1 {
                                     iv
                                 }
                             }
@@ -473,7 +528,7 @@ namespace TestSuite.ApiTests
                     }",
                 variables = new
                 {
-                    filter = @"data/number/iv gt 4 and data/number/iv lt 7"
+                    filter = @"data/number1/iv gt 4 and data/number1/iv lt 7"
                 }
             };
 
@@ -482,8 +537,8 @@ namespace TestSuite.ApiTests
             var items1 = results.ElementAt(0).Data.Items;
             var items2 = results.ElementAt(1).Data.Items;
 
-            Assert.Equal(items1.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
-            Assert.Equal(items2.Select(x => x.Data.Number).ToArray(), new[] { 5, 6 });
+            Assert.Equal(items1.Select(x => x.Data.Number1).ToArray(), new[] { 4, 5, 6 });
+            Assert.Equal(items2.Select(x => x.Data.Number1).ToArray(), new[] { 5, 6 });
         }
 
         [Fact]
@@ -493,10 +548,10 @@ namespace TestSuite.ApiTests
             {
                 query = @"
                     query ContentsQuery($filter: String!) {
-                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number1/iv asc"") {
                             id,
                             data {
-                                number {
+                                number1 {
                                     iv
                                 }
                             }
@@ -504,7 +559,7 @@ namespace TestSuite.ApiTests
                     }",
                 variables = new
                 {
-                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
+                    filter = @"data/number1/iv gt 3 and data/number1/iv lt 7"
                 }
             };
 
@@ -512,7 +567,7 @@ namespace TestSuite.ApiTests
 
             var items = result.Items;
 
-            Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+            Assert.Equal(items.Select(x => x.Data.Number1).ToArray(), new[] { 4, 5, 6 });
         }
 
         [Fact]
@@ -522,10 +577,10 @@ namespace TestSuite.ApiTests
             {
                 query = @"
                     query ContentsQuery($filter: String!) {
-                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number1/iv asc"") {
                             id,
                             data {
-                                number {
+                                number1 {
                                     iv
                                 }
                             }
@@ -533,7 +588,7 @@ namespace TestSuite.ApiTests
                     }",
                 variables = new
                 {
-                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
+                    filter = @"data/number1/iv gt 3 and data/number1/iv lt 7"
                 }
             };
 
@@ -541,7 +596,7 @@ namespace TestSuite.ApiTests
 
             var items = result.Items;
 
-            Assert.Equal(items.Select(x => x.Data.Number).ToArray(), new[] { 4, 5, 6 });
+            Assert.Equal(items.Select(x => x.Data.Number1).ToArray(), new[] { 4, 5, 6 });
         }
 
         [Fact]
@@ -551,10 +606,10 @@ namespace TestSuite.ApiTests
             {
                 query = @"
                 {
-                    queryMyReadsContents(filter: ""data/number/iv gt 3 and data/number/iv lt 7"", orderby: ""data/number/iv asc"") {
+                    queryMyReadsContents(filter: ""data/number1/iv gt 3 and data/number1/iv lt 7"", orderby: ""data/number1/iv asc"") {
                       id,
                       data {
-                        number {
+                        number1 {
                           iv
                         }
                       }
@@ -566,7 +621,7 @@ namespace TestSuite.ApiTests
 
             var items = result["queryMyReadsContents"];
 
-            Assert.Equal(items.Select(x => x["data"]["number"]["iv"].Value<int>()).ToArray(), new[] { 4, 5, 6 });
+            Assert.Equal(items.Select(x => x["data"]["number1"]["iv"].Value<int>()).ToArray(), new[] { 4, 5, 6 });
         }
 
         private sealed class QueryResult
@@ -585,13 +640,13 @@ namespace TestSuite.ApiTests
         private sealed class QueryItemData
         {
             [JsonConverter(typeof(InvariantConverter))]
-            public int Number { get; set; }
+            public int Number1 { get; set; }
         }
 
         private static void AssertItems(ContentsResult<TestEntity, TestEntityData> entities, int total, int[] expected)
         {
             Assert.Equal(total, entities.Total);
-            Assert.Equal(expected, entities.Items.Select(x => x.Data.Number).ToArray());
+            Assert.Equal(expected, entities.Items.Select(x => x.Data.Number1).ToArray());
         }
     }
 }

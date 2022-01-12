@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 
@@ -24,10 +25,18 @@ namespace TestSuite.Model
                 {
                     new UpsertSchemaFieldDto
                     {
-                        Name = TestEntityData.NumberField,
+                        Name = TestEntityData.Number1Field,
                         Properties = new NumberFieldPropertiesDto
                         {
                             IsRequired = true
+                        }
+                    },
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = TestEntityData.Number2Field,
+                        Properties = new NumberFieldPropertiesDto
+                        {
+                            IsRequired = false
                         }
                     },
                     new UpsertSchemaFieldDto
@@ -42,6 +51,14 @@ namespace TestSuite.Model
                     {
                         Name = TestEntityData.GeoField,
                         Properties = new GeolocationFieldPropertiesDto
+                        {
+                            IsRequired = false
+                        }
+                    },
+                    new UpsertSchemaFieldDto
+                    {
+                        Name = TestEntityData.JsonField,
+                        Properties = new JsonFieldPropertiesDto
                         {
                             IsRequired = false
                         }
@@ -67,8 +84,8 @@ namespace TestSuite.Model
                 Scripts = new SchemaScriptsDto
                 {
                     Create = $@"
-                        if (ctx.data.{TestEntityData.NumberField}.iv === {ScriptTrigger}) {{
-                            ctx.data.{TestEntityData.NumberField}.iv = incrementCounter('my');
+                        if (ctx.data.{TestEntityData.Number1Field}.iv === {ScriptTrigger}) {{
+                            ctx.data.{TestEntityData.Number1Field}.iv = incrementCounter('my');
                             replace();
                         }}"
                 },
@@ -85,7 +102,11 @@ namespace TestSuite.Model
 
         public static readonly string StringField = nameof(String).ToLowerInvariant();
 
-        public static readonly string NumberField = nameof(Number).ToLowerInvariant();
+        public static readonly string Number1Field = nameof(Number1).ToLowerInvariant();
+
+        public static readonly string Number2Field = nameof(Number2).ToLowerInvariant();
+
+        public static readonly string JsonField = nameof(Json).ToLowerInvariant();
 
         public static readonly string GeoField = nameof(Geo).ToLowerInvariant();
 
@@ -94,13 +115,19 @@ namespace TestSuite.Model
         public Dictionary<string, string> Localized { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
-        public int Number { get; set; }
+        public int Number1 { get; set; }
+
+        [JsonConverter(typeof(InvariantConverter))]
+        public int Number2 { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public string Id { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public string String { get; set; }
+
+        [JsonConverter(typeof(InvariantConverter))]
+        public JToken Json { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public object Geo { get; set; }
