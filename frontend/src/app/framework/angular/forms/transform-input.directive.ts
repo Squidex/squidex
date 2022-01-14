@@ -7,8 +7,8 @@
 
 import { Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Types } from '@app/framework/internal';
 import slugify from 'slugify';
+import { Types } from '@app/framework/internal';
 
 type Transform = (value: string) => string;
 

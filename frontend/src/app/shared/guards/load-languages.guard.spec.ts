@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { LanguagesState } from '@app/shared';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
+import { LanguagesState } from '@app/shared';
 import { LoadLanguagesGuard } from './load-languages.guard';
 
 describe('LoadLanguagesGuard', () => {

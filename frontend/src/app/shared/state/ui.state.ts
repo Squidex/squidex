@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { defined, hasAnyLink, State, Types } from '@app/framework';
 import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import { defined, hasAnyLink, State, Types } from '@app/framework';
 import { UIService } from './../services/ui.service';
 import { UsersService } from './../services/users.service';
 import { AppsState } from './apps.state';

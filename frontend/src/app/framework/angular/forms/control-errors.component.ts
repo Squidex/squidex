@@ -7,10 +7,10 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormArray, FormGroupDirective } from '@angular/forms';
-import { LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { merge } from 'rxjs';
-import { touchedChange$ } from './forms-helper';
+import { LocalizerService, StatefulComponent, Types } from '@app/framework/internal';
 import { formatError } from './error-formatting';
+import { touchedChange$ } from './forms-helper';
 
 interface State {
     // The error messages to show.

@@ -6,9 +6,9 @@
  */
 
 import { Component, Injectable, Input, OnChanges } from '@angular/core';
-import { AssignContributorForm, AutocompleteSource, ContributorsState, DialogModel, DialogService, RoleDto, UsersService } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
+import { AssignContributorForm, AutocompleteSource, ContributorsState, DialogModel, DialogService, RoleDto, UsersService } from '@app/shared';
 
 @Injectable()
 export class UsersDataSource implements AutocompleteSource {

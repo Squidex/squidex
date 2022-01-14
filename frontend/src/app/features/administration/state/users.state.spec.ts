@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UsersDto, UsersService } from '@app/features/administration/internal';
-import { DialogService } from '@app/shared';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { UsersDto, UsersService } from '@app/features/administration/internal';
+import { DialogService } from '@app/shared';
 import { createUser } from './../services/users.service.spec';
 import { UsersState } from './users.state';
 

@@ -7,8 +7,8 @@
 
 import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, Types } from '@app/shared';
 import { Observable } from 'rxjs';
+import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-editor[form][formContext][formLevel][formModel][language][languages]',

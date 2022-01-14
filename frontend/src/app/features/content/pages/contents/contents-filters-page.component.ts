@@ -6,8 +6,8 @@
  */
 
 import { Component } from '@angular/core';
-import { ContentsState, defined, Queries, Query, SchemasState, UIState } from '@app/shared';
 import { map } from 'rxjs/operators';
+import { ContentsState, defined, Queries, Query, SchemasState, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-filters-page',

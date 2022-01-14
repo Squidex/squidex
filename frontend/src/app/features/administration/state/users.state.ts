@@ -9,9 +9,9 @@
 
 import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
-import { DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
+import { DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
 import { CreateUserDto, UpdateUserDto, UserDto, UsersService } from './../services/users.service';
 
 interface Snapshot extends ListState<string> {

@@ -7,9 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, compareStrings, hasAnyLink, HTTP, mapVersioned, Model, pretifyError, Resource, ResourceLinks, StringHelper, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { AnalyticsService, ApiUrlConfig, compareStrings, hasAnyLink, HTTP, mapVersioned, Model, pretifyError, Resource, ResourceLinks, StringHelper, Version, Versioned } from '@app/framework';
 
 export class WorkflowDto extends Model<WorkflowDto> {
     public readonly _links: ResourceLinks;

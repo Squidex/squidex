@@ -7,9 +7,9 @@
 
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { AppsState, getCategoryTree, LocalStoreService, SchemaCategory, SchemasState, Settings, value$ } from '@app/shared';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppsState, getCategoryTree, LocalStoreService, SchemaCategory, SchemasState, Settings, value$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',

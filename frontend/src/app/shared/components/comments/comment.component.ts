@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges } from '@angular/core';
-import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 import { MentionConfig } from 'angular-mentions';
+import { CommentDto, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent } from '@app/shared/internal';
 
 interface State {
     isEditing: boolean;

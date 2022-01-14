@@ -6,9 +6,9 @@
  */
 
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService } from '@app/shared';
 import { BehaviorSubject, combineLatest, of } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
+import { AppLanguageDto, ContentDto, ContentsService, ContentsState, ErrorDto, ToolbarService } from '@app/shared';
 
 type Mode = 'Content' | 'Data' | 'FlatData';
 

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AppLanguagesPayload, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { AppLanguagesPayload, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, versioned } from '@app/shared/internal';
 import { createLanguages } from './../services/app-languages.service.spec';
 import { TestValues } from './_test-helpers';
 

@@ -5,14 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DialogService, RulesDto, RulesService, versioned } from '@app/shared/internal';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { DialogService, RulesDto, RulesService, versioned } from '@app/shared/internal';
 import { RuleDto } from './../services/rules.service';
 import { createRule } from './../services/rules.service.spec';
-import { RulesState } from './rules.state';
 import { TestValues } from './_test-helpers';
+import { RulesState } from './rules.state';
 
 describe('RulesState', () => {
     const {

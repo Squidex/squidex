@@ -7,8 +7,8 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, ReplaySubject, Subject, throwError } from 'rxjs';
-import { RelativePosition } from './../utils/modal-positioner';
 import { ErrorDto } from './../utils/error';
+import { RelativePosition } from './../utils/modal-positioner';
 import { Types } from './../utils/types';
 import { LocalStoreService } from './local-store.service';
 

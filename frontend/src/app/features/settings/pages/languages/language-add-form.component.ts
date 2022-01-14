@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AddLanguageForm, AutocompleteSource, LanguageDto, LanguagesState } from '@app/shared';
 import { Observable, of } from 'rxjs';
+import { AddLanguageForm, AutocompleteSource, LanguageDto, LanguagesState } from '@app/shared';
 
 class LanguageSource implements AutocompleteSource {
     constructor(

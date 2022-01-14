@@ -7,9 +7,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ResolveContents, ContentsState, defined, DialogService, EditContentForm, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version, ResolveAssets } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ResolveContents, ContentsState, defined, DialogService, EditContentForm, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version, ResolveAssets } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-page',

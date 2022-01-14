@@ -7,9 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
+import { Keys, ModalModel, RelativePosition, StatefulControlComponent, Types } from '@app/framework/internal';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;

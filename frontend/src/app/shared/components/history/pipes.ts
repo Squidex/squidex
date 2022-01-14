@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
-import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@app/shared/internal';
 import { Subscription } from 'rxjs';
+import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@app/shared/internal';
 
 @Pipe({
     name: 'sqxHistoryMessage',

@@ -7,8 +7,8 @@
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, FloatConverter, NumberFieldPropertiesDto, NUMBER_FIELD_EDITORS, ResourceOwner, valueProjection$ } from '@app/shared';
 import { Observable } from 'rxjs';
+import { FieldDto, FloatConverter, NumberFieldPropertiesDto, NUMBER_FIELD_EDITORS, ResourceOwner, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui[field][fieldForm][properties]',

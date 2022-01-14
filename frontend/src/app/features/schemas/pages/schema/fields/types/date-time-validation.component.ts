@@ -7,8 +7,8 @@
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
 import { Observable } from 'rxjs';
+import { DateTimeFieldPropertiesDto, FieldDto, hasNoValue$, LanguageDto } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 

@@ -6,9 +6,9 @@
  */
 
 import { Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
-import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { SchemaDto, SchemasState } from '@app/shared/internal';
 import { SchemaMustNotBeSingletonGuard } from './schema-must-not-be-singleton.guard';
 
 describe('SchemaMustNotBeSingletonGuard', () => {

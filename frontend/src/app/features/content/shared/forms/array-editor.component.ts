@@ -7,9 +7,9 @@
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({

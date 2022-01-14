@@ -6,8 +6,8 @@
  */
 
 import { Component } from '@angular/core';
-import { AuthService, BackupsService, DialogService, RestoreForm, switchSafe } from '@app/shared';
 import { timer } from 'rxjs';
+import { AuthService, BackupsService, DialogService, RestoreForm, switchSafe } from '@app/shared';
 
 @Component({
     selector: 'sqx-restore-page',

@@ -6,8 +6,8 @@
  */
 
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, Renderer2 } from '@angular/core';
-import { AnchorX, AnchorY, computeAnchors, positionModal, PositionRequest, RelativePosition, ResourceOwner } from '@app/framework/internal';
 import { timer } from 'rxjs';
+import { AnchorX, AnchorY, computeAnchors, positionModal, PositionRequest, RelativePosition, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxAnchoredTo]',

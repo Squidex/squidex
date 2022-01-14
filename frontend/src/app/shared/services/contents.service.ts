@@ -7,9 +7,9 @@
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, ResultSet, Version, Versioned } from '@app/framework';
 import { Query, sanitize, StatusInfo } from './../state/query';
 import { parseField, RootFieldDto } from './schemas.service';
 

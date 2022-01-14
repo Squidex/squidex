@@ -7,9 +7,9 @@
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiUrlConfig, DateTime, pretifyError, Version } from '@app/framework';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, pretifyError, Version } from '@app/framework';
 import { UsersProviderService } from './users-provider.service';
 
 export class HistoryEventDto {

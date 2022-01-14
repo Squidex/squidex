@@ -6,9 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
+import { DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
 import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService } from './../services/contents.service';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';

@@ -7,8 +7,8 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { defined, MessageBus, ModalModel, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 import { map } from 'rxjs/operators';
+import { defined, MessageBus, ModalModel, ResourceOwner, SchemaDto, SchemasState } from '@app/shared';
 import { SchemaCloning } from './../messages';
 
 @Component({

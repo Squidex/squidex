@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { SchemasState } from '@app/shared';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
+import { SchemasState } from '@app/shared';
 import { LoadSchemasGuard } from './load-schemas.guard';
 
 describe('LoadSchemasGuard', () => {

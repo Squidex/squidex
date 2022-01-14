@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { Observable, from, of, shareReplay } from 'rxjs';
 import { UIOptions } from '@app/framework';
 import { AssetDto, AssetsDto, AssetsService } from './../services/assets.service';
-import { AppsState } from './apps.state';
 import { ContentDto, ContentsDto, ContentsService } from './../services/contents.service';
+import { AppsState } from './apps.state';
 
 abstract class ResolverBase<T extends { id: string }, TResult extends { items: ReadonlyArray<T> }> {
     private readonly items: { [id: string]: Deferred<T | undefined> } = {};

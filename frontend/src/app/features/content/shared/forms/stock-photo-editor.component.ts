@@ -7,9 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$, valueProjection$ } from '@app/shared';
 import { of } from 'rxjs';
 import { debounceTime, switchMap, tap } from 'rxjs/operators';
+import { StatefulControlComponent, StockPhotoDto, StockPhotoService, thumbnail, Types, value$, valueProjection$ } from '@app/shared';
 
 export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,

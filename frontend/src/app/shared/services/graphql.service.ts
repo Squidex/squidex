@@ -7,8 +7,8 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiUrlConfig } from '@app/framework';
 import { Observable } from 'rxjs';
+import { ApiUrlConfig } from '@app/framework';
 
 @Injectable()
 export class GraphQlService {

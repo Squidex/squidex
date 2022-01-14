@@ -7,9 +7,9 @@
 
 import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ResultSet, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
+import { AnalyticsService, ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ResultSet, StringHelper, Types, Version, Versioned } from '@app/framework';
 import { Query, sanitize } from './../state/query';
 import { AuthService } from './auth.service';
 

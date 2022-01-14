@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { TagConverter, TagValue } from '@app/framework';
 import { map, shareReplay } from 'rxjs/operators';
+import { TagConverter, TagValue } from '@app/framework';
 import { SchemaDto } from './../services/schemas.service';
 import { SchemasState } from './schemas.state';
 

@@ -6,10 +6,10 @@
  */
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { defined } from '@app/framework/internal';
-import { ContentsState, SchemasState } from '@app/shared';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { defined } from '@app/framework/internal';
+import { ContentsState, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-sidebar-page',

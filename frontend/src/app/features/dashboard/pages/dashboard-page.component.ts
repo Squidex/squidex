@@ -6,8 +6,8 @@
  */
 
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, LocalStoreService, ResourceOwner, Settings, StorageUsagePerDateDto, switchSafe, UsagesService } from '@app/shared';
 import { GridsterComponent, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
+import { AppsState, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, LocalStoreService, ResourceOwner, Settings, StorageUsagePerDateDto, switchSafe, UsagesService } from '@app/shared';
 
 @Component({
     selector: 'sqx-dashboard-page',
