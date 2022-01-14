@@ -134,7 +134,7 @@
     <value>Hoofdtaal kan niet worden verwijderd.</value>
   </data>
   <data name="apps.maximumTotalReached" xml:space="preserve">
-    <value>You cannot create more apps. Please contact the support to remove this restriction from your account.</value>
+    <value>U kunt niet meer apps maken. Neem contact op met de support om deze beperking van uw account te verwijderen.</value>
   </data>
   <data name="apps.nameAlreadyExists" xml:space="preserve">
     <value>Er bestaat al een app met dezelfde naam.</value>
@@ -218,7 +218,7 @@
     <value>Bijdrager-ID of e-mailadres</value>
   </data>
   <data name="common.critical" xml:space="preserve">
-    <value>Critial</value>
+    <value>Kritiek</value>
   </data>
   <data name="common.data" xml:space="preserve">
     <value>Gegevens</value>
@@ -230,7 +230,7 @@
     <value>Weergavenaam</value>
   </data>
   <data name="common.documentation" xml:space="preserve">
-    <value>Documentation</value>
+    <value>Documentatie</value>
   </data>
   <data name="common.editor" xml:space="preserve">
     <value>Editor</value>
@@ -239,7 +239,7 @@
     <value>E-mail</value>
   </data>
   <data name="common.errorNoPermission" xml:space="preserve">
-    <value>You do not have the necessary permission.</value>
+    <value>Je hebt niet de benodigde rechten.</value>
   </data>
   <data name="common.field" xml:space="preserve">
     <value>Veld</value>
@@ -428,7 +428,7 @@
     <value>Aanmelden</value>
   </data>
   <data name="common.success" xml:space="preserve">
-    <value>Success</value>
+    <value>Succes</value>
   </data>
   <data name="common.text" xml:space="preserve">
     <value>Tekst</value>
@@ -437,7 +437,7 @@
     <value>Trigger</value>
   </data>
   <data name="common.warning" xml:space="preserve">
-    <value>Warning</value>
+    <value>Waarschuwing</value>
   </data>
   <data name="common.workflow" xml:space="preserve">
     <value>Workflow</value>
@@ -458,7 +458,7 @@
     <value>Er is niets te verwijderen.</value>
   </data>
   <data name="contents.invalidAllQuery" xml:space="preserve">
-    <value>Either Ids or Schedule range must be defined.</value>
+    <value>Ofwel Ids of Schedule bereik moeten worden gedefinieerd.</value>
   </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>Ongeldig json-type, verwachte reeks objecten.</value>
@@ -470,13 +470,13 @@
     <value>Ongeldig json-type, verwachte boolean.</value>
   </data>
   <data name="contents.invalidComponentNoObject" xml:space="preserve">
-    <value>Invalid json object, expected object with 'schemaId' field.</value>
+    <value>Ongelid json object, verwacht object met een 'schemaId' veld</value>
   </data>
   <data name="contents.invalidComponentNoType" xml:space="preserve">
-    <value>Invalid component. No 'schemaId' field found.</value>
+    <value>Ongeldig component. Het veld 'schemaId' is niet gevonden.</value>
   </data>
   <data name="contents.invalidComponentUnknownSchema" xml:space="preserve">
-    <value>Invalid component. Cannot find schema.</value>
+    <value>Ongeldig component. Kan schema niet vinden.</value>
   </data>
   <data name="contents.invalidGeolocation" xml:space="preserve">
     <value>Ongeldig json-type, verwacht object voor lengte- / breedtegraad.</value>
@@ -500,7 +500,7 @@
     <value>Er wordt naar de inhoud verwezen door een andere item en kan niet worden verwijderd.</value>
   </data>
   <data name="contents.schemaNotPublished" xml:space="preserve">
-    <value>Schema not published.</value>
+    <value>Schema is niet gepubliceerd.</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Singleton-inhoud kan niet worden bijgewerkt.</value>
@@ -512,7 +512,7 @@
     <value>Singleton-inhoud kan niet worden verwijderd.</value>
   </data>
   <data name="contents.statusNotValid" xml:space="preserve">
-    <value>Status is not defined in the workflow.</value>
+    <value>Status is niet gedefineerd in de werkstroom.</value>
   </data>
   <data name="contents.statusTransitionNotAllowed" xml:space="preserve">
     <value>Kan status niet wijzigen van {oldStatus} in {newStatus}.</value>
@@ -524,7 +524,7 @@
     <value>Id {id} niet gevonden.</value>
   </data>
   <data name="contents.validation.assetType" xml:space="preserve">
-    <value>Not of expected type: {type}.</value>
+    <value>Niet van het verwachte type{type}.</value>
   </data>
   <data name="contents.validation.between" xml:space="preserve">
     <value>Moet tussen {min} en {max} liggen.</value>
@@ -635,7 +635,7 @@
     <value>Er bestaat een andere inhoud met dezelfde waarde.</value>
   </data>
   <data name="contents.validation.uniqueObjectValues" xml:space="preserve">
-    <value>Must not contain items with duplicate '{field}' fields.</value>
+    <value>Mag geen items bevatten met dubbele '{field}' velden.</value>
   </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
     <value>Onbekend {fieldType}.</value>
@@ -701,7 +701,7 @@
     <value>Json-query is niet geldig json: {message}</value>
   </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
-    <value>Entity ({id}) already exists.</value>
+    <value>Entiteit ({id}) bestaat al.</value>
   </data>
   <data name="exceptions.domainObjectDeleted" xml:space="preserve">
     <value>Entiteit ({id}) is verwijderd.</value>
@@ -755,7 +755,7 @@
     <value>bijgewerkte rol {[Name]}</value>
   </data>
   <data name="history.apps.settingsUpdated" xml:space="preserve">
-    <value>updated UI settings</value>
+    <value>Bijgewerkte UI instellingen</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>item vervangen.</value>
@@ -1025,7 +1025,7 @@
     <value>Toestemming</value>
   </data>
   <data name="users.deleteYourselfError" xml:space="preserve">
-    <value>You cannot delete yourself.</value>
+    <value>Je kan jezelf niet verwijderen.</value>
   </data>
   <data name="users.error.headline" xml:space="preserve">
     <value>Bewerking mislukt</value>
@@ -1190,7 +1190,7 @@
     <value>Afbeelding is geen geldige afbeelding.</value>
   </data>
   <data name="validation.notAnValidSvg" xml:space="preserve">
-    <value>The SVG is malicious and contains script tags.</value>
+    <value>De SVG is schadelijk en bevat scripttags.</value>
   </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>Kan slechts één bestand uploaden.</value>
