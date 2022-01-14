@@ -41,7 +41,7 @@ namespace TestSuite.ApiTests
 
                     replace()",
                 Create = @$"
-                    ctx.data.{TestEntityData.NumberField}.iv *= 2;
+                    ctx.data.{TestEntityData.Number1Field}.iv *= 2;
                     replace()"
             });
 
@@ -49,11 +49,11 @@ namespace TestSuite.ApiTests
             // STEP 3: Create content
             var contents = _.ClientManager.CreateContentsClient<TestEntity, TestEntityData>(schemaName);
 
-            var data = new TestEntityData { Number = 13, String = "Hello" };
+            var data = new TestEntityData { Number1 = 13, String = "Hello" };
 
             var content = await contents.CreateAsync(data);
 
-            Assert.Equal(26, content.Data.Number);
+            Assert.Equal(26, content.Data.Number1);
             Assert.Equal("Hello_Updated", content.Data.String);
         }
     }

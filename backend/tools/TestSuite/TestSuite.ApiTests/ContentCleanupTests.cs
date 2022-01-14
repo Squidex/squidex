@@ -35,7 +35,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create a content for this schema.
-            var data = new TestEntityData { Number = 12, String = "hello" };
+            var data = new TestEntityData { Number1 = 12, String = "hello" };
 
             var content_1 = await contents.CreateAsync(data);
 
@@ -43,7 +43,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Delete a field from schema.
-            await _.Schemas.DeleteFieldAsync(_.AppName, schema.Name, schema.Fields[1].FieldId);
+            await _.Schemas.DeleteFieldAsync(_.AppName, schema.Name, schema.Fields.First(x => x.Name == TestEntityData.StringField).FieldId);
 
 
             // STEP 4: Make any update.

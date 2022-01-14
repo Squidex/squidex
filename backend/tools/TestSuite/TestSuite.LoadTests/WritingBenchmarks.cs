@@ -61,7 +61,7 @@ namespace TestSuite.LoadTests
 
             await Run.Parallel(numUsers, numIterationsPerUser, async () =>
             {
-                await _.Contents.CreateAsync(new TestEntityData { Number = random.Next() }, true);
+                await _.Contents.CreateAsync(new TestEntityData { Number1 = random.Next() }, true);
             });
         }
     }
