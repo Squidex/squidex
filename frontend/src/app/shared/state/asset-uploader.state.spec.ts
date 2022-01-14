@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever } from '@app/shared/internal';
 import { lastValueFrom, NEVER, of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock } from 'typemoq';
+import { AssetsService, AssetsState, AssetUploaderState, DialogService, ofForever } from '@app/shared/internal';
 import { createAsset } from './../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 

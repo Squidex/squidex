@@ -7,8 +7,8 @@
 
 import { ChangeDetectionStrategy, Component, Injectable, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, Types } from '@app/shared/internal';
 import { Observable, of } from 'rxjs';
+import { ApiUrlConfig, AppsState, AutocompleteComponent, AutocompleteSource, SearchResultDto, SearchService, Types } from '@app/shared/internal';
 
 @Injectable()
 export class SearchSource implements AutocompleteSource {

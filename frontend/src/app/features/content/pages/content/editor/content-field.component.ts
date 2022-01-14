@@ -6,8 +6,8 @@
  */
 
 import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
 import { Observable } from 'rxjs';
+import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-field[form][formContext][formLevel][formModel][language][languages][schema]',

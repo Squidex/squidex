@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DialogService, RolesPayload, RolesService, RolesState, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { DialogService, RolesPayload, RolesService, RolesState, versioned } from '@app/shared/internal';
 import { createRoles } from './../services/roles.service.spec';
 import { TestValues } from './_test-helpers';
 

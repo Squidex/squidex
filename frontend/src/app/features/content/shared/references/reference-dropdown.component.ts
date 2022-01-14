@@ -7,9 +7,9 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Observable } from 'rxjs';
 import { ContentsDto } from '@app/shared';
 import { ContentDto, ResolveContents, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, Types, value$ } from '@app/shared/internal';
-import { Observable } from 'rxjs';
 
 export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,

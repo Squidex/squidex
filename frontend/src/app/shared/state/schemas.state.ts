@@ -6,9 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
+import { DialogService, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
 import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 

@@ -7,9 +7,9 @@
 
 import { Injectable, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { LocalStoreService, Types } from '@app/framework/internal';
 import { State } from '@app/framework/state';
-import { Subscription } from 'rxjs';
 
 export type QueryParams = { [name: string]: string };
 

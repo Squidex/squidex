@@ -6,9 +6,9 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, Types, UIState } from '@app/shared';
 import { GridsterItem } from 'angular-gridster2';
 import { take } from 'rxjs/operators';
+import { AppDto, AppsState, AuthService, DialogModel, DialogService, LocalizerService, ModalModel, Types, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-dashboard-config[app][config]',

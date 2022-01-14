@@ -6,9 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, StatefulComponent, Types, valueProjection$ } from '@app/shared';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, StatefulComponent, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 interface State {

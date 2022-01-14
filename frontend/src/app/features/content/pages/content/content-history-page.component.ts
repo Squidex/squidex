@@ -6,9 +6,9 @@
  */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppsState, ContentDto, ContentsState, defined, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemasState, switchSafe } from '@app/shared';
 import { Observable, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppsState, ContentDto, ContentsState, defined, HistoryEventDto, HistoryService, ModalModel, ResourceOwner, SchemasState, switchSafe } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 import { ContentPageComponent } from './content-page.component';
 

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BackupsDto, BackupsService, BackupsState, DialogService } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { BackupsDto, BackupsService, BackupsState, DialogService } from '@app/shared/internal';
 import { createBackup } from './../services/backups.service.spec';
 import { TestValues } from './_test-helpers';
 

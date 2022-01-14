@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { EventConsumersDto, EventConsumersService } from '@app/features/administration/internal';
-import { DialogService } from '@app/framework';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { EventConsumersDto, EventConsumersService } from '@app/features/administration/internal';
+import { DialogService } from '@app/framework';
 import { createEventConsumer } from './../services/event-consumers.service.spec';
 import { EventConsumersState } from './event-consumers.state';
 

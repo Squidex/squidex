@@ -6,9 +6,9 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/shared/internal';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppsState, AssetDto, HistoryEventDto, HistoryService } from '@app/shared/internal';
 
 interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 

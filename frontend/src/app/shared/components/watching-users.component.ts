@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AppsState, CommentsService, switchSafe } from '@app/shared/internal';
 import { timer } from 'rxjs';
+import { AppsState, CommentsService, switchSafe } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-watching-users[resource]',

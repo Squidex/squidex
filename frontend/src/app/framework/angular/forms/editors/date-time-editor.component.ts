@@ -7,8 +7,8 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
 import * as Pikaday from 'pikaday/pikaday';
+import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
 import { FocusComponent } from './../forms-helper';
 
 declare module 'pikaday/pikaday';

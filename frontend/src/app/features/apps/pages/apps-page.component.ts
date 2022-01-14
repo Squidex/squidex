@@ -6,9 +6,9 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { take } from 'rxjs/operators';
 import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, UIOptions, UIState } from '@app/shared';
 import { Settings } from '@app/shared/state/settings';
-import { take } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-apps-page',

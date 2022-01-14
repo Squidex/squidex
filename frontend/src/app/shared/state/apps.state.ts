@@ -6,9 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { AppDto, AppSettingsDto, AppsService, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from './../services/apps.service';
 
 interface Snapshot {

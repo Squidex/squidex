@@ -11,9 +11,9 @@ import { AbstractControl, FormArray } from '@angular/forms';
 import { MathHelper } from '@app/framework';
 import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, RootFieldDto } from '@app/shared/internal';
 import { FieldRule, SchemaDto } from './../services/schemas.service';
+import { TestValues } from './_test-helpers';
 import { ComponentForm, FieldArrayForm } from './contents.forms';
 import { PartitionConfig } from './contents.forms-helpers';
-import { TestValues } from './_test-helpers';
 
 const {
     createField,

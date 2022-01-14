@@ -7,8 +7,8 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { getTagValues, Keys, ModalModel, StatefulControlComponent, StringConverter, TagValue, Types } from '@app/framework/internal';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,

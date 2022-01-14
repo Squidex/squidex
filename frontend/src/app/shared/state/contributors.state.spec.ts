@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ErrorDto } from '@app/framework';
-import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
 import { EMPTY, of, throwError } from 'rxjs';
 import { catchError, onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { ErrorDto } from '@app/framework';
+import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
 import { createContributors } from './../services/contributors.service.spec';
 import { TestValues } from './_test-helpers';
 

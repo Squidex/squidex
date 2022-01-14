@@ -8,9 +8,9 @@
 /* eslint-disable no-inner-declarations */
 
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
-import { ErrorDto, Types, Version, Versioned } from '@app/framework/internal';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { ErrorDto, Types, Version, Versioned } from '@app/framework/internal';
 
 export module HTTP {
     export function upload<T = any>(http: HttpClient, method: string, url: string, file: Blob, version?: Version): Observable<HttpEvent<T>> {

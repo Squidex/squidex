@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { UIOptions } from '@app/framework';
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
+import { UIOptions } from '@app/framework';
 import { ContentsDto, ContentsService } from '../services/contents.service';
 import { createContent } from '../services/contents.service.spec';
-import { ResolveContents } from './resolvers';
 import { TestValues } from './_test-helpers';
+import { ResolveContents } from './resolvers';
 
 describe('ResolveContents', () => {
     const {

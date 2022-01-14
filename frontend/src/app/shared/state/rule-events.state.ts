@@ -6,9 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { DialogService, getPagingInfo, hasAnyLink, ListState, ResourceLinks, shareSubscribed, State } from '@app/framework';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
+import { DialogService, getPagingInfo, hasAnyLink, ListState, ResourceLinks, shareSubscribed, State } from '@app/framework';
 import { RuleEventDto, RulesService } from './../services/rules.service';
 import { AppsState } from './apps.state';
 

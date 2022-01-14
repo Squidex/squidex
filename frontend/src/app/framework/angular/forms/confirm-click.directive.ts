@@ -6,9 +6,9 @@
  */
 
 import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
-import { DialogService, Types } from '@app/framework/internal';
 import { Subscriber } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { DialogService, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxConfirmClick]',

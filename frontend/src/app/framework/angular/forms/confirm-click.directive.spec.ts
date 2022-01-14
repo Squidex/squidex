@@ -5,9 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { DialogService } from '@app/framework/internal';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { DialogService } from '@app/framework/internal';
 import { ConfirmClickDirective } from './confirm-click.directive';
 
 describe('ConfirmClickDirective', () => {

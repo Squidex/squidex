@@ -7,8 +7,8 @@
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, ResourceOwner, StringFieldPropertiesDto, STRING_FIELD_EDITORS, valueProjection$ } from '@app/shared';
 import { Observable } from 'rxjs';
+import { FieldDto, ResourceOwner, StringFieldPropertiesDto, STRING_FIELD_EDITORS, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui[field][fieldForm][properties]',

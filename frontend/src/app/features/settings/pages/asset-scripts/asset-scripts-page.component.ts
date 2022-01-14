@@ -6,8 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAssetScriptsForm, ResourceOwner } from '@app/shared';
 import { EMPTY, Observable } from 'rxjs';
+import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAssetScriptsForm, ResourceOwner } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-scripts-page',

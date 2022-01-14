@@ -5,14 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DialogService, versioned } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { DialogService, versioned } from '@app/shared/internal';
 import { AppsService, AssetScriptsPayload } from '../services/apps.service';
 import { createAssetScripts } from '../services/apps.service.spec';
-import { AssetScriptsState } from './asset-scripts.state';
 import { TestValues } from './_test-helpers';
+import { AssetScriptsState } from './asset-scripts.state';
 
 describe('AssetScriptsState', () => {
     const {

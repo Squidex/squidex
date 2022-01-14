@@ -7,10 +7,10 @@
 
 import { ChangeDetectorRef, Component, ElementRef, Input, OnChanges, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
-import { switchSafe } from '@app/framework';
-import { AppsState, AuthService, CommentDto, CommentsService, CommentsState, ContributorsState, DialogService, ResourceOwner, UpsertCommentForm } from '@app/shared/internal';
 import { MentionConfig } from 'angular-mentions';
 import { timer } from 'rxjs';
+import { switchSafe } from '@app/framework';
+import { AppsState, AuthService, CommentDto, CommentsService, CommentsState, ContributorsState, DialogService, ResourceOwner, UpsertCommentForm } from '@app/shared/internal';
 import { CommentComponent } from './comment.component';
 
 @Component({

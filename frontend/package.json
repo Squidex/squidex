@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "build": "ng build",
+    "lint": "eslint src/app/**/*.ts",
+    "lint:fix": "eslint src/app/**/*.ts --fix",
     "ng": "ng",
     "postinstall": "npx patch-package",
     "start": "ng serve",

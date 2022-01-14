@@ -6,8 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { AppsState, AutocompleteSource, RoleDto, RolesService, RolesState, SchemasState } from '@app/shared';
 import { Observable, of } from 'rxjs';
+import { AppsState, AutocompleteSource, RoleDto, RolesService, RolesState, SchemasState } from '@app/shared';
 
 /* eslint-disable no-return-assign */
 

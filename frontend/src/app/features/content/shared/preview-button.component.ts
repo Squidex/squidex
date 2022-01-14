@@ -6,9 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { ContentDto, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { ContentDto, interpolate, LocalStoreService, ModalModel, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
     // The name of the selected preview config.

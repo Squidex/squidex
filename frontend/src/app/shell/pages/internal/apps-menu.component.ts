@@ -9,9 +9,9 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AppDto, AppsState, DialogModel, ModalModel, Title, TitleService, UIState } from '@app/shared';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AppDto, AppsState, DialogModel, ModalModel, Title, TitleService, UIState } from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-menu',

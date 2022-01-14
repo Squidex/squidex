@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DialogService, versioned, WorkflowsPayload, WorkflowsService, WorkflowsState } from '@app/shared/internal';
 import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { DialogService, versioned, WorkflowsPayload, WorkflowsService, WorkflowsState } from '@app/shared/internal';
 import { createWorkflows } from './../services/workflows.service.spec';
 import { TestValues } from './_test-helpers';
 

@@ -15,11 +15,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, RouterModule } from '@angular/router';
+import { environment } from './../environments/environment';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
 import { ApiUrlConfig, CurrencyConfig, DateHelper, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
-import { environment } from './../environments/environment';
 
 DateHelper.setlocale(window['options']?.more?.culture);
 

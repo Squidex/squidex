@@ -7,9 +7,9 @@
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiUrlConfig, DateTime, Model, pretifyError, Version } from '@app/framework';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ApiUrlConfig, DateTime, Model, pretifyError, Version } from '@app/framework';
 
 export class CommentsDto extends Model<CommentsDto> {
     constructor(

@@ -6,8 +6,8 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 import { EMPTY, Observable } from 'rxjs';
+import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-scripts-form',

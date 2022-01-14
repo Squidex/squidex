@@ -6,9 +6,9 @@
  */
 
 import { Router } from '@angular/router';
-import { RuleDto, RulesState } from '@app/shared/internal';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
+import { RuleDto, RulesState } from '@app/shared/internal';
 import { RuleMustExistGuard } from './rule-must-exist.guard';
 
 describe('RuleMustExistGuard', () => {

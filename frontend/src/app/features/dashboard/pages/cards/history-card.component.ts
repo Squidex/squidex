@@ -6,8 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { AppDto, HistoryEventDto, HistoryService } from '@app/shared';
 import { Observable } from 'rxjs';
+import { AppDto, HistoryEventDto, HistoryService } from '@app/shared';
 
 @Component({
     selector: 'sqx-history-card[app]',
