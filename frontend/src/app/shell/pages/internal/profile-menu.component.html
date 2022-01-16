@@ -22,7 +22,7 @@
             {{ 'common.administration' | sqxTranslate }}
         </a>
 
-        <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
+        <a class="dropdown-item" href="{{snapshot.profileUrl}}" sqxExternalLink>
             {{ 'profile.title' | sqxTranslate }}
         </a>
 

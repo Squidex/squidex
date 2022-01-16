@@ -8,7 +8,7 @@
         @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
         {
             <div class="errors-container">
-                <span class="errors">Html.ValidationMessage(field)</span>
+                <span class="errors">@Html.ValidationMessage(field)</span>
             </div>
         }
     }
