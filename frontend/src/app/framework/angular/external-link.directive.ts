@@ -12,7 +12,7 @@ import { AfterViewInit, Directive, ElementRef, Input, Renderer2 } from '@angular
 })
 export class ExternalLinkDirective implements AfterViewInit {
     @Input('sqxExternalLink')
-    public type?: string;
+    public type?: 'noicon' | 'default' | string;
 
     constructor(
         private readonly element: ElementRef<Element>,
