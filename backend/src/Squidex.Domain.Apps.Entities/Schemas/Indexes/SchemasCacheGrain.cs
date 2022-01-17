@@ -25,6 +25,26 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             this.schemaRepository = schemaRepository;
         }
 
+        public override async Task<string?> ReserveAsync(DomainId id, string name)
+        {
+            var token = await base.ReserveAsync(id, name);
+
+            if (token == null)
+            {
+                return null;
+            }
+
+            var ids = await GetIdsAsync();
+
+            if (ids.ContainsKey(name))
+            {
+                await RemoveReservationAsync(token);
+                return null;
+            }
+
+            return token;
+        }
+
         public async Task<IReadOnlyCollection<DomainId>> GetSchemaIdsAsync()
         {
             var ids = await GetIdsAsync();

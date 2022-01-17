@@ -264,32 +264,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_not_add_to_indexes_if_name_is_taken()
-        {
-            var token = RandomHash.Simple();
-
-            A.CallTo(() => cache.ReserveAsync(appId.Id, appId.Name))
-                .Returns(token);
-
-            A.CallTo(() => cache.GetAppIdsAsync(A<string[]>.That.Is(appId.Name)))
-                .Returns(new List<DomainId> { appId.Id });
-
-            var command = Create(appId.Name);
-
-            var context =
-                new CommandContext(command, commandBus)
-                    .Complete();
-
-            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
-
-            A.CallTo(() => cache.AddAsync(A<DomainId>._, A<string>._))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => cache.RemoveReservationAsync(token))
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_update_index_with_result_if_app_is_updated()
         {
             var (app, appGrain) = CreateApp();
@@ -326,7 +300,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_forward_reserveration()
         {
-            await sut.ReserveAsync(appId.Id, appId.Name);
+            A.CallTo(() => cache.ReserveAsync(appId.Id, appId.Name))
+                .Returns("token");
+
+            var token = await sut.ReserveAsync(appId.Id, appId.Name);
+
+            Assert.Equal("token", token);
 
             A.CallTo(() => cache.ReserveAsync(appId.Id, appId.Name))
                 .MustHaveHappened();
