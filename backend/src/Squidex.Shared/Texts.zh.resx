@@ -835,6 +835,9 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>您的邮箱在 Github 中设置为私有。请设置为公开以使用 Github 登录。</value>
   </data>
+  <data name="login.noEmailAddress" xml:space="preserve">
+    <value>We cannot get the email address from authentication provider.</value>
+  </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>另一个规则已经在运行。</value>
   </data>

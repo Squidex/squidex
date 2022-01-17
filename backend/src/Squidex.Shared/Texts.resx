@@ -656,7 +656,7 @@
     <value>Email is already taken.</value>
   </data>
   <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
-    <value>User name is already taken.</value>
+    <value>Email is already taken by another user. You can add this external login to your account if you go to the profile page.</value>
   </data>
   <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
     <value>Email is invalid.</value>
@@ -834,6 +834,9 @@
   </data>
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Your email address is set to private in Github. Please set it to public to use Github login.</value>
+  </data>
+  <data name="login.noEmailAddress" xml:space="preserve">
+    <value>We cannot get the email address from authentication provider.</value>
   </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>Another rule is already running.</value>

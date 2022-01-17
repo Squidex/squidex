@@ -8,7 +8,7 @@
         @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
         {
             <div class="errors-container">
-                <span class="errors">Html.ValidationMessage(field)</span>
+                <span class="errors">@Html.ValidationMessage(field)</span>
             </div>
         }
     }
@@ -77,6 +77,8 @@
 
 @if (Model!.ExternalProviders.Any())
 {
+    <hr />
+
     <div class="profile-section">
         <h2>@T.Get("users.profile.loginsTitle")</h2>
 
@@ -127,6 +129,8 @@
 
 @if (Model!.HasPasswordAuth)
 {
+    <hr />
+
     <div class="profile-section">
         <h2>@T.Get("users.profile.passwordTitle")</h2>
 
@@ -189,19 +193,21 @@
     </div>
 }
 
+<hr />
+
 <div class="profile-section">
     <h2>@T.Get("users.profile.clientTitle")</h2>
 
     <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.clientHint")</small>
 
-    <div class="row no-gutters form-group">
+    <div class="row g-2 form-group">
         <div class="col-8">
             <label for="clientId">@T.Get("common.clientId")</label>
 
             <input class="form-control" name="clientId" id="clientId" readonly value="@Model!.Id" />
         </div>
     </div>
-    <div class="row no-gutters form-group">
+    <div class="row g-2 form-group">
         <div class="col-8">
             <label for="clientSecret">@T.Get("common.clientSecret")</label>
 
@@ -217,6 +223,8 @@
     </div>
 </div>
 
+<hr />
+
 <div class="profile-section">
     <h2>@T.Get("users.profile.propertiesTitle")</h2>
 
@@ -226,7 +234,7 @@
         <div class="mb-2" id="properties">
             @for (var i = 0; i < Model!.Properties.Count; i++)
             {
-                <div class="row no-gutters form-group">
+                <div class="row g-2 form-group">
                     <div class="col-5 pr-2">
 
                         @{ RenderValidation($"Properties[{i}].Name"); }
@@ -299,7 +307,7 @@
             var template = document.createElement('template');
 
             template.innerHTML =
-                `<div class="row no-gutters form-group">
+                `<div class="row g-2 form-group">
                     <div class="col-5 pr-2">
                         <input class="form-control" />
                     </div>

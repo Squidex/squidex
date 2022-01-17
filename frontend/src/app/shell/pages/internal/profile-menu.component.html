@@ -10,7 +10,7 @@
 
 <ng-container *sqxModal="modalMenu;onRoot:false;closeAlways:true">
     <sqx-dropdown-menu [sqxAnchoredTo]="button" [offsetY]="10">
-        <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
+        <a class="dropdown-item dropdown-info" href="{{snapshot.profileUrl}}" sqxExternalLink="noicon">
             <div>{{ 'profile.userEmail' | sqxTranslate }}</div>
     
             <strong>{{snapshot.profileEmail}}</strong>
@@ -22,7 +22,7 @@
             {{ 'common.administration' | sqxTranslate }}
         </a>
 
-        <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
+        <a class="dropdown-item" href="{{snapshot.profileUrl}}" sqxExternalLink="noicon">
             {{ 'profile.title' | sqxTranslate }}
         </a>
 

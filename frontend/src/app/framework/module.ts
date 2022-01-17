@@ -11,7 +11,7 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactivateGuard, CheckboxGroupComponent, ClipboardService, CodeComponent, CodeEditorComponent, ColorPickerComponent, ConfirmClickDirective, ControlErrorsComponent, ControlErrorsMessagesComponent, CopyDirective, DarkenPipe, DatePipe, DateTimeEditorComponent, DayOfWeekPipe, DayPipe, DialogRendererComponent, DialogService, DisplayNamePipe, DropdownComponent, DropdownMenuComponent, DurationPipe, EditableTitleComponent, ExternalLinkDirective, FileDropDirective, FileSizePipe, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FromNowPipe, FullDateTimePipe, HighlightPipe, HoverBackgroundDirective, ImageSourceDirective, IndeterminateValueDirective, ISODatePipe, KeysPipe, KNumberPipe, LanguageSelectorComponent, LayoutComponent, LayoutContainerDirective, LightenPipe, ListViewComponent, LoadingInterceptor, LoadingService, LocalizedInputComponent, LocalStoreService, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, ModalDirective, ModalPlacementDirective, MoneyPipe, MonthPipe, OnboardingService, OnboardingTooltipComponent, PagerComponent, ParentLinkDirective, PopupLinkDirective, ProgressBarComponent, ResizedDirective, ResizeService, ResourceLoaderService, RootViewComponent, SafeHtmlPipe, SafeResourceUrlPipe, SafeUrlPipe, ScrollActiveDirective, ShortcutComponent, ShortcutDirective, ShortcutService, ShortDatePipe, ShortTimePipe, StarsComponent, StatusIconComponent, StopClickDirective, StopDragDirective, SyncScollingDirective, SyncWidthDirective, TabRouterlinkDirective, TagEditorComponent, TemplateWrapperDirective, TempService, TitleComponent, TitleService, ToggleComponent, ToolbarComponent, TooltipDirective, TransformInputDirective, TranslatePipe, VideoPlayerComponent } from './declarations';
+import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterceptor, CanDeactivateGuard, CheckboxGroupComponent, ClipboardService, CodeComponent, CodeEditorComponent, ColorPickerComponent, ConfirmClickDirective, ControlErrorsComponent, ControlErrorsMessagesComponent, CopyDirective, DarkenPipe, DatePipe, DateTimeEditorComponent, DayOfWeekPipe, DayPipe, DialogRendererComponent, DialogService, DisplayNamePipe, DropdownComponent, DropdownMenuComponent, DurationPipe, EditableTitleComponent, ExternalLinkDirective, FileDropDirective, FileSizePipe, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FromNowPipe, FullDateTimePipe, HighlightPipe, HoverBackgroundDirective, ImageSourceDirective, IndeterminateValueDirective, ISODatePipe, KeysPipe, KNumberPipe, LanguageSelectorComponent, LayoutComponent, LayoutContainerDirective, LightenPipe, ListViewComponent, LoadingInterceptor, LoadingService, LocalizedInputComponent, LocalStoreService, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, ModalDirective, ModalPlacementDirective, MoneyPipe, MonthPipe, OnboardingService, OnboardingTooltipComponent, PagerComponent, ParentLinkDirective, ProgressBarComponent, ResizedDirective, ResizeService, ResourceLoaderService, RootViewComponent, SafeHtmlPipe, SafeResourceUrlPipe, SafeUrlPipe, ScrollActiveDirective, ShortcutComponent, ShortcutDirective, ShortcutService, ShortDatePipe, ShortTimePipe, StarsComponent, StatusIconComponent, StopClickDirective, StopDragDirective, SyncScollingDirective, SyncWidthDirective, TabRouterlinkDirective, TagEditorComponent, TemplateWrapperDirective, TempService, TitleComponent, TitleService, ToggleComponent, ToolbarComponent, TooltipDirective, TransformInputDirective, TranslatePipe, VideoPlayerComponent } from './declarations';
 
 @NgModule({
     imports: [
@@ -76,7 +76,6 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         OnboardingTooltipComponent,
         PagerComponent,
         ParentLinkDirective,
-        PopupLinkDirective,
         ProgressBarComponent,
         ResizedDirective,
         RootViewComponent,
@@ -161,7 +160,6 @@ import { AnalyticsService, AutocompleteComponent, AvatarComponent, CachingInterc
         OnboardingTooltipComponent,
         PagerComponent,
         ParentLinkDirective,
-        PopupLinkDirective,
         ProgressBarComponent,
         ReactiveFormsModule,
         ResizedDirective,

@@ -181,11 +181,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             {
                 var provider = externalProviders[0].AuthenticationScheme;
 
-                var properties =
-                    SignInManager.ConfigureExternalAuthenticationProperties(provider,
-                        Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
+                var challengeRedirectUrl = Url.Action(nameof(ExternalCallback));
+                var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl);
 
-                return Challenge(properties, provider);
+                return Challenge(challengeProperties, provider);
             }
 
             var vm = new LoginVM
@@ -204,25 +203,24 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/external/")]
         public IActionResult External(string provider, string? returnUrl = null)
         {
-            var properties =
-                SignInManager.ConfigureExternalAuthenticationProperties(provider,
-                    Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
+            var challengeRedirectUrl = Url.Action(nameof(ExternalCallback), new { returnUrl });
+            var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl);
 
-            return Challenge(properties, provider);
+            return Challenge(challengeProperties, provider);
         }
 
         [HttpGet]
         [Route("account/external-callback/")]
         public async Task<IActionResult> ExternalCallback(string? returnUrl = null)
         {
-            var externalLogin = await SignInManager.GetExternalLoginInfoWithDisplayNameAsync();
+            var login = await SignInManager.GetExternalLoginInfoWithDisplayNameAsync();
 
-            if (externalLogin == null)
+            if (login == null)
             {
                 return RedirectToAction(nameof(Login));
             }
 
-            var result = await SignInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
+            var result = await SignInManager.ExternalLoginSignInAsync(login.LoginProvider, login.ProviderKey, true);
 
             if (!result.Succeeded && result.IsLockedOut)
             {
@@ -235,42 +233,33 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             if (isLoggedIn)
             {
-                user = await userService.FindByLoginAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, HttpContext.RequestAborted);
+                user = await userService.FindByLoginAsync(login.LoginProvider, login.ProviderKey, HttpContext.RequestAborted);
             }
             else
             {
-                var email = externalLogin.Principal.GetEmail();
+                var email = login.Principal.GetEmail();
 
                 if (string.IsNullOrWhiteSpace(email))
                 {
-                    throw new DomainException("User has no exposed email address.");
+                    throw new DomainException(T.Get("login.noEmailAddress"));
                 }
 
-                user = await userService.FindByEmailAsync(email, HttpContext.RequestAborted);
-
-                if (user != null)
+                var values = new UserValues
                 {
-                    var update = CreateUserValues(externalLogin, email, user);
+                    CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList()
+                };
 
-                    await userService.UpdateAsync(user.Id, update, ct: HttpContext.RequestAborted);
-                }
-                else
-                {
-                    var update = CreateUserValues(externalLogin, email);
+                user = await userService.CreateAsync(email, values, identityOptions.LockAutomatically, HttpContext.RequestAborted);
 
-                    user = await userService.CreateAsync(email, update, identityOptions.LockAutomatically, HttpContext.RequestAborted);
-                }
+                await userService.AddLoginAsync(user.Id, login,
+                    HttpContext.RequestAborted);
 
-                await userService.AddLoginAsync(user.Id, externalLogin, HttpContext.RequestAborted);
-
-                var (success, locked) = await LoginAsync(externalLogin);
+                (isLoggedIn, var locked) = await LoginAsync(login);
 
                 if (locked)
                 {
                     return View(nameof(LockedOut));
                 }
-
-                isLoggedIn = success;
             }
 
             if (!isLoggedIn)
@@ -285,26 +274,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             {
                 return RedirectToReturnUrl(returnUrl);
             }
-        }
-
-        private static UserValues CreateUserValues(ExternalLoginInfo externalLogin, string email, IUser? user = null)
-        {
-            var values = new UserValues
-            {
-                CustomClaims = externalLogin.Principal.Claims.GetSquidexClaims().ToList()
-            };
-
-            if (user != null && !user.Claims.HasPictureUrl())
-            {
-                values.PictureUrl = GravatarHelper.CreatePictureUrl(email);
-            }
-
-            if (user != null && !user.Claims.HasDisplayName())
-            {
-                values.DisplayName = email;
-            }
-
-            return values;
         }
 
         private async Task<(bool Success, bool Locked)> LoginAsync(UserLoginInfo externalLogin)
