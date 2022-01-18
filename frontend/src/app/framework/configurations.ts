@@ -47,7 +47,7 @@ export class ApiUrlConfig {
 
     public buildUrl(path: string) {
         if (path.indexOf('/') === 0) {
-            path = path.substr(1);
+            path = path.substring(1);
         }
 
         return this.value + path;

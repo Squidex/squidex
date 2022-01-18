@@ -39,7 +39,7 @@ export class ErrorValidator {
             for (const details of this.error.details) {
                 for (const property of details.properties) {
                     if (property.startsWith(path)) {
-                        const subProperty = property.substr(path.length);
+                        const subProperty = property.substring(path.length);
 
                         const first = subProperty[0];
 
@@ -50,7 +50,7 @@ export class ErrorValidator {
                             errors.push(`${subProperty}: ${details.message}`);
                             break;
                         } else if (first === '.') {
-                            errors.push(`${subProperty.substr(1)}: ${details.message}`);
+                            errors.push(`${subProperty.substring(1)}: ${details.message}`);
                             break;
                         }
                     }

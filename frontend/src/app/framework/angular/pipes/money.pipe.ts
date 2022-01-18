@@ -22,7 +22,7 @@ export class MoneyPipe implements PipeTransform {
     public transform(value: number): any {
         const money = value.toFixed(2).toString();
 
-        let result = `${money.substr(0, money.length - 3) + this.separator.value}<span class="decimal">${money.substr(money.length - 2, 2)}</span>`;
+        let result = `${money.substring(0, money.length - 3) + this.separator.value}<span class="decimal">${money.substring(money.length - 2)}</span>`;
 
         if (this.currency.showAfter) {
             result = `${result} ${this.currency.symbol}`;

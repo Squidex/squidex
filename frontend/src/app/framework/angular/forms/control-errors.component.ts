@@ -56,7 +56,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
                 let translation = this.localizer.get(`common.${this.for}`)!;
 
                 if (!translation) {
-                    translation = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
+                    translation = this.for.substring(0, 1).toUpperCase() + this.for.substring(1);
                 }
 
                 this.controlDisplayName = translation;

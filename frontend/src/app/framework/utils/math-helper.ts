@@ -146,7 +146,7 @@ export module MathHelper {
         }
 
         if (value.charAt(0) === '#') {
-            value = value.substr(1, 6);
+            value = value.substr(1, 7);
         }
 
         value = value.replace(/ /g, '').toLowerCase();
