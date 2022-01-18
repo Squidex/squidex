@@ -68,7 +68,7 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 3. Get a 404 for the item because it is not published anymore.
-                await Assert.ThrowsAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+                await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
             }
             finally
             {
@@ -95,7 +95,7 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 3. Get a 404 for the item because it is not published anymore.
-                await Assert.ThrowsAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+                await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
             }
             finally
             {
@@ -309,7 +309,7 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 2. Get a 404 for the item because it is not published.
-                await Assert.ThrowsAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+                await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
             }
             finally
             {
@@ -379,7 +379,7 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 2: Create a new item with a custom id.
-                var ex = await Assert.ThrowsAsync<SquidexException>(() => _.Contents.CreateAsync(new TestEntityData { Number1 = 1 }, id, true));
+                var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.CreateAsync(new TestEntityData { Number1 = 1 }, id, true));
 
                 Assert.Contains("\"statusCode\":409", ex.Message, StringComparison.Ordinal);
             }

@@ -88,7 +88,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Try to delete role.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException<ErrorDto>>(() =>
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
             {
                 return _.Apps.DeleteRoleAsync(_.AppName, roleName);
             });
@@ -123,7 +123,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Try to delete role.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException<ErrorDto>>(() =>
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
             {
                 return _.Apps.DeleteRoleAsync(_.AppName, roleName);
             });
