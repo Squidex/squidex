@@ -56,7 +56,7 @@ export class LocalizerService {
 
     private replaceVariables(text: string, args: {}): string {
         text = text.replace(/{[^}]*}/g, (matched: string) => {
-            const inner = matched.substr(1, matched.length - 2);
+            const inner = matched.substring(1, matched.length - 1);
 
             let replaceValue: string;
 

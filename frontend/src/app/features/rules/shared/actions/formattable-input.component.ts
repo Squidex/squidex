@@ -78,11 +78,11 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
                 const lower = obj.toLowerCase();
 
                 if (lower.startsWith('liquid(')) {
-                    this.value = obj.substr(7, obj.length - 8);
+                    this.value = obj.substring(7, obj.length - 1);
 
                     mode = 'Liquid';
                 } else if (lower.startsWith('script(')) {
-                    this.value = obj.substr(7, obj.length - 8);
+                    this.value = obj.substring(7, obj.length - 1);
 
                     mode = 'Script';
                 }
