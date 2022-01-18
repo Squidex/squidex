@@ -59,6 +59,23 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_not_allow_creation_if_name_used()
+        {
+            var appName = Guid.NewGuid().ToString();
+
+            // STEP 1: Create app
+            var createRequest = new CreateAppDto { Name = appName };
+
+            await _.Apps.PostAppAsync(createRequest);
+
+
+            // STEP 2: Create again and fail
+            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Apps.PostAppAsync(createRequest));
+
+            Assert.Equal(400, ex.StatusCode);
+        }
+
+        [Fact]
         public async Task Should_archive_app()
         {
             var appName = Guid.NewGuid().ToString();

@@ -46,6 +46,23 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_not_allow_creation_if_name_used()
+        {
+            var schemaName = $"schema-{Guid.NewGuid()}";
+
+            // STEP 1: Create schema
+            var createRequest = new CreateSchemaDto { Name = schemaName };
+
+            var schema = await _.Schemas.PostSchemaAsync(_.AppName, createRequest);
+
+
+            // STEP 2: Create again and fail
+            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Schemas.PostSchemaAsync(_.AppName, createRequest));
+
+            Assert.Equal(400, ex.StatusCode);
+        }
+
+        [Fact]
         public async Task Should_create_singleton_schema()
         {
             var schemaName = $"schema-{Guid.NewGuid()}";
