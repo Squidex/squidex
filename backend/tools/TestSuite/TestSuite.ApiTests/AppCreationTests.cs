@@ -70,7 +70,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create again and fail
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Apps.PostAppAsync(createRequest));
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Apps.PostAppAsync(createRequest));
 
             Assert.Equal(400, ex.StatusCode);
         }

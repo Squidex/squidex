@@ -71,7 +71,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 3: Try to delete with referrer check.
-            await Assert.ThrowsAsync<SquidexException>(() => _.Contents.DeleteAsync(contentA_1.Id, checkReferrers: true));
+            await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.DeleteAsync(contentA_1.Id, checkReferrers: true));
 
 
             // STEP 4: Delete without referrer check
@@ -93,8 +93,8 @@ namespace TestSuite.ApiTests
             await _.Contents.CreateAsync(dataB, true);
 
 
-            // STEP 3: Try to delete with referrer check.
-            await Assert.ThrowsAsync<SquidexException>(() => _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
+            // STEP 3: Try to ThrowsAnyAsync with referrer check.
+            await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
             {
                 Status = "Draft",
                 CheckReferrers = true
