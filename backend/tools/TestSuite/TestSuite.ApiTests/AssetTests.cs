@@ -60,7 +60,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create a new item with a custom id.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id));
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.UploadFileAsync("Assets/logo-squared.png", "image/png", id: id));
 
             Assert.Equal(409, ex.StatusCode);
         }
@@ -182,7 +182,7 @@ namespace TestSuite.ApiTests
             // STEP 5: Download asset without key.
             await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
-                var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.DownloadAsync(asset_1));
+                var ex = await Assert.ThrowsAnyAsync<HttpRequestException>(() => _.DownloadAsync(asset_1));
 
                 // Should return 403 when not authenticated.
                 Assert.Contains("403", ex.Message, StringComparison.Ordinal);
@@ -192,7 +192,7 @@ namespace TestSuite.ApiTests
             // STEP 6: Download asset without key and version.
             await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
-                var ex = await Assert.ThrowsAsync<HttpRequestException>(() => _.DownloadAsync(asset_1, 0));
+                var ex = await Assert.ThrowsAnyAsync<HttpRequestException>(() => _.DownloadAsync(asset_1, 0));
 
                 // Should return 403 when not authenticated.
                 Assert.Contains("403", ex.Message, StringComparison.Ordinal);
@@ -318,7 +318,7 @@ namespace TestSuite.ApiTests
             await _.Assets.DeleteAssetAsync(_.AppName, asset.Id, permanent: permanent);
 
             // Should return 404 when asset deleted.
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset.Id));
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Assets.GetAssetAsync(_.AppName, asset.Id));
 
             Assert.Equal(404, ex.StatusCode);
 

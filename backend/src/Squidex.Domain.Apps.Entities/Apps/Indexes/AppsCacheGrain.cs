@@ -23,6 +23,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             this.appRepository = appRepository;
         }
 
+        public override async Task<string?> ReserveAsync(DomainId id, string name)
+        {
+            var token = await base.ReserveAsync(id, name);
+
+            if (token == null)
+            {
+                return null;
+            }
+
+            var ids = await GetAppIdsAsync(new[] { name });
+
+            if (ids.Any())
+            {
+                await RemoveReservationAsync(token);
+                return null;
+            }
+
+            return token;
+        }
+
         public async Task<IReadOnlyCollection<DomainId>> GetAppIdsAsync(string[] names)
         {
             var result = new List<DomainId>();

@@ -25,6 +25,24 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
+        public async Task Should_not_reserve_name_if_already_used()
+        {
+            var ids = new Dictionary<string, DomainId>
+            {
+                ["name1"] = DomainId.NewGuid()
+            };
+
+            A.CallTo(() => schemaRepository.QueryIdsAsync(appId, default))
+                .Returns(ids);
+
+            var token1 = await sut.ReserveAsync(DomainId.NewGuid(), "name1");
+            var token2 = await sut.ReserveAsync(DomainId.NewGuid(), "name2");
+
+            Assert.Null(token1);
+            Assert.NotNull(token2);
+        }
+
+        [Fact]
         public async Task Should_provide_schema_ids_from_repository_once()
         {
             var ids = new Dictionary<string, DomainId>

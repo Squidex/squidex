@@ -36,7 +36,7 @@ namespace TestSuite.ApiTests
             // STEP 1:  Do not invite contributors when flag is false.
             var createRequest = new AssignContributorDto { ContributorId = "test@squidex.io" };
 
-            var ex = await Assert.ThrowsAsync<SquidexManagementException>(() =>
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() =>
             {
                 return _.Apps.PostContributorAsync(appName, createRequest);
             });

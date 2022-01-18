@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Orleans.Indexes
     {
         private readonly Dictionary<string, (string Name, T Id)> reservations = new Dictionary<string, (string Name, T Id)>();
 
-        public Task<string?> ReserveAsync(T id, string name)
+        public virtual Task<string?> ReserveAsync(T id, string name)
         {
             string? token = null;
 

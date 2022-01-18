@@ -40,10 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Cache().RemoveReservationAsync(token);
         }
 
-        public Task<string?> ReserveAsync(DomainId id, string name,
+        public async Task<string?> ReserveAsync(DomainId id, string name,
             CancellationToken ct = default)
         {
-            return Cache().ReserveAsync(id, name);
+            return await Cache().ReserveAsync(id, name);
         }
 
         public async Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions,
@@ -183,29 +183,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<string?> CheckAppAsync(IAppsCacheGrain cache, CreateApp command)
+        private static async Task<string?> CheckAppAsync(IAppsCacheGrain cache, CreateApp command)
         {
             var token = await cache.ReserveAsync(command.AppId, command.Name);
 
             if (token == null)
             {
                 throw new ValidationException(T.Get("apps.nameAlreadyExists"));
-            }
-
-            try
-            {
-                var existingId = await GetAppIdAsync(command.Name);
-
-                if (existingId != default)
-                {
-                    throw new ValidationException(T.Get("apps.nameAlreadyExists"));
-                }
-            }
-            catch
-            {
-                // Catch our own exception, just in case something went wrong before.
-                await cache.RemoveReservationAsync(token);
-                throw;
             }
 
             return token;
