@@ -136,7 +136,7 @@ namespace TestSuite.ApiTests
                         Type = BulkUpdateType.Upsert,
                         Data = new
                         {
-                            number1 = new
+                            number = new
                             {
                                 iv = 99
                             }
@@ -184,7 +184,7 @@ namespace TestSuite.ApiTests
                         Type = BulkUpdateType.Upsert,
                         Data = new
                         {
-                            number1 = new
+                            number = new
                             {
                                 iv = 99
                             }

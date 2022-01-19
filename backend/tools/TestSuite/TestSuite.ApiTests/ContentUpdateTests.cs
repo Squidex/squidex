@@ -238,7 +238,7 @@ namespace TestSuite.ApiTests
                             Type = BulkUpdateType.Upsert,
                             Data = new
                             {
-                                number1 = new
+                                number = new
                                 {
                                     iv = TestEntity.ScriptTrigger
                                 }
@@ -282,7 +282,7 @@ namespace TestSuite.ApiTests
                             Type = BulkUpdateType.Upsert,
                             Data = new
                             {
-                                number1 = new
+                                number = new
                                 {
                                     iv = TestEntity.ScriptTrigger
                                 }
