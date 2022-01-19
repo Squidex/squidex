@@ -17,6 +17,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
         }
 
+        public ScriptContext(ScriptContext source)
+            : base(source, StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
         public bool TryGetValue<T>(string key, [MaybeNullWhen(false)] out T value)
         {
             Guard.NotNull(key, nameof(key));

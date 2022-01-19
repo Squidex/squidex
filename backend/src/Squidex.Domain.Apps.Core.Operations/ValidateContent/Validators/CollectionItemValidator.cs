@@ -7,6 +7,7 @@
 
 using System.Collections;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -21,23 +22,21 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.itemValidator = itemValidator;
         }
 
-        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is ICollection { Count: > 0 } items)
             {
-                var innerTasks = new List<Task>();
-                var index = 1;
-
-                foreach (var item in items)
+                var targets = items.OfType<object>().Select((item, index) =>
                 {
-                    var innerContext = context.Nested($"[{index}]");
+                    var innerContext = context.Nested($"[{index + 1}]");
 
-                    await itemValidator.ValidateAsync(item, innerContext, addError);
+                    return (item, innerContext);
+                });
 
-                    index++;
-                }
-
-                await Task.WhenAll(innerTasks);
+                await AsyncHelper.WhenAllThrottledAsync(targets, async (x, _) =>
+                {
+                    await itemValidator.ValidateAsync(x.item, x.innerContext, addError);
+                });
             }
         }
     }

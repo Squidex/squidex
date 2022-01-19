@@ -14,9 +14,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
     public sealed class SchemaScriptsDto
     {
         /// <summary>
-        /// The script that is executed for each query when querying contents.
+        /// The script that is executed for each content when querying contents.
         /// </summary>
         public string? Query { get; set; }
+
+        /// <summary>
+        /// The script that is executed for all contents when querying contents.
+        /// </summary>
+        public string? QueryPre { get; set; }
 
         /// <summary>
         /// The script that is executed when creating a content.

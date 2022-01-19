@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxWords = maxWords;
         }
 
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

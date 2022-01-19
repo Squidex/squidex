@@ -13,14 +13,16 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
-    public class JintScriptEngineTests
+    public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         private readonly ScriptOptions contentOptions = new ScriptOptions
         {
@@ -85,13 +87,17 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         public async Task TransformAsync_should_return_original_content_if_script_failed()
         {
             var content = new ContentData();
-            var context = new ScriptVars { ["data"] = content };
+
+            var vars = new ScriptVars
+            {
+                ["data"] = content
+            };
 
             const string script = @"
                 x => x
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Empty(result);
         }
@@ -116,7 +122,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(10.0));
 
-            var context = new ScriptVars { ["data"] = content };
+            var vars = new ScriptVars
+            {
+                ["data"] = content
+            };
 
             const string script = @"
                 var data = ctx.data;
@@ -129,7 +138,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(data);
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Equal(expected, result);
         }
@@ -147,27 +156,31 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_throw_exception_if_script_failed()
         {
-            var content = new ContentData();
-            var context = new ScriptVars { ["data"] = content };
+            var vars = new ScriptVars
+            {
+                ["data"] = new ContentData()
+            };
 
             const string script = @"
                 invalid(();
             ";
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(context, script, contentOptions));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(vars, script, contentOptions));
         }
 
         [Fact]
         public async Task TransformAsync_should_return_original_content_if_not_replaced()
         {
-            var content = new ContentData();
-            var context = new ScriptVars { ["data"] = content };
+            var vars = new ScriptVars
+            {
+                ["data"] = new ContentData()
+            };
 
             const string script = @"
                 var x = 0;
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Empty(result);
         }
@@ -175,8 +188,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_return_original_content_if_not_replaced_async()
         {
-            var content = new ContentData();
-            var context = new ScriptVars { ["data"] = content };
+            var vars = new ScriptVars
+            {
+                ["data"] = new ContentData()
+            };
 
             const string script = @"
                 async = true;
@@ -188,7 +203,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 });                    
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Empty(result);
         }
@@ -204,7 +219,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant("MyOperation"));
 
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["data"] = content,
                 ["dataOld"] = null,
@@ -219,7 +234,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(data);
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Equal(expected, result);
         }
@@ -235,7 +250,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(42));
 
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["data"] = content,
                 ["dataOld"] = null,
@@ -255,7 +270,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Equal(expected, result);
         }
@@ -263,10 +278,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_not_ignore_transformation_if_async_not_set()
         {
-            var content = new ContentData();
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
-                ["data"] = content,
+                ["data"] = new ContentData(),
                 ["dataOld"] = null,
                 ["operation"] = "MyOperation"
             };
@@ -282,7 +296,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.NotEmpty(result);
         }
@@ -290,10 +304,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_timeout_if_replace_never_called()
         {
-            var content = new ContentData();
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
-                ["data"] = content,
+                ["data"] = new ContentData(),
                 ["dataOld"] = null,
                 ["operation"] = "MyOperation"
             };
@@ -308,7 +321,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 });
             ";
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.TransformAsync(context, script, contentOptions));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.TransformAsync(vars, script, contentOptions));
         }
 
         [Fact]
@@ -331,7 +344,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(10.0));
 
-            var context = new ScriptVars { ["data"] = content };
+            var vars = new ScriptVars
+            {
+                ["data"] = content
+            };
 
             const string script = @"
                 var data = ctx.data;
@@ -344,7 +360,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(data);
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Equal(expected, result);
         }
@@ -375,7 +391,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             userIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, "2"));
 
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["data"] = content,
                 ["dataOld"] = oldContent,
@@ -388,7 +404,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace(ctx.data);
             ";
 
-            var result = await sut.TransformAsync(context, script, contentOptions);
+            var result = await sut.TransformAsync(vars, script, contentOptions);
 
             Assert.Equal(expected, result);
         }
@@ -396,16 +412,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Evaluate_should_return_true_if_expression_match()
         {
-            const string script = @"
-                value.i == 2
-            ";
-
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["value"] = new { i = 2 }
             };
 
-            var result = ((IScriptEngine)sut).Evaluate(context, script);
+            const string script = @"
+                value.i == 2
+            ";
+
+            var result = ((IScriptEngine)sut).Evaluate(vars, script);
 
             Assert.True(result);
         }
@@ -413,16 +429,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Evaluate_should_return_true_if_status_match()
         {
-            const string script = @"
-                value.status == 'Published'
-            ";
-
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["value"] = new { status = Status.Published }
             };
 
-            var result = ((IScriptEngine)sut).Evaluate(context, script);
+            const string script = @"
+                value.status == 'Published'
+            ";
+
+            var result = ((IScriptEngine)sut).Evaluate(vars, script);
 
             Assert.True(result);
         }
@@ -430,16 +446,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Evaluate_should_return_false_if_expression_match()
         {
-            const string script = @"
-                value.i == 3
-            ";
-
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["value"] = new { i = 2 }
             };
 
-            var result = ((IScriptEngine)sut).Evaluate(context, script);
+            const string script = @"
+                value.i == 3
+            ";
+
+            var result = ((IScriptEngine)sut).Evaluate(vars, script);
 
             Assert.False(result);
         }
@@ -447,16 +463,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Evaluate_should_return_false_if_script_is_invalid()
         {
-            const string script = @"
-                function();
-            ";
-
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["value"] = new { i = 2 }
             };
 
-            var result = ((IScriptEngine)sut).Evaluate(context, script);
+            const string script = @"
+                function();
+            ";
+
+            var result = ((IScriptEngine)sut).Evaluate(vars, script);
 
             Assert.False(result);
         }
@@ -466,18 +482,93 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var id = DomainId.NewGuid();
 
-            const string script = @"
-                return value;
-            ";
-
-            var context = new ScriptVars
+            var vars = new ScriptVars
             {
                 ["value"] = id
             };
 
-            var result = sut.Execute(context, script);
+            const string script = @"
+                return value;
+            ";
+
+            var result = sut.Execute(vars, script);
 
             Assert.Equal(id.ToString(), result.ToString());
+        }
+
+        [Fact]
+        public void Should_share_vars_between_executions()
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = 13
+            };
+
+            const string script1 = @"
+                ctx.value = ctx.value * 2;
+            ";
+
+            const string script2 = @"
+                return ctx.value + 2;
+            ";
+
+            sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
+
+            var result = sut.Execute(vars, script2, new ScriptOptions { AsContext = true });
+
+            Assert.Equal(JsonValue.Create(28), result);
+        }
+
+        [Fact]
+        public void Should_share_complex_vars_between_executions()
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = 13
+            };
+
+            const string script1 = @"
+                ctx.obj = { number: ctx.value * 2 };
+            ";
+
+            const string script2 = @"
+                return ctx.obj.number + 2;
+            ";
+
+            sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
+
+            var result = sut.Execute(vars, script2, new ScriptOptions { AsContext = true });
+
+            Assert.Equal(JsonValue.Create(28), result);
+        }
+
+        [Fact]
+        public async Task Should_share_vars_between_execution_for_transform()
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = 13
+            };
+
+            const string script1 = @"
+                ctx.obj = { number: ctx.value * 2 };
+            ";
+
+            const string script2 = @"
+                ctx.data.test = { iv: ctx.obj.number + 2 };
+                replace();
+            ";
+
+            sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
+
+            var vars2 = new ScriptVars(vars)
+            {
+                Data = new ContentData()
+            };
+
+            var result = await sut.TransformAsync(vars2, script2, new ScriptOptions { AsContext = true });
+
+            Assert.Equal(JsonValue.Create(28), result["test"]!["iv"]);
         }
     }
 }

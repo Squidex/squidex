@@ -646,7 +646,7 @@ namespace TestSuite.ApiTests
         private static void AssertItems(ContentsResult<TestEntity, TestEntityData> entities, int total, int[] expected)
         {
             Assert.Equal(total, entities.Total);
-            Assert.Equal(expected, entities.Items.Select(x => x.Data.Number1).ToArray());
+            Assert.Equal(expected, entities.Items.Select(x => x.Data.Number).ToArray());
         }
     }
 }

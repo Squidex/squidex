@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -11,14 +11,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public class RequiredValidator : IValidator
     {
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value.IsNullOrUndefined() && !context.IsOptional)
             {
                 addError(context.Path, T.Get("contents.validation.required"));
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

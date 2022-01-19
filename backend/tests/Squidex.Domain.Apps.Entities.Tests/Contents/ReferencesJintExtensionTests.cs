@@ -78,16 +78,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 ["user"] = user
             };
 
+            var expected = @"
+                Text: Hello 1 World 1
+            ";
+
             var script = @"
                 getReference(data.references.iv[0], function (references) {
                     var result1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
 
                     complete(`${result1}`);
                 })";
-
-            var expected = @"
-                Text: Hello 1 World 1
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -122,6 +122,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 ["user"] = user
             };
 
+            var expected = @"
+                Text: Hello 1 World 1
+                Text: Hello 2 World 2
+            ";
+
             var script = @"
                 getReferences(data.references.iv, function (references) {
                     var result1 = `Text: ${references[0].data.field1.iv} ${references[0].data.field2.iv}`;
@@ -129,11 +134,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     complete(`${result1}\n${result2}`);
                 })";
-
-            var expected = @"
-                Text: Hello 1 World 1
-                Text: Hello 2 World 2
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 

@@ -16,7 +16,7 @@ namespace TestSuite.Model
     {
         public const int ScriptTrigger = -99;
 
-        public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
+        public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name, SchemaScriptsDto scripts = null)
         {
             var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
             {
@@ -25,18 +25,10 @@ namespace TestSuite.Model
                 {
                     new UpsertSchemaFieldDto
                     {
-                        Name = TestEntityData.Number1Field,
+                        Name = TestEntityData.NumberField,
                         Properties = new NumberFieldPropertiesDto
                         {
                             IsRequired = true
-                        }
-                    },
-                    new UpsertSchemaFieldDto
-                    {
-                        Name = TestEntityData.Number2Field,
-                        Properties = new NumberFieldPropertiesDto
-                        {
-                            IsRequired = false
                         }
                     },
                     new UpsertSchemaFieldDto
@@ -79,16 +71,9 @@ namespace TestSuite.Model
                         {
                             IsRequired = false
                         }
-                    },
+                    }
                 },
-                Scripts = new SchemaScriptsDto
-                {
-                    Create = $@"
-                        if (ctx.data.{TestEntityData.Number1Field}.iv === {ScriptTrigger}) {{
-                            ctx.data.{TestEntityData.Number1Field}.iv = incrementCounter('my');
-                            replace();
-                        }}"
-                },
+                Scripts = scripts,
                 IsPublished = true
             });
 
@@ -102,9 +87,7 @@ namespace TestSuite.Model
 
         public static readonly string StringField = nameof(String).ToLowerInvariant();
 
-        public static readonly string Number1Field = nameof(Number1).ToLowerInvariant();
-
-        public static readonly string Number2Field = nameof(Number2).ToLowerInvariant();
+        public static readonly string NumberField = nameof(Number).ToLowerInvariant();
 
         public static readonly string JsonField = nameof(Json).ToLowerInvariant();
 
@@ -115,10 +98,7 @@ namespace TestSuite.Model
         public Dictionary<string, string> Localized { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
-        public int Number1 { get; set; }
-
-        [JsonConverter(typeof(InvariantConverter))]
-        public int Number2 { get; set; }
+        public int Number { get; set; }
 
         [JsonConverter(typeof(InvariantConverter))]
         public string Id { get; set; }

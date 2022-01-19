@@ -17,25 +17,25 @@ namespace Squidex.Domain.Apps.Entities.Scripting
 
         public IReadOnlyList<ScriptingValue> Content(Schema schema, PartitionResolver partitionResolver)
         {
+            AddFunction("replace()",
+                "Tell Squidex that you have modified the data and that the change should be applied.");
+
+            AddFunction("getReferences(ids, callback)",
+                "Queries the content items with the specified IDs and invokes the callback with an array of contents.");
+
+            AddFunction("getReference(ids, callback)",
+                "Queries the content item with the specified ID and invokes the callback with an array of contents.");
+
+            AddFunction("getAssets(ids, callback)",
+                "Queries the assets with the specified IDs and invokes the callback with an array of assets.");
+
+            AddFunction("getAsset(ids, callback)",
+                "Queries the asset with the specified ID and invokes the callback with an array of assets.");
+
+            AddShared();
+
             AddObject("ctx", FieldDescriptions.Context, () =>
             {
-                AddFunction("replace()",
-                    "Tell Squidex that you have modified the data and that the change should be applied.");
-
-                AddFunction("getReferences(ids, callback)",
-                    "Queries the content items with the specified IDs and invokes the callback with an array of contents.");
-
-                AddFunction("getReference(ids, callback)",
-                    "Queries the content item with the specified ID and invokes the callback with an array of contents.");
-
-                AddFunction("getAssets(ids, callback)",
-                    "Queries the assets with the specified IDs and invokes the callback with an array of assets.");
-
-                AddFunction("getAsset(ids, callback)",
-                    "Queries the asset with the specified ID and invokes the callback with an array of assets.");
-
-                AddShared();
-
                 AddString("contentId",
                     FieldDescriptions.EntityId);
 
@@ -61,10 +61,10 @@ namespace Squidex.Domain.Apps.Entities.Scripting
 
         public IReadOnlyList<ScriptingValue> Asset()
         {
+            AddShared();
+
             AddObject("ctx", FieldDescriptions.Context, () =>
             {
-                AddShared();
-
                 AddString("assetId",
                     FieldDescriptions.EntityId);
 
