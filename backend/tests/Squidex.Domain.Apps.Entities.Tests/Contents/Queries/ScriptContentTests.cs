@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly ProvideSchema schemaProvider;
         private readonly ScriptContent sut;
 
         public ScriptContentTests()
@@ -37,11 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
             var (provider, schemaId) = CreateSchema(
-                queryPre: "QueryPreScript");
+                queryPre: "my-pre-query");
 
             var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
+            await sut.EnrichAsync(ctx, new[] { content }, provider, default);
 
             A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -53,11 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
             var (provider, schemaId) = CreateSchema(
-                query: "QueryScript");
+                query: "my-query");
 
             var content = new ContentEntity { Data = new ContentData(), SchemaId = schemaId };
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
+            await sut.EnrichAsync(ctx, new[] { content }, provider, default);
 
             A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
@@ -71,14 +70,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var oldData = new ContentData();
 
             var (provider, schemaId) = CreateSchema(
-                query: "QueryScript");
+                query: "my-query");
 
             var content = new ContentEntity { Data = oldData, SchemaId = schemaId };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "QueryScript", ScriptOptions(), A<CancellationToken>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
                 .Returns(new ContentData());
 
-            await sut.EnrichAsync(ctx, new[] { content }, schemaProvider, default);
+            await sut.EnrichAsync(ctx, new[] { content }, provider, default);
 
             Assert.NotSame(oldData, content.Data);
 
