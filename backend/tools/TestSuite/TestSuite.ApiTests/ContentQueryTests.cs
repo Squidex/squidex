@@ -560,10 +560,10 @@ namespace TestSuite.ApiTests
             {
                 query = @"
                     query ContentsQuery($filter: String!) {
-                        queryMyReadsContents(filter: $filter, orderby: ""data/number1/iv asc"") {
+                        queryMyReadsContents(filter: $filter, orderby: ""data/number/iv asc"") {
                             id,
                             data {
-                                number1 {
+                                number {
                                     iv
                                 }
                             }
@@ -571,7 +571,7 @@ namespace TestSuite.ApiTests
                     }",
                 variables = new
                 {
-                    filter = @"data/number1/iv gt 3 and data/number1/iv lt 7"
+                    filter = @"data/number/iv gt 3 and data/number/iv lt 7"
                 }
             };
 
@@ -589,10 +589,10 @@ namespace TestSuite.ApiTests
             {
                 query = @"
                 {
-                    queryMyReadsContents(filter: ""data/number1/iv gt 3 and data/number1/iv lt 7"", orderby: ""data/number1/iv asc"") {
+                    queryMyReadsContents(filter: ""data/number/iv gt 3 and data/number/iv lt 7"", orderby: ""data/number/iv asc"") {
                       id,
                       data {
-                        number1 {
+                        number {
                           iv
                         }
                       }

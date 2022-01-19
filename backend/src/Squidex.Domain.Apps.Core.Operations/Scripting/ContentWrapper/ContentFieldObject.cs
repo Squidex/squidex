@@ -161,5 +161,15 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 }
             }
         }
+
+        public override object ToObject()
+        {
+            if (TryUpdate(out var result))
+            {
+                return result!;
+            }
+
+            return fieldData!;
+        }
     }
 }
