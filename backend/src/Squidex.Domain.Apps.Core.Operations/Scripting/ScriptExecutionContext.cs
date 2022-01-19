@@ -68,18 +68,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (options.AsContext)
             {
-                var contextInstance = new ObjectInstance(engine);
+                var contextInstance = new WritableContext(engine, vars);
 
-                foreach (var (key, value) in vars)
+                foreach (var (key, value) in vars.Where(x => x.Value != null))
                 {
-                    var property = key.ToCamelCase();
-
-                    if (value != null)
-                    {
-                        contextInstance.FastAddProperty(property, JsValue.FromObject(engine, value), true, true, true);
-
-                        this[property] = value;
-                    }
+                    this[key.ToCamelCase()] = value;
                 }
 
                 engine.SetValue("ctx", contextInstance);

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 using Squidex.Log;
 
@@ -22,13 +23,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.log = log;
         }
 
-        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             try
             {
                 if (validators?.Length > 0)
                 {
-                    await Task.WhenAll(validators.Select(x => x.ValidateAsync(value, context, addError)));
+                    await AsyncHelper.WhenAllThrottledAsync(validators, (x, _) => x.ValidateAsync(value, context, addError));
                 }
             }
             catch (Exception ex)

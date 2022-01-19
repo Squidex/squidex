@@ -44,7 +44,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(OpenIdClaims.Email, "hello@squidex.io"));
 
-            Assert.Equal("hello@squidex.io", GetValue(identity, "user.email"));
+            const string script = @"
+                return user.email;
+            ";
+
+            Assert.Equal("hello@squidex.io", GetValue(identity, script));
         }
 
         [Fact]
@@ -54,7 +58,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, "my-picture"));
 
-            Assert.Equal(new[] { "my-picture" }, GetValue(identity, "user.claims.picture"));
+            const string script = @"
+                return user.claims.picture;
+            ";
+
+            Assert.Equal(new[] { "my-picture" }, GetValue(identity, script));
         }
 
         [Fact]
@@ -64,7 +72,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(ClaimTypes.Role, "my-role"));
 
-            Assert.Equal(new[] { "my-role" }, GetValue(identity, "user.claims.role"));
+            const string script = @"
+                return user.claims.role;
+            ";
+
+            Assert.Equal(new[] { "my-role" }, GetValue(identity, script));
         }
 
         [Fact]
@@ -77,8 +89,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             identity.AddClaim(new Claim("claim2", "2a"));
             identity.AddClaim(new Claim("claim2", "2b"));
 
-            Assert.Equal(new[] { "1a", "1b" }, GetValue(identity, "user.claims.claim1"));
-            Assert.Equal(new[] { "2a", "2b" }, GetValue(identity, "user.claims.claim2"));
+            const string script1 = @"
+                return user.claims.claim1;
+            ";
+
+            const string script2 = @"
+                return user.claims.claim2;
+            ";
+
+            Assert.Equal(new[] { "1a", "1b" }, GetValue(identity, script1));
+            Assert.Equal(new[] { "2a", "2b" }, GetValue(identity, script2));
         }
 
         private static void AssetUser(ClaimsIdentity identity, string id, bool isClient, bool isUser)

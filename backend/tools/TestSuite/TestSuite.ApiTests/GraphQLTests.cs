@@ -192,7 +192,7 @@ namespace TestSuite.ApiTests
 
             var citiesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("cities");
 
-            var city = await citiesClient.CreateAsync(cityData, true);
+            var city = await citiesClient.CreateAsync(cityData, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create city
@@ -210,7 +210,7 @@ namespace TestSuite.ApiTests
 
             var statesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("states");
 
-            var state = await statesClient.CreateAsync(stateData, true);
+            var state = await statesClient.CreateAsync(stateData, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Create country
@@ -228,7 +228,7 @@ namespace TestSuite.ApiTests
 
             var countriesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("countries");
 
-            await countriesClient.CreateAsync(countryData, true);
+            await countriesClient.CreateAsync(countryData, ContentCreateOptions.AsPublish);
         }
     }
 }

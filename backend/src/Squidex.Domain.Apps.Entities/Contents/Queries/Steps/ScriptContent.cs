@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 {
@@ -31,32 +32,55 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
             CancellationToken ct)
         {
-            if (ShouldEnrich(context))
+            if (!ShouldEnrich(context))
             {
-                foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+                return;
+            }
+
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var (schema, _) = await schemas(group.Key);
+
+                var script = schema.SchemaDef.Scripts.Query;
+
+                if (string.IsNullOrWhiteSpace(script))
                 {
-                    var (schema, _) = await schemas(group.Key);
-
-                    var script = schema.SchemaDef.Scripts.Query;
-
-                    if (!string.IsNullOrWhiteSpace(script))
-                    {
-                        await Task.WhenAll(group.Select(x => TransformAsync(context, script, x, ct)));
-                    }
+                    continue;
                 }
+
+                var vars = new ScriptVars
+                {
+                    [ScriptKeys.AppId] = context.App.Id,
+                    [ScriptKeys.AppName] = context.App.Name,
+                    [ScriptKeys.User] = context.User
+                };
+
+                var preScript = schema.SchemaDef.Scripts.QueryPre;
+
+                if (!string.IsNullOrWhiteSpace(preScript))
+                {
+                    var options = new ScriptOptions
+                    {
+                        AsContext = true
+                    };
+
+                    await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
+                }
+
+                await AsyncHelper.WhenAllThrottledAsync(group, async (content, _) =>
+                {
+                    await TransformAsync(vars, script, content, ct);
+                }, ct: ct);
             }
         }
 
-        private async Task TransformAsync(Context context, string script, ContentEntity content,
+        private async Task TransformAsync(ScriptVars rootVars, string script, ContentEntity content,
             CancellationToken ct)
         {
-            var vars = new ScriptVars
+            var vars = new ScriptVars(rootVars)
             {
-                [ScriptKeys.AppId] = context.App.Id,
-                [ScriptKeys.AppName] = context.App.Name,
                 [ScriptKeys.ContentId] = content.Id,
                 [ScriptKeys.Data] = content.Data,
-                [ScriptKeys.User] = context.User
             };
 
             var options = new ScriptOptions

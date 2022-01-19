@@ -11,6 +11,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
     public interface IValidator
     {
-        Task ValidateAsync(object? value, ValidationContext context, AddError addError);
+        ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError);
     }
 }

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.fields = fields;
         }
 
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is IEnumerable<JsonObject> objects && objects.Count() > 1)
             {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 Validate(context, addError, components.Select(x => x.Data));
             }
 
-            return Task.CompletedTask;
+            return default;
         }
 
         private void Validate(ValidationContext context, AddError addError, IEnumerable<JsonObject> items)

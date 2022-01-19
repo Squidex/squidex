@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -18,11 +18,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validateEmptyStrings = validateEmptyStrings;
         }
 
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (context.IsOptional)
             {
-                return Task.CompletedTask;
+                return default;
             }
 
             if (value.IsNullOrUndefined() || IsEmptyString(value))
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 addError(context.Path, T.Get("contents.validation.required"));
             }
 
-            return Task.CompletedTask;
+            return default;
         }
 
         private bool IsEmptyString(object? value)

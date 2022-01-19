@@ -62,16 +62,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var (vars, asset) = SetupAssetVars();
 
+            var expected = $@"
+                Text: {asset.FileName} {asset.Id}
+            ";
+
             var script = @"
                 getAsset(data.assets.iv[0], function (assets) {
                     var result1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
 
                     complete(`${result1}`);
                 });";
-
-            var expected = $@"
-                Text: {asset.FileName} {asset.Id}
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -83,6 +83,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var (vars, assets) = SetupAssetsVars();
 
+            var expected = $@"
+                Text: {assets[0].FileName} {assets[0].Id}
+                Text: {assets[1].FileName} {assets[1].Id}
+            ";
+
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     var result1 = `Text: ${assets[0].fileName} ${assets[0].id}`;
@@ -90,11 +95,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     complete(`${result1}\n${result2}`);
                 });";
-
-            var expected = $@"
-                Text: {assets[0].FileName} {assets[0].Id}
-                Text: {assets[1].FileName} {assets[1].Id}
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -108,6 +108,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
 
+            var expected = @"
+                Text: Hello Asset
+            ";
+
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetText(assets[0], function (text) {
@@ -116,10 +120,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         complete(result);
                     });
                 });";
-
-            var expected = @"
-                Text: Hello Asset
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -133,6 +133,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
 
+            var expected = @"
+                Text: Hello Asset
+            ";
+
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetText(assets[0], function (text) {
@@ -141,10 +145,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         complete(result);
                     }, 'utf8');
                 });";
-
-            var expected = @"
-                Text: Hello Asset
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -158,6 +158,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupText(asset.Id, Encoding.Unicode.GetBytes("Hello Asset"));
 
+            var expected = @"
+                Text: Hello Asset
+            ";
+
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetText(assets[0], function (text) {
@@ -166,10 +170,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         complete(result);
                     }, 'unicode');
                 });";
-
-            var expected = @"
-                Text: Hello Asset
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -183,6 +183,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupText(asset.Id, Encoding.ASCII.GetBytes("Hello Asset"));
 
+            var expected = @"
+                Text: Hello Asset
+            ";
+
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetText(assets[0], function (text) {
@@ -191,10 +195,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         complete(result);
                     }, 'ascii');
                 });";
-
-            var expected = @"
-                Text: Hello Asset
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -208,6 +208,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
 
+            var expected = @"
+                Text: SGVsbG8gQXNzZXQ=
+            ";
+
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetText(assets[0], function (text) {
@@ -216,10 +220,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         complete(result);
                     }, 'base64');
                 });";
-
-            var expected = @"
-                Text: SGVsbG8gQXNzZXQ=
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -231,6 +231,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var (vars, _) = SetupAssetVars(1_000_000);
 
+            var expected = @"
+                Text: ErrorTooBig
+            ";
+
             var script = @"
                 getAssets(data.assets.iv, function (assets) {
                     getAssetText(assets[0], function (text) {
@@ -239,10 +243,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         complete(result);
                     });
                 });";
-
-            var expected = @"
-                Text: ErrorTooBig
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -270,16 +270,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 ["event"] = @event
             };
 
+            var expected = @"
+                Text: Hello Asset
+            ";
+
             var script = @"
                 getAssetText(event, function (text) {
                     var result = `Text: ${text}`;
 
                     complete(result);
                 });";
-
-            var expected = @"
-                Text: Hello Asset
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -302,16 +302,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 ["event"] = @event
             };
 
+            var expected = @"
+                Text: ErrorTooBig
+            ";
+
             var script = @"
                 getAssetText(event, function (text) {
                     var result = `Text: ${text}`;
 
                     complete(result);
                 });";
-
-            var expected = @"
-                Text: ErrorTooBig
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 

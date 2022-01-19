@@ -27,7 +27,7 @@ namespace Squidex.Extensions.Validation
             this.contentRepository = contentRepository;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is ContentData data)
             {

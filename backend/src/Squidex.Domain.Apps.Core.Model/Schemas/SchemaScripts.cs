@@ -20,5 +20,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public string? Delete { get; init; }
 
         public string? Query { get; init; }
+
+        public string? QueryPre { get; init; }
     }
 }

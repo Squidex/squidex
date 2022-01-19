@@ -37,25 +37,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
             CancellationToken ct)
         {
-            if (ShouldEnrich(context))
+            if (!ShouldEnrich(context))
             {
-                var ids = new HashSet<DomainId>();
+                return;
+            }
 
-                foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
-                {
-                    var (schema, components) = await schemas(group.Key);
+            var ids = new HashSet<DomainId>();
 
-                    AddReferenceIds(ids, schema, components, group);
-                }
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var (schema, components) = await schemas(group.Key);
 
-                var references = await GetReferencesAsync(context, ids, ct);
+                AddReferenceIds(ids, schema, components, group);
+            }
 
-                foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
-                {
-                    var (schema, components) = await schemas(group.Key);
+            var references = await GetReferencesAsync(context, ids, ct);
 
-                    await ResolveReferencesAsync(context, schema, components, group, references, schemas);
-                }
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var (schema, components) = await schemas(group.Key);
+
+                await ResolveReferencesAsync(context, schema, components, group, references, schemas);
             }
         }
 

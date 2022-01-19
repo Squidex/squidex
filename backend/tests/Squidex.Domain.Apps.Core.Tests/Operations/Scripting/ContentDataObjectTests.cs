@@ -27,7 +27,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(1.0));
 
-            var result = ExecuteScript(original, @"data.number = { iv: 1 }");
+            const string script = @"
+                data.number = { iv: 1 }
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -43,7 +47,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(1.0));
 
-            var result = ExecuteScript(original, @"data.number.iv = 1");
+            const string script = @"
+                data.number.iv = 1
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -59,7 +67,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(1.0));
 
-            var result = ExecuteScript(original, "Object.defineProperty(data, 'number', { value: { iv: 1 } })");
+            const string script = @"
+                Object.defineProperty(data, 'number', { value: { iv: 1 } })
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -69,7 +81,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var original = new ContentData();
 
-            Assert.Throws<JavaScriptException>(() => ExecuteScript(original, @"data.number = 1"));
+            const string script = @"
+                data.number = 1
+            ";
+
+            Assert.Throws<JavaScriptException>(() => ExecuteScript(original, script));
         }
 
         [Fact]
@@ -83,7 +99,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var expected = new ContentData();
 
-            var result = ExecuteScript(original, @"delete data.number");
+            const string script = @"
+                delete data.number
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -103,7 +123,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant("1new"));
 
-            var result = ExecuteScript(original, @"data.string.iv = data.string.iv + 'new'");
+            const string script = @"
+                data.string.iv = data.string.iv + 'new'
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -123,7 +147,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(3.0));
 
-            var result = ExecuteScript(original, @"data.number.iv = data.number.iv + 2");
+            const string script = @"
+                data.number.iv = data.number.iv + 2
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -143,7 +171,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(true));
 
-            var result = ExecuteScript(original, @"data.boolean.iv = !data.boolean.iv");
+            const string script = @"
+                data.boolean.iv = !data.boolean.iv
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -163,7 +195,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(1.0, 4.0, 5.0)));
 
-            var result = ExecuteScript(original, @"data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]");
+            const string script = @"
+                data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -183,7 +219,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Object().Add("lat", 1.0).Add("lon", 4.0)));
 
-            var result = ExecuteScript(original, @"data.geo.iv = { lat: data.geo.iv.lat, lon: data.geo.iv.lat + 3 }");
+            const string script = @"
+                data.geo.iv = { lat: data.geo.iv.lat, lon: data.geo.iv.lat + 3 }
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -203,11 +243,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Object().Add("lat", 2.0).Add("lon", 4.0)));
 
-            var result = ExecuteScript(original, @"
+            const string script = @"
                 var nested = data.geo.iv;
                 nested.lat = 2;
                 nested.lon = 4;
-                data.geo.iv = nested");
+                data.geo.iv = nested
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -221,11 +264,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Object().Add("lat", 2.0).Add("lon", 4.0)));
 
-            var result = ExecuteScript(original, @"
+            const string script = @"
                 var nested = data.geo.iv;
                 nested.lat = 2;
                 nested.lon = 4;
-                data.geo.iv = nested");
+                data.geo.iv = nested
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Same(original, result);
         }
@@ -244,7 +290,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(1.0));
 
-            var result = ExecuteScript(original, "Object.defineProperty(data.number, 'iv', { value: 1 })");
+            const string script = @"
+                Object.defineProperty(data.number, 'iv', { value: 1 })
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -263,7 +313,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     .AddField("string",
                         new ContentFieldData());
 
-            var result = ExecuteScript(original, @"delete data.string.iv");
+            const string script = @"
+                delete data.string.iv
+            ";
+
+            var result = ExecuteScript(original, script);
 
             Assert.Equal(expected, result);
         }
@@ -286,7 +340,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             engine.SetValue("data", new ContentDataObject(engine, content));
 
-            var result = engine.Evaluate(@"
+            const string script = @"
                 var result = [];
                 for (var x in data) {
                     var field = data[x];
@@ -295,7 +349,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         result.push(field[y]);
                     }
                 }
-                result;").ToObject();
+                result;
+            ";
+
+            var result = engine.Evaluate(script).ToObject();
 
             Assert.Equal(new[] { "1", "2", "3", "4" }, result);
         }
@@ -309,13 +366,21 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array()));
 
-            ExecuteScript(original, "data.obj.iv[0] = 1");
+            const string script = @"
+                data.obj.iv[0] = 1
+            ";
+
+            ExecuteScript(original, script);
         }
 
         [Fact]
         public void Should_null_propagate_unknown_fields()
         {
-            ExecuteScript(new ContentData(), @"data.string.iv = 'hello'");
+            const string script = @"
+                data.string.iv = 'hello'
+            ";
+
+            ExecuteScript(new ContentData(), script);
         }
 
         private static ContentData ExecuteScript(ContentData original, string script)

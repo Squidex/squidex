@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             errors.Add(new ValidationError(message, pathString));
         }
 
-        public Task ValidateInputPartialAsync(ContentData data)
+        public ValueTask ValidateInputPartialAsync(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return validator.ValidateAsync(data, context, AddError);
         }
 
-        public Task ValidateInputAsync(ContentData data)
+        public ValueTask ValidateInputAsync(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return validator.ValidateAsync(data, context, AddError);
         }
 
-        public Task ValidateContentAsync(ContentData data)
+        public ValueTask ValidateContentAsync(ContentData data)
         {
             Guard.NotNull(data, nameof(data));
 

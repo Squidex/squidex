@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
@@ -35,7 +36,7 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Create a content for this schema.
-            var data = new TestEntityData { Number1 = 12, String = "hello" };
+            var data = new TestEntityData { Number = 12, String = "hello" };
 
             var content_1 = await contents.CreateAsync(data);
 
@@ -47,7 +48,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Make any update.
-            var content_2 = await contents.ChangeStatusAsync(content_1.Id, "Published");
+            var content_2 = await contents.ChangeStatusAsync(content_1.Id, new ChangeStatus
+            {
+                Status = "Published"
+            });
 
             // Should not return deleted field.
             Assert.Null(content_2.Data.String);
@@ -81,7 +85,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Make any update.
-            var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id, "Published");
+            var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id, new ChangeStatus
+            {
+                Status = "Published"
+            });
 
             // Should not return deleted field.
             Assert.Empty(contentB_2.Data.References);

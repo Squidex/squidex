@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.checkAssets = checkAssets;
         }
 
-        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             var foundIds = new List<DomainId>();
 

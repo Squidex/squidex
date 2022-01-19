@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private static readonly NamedId<DomainId> AppId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private static readonly NamedId<DomainId> SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
-        public static Task ValidateAsync(this IValidator validator, object? value, IList<string> errors,
+        public static ValueTask ValidateAsync(this IValidator validator, object? value, IList<string> errors,
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return validator.ValidateAsync(value, context, CreateFormatter(errors));
         }
 
-        public static Task ValidateAsync(this IField field, object? value, IList<string> errors,
+        public static ValueTask ValidateAsync(this IField field, object? value, IList<string> errors,
             Schema? schema = null,
             ValidationMode mode = ValidationMode.Default,
             ValidationUpdater? updater = null,

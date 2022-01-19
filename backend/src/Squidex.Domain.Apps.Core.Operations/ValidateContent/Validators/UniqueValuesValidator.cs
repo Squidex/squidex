@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class UniqueValuesValidator<TValue> : IValidator
     {
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is IEnumerable<TValue> items && items.Any())
             {
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

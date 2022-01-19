@@ -51,6 +51,30 @@ namespace Squidex.Infrastructure.Tasks
                 .GetResult();
         }
 
+        public static async ValueTask WhenAllThrottledAsync<T>(IEnumerable<T> source, Func<T, CancellationToken, ValueTask> action, int maxDegreeOfParallelism = 0,
+            CancellationToken ct = default)
+        {
+            if (maxDegreeOfParallelism <= 0)
+            {
+                maxDegreeOfParallelism = Environment.ProcessorCount * 2;
+            }
+
+            var semaphore = new SemaphoreSlim(maxDegreeOfParallelism);
+
+            foreach (var item in source)
+            {
+                await semaphore.WaitAsync(ct);
+                try
+                {
+                    await action(item, ct);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }
+        }
+
         public static void Batch<TIn, TOut>(this Channel<object> source, Channel<TOut> target, Func<IReadOnlyList<TIn>, TOut> converter, int batchSize, int timeout,
             CancellationToken ct = default)
         {

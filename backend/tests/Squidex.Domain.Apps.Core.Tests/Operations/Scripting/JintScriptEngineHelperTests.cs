@@ -47,14 +47,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_convert_html_to_text()
         {
-            const string script = @"
-                return html2Text(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>"
             };
+
+            const string script = @"
+                return html2Text(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -64,14 +64,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_convert_markdown_to_text()
         {
-            const string script = @"
-                return markdown2Text(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "## Hello World"
             };
+
+            const string script = @"
+                return markdown2Text(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -81,14 +81,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_count_words()
         {
-            const string script = @"
-                return wordCount(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello, World"
             };
+
+            const string script = @"
+                return wordCount(value);
+            ";
 
             var result = ((JsonNumber)sut.Execute(vars, script)).Value;
 
@@ -98,14 +98,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_count_characters()
         {
-            const string script = @"
-                return characterCount(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello, World"
             };
+
+            const string script = @"
+                return characterCount(value);
+            ";
 
             var result = ((JsonNumber)sut.Execute(vars, script)).Value;
 
@@ -115,14 +115,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_camel_case_value()
         {
-            const string script = @"
-                return toCamelCase(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
+
+            const string script = @"
+                return toCamelCase(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -132,14 +132,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_pascal_case_value()
         {
-            const string script = @"
-                return toPascalCase(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "Hello World"
             };
+
+            const string script = @"
+                return toPascalCase(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -149,14 +149,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_slugify_value()
         {
-            const string script = @"
-                return slugify(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
+
+            const string script = @"
+                return slugify(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -166,14 +166,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_slugify_value_with_single_char()
         {
-            const string script = @"
-                return slugify(value, true);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "4 Häuser"
             };
+
+            const string script = @"
+                return slugify(value, true);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -183,14 +183,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_compute_sha256_hash()
         {
-            const string script = @"
-                return sha256(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "HelloWorld"
             };
+
+            const string script = @"
+                return sha256(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -200,14 +200,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_compute_sha512_hash()
         {
-            const string script = @"
-                return sha512(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "HelloWorld"
             };
+
+            const string script = @"
+                return sha512(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -217,14 +217,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_compute_md5_hash()
         {
-            const string script = @"
-                return md5(value);
-            ";
-
             var vars = new ScriptVars
             {
                 ["value"] = "HelloWorld"
             };
+
+            const string script = @"
+                return md5(value);
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -234,13 +234,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_compute_guid()
         {
-            const string script = @"
-                return guid();
-            ";
-
             var vars = new ScriptVars
             {
             };
+
+            const string script = @"
+                return guid();
+            ";
 
             var result = sut.Execute(vars, script).ToString();
 
@@ -250,16 +250,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_validation_exception_if_calling_reject()
         {
-            const string script = @"
-                reject()
-            ";
-
             var options = new ScriptOptions
             {
                 CanReject = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                reject()
+            ";
 
             var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -269,16 +271,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_validation_exception_if_calling_reject_with_message()
         {
-            const string script = @"
-                reject('Not valid')
-            ";
-
             var options = new ScriptOptions
             {
                 CanReject = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                reject('Not valid')
+            ";
 
             var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -288,16 +292,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_security_exception_if_calling_reject()
         {
-            const string script = @"
-                disallow()
-            ";
-
             var options = new ScriptOptions
             {
                 CanDisallow = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
+
+            const string script = @"
+                disallow()
+            ";
 
             var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -316,7 +322,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 CanDisallow = true
             };
 
-            var vars = new ScriptVars();
+            var vars = new ScriptVars
+            {
+            };
 
             var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
 
@@ -326,13 +334,15 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_exception_if_getJson_url_is_null()
         {
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 getJSON(null, function(result) {
                     complete(result);
                 });
             ";
-
-            var vars = new ScriptVars();
 
             await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
         }
@@ -340,13 +350,15 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_throw_exception_if_getJson_callback_is_null()
         {
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var url = 'http://squidex.io';
 
                 getJSON(url, null);
             ";
-
-            var vars = new ScriptVars();
 
             await Assert.ThrowsAsync<JavaScriptException>(() => sut.ExecuteAsync(vars, script));
         }
@@ -356,6 +368,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var httpHandler = SetupRequest();
 
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var url = 'http://squidex.io';
 
@@ -363,8 +379,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     complete(result);
                 });
             ";
-
-            var vars = new ScriptVars();
 
             var result = await sut.ExecuteAsync(vars, script);
 
@@ -381,6 +395,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var httpHandler = SetupRequest();
 
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var headers = {
                     'X-Header1': 1,
@@ -393,8 +411,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     complete(result);
                 }, headers);
             ";
-
-            var vars = new ScriptVars();
 
             var result = await sut.ExecuteAsync(vars, script);
 
@@ -413,6 +429,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var httpHandler = SetupRequest();
 
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var url = 'http://squidex.io';
 
@@ -420,8 +440,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     complete(result);
                 });
             ";
-
-            var vars = new ScriptVars();
 
             var result = await sut.ExecuteAsync(vars, script);
 
@@ -438,6 +456,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var httpHandler = SetupRequest();
 
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var url = 'http://squidex.io';
 
@@ -447,8 +469,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     complete(result);
                 });
             ";
-
-            var vars = new ScriptVars();
 
             var result = await sut.ExecuteAsync(vars, script);
 
@@ -466,6 +486,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var httpHandler = SetupRequest();
 
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var url = 'http://squidex.io';
 
@@ -475,8 +499,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     complete(result);
                 });
             ";
-
-            var vars = new ScriptVars();
 
             var result = await sut.ExecuteAsync(vars, script);
 
@@ -494,6 +516,10 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var httpHandler = SetupRequest();
 
+            var vars = new ScriptVars
+            {
+            };
+
             const string script = @"
                 var url = 'http://squidex.io';
 
@@ -503,8 +529,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     complete(result);
                 });
             ";
-
-            var vars = new ScriptVars();
 
             var result = await sut.ExecuteAsync(vars, script);
 

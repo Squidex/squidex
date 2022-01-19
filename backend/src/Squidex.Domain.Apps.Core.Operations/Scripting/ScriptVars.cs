@@ -12,6 +12,15 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class ScriptVars : ScriptContext
     {
+        public ScriptVars()
+        {
+        }
+
+        public ScriptVars(ScriptVars source)
+            : base(source)
+        {
+        }
+
         public ContentData? Data
         {
             get => GetValue<ContentData?>();

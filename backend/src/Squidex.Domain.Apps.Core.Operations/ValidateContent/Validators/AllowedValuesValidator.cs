@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -26,14 +26,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.allowedValues = allowedValues;
         }
 
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is TValue typedValue && !allowedValues.Contains(typedValue))
             {
                 addError(context.Path, T.Get("contents.validation.notAllowed"));
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

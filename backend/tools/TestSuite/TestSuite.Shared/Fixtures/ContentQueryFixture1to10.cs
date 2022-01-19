@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using Newtonsoft.Json.Linq;
+using Squidex.ClientLibrary;
 using TestSuite.Model;
 
 namespace TestSuite.Fixtures
@@ -34,15 +35,14 @@ namespace TestSuite.Fixtures
                     var data = new TestEntityData
                     {
                         String = text,
-                        Number1 = i,
-                        Number2 = i,
                         Json = JObject.FromObject(new
                         {
                             nested1 = new
                             {
                                 nested2 = i
                             }
-                        })
+                        }),
+                        Number = i,
                     };
 
                     if (i % 2 == 0)
@@ -54,7 +54,7 @@ namespace TestSuite.Fixtures
                         data.Geo = new { longitude = i, latitude = i };
                     }
 
-                    await Contents.CreateAsync(data, true);
+                    await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
                 }
             }).Wait();
         }
