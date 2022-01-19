@@ -202,26 +202,6 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_content_with_scripting()
-        {
-            TestEntity content = null;
-            try
-            {
-                // STEP 1: Create a content item with a value that triggers the schema.
-                content = await _.Contents.CreateAsync(new TestEntityData { Number = -99 }, ContentCreateOptions.AsPublish);
-
-                Assert.True(content.Data.Number > 0);
-            }
-            finally
-            {
-                if (content != null)
-                {
-                    await _.Contents.DeleteAsync(content.Id);
-                }
-            }
-        }
-
-        [Fact]
         public async Task Should_create_non_published_content()
         {
             TestEntity content = null;
