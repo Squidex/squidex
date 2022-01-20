@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement("vs")]
         public long Version { get; set; }
 
-        [BsonRequired]
+        [BsonIgnoreIfDefault]
         [BsonElement("ts")]
         public long TotalSize { get; set; }
 
