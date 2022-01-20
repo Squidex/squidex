@@ -73,6 +73,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public long Version { get; set; }
 
         [BsonRequired]
+        [BsonElement("ts")]
+        public long TotalSize { get; set; }
+
+        [BsonRequired]
         [BsonElement("at")]
         public AssetType Type { get; set; }
 
