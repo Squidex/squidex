@@ -1,16 +1,3 @@
-
-const path = require('path');
-
-const appRoot = path.resolve(__dirname, '../..');
-
-function root() {
-    // eslint-disable-next-line prefer-rest-params
-    const newArgs = Array.prototype.slice.call(arguments, 0);
-
-    // eslint-disable-next-line prefer-spread
-    return path.join.apply(path, [appRoot].concat(newArgs));
-}
-
 const plugins = {
     // https://webpack.js.org/plugins/eslint-webpack-plugin/
     ESLintPlugin: require('eslint-webpack-plugin'),
