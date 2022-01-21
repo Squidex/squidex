@@ -53,20 +53,3 @@ export class ApiUrlConfig {
         return this.value + path;
     }
 }
-
-export class CurrencyConfig {
-    constructor(
-        public readonly code: string,
-        public readonly symbol: string,
-        public readonly showAfter: boolean = true,
-    ) {
-    }
-}
-
-export class DecimalSeparatorConfig {
-    constructor(public readonly value: string) {}
-}
-
-export class ProductionModeConfig {
-    constructor(public readonly isProductionMode: boolean) {}
-}
