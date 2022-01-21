@@ -120,6 +120,16 @@ spec:
                 secretKeyRef:
                   name: squidex
                   key: google_auth_secret
+            - name: FASTLY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: squidex
+                  key: fastly_api_key
+            - name: FASTLY_SERVICE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: squidex
+                  key: fastly_service_id
             # Specifically Blanking out to deactive these options
             - name: IDENTITY__GITHUBCLIENT
               value: ""
