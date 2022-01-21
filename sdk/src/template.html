@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title><% preact.title %></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+		<% preact.headEnd %>
+
+		<style>
+			.element {
+				border: 2px dashed red;
+				border-radius: 0;
+				box-sizing: border-box;
+				padding: 20px;
+				position: fixed;
+				text-align: center;
+				text-decoration: none;
+				width: 200px;
+			}
+
+			.element-left {
+				left: -100px;
+			}
+
+			.element-right {
+				right: -100px;
+			}
+
+			.element-top {
+				top: -30px;
+			}
+
+			.element-bottom {
+				bottom: -30px;
+			}
+			
+			.element-left,
+			.element-center,
+			.element-right {
+				top: 50%;
+				margin-top: -30px;
+			}
+			
+			.element-top,
+			.element-center,
+			.element-bottom {
+				left: 50%;
+				margin-left: -100px;
+			}
+		</style>
+	</head>
+	<body>
+		<% preact.bodyEnd %>
+
+		<div class="element element-top" squidex-token="ewogICJ1cmwiOiAiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsCiAgImFwcCI6ICJteS1hcHAiLAogICJzY2hlbWEiOiAibXktc2NoZW1hIiwKICAiaWQiOiAiMTIzIgp9">
+			Top Aligned
+		</div>
+
+		<div class="element element-right" squidex-token="ewogICJ1cmwiOiAiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsCiAgImFwcCI6ICJteS1hcHAiLAogICJzY2hlbWEiOiAibXktc2NoZW1hIiwKICAiaWQiOiAiMTIzIgp9">
+			Right Aligned
+		</div>
+
+		<div class="element element-bottom" squidex-token="ewogICJ1cmwiOiAiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsCiAgImFwcCI6ICJteS1hcHAiLAogICJzY2hlbWEiOiAibXktc2NoZW1hIiwKICAiaWQiOiAiMTIzIgp9" style="width: 2">
+			Bottom Aligned
+		</div>
+
+		<div class="element element-left" squidex-token="ewogICJ1cmwiOiAiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsCiAgImFwcCI6ICJteS1hcHAiLAogICJzY2hlbWEiOiAibXktc2NoZW1hIiwKICAiaWQiOiAiMTIzIgp9" style="width: 2">
+			Left Aligned
+		</div>
+
+		<div class="element element-center" squidex-token="ewogICJ1cmwiOiAiaHR0cHM6Ly9sb2NhbGhvc3Q6NTAwMSIsCiAgImFwcCI6ICJteS1hcHAiLAogICJzY2hlbWEiOiAibXktc2NoZW1hIiwKICAiaWQiOiAiMTIzIgp9" style="width: 2">
+			Center
+		</div>
+	</body>
+</html>
