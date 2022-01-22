@@ -37,7 +37,7 @@ namespace Squidex.Areas.Frontend
 
             app.UseMiddleware<NotifoMiddleware>();
 
-            app.UseWhen(x => !Path.IsPathRooted(x.Request.Path), builder =>
+            app.UseWhen(x => !Path.HasExtension(x.Request.Path), builder =>
             {
                 builder.UseMiddleware<SetupMiddleware>();
             });
