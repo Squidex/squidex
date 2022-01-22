@@ -39,6 +39,9 @@ interface Snapshot extends ListState<Query> {
     // The folder path.
     path: ReadonlyArray<AssetPathItem>;
 
+    // The ref asset.
+    ref?: string | null;
+
     // The parent folder.
     parentId: string;
 
@@ -395,7 +398,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     private searchInternal(query?: Query | null, tags?: TagsSelected) {
-        const update: Partial<Snapshot> = { page: 0 };
+        const update: Partial<Snapshot> = { page: 0, ref: null };
 
         if (query !== null) {
             update.query = query;
@@ -459,6 +462,7 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
 
 function createQuery(snapshot: Snapshot) {
     const {
+        ref,
         page,
         pageSize,
         query,
@@ -470,7 +474,9 @@ function createQuery(snapshot: Snapshot) {
 
     const tags = Object.keys(tagsSelected);
 
-    if (Types.isString(query?.fullText) || tags.length > 0) {
+    if (Types.isString(ref)) {
+        result.ref = ref;
+    } else if (Types.isString(query?.fullText) || tags.length > 0) {
         if (query) {
             result.query = query;
         }

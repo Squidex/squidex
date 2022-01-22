@@ -4,12 +4,19 @@ import { IFrame } from './iframe';
 import { Overlay } from './Overlay';
 import { TokenInfo } from './shared';
 
-export const OverlayContainer = () => {
+export interface OverlayContainerProps {
+    // The base url of the script.
+    baseUrl: string | null | undefined;
+}
+
+type AuthState = 'Authenticated' | 'Failed' | 'Pending';
+
+export const OverlayContainer = (props: OverlayContainerProps) => {
     const div = useRef<any>();
-    const [auth, setAuth] = useState<{ [url: string]: Boolean }>({});
+    const [auth, setAuth] = useState<{ [url: string]: AuthState }>({});
     const [target, setTarget] = useState<{ target: HTMLElement, token: TokenInfo}>();
     const [targetUrl, setTargetUrl] = useState<string>();
-    const [uniqueUrls, setUniqueUrls] = useState<{ [url: string]: string }>({});
+    const authRef = useRef(auth);
     
     useEffect(() => {
         let previous: any;
@@ -20,7 +27,7 @@ export const OverlayContainer = () => {
 
             if (target && target !== previous) {
                 try {
-                    const token = parseToken(target);
+                    const token = parseToken(target, Object.keys(authRef.current));
     
                     if (token) {
                         previousTarget = target;
@@ -45,42 +52,65 @@ export const OverlayContainer = () => {
         }
     }, []);
 
-    useEffect(() => {
-        const url = target?.token.u;
-
+    const checkAuth = useCallback((url: string | null | undefined) => {
         if (!url) {
             return;
         }
 
-        if (url.indexOf('http://') >= 0) {
-            setAuth(auth => ({ ...auth, [url]: true }));
+        if (authRef.current[url]) {
             return;
         }
 
-        setUniqueUrls(urls => {
-            if (urls[url]) {
-                return urls;
-            } else {
-                const image = `${url}/identity-server/status.png`;
+        const setStatus = (state: AuthState) => {
+            const newAuth = {
+                ...authRef.current,
+                [url]: state
+            };
 
-                return { ...uniqueUrls, [url]: image };
+            authRef.current = newAuth;
+
+            setAuth(newAuth);
+        };
+
+        if (url.indexOf('http://') === 0) {
+            setStatus('Authenticated');
+            return;
+        }
+
+        const fetchStatus = async () => {
+            setStatus('Pending');
+
+            try {
+                const response = await fetch(`${url}/identity-server/info`, {
+                    credentials: 'include'
+                });
+
+                const json = await response.json();
+
+                setStatus(json.displayName ? 'Authenticated' : 'Failed');
+            } catch {
+                setStatus('Failed');
             }
-        });
-    }, [target?.token.u]);
+        };
 
-    const doAuth = useCallback((url: string, status: boolean) => {
-        setAuth(auth => ({ ...auth, [url]: status }));
-    }, []);
+        fetchStatus();
+    }, [auth]);
+
+    useEffect(() => {
+        checkAuth(props.baseUrl);
+    }, [props.baseUrl]);
+
+    useEffect(() => {
+        checkAuth(target?.token.u);
+    }, [target?.token.u]);
+    
+    const isAuthenticated = auth[target?.token.u!] === 'Authenticated'
 
     return (
         <div class='squidex' ref={div}>
-            {target && auth[target.token.u!] === true &&
+            {target && isAuthenticated &&
                 <Overlay onOpen={setTargetUrl} {...target} />
             }
-
-            {Object.entries(uniqueUrls).map(([u, img]) => 
-                <img width={0} height={0} key={img} src={img} onLoad={() => doAuth(u, true)} onError={() => doAuth(u, false)} />    
-            )}
 
             {targetUrl &&
                 <IFrame url={targetUrl} onClose={() => setTargetUrl(undefined)} />
@@ -89,8 +119,47 @@ export const OverlayContainer = () => {
     );
 }
 
-function parseToken(target: HTMLElement): TokenInfo | null {
+const CDN_URL = 'https://assets.squidex.io';
+
+function parseToken(target: HTMLElement, baseUrls: string[]): TokenInfo | null {
     const value = target.getAttribute('squidex-token');
+
+    if (!value && target.nodeName === 'IMG') {
+        const src = (target as any)['src'] as string;
+
+        if (src) {
+            for (const baseUrl of baseUrls) {
+                if (src.indexOf(baseUrl) === 0) {
+                    const parts = src.substring(baseUrl.length + 1).split('/');
+
+                    if (parts[0] === 'api' &&
+                        parts[1] === 'assets' &&
+                        parts[2]?.length > 0 &&
+                        parts[3]?.length > 0) {
+                        return {
+                            u: baseUrl,
+                            a: parts[2],
+                            i: parts[3]
+                        };
+                    }
+                }
+            }
+
+            if (src.indexOf(CDN_URL) === 0) {
+                const parts = src.substring(CDN_URL.length + 1).split('/');
+
+                if (parts[0]?.length > 0 &&
+                    parts[1]?.length > 0) {
+                    return {
+                        u: CDN_URL,
+                        a: parts[0],
+                        i: parts[1]
+                    };
+                }
+
+            }
+        }
+    }
 
     if (!value) {
         return null;

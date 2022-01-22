@@ -80,7 +80,7 @@ export const Overlay = (props: OverlayProps) => {
         if (s) {
             return `${u}/app/${a}/content/${s}/${i}`;
         } else {
-            return `${u}/app/${a}/assets/${s}/${i}`;
+            return `${u}/app/${a}/assets/?ref=${i}`;
         }
     }, [token]);
 
@@ -90,7 +90,7 @@ export const Overlay = (props: OverlayProps) => {
         if (s) {
             return `${u}/embed/app/${a}/content/${s}/${i}`;
         } else {
-            return `${u}/embed/app/${a}/assets/${s}/${i}`;
+            return `${u}/embed/app/${a}/assets/?ref=${i}`;
         }
     }, [token]);
 

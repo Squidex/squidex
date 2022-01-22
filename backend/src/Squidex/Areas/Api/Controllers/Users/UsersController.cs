@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// 200 => User resources returned.
         /// </returns>
         [HttpGet]
-        [Route("/")]
+        [Route("")]
         [ProducesResponseType(typeof(ResourcesDto), StatusCodes.Status200OK)]
         [ApiPermission]
         public IActionResult GetUserResources()

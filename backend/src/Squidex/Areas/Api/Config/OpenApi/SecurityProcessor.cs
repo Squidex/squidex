@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 Type = OpenApiSecuritySchemeType.OAuth2
             };
 
-            var tokenUrl = urlGenerator.BuildUrl($"{Constants.PrefixIdentityServer}/connect/token", false);
+            var tokenUrl = urlGenerator.BuildUrl($"/{Constants.PrefixIdentityServer}/connect/token", false);
 
             security.TokenUrl = tokenUrl;
 

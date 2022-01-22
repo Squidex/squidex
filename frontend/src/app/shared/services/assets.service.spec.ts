@@ -219,6 +219,24 @@ describe('AssetsService', () => {
             req.flush({ total: 10, items: [] });
         }));
 
+        it('should make post request to get assets by ref',
+            inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+                const value = '1', op = 'eq';
+    
+                assetsService.getAssets('my-app', { ref: value }).subscribe();
+    
+                const expectedQuery = { filter: { or: [{ path: 'id', op, value }, { path: 'slug', op, value }] }, take: 1 };
+    
+                const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/query');
+    
+                expect(req.request.method).toEqual('POST');
+                expect(req.request.headers.get('If-Match')).toBeNull();
+                expect(req.request.headers.get('X-NoTotal')).toEqual('1');
+                expect(req.request.body).toEqual({ q: sanitize(expectedQuery) });
+    
+                req.flush({ total: 10, items: [] });
+            }));
+
     it('should make post request to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let asset: AssetDto;

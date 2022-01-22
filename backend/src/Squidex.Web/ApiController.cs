@@ -6,19 +6,20 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Web;
 
 namespace Squidex.Web
 {
-    [Area("Api")]
+    [Area("api")]
     [ApiController]
     [ApiExceptionFilter]
     [ApiModelValidation(false)]
+    [Route(Constants.PrefixApi)]
     public abstract class ApiController : Controller
     {
         private readonly Lazy<Resources> resources;
@@ -75,16 +76,6 @@ namespace Squidex.Web
             CommandBus = commandBus;
 
             resources = new Lazy<Resources>(() => new Resources(this));
-        }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            var request = context.HttpContext.Request;
-
-            if (!request.PathBase.HasValue || request.PathBase.Value?.EndsWith("/api", StringComparison.OrdinalIgnoreCase) != true)
-            {
-                context.Result = new RedirectResult("/");
-            }
         }
     }
 }

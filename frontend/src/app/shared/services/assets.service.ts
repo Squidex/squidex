@@ -161,13 +161,16 @@ export type MoveAssetItemDto =
     Readonly<{ parentId?: string }>;
 
 export type AssetsQuery =
-    Readonly<{ noTotal?: boolean; parentId?: string }>;
+    Readonly<{ noTotal?: boolean }>;
+
+export type AssetsByRef =
+    Readonly<{ ref: string }>;
 
 export type AssetsByIds =
-    Readonly<{ ids: ReadonlyArray<string> }> & AssetsQuery;
+    Readonly<{ ids: ReadonlyArray<string> }>;
 
 export type AssetsByQuery =
-    Readonly<{ query?: Query; skip?: number; tags?: Tags; take?: number; noTotal?: boolean }> & AssetsQuery;
+    Readonly<{ query?: Query; skip?: number; tags?: Tags; take?: number; parentId?: string }>;
 
 type AssetsResponse =
     Readonly<{ total: number; items: any[]; folders: any[] } & Resource>;
@@ -198,14 +201,14 @@ export class AssetsService {
             pretifyError('i18n:assets.loadTagsFailed'));
     }
 
-    public getAssets(appName: string, q?: AssetsByQuery | AssetsByIds): Observable<AssetsDto> {
+    public getAssets(appName: string, q?: AssetsQuery & (AssetsByQuery | AssetsByIds | AssetsByRef)): Observable<AssetsDto> {
         const body = buildQuery(q as any);
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/query`);
 
         let options = {};
 
-        if (q?.noTotal) {
+        if (q?.noTotal || q?.['ref']) {
             options = {
                 headers: {
                     'X-NoTotal': '1',
@@ -393,8 +396,8 @@ export class AssetsService {
     }
 }
 
-function buildQuery(q?: AssetsByQuery & AssetsByIds) {
-    const { ids, parentId, query, skip, tags, take } = q || {};
+function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef) {
+    const { ids, parentId, query, ref, skip, tags, take } = q || {};
 
     const body: any = {};
 
@@ -402,7 +405,24 @@ function buildQuery(q?: AssetsByQuery & AssetsByIds) {
         body.parentId = parentId;
     }
 
-    if (Types.isArray(ids)) {
+    if (ref) {
+        const queryObj: Query = {
+            filter: {
+                or: [{
+                    path: 'id',
+                    op: 'eq',
+                    value: ref,
+                }, {
+                    path: 'slug',
+                    op: 'eq',
+                    value: ref,
+                }],
+            },
+            take: 1,
+        };
+
+        body.q = sanitize(queryObj);
+    } else if (Types.isArray(ids)) {
         body.ids = ids;
     } else {
         const queryObj: Query = {};

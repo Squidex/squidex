@@ -16,7 +16,7 @@ namespace Squidex.Areas.Frontend
 {
     public static class Startup
     {
-        public static void ConfigureFrontend(this IApplicationBuilder app)
+        public static void UseFrontend(this IApplicationBuilder app)
         {
             var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
@@ -37,6 +37,11 @@ namespace Squidex.Areas.Frontend
 
             app.UseMiddleware<NotifoMiddleware>();
 
+            app.UseWhen(x => !Path.IsPathRooted(x.Request.Path), builder =>
+            {
+                builder.UseMiddleware<SetupMiddleware>();
+            });
+
             app.UseHtmlTransform(new HtmlTransformOptions
             {
                 Transform = (html, context) =>
@@ -50,27 +55,19 @@ namespace Squidex.Areas.Frontend
                 }
             });
 
-            app.UseSquidexStaticFile(fileProvider);
+            app.UseSquidexStaticFiles(fileProvider);
 
+            // Try static files again and serve index.html.
             if (environment.IsProduction())
             {
                 app.Use((context, next) =>
                 {
-                    if (context.Response.StatusCode == 404)
-                    {
-                        context.Request.Path = new PathString("/index.html");
-                    }
-
+                    context.Request.Path = new PathString("/index.html");
                     return next();
                 });
+
+                app.UseSquidexStaticFiles(fileProvider);
             }
-
-            app.UseSquidexStaticFile(fileProvider);
-
-            app.UseWhen(x => x.Response.StatusCode == 404, builder =>
-            {
-                builder.UseMiddleware<SetupMiddleware>();
-            });
 
             if (environment.IsDevelopment())
             {
@@ -88,7 +85,7 @@ namespace Squidex.Areas.Frontend
             }
         }
 
-        private static void UseSquidexStaticFile(this IApplicationBuilder app, IFileProvider fileProvider)
+        private static void UseSquidexStaticFiles(this IApplicationBuilder app, IFileProvider fileProvider)
         {
             app.UseStaticFiles(new StaticFileOptions
             {

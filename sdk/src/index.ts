@@ -1,33 +1,37 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
 import './style/index.scss';
 import { renderOverlay } from './render';
+import { getBaseUrl } from './utils';
 
-function init(script: HTMLOrSVGScriptElement | null) {
-    renderOverlay();
-    renderStyles(script);
+const baseUrl = getBaseUrl();
+
+function init() {
+    renderOverlay(baseUrl);
+    renderStyles();
 }
 
-function renderStyles(script: HTMLOrSVGScriptElement | null) {
-    const src = (script as any)?.['src'] as string;
-
-    if (!src) {
+function renderStyles() {
+    if (baseUrl) {
         return;
     }
-
-    const url = src.substring(0, src.lastIndexOf('/')) + '/' + 'embed-sdk.css';
 
     const styleElement = document.createElement('link');
 
     styleElement.rel = 'stylesheet';
-    styleElement.href = url;
+    styleElement.href = `${baseUrl}/scripts/embed-sdk.css`;
     styleElement.type = 'text/css';
 
     document.head?.appendChild(styleElement);
 }
 
-let script = document.currentScript;
-
 if (document.readyState === 'complete') {
-    init(script);
+    init();
 } else {
-    window.addEventListener('load', () => init(script));
+    window.addEventListener('load', () => init());
 }

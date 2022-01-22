@@ -12,22 +12,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.Info
 {
     public sealed class InfoController : IdentityServerController
     {
-        [Route("/status.png")]
+        [Route("info")]
         [HttpGet]
         public IActionResult Info()
         {
             var displayName = User.Claims.DisplayName();
 
-            if (!string.IsNullOrWhiteSpace(displayName))
-            {
-                var stream = typeof(InfoController).Assembly.GetManifestResourceStream("Squidex.Areas.IdentityServer.Controllers.Info.TrackingPixel.png")!;
-
-                return File(stream, "image/png");
-            }
-            else
-            {
-                return NotFound();
-            }
+            return Ok(new { displayName });
         }
     }
 }

@@ -115,7 +115,7 @@ describe('AssetsState', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noTotal: true }))
                 .returns(() => of(new AssetsDto(200, []))).verifiable();
 
-                assetsState.load().subscribe();
+            assetsState.load().subscribe();
             assetsState.page({ page: 1, pageSize: 30 }).subscribe();
 
             expect().nothing();
@@ -164,6 +164,19 @@ describe('AssetsState', () => {
             assetsState.search(query).subscribe();
 
             expect(assetsState.snapshot.query).toEqual(query);
+        });
+
+        it('should unset ref when searching', () => {
+            const query = { fullText: 'my-query' };
+
+            assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query }))
+                .returns(() => of(new AssetsDto(0, []))).verifiable();
+
+            assetsState.next({ ref: '1' });
+            assetsState.search(query).subscribe();
+
+            expect(assetsState.snapshot.query).toEqual(query);
+            expect(assetsState.snapshot.ref).toBeNull(null);
         });
     });
 

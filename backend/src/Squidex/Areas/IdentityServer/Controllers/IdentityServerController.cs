@@ -7,27 +7,18 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Hosting;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers
 {
     [Area("IdentityServer")]
+    [Route(Constants.PrefixIdentityServer)]
     public abstract class IdentityServerController : Controller
     {
         public SignInManager<IdentityUser> SignInManager
         {
             get => HttpContext.RequestServices.GetRequiredService<SignInManager<IdentityUser>>();
-        }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            var request = context.HttpContext.Request;
-
-            if (!request.PathBase.HasValue || request.PathBase.Value?.EndsWith("/identity-server", StringComparison.OrdinalIgnoreCase) != true)
-            {
-                context.Result = new NotFoundResult();
-            }
         }
 
         protected IActionResult RedirectToReturnUrl(string? returnUrl)

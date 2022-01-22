@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (context.UserPermissions.Allows(Permissions.AppAssetsRead, context.App.Name))
             {
-                var filter = ClrFilter.Contains("fileName", query);
+                var filter = ClrFilter.Eq("fileName", query);
 
                 var clrQuery = new ClrQuery { Filter = filter, Take = 5 };
 
@@ -40,10 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 if (assets.Count > 0)
                 {
-                    var url = urlGenerator.AssetsUI(context.App.NamedId(), query);
-
                     foreach (var asset in assets)
                     {
+                        var url = urlGenerator.AssetsUI(context.App.NamedId(), asset.Id.ToString());
+
                         result.Add(asset.FileName, SearchResultType.Asset, url);
                     }
                 }
