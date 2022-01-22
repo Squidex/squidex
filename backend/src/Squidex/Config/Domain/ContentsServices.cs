@@ -55,6 +55,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ConvertData>()
                 .As<IContentEnricherStep>();
 
+            services.AddSingletonAs<CalculateTokens>()
+                .As<IContentEnricherStep>();
+
             services.AddSingletonAs<EnrichForCaching>()
                 .As<IContentEnricherStep>();
 

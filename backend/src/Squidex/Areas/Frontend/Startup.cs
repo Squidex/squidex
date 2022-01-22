@@ -22,20 +22,12 @@ namespace Squidex.Areas.Frontend
 
             var fileProvider = environment.WebRootFileProvider;
 
+            app.UseMiddleware<EmbedMiddleware>();
+
             if (environment.IsProduction())
             {
                 fileProvider = new CompositeFileProvider(fileProvider,
                     new PhysicalFileProvider(Path.Combine(environment.WebRootPath, "build")));
-
-                app.Use((context, next) =>
-                {
-                    if (!Path.HasExtension(context.Request.Path.Value))
-                    {
-                        context.Request.Path = new PathString("/index.html");
-                    }
-
-                    return next();
-                });
             }
 
             app.Map("/squid.svg", builder =>
@@ -45,16 +37,11 @@ namespace Squidex.Areas.Frontend
 
             app.UseMiddleware<NotifoMiddleware>();
 
-            app.UseWhen(x => x.IsIndex(), builder =>
-            {
-                builder.UseMiddleware<SetupMiddleware>();
-            });
-
             app.UseHtmlTransform(new HtmlTransformOptions
             {
                 Transform = (html, context) =>
                 {
-                    if (context.IsIndex())
+                    if (context.Request.Path.StartsWithSegments("/index.html", StringComparison.Ordinal) || context.Items.ContainsKey("spa"))
                     {
                         html = html.AddOptions(context);
                     }
@@ -63,6 +50,46 @@ namespace Squidex.Areas.Frontend
                 }
             });
 
+            app.UseSquidexStaticFile(fileProvider);
+
+            if (environment.IsProduction())
+            {
+                app.Use((context, next) =>
+                {
+                    if (context.Response.StatusCode == 404)
+                    {
+                        context.Request.Path = new PathString("/index.html");
+                    }
+
+                    return next();
+                });
+            }
+
+            app.UseSquidexStaticFile(fileProvider);
+
+            app.UseWhen(x => x.Response.StatusCode == 404, builder =>
+            {
+                builder.UseMiddleware<SetupMiddleware>();
+            });
+
+            if (environment.IsDevelopment())
+            {
+                app.Use((context, next) =>
+                {
+                    context.Items["spa"] = true;
+
+                    return next();
+                });
+
+                app.UseSpa(builder =>
+                {
+                    builder.UseProxyToSpaDevelopmentServer("https://localhost:3000");
+                });
+            }
+        }
+
+        private static void UseSquidexStaticFile(this IApplicationBuilder app, IFileProvider fileProvider)
+        {
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = context =>
@@ -80,14 +107,6 @@ namespace Squidex.Areas.Frontend
                 },
                 FileProvider = fileProvider
             });
-
-            if (environment.IsDevelopment())
-            {
-                app.UseSpa(builder =>
-                {
-                    builder.UseProxyToSpaDevelopmentServer("https://localhost:3000");
-                });
-            }
         }
     }
 }

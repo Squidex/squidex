@@ -24,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         string SchemaDisplayName { get; }
 
+        string? UIToken { get; }
+
         RootField[]? ReferenceFields { get; }
 
         StatusInfo[]? NextStatuses { get; }

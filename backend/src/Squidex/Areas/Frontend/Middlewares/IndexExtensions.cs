@@ -7,7 +7,6 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.Net;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -28,7 +27,9 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public static bool IsIndex(this HttpContext context)
         {
-            return context.Request.Path.StartsWithSegments("/index.html", StringComparison.OrdinalIgnoreCase);
+            string? path = context.Request.Path;
+
+            return string.IsNullOrEmpty(path) || path.StartsWith("/index.html", StringComparison.OrdinalIgnoreCase) || path == "/";
         }
 
         public static string AddOptions(this string html, HttpContext httpContext)
@@ -58,6 +59,16 @@ namespace Squidex.Areas.Frontend.Middlewares
                 {
                     json["more"] ??= new JObject();
                     json["more"]!["notifoApi"] = notifo.Value.ApiUrl;
+                }
+
+                var options = httpContext.Features.Get<OptionsFeature>();
+
+                if (options != null)
+                {
+                    foreach (var (key, value) in options.Options)
+                    {
+                        json[key] = JToken.FromObject(value);
+                    }
                 }
 
                 uiOptions.More["culture"] = CultureInfo.CurrentUICulture.Name;

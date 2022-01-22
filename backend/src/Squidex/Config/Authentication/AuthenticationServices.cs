@@ -29,6 +29,7 @@ namespace Squidex.Config.Authentication
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = ".sq.auth";
+                options.Cookie.SameSite = SameSiteMode.None;
             });
 
             return builder.AddCookie();

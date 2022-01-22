@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Areas.Frontend.Middlewares
 {
-    public interface IEnrichedAssetEntity : IAssetEntity
+    public sealed class OptionsFeature
     {
-        HashSet<string> TagNames { get; }
-
-        string MetadataText { get; }
-
-        string? UIToken { get; set; }
+        public Dictionary<string, object> Options { get; } = new Dictionary<string, object>();
     }
 }

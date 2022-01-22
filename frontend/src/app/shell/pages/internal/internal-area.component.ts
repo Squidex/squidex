@@ -7,7 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { DialogService, LoadingService, Notification, ResourceOwner } from '@app/shared';
+import { DialogService, LoadingService, Notification, ResourceOwner, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-internal-area',
@@ -15,12 +15,16 @@ import { DialogService, LoadingService, Notification, ResourceOwner } from '@app
     templateUrl: './internal-area.component.html',
 })
 export class InternalAreaComponent extends ResourceOwner implements OnInit {
-    constructor(
+    public isEmbedded = false;
+
+    constructor(uiOptions: UIOptions,
         public readonly loadingService: LoadingService,
         private readonly dialogs: DialogService,
         private readonly route: ActivatedRoute,
     ) {
         super();
+
+        this.isEmbedded = !!uiOptions.get('embedded');
     }
 
     public ngOnInit() {

@@ -119,6 +119,11 @@ namespace Squidex.Web.Services
             return urlGenerator.BuildUrl($"app/{appId.Name}/settings/roles", false);
         }
 
+        public string Root()
+        {
+            return urlGenerator.BuildUrl();
+        }
+
         public string RulesUI(NamedId<DomainId> appId)
         {
             return urlGenerator.BuildUrl($"app/{appId.Name}/rules", false);

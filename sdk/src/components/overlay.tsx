@@ -1,29 +1,16 @@
 import { h } from 'preact';
 import { useEffect, useState, useMemo, useRef, useLayoutEffect } from 'preact/hooks';
+import { TokenInfo } from './shared';
 
 export interface OverlayProps {
     // The target element ot attach to.
     target: HTMLElement;
 
     // The token string.
-    token: string;
+    token: TokenInfo;
 
     // When opened.
     onOpen: (url: string) => void;
-}
-
-export interface TokenInfo {
-    // The content or asset id.
-    id: string;
-
-    // The app name.
-    app: string;
-
-    // The schema name.
-    schema?: string;
-
-    // The base url.
-    url: string;
 }
 
 const PADDING = 4;
@@ -87,37 +74,25 @@ export const Overlay = (props: OverlayProps) => {
         }
     }, [render]);
 
-    const tokenDetails = useMemo(() => {
-        try {
-            const decoded = atob(token);
+    const externalUrl = useMemo(() => {
+        let { a, i, s, u } = token;
 
-            return JSON.parse(decoded) as TokenInfo;
-        } catch {
-            return null;
+        if (s) {
+            return `${u}/app/${a}/content/${s}/${i}`;
+        } else {
+            return `${u}/app/${a}/assets/${s}/${i}`;
         }
     }, [token]);
 
-    const url = useMemo(() => {
-        if (!tokenDetails) {
-            return null;
+    const embedUrl = useMemo(() => {
+        let { a, i, s, u } = token;
+
+        if (s) {
+            return `${u}/embed/app/${a}/content/${s}/${i}`;
         } else {
-            let { app, id, schema, url } = tokenDetails;
-
-            while (url.endsWith('/')) {
-                url = url.substring(0, url.substring.length - 1);
-            }
-
-            if (schema) {
-                return `${url}/app/${app}/content/${schema}/${id}`;
-            } else {
-                return `${url}/app/${app}/assets/${schema}/${id}`;
-            }
+            return `${u}/embed/app/${a}/assets/${s}/${i}`;
         }
-    }, [tokenDetails]);
-
-    if (!url) {
-        return null;
-    }
+    }, [token]);
 
     const x = (targetRect.current?.x || 0) - PADDING;
     const y = (targetRect.current?.y || 0) - PADDING;
@@ -135,7 +110,7 @@ export const Overlay = (props: OverlayProps) => {
         linkY = y + overlayHeight;
     }
 
-    if (linkX + linksWidth > window.innerHeight) {
+    if (linkY + linksHeight > window.innerHeight) {
         linkX = window.innerHeight - linksHeight;
     }
 
@@ -147,13 +122,11 @@ export const Overlay = (props: OverlayProps) => {
         linkX = window.innerWidth - linksWidth;
     }
 
-    // const embedUrl = `${url}?embed=true`;
-    const embedUrl = 'https://squidex.io';
     return (
         <div class='squidex-overlay' style={{ left: x, top: y, width: overlayWidth, height: overlayHeight }}>
             <div class='squidex-overlay-toolbar' style={{ left: linkX, top: linkY }} ref={linksRef as any}>
                 <div class='squidex-overlay-schema'>
-                    {tokenDetails?.schema || 'Asset'}
+                    {token?.s || 'Asset'}
                 </div>
 
                 <div class='squidex-overlay-links'>
@@ -161,7 +134,7 @@ export const Overlay = (props: OverlayProps) => {
                         Edit Inline
                     </a>
 
-                    <a href={url!} target='_blank'>
+                    <a href={externalUrl!} target='_blank'>
                         Edit In Squidex
                     </a>
                 </div>

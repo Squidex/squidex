@@ -95,6 +95,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             throw new NotSupportedException();
         }
 
+        public string Root()
+        {
+            throw new NotSupportedException();
+        }
+
         public string RulesUI(NamedId<DomainId> appId)
         {
             throw new NotSupportedException();

@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System.Text;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
@@ -18,12 +20,17 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         private readonly ITagService tagService;
         private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
         private readonly IRequestCache requestCache;
+        private readonly IUrlGenerator urlGenerator;
+        private readonly IJsonSerializer jsonSerializer;
 
-        public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources, IRequestCache requestCache)
+        public AssetEnricher(ITagService tagService, IEnumerable<IAssetMetadataSource> assetMetadataSources, IRequestCache requestCache,
+            IUrlGenerator urlGenerator, IJsonSerializer jsonSerializer)
         {
             this.tagService = tagService;
             this.assetMetadataSources = assetMetadataSources;
             this.requestCache = requestCache;
+            this.urlGenerator = urlGenerator;
+            this.jsonSerializer = jsonSerializer;
         }
 
         public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context,
@@ -57,9 +64,33 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                     await EnrichTagsAsync(results, ct);
 
                     EnrichWithMetadataText(results);
+
+                    if (!context.IsFrontendClient)
+                    {
+                        ComputeTokens(results);
+                    }
                 }
 
                 return results;
+            }
+        }
+
+        private void ComputeTokens(IEnumerable<IEnrichedAssetEntity> assets)
+        {
+            var url = urlGenerator.Root();
+
+            foreach (var asset in assets)
+            {
+                var token = new
+                {
+                    a = asset.AppId.Name,
+                    i = asset.Id.ToString(),
+                    u = url
+                };
+
+                var json = jsonSerializer.Serialize(token);
+
+                asset.UIToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
             }
         }
 

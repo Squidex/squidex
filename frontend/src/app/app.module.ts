@@ -8,7 +8,7 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 
-import { CommonModule } from '@angular/common';
+import { APP_BASE_HREF, CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ApplicationRef, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -21,7 +21,9 @@ import { routing } from './app.routes';
 import { ApiUrlConfig, CurrencyConfig, DateHelper, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
-DateHelper.setlocale(window['options']?.more?.culture);
+const options = window['options'] || {};
+
+DateHelper.setlocale(options.more?.culture);
 
 function configApiUrl() {
     const baseElements = document.getElementsByTagName('base');
@@ -44,7 +46,7 @@ function configApiUrl() {
 }
 
 function configUIOptions() {
-    return new UIOptions(window['options']);
+    return new UIOptions(options);
 }
 
 function configTitles() {
@@ -94,6 +96,7 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
         { provide: RouteReuseStrategy, useClass: AppRouteReuseStrategy },
         { provide: TitlesConfig, useFactory: configTitles },
         { provide: UIOptions, useFactory: configUIOptions },
+        { provide: APP_BASE_HREF, useValue: options.embedPath || '/' },
     ],
     entryComponents: [AppComponent],
 })

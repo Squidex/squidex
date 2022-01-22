@@ -80,7 +80,7 @@
     <PackageReference Include="Squidex.Assets.S3" Version="2.6.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="7.7.0" />
-    <PackageReference Include="Squidex.Hosting" Version="2.8.0" />
+    <PackageReference Include="Squidex.Hosting" Version="2.11.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
@@ -103,6 +103,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
+    <EmbeddedResource Include="Areas\IdentityServer\Controllers\Info\TrackingPixel.png" />
     <EmbeddedResource Include="Pipeline\Squid\icon-happy-sm.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-happy.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-sad-sm.svg" />
@@ -116,6 +117,7 @@
 
   <ItemGroup>
     <None Remove="Areas\Api\Controllers\Users\Assets\Avatar.png" />
+    <None Remove="Areas\IdentityServer\Controllers\Info\TrackingPixel.png" />
     <None Remove="Pipeline\Squid\icon-happy-sm.svg" />
     <None Remove="Pipeline\Squid\icon-happy.svg" />
     <None Remove="Pipeline\Squid\icon-sad-sm.svg" />

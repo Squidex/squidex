@@ -9,7 +9,7 @@ import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppsState, getCategoryTree, LocalStoreService, SchemaCategory, SchemasState, Settings, value$ } from '@app/shared';
+import { AppsState, getCategoryTree, LocalStoreService, SchemaCategory, SchemasState, Settings, UIOptions, value$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -18,6 +18,8 @@ import { AppsState, getCategoryTree, LocalStoreService, SchemaCategory, SchemasS
 })
 export class SchemasPageComponent {
     public schemasFilter = new FormControl();
+
+    public isEmbedded = false;
 
     public schemas =
         this.schemasState.schemas.pipe(
@@ -47,12 +49,13 @@ export class SchemasPageComponent {
         return this.isCollapsed ? '4rem' : '16rem';
     }
 
-    constructor(
+    constructor(uiOptions: UIOptions,
         public readonly schemasState: SchemasState,
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
     ) {
         this.isCollapsed = localStore.getBoolean(Settings.Local.SCHEMAS_COLLAPSED);
+        this.isEmbedded = uiOptions.get('embedded');
     }
 
     public toggle() {

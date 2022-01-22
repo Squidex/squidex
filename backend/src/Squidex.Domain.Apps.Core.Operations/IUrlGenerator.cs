@@ -54,6 +54,8 @@ namespace Squidex.Domain.Apps.Core
 
         string WorkflowsUI(NamedId<DomainId> appId);
 
+        string Root();
+
         string UI();
     }
 }
