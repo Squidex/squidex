@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
             return $"contents/{schemaId.Name}/{contentId}";
         }
 
-        public string AssetsUI(NamedId<DomainId> appId, string? ref = null)
+        public string AssetsUI(NamedId<DomainId> appId, string? @ref = null)
         {
             throw new NotSupportedException();
         }

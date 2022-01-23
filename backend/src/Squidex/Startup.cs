@@ -34,7 +34,6 @@ namespace Squidex
             services.AddHttpClient();
             services.AddMemoryCache();
             services.AddHealthChecks();
-            services.AddNonBreakingSameSiteCookies();
             services.AddDefaultWebServices(config);
             services.AddDefaultForwardRules();
 
