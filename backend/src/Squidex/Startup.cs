@@ -85,7 +85,10 @@ namespace Squidex
             app.UseSquidexLocalization();
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
-            app.UseOpenApi();
+            app.UseOpenApi(options =>
+            {
+                options.Path = "/api/swagger/v1/swagger.json";
+            });
 
             app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase), builder =>
             {

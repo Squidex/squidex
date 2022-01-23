@@ -37,47 +37,39 @@ namespace Squidex.Areas.Frontend
 
             app.UseMiddleware<NotifoMiddleware>();
 
-            app.UseWhen(x => !Path.HasExtension(x.Request.Path), builder =>
+            app.UseWhen(c => c.IsSpaFile(), builder =>
             {
                 builder.UseMiddleware<SetupMiddleware>();
             });
 
-            app.UseHtmlTransform(new HtmlTransformOptions
+            app.UseWhen(c => c.IsHtmlPath(), builder =>
             {
-                Transform = (html, context) =>
+                // Adjust the base for all potential html files.
+                builder.UseHtmlTransform(new HtmlTransformOptions
                 {
-                    if (context.Request.Path.StartsWithSegments("/index.html", StringComparison.Ordinal) || context.Items.ContainsKey("spa"))
+                    Transform = (html, context) =>
                     {
-                        html = html.AddOptions(context);
-                    }
+                        if (context.IsIndex())
+                        {
+                            html = html.AddOptions(context);
+                        }
 
-                    return new ValueTask<string>(html);
-                }
+                        return new ValueTask<string>(html);
+                    }
+                });
             });
 
             app.UseSquidexStaticFiles(fileProvider);
 
-            // Try static files again and serve index.html.
             if (environment.IsProduction())
             {
-                app.Use((context, next) =>
-                {
-                    context.Request.Path = new PathString("/index.html");
-                    return next();
-                });
-
+                // Try static files again to serve index.html.
+                app.UsePathOverride("/index.html");
                 app.UseSquidexStaticFiles(fileProvider);
             }
-
-            if (environment.IsDevelopment())
+            else
             {
-                app.Use((context, next) =>
-                {
-                    context.Items["spa"] = true;
-
-                    return next();
-                });
-
+                // Forward requests to SPA development server.
                 app.UseSpa(builder =>
                 {
                     builder.UseProxyToSpaDevelopmentServer("https://localhost:3000");
@@ -104,6 +96,16 @@ namespace Squidex.Areas.Frontend
                 },
                 FileProvider = fileProvider
             });
+        }
+
+        private static bool IsSpaFile(this HttpContext context)
+        {
+            return context.IsIndex() || !Path.HasExtension(context.Request.Path);
+        }
+
+        private static bool IsHtmlPath(this HttpContext context)
+        {
+            return context.IsSpaFile() || context.Request.Path.Value?.Contains(".html", StringComparison.OrdinalIgnoreCase) == true;
         }
     }
 }

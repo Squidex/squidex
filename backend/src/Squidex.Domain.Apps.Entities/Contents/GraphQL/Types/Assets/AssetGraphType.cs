@@ -227,6 +227,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Description = FieldDescriptions.AssetMetadata
             });
 
+            AddField(new FieldType
+            {
+                Name = "editToken",
+                ResolvedType = AllTypes.String,
+                Resolver = Resolve(x => x.EditToken),
+                Description = FieldDescriptions.EditToken
+            });
+
             if (canGenerateSourceUrl)
             {
                 AddField(new FieldType

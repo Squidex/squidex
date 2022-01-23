@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (context.UserPermissions.Allows(Permissions.AppAssetsRead, context.App.Name))
             {
-                var filter = ClrFilter.Eq("fileName", query);
+                var filter = ClrFilter.Contains("fileName", query);
 
                 var clrQuery = new ClrQuery { Filter = filter, Take = 5 };
 

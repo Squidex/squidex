@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public string MetadataText { get; set; }
 
-        public string? UIToken { get; set; }
+        public string? EditToken { get; set; }
 
         public long FileSize { get; set; }
 

@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => urlGenerator.AssetsUI(appId, asset1.Id.ToString()))
                 .Returns("assets-url1");
 
-            A.CallTo(() => urlGenerator.AssetsUI(appId, asset1.Id.ToString()))
+            A.CallTo(() => urlGenerator.AssetsUI(appId, asset2.Id.ToString()))
                 .Returns("assets-url2");
 
             A.CallTo(() => assetQuery.QueryAsync(ctx, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5"), A<CancellationToken>._))

@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         string MetadataText { get; }
 
-        string? UIToken { get; set; }
+        string? EditToken { get; set; }
     }
 }

@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public string? ScheduledStatusColor { get; set; }
 
-        public string? UIToken { get; set; }
+        public string? EditToken { get; set; }
 
         public RootField[]? ReferenceFields { get; set; }
 

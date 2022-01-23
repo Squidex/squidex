@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The UI token.
         /// </summary>
-        public string? UIToken { get; set; }
+        public string? EditToken { get; set; }
 
         /// <summary>
         /// The asset metadata.

@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 var json = jsonSerializer.Serialize(token);
 
-                asset.UIToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
+                asset.EditToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
             }
         }
 

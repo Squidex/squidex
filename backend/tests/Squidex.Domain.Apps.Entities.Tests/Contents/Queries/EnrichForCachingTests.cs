@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, schemaProvider, default);
 
-            Assert.Null(source.UIToken);
+            Assert.Null(source.EditToken);
 
             A.CallTo(() => urlGenerator.Root())
                 .MustNotHaveHappened();
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(requestContext, new[] { source }, schemaProvider, default);
 
-            Assert.NotNull(source.UIToken);
+            Assert.NotNull(source.EditToken);
 
             A.CallTo(() => urlGenerator.Root())
                 .MustHaveHappened();

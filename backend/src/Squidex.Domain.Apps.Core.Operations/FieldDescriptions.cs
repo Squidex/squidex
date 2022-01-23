@@ -153,6 +153,9 @@ namespace Squidex.Domain.Apps.Core
         public static string Context =>
             "The context object holding all values.";
 
+        public static string EditToken =>
+            "The edit token.";
+
         public static string EntityCreated =>
             "The timestamp when the object was created.";
 

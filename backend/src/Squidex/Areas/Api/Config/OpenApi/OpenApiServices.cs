@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                 ConfigureSchemaSettings(settings);
 
-                settings.OperationProcessors.Add(new QueryParamsProcessor("/apps/{app}/assets"));
+                settings.OperationProcessors.Add(new QueryParamsProcessor("/api/apps/{app}/assets"));
             });
         }
 

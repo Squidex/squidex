@@ -25,13 +25,6 @@ namespace Squidex.Areas.Frontend.Middlewares
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         });
 
-        public static bool IsIndex(this HttpContext context)
-        {
-            string? path = context.Request.Path;
-
-            return string.IsNullOrEmpty(path) || path.StartsWith("/index.html", StringComparison.OrdinalIgnoreCase) || path == "/";
-        }
-
         public static string AddOptions(this string html, HttpContext httpContext)
         {
             var scripts = new List<string>

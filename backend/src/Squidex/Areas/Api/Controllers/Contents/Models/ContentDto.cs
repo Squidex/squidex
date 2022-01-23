@@ -80,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The UI token.
         /// </summary>
-        public string? UIToken { get; set; }
+        public string? EditToken { get; set; }
 
         /// <summary>
         /// The scheduled status.

@@ -24,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               email
               displayName
             }
+            editToken
             lastModified
             lastModifiedBy
             lastModifiedByUser {
@@ -105,6 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               email
               displayName
             }
+            editToken
             lastModified
             lastModifiedBy
             lastModifiedByUser {
@@ -227,6 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
                 LastModifiedBy = RefToken.Client("client1"),
                 Data = data,
@@ -257,6 +260,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
                 LastModifiedBy = RefToken.User("user2"),
                 Data = data,
@@ -284,6 +288,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     email = $"{content.CreatedBy.Identifier}@email.com",
                     displayName = $"name_{content.CreatedBy.Identifier}"
                 },
+                editToken = $"token_{content.Id}",
                 lastModified = content.LastModified,
                 lastModifiedBy = content.LastModifiedBy.ToString(),
                 lastModifiedByUser = new
@@ -315,6 +320,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     email = $"{content.CreatedBy.Identifier}@email.com",
                     displayName = $"name_{content.CreatedBy.Identifier}"
                 },
+                editToken = $"token_{content.Id}",
                 lastModified = content.LastModified,
                 lastModifiedBy = content.LastModifiedBy.ToString(),
                 lastModifiedByUser = new

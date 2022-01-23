@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
                 var json = jsonSerializer.Serialize(token);
 
-                content.UIToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
+                content.EditToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
             }
 
             return Task.CompletedTask;

@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Web;
 
 namespace Squidex.Web
 {
