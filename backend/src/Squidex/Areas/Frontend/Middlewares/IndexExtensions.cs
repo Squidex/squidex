@@ -27,7 +27,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public static string AddOptions(this string html, HttpContext httpContext)
         {
-            const string Placeholder = "[OPTIONS]";
+            const string Placeholder = "/* INJECT OPTIONS */";
 
             if (!html.Contains(Placeholder, StringComparison.Ordinal))
             {

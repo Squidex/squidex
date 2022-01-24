@@ -24,7 +24,7 @@ namespace Squidex.Areas.Frontend
 
             app.UseMiddleware<EmbedMiddleware>();
 
-            if (environment.IsProduction())
+            if (!environment.IsDevelopment())
             {
                 fileProvider = new CompositeFileProvider(fileProvider,
                     new PhysicalFileProvider(Path.Combine(environment.WebRootPath, "build")));
