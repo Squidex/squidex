@@ -130,6 +130,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 alias = await context.Reader.ReadJsonAsync<Dictionary<string, string>>(TagsAliasFile, ct);
             }
 
+            if (alias == null && tags == null)
+            {
+                return;
+            }
+
             var export = new TagsExport { Tags = tags, Alias = alias };
 
             await tagService.RebuildTagsAsync(context.AppId, TagGroups.Assets, export);

@@ -91,11 +91,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_read_tags()
+        public async Task Should_read_tags_if_file_exists()
         {
             var tags = new Dictionary<string, Tag>();
 
             var context = CreateRestoreContext();
+
+            A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
+                .Returns(true);
 
             A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
                 .Returns(tags);
@@ -109,24 +112,45 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_read_tags_alias_if_file_exists()
         {
-            var tags = new Dictionary<string, Tag>();
             var alias = new Dictionary<string, string>();
 
             var context = CreateRestoreContext();
 
             A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
-                .Returns(true);
-
-            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
-                .Returns(tags);
+                .Returns(false).Once().Then.Returns(true);
 
             A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
                 .Returns(alias);
 
             await sut.RestoreAsync(context, ct);
 
-            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Tags == tags && x.Alias == alias)))
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias)))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_read_tags_if_no_file_exists()
+        {
+            var alias = new Dictionary<string, string>();
+
+            var context = CreateRestoreContext();
+
+            A.CallTo(() => context.Reader.HasFileAsync(A<string>._, ct))
+                .Returns(false);
+
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
+                .Returns(alias);
+
+            await sut.RestoreAsync(context, ct);
+
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, string>>(A<string>._, ct))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(A<string>._, ct))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => tagService.RebuildTagsAsync(appId.Id, TagGroups.Assets, A<TagsExport>.That.Matches(x => x.Alias == alias)))
+                .MustNotHaveHappened();
         }
 
         [Fact]
