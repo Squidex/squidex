@@ -25,8 +25,9 @@ namespace Squidex.Areas.IdentityServer.Controllers.UserInfo
         }
 
         [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
-        [HttpGet("connect/userinfo")]
-        [HttpPost("connect/userinfo")]
+        [HttpGet]
+        [HttpPost]
+        [Route("connect/userinfo")]
         [Produces("application/json")]
         public async Task<IActionResult> UserInfo()
         {

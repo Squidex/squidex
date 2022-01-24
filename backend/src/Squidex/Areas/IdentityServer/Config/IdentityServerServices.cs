@@ -18,7 +18,6 @@ using Squidex.Hosting;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 using static OpenIddict.Abstractions.OpenIddictConstants;
-using static OpenIddict.Server.AspNetCore.OpenIddictServerAspNetCoreHandlers;
 using static OpenIddict.Server.OpenIddictServerEvents;
 using static OpenIddict.Server.OpenIddictServerHandlers;
 
@@ -79,20 +78,13 @@ namespace Squidex.Areas.IdentityServer.Config
                 })
                 .AddServer(builder =>
                 {
-                    builder.RemoveEventHandler(ValidateTransportSecurityRequirement.Descriptor);
-
                     builder.AddEventHandler<ProcessSignInContext>(builder =>
                     {
                         builder.UseSingletonHandler<AlwaysAddTokenHandler>()
                             .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
                     });
 
-                    builder
-                        .SetAuthorizationEndpointUris("/connect/authorize")
-                        .SetIntrospectionEndpointUris("/connect/introspect")
-                        .SetLogoutEndpointUris("/connect/logout")
-                        .SetTokenEndpointUris("/connect/token")
-                        .SetUserinfoEndpointUris("/connect/userinfo");
+                    builder.SetConfigurationEndpointUris("/identity-server/.well-known/openid-configuration");
 
                     builder.DisableAccessTokenEncryption();
 
@@ -127,7 +119,24 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 var urlGenerator = services.GetRequiredService<IUrlGenerator>();
 
-                options.Issuer = new Uri(urlGenerator.BuildUrl("/identity-server", false));
+                var issuerUrl = Constants.PrefixIdentityServer;
+
+                options.Issuer = new Uri(urlGenerator.BuildUrl(issuerUrl, false));
+
+                options.AuthorizationEndpointUris.Add(
+                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/authorize", false)));
+
+                options.IntrospectionEndpointUris.Add(
+                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/introspect", false)));
+
+                options.LogoutEndpointUris.Add(
+                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/logout", false)));
+
+                options.TokenEndpointUris.Add(
+                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/token", false)));
+
+                options.UserinfoEndpointUris.Add(
+                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/userinfo", false)));
             });
         }
     }
