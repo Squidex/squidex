@@ -27,6 +27,13 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public static string AddOptions(this string html, HttpContext httpContext)
         {
+            const string Placeholder = "[OPTIONS]";
+
+            if (!html.Contains(Placeholder, StringComparison.Ordinal))
+            {
+                return html;
+            }
+
             var scripts = new List<string>
             {
                 $"var texts = {GetText(CultureInfo.CurrentUICulture.Name)};"
@@ -69,7 +76,7 @@ namespace Squidex.Areas.Frontend.Middlewares
                 scripts.Add($"var options = {json.ToString(Formatting.Indented)};");
             }
 
-            html = html.Replace("<body>", $"<body>\n<script>{string.Join(Environment.NewLine, scripts)}</script>", StringComparison.OrdinalIgnoreCase);
+            html = html.Replace(Placeholder, string.Join(Environment.NewLine, scripts), StringComparison.OrdinalIgnoreCase);
 
             return html;
         }

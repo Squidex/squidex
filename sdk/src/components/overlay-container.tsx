@@ -11,38 +11,53 @@ export interface OverlayContainerProps {
 
 type AuthState = 'Authenticated' | 'Failed' | 'Pending';
 
+const UNSET = { x: Number.NEGATIVE_INFINITY, y: Number.NEGATIVE_INFINITY };
+
 export const OverlayContainer = (props: OverlayContainerProps) => {
     const div = useRef<any>();
     const [auth, setAuth] = useState<{ [url: string]: AuthState }>({});
-    const [target, setTarget] = useState<{ target: HTMLElement, token: TokenInfo}>();
+    const [target, setTarget] = useState<{ target: HTMLElement, token: TokenInfo }>();
     const [targetUrl, setTargetUrl] = useState<string>();
     const authRef = useRef(auth);
     
     useEffect(() => {
-        let previous: any;
-        let previousTarget: HTMLElement | null = null;
+        let previousElement: any;
+        let previousTarget: HTMLElement | undefined = undefined;
+        let previousPosition = UNSET;
+
+        const updateTarget = (target?: HTMLElement, token?: TokenInfo) => {
+            if (target !== previousTarget) {
+                if (target && token) {
+                    setTarget({ target, token });
+                } else {
+                    setTarget(undefined);
+                }
+
+                previousTarget = target;
+            }
+        };
 
         function listen(event: MouseEvent) {
-            const target = event.target as HTMLElement;
+            const element = event.target as HTMLElement;
 
-            if (target && target !== previous) {
-                try {
-                    const token = parseToken(target, Object.keys(authRef.current));
-    
-                    if (token) {
-                        previousTarget = target;
-                        
-                        setTarget({ target, token });
-                    } else if (previousTarget && !previousTarget.contains(target) && !div.current?.contains(target)) {
-                        previousTarget = null;
-    
-                        setTarget(undefined);
-                    }
-                } catch {
-                }
-    
-                previous = target;
+            console.log(element);
+
+            if (!element || isToolbar(element)) {
+                return;
             }
+
+            const { token, target } = parseTokenInPath(element, Object.keys(authRef.current));
+            const position = { x: event.clientX, y: event.clientY };
+
+            if (token && target) {                        
+                updateTarget(target, token);
+
+                previousPosition = position;
+            } else if (Math.abs(position.x - previousPosition.x) + Math.abs(position.y - previousPosition.y) > 20) {
+                updateTarget(undefined, undefined);
+            }
+
+            previousElement = element;
         }
 
         document.addEventListener('mousemove', listen);
@@ -61,7 +76,7 @@ export const OverlayContainer = (props: OverlayContainerProps) => {
             return;
         }
 
-        const setStatus = (state: AuthState) => {
+        const updateAuth = (state: AuthState) => {
             const newAuth = {
                 ...authRef.current,
                 [url]: state
@@ -73,12 +88,12 @@ export const OverlayContainer = (props: OverlayContainerProps) => {
         };
 
         if (url.indexOf('http://') === 0) {
-            setStatus('Authenticated');
+            updateAuth('Authenticated');
             return;
         }
 
         const fetchStatus = async () => {
-            setStatus('Pending');
+            updateAuth('Pending');
 
             try {
                 const response = await fetch(`${url}/identity-server/info`, {
@@ -87,9 +102,9 @@ export const OverlayContainer = (props: OverlayContainerProps) => {
 
                 const json = await response.json();
 
-                setStatus(json.displayName ? 'Authenticated' : 'Failed');
+                updateAuth(json.displayName ? 'Authenticated' : 'Failed');
             } catch {
-                setStatus('Failed');
+                updateAuth('Failed');
             }
         };
 
@@ -120,6 +135,36 @@ export const OverlayContainer = (props: OverlayContainerProps) => {
 }
 
 const CDN_URL = 'https://assets.squidex.io';
+
+function isToolbar(target: HTMLElement) {
+    let current = target;
+
+    while (current) {
+        if (current.className === 'squidex-overlay-toolbar') {
+            return true;
+        }
+
+        current = current.parentElement as HTMLElement;
+    }
+
+    return false;
+}
+
+function parseTokenInPath(target: HTMLElement, baseUrls: string[]): { token?: TokenInfo, target?: HTMLElement } {
+    let current = target;
+
+    while (current) {
+        const token = parseToken(current, baseUrls);
+
+        if (token) {
+            return { token, target: current };
+        }
+
+        current = current.parentElement as HTMLElement;
+    }
+
+    return {};
+}
 
 function parseToken(target: HTMLElement, baseUrls: string[]): TokenInfo | null {
     const value = target.getAttribute('squidex-token');
@@ -175,7 +220,7 @@ function parseToken(target: HTMLElement, baseUrls: string[]): TokenInfo | null {
         }
 
         while (token.u.endsWith('/')) {
-            token.u = token.u.substring(0, token.u.substring.length - 1);
+            token.u = token.u.substring(0, token.u.length - 1);
         }
 
         return token;

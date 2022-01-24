@@ -13,11 +13,11 @@ export interface OverlayProps {
     onOpen: (url: string) => void;
 }
 
-const PADDING = 4;
+const PADDING = 2;
 
 export const Overlay = (props: OverlayProps) => {
     const { onOpen, target, token } = props;
-    const linksRef = useRef<HTMLDivElement>();
+    const toolbarRef = useRef<HTMLDivElement>();
     const linksRect = useRef<DOMRect>();
     const targetRect = useRef<DOMRect>();
     const [_, render] = useState(0);
@@ -58,11 +58,11 @@ export const Overlay = (props: OverlayProps) => {
     }, [target]);
 
     useLayoutEffect(() => {
-        if (!linksRef.current) {
+        if (!toolbarRef.current) {
             return;
         }
 
-        const rect = linksRef.current.getBoundingClientRect();
+        const rect = toolbarRef.current.getBoundingClientRect();
 
         const current = linksRect.current;
 
@@ -100,45 +100,48 @@ export const Overlay = (props: OverlayProps) => {
     const overlayWidth = (targetRect.current?.width || 0) + 2 * PADDING;
     const overlayHeight = (targetRect.current?.height || 0) + 2 * PADDING;
 
-    const linksWidth = (linksRect.current?.width || 0);
-    const linksHeight = (linksRect.current?.height || 0);
+    const toolbarWidth = (linksRect.current?.width || 0);
+    const toolbarHeight = (linksRect.current?.height || 0);
 
     let linkX = x;
-    let linkY = y - linksHeight;
+    let linkY = y - toolbarHeight + 2;
 
     if (linkY < 0) {
-        linkY = y + overlayHeight;
+        linkY = y + overlayHeight - 2;
     }
 
-    if (linkY + linksHeight > window.innerHeight) {
-        linkX = window.innerHeight - linksHeight;
+    if (linkY + toolbarHeight > window.innerHeight) {
+        linkX = window.innerHeight - toolbarHeight;
     }
 
     if (linkX < 0) {
         linkX = 0;
     }
 
-    if (linkX + linksWidth > window.innerWidth) {
-        linkX = window.innerWidth - linksWidth;
+    if (linkX + toolbarWidth > window.innerWidth) {
+        linkX = window.innerWidth - toolbarWidth;
     }
 
     return (
-        <div class='squidex-overlay' style={{ left: x, top: y, width: overlayWidth, height: overlayHeight }}>
-            <div class='squidex-overlay-toolbar' style={{ left: linkX, top: linkY }} ref={linksRef as any}>
-                <div class='squidex-overlay-schema'>
-                    {token?.s || 'Asset'}
-                </div>
-
-                <div class='squidex-overlay-links'>
-                    <a onClick={() => onOpen(embedUrl)}>
-                        Edit Inline
-                    </a>
-
-                    <a href={externalUrl!} target='_blank'>
-                        Edit In Squidex
-                    </a>
-                </div>
+        <div class='squidex-overlay'>
+            <div class='squidex-overlay-border' style={{ left: x, top: y, width: overlayWidth, height: overlayHeight }}>
             </div>
+            
+            <div class='squidex-overlay-toolbar' style={{ left: linkX, top: linkY }} ref={toolbarRef as any}>
+                    <div class='squidex-overlay-schema'>
+                        {token?.s || 'Asset'}
+                    </div>
+
+                    <div class='squidex-overlay-links' data-links={true}>
+                        <a onClick={() => onOpen(embedUrl)}>
+                            Edit Inline
+                        </a>
+
+                        <a href={externalUrl!} target='_blank'>
+                            Edit In Squidex
+                        </a>
+                    </div>
+                </div>
         </div>
     );
 };

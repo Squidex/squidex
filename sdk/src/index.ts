@@ -17,7 +17,7 @@ function init() {
 }
 
 function renderStyles() {
-    if (baseUrl) {
+    if (!baseUrl) {
         return;
     }
 

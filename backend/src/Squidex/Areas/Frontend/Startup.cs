@@ -49,19 +49,19 @@ namespace Squidex.Areas.Frontend
                 {
                     Transform = (html, context) =>
                     {
-                        if (context.IsIndex())
-                        {
-                            html = html.AddOptions(context);
-                        }
-
-                        return new ValueTask<string>(html);
+                        return new ValueTask<string>(html.AddOptions(context));
                     }
                 });
             });
 
+            app.Use((context, next) =>
+            {
+                return next();
+            });
+
             app.UseSquidexStaticFiles(fileProvider);
 
-            if (environment.IsProduction())
+            if (!environment.IsDevelopment())
             {
                 // Try static files again to serve index.html.
                 app.UsePathOverride("/index.html");

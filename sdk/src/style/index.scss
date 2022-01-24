@@ -23,12 +23,18 @@ $color-border:              #dedfe3;
 	}
 
 	&-overlay {
-		border: 2px solid $color-theme-brand-dark;
-		border-radius: 0;
 		box-sizing: border-box;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-        font-weight: normal;
+		font-weight: normal;
 		position: fixed;
+
+		&-border {
+			border: 2px solid $color-theme-brand-dark;
+			border-radius: 0;
+			position: fixed;
+			pointer-events: none;
+			z-index: 100000;
+		}
 
 		&-toolbar {
 			color: #fff;
@@ -37,6 +43,7 @@ $color-border:              #dedfe3;
 			font-weight: normal;
 			position: fixed;
 			white-space: nowrap;
+			z-index: 100000;
 		}
 
 		&-schema,
@@ -68,7 +75,7 @@ $color-border:              #dedfe3;
 				}
 	
 				&:hover {
-					text-decoration: underline;
+					text-decoration: underline !important;
 				}
 			}
 		}

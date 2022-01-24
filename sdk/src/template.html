@@ -51,11 +51,16 @@
 				margin-left: -100px;
 			}
 
-			.element-center {
+			.element-image {
 				padding: 0;
+				left: 50%;
+				margin-left: -300px;
+				margin-top: -150px;
+				top: 50%;
+				width: 600px;
 			}
 
-			.element-center img {
+			.element-image img {
 				max-width: 100%;
 				max-height: none;
 				display: block;
@@ -67,7 +72,7 @@
 	<body>
 		<% preact.bodyEnd %>
 
-		<div class="element element-top" squidex-token="ewogICJ1IjogImh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLAogICJhIjogInRlc3QiLAogICJzIjogInRlc3QiLAogICJpIjogIjI0ZWQxMWJhLWJjNzItNDMzZS04ODRjLWE0NGE3ODIwYjU1MSIgIAp9">
+		<div class="element element-top" squidex-token="eyJhIjoic3F1aWRleC13ZWJzaXRlIiwicyI6ImJsb2ciLCJpIjoiZmQxZDkzNjYtNDY3ZS00MmFiLWE5MzYtYmNmNDk3NjIxYjk4IiwidSI6Imh0dHBzOi8vbG9jYWxob3N0OjUwMDEvIn0=">
 			Top Aligned
 		</div>
 
@@ -83,8 +88,12 @@
 			Left Aligned
 		</div>
 
-		<div class="element element-center">
+		<div class="element element-image">
 			<img src="https://localhost:5001/api/assets/test/51135569-96e0-45f2-a5c2-8102ad4b4bf3/mydraft.gif?version=0">
+		</div>
+
+		<div class="element element-center" squidex-token="ewogICJ1IjogImh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLAogICJhIjogInRlc3QiLAogICJzIjogInRlc3QiLAogICJpIjogIjI0ZWQxMWJhLWJjNzItNDMzZS04ODRjLWE0NGE3ODIwYjU1MSIgIAp9">
+			 Center
 		</div>
 	</body>
 </html>

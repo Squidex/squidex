@@ -128,11 +128,7 @@ namespace Squidex
             // Return a 404 for all unresolved api requests.
             app.Map(Constants.PrefixApi, builder =>
             {
-                builder.Use(new Func<HttpContext, Func<Task>, Task>((context, next) =>
-                {
-                    context.Response.StatusCode = 404;
-                    return Task.CompletedTask;
-                }));
+                builder.Use404();
             });
 
             app.UseFrontend();
