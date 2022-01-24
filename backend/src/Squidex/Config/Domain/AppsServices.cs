@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 
 namespace Squidex.Config.Domain
 {

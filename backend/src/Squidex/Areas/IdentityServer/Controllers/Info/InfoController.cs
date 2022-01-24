@@ -5,13 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Areas.Api.Config.OpenApi
+using Microsoft.AspNetCore.Mvc;
+using Squidex.Shared.Identity;
+
+namespace Squidex.Areas.IdentityServer.Controllers.Info
 {
-    public static class OpenApiExtensions
+    public sealed class InfoController : IdentityServerController
     {
-        public static void UseSquidexOpenApi(this IApplicationBuilder app)
+        [Route("info")]
+        [HttpGet]
+        public IActionResult Info()
         {
-            app.UseOpenApi();
+            var displayName = User.Claims.DisplayName();
+
+            return Ok(new { displayName });
         }
     }
 }

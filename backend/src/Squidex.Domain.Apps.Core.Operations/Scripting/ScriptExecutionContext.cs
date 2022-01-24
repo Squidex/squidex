@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using Jint;
-using Jint.Native;
-using Jint.Native.Object;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting

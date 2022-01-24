@@ -12,5 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         HashSet<string> TagNames { get; }
 
         string MetadataText { get; }
+
+        string? EditToken { get; set; }
     }
 }

@@ -16,26 +16,18 @@ namespace Squidex.Areas.Frontend
 {
     public static class Startup
     {
-        public static void ConfigureFrontend(this IApplicationBuilder app)
+        public static void UseFrontend(this IApplicationBuilder app)
         {
             var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
             var fileProvider = environment.WebRootFileProvider;
 
-            if (environment.IsProduction())
+            app.UseMiddleware<EmbedMiddleware>();
+
+            if (!environment.IsDevelopment())
             {
                 fileProvider = new CompositeFileProvider(fileProvider,
                     new PhysicalFileProvider(Path.Combine(environment.WebRootPath, "build")));
-
-                app.Use((context, next) =>
-                {
-                    if (!Path.HasExtension(context.Request.Path.Value))
-                    {
-                        context.Request.Path = new PathString("/index.html");
-                    }
-
-                    return next();
-                });
             }
 
             app.Map("/squid.svg", builder =>
@@ -45,24 +37,48 @@ namespace Squidex.Areas.Frontend
 
             app.UseMiddleware<NotifoMiddleware>();
 
-            app.UseWhen(x => x.IsIndex(), builder =>
+            app.UseWhen(c => c.IsSpaFile(), builder =>
             {
                 builder.UseMiddleware<SetupMiddleware>();
             });
 
-            app.UseHtmlTransform(new HtmlTransformOptions
+            app.UseWhen(c => c.IsHtmlPath(), builder =>
             {
-                Transform = (html, context) =>
+                // Adjust the base for all potential html files.
+                builder.UseHtmlTransform(new HtmlTransformOptions
                 {
-                    if (context.IsIndex())
+                    Transform = (html, context) =>
                     {
-                        html = html.AddOptions(context);
+                        return new ValueTask<string>(html.AddOptions(context));
                     }
-
-                    return new ValueTask<string>(html);
-                }
+                });
             });
 
+            app.Use((context, next) =>
+            {
+                return next();
+            });
+
+            app.UseSquidexStaticFiles(fileProvider);
+
+            if (!environment.IsDevelopment())
+            {
+                // Try static files again to serve index.html.
+                app.UsePathOverride("/index.html");
+                app.UseSquidexStaticFiles(fileProvider);
+            }
+            else
+            {
+                // Forward requests to SPA development server.
+                app.UseSpa(builder =>
+                {
+                    builder.UseProxyToSpaDevelopmentServer("https://localhost:3000");
+                });
+            }
+        }
+
+        private static void UseSquidexStaticFiles(this IApplicationBuilder app, IFileProvider fileProvider)
+        {
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = context =>
@@ -80,14 +96,16 @@ namespace Squidex.Areas.Frontend
                 },
                 FileProvider = fileProvider
             });
+        }
 
-            if (environment.IsDevelopment())
-            {
-                app.UseSpa(builder =>
-                {
-                    builder.UseProxyToSpaDevelopmentServer("https://localhost:3000");
-                });
-            }
+        private static bool IsSpaFile(this HttpContext context)
+        {
+            return context.IsIndex() || !Path.HasExtension(context.Request.Path);
+        }
+
+        private static bool IsHtmlPath(this HttpContext context)
+        {
+            return context.IsSpaFile() || context.Request.Path.Value?.Contains(".html", StringComparison.OrdinalIgnoreCase) == true;
         }
     }
 }

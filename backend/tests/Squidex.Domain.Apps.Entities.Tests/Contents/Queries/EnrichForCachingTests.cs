@@ -6,79 +6,67 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Json;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public class EnrichForCachingTests
+    public class CalculateTokensTests
     {
         private readonly ISchemaEntity schema;
-        private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
+        private readonly IJsonSerializer jsonSerializer = A.Fake<IJsonSerializer>();
+        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly Context requestContext;
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly ProvideSchema schemaProvider;
-        private readonly EnrichForCaching sut;
+        private readonly CalculateTokens sut;
 
-        public EnrichForCachingTests()
+        public CalculateTokensTests()
         {
             requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
             schema = Mocks.Schema(appId, schemaId);
             schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
-            sut = new EnrichForCaching(requestCache);
+            sut = new CalculateTokens(urlGenerator, jsonSerializer);
         }
 
         [Fact]
-        public async Task Should_add_cache_headers()
+        public async Task Should_not_compute_ui_tokens_for_frontend()
         {
-            var headers = new List<string>();
+            var source = CreateContent();
 
-            A.CallTo(() => requestCache.AddHeader(A<string>._))
-                .Invokes(new Action<string>(header => headers.Add(header)));
+            await sut.EnrichAsync(new Context(Mocks.FrontendUser(), Mocks.App(appId)), new[] { source }, schemaProvider, default);
 
-            await sut.EnrichAsync(requestContext, default);
+            Assert.Null(source.EditToken);
 
-            Assert.Equal(new List<string>
-            {
-                "X-Flatten",
-                "X-Languages",
-                "X-NoCleanup",
-                "X-NoEnrichment",
-                "X-NoResolveLanguages",
-                "X-ResolveFlow",
-                "X-Resolve-Urls",
-                "X-Unpublished"
-            }, headers);
+            A.CallTo(() => urlGenerator.Root())
+                .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_add_app_version_and_schema_as_dependency()
+        public async Task Should_compute_ui_tokens()
         {
-            var content = CreateContent();
+            var source = CreateContent();
 
-            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider, default);
+            await sut.EnrichAsync(requestContext, new[] { source }, schemaProvider, default);
 
-            A.CallTo(() => requestCache.AddDependency(content.UniqueId, content.Version))
-                .MustHaveHappened();
+            Assert.NotNull(source.EditToken);
 
-            A.CallTo(() => requestCache.AddDependency(schema.UniqueId, schema.Version))
-                .MustHaveHappened();
-
-            A.CallTo(() => requestCache.AddDependency(requestContext.App.UniqueId, requestContext.App.Version))
+            A.CallTo(() => urlGenerator.Root())
                 .MustHaveHappened();
         }
 
         private ContentEntity CreateContent()
         {
-            return new ContentEntity { AppId = appId, Id = DomainId.NewGuid(), SchemaId = schemaId, Version = 13 };
+            return new ContentEntity { AppId = appId, SchemaId = schemaId };
         }
     }
 }

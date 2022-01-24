@@ -5,17 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Areas.Api;
+using Orleans;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Frontend;
-using Squidex.Areas.IdentityServer;
 using Squidex.Areas.IdentityServer.Config;
-using Squidex.Areas.OrleansDashboard;
-using Squidex.Areas.Portal;
+using Squidex.Areas.OrleansDashboard.Middlewares;
+using Squidex.Areas.Portal.Middlewares;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
 using Squidex.Pipeline.Plugins;
+using Squidex.Web;
 using Squidex.Web.Pipeline;
 
 namespace Squidex
@@ -34,7 +34,6 @@ namespace Squidex
             services.AddHttpClient();
             services.AddMemoryCache();
             services.AddHealthChecks();
-            services.AddNonBreakingSameSiteCookies();
             services.AddDefaultWebServices(config);
             services.AddDefaultForwardRules();
 
@@ -82,19 +81,57 @@ namespace Squidex
 
             app.UseSquidexHealthCheck();
             app.UseSquidexRobotsTxt();
-            app.UseSquidexCacheKeys();
-            app.UseSquidexExceptionHandling();
-            app.UseSquidexUsage();
             app.UseSquidexLogging();
             app.UseSquidexLocalization();
             app.UseSquidexLocalCache();
             app.UseSquidexCors();
+            app.UseOpenApi(options =>
+            {
+                options.Path = "/api/swagger/v1/swagger.json";
+            });
 
-            app.ConfigureApi();
-            app.ConfigurePortal();
-            app.ConfigureOrleansDashboard();
-            app.ConfigureIdentityServer();
-            app.ConfigureFrontend();
+            app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase), builder =>
+            {
+                builder.UseExceptionHandler("/error");
+            });
+
+            app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixApi, StringComparison.OrdinalIgnoreCase), builder =>
+            {
+                builder.UseSquidexCacheKeys();
+                builder.UseSquidexExceptionHandling();
+                builder.UseSquidexUsage();
+                builder.UseAccessTokenQueryString();
+            });
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.Map(Constants.PrefixPortal, builder =>
+            {
+                builder.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
+                builder.UseMiddleware<PortalRedirectMiddleware>();
+            });
+
+            app.Map(Constants.PrefixOrleans, builder =>
+            {
+                builder.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
+                builder.UseOrleansDashboard();
+            });
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+            // Return a 404 for all unresolved api requests.
+            app.Map(Constants.PrefixApi, builder =>
+            {
+                builder.Use404();
+            });
+
+            app.UseFrontend();
 
             app.UsePlugins();
         }

@@ -64,9 +64,9 @@ namespace Squidex.Web.Services
             return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion, null);
         }
 
-        public string AssetsUI(NamedId<DomainId> appId, string? query = null)
+        public string AssetsUI(NamedId<DomainId> appId, string? @ref = null)
         {
-            return urlGenerator.BuildUrl($"app/{appId.Name}/assets", false) + query != null ? $"?query={query}" : string.Empty;
+            return urlGenerator.BuildUrl($"app/{appId.Name}/assets", false) + @ref != null ? $"?ref={@ref}" : string.Empty;
         }
 
         public string BackupsUI(NamedId<DomainId> appId)
@@ -117,6 +117,11 @@ namespace Squidex.Web.Services
         public string RolesUI(NamedId<DomainId> appId)
         {
             return urlGenerator.BuildUrl($"app/{appId.Name}/settings/roles", false);
+        }
+
+        public string Root()
+        {
+            return urlGenerator.BuildUrl();
         }
 
         public string RulesUI(NamedId<DomainId> appId)

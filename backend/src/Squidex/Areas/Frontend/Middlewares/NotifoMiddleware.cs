@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Entities.History;
 
 namespace Squidex.Areas.Frontend.Middlewares
 {
-    public class NotifoMiddleware
+    public sealed class NotifoMiddleware
     {
         private readonly RequestDelegate next;
         private readonly string? workerUrl;

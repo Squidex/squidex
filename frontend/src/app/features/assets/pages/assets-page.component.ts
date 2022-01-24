@@ -39,6 +39,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         const initial =
             this.assetsRoute.mapTo(this.assetsState)
                 .withPaging('assets', 30)
+                .withString('ref')
                 .withStringOr('parentId', MathHelper.EMPTY_GUID)
                 .withStrings('tagsSelected')
                 .withSynchronizer(QueryFullTextSynchronizer.INSTANCE)

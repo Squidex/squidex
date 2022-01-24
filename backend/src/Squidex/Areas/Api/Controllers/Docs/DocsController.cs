@@ -24,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Docs
         {
             var vm = new DocsVM
             {
-                Specification = "~/swagger/v1/swagger.json"
+                Specification = "~/api/swagger/v1/swagger.json"
             };
 
             return View(nameof(Docs), vm);

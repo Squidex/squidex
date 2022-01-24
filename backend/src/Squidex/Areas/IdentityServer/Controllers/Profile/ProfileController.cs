@@ -45,7 +45,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpGet]
-        [Route("/account/profile/")]
+        [Route("account/profile/")]
         public async Task<IActionResult> Profile(string? successMessage = null)
         {
             var user = await userService.GetAsync(User, HttpContext.RequestAborted);
@@ -54,7 +54,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/login-add/")]
+        [Route("account/profile/login-add/")]
         public async Task<IActionResult> AddLogin(string provider)
         {
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -68,7 +68,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpGet]
-        [Route("/account/profile/login-add-callback/")]
+        [Route("account/profile/login-add-callback/")]
         public Task<IActionResult> AddLoginCallback()
         {
             return MakeChangeAsync((id, ct) => AddLoginAsync(id, ct),
@@ -76,7 +76,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/update/")]
+        [Route("account/profile/update/")]
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
             return MakeChangeAsync((id, ct) => userService.UpdateAsync(id, model.ToValues(), ct: ct),
@@ -84,7 +84,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/properties/")]
+        [Route("account/profile/properties/")]
         public Task<IActionResult> UpdateProperties(ChangePropertiesModel model)
         {
             return MakeChangeAsync((id, ct) => userService.UpdateAsync(id, model.ToValues(), ct: ct),
@@ -92,7 +92,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/login-remove/")]
+        [Route("account/profile/login-remove/")]
         public Task<IActionResult> RemoveLogin(RemoveLoginModel model)
         {
             return MakeChangeAsync((id, ct) => userService.RemoveLoginAsync(id, model.LoginProvider, model.ProviderKey, ct),
@@ -100,7 +100,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/password-set/")]
+        [Route("account/profile/password-set/")]
         public Task<IActionResult> SetPassword(SetPasswordModel model)
         {
             return MakeChangeAsync((id, ct) => userService.SetPasswordAsync(id, model.Password, ct: ct),
@@ -108,7 +108,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/password-change/")]
+        [Route("account/profile/password-change/")]
         public Task<IActionResult> ChangePassword(ChangePasswordModel model)
         {
             return MakeChangeAsync((id, ct) => userService.SetPasswordAsync(id, model.Password, model.OldPassword, ct),
@@ -116,7 +116,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/generate-client-secret/")]
+        [Route("account/profile/generate-client-secret/")]
         public Task<IActionResult> GenerateClientSecret()
         {
             return MakeChangeAsync((id, ct) => GenerateClientSecretAsync(id, ct),
@@ -124,7 +124,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
-        [Route("/account/profile/upload-picture/")]
+        [Route("account/profile/upload-picture/")]
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
             return MakeChangeAsync((id, ct) => UpdatePictureAsync(file, id, ct),

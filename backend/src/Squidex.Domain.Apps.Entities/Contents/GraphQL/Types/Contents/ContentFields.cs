@@ -128,6 +128,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Description = FieldDescriptions.ContentUrl
         };
 
+        public static readonly FieldType EditToken = new FieldType
+        {
+            Name = "editToken",
+            ResolvedType = AllTypes.String,
+            Resolver = Resolve(x => x.EditToken),
+            Description = FieldDescriptions.EditToken
+        };
+
         private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)
         {
             return Resolvers.Sync(resolver);

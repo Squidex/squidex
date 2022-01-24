@@ -69,6 +69,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string MetadataText { get; set; }
 
         /// <summary>
+        /// The UI token.
+        /// </summary>
+        public string? EditToken { get; set; }
+
+        /// <summary>
         /// The asset metadata.
         /// </summary>
         [LocalizedRequired]

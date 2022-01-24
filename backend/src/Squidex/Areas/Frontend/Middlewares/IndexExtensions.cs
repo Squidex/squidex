@@ -7,7 +7,6 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.Net;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -26,13 +25,15 @@ namespace Squidex.Areas.Frontend.Middlewares
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         });
 
-        public static bool IsIndex(this HttpContext context)
-        {
-            return context.Request.Path.StartsWithSegments("/index.html", StringComparison.OrdinalIgnoreCase);
-        }
-
         public static string AddOptions(this string html, HttpContext httpContext)
         {
+            const string Placeholder = "/* INJECT OPTIONS */";
+
+            if (!html.Contains(Placeholder, StringComparison.Ordinal))
+            {
+                return html;
+            }
+
             var scripts = new List<string>
             {
                 $"var texts = {GetText(CultureInfo.CurrentUICulture.Name)};"
@@ -60,12 +61,22 @@ namespace Squidex.Areas.Frontend.Middlewares
                     json["more"]!["notifoApi"] = notifo.Value.ApiUrl;
                 }
 
+                var options = httpContext.Features.Get<OptionsFeature>();
+
+                if (options != null)
+                {
+                    foreach (var (key, value) in options.Options)
+                    {
+                        json[key] = JToken.FromObject(value);
+                    }
+                }
+
                 uiOptions.More["culture"] = CultureInfo.CurrentUICulture.Name;
 
                 scripts.Add($"var options = {json.ToString(Formatting.Indented)};");
             }
 
-            html = html.Replace("<body>", $"<body>\n<script>{string.Join(Environment.NewLine, scripts)}</script>", StringComparison.OrdinalIgnoreCase);
+            html = html.Replace(Placeholder, string.Join(Environment.NewLine, scripts), StringComparison.OrdinalIgnoreCase);
 
             return html;
         }

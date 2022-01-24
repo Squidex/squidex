@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
+using Squidex.Hosting.Web;
 
 namespace Squidex.Config.Authentication
 {
@@ -16,7 +17,7 @@ namespace Squidex.Config.Authentication
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>() ?? new ();
 
             services.AddAuthentication()
-                .AddSquidexCookies()
+                .AddSquidexCookies(config)
                 .AddSquidexExternalGithubAuthentication(identityOptions)
                 .AddSquidexExternalGoogleAuthentication(identityOptions)
                 .AddSquidexExternalMicrosoftAuthentication(identityOptions)
@@ -24,11 +25,18 @@ namespace Squidex.Config.Authentication
                 .AddSquidexIdentityServerAuthentication(identityOptions, config);
         }
 
-        public static AuthenticationBuilder AddSquidexCookies(this AuthenticationBuilder builder)
+        public static AuthenticationBuilder AddSquidexCookies(this AuthenticationBuilder builder, IConfiguration config)
         {
+            var urlsOptions = config.GetSection("urls").Get<UrlOptions>() ?? new ();
+
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = ".sq.auth";
+
+                if (urlsOptions.BaseUrl?.StartsWith("https://", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    options.Cookie.SameSite = SameSiteMode.None;
+                }
             });
 
             return builder.AddCookie();

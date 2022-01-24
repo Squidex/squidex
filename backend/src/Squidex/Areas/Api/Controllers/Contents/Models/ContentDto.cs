@@ -78,6 +78,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public string? NewStatusColor { get; set; }
 
         /// <summary>
+        /// The UI token.
+        /// </summary>
+        public string? EditToken { get; set; }
+
+        /// <summary>
         /// The scheduled status.
         /// </summary>
         public ScheduleJobDto? ScheduleJob { get; set; }

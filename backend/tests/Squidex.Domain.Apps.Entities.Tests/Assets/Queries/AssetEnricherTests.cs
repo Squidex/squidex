@@ -6,11 +6,13 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Json;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
@@ -19,8 +21,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
+        private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IAssetMetadataSource assetMetadataSource1 = A.Fake<IAssetMetadataSource>();
         private readonly IAssetMetadataSource assetMetadataSource2 = A.Fake<IAssetMetadataSource>();
+        private readonly IJsonSerializer jsonSerializer = A.Fake<IJsonSerializer>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly Context requestContext;
         private readonly AssetEnricher sut;
@@ -35,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             requestContext = Context.Anonymous(Mocks.App(appId));
 
-            sut = new AssetEnricher(tagService, assetMetadataSources, requestCache);
+            sut = new AssetEnricher(tagService, assetMetadataSources, requestCache, urlGenerator, jsonSerializer);
         }
 
         [Fact]
@@ -162,6 +166,38 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
             Assert.Equal(new HashSet<string> { "name1", "name2" }, result[0].TagNames);
             Assert.Equal(new HashSet<string> { "name2", "name3" }, result[1].TagNames);
+        }
+
+        [Fact]
+        public async Task Should_not_compute_ui_tokens_for_frontend()
+        {
+            var source = new AssetEntity
+            {
+                AppId = appId
+            };
+
+            var result = await sut.EnrichAsync(new[] { source }, new Context(Mocks.FrontendUser(), Mocks.App(appId)), default);
+
+            Assert.Null(result[0].EditToken);
+
+            A.CallTo(() => urlGenerator.Root())
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_compute_ui_tokens()
+        {
+            var source = new AssetEntity
+            {
+                AppId = appId
+            };
+
+            var result = await sut.EnrichAsync(new[] { source }, requestContext, default);
+
+            Assert.NotNull(result[0].EditToken);
+
+            A.CallTo(() => urlGenerator.Root())
+                .MustHaveHappened();
         }
     }
 }

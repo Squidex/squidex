@@ -40,10 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 if (assets.Count > 0)
                 {
-                    var url = urlGenerator.AssetsUI(context.App.NamedId(), query);
-
                     foreach (var asset in assets)
                     {
+                        var url = urlGenerator.AssetsUI(context.App.NamedId(), asset.Id.ToString());
+
                         result.Add(asset.FileName, SearchResultType.Asset, url);
                     }
                 }

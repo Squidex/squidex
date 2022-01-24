@@ -15,3 +15,23 @@
     font-weight: normal;
     width: $size-sidebar-width;
 }
+
+.main {
+    &.top {
+        margin-top: -$size-navbar-height;
+    }
+
+    &.top ::ng-deep {
+        .panel-container {
+            top: 0;
+        }
+
+        .panel-container {
+            left: 0;
+        }
+
+        .sidebar {
+            display: none;
+        }
+    }
+}

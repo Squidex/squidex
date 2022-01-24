@@ -133,7 +133,8 @@ namespace Squidex.Config.Web
         public static void UseSquidexCors(this IApplicationBuilder app)
         {
             app.UseCors(builder => builder
-                .AllowAnyOrigin()
+                .SetIsOriginAllowed(x => true)
+                .AllowCredentials()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
         }

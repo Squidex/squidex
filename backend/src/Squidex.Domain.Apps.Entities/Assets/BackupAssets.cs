@@ -116,13 +116,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private async Task RestoreTagsAsync(RestoreContext context,
             CancellationToken ct)
         {
-            var tags = await context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(TagsFile, ct);
+            var tags = (Dictionary<string, Tag>?)null;
+
+            if (await context.Reader.HasFileAsync(TagsFile, ct))
+            {
+                tags = await context.Reader.ReadJsonAsync<Dictionary<string, Tag>>(TagsFile, ct);
+            }
 
             var alias = (Dictionary<string, string>?)null;
 
             if (await context.Reader.HasFileAsync(TagsAliasFile, ct))
             {
                 alias = await context.Reader.ReadJsonAsync<Dictionary<string, string>>(TagsAliasFile, ct);
+            }
+
+            if (alias == null && tags == null)
+            {
+                return;
             }
 
             var export = new TagsExport { Tags = tags, Alias = alias };
