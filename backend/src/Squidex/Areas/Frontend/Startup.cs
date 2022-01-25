@@ -42,7 +42,7 @@ namespace Squidex.Areas.Frontend
                 builder.UseMiddleware<SetupMiddleware>();
             });
 
-            app.UseWhen(c => c.IsHtmlPath(), builder =>
+            app.UseWhen(c => c.IsSpaFile() || c.IsHtmlPath(), builder =>
             {
                 // Adjust the base for all potential html files.
                 builder.UseHtmlTransform(new HtmlTransformOptions
@@ -106,16 +106,6 @@ namespace Squidex.Areas.Frontend
         private static bool IsDevServer(this HttpContext context)
         {
             return context.Request.Path.StartsWithSegments("/ws", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsHtmlPath(this HttpContext context)
-        {
-            return context.IsSpaFile() || context.IsHtml();
-        }
-
-        private static bool IsHtml(this HttpContext context)
-        {
-            return context.Request.Path.Value?.Contains(".html", StringComparison.OrdinalIgnoreCase) == true;
         }
     }
 }
