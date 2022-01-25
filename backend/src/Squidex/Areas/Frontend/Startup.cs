@@ -100,12 +100,22 @@ namespace Squidex.Areas.Frontend
 
         private static bool IsSpaFile(this HttpContext context)
         {
-            return context.IsIndex() || !Path.HasExtension(context.Request.Path);
+            return (context.IsIndex() || !Path.HasExtension(context.Request.Path)) && !context.IsDevServer();
+        }
+
+        private static bool IsDevServer(this HttpContext context)
+        {
+            return context.Request.Path.StartsWithSegments("/ws", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsHtmlPath(this HttpContext context)
         {
-            return context.IsSpaFile() || context.Request.Path.Value?.Contains(".html", StringComparison.OrdinalIgnoreCase) == true;
+            return context.IsSpaFile() || context.IsHtml();
+        }
+
+        private static bool IsHtml(this HttpContext context)
+        {
+            return context.Request.Path.Value?.Contains(".html", StringComparison.OrdinalIgnoreCase) == true;
         }
     }
 }

@@ -34,13 +34,13 @@
                     <input type="number" class="form-control" formControlName="maxSize" placeholder="{{ 'schemas.fieldTypes.assets.sizeMax' | sqxTranslate }}">
                 </div>
                 <div class="col col-label">
-                    <label class="col-form-label">bytes</label>
+                    <label class="col-form-label">{{ 'common.bytes' | sqxTranslate }}</label>
                 </div>
             </div>
         </div>
     </div>
 
-    <hr />
+    <hr>
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.assets.expectedType' | sqxTranslate }}</label>
@@ -50,7 +50,7 @@
                 <div class="col">
                     <select class="form-select" formControlName="expectedType">
                         <option></option>
-                        <option ngValue="Image">Image</option>
+                        <option ngValue="Image">{{ 'apps.image' | sqxTranslate }}</option>
                         <option ngValue="Audio">Audio</option>
                         <option ngValue="Video">Video</option>
                         <option ngValue="Unknown">Unknown</option>
@@ -125,7 +125,7 @@
         </div>
     </div>
 
-    <hr />
+    <hr>
 
     <div class="form-group row">
         <div class="col-9 offset-3">

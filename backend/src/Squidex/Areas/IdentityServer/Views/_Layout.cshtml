@@ -14,6 +14,11 @@
     {
         @await RenderSectionAsync("header")
     }
+
+    <environment include="Development">
+        <script type="text/javascript" src="@Url.RootContentUrl("~/runtime.js")"></script>
+        <script type="text/javascript" src="@Url.RootContentUrl("~/polyfills.js")"></script>
+    </environment>
 </head>
 <body class="profile">
     <div class="profile-container">

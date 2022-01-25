@@ -1,17 +1,17 @@
 <ng-container *ngIf="!triggerForm.form.controls.handleAll.value">
     <table class="table table-middle table-sm table-fixed table-borderless">
         <colgroup>
-            <col style="width: 40%;" />
-            <col style="width: 60%;" />
-            <col style="width: 40px;" />
+            <col style="width: 40%;">
+            <col style="width: 60%;">
+            <col style="width: 40px;">
         </colgroup>
 
         <tr>
             <td>
-                <label>Schema</label>
+                <label>{{ 'common.schema' | sqxTranslate }}</label>
             </td>
             <td>
-                <label>Condition</label>
+                <label>{{ 'common.condition' | sqxTranslate }}</label>
             </td>
             <th></th>
         </tr>
@@ -21,11 +21,7 @@
                 <span class="truncate">{{triggerSchema.schema.displayName}}</span>
             </td>
             <td class="text-center">
-                <input type="text" class="form-control code" placeholder="Optional condition as javascript expression"
-                    [disabled]="triggerForm.form.disabled"
-                    [ngModelOptions]="{ updateOn: 'blur' }"
-                    [ngModel]="triggerSchema.condition" 
-                    (ngModelChange)="updateCondition(triggerSchema.schema, $event)" />
+                <input type="text" class="form-control code" placeholder="i18n:rules.conditionHint" [disabled]="triggerForm.form.disabled" [ngModelOptions]="{ updateOn: 'blur' }" [ngModel]="triggerSchema.condition" (ngModelChange)="updateCondition(triggerSchema.schema, $event)">
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)" [disabled]="triggerForm.form.disabled">
@@ -44,30 +40,30 @@
             </div>
 
             <div class="col-auto">
-                <button type="submit" class="btn btn-success" [disabled]="triggerForm.form.disabled">Add Schema</button>
+                <button type="submit" class="btn btn-success" [disabled]="triggerForm.form.disabled">{{ 'rules.addSchema' | sqxTranslate }}</button>
             </div>
         </form>
     </div>
     
 
     <div class="help">
-        <h4>Conditions</h4>
+        <h4>{{ 'common.conditions' | sqxTranslate }}</h4>
     
-        <p>Conditions are javascript expressions that define when to trigger, for example:</p>
+        <p>{{ 'rules.conditionHint2' | sqxTranslate }}:</p>
     
         <ul class="help-examples">
             <li class="help-example">
-                Specific events:<br/>
+                {{ 'rules.conditions.event' | sqxTranslate }}:<br>
 
                 <sqx-code>event.type == 'Created' || event.type == 'Published'</sqx-code>
             </li>
             <li class="help-example">
-                Content has value:<br/>
+                {{ 'rules.conditions.contentValue' | sqxTranslate }}:<br>
 
                 <sqx-code>event.data.important.iv === true</sqx-code>
             </li>
             <li class="help-example">
-                Updated by user:<br/>
+                {{ 'rules.conditions.updatedBy' | sqxTranslate }}:<br>
                 
                 <sqx-code>user.email === 'user@squidex.io'</sqx-code>
             </li>
@@ -79,7 +75,7 @@
     <div class="form-check">
         <input class="form-check-input" type="checkbox" id="handleAll" formControlName="handleAll">
         <label class="form-check-label" for="handleAll">
-            Trigger on all content events
+            {{ 'rules.triggerAll' | sqxTranslate }}
         </label>
     </div>
 </div>
