@@ -18,7 +18,7 @@ import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, RouteReuseStrategy, Rou
 import { environment } from './../environments/environment';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
-import { ApiUrlConfig, CurrencyConfig, DateHelper, DecimalSeparatorConfig, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
+import { ApiUrlConfig, DateHelper, LocalizerService, SqxFrameworkModule, SqxSharedModule, TitlesConfig, UIOptions } from './shared';
 import { SqxShellModule } from './shell';
 
 const options = window['options'] || {};
@@ -53,14 +53,6 @@ function configTitles() {
     return new TitlesConfig(undefined, 'i18n:common.product');
 }
 
-function configDecimalSeparator() {
-    return new DecimalSeparatorConfig('.');
-}
-
-function configCurrency() {
-    return new CurrencyConfig('EUR', '€', true);
-}
-
 function configLocalizerService() {
     return new LocalizerService(environment.textResolver()).logMissingKeys(environment.textLogger);
 }
@@ -90,8 +82,6 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
     ],
     providers: [
         { provide: ApiUrlConfig, useFactory: configApiUrl },
-        { provide: CurrencyConfig, useFactory: configCurrency },
-        { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
         { provide: LocalizerService, useFactory: configLocalizerService },
         { provide: RouteReuseStrategy, useClass: AppRouteReuseStrategy },
         { provide: TitlesConfig, useFactory: configTitles },
