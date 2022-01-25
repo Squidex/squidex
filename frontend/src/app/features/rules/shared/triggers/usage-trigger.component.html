@@ -1,25 +1,25 @@
 <div [formGroup]="triggerForm.form" class="form-horizontal">
     <div class="form-group">
-        <label for="limit">Limit</label>
+        <label for="limit">{{ 'rules.conditions.usageLimit' | sqxTranslate }}</label>
 
         <sqx-control-errors for="limit"></sqx-control-errors>
 
         <input type="number" step="1" class="form-control" id="limit" formControlName="limit">
         
         <sqx-form-hint>
-            The monthly api calls to trigger.
+            {{ 'rules.conditions.usageLimitHint' | sqxTranslate }}
         </sqx-form-hint>
     </div>
 
     <div class="form-group">
-        <label for="condition">Days</label>
+        <label for="condition">{{ 'rules.conditions.usageDays' | sqxTranslate }}</label>
 
         <sqx-control-errors for="numDays" fieldName="Days"></sqx-control-errors>
 
         <input type="number" step="1" class="form-control" id="condition" formControlName="numDays">
         
         <sqx-form-hint>
-            The number of days to check or empty to check the current month.
+            {{ 'rules.conditions.usageDaysHint' | sqxTranslate }}
         </sqx-form-hint>
     </div>
 </div>

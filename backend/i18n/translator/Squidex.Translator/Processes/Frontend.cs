@@ -11,7 +11,7 @@ namespace Squidex.Translator.Processes
     {
         public static DirectoryInfo GetFolder(DirectoryInfo folder)
         {
-            return new DirectoryInfo(Path.Combine(folder.FullName, "frontend", "app"));
+            return new DirectoryInfo(Path.Combine(folder.FullName, "frontend", "src", "app"));
         }
 
         public static IEnumerable<(FileInfo, string)> GetTypescriptFiles(DirectoryInfo folder)

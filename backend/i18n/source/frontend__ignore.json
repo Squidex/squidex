@@ -5,6 +5,10 @@
   "/app.module.ts": [
     "Application element not found"
   ],
+  "/features/apps/pages/app.component.html": [
+    "&middot;",
+    "|"
+  ],
   "/features/apps/pages/apps-page.component.html": [
     "&middot;",
     "|"
@@ -22,25 +26,21 @@
     "{{field.displayName}} {{displaySuffix}}",
     "*"
   ],
+  "/features/content/shared/references/reference-item.component.html": [
+    "INVALID",
+    "VALID"
+  ],
   "/features/content/shared/references/references-editor.component.html": [
     "&middot;"
+  ],
+  "/features/rules/pages/rule/rule-page.component.html": [
+    "...",
+    "#"
   ],
   "/features/rules/pages/rules/actions/generic-action.component.html": [
     "*"
   ],
-  "/features/rules/pages/rules/triggers/asset-changed-trigger.component.html": [
-    "*"
-  ],
-  "/features/rules/pages/rules/triggers/comment-trigger.component.html": [
-    "*"
-  ],
-  "/features/rules/pages/rules/triggers/content-changed-trigger.component.html": [
-    "*"
-  ],
-  "/features/rules/pages/rules/triggers/schema-changed-trigger.component.html": [
-    "*"
-  ],
-  "/features/rules/pages/rules/triggers/usage-trigger.component.html": [
+  "/features/rules/shared/actions/generic-action.component.html": [
     "*"
   ],
   "/features/schemas/pages/schema/fields/types/array-validation.component.html": [
@@ -50,11 +50,17 @@
     "-",
     "3",
     "4",
-    "px"
+    "Audio",
+    "px",
+    "Unknown",
+    "Video"
   ],
   "/features/schemas/pages/schema/fields/types/boolean-ui.component.html": [
     "Checkbox",
     "Toggle"
+  ],
+  "/features/schemas/pages/schema/fields/types/components-validation.component.html": [
+    "-"
   ],
   "/features/schemas/pages/schema/fields/types/date-time-ui.component.html": [
     "DateTime"
@@ -118,10 +124,14 @@
   "/features/settings/pages/contributors/import-contributors-dialog.component.html": [
     "user1@squidex.io;user2@squidex.io"
   ],
+  "/features/settings/pages/languages/language-add-form.component.html": [
+    "{{language.iso2Code}} ({{language.englishName}}"
+  ],
   "/framework/angular/forms/validators.ts": [
     "matchValidator(): other control is not found in parent group"
   ],
   "/framework/angular/modals/dialog-renderer.component.html": [
+    "({{tooltip.shortcut}}",
     "&times;"
   ],
   "/framework/angular/pager.component.html": [
@@ -145,6 +155,9 @@
   ],
   "/shared/components/app-form.component.html": [
     "appName"
+  ],
+  "/shared/components/assets/assets-selector.component.html": [
+    "[query]=\"assetsState.query | async\""
   ],
   "/shared/components/forms/geolocation-editor.component.ts": [
     "&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors"
@@ -172,6 +185,9 @@
   ],
   "/shared/components/search/search-form.component.ts": [
     "form-inline search-form"
+  ],
+  "/shared/components/watching-users.component.html": [
+    "+{{currentUsers.length - 5}}"
   ],
   "/shared/services/auth.service.ts": [
     "*"

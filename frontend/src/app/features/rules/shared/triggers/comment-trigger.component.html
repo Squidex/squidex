@@ -1,25 +1,25 @@
 <div [formGroup]="triggerForm.form" class="form-horizontal">
     <div class="form-group">
-        <label for="condition">Condition</label>
+        <label for="condition">{{ 'common.condition' | sqxTranslate }}</label>
 
         <sqx-control-errors for="condition"></sqx-control-errors>
 
-        <textarea class="form-control code" id="condition" formControlName="condition" placeholder="Optional condition as javascript expression"></textarea>
+        <textarea class="form-control code" id="condition" formControlName="condition" placeholder="i18n:rules.conditionHint"></textarea>
     </div>
 
     <div class="help">
-        <h4>Conditions</h4>
+        <h4>{{ 'common.conditions' | sqxTranslate }}</h4>
     
-        <p>Conditions are javascript expressions that define when to trigger, for example:</p>
+        <p>{{ 'rules.conditionHint2' | sqxTranslate }}:</p>
     
         <ul class="help-examples">
             <li class="help-example">
-                Specific users:<br/>
+                {{ 'rules.conditions.commentUser' | sqxTranslate }}:<br>
 
                 <sqx-code>event.mentionedUser.email === 'mail2stehle@gmail.com'</sqx-code>
             </li>
             <li class="help-example">
-                Only for text keywords:<br/>
+                {{ 'rules.conditions.commentKeyword' | sqxTranslate }}:<br>
 
                 <sqx-code>event.text.indexOf('urgent') >= 0</sqx-code>
             </li>

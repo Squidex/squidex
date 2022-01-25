@@ -944,7 +944,7 @@
     <value>Installation</value>
   </data>
   <data name="setup.hint" xml:space="preserve">
-    <value>You are seeing this screen because no user exists yet. After a user is created, you are not able to use this screen again.</value>
+    <value>You see this screen because no user exists yet. After a user is created, you are not able to use this setup page again.</value>
   </data>
   <data name="setup.madeBy" xml:space="preserve">
     <value>Proudly made by</value>
@@ -959,7 +959,7 @@
     <value>With your setup, every user can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt; as environment variable.</value>
   </data>
   <data name="setup.ruleFolder.warning" xml:space="preserve">
-    <value>You are using the &lt;strong&gt;folder asset store&lt;/strong&gt; where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using Docker.</value>
+    <value>You are using the &lt;strong&gt;folder asset store&lt;/strong&gt; where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using docker.</value>
   </data>
   <data name="setup.ruleFtp.warning" xml:space="preserve">
     <value>You are using the &lt;strong&gt;FTP asset store&lt;/strong&gt;. It is not recommended to use this storage type because of bad performance.</value>
@@ -974,10 +974,10 @@
     <value>System Checklist</value>
   </data>
   <data name="setup.ruleUrl.failure" xml:space="preserve">
-    <value>You should access Squidex only over one canonical URL and configure this URL with the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;.</value>
+    <value>You should access Squidex only over one canonical URL and configure this URL with the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;. This variable must point to the public URL under which your Squidex instance is available.</value>
   </data>
   <data name="setup.ruleUrl.success" xml:space="preserve">
-    <value>Congratulations, the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly.</value>
+    <value>Congratulations, the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly. This variable  must point to the public URL under which your Squidex instance is available.</value>
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
