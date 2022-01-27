@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class ClaimsPrinicpalSurrogate : List<ClaimsIdentitySurrogate>, ISurrogate<ClaimsPrincipal>
+    public sealed class ClaimsPrincipalSurrogate : List<ClaimsIdentitySurrogate>, ISurrogate<ClaimsPrincipal>
     {
         public void FromSource(ClaimsPrincipal source)
         {

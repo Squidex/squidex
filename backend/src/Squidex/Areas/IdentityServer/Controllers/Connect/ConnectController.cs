@@ -43,7 +43,6 @@ namespace Notifo.Areas.Account.Controllers
         public async Task<IActionResult> Exchange()
         {
             var request = HttpContext.GetOpenIddictServerRequest();
-
             if (request == null)
             {
                 throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
@@ -52,14 +51,12 @@ namespace Notifo.Areas.Account.Controllers
             if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType() || request.IsImplicitFlow())
             {
                 var principal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
-
                 if (principal == null)
                 {
                     throw new InvalidOperationException("The user details cannot be retrieved.");
                 }
 
                 var user = await userService.GetAsync(principal, HttpContext.RequestAborted);
-
                 if (user == null)
                 {
                     return Forbid(
@@ -104,7 +101,7 @@ namespace Notifo.Areas.Account.Controllers
                     throw new InvalidOperationException("The application details cannot be found in the database.");
                 }
 
-                var principal = await CreateApplicationPrinicpalAsync(request, application);
+                var principal = await CreateApplicationPrincipalAsync(request, application);
 
                 return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
@@ -155,9 +152,7 @@ namespace Notifo.Areas.Account.Controllers
                 throw new InvalidOperationException("The user details cannot be retrieved.");
             }
 
-            var principal = await SignInManager.CreateUserPrincipalAsync((IdentityUser)user.Identity);
-
-            await EnrichPrincipalAsync(request, principal, false);
+            var principal = await CreatePrincipalAsync(request, user);
 
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
@@ -170,7 +165,14 @@ namespace Notifo.Areas.Account.Controllers
             return SignOut(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
-        private async Task<ClaimsPrincipal> CreateApplicationPrinicpalAsync(OpenIddictRequest request, object application)
+        private async Task<ClaimsPrincipal> CreatePrincipalAsync(OpenIddictRequest request, Squidex.Shared.Users.IUser? user)
+        {
+            var principal = await SignInManager.CreateUserPrincipalAsync((IdentityUser)user.Identity);
+
+            return await EnrichPrincipalAsync(principal, request, false);
+        }
+
+        private async Task<ClaimsPrincipal> CreateApplicationPrincipalAsync(OpenIddictRequest request, object application)
         {
             var identity = new ClaimsIdentity(
                 TokenValidationParameters.DefaultAuthenticationType,
@@ -193,22 +195,24 @@ namespace Notifo.Areas.Account.Controllers
                 identity.AddClaim(claim);
             }
 
-            await EnrichPrincipalAsync(request, principal, true);
-
-            return principal;
+            return await EnrichPrincipalAsync(principal, request, true);
         }
 
-        private async Task EnrichPrincipalAsync(OpenIddictRequest request, ClaimsPrincipal principal, bool alwaysDeliverPermissions)
+        private async Task<ClaimsPrincipal> EnrichPrincipalAsync(ClaimsPrincipal principal, OpenIddictRequest request, bool alwaysDeliverPermissions)
         {
             var scopes = request.GetScopes();
 
+            var resources = await scopeManager.ListResourcesAsync(scopes, HttpContext.RequestAborted).ToListAsync(HttpContext.RequestAborted);
+
             principal.SetScopes(scopes);
-            principal.SetResources(await scopeManager.ListResourcesAsync(scopes, HttpContext.RequestAborted).ToListAsync(HttpContext.RequestAborted));
+            principal.SetResources(resources);
 
             foreach (var claim in principal.Claims)
             {
                 claim.SetDestinations(GetDestinations(claim, principal, alwaysDeliverPermissions));
             }
+
+            return principal;
         }
 
         private static IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal, bool alwaysDeliverPermissions)

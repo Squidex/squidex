@@ -37,13 +37,17 @@ namespace Squidex
             services.AddDefaultWebServices(config);
             services.AddDefaultForwardRules();
 
+            // They must be called in this order.
+            services.AddSquidexMvcWithPlugins(config);
+            services.AddSquidexIdentity(config);
+            services.AddSquidexIdentityServer();
+            services.AddSquidexAuthentication(config);
+
             services.AddSquidexImageResizing(config);
             services.AddSquidexAssetInfrastructure(config);
             services.AddSquidexSerializers();
-            services.AddSquidexMvcWithPlugins(config);
             services.AddSquidexApps(config);
             services.AddSquidexAssets(config);
-            services.AddSquidexAuthentication(config);
             services.AddSquidexBackups();
             services.AddSquidexCommands(config);
             services.AddSquidexComments();
@@ -54,8 +58,6 @@ namespace Squidex
             services.AddSquidexGraphQL();
             services.AddSquidexHealthChecks(config);
             services.AddSquidexHistory(config);
-            services.AddSquidexIdentity(config);
-            services.AddSquidexIdentityServer();
             services.AddSquidexInfrastructure(config);
             services.AddSquidexLocalization();
             services.AddSquidexMigration(config);

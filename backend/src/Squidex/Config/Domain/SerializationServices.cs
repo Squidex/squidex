@@ -46,7 +46,7 @@ namespace Squidex.Config.Domain
                 new ExecutionResultJsonConverter(new ErrorInfoProvider()),
                 new JsonValueConverter(),
                 new StringEnumConverter(),
-                new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
                 new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                 new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
                 new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),

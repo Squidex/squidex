@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry ?? new TypeNameRegistry()),
 
                 ContractResolver = new ConverterContractResolver(
-                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
                     new EnvelopeHeadersConverter(),
                     new JsonValueConverter(),
                     new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),

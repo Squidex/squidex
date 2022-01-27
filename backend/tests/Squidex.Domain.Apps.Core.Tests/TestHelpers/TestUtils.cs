@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new EnvelopeHeadersConverter(),
                     new JsonValueConverter(),
                     new StringEnumConverter(),
-                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
                     new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                     new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
                     new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
