@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
+using System.Globalization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -13,8 +13,6 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.GenerateFilters
 {
-    public delegate (JsonSchema Reference, JsonSchema? Actual) JsonTypeFactory(string name);
-
     public static class JsonSchemaExtensions
     {
         public static FilterableField BuildDataField(this Schema schema, PartitionResolver partitionResolver,
@@ -24,6 +22,8 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
             Guard.NotNull(components, nameof(components));
 
             var fields = new List<FilterableField>();
+
+            var schemaName = schema.DisplayName();
 
             foreach (var field in schema.Fields.ForApi(true))
             {
@@ -35,37 +35,52 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
                 }
 
                 var partitioning = partitionResolver(field.Partitioning);
-
-                var nestedFields = new List<FilterableField>();
+                var partitionFields = new List<FilterableField>();
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
+                    var isNullable = partitioning.IsOptional(partitionKey) || !field.RawProperties.IsRequired;
+
+                    var partitionField = filterableField with
+                    {
+                        IsNullable = isNullable,
+                        FieldHints = FieldPartitionDescription(field, partitioning, partitionKey),
+                        Fields = filterableField.Fields
+                    };
+
+                    partitionFields.Add(partitionField);
                 }
 
-                fields.Add(new FilterableField(FilterableFieldType.Object, field.Name)
+                var fieldGroup = new FilterableField(FilterableFieldType.Object, field.Name)
                 {
-                    Fields = nestedFields.ToReadonlyList()
-                });
+                    FieldHints = FieldDescription(schemaName, field),
+                    Fields = partitionFields.ToReadonlyList()
+                };
+
+                fields.Add(fieldGroup);
             }
 
-            return new FilterableField(FilterableFieldType.Object, "data")
+            var dataField = new FilterableField(FilterableFieldType.Object, "data")
             {
+                FieldHints = FieldDescriptions.ContentData,
                 Fields = fields.ToReadonlyList()
             };
+
+            return dataField;
         }
 
-        public static JsonSchemaProperty SetDescription(this JsonSchemaProperty jsonProperty, IField field)
+        private static string FieldPartitionDescription(RootField field, IFieldPartitioning partitioning, string partitionKey)
         {
-            if (!string.IsNullOrWhiteSpace(field.RawProperties.Hints))
-            {
-                jsonProperty.Description = $"{field.Name} ({field.RawProperties.Hints})";
-            }
-            else
-            {
-                jsonProperty.Description = field.Name;
-            }
+            var name = field.DisplayName();
 
-            return jsonProperty;
+            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ContentPartitionField, name, partitioning.GetName(partitionKey));
+        }
+
+        private static string FieldDescription(string schemaName, RootField field)
+        {
+            var name = field.DisplayName();
+
+            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ContentField, name, schemaName);
         }
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 {
     internal sealed class FilterVisitor : IFieldVisitor<FilterableField?, FilterVisitor.Args>
     {
-        private const int MaxDepth = 3;
+        private const int MaxDepth = 5;
         private static readonly FilterVisitor Instance = new FilterVisitor();
 
         public record struct Args(ResolvedComponents Components, int Level = 0);
@@ -50,13 +51,12 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 
                 if (filterableField != null)
                 {
-                    if (!field.RawProperties.IsRequired)
+                    filterableField = filterableField with
                     {
-                        filterableField = filterableField with
-                        {
-                            IsNullable = true
-                        };
-                    }
+                        IsNullable = !field.RawProperties.IsRequired,
+                        FieldHints = ArrayFieldDescription(nestedField),
+                        Fields = filterableField.Fields
+                    };
 
                     fields.Add(filterableField);
                 }
@@ -76,37 +76,6 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
         public FilterableField? Visit(IField<BooleanFieldProperties> field, Args args)
         {
             return new FilterableField(FilterableFieldType.Boolean, field.Name);
-        }
-
-        public FilterableField? Visit(IField<ComponentFieldProperties> field, Args args)
-        {
-            if (args.Level >= MaxDepth)
-            {
-                return null;
-            }
-
-            return new FilterableField(FilterableFieldType.Object, field.Name)
-            {
-                Fields = BuildComponent(field.Properties.SchemaIds, args).ToReadonlyList()
-            };
-        }
-
-        public FilterableField? Visit(IField<ComponentsFieldProperties> field, Args args)
-        {
-            if (args.Level >= MaxDepth)
-            {
-                return null;
-            }
-
-            return new FilterableField(FilterableFieldType.ObjectArray, field.Name)
-            {
-                Fields = BuildComponent(field.Properties.SchemaIds, args).ToReadonlyList()
-            };
-        }
-
-        public FilterableField? Visit(IField<DateTimeFieldProperties> field, Args args)
-        {
-            return new FilterableField(FilterableFieldType.DateTime, field.Name);
         }
 
         public FilterableField? Visit(IField<GeolocationFieldProperties> field, Args args)
@@ -134,20 +103,60 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
             return new FilterableField(FilterableFieldType.StringArray, field.Name);
         }
 
-        public FilterableField? Visit(IField<ReferencesFieldProperties> field, Args args)
-        {
-            return new FilterableField(FilterableFieldType.StringArray, field.Name)
-            {
-                Extra = field.Properties.SchemaIds ?? ReadonlyList.Empty<DomainId>()
-            };
-        }
-
         public FilterableField? Visit(IField<UIFieldProperties> field, Args args)
         {
             return null;
         }
 
-        private List<FilterableField> BuildComponent(ReadonlyList<DomainId>? schemaIds, Args args)
+        public FilterableField? Visit(IField<ComponentFieldProperties> field, Args args)
+        {
+            if (args.Level >= MaxDepth)
+            {
+                return null;
+            }
+
+            return new FilterableField(FilterableFieldType.Object, field.Name)
+            {
+                Fields = BuildComponent(field.Properties.SchemaIds, args)
+            };
+        }
+
+        public FilterableField? Visit(IField<ComponentsFieldProperties> field, Args args)
+        {
+            if (args.Level >= MaxDepth)
+            {
+                return null;
+            }
+
+            return new FilterableField(FilterableFieldType.ObjectArray, field.Name)
+            {
+                Fields = BuildComponent(field.Properties.SchemaIds, args)
+            };
+        }
+
+        public FilterableField? Visit(IField<DateTimeFieldProperties> field, Args args)
+        {
+            return new FilterableField(FilterableFieldType.DateTime, field.Name)
+            {
+                Extra = new
+                {
+                    editor = field.Properties.Editor.ToString()
+                }
+            };
+        }
+
+        public FilterableField? Visit(IField<ReferencesFieldProperties> field, Args args)
+        {
+            return new FilterableField(FilterableFieldType.StringArray, field.Name)
+            {
+                Extra = new
+                {
+                    schemaIds = field.Properties.SchemaIds
+                }
+            };
+        }
+
+        private ReadonlyList<FilterableField> BuildComponent(ReadonlyList<DomainId>? schemaIds, Args args)
         {
             var fields = new List<FilterableField>();
 
@@ -155,19 +164,20 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 
             foreach (var schema in args.Components.Resolve(schemaIds).Values)
             {
+                var componentName = schema.DisplayName();
+
                 foreach (var field in schema.Fields.ForApi(true))
                 {
                     var filterableField = field.Accept(this, nestedArgs);
 
                     if (filterableField != null)
                     {
-                        if (!field.RawProperties.IsRequired)
+                        filterableField = filterableField with
                         {
-                            filterableField = filterableField with
-                            {
-                                IsNullable = true
-                            };
-                        }
+                            IsNullable = !field.RawProperties.IsRequired,
+                            FieldHints = ComponentFieldDescription(componentName, field),
+                            Fields = filterableField.Fields
+                        };
 
                         fields.Add(filterableField);
                     }
@@ -176,7 +186,21 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
                 fields.Add(new FilterableField(FilterableFieldType.String, Component.Discriminator));
             }
 
-            return fields;
+            return fields.ToReadonlyList();
+        }
+
+        private static string ArrayFieldDescription(IField field)
+        {
+            var name = field.DisplayName();
+
+            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ContentArrayField, name);
+        }
+
+        private static string ComponentFieldDescription(string componentName, RootField field)
+        {
+            var name = field.DisplayName();
+
+            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ComponentField, name, componentName);
         }
     }
 }

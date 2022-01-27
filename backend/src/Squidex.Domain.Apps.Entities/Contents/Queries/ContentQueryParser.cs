@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
-                return ContentQueryModel.BuildModel(schema?.SchemaDef, context.App.PartitionResolver(), components);
+                return ContentQueryModel.Build(schema?.SchemaDef, context.App.PartitionResolver(), components);
             });
 
             return result;

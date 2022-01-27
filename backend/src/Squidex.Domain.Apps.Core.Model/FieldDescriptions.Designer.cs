@@ -304,6 +304,24 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} field ({1} component)..
+        /// </summary>
+        public static string ComponentField {
+            get {
+                return ResourceManager.GetString("ComponentField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} nested field..
+        /// </summary>
+        public static string ContentArrayField {
+            get {
+                return ResourceManager.GetString("ContentArrayField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The data of the content..
         /// </summary>
         public static string ContentData {
@@ -318,6 +336,15 @@ namespace Squidex.Domain.Apps.Core {
         public static string ContentDataOld {
             get {
                 return ResourceManager.GetString("ContentDataOld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} field..
+        /// </summary>
+        public static string ContentField {
+            get {
+                return ResourceManager.GetString("ContentField", resourceCulture);
             }
         }
         
@@ -345,6 +372,15 @@ namespace Squidex.Domain.Apps.Core {
         public static string ContentNewStatusColor {
             get {
                 return ResourceManager.GetString("ContentNewStatusColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} field ({1})..
+        /// </summary>
+        public static string ContentPartitionField {
+            get {
+                return ResourceManager.GetString("ContentPartitionField", resourceCulture);
             }
         }
         

@@ -125,23 +125,25 @@ namespace Squidex.Infrastructure.Queries
 
             var result = new List<FilterableField>();
 
-            var path = new Stack<string>();
+            var pathStack = new Stack<string>();
 
             void AddField(FilterableField field)
             {
-                path.Push(field.FieldPath);
+                pathStack.Push(field.Path);
 
-                result.Add(field with
+                if (Operators.TryGetValue(field.Type, out var operators) && operators.Count > 0)
                 {
-                    FieldPath = string.Join('.', path.Reverse())
-                });
+                    var path = string.Join('.', pathStack.Reverse());
 
-                if (field.Fields?.Count > 0)
+                    result.Add(field with { Path = path });
+                }
+
+                if (field.Fields?.Count > 0 && pathStack.Count < 5)
                 {
                     AddFields(field.Fields);
                 }
 
-                path.Pop();
+                pathStack.Pop();
             }
 
             void AddFields(IEnumerable<FilterableField> source)
@@ -152,7 +154,9 @@ namespace Squidex.Infrastructure.Queries
                 }
             }
 
-            var simplified = result.GroupBy(x => new { x.FieldPath, x.Type }).SingleGroups().OrderBy(x => x.FieldPath);
+            AddFields(Fields);
+
+            var simplified = result.GroupBy(x => new { x.Path, x.Type }).SingleGroups();
 
             return new QueryModel { Operators = Operators, Fields = simplified.ToList() };
         }

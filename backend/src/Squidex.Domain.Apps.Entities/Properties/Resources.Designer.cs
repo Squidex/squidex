@@ -61,51 +61,6 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Counts the number of characters in a text. Useful in combination with html2Text or markdown2Text..
-        /// </summary>
-        internal static string ScriptingCharacterCount {
-            get {
-                return ResourceManager.GetString("ScriptingCharacterCount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Makes a DELETE request to the defined URL and parses the result as JSON. Headers are optional..
-        /// </summary>
-        internal static string ScriptingDeleteJson {
-            get {
-                return ResourceManager.GetString("ScriptingDeleteJson", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tell Squidex to not allow the current operation and to return a 403 (Forbidden)..
-        /// </summary>
-        internal static string ScriptingDisallow {
-            get {
-                return ResourceManager.GetString("ScriptingDisallow", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Formats a JavaScript date object using the specified pattern..
-        /// </summary>
-        internal static string ScriptingFormatDate {
-            get {
-                return ResourceManager.GetString("ScriptingFormatDate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Formats a JavaScript date object using the specified pattern..
-        /// </summary>
-        internal static string ScriptingFormatTime {
-            get {
-                return ResourceManager.GetString("ScriptingFormatTime", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Queries the asset with the specified ID and invokes the callback with an array of assets..
         /// </summary>
         internal static string ScriptingGetAsset {
@@ -124,11 +79,11 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Makes a GET request to the defined URL and parses the result as JSON. Headers are optional..
+        ///   Looks up a localized string similar to Get the text of an asset. Encodings: base64,ascii,unicode,utf8.
         /// </summary>
-        internal static string ScriptingGetJSON {
+        internal static string ScriptingGetAssetText {
             get {
-                return ResourceManager.GetString("ScriptingGetJSON", resourceCulture);
+                return ResourceManager.GetString("ScriptingGetAssetText", resourceCulture);
             }
         }
         
@@ -151,137 +106,20 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Generates a guid..
+        ///   Looks up a localized string similar to Increments the counter with the given name and returns the value..
         /// </summary>
-        internal static string ScriptingGuid {
+        internal static string ScriptingIncrementCounter {
             get {
-                return ResourceManager.GetString("ScriptingGuid", resourceCulture);
+                return ResourceManager.GetString("ScriptingIncrementCounter", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Converts a HTML string to plain text..
+        ///   Looks up a localized string similar to Resets the counter with the given name to zero..
         /// </summary>
-        internal static string ScriptingHtml2Text {
+        internal static string ScriptingResetCounter {
             get {
-                return ResourceManager.GetString("ScriptingHtml2Text", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Converts a markdown string to plain text..
-        /// </summary>
-        internal static string ScriptingMarkdown2Text {
-            get {
-                return ResourceManager.GetString("ScriptingMarkdown2Text", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Calculate the MD5 hash from a given string. Use this method for hashing passwords, when backwards compatibility is important..
-        /// </summary>
-        internal static string ScriptingMD5 {
-            get {
-                return ResourceManager.GetString("ScriptingMD5", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Makes a PATCH request to the defined URL and parses the result as JSON. Headers are optional..
-        /// </summary>
-        internal static string ScriptingPatchJson {
-            get {
-                return ResourceManager.GetString("ScriptingPatchJson", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Makes a POST request to the defined URL and parses the result as JSON. Headers are optional..
-        /// </summary>
-        internal static string ScriptingPostJSON {
-            get {
-                return ResourceManager.GetString("ScriptingPostJSON", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Makes a PUT request to the defined URL and parses the result as JSON. Headers are optional..
-        /// </summary>
-        internal static string ScriptingPutJson {
-            get {
-                return ResourceManager.GetString("ScriptingPutJson", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tell Squidex to reject the current operation and to return a 403 (Forbidden)..
-        /// </summary>
-        internal static string ScriptingReject {
-            get {
-                return ResourceManager.GetString("ScriptingReject", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tell Squidex that you have modified the data and that the change should be applied..
-        /// </summary>
-        internal static string ScriptingReplace {
-            get {
-                return ResourceManager.GetString("ScriptingReplace", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Calculate the SHA256 hash from a given string. Use this method for hashing passwords..
-        /// </summary>
-        internal static string ScriptingSHA256 {
-            get {
-                return ResourceManager.GetString("ScriptingSHA256", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Calculate the SHA256 hash from a given string. Use this method for hashing passwords..
-        /// </summary>
-        internal static string ScriptingSHA512 {
-            get {
-                return ResourceManager.GetString("ScriptingSHA512", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Calculates the slug of a text by removing all special characters and whitespaces to create a friendly term that can be used for SEO-friendly URLs..
-        /// </summary>
-        internal static string ScriptingSlugify {
-            get {
-                return ResourceManager.GetString("ScriptingSlugify", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Converts a text to camelCase..
-        /// </summary>
-        internal static string ScriptingToCamelCase {
-            get {
-                return ResourceManager.GetString("ScriptingToCamelCase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Converts a text to PascalCase.
-        /// </summary>
-        internal static string ScriptingToPascalCase {
-            get {
-                return ResourceManager.GetString("ScriptingToPascalCase", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Counts the number of words in a text. Useful in combination with html2Text or markdown2Text..
-        /// </summary>
-        internal static string ScriptingWordCount {
-            get {
-                return ResourceManager.GetString("ScriptingWordCount", resourceCulture);
+                return ResourceManager.GetString("ScriptingResetCounter", resourceCulture);
             }
         }
     }

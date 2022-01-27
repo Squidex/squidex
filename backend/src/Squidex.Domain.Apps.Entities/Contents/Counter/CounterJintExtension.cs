@@ -7,12 +7,13 @@
 
 using Orleans;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter
 {
-    public sealed class CounterJintExtension : IJintExtension
+    public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
     {
         private readonly IGrainFactory grainFactory;
 
@@ -37,6 +38,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                     return Reset(appId, name, value);
                 }));
             }
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            describe(JsonType.Function, "incrementCounter(name)",
+                Resources.ScriptingIncrementCounter);
+
+            describe(JsonType.Function, "resetCounter(name, value)",
+                Resources.ScriptingResetCounter);
         }
 
         private long Increment(DomainId appId, string name)

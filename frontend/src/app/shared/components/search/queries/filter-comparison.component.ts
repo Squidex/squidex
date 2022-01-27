@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FilterComparison, LanguageDto, QueryFieldModel, QueryModel } from '@app/shared/internal';
+import { FilterComparison, LanguageDto, FilterableField, QueryModel } from '@app/shared/internal';
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
 @Component({
@@ -34,7 +34,7 @@ export class FilterComparisonComponent implements OnChanges {
     @Input()
     public filter!: FilterComparison;
 
-    public fieldModel?: QueryFieldModel;
+    public fieldModel?: FilterableField;
 
     public get operators() {
         return this.model.operators[this.fieldModel?.type!] || [];
@@ -76,7 +76,7 @@ export class FilterComparisonComponent implements OnChanges {
     }
 
     private updatePath(refresh: boolean) {
-        const newModel = this.model.fields.find(x => x.fieldPath === this.filter.path);
+        const newModel = this.model.fields.find(x => x.path === this.filter.path);
 
         if (newModel && refresh) {
             const operators = this.model.operators[newModel.type];

@@ -117,25 +117,85 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ScriptingGetAsset" xml:space="preserve">
-    <value>Queries the asset with the specified ID and invokes the callback with an array of assets.</value>
+  <data name="ScriptingAssetContentAppUrl" xml:space="preserve">
+    <value>The download URL to the asset.</value>
   </data>
-  <data name="ScriptingGetAssets" xml:space="preserve">
-    <value>ueries the assets with the specified IDs and invokes the callback with an array of assets.</value>
+  <data name="ScriptingAssetContentSlugUrl" xml:space="preserve">
+    <value>The download URL to the asset using the file slug instead of the ID.</value>
   </data>
-  <data name="ScriptingGetAssetText" xml:space="preserve">
-    <value>Get the text of an asset. Encodings: base64,ascii,unicode,utf8</value>
+  <data name="ScriptingAssetContentUrl" xml:space="preserve">
+    <value>The download URL to the asset without the app name (deprecated).</value>
   </data>
-  <data name="ScriptingGetReference" xml:space="preserve">
-    <value>Queries the content item with the specified ID and invokes the callback with an array of contents.</value>
+  <data name="ScriptingCharacterCount" xml:space="preserve">
+    <value>Counts the number of characters in a text. Useful in combination with html2Text or markdown2Text.</value>
   </data>
-  <data name="ScriptingGetReferences" xml:space="preserve">
-    <value>Queries the content items with the specified IDs and invokes the callback with an array of contents.</value>
+  <data name="ScriptingComplete" xml:space="preserve">
+    <value>Completes the script when an async method is used.</value>
   </data>
-  <data name="ScriptingIncrementCounter" xml:space="preserve">
-    <value>Increments the counter with the given name and returns the value.</value>
+  <data name="ScriptingContentAction" xml:space="preserve">
+    <value>The status of the content.</value>
   </data>
-  <data name="ScriptingResetCounter" xml:space="preserve">
-    <value>Resets the counter with the given name to zero.</value>
+  <data name="ScriptingContentUrl" xml:space="preserve">
+    <value>The URL to the content in the UI.</value>
+  </data>
+  <data name="ScriptingDeleteJson" xml:space="preserve">
+    <value>Makes a DELETE request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingDisallow" xml:space="preserve">
+    <value>Tell Squidex to not allow the current operation and to return a 403 (Forbidden).</value>
+  </data>
+  <data name="ScriptingFormatDate" xml:space="preserve">
+    <value>Formats a JavaScript date object using the specified pattern.</value>
+  </data>
+  <data name="ScriptingFormatTime" xml:space="preserve">
+    <value>Formats a JavaScript date object using the specified pattern.</value>
+  </data>
+  <data name="ScriptingGetJSON" xml:space="preserve">
+    <value>Makes a GET request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingGuid" xml:space="preserve">
+    <value>Generates a guid.</value>
+  </data>
+  <data name="ScriptingHtml2Text" xml:space="preserve">
+    <value>Converts a HTML string to plain text.</value>
+  </data>
+  <data name="ScriptingMarkdown2Text" xml:space="preserve">
+    <value>Converts a markdown string to plain text.</value>
+  </data>
+  <data name="ScriptingMD5" xml:space="preserve">
+    <value>Calculate the MD5 hash from a given string. Use this method for hashing passwords, when backwards compatibility is important.</value>
+  </data>
+  <data name="ScriptingPatchJson" xml:space="preserve">
+    <value>Makes a PATCH request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingPostJSON" xml:space="preserve">
+    <value>Makes a POST request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingPutJson" xml:space="preserve">
+    <value>Makes a PUT request to the defined URL and parses the result as JSON. Headers are optional.</value>
+  </data>
+  <data name="ScriptingReject" xml:space="preserve">
+    <value>Tell Squidex to reject the current operation and to return a 403 (Forbidden).</value>
+  </data>
+  <data name="ScriptingReplace" xml:space="preserve">
+    <value>Tell Squidex that you have modified the data and that the change should be applied.</value>
+  </data>
+  <data name="ScriptingSHA256" xml:space="preserve">
+    <value>Calculate the SHA256 hash from a given string. Use this method for hashing passwords.</value>
+  </data>
+  <data name="ScriptingSHA512" xml:space="preserve">
+    <value>Calculate the SHA256 hash from a given string. Use this method for hashing passwords.</value>
+  </data>
+  <data name="ScriptingSlugify" xml:space="preserve">
+    <value>Calculates the slug of a text by removing all special characters and whitespaces to create a friendly term that can be used for SEO-friendly URLs.</value>
+  </data>
+  <data name="ScriptingToCamelCase" xml:space="preserve">
+    <value>Converts a text to camelCase.</value>
+  </data>
+  <data name="ScriptingToPascalCase" xml:space="preserve">
+    <value>Converts a text to PascalCase</value>
+  </data>
+  <data name="ScriptingWordCount" xml:space="preserve">
+    <value>Counts the number of words in a text. Useful in combination with html2Text or markdown2Text.</value>
   </data>
 </root>

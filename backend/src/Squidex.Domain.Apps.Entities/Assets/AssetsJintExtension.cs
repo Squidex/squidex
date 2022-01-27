@@ -14,12 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetsJintExtension : IJintExtension
+    public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
         private delegate void GetAssetTextDelegate(JsValue references, Action<JsValue> callback, JsValue encoding);
@@ -34,6 +35,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             AddAssetText(context);
             AddAsset(context);
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            describe(JsonType.Function, "getAssets(ids, callback)",
+                Resources.ScriptingGetAssets);
+
+            describe(JsonType.Function, "getAsset(ids, callback)",
+                Resources.ScriptingGetAsset);
+
+            describe(JsonType.Function, "getAssetText(asset, callback, encoding)",
+                Resources.ScriptingGetAssetText);
         }
 
         private void AddAsset(ScriptExecutionContext context)

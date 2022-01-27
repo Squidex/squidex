@@ -6,13 +6,14 @@
 // ==========================================================================
 
 using Jint.Native;
+using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 {
-    public sealed class EventJintExtension : IJintExtension
+    public sealed class EventJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate JsValue EventDelegate();
         private readonly IUrlGenerator urlGenerator;
@@ -73,6 +74,30 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 
                 return JsValue.Null;
             }));
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            if ((scope & ScriptScope.ContentTrigger) == ScriptScope.ContentTrigger)
+            {
+                describe(JsonType.Function, "contentAction",
+                    Resources.ScriptingContentAction);
+
+                describe(JsonType.Function, "contentUrl",
+                    Resources.ScriptingContentUrl);
+            }
+
+            if ((scope & ScriptScope.AssetTrigger) == ScriptScope.AssetTrigger)
+            {
+                describe(JsonType.Function, "assetContentUrl",
+                Resources.ScriptingAssetContentUrl);
+
+                describe(JsonType.Function, "assetContentAppUrl",
+                    Resources.ScriptingAssetContentAppUrl);
+
+                describe(JsonType.Function, "assetContentSlugUrl",
+                    Resources.ScriptingAssetContentSlugUrl);
+            }
         }
     }
 }

@@ -57,6 +57,18 @@ namespace Squidex.Infrastructure.Queries
             Assert.NotNull(parser);
         }
 
+        [Fact]
+        public void Should_escape_field_name()
+        {
+            Assert.Equal("field_name", "field-name".EscapeEdmField());
+        }
+
+        [Fact]
+        public void Should_unescape_field_name()
+        {
+            Assert.Equal("field-name", "field_name".UnescapeEdmField());
+        }
+
         [Theory]
         [InlineData("created")]
         [InlineData("createdNullable")]

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.OData.Edm;
+using Squidex.Text;
 
 namespace Squidex.Infrastructure.Queries.OData
 {
@@ -22,7 +23,7 @@ namespace Squidex.Infrastructure.Queries.OData
             {
                 foreach (var field in queryModel.Fields)
                 {
-                    var fieldName = field.FieldPath.EscapeEdmField();
+                    var fieldName = field.Path.EscapeEdmField();
 
                     switch (field.Type)
                     {
@@ -55,18 +56,13 @@ namespace Squidex.Infrastructure.Queries.OData
 
                                 entityPath.Push(fieldName);
 
-                                var name = field.TypeName;
+                                var typeName = string.Join("_", entityPath.Reverse().Select(x => x.EscapeEdmField().ToPascalCase()));
 
-                                if (string.IsNullOrEmpty(name))
-                                {
-                                    name = string.Join(".", entityPath.Reverse());
-                                }
-
-                                var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == name);
+                                var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == typeName);
 
                                 if (result == null)
                                 {
-                                    result = new EdmComplexType(modelName, name);
+                                    result = new EdmComplexType(modelName, typeName);
 
                                     model.AddElement(result);
 

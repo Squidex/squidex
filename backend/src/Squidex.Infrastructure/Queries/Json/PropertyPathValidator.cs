@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
             foreach (var element in path)
             {
-                var current = list.FirstOrDefault(x => x.FieldPath == element);
+                var current = list.FirstOrDefault(x => x.Path == element);
 
                 if (current == null)
                 {

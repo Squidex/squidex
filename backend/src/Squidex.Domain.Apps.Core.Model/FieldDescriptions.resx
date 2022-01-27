@@ -198,11 +198,20 @@
   <data name="Command" xml:space="preserve">
     <value>The executed command.</value>
   </data>
+  <data name="ComponentField" xml:space="preserve">
+    <value>{0} field ({1} component).</value>
+  </data>
+  <data name="ContentArrayField" xml:space="preserve">
+    <value>{0} nested field.</value>
+  </data>
   <data name="ContentData" xml:space="preserve">
     <value>The data of the content.</value>
   </data>
   <data name="ContentDataOld" xml:space="preserve">
     <value>The previous data of the content.</value>
+  </data>
+  <data name="ContentField" xml:space="preserve">
+    <value>{0} field.</value>
   </data>
   <data name="ContentFlatData" xml:space="preserve">
     <value>The flat data of the content.</value>
@@ -212,6 +221,9 @@
   </data>
   <data name="ContentNewStatusColor" xml:space="preserve">
     <value>The new status color of the content.</value>
+  </data>
+  <data name="ContentPartitionField" xml:space="preserve">
+    <value>{0} field ({1}).</value>
   </data>
   <data name="ContentRequestData" xml:space="preserve">
     <value>The data for the content.</value>

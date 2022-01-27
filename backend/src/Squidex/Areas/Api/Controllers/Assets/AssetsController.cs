@@ -11,12 +11,12 @@ using Microsoft.Net.Http.Headers;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
@@ -387,8 +387,21 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [OpenApiIgnore]
         public IActionResult GetScriptCompletion(string app, string schema)
         {
-            var completer = new ScriptingCompletion();
-            var completion = completer.Asset();
+            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
+            var completion = completer.AssetScript();
+
+            return Ok(completion);
+        }
+
+        [HttpGet]
+        [Route("apps/{app}/assets/completion/trigger")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public IActionResult GetScriptTriggerCompletion(string app, string schema)
+        {
+            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
+            var completion = completer.AssetTrigger();
 
             return Ok(completion);
         }

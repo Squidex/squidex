@@ -7,12 +7,13 @@
 
 using Jint;
 using Jint.Native;
+using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Infrastructure;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class StringJintExtension : IJintExtension
+    public sealed class StringJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate JsValue StringSlugifyDelegate(string text, bool single = false);
 
@@ -121,20 +122,45 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public void Extend(Engine engine)
         {
-            engine.SetValue("slugify", slugify);
-
             engine.SetValue("guid", guid);
-
+            engine.SetValue("html2Text", Html2Text);
+            engine.SetValue("markdown2Text", markdown2Text);
+            engine.SetValue("md5", md5);
             engine.SetValue("sha256", sha256);
             engine.SetValue("sha512", sha512);
-            engine.SetValue("md5", md5);
-
+            engine.SetValue("slugify", slugify);
             engine.SetValue("toCamelCase", toCamelCase);
             engine.SetValue("toPascalCase", toPascalCase);
+        }
 
-            engine.SetValue("html2Text", Html2Text);
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            describe(JsonType.Function, "html2Text(text)",
+                Resources.ScriptingHtml2Text);
 
-            engine.SetValue("markdown2Text", markdown2Text);
+            describe(JsonType.Function, "markdown2Text(text)",
+                Resources.ScriptingMarkdown2Text);
+
+            describe(JsonType.Function, "toCamelCase(text)",
+                Resources.ScriptingToCamelCase);
+
+            describe(JsonType.Function, "toPascalCase(text)",
+                Resources.ScriptingToPascalCase);
+
+            describe(JsonType.Function, "md5(text)",
+                Resources.ScriptingMD5);
+
+            describe(JsonType.Function, "sha256(text)",
+                Resources.ScriptingSHA256);
+
+            describe(JsonType.Function, "sha512(text)",
+                Resources.ScriptingSHA512);
+
+            describe(JsonType.Function, "slugify(text)",
+                Resources.ScriptingSlugify);
+
+            describe(JsonType.Function, "guid()",
+                Resources.ScriptingGuid);
         }
     }
 }

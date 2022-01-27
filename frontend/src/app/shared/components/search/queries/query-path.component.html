@@ -1,21 +1,22 @@
 <sqx-dropdown
     [canSearch]="false"
+    [disabled]="model.fields.length === 0"
     [items]="model.fields"
     [itemSeparator]="true"
     [ngModel]="value"
-    (ngModelChange)="pathChange.emit($event?.fieldPath)">
+    (ngModelChange)="pathChange.emit($event?.path)">
     <ng-template let-field="$implicit">
         <div class="row">
             <div class="col-auto">
-                <div class="badge rounded-pill badge-primary">{{field.fieldPath}}</div>
+                <div class="badge rounded-pill badge-primary">{{field.path}}</div>
             </div>
             <div class="col text-end">
-                <sqx-form-hint>{{field.fieldDescription}}</sqx-form-hint>
+                <sqx-form-hint>{{field.description}}</sqx-form-hint>
             </div>
         </div>
     </ng-template>
 
     <ng-template let-field="$implicit">
-        {{field.fieldPath}}
+        {{field.path}}
     </ng-template>
 </sqx-dropdown>

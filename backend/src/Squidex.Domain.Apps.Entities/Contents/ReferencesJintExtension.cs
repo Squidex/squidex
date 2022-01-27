@@ -12,12 +12,13 @@ using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ReferencesJintExtension : IJintExtension
+    public sealed class ReferencesJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate void GetReferencesDelegate(JsValue references, Action<JsValue> callback);
         private readonly IServiceProvider serviceProvider;
@@ -43,6 +44,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             context.Engine.SetValue("getReference", action);
             context.Engine.SetValue("getReferences", action);
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            describe(JsonType.Function, "getReferences(ids, callback)",
+                Resources.ScriptingGetReferences);
+
+            describe(JsonType.Function, "getReference(ids, callback)",
+                Resources.ScriptingGetReference);
         }
 
         private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)

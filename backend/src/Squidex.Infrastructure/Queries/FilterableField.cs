@@ -13,9 +13,7 @@ namespace Squidex.Infrastructure.Queries
 {
     public sealed record FilterableField(FilterableFieldType Type, string Path)
     {
-        public string? Description { get; init; }
-
-        public string? TypeName { get; init; }
+        public string? FieldHints { get; init; }
 
         public object? Extra { get; init; }
 

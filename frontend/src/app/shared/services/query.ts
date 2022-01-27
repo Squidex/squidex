@@ -7,38 +7,35 @@
 
 import { QueryParams, RouteSynchronizer, Types } from '@app/framework';
 
-export type QueryValueType =
+export type FilterableFieldType =
+    'Any' |
     'Boolean' |
-    'Date' |
-    'Datetime' |
+    'DateTime' |
+    'GeoObject' |
+    'Guid' |
     'Number' |
-    'Reference' |
-    'Status' |
+    'Object' |
+    'ObjectArray' |
     'String' |
-    'Tags' |
-    'User';
+    'StringArray';
 
-
-export interface QueryFieldModel {
+export interface FilterableField {
     // The value type.
-    type: QueryValueType;
-
-    // The allowed operator.
-    operators: ReadonlyArray<string>;
+    type: FilterableFieldType;
 
     // Extra values.
     extra?: any;
 
     // The field path.
-    fieldPath: string;
+    path: string;
 
     // The optional description for the field.
-    fieldDescription?: string;
+    description?: string;
 }
 
 export interface QueryModel {
     // All available fields.
-    fields: QueryFieldModel[];
+    fields: FilterableField[];
 
     // The allowed operators.
     operators: { [type: string]: ReadonlyArray<string> };

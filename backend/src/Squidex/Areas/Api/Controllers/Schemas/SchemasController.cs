@@ -7,15 +7,16 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using NJsonSchema;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
-using Squidex.Domain.Apps.Entities.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -337,12 +338,21 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [OpenApiIgnore]
         public async Task<IActionResult> GetScriptCompletion(string app, string schema)
         {
-            var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
+            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
+            var completion = completer.ContentScript(await BuildModel());
 
-            var dataSchema = Schema.SchemaDef.BuildJsonSchema(App.PartitionResolver(), components, null, true, true);
+            return Ok(completion);
+        }
 
-            var completer = new ScriptingCompletion();
-            var completion = new ScriptingCompletion().Content(dataSchema);
+        [HttpGet]
+        [Route("apps/{app}/schemas/{schema}/completion/triggers")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public async Task<IActionResult> GetScriptTriggerCompletion(string app, string schema)
+        {
+            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
+            var completion = completer.ContentTrigger(await BuildModel());
 
             return Ok(completion);
         }
@@ -356,9 +366,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-            var filters = ContentQueryModel.BuildModel(Schema.SchemaDef, App.PartitionResolver(), components);
+            var filters = ContentQueryModel.Build(Schema.SchemaDef, App.PartitionResolver(), components).Flatten();
 
             return Ok(filters);
+        }
+
+        private async Task<JsonSchema> BuildModel()
+        {
+            var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
+
+            return Schema.SchemaDef.BuildJsonSchema(App.PartitionResolver(), components, null, true, true);
         }
 
         private Task<ISchemaEntity?> GetSchemaAsync(string schema)

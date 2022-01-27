@@ -29,6 +29,7 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain
@@ -41,6 +42,7 @@ namespace Squidex.Config.Domain
             settings.Converters.Add(new StringEnumConverter());
 
             settings.ContractResolver = new ConverterContractResolver(
+                new CompareOperatorJsonConverter(),
                 new ContentFieldDataConverter(),
                 new EnvelopeHeadersConverter(),
                 new ExecutionResultJsonConverter(new ErrorInfoProvider()),

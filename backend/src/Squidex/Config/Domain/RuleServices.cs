@@ -51,13 +51,13 @@ namespace Squidex.Config.Domain
                 .As<IFluidExtension>();
 
             services.AddSingletonAs<AssetsJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<ReferencesFluidExtension>()
                 .As<IFluidExtension>();
 
             services.AddSingletonAs<ReferencesJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<ManualTriggerHandler>()
                 .As<IRuleTriggerHandler>();
@@ -87,7 +87,7 @@ namespace Squidex.Config.Domain
                 .As<ITypeProvider>().AsSelf();
 
             services.AddSingletonAs<EventJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<EventFluidExtensions>()
                 .As<IFluidExtension>();

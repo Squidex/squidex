@@ -13,48 +13,63 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 {
     public static class ContentQueryModel
     {
-        public static QueryModel BuildModel(Schema? schema, PartitionResolver partitionResolver, ResolvedComponents components)
+        public static QueryModel Build(Schema? schema, PartitionResolver partitionResolver, ResolvedComponents components)
         {
             var fields = new List<FilterableField>
             {
                 new FilterableField(FilterableFieldType.String, "id")
                 {
-                    Description = FieldDescriptions.EntityId
+                    FieldHints = FieldDescriptions.EntityId
                 },
                 new FilterableField(FilterableFieldType.Boolean, "isDeleted")
                 {
-                    Description = FieldDescriptions.EntityIsDeleted
+                    FieldHints = FieldDescriptions.EntityIsDeleted
                 },
                 new FilterableField(FilterableFieldType.DateTime, "created")
                 {
-                    Description = FieldDescriptions.EntityCreated
-                },
-                new FilterableField(FilterableFieldType.DateTime, "lastModified")
-                {
-                    Description = FieldDescriptions.EntityCreated
-                },
-                new FilterableField(FilterableFieldType.String, "status")
-                {
-                    Description = FieldDescriptions.ContentStatus
-                },
-                new FilterableField(FilterableFieldType.String, "version")
-                {
-                    Description = FieldDescriptions.EntityVersion
-                },
-                new FilterableField(FilterableFieldType.String, "newStatus")
-                {
-                    Description = FieldDescriptions.ContentNewStatus,
-                    IsNullable = true
+                    FieldHints = FieldDescriptions.EntityCreated
                 },
                 new FilterableField(FilterableFieldType.String, "createdBy")
                 {
-                    Description = FieldDescriptions.EntityCreated,
-                    Extra = "user"
+                    FieldHints = FieldDescriptions.EntityCreatedBy,
+                    Extra = new
+                    {
+                        editor = "User"
+                    }
+                },
+                new FilterableField(FilterableFieldType.DateTime, "lastModified")
+                {
+                    FieldHints = FieldDescriptions.EntityLastModified
                 },
                 new FilterableField(FilterableFieldType.String, "lastModifiedBy")
                 {
-                    Description = FieldDescriptions.EntityCreated,
-                    Extra = "user"
+                    FieldHints = FieldDescriptions.EntityLastModifiedBy,
+                    Extra = new
+                    {
+                        editor = "User"
+                    }
+                },
+                new FilterableField(FilterableFieldType.String, "version")
+                {
+                    FieldHints = FieldDescriptions.EntityVersion
+                },
+                new FilterableField(FilterableFieldType.String, "status")
+                {
+                    FieldHints = FieldDescriptions.ContentStatus,
+                    Extra = new
+                    {
+                        editor = "Status"
+                    },
+                    IsNullable = false
+                },
+                new FilterableField(FilterableFieldType.String, "newStatus")
+                {
+                    FieldHints = FieldDescriptions.ContentNewStatus,
+                    Extra = new
+                    {
+                        editor = "Status"
+                    },
+                    IsNullable = true
                 }
             };
 

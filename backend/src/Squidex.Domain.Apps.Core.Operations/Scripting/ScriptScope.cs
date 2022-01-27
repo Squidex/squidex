@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Scripting
+namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public enum JsonType
+    [Flags]
+    public enum ScriptScope
     {
-        Any,
-        Array,
-        Boolean,
-        Function,
-        Number,
-        Object,
-        String
+        AssetScript,
+        AssetTrigger,
+        ContentScript,
+        ContentTrigger,
+        Transform
     }
 }

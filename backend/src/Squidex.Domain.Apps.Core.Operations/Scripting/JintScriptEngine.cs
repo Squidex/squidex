@@ -12,6 +12,7 @@ using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure;
@@ -21,7 +22,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class JintScriptEngine : IScriptEngine
+    public sealed class JintScriptEngine : IScriptEngine, IScriptDescriptor
     {
         private readonly IJintExtension[] extensions;
         private readonly Parser parser;
@@ -207,6 +208,24 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 throw new ValidationException(T.Get("common.jsError", new { message = ex.GetType().Name }), ex);
             }
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            if (scope == ScriptScope.Transform)
+            {
+                describe(JsonType.Function, "replace()",
+                    Resources.ScriptingReplace);
+            }
+
+            describe(JsonType.Function, "disallow()",
+                Resources.ScriptingDisallow);
+
+            describe(JsonType.Function, "complete()",
+                Resources.ScriptingComplete);
+
+            describe(JsonType.Function, "reject(reason)",
+                Resources.ScriptingReject);
         }
     }
 }

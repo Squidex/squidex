@@ -64,6 +64,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<BackgroundRequestLogStore>()
                 .AsOptional<IRequestLogStore>();
 
+            services.AddSingletonAs<ScriptingCompleter>()
+                .AsSelf();
+
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();
 
@@ -71,19 +74,19 @@ namespace Squidex.Config.Domain
                 .As<ITagService>();
 
             services.AddSingletonAs<CounterJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<DateTimeJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<StringJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<StringWordsJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<HttpJintExtension>()
-                .As<IJintExtension>();
+                .As<IJintExtension>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<FluidTemplateEngine>()
                 .AsOptional<ITemplateEngine>();
