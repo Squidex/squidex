@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
     {
         private static readonly DefaultValueFactory Instance = new DefaultValueFactory();
 
-        public sealed record Args(Instant Now, string Partition);
+        public record struct Args(Instant Now, string Partition);
 
         private DefaultValueFactory()
         {

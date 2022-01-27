@@ -7,6 +7,7 @@
 
 using NJsonSchema;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Entities.Properties;
 
 namespace Squidex.Domain.Apps.Entities.Scripting
 {
@@ -18,19 +19,19 @@ namespace Squidex.Domain.Apps.Entities.Scripting
         public IReadOnlyList<ScriptingValue> Content(JsonSchema dataSchema)
         {
             AddFunction("replace()",
-                "Tell Squidex that you have modified the data and that the change should be applied.");
+                Resources.ScriptingReplace);
 
             AddFunction("getReferences(ids, callback)",
-                "Queries the content items with the specified IDs and invokes the callback with an array of contents.");
+                Resources.ScriptingGetReferences);
 
             AddFunction("getReference(ids, callback)",
-                "Queries the content item with the specified ID and invokes the callback with an array of contents.");
+                Resources.ScriptingGetReference);
 
             AddFunction("getAssets(ids, callback)",
-                "Queries the assets with the specified IDs and invokes the callback with an array of assets.");
+                Resources.ScriptingGetAssets);
 
             AddFunction("getAsset(ids, callback)",
-                "Queries the asset with the specified ID and invokes the callback with an array of assets.");
+                Resources.ScriptingGetAsset);
 
             AddShared();
 
@@ -130,67 +131,64 @@ namespace Squidex.Domain.Apps.Entities.Scripting
         private void AddShared()
         {
             AddFunction("disallow()",
-                "Tell Squidex to not allow the current operation and to return a 403 (Forbidden).");
+                Resources.ScriptingDisallow);
 
             AddFunction("reject('Reason')",
-                "Tell Squidex to reject the current operation and to return a 403 (Forbidden).");
+                Resources.ScriptingReject);
 
             AddFunction("html2Text(text)",
-                "Converts a HTML string to plain text.");
+                Resources.ScriptingHtml2Text);
 
             AddFunction("markdown2Text(text)",
-                "Converts a markdown string to plain text.");
+                Resources.ScriptingMarkdown2Text);
 
             AddFunction("formatDate(data, pattern)",
-                "Formats a JavaScript date object using the specified pattern.");
+                Resources.ScriptingFormatDate);
 
             AddFunction("formatTime(text)",
-                "Formats a JavaScript date object using the specified pattern.");
+                Resources.ScriptingFormatTime);
 
             AddFunction("wordCount(text)",
-                "Counts the number of words in a text. Useful in combination with html2Text or markdown2Text.");
+                Resources.ScriptingWordCount);
 
             AddFunction("characterCount(text)",
-                "Counts the number of characters in a text. Useful in combination with html2Text or markdown2Text.");
+                Resources.ScriptingCharacterCount);
 
             AddFunction("toCamelCase(text)",
-                "Converts a text to camelCase.");
+                Resources.ScriptingToCamelCase);
 
             AddFunction("toPascalCase(text)",
-                "Calculate the SHA256 hash from a given string. Use this method for hashing passwords");
+                Resources.ScriptingToPascalCase);
+
+            AddFunction("md5(text)",
+                Resources.ScriptingMD5);
 
             AddFunction("sha256(text)",
-                "Calculate the MD5 hash from a given string. Use this method for hashing passwords, when backwards compatibility is important.");
+                Resources.ScriptingSHA256);
+
+            AddFunction("sha512(text)",
+                Resources.ScriptingSHA512);
 
             AddFunction("slugify(text)",
-                "Calculates the slug of a text by removing all special characters and whitespaces to create a friendly term that can be used for SEO-friendly URLs.");
+                Resources.ScriptingSlugify);
 
-            AddFunction("slugify(text)",
-                "Calculates the slug of a text by removing all special characters and whitespaces to create a friendly term that can be used for SEO-friendly URLs.");
-
-            AddFunction("slugify(text)",
-                "Calculates the slug of a text by removing all special characters and whitespaces to create a friendly term that can be used for SEO-friendly URLs.");
-
-            AddFunction("slugify(text)",
-                "Calculates the slug of a text by removing all special characters and whitespaces to create a friendly term that can be used for SEO-friendly URLs.");
+            AddFunction("guid()",
+                Resources.ScriptingGuid);
 
             AddFunction("getJSON(url, callback, ?headers)",
-                "Makes a GET request to the defined URL and parses the result as JSON. Headers are optional.");
+                Resources.ScriptingGetJSON);
 
             AddFunction("postJSON(url, body, callback, ?headers)",
-                "Makes a POST request to the defined URL and parses the result as JSON. Headers are optional.");
+                Resources.ScriptingPostJSON);
 
             AddFunction("putJSON(url, body, callback, ?headers)",
-                "Makes a PUT request to the defined URL and parses the result as JSON. Headers are optional.");
-
-            AddFunction("putJSON(url, body, callback, ?headers)",
-                "Makes a PUT request to the defined URL and parses the result as JSON. Headers are optional.");
+                Resources.ScriptingPutJson);
 
             AddFunction("patchJSON(url, body, callback, headers)",
-                "Makes a PATCH request to the defined URL and parses the result as JSON. Headers are optional.");
+                Resources.ScriptingPatchJson);
 
             AddFunction("deleteJSON(url, body, callback, headers)",
-                "Makes a DELETE request to the defined URL and parses the result as JSON. Headers are optional.");
+                Resources.ScriptingDeleteJson);
 
             AddString("appId",
                 FieldDescriptions.AppId);

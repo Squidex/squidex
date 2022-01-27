@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using NamedIdStatic = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -21,18 +20,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static IEnumerable<T> ForApi<T>(this IEnumerable<T> fields, bool withHidden = false) where T : IField
         {
             return fields.Where(x => IsForApi(x, withHidden));
-        }
-
-        public static IEnumerable<IRootField> GetSharedFields(this ResolvedComponents components, ReadonlyList<DomainId>? schemaIds, bool withHidden)
-        {
-            if (schemaIds == null || schemaIds.Count == 0)
-            {
-                return Enumerable.Empty<IRootField>();
-            }
-
-            var allFields = components.Resolve(schemaIds).Values.SelectMany(x => x.Fields.ForApi(withHidden));
-
-            return allFields.GroupBy(x => new { x.Name, Type = x.RawProperties }).SingleGroups();
         }
 
         public static bool IsForApi<T>(this T field, bool withHidden = false) where T : IField
@@ -59,14 +46,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (parentId != null)
             {
-                return schema.UpdateField(parentId.Value, f =>
+                return schema.UpdateField(parentId.Value, field =>
                 {
-                    if (f is ArrayField arrayField)
+                    if (field is ArrayField arrayField)
                     {
                         return arrayField.ReorderFields(ids);
                     }
 
-                    return f;
+                    return field;
                 });
             }
 
@@ -77,14 +64,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (parentId != null)
             {
-                return schema.UpdateField(parentId.Value, f =>
+                return schema.UpdateField(parentId.Value, field =>
                 {
-                    if (f is ArrayField arrayField)
+                    if (field is ArrayField arrayField)
                     {
                         return arrayField.DeleteField(fieldId);
                     }
 
-                    return f;
+                    return field;
                 });
             }
 
@@ -95,14 +82,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (parentId != null)
             {
-                return schema.UpdateField(parentId.Value, f =>
+                return schema.UpdateField(parentId.Value, field =>
                 {
-                    if (f is ArrayField arrayField)
+                    if (field is ArrayField arrayField)
                     {
-                        return arrayField.UpdateField(fieldId, n => n.Lock());
+                        return arrayField.UpdateField(fieldId, f => f.Lock());
                     }
 
-                    return f;
+                    return field;
                 });
             }
 
@@ -131,14 +118,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (parentId != null)
             {
-                return schema.UpdateField(parentId.Value, f =>
+                return schema.UpdateField(parentId.Value, field =>
                 {
-                    if (f is ArrayField arrayField)
+                    if (field is ArrayField arrayField)
                     {
-                        return arrayField.UpdateField(fieldId, n => n.Show());
+                        return arrayField.UpdateField(fieldId, f => f.Show());
                     }
 
-                    return f;
+                    return field;
                 });
             }
 
@@ -149,14 +136,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (parentId != null)
             {
-                return schema.UpdateField(parentId.Value, f =>
+                return schema.UpdateField(parentId.Value, field =>
                 {
-                    if (f is ArrayField arrayField)
+                    if (field is ArrayField arrayField)
                     {
-                        return arrayField.UpdateField(fieldId, n => n.Enable());
+                        return arrayField.UpdateField(fieldId, f => f.Enable());
                     }
 
-                    return f;
+                    return field;
                 });
             }
 
@@ -167,14 +154,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (parentId != null)
             {
-                return schema.UpdateField(parentId.Value, f =>
+                return schema.UpdateField(parentId.Value, field =>
                 {
-                    if (f is ArrayField arrayField)
+                    if (field is ArrayField arrayField)
                     {
-                        return arrayField.UpdateField(fieldId, n => n.Disable());
+                        return arrayField.UpdateField(fieldId, f => f.Disable());
                     }
 
-                    return f;
+                    return field;
                 });
             }
 
@@ -185,14 +172,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             if (parentId != null)
             {
-                return schema.UpdateField(parentId.Value, f =>
+                return schema.UpdateField(parentId.Value, field =>
                 {
-                    if (f is ArrayField arrayField)
+                    if (field is ArrayField arrayField)
                     {
-                        return arrayField.UpdateField(fieldId, n => n.Update(properties));
+                        return arrayField.UpdateField(fieldId, f => f.Update(properties));
                     }
 
-                    return f;
+                    return field;
                 });
             }
 

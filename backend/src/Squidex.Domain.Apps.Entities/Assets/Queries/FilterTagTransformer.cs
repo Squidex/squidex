@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
     {
         private static readonly FilterTagTransformer Instance = new FilterTagTransformer();
 
-        public sealed record Args(DomainId AppId, ITagService TagService);
+        public record struct Args(DomainId AppId, ITagService TagService);
 
         private FilterTagTransformer()
         {

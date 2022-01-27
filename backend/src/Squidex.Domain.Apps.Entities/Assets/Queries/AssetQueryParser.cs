@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using NJsonSchema;
+using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -17,14 +18,13 @@ using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     public class AssetQueryParser
     {
-        private readonly JsonSchema jsonSchema = BuildJsonSchema();
-        private readonly IEdmModel edmModel = BuildEdmModel();
+        private readonly QueryModel queryModel = AssetQueryModel.Build();
+        private readonly IEdmModel edmModel;
         private readonly IJsonSerializer jsonSerializer;
         private readonly ITagService tagService;
         private readonly AssetOptions options;
@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public AssetQueryParser(IJsonSerializer jsonSerializer, ITagService tagService, IOptions<AssetOptions> options)
         {
             this.jsonSerializer = jsonSerializer;
-
             this.tagService = tagService;
-
             this.options = options.Value;
+
+            edmModel = queryModel.ConvertToEdm("Squidex", "Asset");
         }
 
         public virtual async Task<Q> ParseAsync(Context context, Q q)
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         private ClrQuery ParseJson(string json)
         {
-            return jsonSchema.Parse(json, jsonSerializer);
+            return queryModel.Parse(json, jsonSerializer);
         }
 
         private ClrQuery ParseOData(string odata)
@@ -148,85 +148,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 throw new ValidationException(T.Get("common.odataNotSupported", new { odata }));
             }
-        }
-
-        private static JsonSchema BuildJsonSchema()
-        {
-            var schema = new JsonSchema { Title = "Asset", Type = JsonObjectType.Object };
-
-            void AddProperty(string name, JsonObjectType type, string? format = null)
-            {
-                var property = new JsonSchemaProperty { Type = type, Format = format };
-
-                schema.Properties[name.ToCamelCase()] = property;
-            }
-
-            AddProperty("id", JsonObjectType.String);
-            AddProperty("version", JsonObjectType.Integer);
-            AddProperty("created", JsonObjectType.String, JsonFormatStrings.DateTime);
-            AddProperty("createdBy", JsonObjectType.String);
-            AddProperty("fileHash", JsonObjectType.String);
-            AddProperty("fileName", JsonObjectType.String);
-            AddProperty("fileSize", JsonObjectType.Integer);
-            AddProperty("fileVersion", JsonObjectType.Integer);
-            AddProperty("isDeleted", JsonObjectType.Boolean);
-            AddProperty("isProtected", JsonObjectType.Boolean);
-            AddProperty("lastModified", JsonObjectType.String, JsonFormatStrings.DateTime);
-            AddProperty("lastModifiedBy", JsonObjectType.String);
-            AddProperty("metadata", JsonObjectType.None);
-            AddProperty("mimeType", JsonObjectType.String);
-            AddProperty("slug", JsonObjectType.String);
-            AddProperty("tags", JsonObjectType.String);
-            AddProperty("type", JsonObjectType.String);
-
-            return schema;
-        }
-
-        private static IEdmModel BuildEdmModel()
-        {
-            var entityType = new EdmEntityType("Squidex", "Asset");
-
-            void AddProperty(string name, EdmPrimitiveTypeKind type)
-            {
-                entityType.AddStructuralProperty(name.ToCamelCase(), type);
-            }
-
-            void AddPropertyReference(string name, IEdmTypeReference reference)
-            {
-                entityType.AddStructuralProperty(name.ToCamelCase(), reference);
-            }
-
-            var jsonType = new EdmComplexType("Squidex", "Json", null, false, true);
-
-            AddPropertyReference("Metadata", new EdmComplexTypeReference(jsonType, false));
-
-            AddProperty("id", EdmPrimitiveTypeKind.String);
-            AddProperty("version", EdmPrimitiveTypeKind.Int64);
-            AddProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
-            AddProperty("createdBy", EdmPrimitiveTypeKind.String);
-            AddProperty("fileHash", EdmPrimitiveTypeKind.String);
-            AddProperty("fileName", EdmPrimitiveTypeKind.String);
-            AddProperty("isDeleted", EdmPrimitiveTypeKind.Boolean);
-            AddProperty("isProtected", EdmPrimitiveTypeKind.Boolean);
-            AddProperty("fileSize", EdmPrimitiveTypeKind.Int64);
-            AddProperty("fileVersion", EdmPrimitiveTypeKind.Int64);
-            AddProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
-            AddProperty("lastModifiedBy", EdmPrimitiveTypeKind.String);
-            AddProperty("mimeType", EdmPrimitiveTypeKind.String);
-            AddProperty("slug", EdmPrimitiveTypeKind.String);
-            AddProperty("tags", EdmPrimitiveTypeKind.String);
-            AddProperty("type", EdmPrimitiveTypeKind.String);
-
-            var container = new EdmEntityContainer("Squidex", "Container");
-
-            container.AddEntitySet("AssetSet", entityType);
-
-            var model = new EdmModel();
-
-            model.AddElement(container);
-            model.AddElement(entityType);
-
-            return model;
         }
     }
 }

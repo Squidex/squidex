@@ -11,9 +11,9 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed record FilterableField(FilterableFieldType Type, string FieldPath)
+    public sealed record FilterableField(FilterableFieldType Type, string Path)
     {
-        public string? FieldDescription { get; init; }
+        public string? Description { get; init; }
 
         public string? TypeName { get; init; }
 

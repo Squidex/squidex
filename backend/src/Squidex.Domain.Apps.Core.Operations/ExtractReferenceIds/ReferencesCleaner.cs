@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         private static readonly ReferencesCleaner Instance = new ReferencesCleaner();
 
-        public sealed record Args(IJsonValue Value, ISet<DomainId> ValidIds);
+        public record struct Args(IJsonValue Value, ISet<DomainId> ValidIds);
 
         private ReferencesCleaner()
         {

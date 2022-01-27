@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.Collections;
+
 namespace Squidex.Infrastructure.Queries
 {
     public sealed class QueryModel
@@ -110,8 +112,49 @@ namespace Squidex.Infrastructure.Queries
             }
         };
 
-        public IReadOnlyList<FilterableField> Fields { get; init; }
+        public IReadOnlyList<FilterableField> Fields { get; init; } = ReadonlyList.Empty<FilterableField>();
 
         public IReadOnlyDictionary<FilterableFieldType, IReadOnlyList<CompareOperator>> Operators { get; init; } = DefaultOperators;
+
+        public QueryModel Flatten()
+        {
+            if (Fields.Count == 0)
+            {
+                return this;
+            }
+
+            var result = new List<FilterableField>();
+
+            var path = new Stack<string>();
+
+            void AddField(FilterableField field)
+            {
+                path.Push(field.FieldPath);
+
+                result.Add(field with
+                {
+                    FieldPath = string.Join('.', path.Reverse())
+                });
+
+                if (field.Fields?.Count > 0)
+                {
+                    AddFields(field.Fields);
+                }
+
+                path.Pop();
+            }
+
+            void AddFields(IEnumerable<FilterableField> source)
+            {
+                foreach (var field in source)
+                {
+                    AddField(field);
+                }
+            }
+
+            var simplified = result.GroupBy(x => new { x.FieldPath, x.Type }).SingleGroups().OrderBy(x => x.FieldPath);
+
+            return new QueryModel { Operators = Operators, Fields = simplified.ToList() };
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         private const int MaxDepth = 5;
         private static readonly JsonTypeVisitor Instance = new JsonTypeVisitor();
 
-        public sealed record Args(ResolvedComponents Components, Schema Schema,
+        public record struct Args(ResolvedComponents Components, Schema Schema,
             JsonTypeFactory Factory,
             bool WithHidden,
             bool WithComponents,

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization;
-using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;

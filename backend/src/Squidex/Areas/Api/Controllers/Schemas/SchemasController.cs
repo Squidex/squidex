@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
+using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -341,7 +342,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             var dataSchema = Schema.SchemaDef.BuildJsonSchema(App.PartitionResolver(), components, null, true, true);
 
             var completer = new ScriptingCompletion();
-            var completion = completer.Content(dataSchema);
+            var completion = new ScriptingCompletion().Content(dataSchema);
 
             return Ok(completion);
         }
@@ -351,14 +352,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public async Task<IActionResult> GetSFilters(string app, string schema)
+        public async Task<IActionResult> GetFilters(string app, string schema)
         {
             var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-            var contentData = Schema.SchemaDef.BuildJsonSchema(App.PartitionResolver(), components, null, true, true);
-            var contentSchema = ContentJsonSchemaBuilder.BuildSchema(contentData);
-
-            var filters = FilterableFieldModel.Build(contentSchema);
+            var filters = ContentQueryModel.BuildModel(Schema.SchemaDef, App.PartitionResolver(), components);
 
             return Ok(filters);
         }
