@@ -31,6 +31,10 @@ namespace Squidex.Config.Authentication
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
+                options.AccessDeniedPath = "/identity-server/account/access-denied";
+                options.LoginPath = "/identity-server/account/login";
+                options.LogoutPath = "/identity-server/account/login";
+
                 options.Cookie.Name = ".sq.auth";
 
                 if (urlsOptions.BaseUrl?.StartsWith("https://", StringComparison.OrdinalIgnoreCase) == true)

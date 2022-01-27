@@ -251,8 +251,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
                 user = await userService.CreateAsync(email, values, identityOptions.LockAutomatically, HttpContext.RequestAborted);
 
-                await userService.AddLoginAsync(user.Id, login,
-                    HttpContext.RequestAborted);
+                await userService.AddLoginAsync(user.Id, login, HttpContext.RequestAborted);
 
                 (isLoggedIn, var locked) = await LoginAsync(login);
 

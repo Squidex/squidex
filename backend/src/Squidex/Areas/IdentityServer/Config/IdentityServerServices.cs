@@ -121,8 +121,6 @@ namespace Squidex.Areas.IdentityServer.Config
 
                 var issuerUrl = Constants.PrefixIdentityServer;
 
-                options.Issuer = new Uri(urlGenerator.BuildUrl(issuerUrl, false));
-
                 options.AuthorizationEndpointUris.Add(
                      new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/authorize", false)));
 
@@ -137,6 +135,8 @@ namespace Squidex.Areas.IdentityServer.Config
 
                 options.UserinfoEndpointUris.Add(
                      new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/userinfo", false)));
+
+                options.Issuer = new Uri(urlGenerator.BuildUrl(issuerUrl, false));
             });
         }
     }

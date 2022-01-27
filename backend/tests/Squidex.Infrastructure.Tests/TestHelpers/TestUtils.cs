@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.TestHelpers
                     new CompareOperatorJsonConverter(),
                     new JsonValueConverter(),
                     new StringEnumConverter(),
-                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrinicpalSurrogate>(),
+                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
                     new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
                     new EnvelopeHeadersConverter()),
 
