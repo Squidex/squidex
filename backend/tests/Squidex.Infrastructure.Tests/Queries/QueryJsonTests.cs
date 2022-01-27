@@ -158,14 +158,6 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_throw_exception_for_invalid_property()
-        {
-            var json = new { path = "property", op = "invalid", value = 12, other = 4 };
-
-            Assert.ThrowsAny<JsonException>(() => SerializeAndDeserialize(json));
-        }
-
-        [Fact]
         public void Should_not_throw_exception_if_filter_has_unknown_property()
         {
             var json = new

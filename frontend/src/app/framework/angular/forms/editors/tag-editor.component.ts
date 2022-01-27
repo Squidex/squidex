@@ -77,7 +77,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public dashed?: boolean | null;
 
     @Input()
-    public separated?: boolean | null;
+    public itemSeparator?: boolean | null;
 
     @Input()
     public singleLine?: boolean | null;

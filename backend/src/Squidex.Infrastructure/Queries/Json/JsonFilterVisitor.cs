@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 
@@ -17,15 +16,15 @@ namespace Squidex.Infrastructure.Queries.Json
     {
         private static readonly JsonFilterVisitor Instance = new JsonFilterVisitor();
 
-        public sealed record Args(JsonSchema Schema, List<string> Errors);
+        public record struct Args(QueryModel Model, List<string> Errors);
 
         private JsonFilterVisitor()
         {
         }
 
-        public static FilterNode<ClrValue>? Parse(FilterNode<IJsonValue> filter, JsonSchema schema, List<string> errors)
+        public static FilterNode<ClrValue>? Parse(FilterNode<IJsonValue> filter, QueryModel model, List<string> errors)
         {
-            var args = new Args(schema, errors);
+            var args = new Args(model, errors);
 
             var parsed = filter.Accept(Instance, args);
 
@@ -53,23 +52,18 @@ namespace Squidex.Infrastructure.Queries.Json
         {
             CompareFilter<ClrValue>? result = null;
 
-            if (nodeIn.Path.TryGetProperty(args.Schema, args.Errors, out var property))
+            if (nodeIn.Path.TryGetField(args.Model, args.Errors, out var field))
             {
-                var isValidOperator = OperatorValidator.IsAllowedOperator(property, nodeIn.Operator);
+                var isValidOperator = args.Model.Operators.TryGetValue(field.Type, out var operators) && operators.Contains(nodeIn.Operator);
 
                 if (!isValidOperator)
                 {
-                    var name = property.Type.ToString();
-
-                    if (!string.IsNullOrWhiteSpace(property.Format))
-                    {
-                        name = $"{name}({property.Format})";
-                    }
+                    var name = field.Type.ToString();
 
                     args.Errors.Add($"'{nodeIn.Operator}' is not a valid operator for type {name} at '{nodeIn.Path}'.");
                 }
 
-                var value = ValueConverter.Convert(property, nodeIn.Value, nodeIn.Path, args.Errors);
+                var value = ValueConverter.Convert(field, nodeIn.Value, nodeIn.Path, args.Errors);
 
                 if (value != null && isValidOperator)
                 {

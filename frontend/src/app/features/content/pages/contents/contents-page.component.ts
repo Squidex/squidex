@@ -9,9 +9,8 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest } from 'rxjs';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, ModalModel, Queries, Query, queryModelFromSchema, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -47,16 +46,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public queryModel =
-        combineLatest([
-            this.schemasState.selectedSchema.pipe(defined()),
-            this.languagesState.isoLanguages,
-            this.contentsState.statuses,
-        ]).pipe(
-            map(values => queryModelFromSchema(values[0], values[1], values[2])));
+        this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
+            switchMap(x => this.schemasService.getFilters(this.appsState.appName, x)));
 
     public queries =
-        this.schemasState.selectedSchema.pipe(defined(),
-            map(schema => new Queries(this.uiState, `schemas.${schema.name}`)));
+        this.schemasState.selectedSchema.pipe(defined(), map(x => x.name), distinctUntilChanged(),
+            map(x => new Queries(this.uiState, `schemas.${x}`)));
 
     constructor(
         public readonly contentsRoute: Router2State,
@@ -67,6 +62,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly schemasState: SchemasState,
+        private readonly schemasService: SchemasService,
         private readonly tempService: TempService,
         private readonly uiState: UIState,
     ) {

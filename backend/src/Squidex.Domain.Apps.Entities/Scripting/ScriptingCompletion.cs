@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NJsonSchema;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Scripting
 {
@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Scripting
         private readonly Stack<string> prefixes = new Stack<string>();
         private readonly HashSet<ScriptingValue> result = new HashSet<ScriptingValue>();
 
-        public IReadOnlyList<ScriptingValue> Content(Schema schema, PartitionResolver partitionResolver)
+        public IReadOnlyList<ScriptingValue> Content(JsonSchema dataSchema)
         {
             AddFunction("replace()",
                 "Tell Squidex that you have modified the data and that the change should be applied.");
@@ -47,12 +47,12 @@ namespace Squidex.Domain.Apps.Entities.Scripting
 
                 AddObject("data", FieldDescriptions.ContentData, () =>
                 {
-                    AddData(schema, partitionResolver);
+                    AddData(dataSchema);
                 });
 
                 AddObject("dataOld", FieldDescriptions.ContentDataOld, () =>
                 {
-                    AddData(schema, partitionResolver);
+                    AddData(dataSchema);
                 });
             });
 
@@ -225,74 +225,108 @@ namespace Squidex.Domain.Apps.Entities.Scripting
             });
         }
 
-        private void AddData(Schema schema, PartitionResolver partitionResolver)
+        private void AddData(JsonSchema schema)
         {
-            foreach (var field in schema.Fields.Where(x => x.IsForApi(true)))
+            void CheckField(JsonSchema schema)
             {
-                var description = $"The values of the '{field.DisplayName()}' field.";
-
-                AddObject(field.Name, $"The values of the '{field.DisplayName()}' field.", () =>
+                switch (schema.Type)
                 {
-                    foreach (var partition in partitionResolver(field.Partitioning).AllKeys)
-                    {
-                        var description = $"The '{partition}' value of the '{field.DisplayName()}' field.";
+                    case JsonObjectType.None:
+                        AddAny(null, schema.Description);
+                        break;
+                    case JsonObjectType.Boolean:
+                        AddBoolean(null, schema.Description);
+                        break;
+                    case JsonObjectType.Number:
+                        AddNumber(null, schema.Description);
+                        break;
+                    case JsonObjectType.String:
+                        AddString(null, schema.Description);
+                        break;
+                    case JsonObjectType.Array:
+                        AddArray(null, schema.Description);
 
-                        if (field is ArrayField arrayField)
+                        if (schema.Item?.Type == JsonObjectType.Object)
                         {
-                            AddObject(partition, description, () =>
+                            CheckField(schema.Item);
+                        }
+
+                        break;
+                    case JsonObjectType.Object:
+                        Add(JsonType.Object, null, schema.Description);
+
+                        foreach (var (name, property) in schema.Properties)
+                        {
+                            prefixes.Push(name);
+                            CheckField(property);
+                            prefixes.Pop();
+                        }
+
+                        if (schema.DiscriminatorObject != null)
+                        {
+                            foreach (var mapping in schema.DiscriminatorObject.Mapping.Values)
                             {
-                                foreach (var nestedField in arrayField.Fields.Where(x => x.IsForApi(true)))
-                                {
-                                    var description = $"The value of the '{nestedField.DisplayName()}' nested field.";
+                                CheckField(mapping);
+                            }
+                        }
 
-                                    AddAny(field.Name, description);
-                                }
-                            });
-                        }
-                        else
-                        {
-                            AddAny(partition, description);
-                        }
-                    }
-                });
+                        break;
+                }
             }
+
+            CheckField(schema);
         }
 
-        private void AddAny(string name, string description)
+        private void AddAny(string? name, string description)
         {
             Add(JsonType.Any, name, description);
         }
 
-        private void AddArray(string name, string description)
+        private void AddArray(string? name, string description)
         {
             Add(JsonType.Array, name, description);
         }
 
-        private void AddBoolean(string name, string description)
+        private void AddBoolean(string? name, string description)
         {
             Add(JsonType.Boolean, name, description);
         }
 
-        private void AddFunction(string name, string description)
+        private void AddFunction(string? name, string description)
         {
             Add(JsonType.Function, name, description);
         }
 
-        private void AddNumber(string name, string description)
+        private void AddNumber(string? name, string description)
         {
             Add(JsonType.Number, name, description);
         }
 
-        private void AddString(string name, string description)
+        private void AddString(string? name, string description)
         {
             Add(JsonType.String, name, description);
         }
 
-        private void Add(JsonType type, string name, string description)
+        private void Add(JsonType type, string? name, string description)
         {
-            var fullName = string.Join('.', prefixes.Reverse().Union(Enumerable.Repeat(name, 1)));
+            if (name != null)
+            {
+                prefixes.Push(name);
+            }
 
-            result.Add(new ScriptingValue(fullName, type, description));
+            if (prefixes.Count == 0)
+            {
+                return;
+            }
+
+            var path = string.Join('.', prefixes.Reverse());
+
+            result.Add(new ScriptingValue(path, type, description));
+
+            if (name != null)
+            {
+                prefixes.Pop();
+            }
         }
 
         private void AddObject(string name, string description, Action inner)

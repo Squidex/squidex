@@ -1,11 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
@@ -16,7 +15,7 @@ namespace Squidex.Infrastructure.Queries.Json
 {
     public static class QueryParser
     {
-        public static ClrQuery Parse(this JsonSchema schema, string json, IJsonSerializer jsonSerializer)
+        public static ClrQuery Parse(this QueryModel model, string json, IJsonSerializer jsonSerializer)
         {
             if (string.IsNullOrWhiteSpace(json))
             {
@@ -25,10 +24,10 @@ namespace Squidex.Infrastructure.Queries.Json
 
             var query = ParseFromJson(json, jsonSerializer);
 
-            return Convert(schema, query);
+            return Convert(model, query);
         }
 
-        public static ClrQuery Convert(this JsonSchema schema, Query<IJsonValue> query)
+        public static ClrQuery Convert(this QueryModel model, Query<IJsonValue> query)
         {
             if (query == null)
             {
@@ -39,8 +38,8 @@ namespace Squidex.Infrastructure.Queries.Json
 
             var errors = new List<string>();
 
-            ConvertSorting(schema, result, errors);
-            ConvertFilters(schema, result, errors, query);
+            ConvertSorting(model, result, errors);
+            ConvertFilters(model, result, errors, query);
 
             if (errors.Count > 0)
             {
@@ -57,11 +56,11 @@ namespace Squidex.Infrastructure.Queries.Json
             return new ValidationError(error);
         }
 
-        private static void ConvertFilters(JsonSchema schema, ClrQuery result, List<string> errors, Query<IJsonValue> query)
+        private static void ConvertFilters(QueryModel model, ClrQuery result, List<string> errors, Query<IJsonValue> query)
         {
             if (query.Filter != null)
             {
-                var filter = JsonFilterVisitor.Parse(query.Filter, schema, errors);
+                var filter = JsonFilterVisitor.Parse(query.Filter, model, errors);
 
                 if (filter != null)
                 {
@@ -70,13 +69,13 @@ namespace Squidex.Infrastructure.Queries.Json
             }
         }
 
-        private static void ConvertSorting(JsonSchema schema, ClrQuery result, List<string> errors)
+        private static void ConvertSorting(QueryModel model, ClrQuery result, List<string> errors)
         {
             if (result.Sort != null)
             {
                 foreach (var sorting in result.Sort)
                 {
-                    sorting.Path.TryGetProperty(schema, errors, out _);
+                    sorting.Path.TryGetField(model, errors, out _);
                 }
             }
         }

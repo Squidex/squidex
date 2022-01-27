@@ -20,11 +20,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 {
                     ["id"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityId, true),
                     ["created"] = JsonTypeBuilder.DateTimeProperty(FieldDescriptions.EntityCreated, true),
-                    ["createdBy"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityCreatedBy, true),
+                    ["createdBy"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityCreatedBy, true, SpecialFormats.User),
                     ["lastModified"] = JsonTypeBuilder.DateTimeProperty(FieldDescriptions.EntityLastModified, true),
-                    ["lastModifiedBy"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityLastModifiedBy, true),
-                    ["newStatus"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentNewStatus),
-                    ["status"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentStatus, true)
+                    ["lastModifiedBy"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityLastModifiedBy, true, SpecialFormats.User),
+                    ["newStatus"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentNewStatus, false, SpecialFormats.Status),
+                    ["status"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentStatus, true, SpecialFormats.Status)
                 },
                 Type = JsonObjectType.Object
             };

@@ -6,47 +6,55 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
-using NJsonSchema;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
     public static class PropertyPathValidator
     {
-        public static bool TryGetProperty(this PropertyPath path, JsonSchema schema, List<string> errors, [MaybeNullWhen(false)] out JsonSchema property)
+        public static bool TryGetField(this PropertyPath path, QueryModel model, List<string> errors, [MaybeNullWhen(false)] out FilterableField field)
         {
+            field = null!;
+
+            var list = model.Fields;
+            var index = 0;
+
             foreach (var element in path)
             {
-                var parent = schema.Reference ?? schema;
+                var current = list.FirstOrDefault(x => x.FieldPath == element);
 
-                if (parent.Properties.TryGetValue(element, out var p))
+                if (current == null)
                 {
-                    schema = p;
+                    break;
+                }
 
-                    if (schema.Type == JsonObjectType.None && schema.Reference == null)
-                    {
-                        break;
-                    }
+                if (current.Fields == null || current.Fields.Count == 0 || element == path[^1])
+                {
+                    field = current;
+                    return true;
+                }
+
+                if (current.Fields != null)
+                {
+                    list = current.Fields;
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(parent.Title))
-                    {
-                        errors.Add($"'{element}' is not a property of '{parent.Title}'.");
-                    }
-                    else
-                    {
-                        errors.Add($"Path '{path}' does not point to a valid property in the model.");
-                    }
-
-                    property = null!;
-
-                    return false;
+                    break;
                 }
+
+                index++;
             }
 
-            property = schema;
+            if (index > 0)
+            {
+                errors.Add($"'{path[index]}' is not a property of '{string.Join('.', path.Take(index))}'.");
+            }
+            else
+            {
+                errors.Add($"Path '{path}' does not point to a valid property in the model.");
+            }
 
-            return true;
+            return false;
         }
     }
 }

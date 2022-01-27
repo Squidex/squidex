@@ -25,7 +25,7 @@
                         [languages]="languages"
                         (queryChange)="search($event)"
                         [query]="contentsState.query | async"
-                        [queryModel]="queryModel">
+                        [queryModel]="queryModel | async">
                     </sqx-search-form>
                 </div>
                     

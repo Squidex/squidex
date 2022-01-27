@@ -5,8 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.TestHelpers;
@@ -32,80 +31,28 @@ namespace Squidex.Infrastructure.Queries
             ("StartsWith", "startswith", "startsWith($FIELD, $VALUE)")
         };
 
-        private static readonly JsonSchema Schema = new JsonSchema();
+        private static readonly QueryModel Model = new QueryModel();
 
         static QueryFromJsonTests()
         {
-            var nested = new JsonSchemaProperty { Title = "nested", Type = JsonObjectType.Object };
-
-            nested.Properties["property"] = new JsonSchemaProperty
+            var fields = new List<FilterableField>
             {
-                Type = JsonObjectType.String
-            };
-
-            Schema.Properties["boolean"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Boolean
-            };
-
-            Schema.Properties["datetime"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime
-            };
-
-            Schema.Properties["guid"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.String, Format = JsonFormatStrings.Guid
-            };
-
-            Schema.Properties["integer"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Integer
-            };
-
-            Schema.Properties["number"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Number
-            };
-
-            Schema.Properties["json"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.None
-            };
-
-            Schema.Properties["geo"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Object, Format = GeoJson.Format
-            };
-
-            Schema.Properties["reference"] = new JsonSchemaProperty
-            {
-                Reference = nested
-            };
-
-            Schema.Properties["string"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.String
-            };
-
-            Schema.Properties["geoRef"] = new JsonSchemaProperty
-            {
-                Reference = new JsonSchema
+                new FilterableField(FilterableFieldType.Object, "object")
                 {
-                    Format = GeoJson.Format
-                }
-            };
-
-            Schema.Properties["stringArray"] = new JsonSchemaProperty
-            {
-                Item = new JsonSchema
-                {
-                    Type = JsonObjectType.String
+                    Fields = ReadonlyList.Create(new FilterableField(FilterableFieldType.String, "property"))
                 },
-                Type = JsonObjectType.Array
+                new FilterableField(FilterableFieldType.Any, "json"),
+                new FilterableField(FilterableFieldType.Boolean, "boolean"),
+                new FilterableField(FilterableFieldType.DateTime, "datetime"),
+                new FilterableField(FilterableFieldType.GeoObject, "geo"),
+                new FilterableField(FilterableFieldType.Guid, "guid"),
+                new FilterableField(FilterableFieldType.Number, "number"),
+                new FilterableField(FilterableFieldType.String, "string"),
+                new FilterableField(FilterableFieldType.StringArray, "stringArray"),
+                new FilterableField(FilterableFieldType.String, "nested2.value")
             };
 
-            Schema.Properties["object"] = nested;
+            Model = new QueryModel { Fields = fields };
         }
 
         public class DateTime
@@ -235,14 +182,6 @@ namespace Squidex.Infrastructure.Queries
 
                 AssertFilter(json, "object.property in ['Hello']");
             }
-
-            [Fact]
-            public void Should_parse_referenced_string_filter()
-            {
-                var json = new { path = "reference.property", op = "in", value = new[] { "Hello" } };
-
-                AssertFilter(json, "reference.property in ['Hello']");
-            }
         }
 
         public class Geo
@@ -257,13 +196,6 @@ namespace Squidex.Infrastructure.Queries
                 var value = new { longitude = 10, latitude = 20, distance = 30 };
 
                 return BuildFlatTests("geo", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
-            }
-
-            public static IEnumerable<object[]> ValidRefTests()
-            {
-                var value = new { longitude = 10, latitude = 20, distance = 30 };
-
-                return BuildFlatTests("geoRef", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
             }
 
             public static IEnumerable<object[]> InvalidTests()
@@ -283,21 +215,12 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Theory]
-            [MemberData(nameof(ValidRefTests))]
-            public void Should_parse_filter_with_reference(string field, string op, object value, string expected)
-            {
-                var json = new { path = field, op, value };
-
-                AssertFilter(json, expected);
-            }
-
-            [Theory]
             [MemberData(nameof(InvalidTests))]
             public void Should_add_error_if_operator_is_invalid(string field, string op, object value, string expected)
             {
                 var json = new { path = field, op, value };
 
-                AssertErrors(json, $"'{expected}' is not a valid operator for type Object(geo-json) at '{field}'.");
+                AssertErrors(json, $"'{expected}' is not a valid operator for type GeoObject at '{field}'.");
             }
 
             [Fact]
@@ -514,15 +437,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "object.notfound", op = "eq", value = 1 };
 
-            AssertErrors(json, "'notfound' is not a property of 'nested'.");
-        }
-
-        [Fact]
-        public void Should_add_error_if_nested_reference_property_does_not_exist()
-        {
-            var json = new { path = "reference.notfound", op = "eq", value = 1 };
-
-            AssertErrors(json, "'notfound' is not a property of 'nested'.");
+            AssertErrors(json, "'notfound' is not a property of 'object'.");
         }
 
         [Fact]
@@ -601,14 +516,14 @@ namespace Squidex.Infrastructure.Queries
 
             var jsonFilter = TestUtils.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
 
-            return JsonFilterVisitor.Parse(jsonFilter, Schema, errors)?.ToString();
+            return JsonFilterVisitor.Parse(jsonFilter, Model, errors)?.ToString();
         }
 
         private static string? ConvertQuery<T>(T value)
         {
             var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            var jsonFilter = Schema.Parse(json, TestUtils.DefaultSerializer);
+            var jsonFilter = Model.Parse(json, TestUtils.DefaultSerializer);
 
             return jsonFilter.ToString();
         }

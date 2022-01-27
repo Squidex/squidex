@@ -10,6 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { AnalyticsService, ApiUrlConfig, DateTime, hasAnyLink, HTTP, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { QueryModel } from './query';
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
 export const MetaFields = {
@@ -667,6 +668,12 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/completion`);
 
         return this.http.get<SchemaCompletions>(url);
+    }
+
+    public getFilters(appName: string, schemaName: string): Observable<QueryModel> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/filters`);
+
+        return this.http.get<QueryModel>(url);
     }
 }
 

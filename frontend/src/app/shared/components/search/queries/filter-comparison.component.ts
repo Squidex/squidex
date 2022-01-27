@@ -36,7 +36,13 @@ export class FilterComparisonComponent implements OnChanges {
 
     public fieldModel?: QueryFieldModel;
 
-    public noValue = false;
+    public get operators() {
+        return this.model.operators[this.fieldModel?.type!] || [];
+    }
+
+    public get noValue() {
+        return this.filter.op === 'empty' || this.filter.op === 'exists';
+    }
 
     constructor(
         public readonly contributorsState: ContributorsState,
@@ -46,7 +52,6 @@ export class FilterComparisonComponent implements OnChanges {
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['filter']) {
             this.updatePath(false);
-            this.updateOperator();
         }
     }
 
@@ -59,8 +64,6 @@ export class FilterComparisonComponent implements OnChanges {
     public changeOp(op: string) {
         this.filter.op = op;
 
-        this.updateOperator();
-
         this.emitChange();
     }
 
@@ -72,20 +75,14 @@ export class FilterComparisonComponent implements OnChanges {
         this.emitChange();
     }
 
-    private updateOperator() {
-        if (this.fieldModel) {
-            const operator = this.fieldModel.operators.find(x => x.value === this.filter.op);
-
-            this.noValue = !!(operator && operator.noValue);
-        }
-    }
-
     private updatePath(refresh: boolean) {
-        const newModel = this.model.fields[this.filter.path];
+        const newModel = this.model.fields.find(x => x.fieldPath === this.filter.path);
 
         if (newModel && refresh) {
-            if (!newModel.operators.find(x => x.value === this.filter.op)) {
-                this.filter.op = newModel.operators[0].value;
+            const operators = this.model.operators[newModel.type];
+
+            if (operators && operators.indexOf(this.filter.op) < 0) {
+                this.filter.op = operators[0];
             }
 
             this.filter.value = null;

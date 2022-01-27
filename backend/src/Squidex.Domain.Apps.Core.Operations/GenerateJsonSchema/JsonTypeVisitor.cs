@@ -145,7 +145,16 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            return JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+            var property = JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+
+            property.Format = GeoJson.Format;
+
+            property.ExtensionData = new Dictionary<string, object>
+            {
+                ["schemaIds"] = field.Properties.SchemaIds ?? ReadonlyList.Empty<DomainId>()
+            };
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<StringFieldProperties> field, Args args)
@@ -223,7 +232,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 }
 
                 jsonSchema.DiscriminatorObject = discriminator;
-                jsonSchema.Properties.Add(Component.Discriminator, JsonTypeBuilder.StringProperty(isRequired: true));
+
+                if (discriminator.Mapping.Count > 0)
+                {
+                    jsonSchema.Properties.Add(Component.Discriminator, JsonTypeBuilder.StringProperty(isRequired: true));
+                }
             }
             else
             {

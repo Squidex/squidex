@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Queries
 
         public FilterNode<IJsonValue>? Not { get; set; }
 
-        public string? Op { get; set; }
+        public CompareOperator? Op { get; set; }
 
         public string? Path { get; set; }
 
@@ -46,49 +46,12 @@ namespace Squidex.Infrastructure.Queries
                 return new LogicalFilter<IJsonValue>(LogicalFilterType.Or, Or);
             }
 
-            if (!string.IsNullOrWhiteSpace(Path) && !string.IsNullOrWhiteSpace(Op))
+            if (!string.IsNullOrWhiteSpace(Path) && Op != null)
             {
-                var @operator = ReadOperator(Op);
-
-                return new CompareFilter<IJsonValue>(Path, @operator, Value ?? JsonValue.Null);
+                return new CompareFilter<IJsonValue>(Path, Op.Value, Value ?? JsonValue.Null);
             }
 
             throw new JsonException("Invalid query.");
-        }
-
-        private static CompareOperator ReadOperator(string op)
-        {
-            switch (op.ToLowerInvariant())
-            {
-                case "eq":
-                    return CompareOperator.Equals;
-                case "ne":
-                    return CompareOperator.NotEquals;
-                case "lt":
-                    return CompareOperator.LessThan;
-                case "le":
-                    return CompareOperator.LessThanOrEqual;
-                case "gt":
-                    return CompareOperator.GreaterThan;
-                case "ge":
-                    return CompareOperator.GreaterThanOrEqual;
-                case "empty":
-                    return CompareOperator.Empty;
-                case "exists":
-                    return CompareOperator.Exists;
-                case "matchs":
-                    return CompareOperator.Matchs;
-                case "contains":
-                    return CompareOperator.Contains;
-                case "endswith":
-                    return CompareOperator.EndsWith;
-                case "startswith":
-                    return CompareOperator.StartsWith;
-                case "in":
-                    return CompareOperator.In;
-            }
-
-            throw new JsonException($"Unexpected compare operator, got {op}.");
         }
     }
 }

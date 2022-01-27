@@ -23,4 +23,8 @@ export class QueryPathComponent {
 
     @Input()
     public model!: QueryModel;
+
+    public get value() {
+        return this.model.fields.find(x => x.fieldPath === this.path);
+    }
 }

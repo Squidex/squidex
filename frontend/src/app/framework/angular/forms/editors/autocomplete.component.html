@@ -22,10 +22,10 @@
     <ng-container *sqxModal="suggestionsModal">
         <sqx-dropdown-menu class="control-dropdown" #container
             [sqxAnchoredTo]="input"
-            [adjustWidth]="true"
+            [adjustWidth]="dropdownFullWidth"
             [adjustHeight]="false"
             [scrollY]="true" 
-            [style.minWidth]="dropdownWidth"
+            [style]="dropdownStyles"
             [position]="dropdownPosition">
             <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
