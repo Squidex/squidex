@@ -120,12 +120,12 @@ spec:
                 secretKeyRef:
                   name: squidex
                   key: google_auth_secret
-            - name: FASTLY__API__KEY
+            - name: FASTLY__APIKEY
               valueFrom:
                 secretKeyRef:
                   name: squidex
                   key: fastly_api_key
-            - name: FASTLY__SERVICE__ID
+            - name: FASTLY__SERVICEID
               valueFrom:
                 secretKeyRef:
                   name: squidex
