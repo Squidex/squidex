@@ -22,5 +22,7 @@ spec:
         paths:
         - path: /
           backend:
-            serviceName: squidex
-            servicePort: 80
+            service:
+              name: squidex
+              port:
+                number: 80
