@@ -11,14 +11,8 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed record FilterableField(FilterableFieldType Type, string Path)
-    {
-        public string? FieldHints { get; init; }
-
-        public object? Extra { get; init; }
-
-        public bool IsNullable { get; init; }
-
-        public ReadonlyList<FilterableField>? Fields { get; init; }
-    }
+    public sealed record FilterField(FilterSchema Schema,
+        string Path,
+        string? Description = null,
+        bool IsNullable = false);
 }

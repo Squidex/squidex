@@ -7,10 +7,11 @@
 
 namespace Squidex.Infrastructure.Queries
 {
-    public enum FilterableFieldType
+    public enum FilterSchemaType
     {
         Any,
         Boolean,
+        Date,
         DateTime,
         GeoObject,
         Guid,

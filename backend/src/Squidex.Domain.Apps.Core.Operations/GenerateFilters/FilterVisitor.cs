@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.GenerateFilters
 {
-    internal sealed class FilterVisitor : IFieldVisitor<FilterableField?, FilterVisitor.Args>
+    internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor.Args>
     {
         private const int MaxDepth = 5;
         private static readonly FilterVisitor Instance = new FilterVisitor();
@@ -27,127 +27,125 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
         {
         }
 
-        public static FilterableField? BuildProperty(IField field, ResolvedComponents components)
+        public static FilterSchema? BuildProperty(IField field, ResolvedComponents components)
         {
             var args = new Args(components);
 
             return field.Accept(Instance, args);
         }
 
-        public FilterableField? Visit(IArrayField field, Args args)
+        public FilterSchema? Visit(IArrayField field, Args args)
         {
             if (args.Level >= MaxDepth)
             {
                 return null;
             }
 
-            var fields = new List<FilterableField>();
+            var fields = new List<FilterField>();
 
             var nestedArgs = args with { Level = args.Level + 1 };
 
             foreach (var nestedField in field.Fields.ForApi(true))
             {
-                var filterableField = nestedField.Accept(this, nestedArgs);
+                var nestedSchema = nestedField.Accept(this, nestedArgs);
 
-                if (filterableField != null)
+                if (nestedSchema != null)
                 {
-                    filterableField = filterableField with
-                    {
-                        IsNullable = !field.RawProperties.IsRequired,
-                        FieldHints = ArrayFieldDescription(nestedField),
-                        Fields = filterableField.Fields
-                    };
+                    var filterableField = new FilterField(
+                        nestedSchema,
+                        nestedField.Name,
+                        ArrayFieldDescription(nestedField),
+                        nestedField.RawProperties.IsRequired);
 
                     fields.Add(filterableField);
                 }
             }
 
-            return new FilterableField(FilterableFieldType.ObjectArray, field.Name)
+            return new FilterSchema(FilterSchemaType.ObjectArray)
             {
                 Fields = fields.ToReadonlyList()
             };
         }
 
-        public FilterableField? Visit(IField<AssetsFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.StringArray, field.Name);
+            return FilterSchema.StringArray;
         }
 
-        public FilterableField? Visit(IField<BooleanFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.Boolean, field.Name);
+            return FilterSchema.Boolean;
         }
 
-        public FilterableField? Visit(IField<GeolocationFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<GeolocationFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.GeoObject, field.Name);
+            return FilterSchema.GeoObject;
         }
 
-        public FilterableField? Visit(IField<JsonFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<JsonFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.Any, field.Name);
+            return FilterSchema.Any;
         }
 
-        public FilterableField? Visit(IField<NumberFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<NumberFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.Number, field.Name);
+            return FilterSchema.Number;
         }
 
-        public FilterableField? Visit(IField<StringFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<StringFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.String, field.Name);
+            return FilterSchema.String;
         }
 
-        public FilterableField? Visit(IField<TagsFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<TagsFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.StringArray, field.Name);
+            return FilterSchema.StringArray;
         }
 
-        public FilterableField? Visit(IField<UIFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<UIFieldProperties> field, Args args)
         {
             return null;
         }
 
-        public FilterableField? Visit(IField<ComponentFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<ComponentFieldProperties> field, Args args)
         {
             if (args.Level >= MaxDepth)
             {
                 return null;
             }
 
-            return new FilterableField(FilterableFieldType.Object, field.Name)
+            return new FilterSchema(FilterSchemaType.Object)
             {
                 Fields = BuildComponent(field.Properties.SchemaIds, args)
             };
         }
 
-        public FilterableField? Visit(IField<ComponentsFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<ComponentsFieldProperties> field, Args args)
         {
             if (args.Level >= MaxDepth)
             {
                 return null;
             }
 
-            return new FilterableField(FilterableFieldType.ObjectArray, field.Name)
+            return new FilterSchema(FilterSchemaType.Object)
             {
                 Fields = BuildComponent(field.Properties.SchemaIds, args)
             };
         }
 
-        public FilterableField? Visit(IField<DateTimeFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<DateTimeFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.DateTime, field.Name)
+            if (field.Properties.Editor == DateTimeFieldEditor.Date)
             {
-                Extra = new
-                {
-                    editor = field.Properties.Editor.ToString()
-                }
-            };
+                return SharedSchemas.Date;
+            }
+
+            return SharedSchemas.DateTime;
         }
 
-        public FilterableField? Visit(IField<ReferencesFieldProperties> field, Args args)
+        public FilterSchema? Visit(IField<ReferencesFieldProperties> field, Args args)
         {
-            return new FilterableField(FilterableFieldType.StringArray, field.Name)
+            return new FilterSchema(FilterSchemaType.StringArray)
             {
                 Extra = new
                 {
@@ -156,9 +154,9 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
             };
         }
 
-        private ReadonlyList<FilterableField> BuildComponent(ReadonlyList<DomainId>? schemaIds, Args args)
+        private ReadonlyList<FilterField> BuildComponent(ReadonlyList<DomainId>? schemaIds, Args args)
         {
-            var fields = new List<FilterableField>();
+            var fields = new List<FilterField>();
 
             var nestedArgs = args with { Level = args.Level + 1 };
 
@@ -168,22 +166,24 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 
                 foreach (var field in schema.Fields.ForApi(true))
                 {
-                    var filterableField = field.Accept(this, nestedArgs);
+                    var fieldSchema = field.Accept(this, nestedArgs);
 
-                    if (filterableField != null)
+                    if (fieldSchema != null)
                     {
-                        filterableField = filterableField with
-                        {
-                            IsNullable = !field.RawProperties.IsRequired,
-                            FieldHints = ComponentFieldDescription(componentName, field),
-                            Fields = filterableField.Fields
-                        };
+                        var filterableField = new FilterField(
+                            fieldSchema,
+                            field.Name,
+                            ComponentFieldDescription(componentName, field),
+                            field.RawProperties.IsRequired);
 
                         fields.Add(filterableField);
                     }
                 }
 
-                fields.Add(new FilterableField(FilterableFieldType.String, Component.Discriminator));
+                fields.Add(new FilterField(FilterSchema.String, Component.Discriminator)
+                {
+                    Description = FieldDescriptions.ComponentSchemaId
+                });
             }
 
             return fields.ToReadonlyList();

@@ -54,11 +54,11 @@ namespace Squidex.Infrastructure.Queries.Json
 
             if (nodeIn.Path.TryGetField(args.Model, args.Errors, out var field))
             {
-                var isValidOperator = args.Model.Operators.TryGetValue(field.Type, out var operators) && operators.Contains(nodeIn.Operator);
+                var isValidOperator = args.Model.Operators.TryGetValue(field.Schema.Type, out var operators) && operators.Contains(nodeIn.Operator);
 
                 if (!isValidOperator)
                 {
-                    var name = field.Type.ToString();
+                    var name = field.Schema.Type.ToString();
 
                     args.Errors.Add($"'{nodeIn.Operator}' is not a valid operator for type {name} at '{nodeIn.Path}'.");
                 }

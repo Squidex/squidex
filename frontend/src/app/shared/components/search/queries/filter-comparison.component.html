@@ -1,4 +1,4 @@
-<div class="row gx-2 mb-1 align-items-center" *ngIf="fieldModel">
+<div class="row gx-2 mb-1 align-items-center" *ngIf="field">
     <div class="col-auto path">
         <sqx-query-path 
             (pathChange)="changePath($event)"
@@ -15,36 +15,36 @@
         </select>
     </div>
     <div class="col" *ngIf="!noValue">
-        <ng-container *ngIf="fieldModel.type === 'Boolean'">
-            <div class="form-check form-check-inline ps-2">
+        <ng-container *ngIf="field.schema.type === 'Boolean'">
+            <div>
                 <input type="checkbox" class="form-check-input"
                     [ngModel]="filter.value"
                     (ngModelChange)="changeValue($event)" />
             </div>
         </ng-container>
-        <ng-container *ngIf="fieldModel.type === 'DateTime' && fieldModel.extra?.editor === 'Date'">
+        <ng-container *ngIf="field.schema.type === 'DateTime' && field.schema.extra?.editor === 'Date'">
             <sqx-date-time-editor mode="Date"
                 [hideDateButtons]="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>
         </ng-container>
-        <ng-container *ngIf="fieldModel.type === 'DateTime' && fieldModel.extra?.editor !== 'Date'">
+        <ng-container *ngIf="field.schema.type === 'DateTime' && field.schema.extra?.editor !== 'Date'">
             <sqx-date-time-editor mode="DateTime"
                 [hideDateButtons]="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>
         </ng-container>
-        <ng-container *ngIf="fieldModel.type === 'Number'">
+        <ng-container *ngIf="field.schema.type === 'Number'">
             <input type="number" class="form-control"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)" />
         </ng-container>
-        <ng-container *ngIf="fieldModel.type === 'String' && fieldModel.extra?.editor === 'Status'">
+        <ng-container *ngIf="field.schema.type === 'String' && field.schema.extra?.editor === 'Status'">
             <sqx-dropdown 
                 valueProperty="status"
-                [items]="fieldModel.extra"
+                [items]="field.schema.extra"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)"
                 [canSearch]="false">
@@ -53,7 +53,7 @@
                 </ng-template>
             </sqx-dropdown>
         </ng-container>
-        <ng-container *ngIf="fieldModel.type === 'String' && fieldModel.extra?.editor === 'User'">
+        <ng-container *ngIf="field.schema.type === 'String' && field.schema.extra?.editor === 'User'">
             <ng-container *ngIf="contributorsState.isLoaded | async; else noPermission">
                 <sqx-dropdown
                     valueProperty="token"
@@ -74,19 +74,19 @@
                 </sqx-dropdown>
             </ng-container>
             <ng-template #noPermission>
-                <input type="text" class="form-control" *ngIf="!fieldModel.extra"
+                <input type="text" class="form-control" *ngIf="!field.schema.extra"
                     [ngModel]="filter.value"
                     (ngModelChange)="changeValue($event)"
                 />
             </ng-template>
         </ng-container>
-        <ng-container *ngIf="fieldModel.type === 'String' && !fieldModel.extra">
-            <input type="text" class="form-control" *ngIf="!fieldModel.extra"
+        <ng-container *ngIf="field.schema.type === 'String' && !field.schema.extra">
+            <input type="text" class="form-control" *ngIf="!field.schema.extra"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)" />
         </ng-container>
-        <ng-container *ngIf="fieldModel.type === 'StringArray' && fieldModel.extra?.schemaIds">
-            <sqx-reference-input [schemaIds]="fieldModel.extra?.schemaIds"
+        <ng-container *ngIf="field.schema.type === 'StringArray' && field.schema.extra?.schemaIds">
+            <sqx-reference-input [schemaIds]="field.schema.extra?.schemaIds"
                 mode="Single"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)"

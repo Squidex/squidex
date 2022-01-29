@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.OData.Edm;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Queries.OData;
 using Xunit;
 
@@ -20,31 +21,33 @@ namespace Squidex.Infrastructure.Queries
 
         static QueryFromODataTests()
         {
-            var fields = new List<FilterableField>
+            var fields = new List<FilterField>
             {
-                new FilterableField(FilterableFieldType.Guid, "id"),
-                new FilterableField(FilterableFieldType.Guid, "idNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.DateTime, "created"),
-                new FilterableField(FilterableFieldType.DateTime, "createdNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.Boolean, "isComicFigure"),
-                new FilterableField(FilterableFieldType.Boolean, "isComicFigureNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.String, "firstName"),
-                new FilterableField(FilterableFieldType.String, "firstNameNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.String, "lastName"),
-                new FilterableField(FilterableFieldType.String, "lastNameNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.Number, "age"),
-                new FilterableField(FilterableFieldType.Number, "ageNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.Number, "incomeMio"),
-                new FilterableField(FilterableFieldType.Number, "incomeMioNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.GeoObject, "geo"),
-                new FilterableField(FilterableFieldType.GeoObject, "geoNullable") { IsNullable = true },
-                new FilterableField(FilterableFieldType.Any, "properties"),
+                new FilterField(FilterSchema.Guid, "id"),
+                new FilterField(FilterSchema.Guid, "idNullable", IsNullable: true),
+                new FilterField(FilterSchema.DateTime, "created"),
+                new FilterField(FilterSchema.DateTime, "createdNullable", IsNullable: true),
+                new FilterField(FilterSchema.Boolean, "isComicFigure"),
+                new FilterField(FilterSchema.Boolean, "isComicFigureNullable", IsNullable: true),
+                new FilterField(FilterSchema.String, "firstName"),
+                new FilterField(FilterSchema.String, "firstNameNullable", IsNullable: true),
+                new FilterField(FilterSchema.String, "lastName"),
+                new FilterField(FilterSchema.String, "lastNameNullable", IsNullable: true),
+                new FilterField(FilterSchema.Number, "age"),
+                new FilterField(FilterSchema.Number, "ageNullable", IsNullable: true),
+                new FilterField(FilterSchema.Number, "incomeMio"),
+                new FilterField(FilterSchema.Number, "incomeMioNullable", IsNullable: true),
+                new FilterField(FilterSchema.GeoObject, "geo"),
+                new FilterField(FilterSchema.GeoObject, "geoNullable", IsNullable: true),
+                new FilterField(FilterSchema.Any, "properties"),
             };
 
-            var queryModel = new QueryModel
+            var filterSchema = new FilterSchema(FilterSchemaType.Object)
             {
-                Fields = fields
+                Fields = fields.ToReadonlyList()
             };
+
+            var queryModel = new QueryModel { Schema = filterSchema };
 
             EdmModel = queryModel.ConvertToEdm("Squidex", "Content");
         }

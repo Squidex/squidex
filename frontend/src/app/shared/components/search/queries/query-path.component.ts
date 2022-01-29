@@ -25,6 +25,6 @@ export class QueryPathComponent {
     public model!: QueryModel;
 
     public get value() {
-        return this.model.fields.find(x => x.path === this.path);
+        return this.model.schema.fields.find(x => x.path === this.path);
     }
 }

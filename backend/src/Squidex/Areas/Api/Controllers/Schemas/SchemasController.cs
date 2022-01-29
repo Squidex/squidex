@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Queries;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -371,11 +372,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
             return Ok(filters);
         }
 
-        private async Task<JsonSchema> BuildModel()
+        private async Task<FilterSchema> BuildModel()
         {
             var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-            return Schema.SchemaDef.BuildJsonSchema(App.PartitionResolver(), components, null, true, true);
+            return Schema.SchemaDef.BuildDataSchema(App.PartitionResolver(), components).Flatten();
         }
 
         private Task<ISchemaEntity?> GetSchemaAsync(string schema)

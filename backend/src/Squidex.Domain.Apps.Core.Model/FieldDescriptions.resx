@@ -201,6 +201,9 @@
   <data name="ComponentField" xml:space="preserve">
     <value>{0} field ({1} component).</value>
   </data>
+  <data name="ComponentSchemaId" xml:space="preserve">
+    <value>The schema id to identity the component type.</value>
+  </data>
   <data name="ContentArrayField" xml:space="preserve">
     <value>{0} nested field.</value>
   </data>

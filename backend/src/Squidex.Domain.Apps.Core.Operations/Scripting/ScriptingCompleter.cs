@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
@@ -19,14 +19,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
             this.descriptors = descriptors;
         }
 
-        public IReadOnlyList<ScriptingValue> ContentScript(JsonSchema dataSchema)
+        public IReadOnlyList<ScriptingValue> ContentScript(FilterSchema dataSchema)
         {
             Guard.NotNull(dataSchema, nameof(dataSchema));
 
             return new Process(descriptors).Content(dataSchema, ScriptScope.ContentScript | ScriptScope.Transform);
         }
 
-        public IReadOnlyList<ScriptingValue> ContentTrigger(JsonSchema dataSchema)
+        public IReadOnlyList<ScriptingValue> ContentTrigger(FilterSchema dataSchema)
         {
             Guard.NotNull(dataSchema, nameof(dataSchema));
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 this.descriptors = descriptors;
             }
 
-            public IReadOnlyList<ScriptingValue> Content(JsonSchema dataSchema, ScriptScope scope)
+            public IReadOnlyList<ScriptingValue> Content(FilterSchema dataSchema, ScriptScope scope)
             {
                 AddShared(scope);
 
@@ -191,84 +191,82 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 });
             }
 
-            private void AddData(JsonSchema schema)
+            private void AddData(FilterSchema dataSchema)
             {
-                void CheckField(JsonSchema schema)
+                if (dataSchema.Fields == null)
                 {
-                    switch (schema.Type)
+                    return;
+                }
+
+                foreach (var field in dataSchema.Fields)
+                {
+                    switch (field.Schema.Type)
                     {
-                        case JsonObjectType.None:
-                            AddAny(null, schema.Description);
+                        case FilterSchemaType.Any:
+                            AddAny(field.Path, field.Description);
                             break;
-                        case JsonObjectType.Boolean:
-                            AddBoolean(null, schema.Description);
+                        case FilterSchemaType.Boolean:
+                            AddBoolean(field.Path, field.Description);
                             break;
-                        case JsonObjectType.Number:
-                            AddNumber(null, schema.Description);
+                        case FilterSchemaType.DateTime:
+                            AddString(field.Path, field.Description);
                             break;
-                        case JsonObjectType.String:
-                            AddString(null, schema.Description);
+                        case FilterSchemaType.GeoObject:
+                            AddObject(field.Path, field.Description);
                             break;
-                        case JsonObjectType.Array:
-                            AddArray(null, schema.Description);
-
-                            if (schema.Item?.Type == JsonObjectType.Object)
-                            {
-                                CheckField(schema.Item);
-                            }
-
+                        case FilterSchemaType.Guid:
+                            AddString(field.Path, field.Description);
                             break;
-                        case JsonObjectType.Object:
-                            Add(JsonType.Object, null, schema.Description);
-
-                            foreach (var (name, property) in schema.Properties)
-                            {
-                                prefixes.Push(name);
-                                CheckField(property);
-                                prefixes.Pop();
-                            }
-
-                            if (schema.DiscriminatorObject != null)
-                            {
-                                foreach (var mapping in schema.DiscriminatorObject.Mapping.Values)
-                                {
-                                    CheckField(mapping);
-                                }
-                            }
-
+                        case FilterSchemaType.Number:
+                            AddNumber(field.Path, field.Description);
+                            break;
+                        case FilterSchemaType.Object:
+                            AddObject(field.Path, field.Description);
+                            break;
+                        case FilterSchemaType.ObjectArray:
+                            AddArray(field.Path, field.Description);
+                            break;
+                        case FilterSchemaType.String:
+                            AddString(field.Path, field.Description);
+                            break;
+                        case FilterSchemaType.StringArray:
+                            AddArray(field.Path, field.Description);
                             break;
                     }
                 }
-
-                CheckField(schema);
             }
 
-            private void AddAny(string? name, string description)
+            private void AddAny(string? name, string? description)
             {
                 Add(JsonType.Any, name, description);
             }
 
-            private void AddArray(string? name, string description)
+            private void AddArray(string? name, string? description)
             {
                 Add(JsonType.Array, name, description);
             }
 
-            private void AddBoolean(string? name, string description)
+            private void AddBoolean(string? name, string? description)
             {
                 Add(JsonType.Boolean, name, description);
             }
 
-            private void AddNumber(string? name, string description)
+            private void AddObject(string? name, string? description)
+            {
+                Add(JsonType.Object, name, description);
+            }
+
+            private void AddNumber(string? name, string? description)
             {
                 Add(JsonType.Number, name, description);
             }
 
-            private void AddString(string? name, string description)
+            private void AddString(string? name, string? description)
             {
                 Add(JsonType.String, name, description);
             }
 
-            private void Add(JsonType type, string? name, string description)
+            private void Add(JsonType type, string? name, string? description)
             {
                 if (name != null)
                 {
@@ -292,7 +290,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             private void AddObject(string name, string description, Action inner)
             {
-                Add(JsonType.Object, description, name);
+                Add(JsonType.Object, name, description);
 
                 prefixes.Push(name);
                 try

@@ -15,73 +15,62 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
     {
         public static QueryModel Build(Schema? schema, PartitionResolver partitionResolver, ResolvedComponents components)
         {
-            var fields = new List<FilterableField>
+            var fields = new List<FilterField>
             {
-                new FilterableField(FilterableFieldType.String, "id")
+                new FilterField(FilterSchema.String, "id")
                 {
-                    FieldHints = FieldDescriptions.EntityId
+                    Description = FieldDescriptions.EntityId
                 },
-                new FilterableField(FilterableFieldType.Boolean, "isDeleted")
+                new FilterField(FilterSchema.Boolean, "isDeleted")
                 {
-                    FieldHints = FieldDescriptions.EntityIsDeleted
+                    Description = FieldDescriptions.EntityIsDeleted
                 },
-                new FilterableField(FilterableFieldType.DateTime, "created")
+                new FilterField(FilterSchema.DateTime, "created")
                 {
-                    FieldHints = FieldDescriptions.EntityCreated
+                    Description = FieldDescriptions.EntityCreated
                 },
-                new FilterableField(FilterableFieldType.String, "createdBy")
+                new FilterField(SharedSchemas.User, "createdBy")
                 {
-                    FieldHints = FieldDescriptions.EntityCreatedBy,
-                    Extra = new
-                    {
-                        editor = "User"
-                    }
+                    Description = FieldDescriptions.EntityCreatedBy
                 },
-                new FilterableField(FilterableFieldType.DateTime, "lastModified")
+                new FilterField(FilterSchema.DateTime, "lastModified")
                 {
-                    FieldHints = FieldDescriptions.EntityLastModified
+                    Description = FieldDescriptions.EntityLastModified
                 },
-                new FilterableField(FilterableFieldType.String, "lastModifiedBy")
+                new FilterField(SharedSchemas.User, "lastModifiedBy")
                 {
-                    FieldHints = FieldDescriptions.EntityLastModifiedBy,
-                    Extra = new
-                    {
-                        editor = "User"
-                    }
+                    Description = FieldDescriptions.EntityLastModifiedBy
                 },
-                new FilterableField(FilterableFieldType.String, "version")
+                new FilterField(FilterSchema.Number, "version")
                 {
-                    FieldHints = FieldDescriptions.EntityVersion
+                    Description = FieldDescriptions.EntityVersion
                 },
-                new FilterableField(FilterableFieldType.String, "status")
+                new FilterField(SharedSchemas.Status, "status")
                 {
-                    FieldHints = FieldDescriptions.ContentStatus,
-                    Extra = new
-                    {
-                        editor = "Status"
-                    },
-                    IsNullable = false
+                    Description = FieldDescriptions.ContentStatus,
                 },
-                new FilterableField(FilterableFieldType.String, "newStatus")
+                new FilterField(SharedSchemas.Status, "newStatus", IsNullable: true)
                 {
-                    FieldHints = FieldDescriptions.ContentNewStatus,
-                    Extra = new
-                    {
-                        editor = "Status"
-                    },
-                    IsNullable = true
+                    Description = FieldDescriptions.ContentNewStatus
                 }
             };
 
             if (schema != null)
             {
-                fields.Add(schema.BuildDataField(partitionResolver, components));
+                var dataSchema = schema.BuildDataSchema(partitionResolver, components);
+
+                fields.Add(new FilterField(dataSchema, "data")
+                {
+                    Description = FieldDescriptions.ContentData
+                });
             }
 
-            return new QueryModel
+            var filterSchema = new FilterSchema(FilterSchemaType.Object)
             {
                 Fields = fields.ToReadonlyList()
             };
+
+            return new QueryModel { Schema = filterSchema };
         }
     }
 }

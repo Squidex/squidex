@@ -64,7 +64,7 @@ export class FilterLogicalComponent {
     public filters: FilterNode[] = [];
 
     public addComparison() {
-        this.filters.push(<any>{ path: this.model.fields[0].path });
+        this.filters.push(<any>{ path: this.model.schema.fields[0].path });
 
         this.emitChange();
     }

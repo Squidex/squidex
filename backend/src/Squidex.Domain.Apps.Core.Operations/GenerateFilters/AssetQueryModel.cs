@@ -14,94 +14,88 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
     {
         public static QueryModel Build()
         {
-            var fields = new List<FilterableField>
+            var fields = new List<FilterField>
             {
-                new FilterableField(FilterableFieldType.String, "id")
+                new FilterField(FilterSchema.String, "id")
                 {
-                    FieldHints = FieldDescriptions.EntityId
+                    Description = FieldDescriptions.EntityId
                 },
-                new FilterableField(FilterableFieldType.Boolean, "isDeleted")
+                new FilterField(FilterSchema.Boolean, "isDeleted")
                 {
-                    FieldHints = FieldDescriptions.EntityIsDeleted
+                    Description = FieldDescriptions.EntityIsDeleted
                 },
-                new FilterableField(FilterableFieldType.DateTime, "created")
+                new FilterField(FilterSchema.DateTime, "created")
                 {
-                    FieldHints = FieldDescriptions.EntityCreated
+                    Description = FieldDescriptions.EntityCreated
                 },
-                new FilterableField(FilterableFieldType.String, "createdBy")
+                new FilterField(SharedSchemas.User, "createdBy")
                 {
-                    FieldHints = FieldDescriptions.EntityCreatedBy,
-                    Extra = new
-                    {
-                        editor = "User"
-                    }
+                    Description = FieldDescriptions.EntityCreatedBy
                 },
-                new FilterableField(FilterableFieldType.DateTime, "lastModified")
+                new FilterField(FilterSchema.DateTime, "lastModified")
                 {
-                    FieldHints = FieldDescriptions.EntityLastModified
+                    Description = FieldDescriptions.EntityLastModified
                 },
-                new FilterableField(FilterableFieldType.String, "lastModifiedBy")
+                new FilterField(SharedSchemas.User, "lastModifiedBy")
                 {
-                    FieldHints = FieldDescriptions.EntityLastModifiedBy,
-                    Extra = new
-                    {
-                        editor = "User"
-                    }
+                    Description = FieldDescriptions.EntityLastModifiedBy
                 },
-                new FilterableField(FilterableFieldType.String, "status")
+                new FilterField(FilterSchema.String, "status")
                 {
-                    FieldHints = FieldDescriptions.ContentStatus
+                    Description = FieldDescriptions.ContentStatus
                 },
-                new FilterableField(FilterableFieldType.String, "version")
+                new FilterField(FilterSchema.String, "version")
                 {
-                    FieldHints = FieldDescriptions.EntityVersion
+                    Description = FieldDescriptions.EntityVersion
                 },
-                new FilterableField(FilterableFieldType.String, "fileHash")
+                new FilterField(FilterSchema.String, "fileHash")
                 {
-                    FieldHints = FieldDescriptions.AssetFileHash
+                    Description = FieldDescriptions.AssetFileHash
                 },
-                new FilterableField(FilterableFieldType.String, "fileName")
+                new FilterField(FilterSchema.String, "fileName")
                 {
-                    FieldHints = FieldDescriptions.AssetFileName
+                    Description = FieldDescriptions.AssetFileName
                 },
-                new FilterableField(FilterableFieldType.Number, "fileSize")
+                new FilterField(FilterSchema.Number, "fileSize")
                 {
-                    FieldHints = FieldDescriptions.AssetFileSize
+                    Description = FieldDescriptions.AssetFileSize
                 },
-                new FilterableField(FilterableFieldType.Number, "fileVersion")
+                new FilterField(FilterSchema.Number, "fileVersion")
                 {
-                    FieldHints = FieldDescriptions.AssetFileVersion
+                    Description = FieldDescriptions.AssetFileVersion
                 },
-                new FilterableField(FilterableFieldType.Boolean, "isProtected")
+                new FilterField(FilterSchema.Boolean, "isProtected")
                 {
-                    FieldHints = FieldDescriptions.AssetIsProtected
+                    Description = FieldDescriptions.AssetIsProtected
                 },
-                new FilterableField(FilterableFieldType.Any, "metadata")
+                new FilterField(FilterSchema.Any, "metadata")
                 {
-                    FieldHints = FieldDescriptions.AssetMetadata
+                    Description = FieldDescriptions.AssetMetadata
                 },
-                new FilterableField(FilterableFieldType.String, "mimeType")
+                new FilterField(FilterSchema.String, "mimeType")
                 {
-                    FieldHints = FieldDescriptions.AssetMimeType
+                    Description = FieldDescriptions.AssetMimeType
                 },
-                new FilterableField(FilterableFieldType.String, "slug")
+                new FilterField(FilterSchema.String, "slug")
                 {
-                    FieldHints = FieldDescriptions.AssetSlug
+                    Description = FieldDescriptions.AssetSlug
                 },
-                new FilterableField(FilterableFieldType.StringArray, "tags")
+                new FilterField(FilterSchema.StringArray, "tags")
                 {
-                    FieldHints = FieldDescriptions.AssetTags
+                    Description = FieldDescriptions.AssetTags
                 },
-                new FilterableField(FilterableFieldType.String, "type")
+                new FilterField(FilterSchema.String, "type")
                 {
-                    FieldHints = FieldDescriptions.AssetType
+                    Description = FieldDescriptions.AssetType
                 }
             };
 
-            return new QueryModel
+            var schema = new FilterSchema(FilterSchemaType.Object)
             {
                 Fields = fields.ToReadonlyList()
             };
+
+            return new QueryModel { Schema = schema };
         }
     }
 }

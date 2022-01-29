@@ -1,10 +1,11 @@
 <sqx-dropdown
-    [canSearch]="false"
-    [disabled]="model.fields.length === 0"
-    [items]="model.fields"
+    searchProperty="path"
+    [disabled]="model.schema.fields.length === 0"
+    [items]="model.schema.fields"
     [itemSeparator]="true"
     [ngModel]="value"
-    (ngModelChange)="pathChange.emit($event?.path)">
+    (ngModelChange)="pathChange.emit($event?.path)"
+    [dropdownStyles]="{ maxWidth: '40rem' }">
     <ng-template let-field="$implicit">
         <div class="row">
             <div class="col-auto">

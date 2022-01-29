@@ -313,6 +313,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The schema id to identity the component type..
+        /// </summary>
+        public static string ComponentSchemaId {
+            get {
+                return ResourceManager.GetString("ComponentSchemaId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} nested field..
         /// </summary>
         public static string ContentArrayField {

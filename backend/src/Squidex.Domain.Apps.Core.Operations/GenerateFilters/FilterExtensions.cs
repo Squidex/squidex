@@ -15,65 +15,65 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 {
     public static class JsonSchemaExtensions
     {
-        public static FilterableField BuildDataField(this Schema schema, PartitionResolver partitionResolver,
+        public static FilterSchema BuildDataSchema(this Schema schema, PartitionResolver partitionResolver,
             ResolvedComponents components)
         {
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
             Guard.NotNull(components, nameof(components));
 
-            var fields = new List<FilterableField>();
+            var fields = new List<FilterField>();
 
             var schemaName = schema.DisplayName();
 
             foreach (var field in schema.Fields.ForApi(true))
             {
-                var filterableField = FilterVisitor.BuildProperty(field, components);
+                var fieldSchema = FilterVisitor.BuildProperty(field, components);
 
-                if (filterableField == null)
+                if (fieldSchema == null)
                 {
                     continue;
                 }
 
                 var partitioning = partitionResolver(field.Partitioning);
-                var partitionFields = new List<FilterableField>();
+                var partitionFields = new List<FilterField>();
 
                 foreach (var partitionKey in partitioning.AllKeys)
                 {
-                    var isNullable = partitioning.IsOptional(partitionKey) || !field.RawProperties.IsRequired;
+                    var partitionDescription = FieldPartitionDescription(field, partitioning.GetName(partitionKey) ?? partitionKey);
 
-                    var partitionField = filterableField with
-                    {
-                        IsNullable = isNullable,
-                        FieldHints = FieldPartitionDescription(field, partitioning, partitionKey),
-                        Fields = filterableField.Fields
-                    };
+                    var partitionField = new FilterField(
+                        fieldSchema,
+                        partitionKey,
+                        partitionDescription,
+                        partitioning.IsOptional(partitionKey) || !field.RawProperties.IsRequired);
 
                     partitionFields.Add(partitionField);
                 }
 
-                var fieldGroup = new FilterableField(FilterableFieldType.Object, field.Name)
-                {
-                    FieldHints = FieldDescription(schemaName, field),
-                    Fields = partitionFields.ToReadonlyList()
-                };
+                var filterable = new FilterField(
+                    new FilterSchema(FilterSchemaType.Object)
+                    {
+                        Fields = partitionFields.ToReadonlyList()
+                    },
+                    field.Name,
+                    FieldDescription(schemaName, field));
 
-                fields.Add(fieldGroup);
+                fields.Add(filterable);
             }
 
-            var dataField = new FilterableField(FilterableFieldType.Object, "data")
+            var dataSchema = new FilterSchema(FilterSchemaType.Object)
             {
-                FieldHints = FieldDescriptions.ContentData,
                 Fields = fields.ToReadonlyList()
             };
 
-            return dataField;
+            return dataSchema;
         }
 
-        private static string FieldPartitionDescription(RootField field, IFieldPartitioning partitioning, string partitionKey)
+        private static string FieldPartitionDescription(RootField field, string partition)
         {
             var name = field.DisplayName();
 
-            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ContentPartitionField, name, partitioning.GetName(partitionKey));
+            return string.Format(CultureInfo.InvariantCulture, FieldDescriptions.ContentPartitionField, name, partition);
         }
 
         private static string FieldDescription(string schemaName, RootField field)

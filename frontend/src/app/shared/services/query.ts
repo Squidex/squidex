@@ -7,7 +7,7 @@
 
 import { QueryParams, RouteSynchronizer, Types } from '@app/framework';
 
-export type FilterableFieldType =
+export type FilterSchemaType =
     'Any' |
     'Boolean' |
     'DateTime' |
@@ -19,26 +19,34 @@ export type FilterableFieldType =
     'String' |
     'StringArray';
 
-export interface FilterableField {
+export interface FilterSchema {
     // The value type.
-    type: FilterableFieldType;
+    readonly type: FilterSchemaType;
 
     // Extra values.
-    extra?: any;
+    readonly extra?: any;
+
+    // The fields.
+    readonly fields: ReadonlyArray<FilterableField>;
+}
+
+export interface FilterableField {
+    // The schema type.
+    readonly schema: FilterSchema;
 
     // The field path.
-    path: string;
+    readonly path: string;
 
     // The optional description for the field.
-    description?: string;
+    readonly description?: string;
 }
 
 export interface QueryModel {
     // All available fields.
-    fields: FilterableField[];
+    readonly schema: FilterSchema;
 
     // The allowed operators.
-    operators: { [type: string]: ReadonlyArray<string> };
+    readonly operators: Readonly<{ [type: string]: ReadonlyArray<string> }>;
 }
 
 export type FilterNode = FilterComparison | FilterLogical;

@@ -19,37 +19,37 @@ namespace Squidex.Infrastructure.Queries.OData
             var entityType = new EdmEntityType(modelName, name);
             var entityPath = new Stack<string>();
 
-            void Convert(EdmStructuredType target, IReadOnlyList<FilterableField> fields)
+            void Convert(EdmStructuredType target, IReadOnlyList<FilterField> fields)
             {
-                foreach (var field in queryModel.Fields)
+                foreach (var field in fields)
                 {
                     var fieldName = field.Path.EscapeEdmField();
 
-                    switch (field.Type)
+                    switch (field.Schema.Type)
                     {
-                        case FilterableFieldType.Boolean:
+                        case FilterSchemaType.Boolean:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Boolean, field.IsNullable);
                             break;
-                        case FilterableFieldType.DateTime:
+                        case FilterSchemaType.DateTime:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.DateTimeOffset, field.IsNullable);
                             break;
-                        case FilterableFieldType.GeoObject:
+                        case FilterSchemaType.GeoObject:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.GeographyPoint, field.IsNullable);
                             break;
-                        case FilterableFieldType.Guid:
+                        case FilterSchemaType.Guid:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Guid, field.IsNullable);
                             break;
-                        case FilterableFieldType.Number:
+                        case FilterSchemaType.Number:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Double, field.IsNullable);
                             break;
-                        case FilterableFieldType.String:
-                        case FilterableFieldType.StringArray:
+                        case FilterSchemaType.String:
+                        case FilterSchemaType.StringArray:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.String, field.IsNullable);
                             break;
-                        case FilterableFieldType.Object:
-                        case FilterableFieldType.ObjectArray:
+                        case FilterSchemaType.Object:
+                        case FilterSchemaType.ObjectArray:
                             {
-                                if (field.Fields == null || field.Fields.Count == 0)
+                                if (field.Schema.Fields == null || field.Schema.Fields.Count == 0)
                                 {
                                     break;
                                 }
@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
                                     model.AddElement(result);
 
-                                    Convert(result, field.Fields);
+                                    Convert(result, field.Schema.Fields);
                                 }
 
                                 target.AddStructuralProperty("data", new EdmComplexTypeReference(result, field.IsNullable));
@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Queries.OData
                                 break;
                             }
 
-                        case FilterableFieldType.Any:
+                        case FilterSchemaType.Any:
                             {
                                 var result = model.SchemaElements.OfType<EdmComplexType>().FirstOrDefault(x => x.Name == "Any");
 
@@ -93,7 +93,10 @@ namespace Squidex.Infrastructure.Queries.OData
                 }
             }
 
-            Convert(entityType, queryModel.Fields);
+            if (queryModel.Schema.Fields != null)
+            {
+                Convert(entityType, queryModel.Schema.Fields);
+            }
 
             var container = new EdmEntityContainer("Squidex", "Container");
 

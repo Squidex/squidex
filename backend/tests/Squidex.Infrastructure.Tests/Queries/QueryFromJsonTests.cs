@@ -35,24 +35,31 @@ namespace Squidex.Infrastructure.Queries
 
         static QueryFromJsonTests()
         {
-            var fields = new List<FilterableField>
+            var nestedSchema = new FilterSchema(FilterSchemaType.Object)
             {
-                new FilterableField(FilterableFieldType.Object, "object")
-                {
-                    Fields = ReadonlyList.Create(new FilterableField(FilterableFieldType.String, "property"))
-                },
-                new FilterableField(FilterableFieldType.Any, "json"),
-                new FilterableField(FilterableFieldType.Boolean, "boolean"),
-                new FilterableField(FilterableFieldType.DateTime, "datetime"),
-                new FilterableField(FilterableFieldType.GeoObject, "geo"),
-                new FilterableField(FilterableFieldType.Guid, "guid"),
-                new FilterableField(FilterableFieldType.Number, "number"),
-                new FilterableField(FilterableFieldType.String, "string"),
-                new FilterableField(FilterableFieldType.StringArray, "stringArray"),
-                new FilterableField(FilterableFieldType.String, "nested2.value")
+                Fields = ReadonlyList.Create(new FilterField(FilterSchema.String, "property"))
             };
 
-            Model = new QueryModel { Fields = fields };
+            var fields = new List<FilterField>
+            {
+                new FilterField(nestedSchema, "object"),
+                new FilterField(FilterSchema.Any, "json"),
+                new FilterField(FilterSchema.Boolean, "boolean"),
+                new FilterField(FilterSchema.DateTime, "datetime"),
+                new FilterField(FilterSchema.GeoObject, "geo"),
+                new FilterField(FilterSchema.Guid, "guid"),
+                new FilterField(FilterSchema.Number, "number"),
+                new FilterField(FilterSchema.String, "string"),
+                new FilterField(FilterSchema.StringArray, "stringArray"),
+                new FilterField(FilterSchema.String, "nested2.value")
+            };
+
+            var schema = new FilterSchema(FilterSchemaType.Object)
+            {
+                Fields = fields.ToReadonlyList()
+            };
+
+            Model = new QueryModel { Schema = schema };
         }
 
         public class DateTime

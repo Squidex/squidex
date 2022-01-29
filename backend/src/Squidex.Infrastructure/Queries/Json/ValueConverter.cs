@@ -22,13 +22,13 @@ namespace Squidex.Infrastructure.Queries.Json
             InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
         };
 
-        public static ClrValue? Convert(FilterableField field, IJsonValue value, PropertyPath path, List<string> errors)
+        public static ClrValue? Convert(FilterField field, IJsonValue value, PropertyPath path, List<string> errors)
         {
             ClrValue? result = null;
 
-            switch (field.Type)
+            switch (field.Schema.Type)
             {
-                case FilterableFieldType.GeoObject:
+                case FilterSchemaType.GeoObject:
                     {
                         if (TryParseGeoJson(errors, path, value, out var temp))
                         {
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case FilterableFieldType.Any:
+                case FilterSchemaType.Any:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case FilterableFieldType.Boolean:
+                case FilterSchemaType.Boolean:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case FilterableFieldType.Number:
+                case FilterSchemaType.Number:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case FilterableFieldType.Guid:
+                case FilterSchemaType.Guid:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case FilterableFieldType.DateTime:
+                case FilterSchemaType.DateTime:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -110,8 +110,8 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case FilterableFieldType.StringArray:
-                case FilterableFieldType.String:
+                case FilterSchemaType.StringArray:
+                case FilterSchemaType.String:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -127,7 +127,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 default:
                     {
-                        errors.Add($"Unsupported type {field.Type} for {path}.");
+                        errors.Add($"Unsupported type {field.Schema.Type} for {path}.");
                         break;
                     }
             }

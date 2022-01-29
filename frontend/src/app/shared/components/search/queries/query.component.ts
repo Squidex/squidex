@@ -47,7 +47,7 @@ export class QueryComponent {
     public queryValue: Query = {};
 
     public addSorting() {
-        const path = Object.keys(this.model.fields)[0];
+        const path = Object.keys(this.model.schema.fields)[0];
 
         if (this.queryValue.sort) {
             this.queryValue.sort.push({ path, order: 'ascending' });

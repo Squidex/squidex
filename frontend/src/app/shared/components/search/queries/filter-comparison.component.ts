@@ -34,10 +34,10 @@ export class FilterComparisonComponent implements OnChanges {
     @Input()
     public filter!: FilterComparison;
 
-    public fieldModel?: FilterableField;
+    public field?: FilterableField;
 
     public get operators() {
-        return this.model.operators[this.fieldModel?.type!] || [];
+        return this.model.operators[this.field?.schema.type!] || [];
     }
 
     public get noValue() {
@@ -76,10 +76,10 @@ export class FilterComparisonComponent implements OnChanges {
     }
 
     private updatePath(refresh: boolean) {
-        const newModel = this.model.fields.find(x => x.path === this.filter.path);
+        const newModel = this.model.schema.fields.find(x => x.path === this.filter.path);
 
         if (newModel && refresh) {
-            const operators = this.model.operators[newModel.type];
+            const operators = this.model.operators[newModel.schema.type];
 
             if (operators && operators.indexOf(this.filter.op) < 0) {
                 this.filter.op = operators[0];
@@ -88,7 +88,7 @@ export class FilterComparisonComponent implements OnChanges {
             this.filter.value = null;
         }
 
-        this.fieldModel = newModel;
+        this.field = newModel;
     }
 
     public emitChange() {

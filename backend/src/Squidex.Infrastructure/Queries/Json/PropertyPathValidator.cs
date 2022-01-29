@@ -11,11 +11,18 @@ namespace Squidex.Infrastructure.Queries.Json
 {
     public static class PropertyPathValidator
     {
-        public static bool TryGetField(this PropertyPath path, QueryModel model, List<string> errors, [MaybeNullWhen(false)] out FilterableField field)
+        public static bool TryGetField(this PropertyPath path, QueryModel model, List<string> errors, [MaybeNullWhen(false)] out FilterField field)
         {
             field = null!;
 
-            var list = model.Fields;
+            var list = model.Schema.Fields;
+
+            if (list == null)
+            {
+                field = null!;
+                return false;
+            }
+
             var index = 0;
 
             foreach (var element in path)
@@ -27,15 +34,15 @@ namespace Squidex.Infrastructure.Queries.Json
                     break;
                 }
 
-                if (current.Fields == null || current.Fields.Count == 0 || element == path[^1])
+                if (current.Schema.Fields == null || current.Schema.Fields.Count == 0 || element == path[^1])
                 {
                     field = current;
                     return true;
                 }
 
-                if (current.Fields != null)
+                if (current.Schema.Fields != null)
                 {
-                    list = current.Fields;
+                    list = current.Schema.Fields;
                 }
                 else
                 {
