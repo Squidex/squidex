@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, Types } from '@app/shared/internal';
+import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, StatusInfo, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-search-form',
@@ -29,6 +29,9 @@ export class SearchFormComponent implements OnChanges {
 
     @Input()
     public languages: ReadonlyArray<LanguageDto> = [];
+
+    @Input()
+    public statuses?: ReadonlyArray<StatusInfo> | null;
 
     @Input()
     public queryModel?: QueryModel | null;

@@ -12,14 +12,15 @@
             </div>
             <div class="col">
                 <sqx-search-form formClass="form" placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
-                    (queryChange)="search($event)"
                     [enableShortcut]="true"
                     [language]="(languagesState.isoMasterLanguage | async)!"
                     [languages]="languages"
                     [queries]="queries | async"
                     [queriesTypes]="'common.contents' | sqxTranslate"
+                    (queryChange)="search($event)"
                     [query]="contentsState.query | async"
-                    [queryModel]="queryModel | async">
+                    [queryModel]="queryModel | async"
+                    [statuses]="contentsState.statuses | async">
                 </sqx-search-form>
             </div>
             <div class="col-auto" *ngIf="languages.length > 1">

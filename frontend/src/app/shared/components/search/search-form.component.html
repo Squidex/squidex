@@ -73,12 +73,14 @@
             </div>
 
             <ng-container *ngIf="!showQueries; else savedQueries">
-                <div class="form-horizontal" *ngIf="queryModel">
-                    <sqx-query [model]="queryModel" 
+                <div class="form-horizontal" *ngIf="queryModel && statuses">
+                    <sqx-query 
+                        [language]="language"
+                        [languages]="languages"
+                        [model]="queryModel" 
                         [query]="query" 
                         (queryChange)="changeQuery($event)"
-                        [language]="language"
-                        [languages]="languages">
+                        [statuses]="statuses">
                     </sqx-query>
     
                     <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>

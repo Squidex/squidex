@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FilterComparison, LanguageDto, FilterableField, QueryModel } from '@app/shared/internal';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { FilterComparison, LanguageDto, FilterableField, QueryModel, FilterFieldUI, getFilterUI, StatusInfo } from '@app/shared/internal';
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
 @Component({
-    selector: 'sqx-filter-comparison[filter][language][languages][model]',
+    selector: 'sqx-filter-comparison[filter][language][languages][model][statuses]',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,30 +29,25 @@ export class FilterComparisonComponent implements OnChanges {
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
+    public statuses?: ReadonlyArray<StatusInfo> | null;
+
+    @Input()
     public model!: QueryModel;
 
     @Input()
     public filter!: FilterComparison;
 
     public field?: FilterableField;
-
-    public get operators() {
-        return this.model.operators[this.field?.schema.type!] || [];
-    }
-
-    public get noValue() {
-        return this.filter.op === 'empty' || this.filter.op === 'exists';
-    }
+    public fieldUI?: FilterFieldUI;
+    public operators: ReadonlyArray<string> = [];
 
     constructor(
         public readonly contributorsState: ContributorsState,
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['filter']) {
-            this.updatePath(false);
-        }
+    public ngOnChanges() {
+        this.updatePath(false);
     }
 
     public changeValue(value: any) {
@@ -63,6 +58,8 @@ export class FilterComparisonComponent implements OnChanges {
 
     public changeOp(op: string) {
         this.filter.op = op;
+
+        this.updatePath(false);
 
         this.emitChange();
     }
@@ -75,20 +72,20 @@ export class FilterComparisonComponent implements OnChanges {
         this.emitChange();
     }
 
-    private updatePath(refresh: boolean) {
-        const newModel = this.model.schema.fields.find(x => x.path === this.filter.path);
+    private updatePath(updateValue: boolean) {
+        this.field = this.model.schema.fields.find(x => x.path === this.filter.path);
 
-        if (newModel && refresh) {
-            const operators = this.model.operators[newModel.schema.type];
+        this.operators = this.model.operators[this.field?.schema.type!] || [];
 
-            if (operators && operators.indexOf(this.filter.op) < 0) {
-                this.filter.op = operators[0];
-            }
+        if (this.operators.indexOf(this.filter.op) < 0) {
+            this.filter.op = this.operators[0];
+        }
 
+        if (updateValue) {
             this.filter.value = null;
         }
 
-        this.field = newModel;
+        this.fieldUI = getFilterUI(this.filter, this.field!);
     }
 
     public emitChange() {

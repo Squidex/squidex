@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
                         nestedSchema,
                         nestedField.Name,
                         ArrayFieldDescription(nestedField),
-                        nestedField.RawProperties.IsRequired);
+                        true);
 
                     fields.Add(filterableField);
                 }
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
                             fieldSchema,
                             field.Name,
                             ComponentFieldDescription(componentName, field),
-                            field.RawProperties.IsRequired);
+                            true);
 
                         fields.Add(filterableField);
                     }

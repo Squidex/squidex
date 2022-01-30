@@ -8,6 +8,7 @@
 using System.ComponentModel;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
+using JsonException = Squidex.Infrastructure.Json.JsonException;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
@@ -28,7 +29,7 @@ namespace Squidex.Infrastructure.Queries.Json
             }
             catch (InvalidCastException ex)
             {
-                throw new Squidex.Infrastructure.Json.JsonException(ex.Message);
+                throw new JsonException(ex.Message);
             }
         }
 

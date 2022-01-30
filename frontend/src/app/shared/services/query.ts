@@ -19,6 +19,50 @@ export type FilterSchemaType =
     'String' |
     'StringArray';
 
+export type FilterFieldUI =
+    'Boolean' |
+    'Date' |
+    'DateTime' |
+    'Reference' |
+    'None' |
+    'Number' |
+    'String' |
+    'Status' |
+    'Unsupported' |
+    'User';
+    
+export function getFilterUI(comparison: FilterComparison, field: FilterableField): FilterFieldUI {
+    if (!field || !comparison) {
+        return 'None';
+    }
+
+    const { type, extra } = field.schema;
+
+    if (comparison.op === 'empty' || comparison.op === 'exists') {
+        return 'None';
+    } else if (type === 'Boolean') {
+        return 'Boolean';
+    } else if (type === 'DateTime' && extra?.editor === 'Date') {
+        return 'Date';
+    } else if (type === 'DateTime') {
+        return 'DateTime';
+    } else if (type === 'Number') {
+        return 'Number';
+    } else if (type === 'String' && extra?.editor === 'Status') {
+        return 'Status';
+    } else if (type === 'String' && extra?.editor === 'User') {
+        return 'User';
+    } else if (type === 'String') {
+        return 'String';
+    } else if (type === 'StringArray' && extra?.schemaIds) {
+        return 'Reference';
+    } else if (type === 'StringArray') {
+        return 'String';
+    } else {
+        return 'Unsupported';
+    }
+}
+
 export interface FilterSchema {
     // The value type.
     readonly type: FilterSchemaType;

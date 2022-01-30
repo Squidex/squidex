@@ -5,63 +5,47 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace Squidex.Infrastructure.Queries.Json
 {
     public static class PropertyPathValidator
     {
-        public static bool TryGetField(this PropertyPath path, QueryModel model, List<string> errors, [MaybeNullWhen(false)] out FilterField field)
+        public static IEnumerable<FilterField> GetMatchingFields(this PropertyPath path, FilterSchema schema, List<string> errors)
         {
-            field = null!;
+            var lastIndex = path.Count - 1;
 
-            var list = model.Schema.Fields;
+            List<FilterField>? result = null;
 
-            if (list == null)
+            void Check(int index, FilterSchema schema)
             {
-                field = null!;
-                return false;
-            }
-
-            var index = 0;
-
-            foreach (var element in path)
-            {
-                var current = list.FirstOrDefault(x => x.Path == element);
-
-                if (current == null)
+                if (schema.Fields == null)
                 {
-                    break;
+                    return;
                 }
 
-                if (current.Schema.Fields == null || current.Schema.Fields.Count == 0 || element == path[^1])
-                {
-                    field = current;
-                    return true;
-                }
+                var fields = schema.Fields.Where(x => x.Path == path[index]);
 
-                if (current.Schema.Fields != null)
+                foreach (var field in fields)
                 {
-                    list = current.Schema.Fields;
+                    if (index == lastIndex || field.Schema.Type == FilterSchemaType.Any)
+                    {
+                        result ??= new List<FilterField>();
+                        result.Add(field);
+                    }
+                    else
+                    {
+                        Check(index + 1, field.Schema);
+                    }
                 }
-                else
-                {
-                    break;
-                }
-
-                index++;
             }
 
-            if (index > 0)
+            Check(0, schema);
+
+            if (result == null)
             {
-                errors.Add($"'{path[index]}' is not a property of '{string.Join('.', path.Take(index))}'.");
-            }
-            else
-            {
-                errors.Add($"Path '{path}' does not point to a valid property in the model.");
+                errors.Add(Errors.InvalidPath(path.ToString()));
             }
 
-            return false;
+            return result as IEnumerable<FilterField> ?? Array.Empty<FilterField>();
         }
     }
 }

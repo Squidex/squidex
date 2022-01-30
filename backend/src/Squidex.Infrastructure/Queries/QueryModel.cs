@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Collections;
-
 namespace Squidex.Infrastructure.Queries
 {
     public sealed class QueryModel

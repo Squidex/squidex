@@ -86,9 +86,9 @@ namespace Squidex.Infrastructure.Queries
                 case CompareOperator.Contains:
                     return "contains";
                 case CompareOperator.EndsWith:
-                    return "endswith";
+                    return "endsWith";
                 case CompareOperator.StartsWith:
-                    return "startswith";
+                    return "startsWith";
                 case CompareOperator.In:
                     return "in";
             }

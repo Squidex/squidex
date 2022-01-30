@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
             {
                 if (!supportsSearch)
                 {
-                    throw new ValidationException(T.Get("common.fullTextNotSupported"));
+                    throw new ValidationException(T.Get("queries.fullTextNotSupported"));
                 }
 
                 return (Builders<TDocument>.Filter.Text(query.FullText), false);

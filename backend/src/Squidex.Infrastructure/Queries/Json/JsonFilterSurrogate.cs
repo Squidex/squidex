@@ -8,7 +8,7 @@
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Infrastructure.Queries
+namespace Squidex.Infrastructure.Queries.Json
 {
     public sealed class JsonFilterSurrogate : ISurrogate<FilterNode<IJsonValue>>
     {
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Queries
                 return new CompareFilter<IJsonValue>(Path, Op.Value, Value ?? JsonValue.Null);
             }
 
-            throw new JsonException("Invalid query.");
+            throw new JsonException(Errors.InvalidJsonStructure());
         }
     }
 }

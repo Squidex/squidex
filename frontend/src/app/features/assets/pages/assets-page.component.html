@@ -20,11 +20,11 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" fieldExample="fileSize"
-                            [query]="assetsState.query | async"
+                            [enableShortcut]="true"
                             [queries]="queries"
                             [queriesTypes]="'common.assets' | sqxTranslate"
-                            (queryChange)="search($event)"
-                            [enableShortcut]="true">
+                            [query]="assetsState.query | async"
+                            (queryChange)="search($event)">
                         </sqx-search-form>
                     </div>
                 </div>

@@ -11,40 +11,38 @@
             [disabled]="operators.length === 0"
             [ngModel]="filter.op" 
             (ngModelChange)="changeOp($event)">
-            <option *ngFor="let operator of operators" [ngValue]="operator">{{operator | sqxTranslate}}</option>
+            <option *ngFor="let operator of operators" [ngValue]="operator">{{operator | sqxFilterOperator | sqxTranslate}}</option>
         </select>
     </div>
-    <div class="col" *ngIf="!noValue">
-        <ng-container *ngIf="field.schema.type === 'Boolean'">
-            <div>
-                <input type="checkbox" class="form-check-input"
-                    [ngModel]="filter.value"
-                    (ngModelChange)="changeValue($event)" />
-            </div>
+    <div class="col align-items-center" [ngSwitch]="fieldUI">
+        <ng-container *ngSwitchCase="'Boolean'">
+            <input type="checkbox" class="form-check-input"
+                [ngModel]="filter.value"
+                (ngModelChange)="changeValue($event)" />
         </ng-container>
-        <ng-container *ngIf="field.schema.type === 'DateTime' && field.schema.extra?.editor === 'Date'">
+        <ng-container *ngSwitchCase="'Date'">
             <sqx-date-time-editor mode="Date"
                 [hideDateButtons]="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>
         </ng-container>
-        <ng-container *ngIf="field.schema.type === 'DateTime' && field.schema.extra?.editor !== 'Date'">
+        <ng-container *ngSwitchCase="'DateTime'">
             <sqx-date-time-editor mode="DateTime"
                 [hideDateButtons]="true"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)">
             </sqx-date-time-editor>
         </ng-container>
-        <ng-container *ngIf="field.schema.type === 'Number'">
+        <ng-container *ngSwitchCase="'Number'">
             <input type="number" class="form-control"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)" />
         </ng-container>
-        <ng-container *ngIf="field.schema.type === 'String' && field.schema.extra?.editor === 'Status'">
+        <ng-container *ngSwitchCase="'Status'">
             <sqx-dropdown 
                 valueProperty="status"
-                [items]="field.schema.extra"
+                [items]="statuses"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)"
                 [canSearch]="false">
@@ -53,7 +51,7 @@
                 </ng-template>
             </sqx-dropdown>
         </ng-container>
-        <ng-container *ngIf="field.schema.type === 'String' && field.schema.extra?.editor === 'User'">
+        <ng-container *ngSwitchCase="'User'">
             <ng-container *ngIf="contributorsState.isLoaded | async; else noPermission">
                 <sqx-dropdown
                     valueProperty="token"
@@ -76,16 +74,15 @@
             <ng-template #noPermission>
                 <input type="text" class="form-control" *ngIf="!field.schema.extra"
                     [ngModel]="filter.value"
-                    (ngModelChange)="changeValue($event)"
-                />
+                    (ngModelChange)="changeValue($event)" />
             </ng-template>
         </ng-container>
-        <ng-container *ngIf="field.schema.type === 'String' && !field.schema.extra">
+        <ng-container *ngSwitchCase="'String'">
             <input type="text" class="form-control" *ngIf="!field.schema.extra"
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)" />
         </ng-container>
-        <ng-container *ngIf="field.schema.type === 'StringArray' && field.schema.extra?.schemaIds">
+        <ng-container *ngSwitchCase="'Reference'">
             <sqx-reference-input [schemaIds]="field.schema.extra?.schemaIds"
                 mode="Single"
                 [ngModel]="filter.value"
@@ -93,6 +90,9 @@
                 [language]="language"
                 [languages]="languages">
             </sqx-reference-input>
+        </ng-container>
+        <ng-container *ngSwitchCase="'Unsupported'">
+            {{ 'common.notSupported' | sqxTranslate }}
         </ng-container>
     </div>
     <div class="col-auto ps-2">

@@ -21,14 +21,14 @@ namespace Squidex.Infrastructure.Queries.OData
 
             void Convert(EdmStructuredType target, IReadOnlyList<FilterField> fields)
             {
-                foreach (var field in fields)
+                foreach (var field in fields.GroupBy(x => x.Path).Select(x => x.First()))
                 {
                     var fieldName = field.Path.EscapeEdmField();
 
                     switch (field.Schema.Type)
                     {
                         case FilterSchemaType.Boolean:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Boolean, field.IsNullable);
+                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Boolean);
                             break;
                         case FilterSchemaType.DateTime:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.DateTimeOffset, field.IsNullable);

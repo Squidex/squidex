@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
                         fieldSchema,
                         partitionKey,
                         partitionDescription,
-                        partitioning.IsOptional(partitionKey) || !field.RawProperties.IsRequired);
+                        true);
 
                     partitionFields.Add(partitionField);
                 }

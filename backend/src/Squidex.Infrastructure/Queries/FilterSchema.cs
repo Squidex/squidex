@@ -67,7 +67,12 @@ namespace Squidex.Infrastructure.Queries
 
             AddFields(Fields);
 
-            var simplified = result.GroupBy(x => new { x.Path, x.Schema.Type }).SingleGroups();
+            var simplified = result.GroupBy(x => x.Path).Where(group =>
+            {
+                var firstType = group.First().Schema.Type;
+
+                return group.All(x => x.Schema.Type == firstType);
+            }).SelectMany(x => x);
 
             return this with
             {

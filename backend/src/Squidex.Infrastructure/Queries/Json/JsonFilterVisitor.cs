@@ -50,20 +50,21 @@ namespace Squidex.Infrastructure.Queries.Json
 
         public override FilterNode<ClrValue> Visit(CompareFilter<IJsonValue> nodeIn, Args args)
         {
-            CompareFilter<ClrValue>? result = null;
+            var fieldMatches = nodeIn.Path.GetMatchingFields(args.Model.Schema, args.Errors);
+            var fieldErrors = new List<string>();
 
-            if (nodeIn.Path.TryGetField(args.Model, args.Errors, out var field))
+            foreach (var field in fieldMatches)
             {
+                fieldErrors.Clear();
+
                 var isValidOperator = args.Model.Operators.TryGetValue(field.Schema.Type, out var operators) && operators.Contains(nodeIn.Operator);
 
                 if (!isValidOperator)
                 {
-                    var name = field.Schema.Type.ToString();
-
-                    args.Errors.Add($"'{nodeIn.Operator}' is not a valid operator for type {name} at '{nodeIn.Path}'.");
+                    fieldErrors.Add(Errors.InvalidOperator(nodeIn.Operator, field.Schema.Type, nodeIn.Path));
                 }
 
-                var value = ValueConverter.Convert(field, nodeIn.Value, nodeIn.Path, args.Errors);
+                var value = ValueConverter.Convert(field, nodeIn.Value, nodeIn.Path, fieldErrors);
 
                 if (value != null && isValidOperator)
                 {
@@ -78,22 +79,27 @@ namespace Squidex.Infrastructure.Queries.Json
                     {
                         if (value.IsList)
                         {
-                            args.Errors.Add($"Array value is not allowed for '{nodeIn.Operator}' operator and path '{nodeIn.Path}'.");
+                            fieldErrors.Add(Errors.InvalidArray(nodeIn.Operator, nodeIn.Path));
                         }
                     }
 
                     if (nodeIn.Operator == CompareOperator.Matchs && value.Value?.ToString()?.IsValidRegex() != true)
                     {
-                        args.Errors.Add($"{value} is not a valid regular expression.");
+                        fieldErrors.Add(Errors.InvalidRegex(value.ToString(), nodeIn.Path));
                     }
+                }
 
-                    result = new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
+                if (args.Errors.Count == 0 && fieldErrors.Count == 0 && value != null)
+                {
+                    return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
+                }
+                else if (field == fieldMatches.Last())
+                {
+                    args.Errors.AddRange(fieldErrors);
                 }
             }
 
-            result ??= new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
-
-            return result;
+            return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
         }
     }
 }

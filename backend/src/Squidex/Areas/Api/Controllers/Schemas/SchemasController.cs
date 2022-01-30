@@ -7,11 +7,9 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using NJsonSchema;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Core.GenerateFilters;
-using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
