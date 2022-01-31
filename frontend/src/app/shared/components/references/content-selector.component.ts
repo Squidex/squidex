@@ -8,8 +8,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
-import { SchemasService } from '@app/shared';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, ResourceOwner, SchemaDto, SchemasState } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-selector[language][languages]',
