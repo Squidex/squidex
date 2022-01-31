@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Queries
 
         public object? Extra { get; init; }
 
-        public FilterSchema Flatten(int maxLevel = 7, Predicate<FilterSchema>? predicate = null)
+        public FilterSchema Flatten(int maxDepth = 7, Predicate<FilterSchema>? predicate = null)
         {
             if (Fields == null || Fields.Count == 0)
             {
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Queries
                     result?.Add(field with { Path = path, Schema = schema });
                 }
 
-                if (field.Schema.Fields?.Count > 0 && pathStack.Count < maxLevel)
+                if (field.Schema.Fields?.Count > 0 && pathStack.Count < maxDepth)
                 {
                     AddFields(field.Schema.Fields);
                 }
@@ -74,7 +74,17 @@ namespace Squidex.Infrastructure.Queries
 
             AddFields(Fields);
 
-            var simplified = result.GroupBy(x => x.Path).Select(group =>
+            var conflictFree = GetConflictFreeFields(result);
+
+            return this with
+            {
+                Fields = conflictFree.ToReadonlyList()
+            };
+        }
+
+        public static IEnumerable<FilterField> GetConflictFreeFields(IEnumerable<FilterField> fields)
+        {
+            var conflictFree = fields.GroupBy(x => x.Path).Select(group =>
             {
                 var firstType = group.First().Schema.Type;
 
@@ -88,10 +98,7 @@ namespace Squidex.Infrastructure.Queries
                 }
             }).SelectMany(x => x);
 
-            return this with
-            {
-                Fields = simplified.ToReadonlyList()
-            };
+            return conflictFree;
         }
     }
 }

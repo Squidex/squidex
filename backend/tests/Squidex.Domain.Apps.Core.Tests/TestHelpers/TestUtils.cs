@@ -50,6 +50,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry),
 
                 ContractResolver = new ConverterContractResolver(
+                    new CompareOperatorJsonConverter(),
                     new ContentFieldDataConverter(),
                     new EnvelopeHeadersConverter(),
                     new JsonValueConverter(),

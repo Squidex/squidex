@@ -12,6 +12,8 @@ namespace Squidex.Infrastructure.Queries.OData
 {
     public static class EdmModelConverter
     {
+        private const int MaxDepth = 7;
+
         public static EdmModel ConvertToEdm(this QueryModel queryModel, string modelName, string name)
         {
             var model = new EdmModel();
@@ -19,16 +21,21 @@ namespace Squidex.Infrastructure.Queries.OData
             var entityType = new EdmEntityType(modelName, name);
             var entityPath = new Stack<string>();
 
-            void Convert(EdmStructuredType target, IReadOnlyList<FilterField> fields)
+            void Convert(EdmStructuredType target, FilterSchema schema)
             {
-                foreach (var field in fields.GroupBy(x => x.Path).Select(x => x.First()))
+                if (schema.Fields == null)
+                {
+                    return;
+                }
+
+                foreach (var field in FilterSchema.GetConflictFreeFields(schema.Fields))
                 {
                     var fieldName = field.Path.EscapeEdmField();
 
                     switch (field.Schema.Type)
                     {
                         case FilterSchemaType.Boolean:
-                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Boolean);
+                            target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.Boolean, field.IsNullable);
                             break;
                         case FilterSchemaType.DateTime:
                             target.AddStructuralProperty(fieldName, EdmPrimitiveTypeKind.DateTimeOffset, field.IsNullable);
@@ -49,7 +56,7 @@ namespace Squidex.Infrastructure.Queries.OData
                         case FilterSchemaType.Object:
                         case FilterSchemaType.ObjectArray:
                             {
-                                if (field.Schema.Fields == null || field.Schema.Fields.Count == 0)
+                                if (field.Schema.Fields == null || field.Schema.Fields.Count == 0 || entityPath.Count >= MaxDepth)
                                 {
                                     break;
                                 }
@@ -66,10 +73,10 @@ namespace Squidex.Infrastructure.Queries.OData
 
                                     model.AddElement(result);
 
-                                    Convert(result, field.Schema.Fields);
+                                    Convert(result, field.Schema);
                                 }
 
-                                target.AddStructuralProperty("data", new EdmComplexTypeReference(result, field.IsNullable));
+                                target.AddStructuralProperty(fieldName, new EdmComplexTypeReference(result, field.IsNullable));
 
                                 entityPath.Pop();
                                 break;
@@ -93,10 +100,7 @@ namespace Squidex.Infrastructure.Queries.OData
                 }
             }
 
-            if (queryModel.Schema.Fields != null)
-            {
-                Convert(entityType, queryModel.Schema.Fields);
-            }
+            Convert(entityType, queryModel.Schema);
 
             var container = new EdmEntityContainer("Squidex", "Container");
 

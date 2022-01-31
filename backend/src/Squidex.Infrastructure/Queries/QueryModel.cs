@@ -114,7 +114,7 @@ namespace Squidex.Infrastructure.Queries
 
         public IReadOnlyDictionary<FilterSchemaType, IReadOnlyList<CompareOperator>> Operators { get; init; } = DefaultOperators;
 
-        public QueryModel Flatten(int maxLevel = 7, bool onlyWithOperators = true)
+        public QueryModel Flatten(int maxDepth = 7, bool onlyWithOperators = true)
         {
             var predicate = (Predicate<FilterSchema>?)null;
 
@@ -123,7 +123,12 @@ namespace Squidex.Infrastructure.Queries
                 predicate = x => Operators.TryGetValue(x.Type, out var operators) && operators.Count > 0;
             }
 
-            var flatten = Schema.Flatten(maxLevel, predicate);
+            var flatten = Schema.Flatten(maxDepth, predicate);
+
+            if (ReferenceEquals(flatten, Schema))
+            {
+                return this;
+            }
 
             return new QueryModel { Operators = Operators, Schema = flatten };
         }
