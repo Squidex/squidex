@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 {
     internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor.Args>
     {
-        private const int MaxDepth = 5;
+        private const int MaxDepth = 3;
         private static readonly FilterVisitor Instance = new FilterVisitor();
 
         public record struct Args(ResolvedComponents Components, int Level = 0);

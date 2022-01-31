@@ -118,7 +118,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var predicate = (Predicate<FilterSchema>?)null;
 
-            if (!onlyWithOperators)
+            if (onlyWithOperators)
             {
                 predicate = x => Operators.TryGetValue(x.Type, out var operators) && operators.Count > 0;
             }

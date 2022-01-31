@@ -46,7 +46,14 @@ namespace Squidex.Infrastructure.Queries
                 {
                     var path = string.Join('.', pathStack.Reverse());
 
-                    result?.Add(field with { Path = path });
+                    var schema = field.Schema;
+
+                    if (schema.Fields != null)
+                    {
+                        schema = schema with { Fields = null };
+                    }
+
+                    result?.Add(field with { Path = path, Schema = schema });
                 }
 
                 if (field.Schema.Fields?.Count > 0 && pathStack.Count < maxLevel)
@@ -67,11 +74,18 @@ namespace Squidex.Infrastructure.Queries
 
             AddFields(Fields);
 
-            var simplified = result.GroupBy(x => x.Path).Where(group =>
+            var simplified = result.GroupBy(x => x.Path).Select(group =>
             {
                 var firstType = group.First().Schema.Type;
 
-                return group.All(x => x.Schema.Type == firstType);
+                if (group.All(x => x.Schema.Type == firstType))
+                {
+                    return group.Take(1);
+                }
+                else
+                {
+                    return Enumerable.Empty<FilterField>();
+                }
             }).SelectMany(x => x);
 
             return this with

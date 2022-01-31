@@ -17,16 +17,16 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 {
     public class JsonSchemaTests
     {
-        private readonly Schema schema = TestUtils.MixedSchema();
-
         [Fact]
         public void Should_build_json_schema()
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), ResolvedComponents.Empty);
+            var (schema, components) = TestUtils.MixedSchema();
 
-            CheckFields(jsonSchema);
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), components);
+
+            CheckFields(jsonSchema, schema);
         }
 
         [Fact]
@@ -34,9 +34,11 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchemaDynamic(languagesConfig.ToResolver(), ResolvedComponents.Empty);
+            var (schema, components) = TestUtils.MixedSchema();
 
-            CheckFields(jsonSchema);
+            var jsonSchema = schema.BuildJsonSchemaDynamic(languagesConfig.ToResolver(), components);
+
+            CheckFields(jsonSchema, schema);
         }
 
         [Fact]
@@ -44,12 +46,14 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
-            var jsonSchema = schema.BuildJsonSchemaFlat(languagesConfig.ToResolver(), ResolvedComponents.Empty);
+            var (schema, components) = TestUtils.MixedSchema();
 
-            CheckFields(jsonSchema);
+            var jsonSchema = schema.BuildJsonSchemaFlat(languagesConfig.ToResolver(), components);
+
+            CheckFields(jsonSchema, schema);
         }
 
-        private void CheckFields(JsonSchema jsonSchema)
+        private static void CheckFields(JsonSchema jsonSchema, Schema schema)
         {
             var jsonProperties = AllPropertyNames(jsonSchema);
 
@@ -85,23 +89,22 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
             void AddProperties(JsonSchema current)
             {
-                if (current != null)
+                if (current == null)
                 {
-                    if (current.Properties != null)
-                    {
-                        foreach (var (key, value) in current.Properties)
-                        {
-                            result.Add(key);
-
-                            AddProperties(value);
-                        }
-                    }
-
-                    AddProperties(current.Item);
-                    AddProperties(current.Reference);
-                    AddProperties(current.AdditionalItemsSchema);
-                    AddProperties(current.AdditionalPropertiesSchema);
+                    return;
                 }
+
+                foreach (var (key, value) in current.Properties.OrEmpty())
+                {
+                    result.Add(key);
+
+                    AddProperties(value);
+                }
+
+                AddProperties(current.Item);
+                AddProperties(current.Reference);
+                AddProperties(current.AdditionalItemsSchema);
+                AddProperties(current.AdditionalPropertiesSchema);
             }
 
             AddProperties(schema);
