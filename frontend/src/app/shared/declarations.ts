@@ -48,6 +48,7 @@ export * from './components/search/queries/filter-logical.component';
 export * from './components/search/queries/filter-node.component';
 export * from './components/search/queries/query-path.component';
 export * from './components/search/queries/query.component';
+export * from './components/search/queries/query.pipes';
 export * from './components/search/queries/sorting.component';
 export * from './components/search/query-list.component';
 export * from './components/search/search-form.component';

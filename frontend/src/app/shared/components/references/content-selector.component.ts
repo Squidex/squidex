@@ -6,7 +6,9 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, QueryModel, queryModelFromSchema, ResourceOwner, SchemaDto, SchemasState } from '@app/shared/internal';
+import { BehaviorSubject, of } from 'rxjs';
+import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
+import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, Query, ResourceOwner, SchemaDto, SchemasService, SchemasState } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-selector[language][languages]',
@@ -44,17 +46,27 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     public schema!: SchemaDto;
     public schemas: ReadonlyArray<SchemaDto> = [];
 
-    public queryModel!: QueryModel;
-
     public selectedItems: { [id: string]: ContentDto } = {};
     public selectionCount = 0;
     public selectedAll = false;
+
+    public querySource = new BehaviorSubject<SchemaDto | null>(null);
+    public queryModel =
+        this.querySource.pipe(map(x => x?.name), distinctUntilChanged(),
+            switchMap(x => {
+                if (x) {
+                    return this.schemasService.getFilters(this.appsState.appName, x);
+                } else {
+                    return of(null);
+                }
+            }));
 
     constructor(
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,
         public readonly contentsState: ComponentContentsState,
         public readonly schemasState: SchemasState,
+        public readonly schemasService: SchemasService,
     ) {
         super();
     }
@@ -140,9 +152,7 @@ export class ContentSelectorComponent extends ResourceOwner implements OnInit {
     }
 
     private updateModel() {
-        if (this.schema) {
-            this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
-        }
+        this.querySource.next(this.schema);
     }
 
     public trackByContent(_index: number, content: ContentDto): string {

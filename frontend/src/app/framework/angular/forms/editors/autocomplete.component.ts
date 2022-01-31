@@ -82,7 +82,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public dropdownPosition: RelativePosition = 'bottom-left';
 
     @Input()
-    public dropdownWidth = '18rem';
+    public dropdownFullWidth = true;
+
+    @Input()
+    public dropdownStyles: any = {};
 
     @Input()
     public set disabled(value: boolean | undefined | null) {

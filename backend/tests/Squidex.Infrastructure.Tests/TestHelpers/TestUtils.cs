@@ -14,6 +14,7 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.TestHelpers
@@ -36,11 +37,12 @@ namespace Squidex.Infrastructure.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry ?? new TypeNameRegistry()),
 
                 ContractResolver = new ConverterContractResolver(
-                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
-                    new EnvelopeHeadersConverter(),
+                    new CompareOperatorJsonConverter(),
                     new JsonValueConverter(),
+                    new StringEnumConverter(),
+                    new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
                     new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
-                    new StringEnumConverter()),
+                    new EnvelopeHeadersConverter()),
 
                 TypeNameHandling = TypeNameHandling.Auto
             }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);

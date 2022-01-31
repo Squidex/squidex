@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 
@@ -17,15 +16,15 @@ namespace Squidex.Infrastructure.Queries.Json
     {
         private static readonly JsonFilterVisitor Instance = new JsonFilterVisitor();
 
-        public sealed record Args(JsonSchema Schema, List<string> Errors);
+        public record struct Args(QueryModel Model, List<string> Errors);
 
         private JsonFilterVisitor()
         {
         }
 
-        public static FilterNode<ClrValue>? Parse(FilterNode<IJsonValue> filter, JsonSchema schema, List<string> errors)
+        public static FilterNode<ClrValue>? Parse(FilterNode<IJsonValue> filter, QueryModel model, List<string> errors)
         {
-            var args = new Args(schema, errors);
+            var args = new Args(model, errors);
 
             var parsed = filter.Accept(Instance, args);
 
@@ -51,25 +50,21 @@ namespace Squidex.Infrastructure.Queries.Json
 
         public override FilterNode<ClrValue> Visit(CompareFilter<IJsonValue> nodeIn, Args args)
         {
-            CompareFilter<ClrValue>? result = null;
+            var fieldMatches = nodeIn.Path.GetMatchingFields(args.Model.Schema, args.Errors);
+            var fieldErrors = new List<string>();
 
-            if (nodeIn.Path.TryGetProperty(args.Schema, args.Errors, out var property))
+            foreach (var field in fieldMatches)
             {
-                var isValidOperator = OperatorValidator.IsAllowedOperator(property, nodeIn.Operator);
+                fieldErrors.Clear();
+
+                var isValidOperator = args.Model.Operators.TryGetValue(field.Schema.Type, out var operators) && operators.Contains(nodeIn.Operator);
 
                 if (!isValidOperator)
                 {
-                    var name = property.Type.ToString();
-
-                    if (!string.IsNullOrWhiteSpace(property.Format))
-                    {
-                        name = $"{name}({property.Format})";
-                    }
-
-                    args.Errors.Add($"'{nodeIn.Operator}' is not a valid operator for type {name} at '{nodeIn.Path}'.");
+                    fieldErrors.Add(Errors.InvalidOperator(nodeIn.Operator, field.Schema.Type, nodeIn.Path));
                 }
 
-                var value = ValueConverter.Convert(property, nodeIn.Value, nodeIn.Path, args.Errors);
+                var value = ValueConverter.Convert(field, nodeIn.Value, nodeIn.Path, fieldErrors);
 
                 if (value != null && isValidOperator)
                 {
@@ -84,22 +79,27 @@ namespace Squidex.Infrastructure.Queries.Json
                     {
                         if (value.IsList)
                         {
-                            args.Errors.Add($"Array value is not allowed for '{nodeIn.Operator}' operator and path '{nodeIn.Path}'.");
+                            fieldErrors.Add(Errors.InvalidArray(nodeIn.Operator, nodeIn.Path));
                         }
                     }
 
                     if (nodeIn.Operator == CompareOperator.Matchs && value.Value?.ToString()?.IsValidRegex() != true)
                     {
-                        args.Errors.Add($"{value} is not a valid regular expression.");
+                        fieldErrors.Add(Errors.InvalidRegex(value.ToString(), nodeIn.Path));
                     }
+                }
 
-                    result = new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
+                if (args.Errors.Count == 0 && fieldErrors.Count == 0 && value != null)
+                {
+                    return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
+                }
+                else if (field == fieldMatches.Last())
+                {
+                    args.Errors.AddRange(fieldErrors);
                 }
             }
 
-            result ??= new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
-
-            return result;
+            return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
         }
     }
 }

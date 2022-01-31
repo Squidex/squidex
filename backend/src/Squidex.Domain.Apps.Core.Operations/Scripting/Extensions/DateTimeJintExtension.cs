@@ -8,10 +8,11 @@
 using System.Globalization;
 using Jint;
 using Jint.Native;
+using Squidex.Domain.Apps.Core.Properties;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class DateTimeJintExtension : IJintExtension
+    public sealed class DateTimeJintExtension : IJintExtension, IScriptDescriptor
     {
         private readonly Func<DateTime, string, JsValue> formatDate = (date, format) =>
         {
@@ -29,6 +30,15 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             engine.SetValue("formatTime", formatDate);
             engine.SetValue("formatDate", formatDate);
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            describe(JsonType.Function, "formatDate(data, pattern)",
+                Resources.ScriptingFormatDate);
+
+            describe(JsonType.Function, "formatTime(text)",
+                Resources.ScriptingFormatTime);
         }
     }
 }

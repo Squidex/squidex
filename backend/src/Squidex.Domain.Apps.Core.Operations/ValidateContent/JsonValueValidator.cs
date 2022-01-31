@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly JsonValueValidator Instance = new JsonValueValidator();
 
-        public sealed record Args(IJsonValue Value, IJsonSerializer JsonSerializer);
+        public record struct Args(IJsonValue Value, IJsonSerializer JsonSerializer);
 
         private JsonValueValidator()
         {

@@ -6,10 +6,10 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel } from '@app/shared/internal';
+import { FilterComparison, FilterLogical, FilterNode, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-filter-node',
+    selector: 'sqx-filter-node[language][languages][model][statuses]',
     styleUrls: ['./filter-node.component.scss'],
     templateUrl: './filter-node.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +28,9 @@ export class FilterNodeComponent {
 
     @Input()
     public languages!: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public statuses?: ReadonlyArray<StatusInfo> | null;
 
     @Input()
     public level = 0;

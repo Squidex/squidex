@@ -9,9 +9,9 @@ using NJsonSchema;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
-    public static class ContentJsonSchemaBuilder
+    public static class ContentJsonSchema
     {
-        public static JsonSchema BuildSchema(JsonSchema? dataSchema, bool extended = false, bool withDeleted = false)
+        public static JsonSchema Build(JsonSchema? dataSchema, bool extended = false, bool withDeleted = false)
         {
             var jsonSchema = new JsonSchema
             {

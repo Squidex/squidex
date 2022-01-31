@@ -5,8 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.ComponentModel;
+
 namespace Squidex.Infrastructure.Queries
 {
+    [TypeConverter(typeof(CompareOperatorTypeConverter))]
     public enum CompareOperator
     {
         Contains,

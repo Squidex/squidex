@@ -10,11 +10,12 @@ using Jint;
 using Jint.Native;
 using Jint.Native.Json;
 using Jint.Runtime;
+using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
-    public sealed class HttpJintExtension : IJintExtension
+    public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate void HttpJson(string url, Action<JsValue> callback, JsValue? headers = null);
         private delegate void HttpJsonWithBody(string url, JsValue post, Action<JsValue> callback, JsValue? headers = null);
@@ -27,12 +28,29 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public void ExtendAsync(ScriptExecutionContext context)
         {
-            AddMethod(context, HttpMethod.Get, "getJSON");
-            AddMethod(context, HttpMethod.Delete, "deleteJSON");
-
             AdBodyMethod(context, HttpMethod.Patch, "patchJSON");
             AdBodyMethod(context, HttpMethod.Post, "postJSON");
             AdBodyMethod(context, HttpMethod.Put, "putJSON");
+            AddMethod(context, HttpMethod.Delete, "deleteJSON");
+            AddMethod(context, HttpMethod.Get, "getJSON");
+        }
+
+        public void Describe(AddDescription describe, ScriptScope scope)
+        {
+            describe(JsonType.Function, "getJSON(url, callback, ?headers)",
+                Resources.ScriptingGetJSON);
+
+            describe(JsonType.Function, "postJSON(url, body, callback, ?headers)",
+                Resources.ScriptingPostJSON);
+
+            describe(JsonType.Function, "putJSON(url, body, callback, ?headers)",
+                Resources.ScriptingPutJson);
+
+            describe(JsonType.Function, "patchJSON(url, body, callback, headers)",
+                Resources.ScriptingPatchJson);
+
+            describe(JsonType.Function, "deleteJSON(url, body, callback, headers)",
+                Resources.ScriptingDeleteJson);
         }
 
         private void AddMethod(ScriptExecutionContext context, HttpMethod method, string name)

@@ -17,6 +17,7 @@ using Squidex.Areas.IdentityServer.Config;
 using Squidex.Areas.IdentityServer.Controllers;
 using Squidex.Domain.Users;
 using Squidex.Shared.Identity;
+using Squidex.Shared.Users;
 using Squidex.Web;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -165,7 +166,7 @@ namespace Notifo.Areas.Account.Controllers
             return SignOut(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
-        private async Task<ClaimsPrincipal> CreatePrincipalAsync(OpenIddictRequest request, Squidex.Shared.Users.IUser? user)
+        private async Task<ClaimsPrincipal> CreatePrincipalAsync(OpenIddictRequest request, IUser user)
         {
             var principal = await SignInManager.CreateUserPrincipalAsync((IdentityUser)user.Identity);
 

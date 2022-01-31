@@ -21,8 +21,8 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" 
-                            (queryChange)="search($event)"
                             [enableShortcut]="true">
+                            (queryChange)="search($event)"
                             [query]="assetsState.query | async" 
                         </sqx-search-form>
                     </div>

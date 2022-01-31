@@ -85,11 +85,6 @@ namespace Squidex.Infrastructure
             return false;
         }
 
-        public static IEnumerable<TElement> SingleGroups<TKey, TElement>(this IEnumerable<IGrouping<TKey, TElement>> source)
-        {
-            return source.Where(x => x.Count() == 1).Select(x => x.First());
-        }
-
         public static bool SetEquals<T>(this IReadOnlyCollection<T> source, IReadOnlyCollection<T> other)
         {
             return source.Count == other.Count && source.Intersect(other).Count() == other.Count;

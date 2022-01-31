@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly JsonValueConverter Instance = new JsonValueConverter();
 
-        public sealed record Args(IJsonValue Value, IJsonSerializer JsonSerializer, ResolvedComponents Components);
+        public record struct Args(IJsonValue Value, IJsonSerializer JsonSerializer, ResolvedComponents Components);
 
         private JsonValueConverter()
         {

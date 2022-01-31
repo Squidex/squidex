@@ -7,9 +7,8 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-namespace Squidex.Domain.Apps.Entities.Scripting
+namespace Squidex.Infrastructure.Queries
 {
-    public sealed record ScriptingValue(string Path, JsonType Type, string Description)
-    {
-    }
+    public sealed record FilterField(FilterSchema Schema, string Path, string? Description = null,
+        bool IsNullable = false);
 }

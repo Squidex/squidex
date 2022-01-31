@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { FilterComparison, LanguageDto, QueryFieldModel, QueryModel } from '@app/shared/internal';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { FilterComparison, LanguageDto, FilterableField, QueryModel, FilterFieldUI, getFilterUI, StatusInfo } from '@app/shared/internal';
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
 @Component({
-    selector: 'sqx-filter-comparison[filter][language][languages][model]',
+    selector: 'sqx-filter-comparison[filter][language][languages][model][statuses]',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,25 +29,25 @@ export class FilterComparisonComponent implements OnChanges {
     public languages!: ReadonlyArray<LanguageDto>;
 
     @Input()
+    public statuses?: ReadonlyArray<StatusInfo> | null;
+
+    @Input()
     public model!: QueryModel;
 
     @Input()
     public filter!: FilterComparison;
 
-    public fieldModel?: QueryFieldModel;
-
-    public noValue = false;
+    public field?: FilterableField;
+    public fieldUI?: FilterFieldUI;
+    public operators: ReadonlyArray<string> = [];
 
     constructor(
         public readonly contributorsState: ContributorsState,
     ) {
     }
 
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['filter']) {
-            this.updatePath(false);
-            this.updateOperator();
-        }
+    public ngOnChanges() {
+        this.updatePath(false);
     }
 
     public changeValue(value: any) {
@@ -59,7 +59,7 @@ export class FilterComparisonComponent implements OnChanges {
     public changeOp(op: string) {
         this.filter.op = op;
 
-        this.updateOperator();
+        this.updatePath(false);
 
         this.emitChange();
     }
@@ -72,26 +72,20 @@ export class FilterComparisonComponent implements OnChanges {
         this.emitChange();
     }
 
-    private updateOperator() {
-        if (this.fieldModel) {
-            const operator = this.fieldModel.operators.find(x => x.value === this.filter.op);
+    private updatePath(updateValue: boolean) {
+        this.field = this.model.schema.fields.find(x => x.path === this.filter.path);
 
-            this.noValue = !!(operator && operator.noValue);
+        this.operators = this.model.operators[this.field?.schema.type!] || [];
+
+        if (this.operators.indexOf(this.filter.op) < 0) {
+            this.filter.op = this.operators[0];
         }
-    }
 
-    private updatePath(refresh: boolean) {
-        const newModel = this.model.fields[this.filter.path];
-
-        if (newModel && refresh) {
-            if (!newModel.operators.find(x => x.value === this.filter.op)) {
-                this.filter.op = newModel.operators[0].value;
-            }
-
+        if (updateValue) {
             this.filter.value = null;
         }
 
-        this.fieldModel = newModel;
+        this.fieldUI = getFilterUI(this.filter, this.field!);
     }
 
     public emitChange() {

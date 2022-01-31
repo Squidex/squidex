@@ -52,11 +52,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                 .SetRequired(isRequired);
         }
 
-        public static JsonSchemaProperty StringProperty(string? description = null, bool isRequired = false)
+        public static JsonSchemaProperty StringProperty(string? description = null, bool isRequired = false, string? format = null)
         {
             const JsonObjectType type = JsonObjectType.String;
 
-            return new JsonSchemaProperty { Type = type }
+            return new JsonSchemaProperty { Type = type, Format = format }
                 .SetDescription(description)
                 .SetRequired(isRequired);
         }

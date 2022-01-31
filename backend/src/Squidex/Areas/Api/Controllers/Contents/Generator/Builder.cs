@@ -52,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             var contentSchema = RegisterReference("ContentDto", _ =>
             {
-                return ContentJsonSchemaBuilder.BuildSchema(dataSchema, true);
+                return ContentJsonSchema.Build(dataSchema, true);
             });
 
             var contentsSchema = RegisterReference("ContentResultDto", _ =>
@@ -95,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             var contentSchema = RegisterReference($"{typeName}ContentDto", _ =>
             {
-                return ContentJsonSchemaBuilder.BuildSchema(flat ? flatDataSchema : dataSchema, true);
+                return ContentJsonSchema.Build(flat ? flatDataSchema : dataSchema, true);
             });
 
             var contentsSchema = RegisterReference($"{typeName}ContentResultDto", _ =>

@@ -6,10 +6,10 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { LanguageDto, Query, QueryModel } from '@app/shared/internal';
+import { LanguageDto, Query, QueryModel, StatusInfo } from '@app/shared/internal';
 
 @Component({
-    selector: 'sqx-query[language][languages][model]',
+    selector: 'sqx-query[language][languages][model][statuses]',
     styleUrls: ['./query.component.scss'],
     templateUrl: './query.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +23,9 @@ export class QueryComponent {
 
     @Input()
     public languages!: ReadonlyArray<LanguageDto>;
+
+    @Input()
+    public statuses?: ReadonlyArray<StatusInfo> | null;
 
     @Input()
     public model!: QueryModel;
@@ -47,7 +50,7 @@ export class QueryComponent {
     public queryValue: Query = {};
 
     public addSorting() {
-        const path = Object.keys(this.model.fields)[0];
+        const path = Object.keys(this.model.schema.fields)[0];
 
         if (this.queryValue.sort) {
             this.queryValue.sort.push({ path, order: 'ascending' });

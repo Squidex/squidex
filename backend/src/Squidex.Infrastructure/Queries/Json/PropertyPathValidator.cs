@@ -5,48 +5,47 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics.CodeAnalysis;
-using NJsonSchema;
-
 namespace Squidex.Infrastructure.Queries.Json
 {
     public static class PropertyPathValidator
     {
-        public static bool TryGetProperty(this PropertyPath path, JsonSchema schema, List<string> errors, [MaybeNullWhen(false)] out JsonSchema property)
+        public static IEnumerable<FilterField> GetMatchingFields(this PropertyPath path, FilterSchema schema, List<string> errors)
         {
-            foreach (var element in path)
+            var lastIndex = path.Count - 1;
+
+            List<FilterField>? result = null;
+
+            void Check(int index, FilterSchema schema)
             {
-                var parent = schema.Reference ?? schema;
-
-                if (parent.Properties.TryGetValue(element, out var p))
+                if (schema.Fields == null)
                 {
-                    schema = p;
-
-                    if (schema.Type == JsonObjectType.None && schema.Reference == null)
-                    {
-                        break;
-                    }
+                    return;
                 }
-                else
+
+                var fields = schema.Fields.Where(x => x.Path == path[index]);
+
+                foreach (var field in fields)
                 {
-                    if (!string.IsNullOrWhiteSpace(parent.Title))
+                    if (index == lastIndex || field.Schema.Type == FilterSchemaType.Any)
                     {
-                        errors.Add($"'{element}' is not a property of '{parent.Title}'.");
+                        result ??= new List<FilterField>();
+                        result.Add(field);
                     }
                     else
                     {
-                        errors.Add($"Path '{path}' does not point to a valid property in the model.");
+                        Check(index + 1, field.Schema);
                     }
-
-                    property = null!;
-
-                    return false;
                 }
             }
 
-            property = schema;
+            Check(0, schema);
 
-            return true;
+            if (result == null)
+            {
+                errors.Add(Errors.InvalidPath(path.ToString()));
+            }
+
+            return result as IEnumerable<FilterField> ?? Array.Empty<FilterField>();
         }
     }
 }

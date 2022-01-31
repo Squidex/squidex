@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb
     {
         private static readonly AdaptIdVisitor Instance = new AdaptIdVisitor();
 
-        public sealed record Args(DomainId AppId);
+        public record struct Args(DomainId AppId);
 
         private AdaptIdVisitor()
         {

@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         private static readonly StringFormatter Instance = new StringFormatter();
 
-        public sealed record Args(IJsonValue Value);
+        public record struct Args(IJsonValue Value);
 
         private StringFormatter()
         {
