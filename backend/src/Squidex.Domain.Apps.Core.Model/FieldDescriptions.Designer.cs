@@ -448,11 +448,11 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The name of the schema..
+        ///   Looks up a localized string similar to The display name of the schema..
         /// </summary>
-        public static string ContentSchema {
+        public static string ContentSchemaDisplayName {
             get {
-                return ResourceManager.GetString("ContentSchema", resourceCulture);
+                return ResourceManager.GetString("ContentSchemaDisplayName", resourceCulture);
             }
         }
         
@@ -466,7 +466,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The display name of the schema..
+        ///   Looks up a localized string similar to The name of the schema..
         /// </summary>
         public static string ContentSchemaName {
             get {

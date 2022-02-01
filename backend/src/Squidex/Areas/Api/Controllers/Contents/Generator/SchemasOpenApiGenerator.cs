@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .Describe(Resources.OpenApiSchemaQuery)
                 .HasQueryOptions(true)
                 .Responds(200, "Content items retrieved.", builder.ContentsSchema)
-                .Responds(400, "Query not valid.");
+                .Responds(400, "Content query not valid.");
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}")
                 .RequirePermission(Permissions.AppContentsReadOwn)
@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             builder.AddOperation(OpenApiOperationMethod.Get, "/{id}/{version}")
                 .RequirePermission(Permissions.AppContentsReadOwn)
-                .Operation("Get")
+                .Operation("GetVersioned")
                 .OperationSummary("Get a [schema] content item by id and version.")
                 .HasPath("version", JsonObjectType.Number, "The version of the content item.")
                 .HasId()

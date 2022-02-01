@@ -37,8 +37,9 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             if (extended)
             {
                 jsonSchema.Properties["newStatusColor"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentNewStatusColor, false);
-                jsonSchema.Properties["schema"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentSchema, true);
-                jsonSchema.Properties["SchemaName"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentSchemaName, true);
+                jsonSchema.Properties["schemaId"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentSchemaId, true);
+                jsonSchema.Properties["schemaName"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentSchemaName, true);
+                jsonSchema.Properties["schemaDisplayName"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentSchemaDisplayName, true);
                 jsonSchema.Properties["statusColor"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentStatusColor, true);
             }
 
