@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             this.requestCache = requestCache;
         }
 
-        public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat = false)
+        public async Task<OpenApiDocument> GenerateAsync(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas, bool flat)
         {
             var document = CreateApiDocument(httpContext, app);
 
@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             {
                 var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
 
-                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, partitionResolver, components, true));
+                GenerateSchemaOperations(builder.Schema(schema.SchemaDef, partitionResolver, components, flat));
             }
 
             GenerateSharedOperations(builder.Shared());

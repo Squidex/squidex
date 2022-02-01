@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var vm = new DocsVM
             {
-                Specification = $"~/content/{app}/swagger/v1/swagger.json"
+                Specification = $"~/api/content/{app}/swagger/v1/swagger.json"
             };
 
             return View(nameof(Docs), vm);
@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var vm = new DocsVM
             {
-                Specification = $"~/content/{app}/flat/swagger/v1/swagger.json"
+                Specification = $"~/api/content/{app}/flat/swagger/v1/swagger.json"
             };
 
             return View(nameof(Docs), vm);
@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var schemas = await appProvider.GetSchemasAsync(AppId, HttpContext.RequestAborted);
 
-            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas);
+            var openApiDocument = await schemasOpenApiGenerator.GenerateAsync(HttpContext, App, schemas, false);
 
             return Content(openApiDocument.ToJson(), "application/json");
         }

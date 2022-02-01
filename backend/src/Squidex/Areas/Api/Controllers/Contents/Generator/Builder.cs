@@ -88,14 +88,19 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 return schema.BuildJsonSchemaDynamic(partitionResolver, components, CreateReference, false, true);
             });
 
-            var flatDataSchema = RegisterReference($"{typeName}FlatDataDto", _ =>
+            var contentDataSchema = dataSchema;
+
+            if (flat)
             {
-                return schema.BuildJsonSchemaFlat(partitionResolver, components, CreateReference, false, true);
-            });
+                contentDataSchema = RegisterReference($"{typeName}FlatDataDto", _ =>
+                {
+                    return schema.BuildJsonSchemaFlat(partitionResolver, components, CreateReference, false, true);
+                });
+            }
 
             var contentSchema = RegisterReference($"{typeName}ContentDto", _ =>
             {
-                return ContentJsonSchema.Build(flat ? flatDataSchema : dataSchema, true);
+                return ContentJsonSchema.Build(contentDataSchema, true);
             });
 
             var contentsSchema = RegisterReference($"{typeName}ContentResultDto", _ =>
