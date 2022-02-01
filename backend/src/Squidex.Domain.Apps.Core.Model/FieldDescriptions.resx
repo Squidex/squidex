@@ -246,14 +246,14 @@
   <data name="ContentRequestStatus" xml:space="preserve">
     <value>The status for the content.</value>
   </data>
-  <data name="ContentSchema" xml:space="preserve">
-    <value>The name of the schema.</value>
+  <data name="ContentSchemaDisplayName" xml:space="preserve">
+    <value>The display name of the schema.</value>
   </data>
   <data name="ContentSchemaId" xml:space="preserve">
     <value>The ID of the schema.</value>
   </data>
   <data name="ContentSchemaName" xml:space="preserve">
-    <value>The display name of the schema.</value>
+    <value>The name of the schema.</value>
   </data>
   <data name="ContentsItems" xml:space="preserve">
     <value>The contents.</value>
