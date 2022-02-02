@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities
         public Context(ClaimsPrincipal user, IAppEntity app)
             : this(app, user, user.Claims.Permissions(), EmptyHeaders)
         {
-            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(user);
         }
 
         private Context(IAppEntity app, ClaimsPrincipal user, ClaimsPermissions userPermissions, IReadOnlyDictionary<string, string> headers)

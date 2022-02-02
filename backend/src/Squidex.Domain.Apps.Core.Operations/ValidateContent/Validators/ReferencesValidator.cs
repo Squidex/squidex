@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public ReferencesValidator(bool isRequired, ReferencesFieldProperties properties, CheckContentsByIds checkReferences)
         {
-            Guard.NotNull(properties, nameof(properties));
-            Guard.NotNull(checkReferences, nameof(checkReferences));
+            Guard.NotNull(properties);
+            Guard.NotNull(checkReferences);
 
             this.properties = properties;
 

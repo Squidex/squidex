@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         public async Task<IEnrichedRuleEntity> EnrichAsync(IRuleEntity rule, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(rule);
 
             var enriched = await EnrichAsync(Enumerable.Repeat(rule, 1), context, ct);
 
@@ -37,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
         public async Task<IReadOnlyList<IEnrichedRuleEntity>> EnrichAsync(IEnumerable<IRuleEntity> rules, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(rules, nameof(rules));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(rules);
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("RuleEnricher/EnrichAsync"))
             {

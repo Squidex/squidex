@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public Roles Update(string name, PermissionSet? permissions = null, JsonObject? properties = null)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             if (!inner.TryGetValue(name, out var role))
             {
@@ -157,7 +157,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public bool TryGet(string app, string name, bool isFrontend, [MaybeNullWhen(false)] out Role value)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             value = null!;
 

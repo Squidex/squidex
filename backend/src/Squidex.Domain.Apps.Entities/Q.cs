@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Q WithQuery(ClrQuery query)
         {
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(query);
 
             return this with { Query = query };
         }

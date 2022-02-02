@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
-            Guard.NotNull(streamFilter, nameof(streamFilter));
+            Guard.NotNull(streamFilter);
 
             return new GetEventStoreSubscription(subscriber, client, projectionClient, serializer, position, StreamPrefix, streamFilter);
         }
@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task<IReadOnlyList<StoredEvent>> QueryReverseAsync(string streamName, int count = int.MaxValue,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             if (count <= 0)
             {
@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             using (Telemetry.Activities.StartActivity("GetEventStore/QueryAsync"))
             {
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task DeleteStreamAsync(string streamName,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             await client.SoftDeleteAsync(GetStreamName(streamName), StreamState.Any, cancellationToken: ct);
         }
@@ -179,7 +179,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
             CancellationToken ct = default)
         {
-            Guard.GreaterEquals(expectedVersion, -1, nameof(expectedVersion));
+            Guard.GreaterEquals(expectedVersion, -1);
 
             return AppendEventsInternalAsync(streamName, expectedVersion, events, ct);
         }
@@ -187,8 +187,8 @@ namespace Squidex.Infrastructure.EventSourcing
         private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events,
             CancellationToken ct)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNull(events);
 
             using (Telemetry.Activities.StartActivity("GetEventStore/AppendEventsInternalAsync"))
             {

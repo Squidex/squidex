@@ -27,8 +27,8 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public static IJsonValue CreateDefaultValue(IField field, Instant now, string partition)
         {
-            Guard.NotNull(field, nameof(field));
-            Guard.NotNull(partition, nameof(partition));
+            Guard.NotNull(field);
+            Guard.NotNull(partition);
 
             return field.RawProperties.Accept(Instance, new Args(now, partition));
         }

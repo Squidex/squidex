@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.States
 
         private IPersistence<T> CreatePersistence(Type owner, DomainId key, PersistenceMode mode, HandleSnapshot<T>? applySnapshot, HandleEvent? applyEvent)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             return new Persistence<T>(key, owner,
                 snapshotStore,

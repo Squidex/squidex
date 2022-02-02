@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public Schema(string name, SchemaProperties? properties = null, SchemaType type = SchemaType.Default)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             Name = name;
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public Schema(string name, RootField[] fields, SchemaProperties? properties, bool isPublished = false, SchemaType type = SchemaType.Default)
             : this(name, properties, type)
         {
-            Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(fields);
 
             FieldCollection = new FieldCollection<RootField>(fields);
 

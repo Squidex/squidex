@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentData AddField(string name, ContentFieldData? data)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             this[name] = data;
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         private static ContentData MergeTo(ContentData target, params ContentData[] sources)
         {
-            Guard.NotEmpty(sources, nameof(sources));
+            Guard.NotEmpty(sources);
 
             if (sources.Length == 1 || sources.Skip(1).All(x => ReferenceEquals(x, sources[0])))
             {

@@ -32,8 +32,8 @@ namespace Squidex.Infrastructure.Plugins
 
         public Assembly? Load(string path, AssemblyName[] sharedAssemblies)
         {
-            Guard.NotNullOrEmpty(path, nameof(path));
-            Guard.NotNull(sharedAssemblies, nameof(sharedAssemblies));
+            Guard.NotNullOrEmpty(path);
+            Guard.NotNull(sharedAssemblies);
 
             Assembly? assembly = null;
 
@@ -93,8 +93,8 @@ namespace Squidex.Infrastructure.Plugins
 
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            Guard.NotNull(services, nameof(services));
-            Guard.NotNull(config, nameof(config));
+            Guard.NotNull(services);
+            Guard.NotNull(config);
 
             foreach (var plugin in loadedPlugins)
             {
@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.Plugins
 
         public void Log(ISemanticLog log)
         {
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(log);
 
             if (loadedPlugins.Count > 0 || exceptions.Count > 0)
             {

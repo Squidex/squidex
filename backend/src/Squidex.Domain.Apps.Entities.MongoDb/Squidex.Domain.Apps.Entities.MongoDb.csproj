@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup>
 	<PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00015" />	  
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.680">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.689">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

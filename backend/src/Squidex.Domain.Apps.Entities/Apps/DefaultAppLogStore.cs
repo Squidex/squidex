@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream,
             CancellationToken ct = default)
         {
-            Guard.NotNull(appId, nameof(appId));
+            Guard.NotNull(appId);
 
             var writer = new StreamWriter(stream, Encoding.UTF8, 4096, true);
             try

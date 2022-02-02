@@ -27,7 +27,7 @@ namespace Squidex.Domain.Users
         public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(email, nameof(email));
+            Guard.NotNullOrEmpty(email);
 
             await using (var scope = serviceProvider.CreateAsyncScope())
             {
@@ -57,9 +57,9 @@ namespace Squidex.Domain.Users
         public async Task SetClaimAsync(string id, string type, string value, bool silent = false,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
-            Guard.NotNullOrEmpty(type, nameof(type));
-            Guard.NotNullOrEmpty(value, nameof(value));
+            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(type);
+            Guard.NotNullOrEmpty(value);
 
             await using (var scope = serviceProvider.CreateAsyncScope())
             {
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Users
         public async Task<IUser?> FindByIdAsync(string id,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             await using (var scope = serviceProvider.CreateAsyncScope())
             {
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Users
         public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(idOrEmail, nameof(idOrEmail));
+            Guard.NotNullOrEmpty(idOrEmail);
 
             await using (var scope = serviceProvider.CreateAsyncScope())
             {
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Users
         public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids,
             CancellationToken ct = default)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             await using (var scope = serviceProvider.CreateAsyncScope())
             {

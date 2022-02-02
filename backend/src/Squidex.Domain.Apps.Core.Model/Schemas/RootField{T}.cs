@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         private static T ValidateProperties(FieldProperties newProperties)
         {
-            Guard.NotNull(newProperties, nameof(newProperties));
+            Guard.NotNull(newProperties);
 
             if (newProperties is not T typedProperties)
             {

@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonJsonSerializer(JsonSerializer serializer)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(serializer);
 
             this.serializer = serializer;
         }

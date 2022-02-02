@@ -95,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
         public ResizeOptions ToResizeOptions(IAssetEntity asset)
         {
-            Guard.NotNull(asset, nameof(asset));
+            Guard.NotNull(asset);
 
             var result = SimpleMapper.Map(this, new ResizeOptions());
 

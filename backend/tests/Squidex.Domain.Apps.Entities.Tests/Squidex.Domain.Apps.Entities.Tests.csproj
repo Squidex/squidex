@@ -20,19 +20,19 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="7.2.0" />
-    <PackageReference Include="FluentAssertions" Version="6.2.0" />
-    <PackageReference Include="GraphQL" Version="4.6.1" />
-    <PackageReference Include="GraphQL.NewtonsoftJson" Version="4.6.1" />
+    <PackageReference Include="FakeItEasy" Version="7.3.0" />
+    <PackageReference Include="FluentAssertions" Version="6.4.0" />
+    <PackageReference Include="GraphQL" Version="4.7.1" />
+    <PackageReference Include="GraphQL.NewtonsoftJson" Version="4.7.1" />
     <PackageReference Include="Lorem.Universal.Net" Version="4.0.80" />
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.680">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.689">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageReference Include="Microsoft.Orleans.TestingHost" Version="3.5.1" />
+    <PackageReference Include="Microsoft.Orleans.TestingHost" Version="3.6.0" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
     <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />

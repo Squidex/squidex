@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private string GetName(string name, bool isEntity)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             if (!char.IsLetter(name[0]))
             {

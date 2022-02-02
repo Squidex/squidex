@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public PatternValidator(string pattern, string? errorMessage = null, bool capture = false)
         {
-            Guard.NotNullOrEmpty(pattern, nameof(pattern));
+            Guard.NotNullOrEmpty(pattern);
 
             this.errorMessage = errorMessage;
 

@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         public AssetFolderOperation(IServiceProvider serviceProvider, Func<IAssetFolderEntity> snapshot)
             : base(serviceProvider, snapshot)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider);
         }
 
         public static async Task<AssetFolderOperation> CreateAsync(IServiceProvider services, AssetFolderCommand command, Func<IAssetFolderEntity> snapshot)

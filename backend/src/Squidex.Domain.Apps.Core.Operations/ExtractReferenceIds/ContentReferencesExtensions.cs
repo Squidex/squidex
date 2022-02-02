@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var ids = new HashSet<DomainId>();
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         public static void AddReferencedIds(this ContentData source, Schema schema, HashSet<DomainId> result,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             AddReferencedIds(source, schema.Fields, result, components, referencesPerField);
         }
@@ -69,9 +69,9 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         public static void AddReferencedIds(this ContentData source, IEnumerable<IField> fields, HashSet<DomainId> result,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(fields, nameof(fields));
-            Guard.NotNull(result, nameof(result));
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(fields);
+            Guard.NotNull(result);
+            Guard.NotNull(components);
 
             foreach (var field in fields)
             {
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         private static void AddReferencedIds(IField field, ContentData source, HashSet<DomainId> result,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(components);
 
             if (source.TryGetValue(field.Name, out var fieldData) && fieldData != null)
             {
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         public static HashSet<DomainId> GetReferencedIds(this IField field, IJsonValue? value,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(components);
 
             var result = new HashSet<DomainId>();
 
@@ -110,8 +110,8 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public static JsonObject FormatReferences(this ContentData data, Schema schema, IFieldPartitioning partitioning, string separator = ", ")
         {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(partitioning, nameof(partitioning));
+            Guard.NotNull(schema);
+            Guard.NotNull(partitioning);
 
             var result = JsonValue.Object();
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static string FormatReferenceFields(this ContentData data, Schema schema, string partitionKey, string separator)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var sb = new StringBuilder();
 

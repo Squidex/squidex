@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Log
         public MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
             : base(database)
         {
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(options);
 
             this.options = options.Value;
         }
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Log
         public Task InsertManyAsync(IEnumerable<Request> items,
             CancellationToken ct = default)
         {
-            Guard.NotNull(items, nameof(items));
+            Guard.NotNull(items);
 
             var entities = items.Select(MongoRequest.FromRequest).ToList();
 
@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.Log
         public Task DeleteAsync(string key,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             return Collection.DeleteManyAsync(Filter.Eq(x => x.Key, key), ct);
         }
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.Log
         public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             var timestampStart = Instant.FromDateTimeUtc(fromDate);
             var timestampEnd = Instant.FromDateTimeUtc(toDate.AddDays(1));

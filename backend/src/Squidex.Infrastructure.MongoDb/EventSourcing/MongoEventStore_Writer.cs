@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public Task DeleteStreamAsync(string streamName,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             return Collection.DeleteManyAsync(x => x.EventStream == streamName, ct);
         }
@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public Task DeleteAsync(string streamFilter,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
+            Guard.NotNullOrEmpty(streamFilter);
 
             return Collection.DeleteManyAsync(FilterExtensions.ByStream(streamFilter), ct);
         }
@@ -41,10 +41,10 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events,
             CancellationToken ct = default)
         {
-            Guard.NotEmpty(commitId, nameof(commitId));
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
-            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
+            Guard.NotEmpty(commitId);
+            Guard.NotNullOrEmpty(streamName);
+            Guard.NotNull(events);
+            Guard.GreaterEquals(expectedVersion, EtagVersion.Any);
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/AppendAsync"))
             {
@@ -107,7 +107,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task AppendUnsafeAsync(IEnumerable<EventCommit> commits,
             CancellationToken ct = default)
         {
-            Guard.NotNull(commits, nameof(commits));
+            Guard.NotNull(commits);
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/AppendUnsafeAsync"))
             {

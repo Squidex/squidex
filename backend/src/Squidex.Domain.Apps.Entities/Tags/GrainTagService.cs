@@ -22,29 +22,29 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public Task RenameTagAsync(DomainId appId, string group, string name, string newName)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNullOrEmpty(newName, nameof(newName));
+            Guard.NotNullOrEmpty(name);
+            Guard.NotNullOrEmpty(newName);
 
             return GetGrain(appId, group).RenameTagAsync(name, newName);
         }
 
         public Task RebuildTagsAsync(DomainId appId, string group, TagsExport export)
         {
-            Guard.NotNull(export, nameof(export));
+            Guard.NotNull(export);
 
             return GetGrain(appId, group).RebuildAsync(export);
         }
 
         public Task<Dictionary<string, string>> GetTagIdsAsync(DomainId appId, string group, HashSet<string> names)
         {
-            Guard.NotNull(names, nameof(names));
+            Guard.NotNull(names);
 
             return GetGrain(appId, group).GetTagIdsAsync(names);
         }
 
         public Task<Dictionary<string, string>> DenormalizeTagsAsync(DomainId appId, string group, HashSet<string> ids)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             return GetGrain(appId, group).DenormalizeTagsAsync(ids);
         }
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         private ITagGrain GetGrain(DomainId appId, string group)
         {
-            Guard.NotNullOrEmpty(group, nameof(group));
+            Guard.NotNullOrEmpty(group);
 
             return grainFactory.GetGrain<ITagGrain>($"{appId}_{group}");
         }

@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         protected QueryExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery)
         {
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(assetQuery);
+            Guard.NotNull(contentQuery);
 
             this.assetQuery = assetQuery;
             this.contentQuery = contentQuery;
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(ICollection<DomainId> ids,
             CancellationToken ct)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             var notLoadedAssets = new HashSet<DomainId>(ids.Where(id => !cachedAssets.ContainsKey(id)));
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(ICollection<DomainId> ids,
             CancellationToken ct)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             var notLoadedContents = ids.Where(id => !cachedContents.ContainsKey(id)).ToList();
 

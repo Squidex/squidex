@@ -71,8 +71,8 @@ namespace Squidex.Extensions.Text.ElasticSearch
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(app);
+            Guard.NotNull(query);
 
             var serveField = GetServeField(scope);
 
@@ -133,8 +133,8 @@ namespace Squidex.Extensions.Text.ElasticSearch
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(app);
+            Guard.NotNull(query);
 
             var parsed = queryParser.Parse(query.Text);
 

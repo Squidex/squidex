@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure
 
         public static Language GetLanguage(string iso2Code)
         {
-            Guard.NotNullOrEmpty(iso2Code, nameof(iso2Code));
+            Guard.NotNullOrEmpty(iso2Code);
 
             if (LanguageByCode.TryGetValue(iso2Code, out var result))
             {
@@ -52,14 +52,14 @@ namespace Squidex.Infrastructure
 
         public static bool IsDefault(string iso2Code)
         {
-            Guard.NotNull(iso2Code, nameof(iso2Code));
+            Guard.NotNull(iso2Code);
 
             return LanguageByCode.ContainsKey(iso2Code);
         }
 
         public static bool TryGetLanguage(string iso2Code, [MaybeNullWhen(false)] out Language language)
         {
-            Guard.NotNull(iso2Code, nameof(iso2Code));
+            Guard.NotNull(iso2Code);
 
             return LanguageByCode.TryGetValue(iso2Code, out language!);
         }

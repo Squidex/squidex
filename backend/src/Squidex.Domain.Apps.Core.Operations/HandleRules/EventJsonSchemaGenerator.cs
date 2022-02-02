@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public JsonSchema? GetSchema(string typeName)
         {
-            Guard.NotNull(typeName, nameof(typeName));
+            Guard.NotNull(typeName);
 
             return schemas.Value.GetOrDefault(typeName);
         }

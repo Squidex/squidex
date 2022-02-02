@@ -45,8 +45,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         public Role(string name, PermissionSet permissions, JsonObject properties)
             : base(name)
         {
-            Guard.NotNull(permissions, nameof(permissions));
-            Guard.NotNull(properties, nameof(properties));
+            Guard.NotNull(permissions);
+            Guard.NotNull(properties);
 
             Permissions = permissions;
             Properties = properties;
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public Role ForApp(string app, bool isFrontend = false)
         {
-            Guard.NotNullOrEmpty(app, nameof(app));
+            Guard.NotNullOrEmpty(app);
 
             var result = new HashSet<Permission>();
 

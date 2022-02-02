@@ -90,12 +90,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task RestoreAsync(Uri url, RefToken actor, string? newAppName = null)
         {
-            Guard.NotNull(url, nameof(url));
-            Guard.NotNull(actor, nameof(actor));
+            Guard.NotNull(url);
+            Guard.NotNull(actor);
 
             if (!string.IsNullOrWhiteSpace(newAppName))
             {
-                Guard.ValidSlug(newAppName, nameof(newAppName));
+                Guard.ValidSlug(newAppName);
             }
 
             if (CurrentJob?.Status == JobStatus.Started)

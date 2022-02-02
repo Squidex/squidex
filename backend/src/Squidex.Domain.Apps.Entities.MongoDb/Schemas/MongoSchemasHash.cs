@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(IAppEntity app,
             CancellationToken ct = default)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             var entity = await Collection.Find(x => x.AppId == app.Id).FirstOrDefaultAsync(ct);
 

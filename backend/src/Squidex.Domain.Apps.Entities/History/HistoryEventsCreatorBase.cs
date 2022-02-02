@@ -23,14 +23,14 @@ namespace Squidex.Domain.Apps.Entities.History
 
         protected HistoryEventsCreatorBase(TypeNameRegistry typeNameRegistry)
         {
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+            Guard.NotNull(typeNameRegistry);
 
             this.typeNameRegistry = typeNameRegistry;
         }
 
         protected void AddEventMessage<TEvent>(string message) where TEvent : IEvent
         {
-            Guard.NotNullOrEmpty(message, nameof(message));
+            Guard.NotNullOrEmpty(message);
 
             texts[typeNameRegistry.GetName<TEvent>()] = message;
         }

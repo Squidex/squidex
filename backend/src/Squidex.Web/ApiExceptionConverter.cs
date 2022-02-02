@@ -44,7 +44,7 @@ namespace Squidex.Web
 
         public static (ErrorDto Error, Exception? Unhandled) ToErrorDto(this ProblemDetails problem, HttpContext? httpContext)
         {
-            Guard.NotNull(problem, nameof(problem));
+            Guard.NotNull(problem);
 
             var error = CreateError(problem.Status ?? 500, problem.Title);
 
@@ -55,7 +55,7 @@ namespace Squidex.Web
 
         public static (ErrorDto Error, Exception? Unhandled) ToErrorDto(this Exception exception, HttpContext? httpContext)
         {
-            Guard.NotNull(exception, nameof(exception));
+            Guard.NotNull(exception);
 
             var result = CreateError(exception);
 

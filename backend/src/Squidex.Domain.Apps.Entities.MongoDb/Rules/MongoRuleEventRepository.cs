@@ -147,8 +147,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         public Task UpdateAsync(RuleJob job, RuleJobUpdate update,
             CancellationToken ct = default)
         {
-            Guard.NotNull(job, nameof(job));
-            Guard.NotNull(update, nameof(update));
+            Guard.NotNull(job);
+            Guard.NotNull(update);
 
             return Task.WhenAll(
                 UpdateStatisticsAsync(job, update, ct),

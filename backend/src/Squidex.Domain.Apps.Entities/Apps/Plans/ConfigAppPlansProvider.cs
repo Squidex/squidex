@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public IAppLimitsPlan? GetPlanUpgradeForApp(IAppEntity app)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             return GetPlanUpgrade(app.Plan?.PlanId);
         }
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public (IAppLimitsPlan Plan, string PlanId) GetPlanForApp(IAppEntity app)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             var planId = app.Plan?.PlanId;
             var plan = GetPlanCore(planId);

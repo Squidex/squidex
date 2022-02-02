@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public async Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
         {
-            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(rule);
             Guard.NotNull(@event, nameof(@event));
 
             var ruleContext = new RuleContext

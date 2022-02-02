@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         public async Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
             CancellationToken ct = default)
         {
-            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(rule);
 
             var context = new RuleContext
             {

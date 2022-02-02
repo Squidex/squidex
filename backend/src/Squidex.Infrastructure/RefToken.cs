@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure
 
         public RefToken(RefTokenType type, string identifier)
         {
-            Guard.NotNullOrEmpty(identifier, nameof(identifier));
+            Guard.NotNullOrEmpty(identifier);
 
             Type = type;
 

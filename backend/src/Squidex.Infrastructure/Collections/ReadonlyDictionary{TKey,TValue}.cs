@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Collections
 
         public ReadonlyDictionary(IDictionary<TKey, TValue> inner)
         {
-            Guard.NotNull(inner, nameof(inner));
+            Guard.NotNull(inner);
 
             this.inner = inner;
         }

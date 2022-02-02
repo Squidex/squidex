@@ -182,7 +182,7 @@ namespace Squidex.Web.Pipeline
 
         public void Start(HttpContext httpContext)
         {
-            Guard.NotNull(httpContext, nameof(httpContext));
+            Guard.NotNull(httpContext);
 
             var maxKeysSize = GetKeysSize(httpContext);
 
@@ -224,7 +224,7 @@ namespace Squidex.Web.Pipeline
 
         public void Finish(HttpContext httpContext)
         {
-            Guard.NotNull(httpContext, nameof(httpContext));
+            Guard.NotNull(httpContext);
 
             var cacheContext = httpContext.Features.Get<CacheContext>();
 

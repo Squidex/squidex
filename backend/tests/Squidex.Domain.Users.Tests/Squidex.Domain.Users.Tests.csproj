@@ -14,9 +14,9 @@
     <ProjectReference Include="..\..\src\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="7.2.0" />
-    <PackageReference Include="FluentAssertions" Version="6.2.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.680">
+    <PackageReference Include="FakeItEasy" Version="7.3.0" />
+    <PackageReference Include="FluentAssertions" Version="6.4.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.689">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

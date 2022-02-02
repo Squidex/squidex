@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope<IEvent> Parse(StoredEvent storedEvent)
         {
-            Guard.NotNull(storedEvent, nameof(storedEvent));
+            Guard.NotNull(storedEvent);
 
             var eventData = storedEvent.Data;
 

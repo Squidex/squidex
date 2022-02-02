@@ -19,8 +19,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public FieldRule(FieldRuleAction action, string field)
         {
-            Guard.Enum(action, nameof(action));
-            Guard.NotNullOrEmpty(field, nameof(field));
+            Guard.Enum(action);
+            Guard.NotNullOrEmpty(field);
 
             Action = action;
 

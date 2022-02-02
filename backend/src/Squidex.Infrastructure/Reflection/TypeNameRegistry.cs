@@ -27,8 +27,8 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry MapObsolete(Type type, string name)
         {
-            Guard.NotNull(type, nameof(type));
-            Guard.NotNull(name, nameof(name));
+            Guard.NotNull(type);
+            Guard.NotNull(name);
 
             lock (namesByType)
             {
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry Map(ITypeProvider provider)
         {
-            Guard.NotNull(provider, nameof(provider));
+            Guard.NotNull(provider);
 
             provider.Map(this);
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry Map(Type type)
         {
-            Guard.NotNull(type, nameof(type));
+            Guard.NotNull(type);
 
             var typeNameAttribute = type.GetCustomAttribute<TypeNameAttribute>();
 
@@ -70,8 +70,8 @@ namespace Squidex.Infrastructure.Reflection
 
         public TypeNameRegistry Map(Type type, string name)
         {
-            Guard.NotNull(type, nameof(type));
-            Guard.NotNull(name, nameof(name));
+            Guard.NotNull(type);
+            Guard.NotNull(name);
 
             lock (namesByType)
             {

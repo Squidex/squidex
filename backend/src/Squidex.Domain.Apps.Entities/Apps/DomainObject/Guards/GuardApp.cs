@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
     {
         public static void CanCreate(CreateApp command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanUploadImage(UploadAppImage command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -44,22 +44,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanUpdate(UpdateApp command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanRemoveImage(RemoveAppImage command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanUpdateAssetScripts(ConfigureAssetScripts command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
         }
 
         public static void CanUpdateSettings(UpdateAppSettings command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanChangePlan(ChangePlan command, IAppEntity app, IAppPlansProvider appPlans)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {

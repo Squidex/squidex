@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result)
         {
-            Guard.NotNull(pathSegment, nameof(pathSegment));
+            Guard.NotNull(pathSegment);
 
             if (pathSegment != null && int.TryParse(pathSegment, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index) && index >= 0 && index < Count)
             {

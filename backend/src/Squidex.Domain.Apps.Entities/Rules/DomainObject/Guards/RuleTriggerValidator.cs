@@ -25,8 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
 
         public static Task<IEnumerable<ValidationError>> ValidateAsync(DomainId appId, RuleTrigger trigger, IAppProvider appProvider)
         {
-            Guard.NotNull(trigger, nameof(trigger));
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(trigger);
+            Guard.NotNull(appProvider);
 
             var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appId, x));
 

@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public AssetsValidator(bool isRequired, AssetsFieldProperties properties, CheckAssets checkAssets)
         {
-            Guard.NotNull(properties, nameof(properties));
-            Guard.NotNull(checkAssets, nameof(checkAssets));
+            Guard.NotNull(properties);
+            Guard.NotNull(checkAssets);
 
             this.properties = properties;
 

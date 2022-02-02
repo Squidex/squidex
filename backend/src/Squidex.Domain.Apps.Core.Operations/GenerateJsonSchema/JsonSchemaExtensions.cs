@@ -29,8 +29,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             bool withHidden = false,
             bool withComponents = false)
         {
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(components);
 
             factory ??= DefaultFactory;
 
@@ -64,8 +64,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             bool withHidden = false,
             bool withComponents = false)
         {
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(components);
 
             factory ??= DefaultFactory;
 
@@ -102,8 +102,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             bool withHidden = false,
             bool withComponents = false)
         {
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(components);
 
             factory ??= DefaultFactory;
 

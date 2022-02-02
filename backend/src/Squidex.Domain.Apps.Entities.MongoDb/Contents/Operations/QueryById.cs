@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IContentEntity?> QueryAsync(ISchemaEntity schema, DomainId id,
             CancellationToken ct)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var documentId = DomainId.Combine(schema.AppId, id);
 

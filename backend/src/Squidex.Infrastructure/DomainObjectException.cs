@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure
         public DomainObjectException(string message, string id, string errorCode, Exception? inner = null)
             : base(message, errorCode, inner)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             Id = id;
         }

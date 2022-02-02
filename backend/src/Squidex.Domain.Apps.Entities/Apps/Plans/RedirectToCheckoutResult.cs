@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public RedirectToCheckoutResult(Uri url)
         {
-            Guard.NotNull(url, nameof(url));
+            Guard.NotNull(url);
 
             Url = url;
         }

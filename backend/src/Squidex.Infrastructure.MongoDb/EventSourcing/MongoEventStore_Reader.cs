@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string? streamFilter = null, string? position = null)
         {
-            Guard.NotNull(subscriber, nameof(subscriber));
+            Guard.NotNull(subscriber);
 
             if (CanUseChangeStreams)
             {
@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task<IReadOnlyList<StoredEvent>> QueryReverseAsync(string streamName, int count = int.MaxValue,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             if (count <= 0)
             {
@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             using (Telemetry.Activities.StartActivity("MongoEventStore/QueryAsync"))
             {
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<StoredEvent>>> QueryManyAsync(IEnumerable<string> streamNames,
             CancellationToken ct = default)
         {
-            Guard.NotNull(streamNames, nameof(streamNames));
+            Guard.NotNull(streamNames);
 
             using (Telemetry.Activities.StartActivity("MongoEventStore/QueryManyAsync"))
             {

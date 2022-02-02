@@ -26,9 +26,9 @@ namespace Squidex.Infrastructure.Tasks
 
         public PartitionedActionBlock(Func<TInput, Task> action, Func<TInput, long> partitioner, ExecutionDataflowBlockOptions dataflowBlockOptions)
         {
-            Guard.NotNull(action, nameof(action));
-            Guard.NotNull(partitioner, nameof(partitioner));
-            Guard.NotNull(dataflowBlockOptions, nameof(dataflowBlockOptions));
+            Guard.NotNull(action);
+            Guard.NotNull(partitioner);
+            Guard.NotNull(dataflowBlockOptions);
             Guard.GreaterThan(dataflowBlockOptions.MaxDegreeOfParallelism, 1, nameof(dataflowBlockOptions.MaxDegreeOfParallelism));
 
             workers = new ActionBlock<TInput>[dataflowBlockOptions.MaxDegreeOfParallelism];

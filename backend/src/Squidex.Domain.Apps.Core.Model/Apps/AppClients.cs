@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Revoke(string id)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             if (!this.TryRemove(id, out var updated))
             {
@@ -40,8 +40,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public AppClients Add(string id, string secret, string? role = null)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
-            Guard.NotNullOrEmpty(secret, nameof(secret));
+            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(secret);
 
             var newClient = new AppClient(id, secret)
             {
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             long? apiTrafficLimit = null,
             bool? allowAnonymous = false)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             if (!TryGetValue(id, out var client))
             {
