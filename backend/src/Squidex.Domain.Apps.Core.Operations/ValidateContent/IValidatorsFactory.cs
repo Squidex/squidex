@@ -7,6 +7,8 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public delegate IValidator ValidatorFactory(IField field);

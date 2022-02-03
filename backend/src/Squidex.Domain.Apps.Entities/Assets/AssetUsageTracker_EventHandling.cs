@@ -10,6 +10,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.UsageTracking;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public partial class AssetUsageTracker : IEventConsumer

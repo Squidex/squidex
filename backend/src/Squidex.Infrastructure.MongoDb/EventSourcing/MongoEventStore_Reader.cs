@@ -11,6 +11,8 @@ using NodaTime;
 using Squidex.Infrastructure.MongoDb;
 using EventFilter = MongoDB.Driver.FilterDefinition<Squidex.Infrastructure.EventSourcing.MongoEventCommit>;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Infrastructure.EventSourcing
 {
     public delegate bool EventPredicate(MongoEvent data);

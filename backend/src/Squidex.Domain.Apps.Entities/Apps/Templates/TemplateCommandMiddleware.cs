@@ -9,6 +9,8 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
     public delegate Task PublishTemplate(IAppCommand command);

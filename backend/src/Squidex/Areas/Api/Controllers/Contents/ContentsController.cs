@@ -24,12 +24,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
-        private readonly GraphQLMiddleware graphQLMiddleware;
+        private readonly GraphQLRunner graphQLMiddleware;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
             IContentWorkflow contentWorkflow,
-            GraphQLMiddleware graphQLMiddleware)
+            GraphQLRunner graphQLMiddleware)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;

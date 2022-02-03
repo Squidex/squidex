@@ -10,6 +10,8 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Text;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class SchemaInfo

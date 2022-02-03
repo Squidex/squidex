@@ -7,8 +7,8 @@
 
 using GraphQL;
 using GraphQL.DataLoader;
+using GraphQL.Server;
 using GraphQL.Server.Transports.AspNetCore;
-using GraphQL.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Localization;
@@ -86,10 +86,11 @@ namespace Squidex.Config.Web
         public static void AddSquidexGraphQL(this IServiceCollection services)
         {
             GraphQL.MicrosoftDI.GraphQLBuilderExtensions.AddGraphQL(services)
-                .ConfigureExecution(options =>
+                .AddServer(false, options =>
                 {
                     options.EnableMetrics = false;
                 })
+                .AddSchema<DummySchema>()
                 .AddSquidexWriter()
                 .AddSystemTextJson()
                 .AddDataLoader();
@@ -103,7 +104,7 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<DynamicUserContextBuilder>()
                 .As<IUserContextBuilder>();
 
-            services.AddSingletonAs<GraphQLMiddleware>()
+            services.AddSingletonAs<GraphQLRunner>()
                 .AsSelf();
         }
     }

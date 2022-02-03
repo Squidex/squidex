@@ -84,9 +84,6 @@ dotnet_diagnostic.MA0038.severity = none
 
 # MA0039: Do not write your own certificate validation method
 dotnet_diagnostic.MA0039.severity = none
-
-# MA0048: File name must match type name
-dotnet_diagnostic.MA0048.severity = none
   
 # MA0049: Type name should not match containing namespace
 dotnet_diagnostic.MA0049.severity = none

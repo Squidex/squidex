@@ -11,6 +11,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure.Http;
 using Squidex.Infrastructure.Json;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Extensions.Actions.Medium
 {
     public sealed class MediumActionHandler : RuleActionHandler<MediumAction, MediumJob>

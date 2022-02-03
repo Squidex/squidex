@@ -10,13 +10,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace Squidex.Web.GraphQL
 {
-    public sealed class GraphQLMiddleware : GraphQLHttpMiddleware<DummySchema>
+    public sealed class GraphQLRunner
     {
-        private static readonly RequestDelegate Noop = _ => Task.CompletedTask;
+        private readonly GraphQLHttpMiddleware<DummySchema> middleware;
 
-        public GraphQLMiddleware(IGraphQLRequestDeserializer deserializer)
-            : base(Noop, deserializer)
+        public GraphQLRunner(IGraphQLRequestDeserializer deserializer)
         {
+            middleware = new GraphQLHttpMiddleware<DummySchema>(x => Task.CompletedTask, deserializer);
+        }
+
+        public Task InvokeAsync(HttpContext context)
+        {
+            return middleware.InvokeAsync(context);
         }
     }
 }

@@ -12,7 +12,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    internal class WritableContext : ObjectInstance
+    internal sealed class WritableContext : ObjectInstance
     {
         private readonly ScriptVars vars;
 

@@ -10,6 +10,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Text;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public delegate (JsonSchema Reference, JsonSchema? Actual) JsonTypeFactory(string name);

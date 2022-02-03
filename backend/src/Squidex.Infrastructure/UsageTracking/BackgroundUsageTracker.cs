@@ -102,7 +102,9 @@ namespace Squidex.Infrastructure.UsageTracking
 
             category = GetCategory(category);
 
+#pragma warning disable MA0105 // Use the lambda parameters instead of using a closure
             jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumUp(counters));
+#pragma warning restore MA0105 // Use the lambda parameters instead of using a closure
 
             return Task.CompletedTask;
         }

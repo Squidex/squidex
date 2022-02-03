@@ -9,6 +9,8 @@ using System.Text;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Extensions.Actions.Discourse
 {
     public sealed class DiscourseActionHandler : RuleActionHandler<DiscourseAction, DiscourseJob>

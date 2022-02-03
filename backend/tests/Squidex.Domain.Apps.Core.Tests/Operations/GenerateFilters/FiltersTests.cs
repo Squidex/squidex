@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
 
             var queryModel = ContentQueryModel.Build(schema, languagesConfig.ToResolver(), components);
 
-            Assert.NotNull(queryModel);
+            CheckFields(queryModel.Schema, schema);
         }
 
         [Fact]

@@ -8,6 +8,8 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Infrastructure
 {
     public delegate bool Parser<T>(ReadOnlySpan<char> input, out T result);

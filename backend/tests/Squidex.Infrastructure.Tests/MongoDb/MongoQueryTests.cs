@@ -311,7 +311,7 @@ namespace Squidex.Infrastructure.MongoDb
                 .MustHaveHappened();
         }
 
-        private void AssertQuery(string expected, FilterNode<ClrValue> filter, object? arg = null)
+        private static void AssertQuery(string expected, FilterNode<ClrValue> filter, object? arg = null)
         {
             AssertQuery(new ClrQuery { Filter = filter }, expected, arg);
         }

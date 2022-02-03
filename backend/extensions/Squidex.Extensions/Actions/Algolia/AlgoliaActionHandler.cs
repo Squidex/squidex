@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Algolia
 {

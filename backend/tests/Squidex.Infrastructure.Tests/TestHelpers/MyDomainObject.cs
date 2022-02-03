@@ -11,6 +11,8 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Log;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Infrastructure.TestHelpers
 {
     public sealed class MyDomainObject : DomainObject<MyDomainState>
@@ -32,7 +34,7 @@ namespace Squidex.Infrastructure.TestHelpers
 
         protected override bool CanRecreate(IEvent @event)
         {
-            return RecreateEvent ? @event is ValueChanged : false;
+            return RecreateEvent && @event is ValueChanged;
         }
 
         protected override bool CanRecreate()

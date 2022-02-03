@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Tags;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 {
-    public static class TagService
+    public static class TagsExtensions
     {
         public static async Task<HashSet<string>> NormalizeTags(this AssetOperation operation, HashSet<string> tags)
         {

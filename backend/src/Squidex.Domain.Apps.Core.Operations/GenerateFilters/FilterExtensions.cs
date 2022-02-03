@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.GenerateFilters
 {
-    public static class JsonSchemaExtensions
+    public static class FilterExtensions
     {
         public static FilterSchema BuildDataSchema(this Schema schema, PartitionResolver partitionResolver,
             ResolvedComponents components)

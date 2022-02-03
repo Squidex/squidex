@@ -65,8 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             Task.Run(async () =>
             {
-                await Task.WhenAll(
-                    SetupAsync(ContentRepository, mongoDatabase));
+                await SetupAsync(ContentRepository, mongoDatabase);
             }).Wait();
         }
 
