@@ -7,6 +7,7 @@
 
 using GraphQL;
 using GraphQL.DataLoader;
+using GraphQL.DI;
 using GraphQL.Server;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Caching;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web;
@@ -98,11 +100,11 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<DummySchema>()
                 .AsSelf();
 
-            services.AddSingletonAs<DynamicExecutor>()
-                .As<IDocumentExecuter>();
-
             services.AddSingletonAs<DynamicUserContextBuilder>()
                 .As<IUserContextBuilder>();
+
+            services.AddSingletonAs<CachingGraphQLResolver>()
+                .As<IConfigureExecution>();
 
             services.AddSingletonAs<GraphQLRunner>()
                 .AsSelf();

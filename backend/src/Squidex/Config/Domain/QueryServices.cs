@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -36,9 +36,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<JsonNoopGraphType>()
                 .AsSelf();
-
-            services.AddSingletonAs<CachingGraphQLService>()
-                .As<IGraphQLService>();
         }
     }
 }

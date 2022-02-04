@@ -35,7 +35,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
             Context context,
             IDataLoaderContextAccessor dataLoaders,
-            ICommandBus commandBus, IUrlGenerator urlGenerator, IUserResolver userResolver,
+            ICommandBus commandBus,
+            IUrlGenerator urlGenerator,
+            IUserResolver userResolver,
             ISemanticLog log)
             : base(assetQuery, contentQuery)
         {
