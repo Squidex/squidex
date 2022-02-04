@@ -10,6 +10,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Text;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public delegate (JsonSchema Reference, JsonSchema? Actual) JsonTypeFactory(string name);
@@ -29,8 +31,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             bool withHidden = false,
             bool withComponents = false)
         {
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(components);
 
             factory ??= DefaultFactory;
 
@@ -64,8 +66,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             bool withHidden = false,
             bool withComponents = false)
         {
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(components);
 
             factory ??= DefaultFactory;
 
@@ -102,8 +104,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             bool withHidden = false,
             bool withComponents = false)
         {
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(components, nameof(components));
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(components);
 
             factory ??= DefaultFactory;
 

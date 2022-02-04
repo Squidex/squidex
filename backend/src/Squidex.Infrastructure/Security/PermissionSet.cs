@@ -43,14 +43,14 @@ namespace Squidex.Infrastructure.Security
 
         public PermissionSet Add(string permission)
         {
-            Guard.NotNullOrEmpty(permission, nameof(permission));
+            Guard.NotNullOrEmpty(permission);
 
             return Add(new Permission(permission));
         }
 
         public PermissionSet Add(Permission permission)
         {
-            Guard.NotNull(permission, nameof(permission));
+            Guard.NotNull(permission);
 
             return new PermissionSet(this.Union(Enumerable.Repeat(permission, 1)).Distinct());
         }

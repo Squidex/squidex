@@ -42,8 +42,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
         public async Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default)
         {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
+            Guard.NotNull(vars);
+            Guard.NotNullOrEmpty(script);
 
             using (var cts = new CancellationTokenSource(timeoutExecution))
             {
@@ -80,8 +80,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
         public async Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default)
         {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
+            Guard.NotNull(vars);
+            Guard.NotNullOrEmpty(script);
 
             using (var cts = new CancellationTokenSource(timeoutExecution))
             {
@@ -137,8 +137,8 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
         {
-            Guard.NotNull(vars, nameof(vars));
-            Guard.NotNullOrEmpty(script, nameof(script));
+            Guard.NotNull(vars);
+            Guard.NotNullOrEmpty(script);
 
             var context =
                 CreateEngine(options)

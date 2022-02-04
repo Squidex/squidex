@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         public AssetOperation(IServiceProvider serviceProvider, Func<IAssetEntity> snapshot)
             : base(serviceProvider, snapshot)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider);
         }
 
         public static async Task<AssetOperation> CreateAsync(IServiceProvider services, AssetCommand command, Func<IAssetEntity> snapshot)

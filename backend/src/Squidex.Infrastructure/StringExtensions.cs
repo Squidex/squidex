@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure
 
         public static string BuildFullUrl(this string baseUrl, string path, bool trailingSlash = false)
         {
-            Guard.NotNull(path, nameof(path));
+            Guard.NotNull(path);
 
             var url = $"{baseUrl.TrimEnd('/')}/{path.Trim('/')}";
 
@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure
 
         public static string JoinNonEmpty(string separator, params string?[] parts)
         {
-            Guard.NotNull(separator, nameof(separator));
+            Guard.NotNull(separator);
 
             if (parts == null || parts.Length == 0)
             {

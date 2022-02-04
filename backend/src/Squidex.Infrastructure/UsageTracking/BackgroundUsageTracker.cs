@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.UsageTracking
         public Task DeleteAsync(string key,
             CancellationToken ct = default)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             return usageRepository.DeleteAsync(key, ct);
         }
@@ -95,14 +95,16 @@ namespace Squidex.Infrastructure.UsageTracking
         public Task TrackAsync(DateTime date, string key, string? category, Counters counters,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
-            Guard.NotNull(counters, nameof(counters));
+            Guard.NotNullOrEmpty(key);
+            Guard.NotNull(counters);
 
             ThrowIfDisposed();
 
             category = GetCategory(category);
 
+#pragma warning disable MA0105 // Use the lambda parameters instead of using a closure
             jobs.AddOrUpdate((key, category, date), counters, (k, p) => p.SumUp(counters));
+#pragma warning restore MA0105 // Use the lambda parameters instead of using a closure
 
             return Task.CompletedTask;
         }
@@ -110,7 +112,7 @@ namespace Squidex.Infrastructure.UsageTracking
         public async Task<Dictionary<string, List<(DateTime, Counters)>>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             ThrowIfDisposed();
 
@@ -161,7 +163,7 @@ namespace Squidex.Infrastructure.UsageTracking
         public async Task<Counters> GetAsync(string key, DateTime fromDate, DateTime toDate, string? category,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             ThrowIfDisposed();
 

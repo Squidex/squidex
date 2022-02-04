@@ -36,8 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(asset, nameof(asset));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(asset);
+            Guard.NotNull(context);
 
             var enriched = await EnrichAsync(Enumerable.Repeat(asset, 1), context, ct);
 
@@ -47,8 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(assets, nameof(assets));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(assets);
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/EnrichAsync"))
             {

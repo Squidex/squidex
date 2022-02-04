@@ -73,8 +73,8 @@ namespace Squidex.Extensions.Text.Azure
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(app);
+            Guard.NotNull(query);
 
             var result = new List<(DomainId Id, double Score)>();
 
@@ -86,8 +86,8 @@ namespace Squidex.Extensions.Text.Azure
         public async Task<List<DomainId>> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(app);
+            Guard.NotNull(query);
 
             var parsed = queryParser.Parse(query.Text);
 

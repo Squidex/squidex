@@ -94,8 +94,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : CommentsCommand
         {
-            Guard.NotNull(command, nameof(command));
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(command);
+            Guard.NotNull(handler);
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {

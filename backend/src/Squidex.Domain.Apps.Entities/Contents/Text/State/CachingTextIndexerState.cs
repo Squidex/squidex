@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public CachingTextIndexerState(ITextIndexerState inner)
         {
-            Guard.NotNull(inner, nameof(inner));
+            Guard.NotNull(inner);
 
             this.inner = inner;
         }
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         public async Task<Dictionary<DomainId, TextContentState>> GetAsync(HashSet<DomainId> ids,
             CancellationToken ct = default)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             var missingIds = new HashSet<DomainId>();
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
         public Task SetAsync(List<TextContentState> updates,
             CancellationToken ct = default)
         {
-            Guard.NotNull(updates, nameof(updates));
+            Guard.NotNull(updates);
 
             foreach (var update in updates)
             {

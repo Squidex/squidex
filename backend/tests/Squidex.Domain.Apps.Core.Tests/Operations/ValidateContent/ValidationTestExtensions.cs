@@ -15,6 +15,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
     public delegate ValidationContext ValidationUpdater(ValidationContext context);

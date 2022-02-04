@@ -17,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         protected FieldBase(long id, string name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.GreaterThan(id, 0, nameof(id));
+            Guard.NotNullOrEmpty(name);
+            Guard.GreaterThan(id, 0);
 
             Id = id;
 

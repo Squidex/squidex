@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private JsonObject? GetContainer(string path, bool add, out string key)
         {
-            Guard.NotNullOrEmpty(path, nameof(path));
+            Guard.NotNullOrEmpty(path);
 
             var segments = path.Split('.');
 

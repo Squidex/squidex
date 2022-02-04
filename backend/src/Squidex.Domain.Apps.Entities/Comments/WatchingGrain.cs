@@ -38,8 +38,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public Task<string[]> GetWatchingUsersAsync(string resource, string userId)
         {
-            Guard.NotNullOrEmpty(resource, nameof(resource));
-            Guard.NotNullOrEmpty(userId, nameof(userId));
+            Guard.NotNullOrEmpty(resource);
+            Guard.NotNullOrEmpty(userId);
 
             var usersByResource = users.GetOrAddNew(resource);
 

@@ -31,10 +31,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories, ISemanticLog log)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(factories, nameof(factories));
-            Guard.NotNull(partitionResolver, nameof(partitionResolver));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(context);
+            Guard.NotNull(factories);
+            Guard.NotNull(partitionResolver);
+            Guard.NotNull(log);
 
             this.context = context;
             this.factories = factories;
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public ValueTask ValidateInputPartialAsync(ContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = CreateSchemaValidator(true);
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public ValueTask ValidateInputAsync(ContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = CreateSchemaValidator(false);
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public ValueTask ValidateContentAsync(ContentData data)
         {
-            Guard.NotNull(data, nameof(data));
+            Guard.NotNull(data);
 
             var validator = new AggregateValidator(CreateContentValidators(), log);
 

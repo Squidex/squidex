@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.UsageTracking
         public Task DeleteAsync(string key,
             CancellationToken ct = default)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             return Collection.DeleteManyAsync(x => x.Key == key, ct);
         }
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.UsageTracking
         public async Task TrackUsagesAsync(UsageUpdate update,
             CancellationToken ct = default)
         {
-            Guard.NotNull(update, nameof(update));
+            Guard.NotNull(update);
 
             if (update.Counters.Count > 0)
             {
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.UsageTracking
         public async Task TrackUsagesAsync(UsageUpdate[] updates,
             CancellationToken ct = default)
         {
-            Guard.NotNull(updates, nameof(updates));
+            Guard.NotNull(updates);
 
             if (updates.Length == 1)
             {

@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         protected MongoRepositoryBase(IMongoDatabase database, bool setup = false)
         {
-            Guard.NotNull(database, nameof(database));
+            Guard.NotNull(database);
 
             mongoDatabase = database;
 

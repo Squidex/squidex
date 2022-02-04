@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
     {
         public static void CanCreate(CreateComment command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
 
         public static void CanUpdate(UpdateComment command, string commentsId, List<Envelope<CommentsEvent>> events)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var comment = FindComment(events, command.CommentId);
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards
 
         public static void CanDelete(DeleteComment command, string commentsId, List<Envelope<CommentsEvent>> events)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var comment = FindComment(events, command.CommentId);
 

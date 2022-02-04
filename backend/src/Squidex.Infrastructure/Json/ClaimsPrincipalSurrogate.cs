@@ -7,6 +7,8 @@
 
 using System.Security.Claims;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Infrastructure.Json
 {
     public sealed class ClaimsPrincipalSurrogate : List<ClaimsIdentitySurrogate>, ISurrogate<ClaimsPrincipal>

@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public StreamMapper(RestoreContext context)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             this.context = context;
 
@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public (string Stream, DomainId) Map(string stream)
         {
-            Guard.NotNullOrEmpty(stream, nameof(stream));
+            Guard.NotNullOrEmpty(stream);
 
             var typeIndex = stream.IndexOf("-", StringComparison.Ordinal);
             var typeName = stream[..typeIndex];
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public long GetStreamOffset(string streamName)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNullOrEmpty(streamName);
 
             if (!streams.TryGetValue(streamName, out var offset))
             {

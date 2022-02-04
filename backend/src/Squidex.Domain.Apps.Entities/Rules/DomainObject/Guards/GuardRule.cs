@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
     {
         public static Task CanCreate(CreateRule command, IAppProvider appProvider)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             return Validate.It(async e =>
             {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
 
         public static Task CanUpdate(UpdateRule command, IRuleEntity rule, IAppProvider appProvider)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             return Validate.It(async e =>
             {

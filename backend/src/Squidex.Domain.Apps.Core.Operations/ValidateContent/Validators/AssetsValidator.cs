@@ -11,6 +11,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public delegate Task<IReadOnlyList<IAssetInfo>> CheckAssets(IEnumerable<DomainId> ids);
@@ -24,8 +26,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public AssetsValidator(bool isRequired, AssetsFieldProperties properties, CheckAssets checkAssets)
         {
-            Guard.NotNull(properties, nameof(properties));
-            Guard.NotNull(checkAssets, nameof(checkAssets));
+            Guard.NotNull(properties);
+            Guard.NotNull(checkAssets);
 
             this.properties = properties;
 

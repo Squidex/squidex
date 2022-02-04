@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IResultList<IContentEntity>> QueryAsync(DomainId appId, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(q);
 
             if (q.Ids == null || q.Ids.Count == 0)
             {

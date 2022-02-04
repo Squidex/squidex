@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
 
             var queryModel = ContentQueryModel.Build(schema, languagesConfig.ToResolver(), components);
 
-            Assert.NotNull(queryModel);
+            CheckFields(queryModel.Schema, schema);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
 
             void CheckField(IField field)
             {
-                if (!field.IsForApi())
+                if (!field.IsForApi(true))
                 {
                     Assert.DoesNotContain(field.Name, filterProperties);
                 }

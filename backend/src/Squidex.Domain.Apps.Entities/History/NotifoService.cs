@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public async Task HandleEventsAsync(IEnumerable<(Envelope<AppEvent> AppEvent, HistoryEvent? HistoryEvent)> events)
         {
-            Guard.NotNull(events, nameof(events));
+            Guard.NotNull(events);
 
             if (client == null)
             {
@@ -270,7 +270,7 @@ namespace Squidex.Domain.Apps.Entities.History
         {
             var publishRequest = new PublishDto
             {
-                Properties = new EventProperties()
+                Properties = new NotificationProperties()
             };
 
             foreach (var (key, value) in historyEvent.Parameters)

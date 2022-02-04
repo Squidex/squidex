@@ -103,8 +103,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
         public virtual async Task<List<DomainId>?> SearchAsync(IAppEntity app, GeoQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(app);
+            Guard.NotNull(query);
 
             var findFilter =
                 Filter.And(
@@ -123,8 +123,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Text
         public virtual async Task<List<DomainId>?> SearchAsync(IAppEntity app, TextQuery query, SearchScope scope,
             CancellationToken ct = default)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(app);
+            Guard.NotNull(query);
 
             var (search, take) = query;
 

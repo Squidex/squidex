@@ -83,23 +83,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return ExcecuteAsync(options, context);
         }
 
-        private Task<ExecutionResult> ExcecuteAsync(ExecutionOptions options, Context context)
+        private async Task<ExecutionResult> ExcecuteAsync(ExecutionOptions options, Context context)
         {
             var sut = CreateSut(TestSchemas.Default, TestSchemas.Ref1, TestSchemas.Ref2);
 
             options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context)!;
 
-            var listener = sut.Services.GetService<DataLoaderDocumentListener>();
-
-            if (listener != null)
+            foreach (var listener in sut.Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
             {
                 options.Listeners.Add(listener);
             }
 
-            return sut.ExecuteAsync(options);
+            await sut.ConfigureAsync(options);
+
+            return await new DocumentExecuter().ExecuteAsync(options);
         }
 
-        protected CachingGraphQLService CreateSut(params ISchemaEntity[] schemas)
+        protected CachingGraphQLResolver CreateSut(params ISchemaEntity[] schemas)
         {
             var cache = new BackgroundCache(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
@@ -108,20 +108,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => appProvider.GetSchemasAsync(TestApp.Default.Id, default))
                 .Returns(schemas.ToList());
 
-            var dataLoaderContext = (IDataLoaderContextAccessor)new DataLoaderContextAccessor();
-            var dataLoaderListener = new DataLoaderDocumentListener(dataLoaderContext);
-
             var services =
                 new ServiceCollection()
                     .AddMemoryCache()
                     .AddTransient<GraphQLExecutionContext>()
+                    .AddSingleton<IDocumentExecutionListener,
+                        DataLoaderDocumentListener>()
+                    .AddSingleton<IDataLoaderContextAccessor,
+                        DataLoaderContextAccessor>()
                     .AddSingleton(A.Fake<ISemanticLog>())
                     .AddSingleton(appProvider)
                     .AddSingleton(assetQuery)
                     .AddSingleton(commandBus)
                     .AddSingleton(contentQuery)
-                    .AddSingleton(dataLoaderContext)
-                    .AddSingleton(dataLoaderListener)
                     .AddSingleton(userResolver)
                     .AddSingleton<InstantGraphType>()
                     .AddSingleton<JsonGraphType>()
@@ -133,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var schemasHash = A.Fake<ISchemasHash>();
 
-            return new CachingGraphQLService(cache, schemasHash, services, Options.Create(new GraphQLOptions()));
+            return new CachingGraphQLResolver(cache, schemasHash, services, Options.Create(new GraphQLOptions()));
         }
     }
 }

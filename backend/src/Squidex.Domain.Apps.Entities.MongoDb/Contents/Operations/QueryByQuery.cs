@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> QueryIdsAsync(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
             CancellationToken ct)
         {
-            Guard.NotNull(filterNode, nameof(filterNode));
+            Guard.NotNull(filterNode);
 
             try
             {
@@ -86,8 +86,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, List<ISchemaEntity> schemas, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(app);
+            Guard.NotNull(q);
 
             try
             {
@@ -122,9 +122,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Q q,
             CancellationToken ct)
         {
-            Guard.NotNull(app, nameof(app));
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(app);
+            Guard.NotNull(schema);
+            Guard.NotNull(q);
 
             try
             {

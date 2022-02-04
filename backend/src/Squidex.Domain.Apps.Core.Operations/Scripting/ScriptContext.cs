@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public bool TryGetValue<T>(string key, [MaybeNullWhen(false)] out T value)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             value = default!;
 

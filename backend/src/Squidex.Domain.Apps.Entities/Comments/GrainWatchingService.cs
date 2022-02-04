@@ -21,8 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         public Task<string[]> GetWatchingUsersAsync(DomainId appId, string resource, string userId)
         {
-            Guard.NotNullOrEmpty(resource, nameof(resource));
-            Guard.NotNullOrEmpty(userId, nameof(userId));
+            Guard.NotNullOrEmpty(resource);
+            Guard.NotNullOrEmpty(userId);
 
             return GetGrain(appId).GetWatchingUsersAsync(resource, userId);
         }

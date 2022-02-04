@@ -45,8 +45,8 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public Task RenameTagAsync(string name, string newName)
         {
-            Guard.NotNull(name, nameof(name));
-            Guard.NotNull(newName, nameof(newName));
+            Guard.NotNull(name);
+            Guard.NotNull(newName);
 
             name = NormalizeName(name);
 
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public Task<Dictionary<string, string>> GetTagIdsAsync(HashSet<string> names)
         {
-            Guard.NotNull(names, nameof(names));
+            Guard.NotNull(names);
 
             var result = new Dictionary<string, string>();
 

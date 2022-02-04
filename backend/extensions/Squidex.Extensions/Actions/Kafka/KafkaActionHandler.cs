@@ -8,6 +8,8 @@
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Extensions.Actions.Kafka
 {
     public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob>

@@ -44,8 +44,8 @@ namespace Squidex.Infrastructure.Commands
 
         protected DomainObject(IPersistenceFactory<T> factory, ISemanticLog log)
         {
-            Guard.NotNull(factory, nameof(factory));
-            Guard.NotNull(log, nameof(log));
+            Guard.NotNull(factory);
+            Guard.NotNull(log);
 
             this.factory = factory;
 
@@ -163,7 +163,7 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task<CommandResult> DeleteCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler) where TCommand : ICommand
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handler);
 
             var previousSnapshot = Snapshot;
             var previousVersion = Version;
@@ -206,7 +206,7 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task<CommandResult> UpsertCoreAsync<TCommand>(TCommand command, Func<TCommand, Task<object?>> handler, bool isCreation = false) where TCommand : ICommand
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handler);
 
             var wasDeleted = IsDeleted(Snapshot);
 

@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Commands
             CancellationToken ct = default)
             where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
-            Guard.NotNull(source, nameof(source));
+            Guard.NotNull(source);
 
             var ids = source.ToAsyncEnumerable();
 

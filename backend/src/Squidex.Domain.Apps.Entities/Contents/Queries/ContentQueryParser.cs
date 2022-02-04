@@ -47,8 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public virtual async Task<Q> ParseAsync(Context context, Q q, ISchemaEntity? schema = null)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(q, nameof(q));
+            Guard.NotNull(context);
+            Guard.NotNull(q);
 
             using (Telemetry.Activities.StartActivity("ContentQueryParser/ParseAsync"))
             {

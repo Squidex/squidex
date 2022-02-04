@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Json.Objects
             }
             set
             {
-                Guard.NotNull(key, nameof(key));
+                Guard.NotNull(key);
 
                 inner[key] = value ?? JsonValue.Null;
             }
@@ -60,14 +60,14 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public JsonObject(JsonObject obj)
         {
-            Guard.NotNull(obj, nameof(obj));
+            Guard.NotNull(obj);
 
             inner = new Dictionary<string, IJsonValue>(obj.inner);
         }
 
         public JsonObject(Dictionary<string, IJsonValue> source)
         {
-            Guard.NotNull(source, nameof(source));
+            Guard.NotNull(source);
 
             inner = source;
         }
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result)
         {
-            Guard.NotNull(pathSegment, nameof(pathSegment));
+            Guard.NotNull(pathSegment);
 
             return TryGetValue(pathSegment, out result!);
         }

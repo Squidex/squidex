@@ -7,9 +7,9 @@
 
 using System.Security.Claims;
 using GraphQL;
+using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.NewtonsoftJson;
-using GraphQL.Server;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -31,6 +31,7 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
+using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace Squidex.Config.Domain
 {
@@ -126,12 +127,12 @@ namespace Squidex.Config.Domain
 
         public static IGraphQLBuilder AddSquidexWriter(this IGraphQLBuilder builder)
         {
-            builder.Services.AddSingleton<IDocumentWriter>(c =>
+            builder.Register<IDocumentWriter>(c =>
             {
                 var serializer = new NewtonsoftJsonSerializer(ConfigureJson(TypeNameHandling.None));
 
                 return new DefaultDocumentWriter(serializer);
-            });
+            }, ServiceLifetime.Singleton);
 
             return builder;
         }

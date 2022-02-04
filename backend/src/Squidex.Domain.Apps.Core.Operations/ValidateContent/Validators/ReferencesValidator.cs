@@ -10,6 +10,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public delegate Task<IReadOnlyList<(DomainId SchemaId, DomainId Id, Status Status)>> CheckContentsByIds(HashSet<DomainId> ids);
@@ -23,8 +25,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public ReferencesValidator(bool isRequired, ReferencesFieldProperties properties, CheckContentsByIds checkReferences)
         {
-            Guard.NotNull(properties, nameof(properties));
-            Guard.NotNull(checkReferences, nameof(checkReferences));
+            Guard.NotNull(properties);
+            Guard.NotNull(checkReferences);
 
             this.properties = properties;
 

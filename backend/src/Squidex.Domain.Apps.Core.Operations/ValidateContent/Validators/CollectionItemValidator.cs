@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public CollectionItemValidator(IValidator itemValidator)
         {
-            Guard.NotNull(itemValidator, nameof(itemValidator));
+            Guard.NotNull(itemValidator);
 
             this.itemValidator = itemValidator;
         }

@@ -25,9 +25,9 @@ namespace Squidex.Infrastructure.Translations
 
         public (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null)
         {
-            Guard.NotNull(culture, nameof(culture));
-            Guard.NotNullOrEmpty(key, nameof(key));
-            Guard.NotNull(fallback, nameof(fallback));
+            Guard.NotNull(culture);
+            Guard.NotNullOrEmpty(key);
+            Guard.NotNull(fallback);
 
             var translation = GetCore(culture, key);
 

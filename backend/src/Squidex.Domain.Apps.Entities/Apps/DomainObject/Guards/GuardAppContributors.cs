@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
     {
         public static Task CanAssign(AssignContributor command, IAppEntity app, IUserResolver users, IAppLimitsPlan plan)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var contributors = app.Contributors;
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanRemove(RemoveContributor command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var contributors = app.Contributors;
 

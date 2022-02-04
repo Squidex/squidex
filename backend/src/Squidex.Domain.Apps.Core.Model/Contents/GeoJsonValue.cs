@@ -19,8 +19,8 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         public static GeoJsonParseResult TryParse(IJsonValue value, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
         {
-            Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(value, nameof(value));
+            Guard.NotNull(serializer);
+            Guard.NotNull(value);
 
             geoJSON = null;
 

@@ -22,7 +22,7 @@ namespace Squidex.Web.Pipeline
 
         public SchemaResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(appProvider);
 
             this.appProvider = appProvider;
         }

@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public GrainBootstrap(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(grainFactory);
 
             this.grainFactory = grainFactory;
         }

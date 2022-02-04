@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using GraphQL;
+using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -15,14 +16,14 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Log;
+using GraphQLSchema = GraphQL.Types.Schema;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 #pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public sealed class CachingGraphQLService : IGraphQLService
+    public sealed class CachingGraphQLResolver : IConfigureExecution
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IBackgroundCache cache;
@@ -30,14 +31,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly IServiceProvider serviceProvider;
         private readonly GraphQLOptions options;
 
-        private sealed record CacheEntry(GraphQLModel Model, string Hash, Instant Created);
+        private sealed record CacheEntry(GraphQLSchema Model, string Hash, Instant Created);
 
         public IServiceProvider Services
         {
             get => serviceProvider;
         }
 
-        public CachingGraphQLService(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider, IOptions<GraphQLOptions> options)
+        public CachingGraphQLResolver(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider,
+            IOptions<GraphQLOptions> options)
         {
             this.cache = cache;
             this.schemasHash = schemasHash;
@@ -45,16 +47,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.options = options.Value;
         }
 
-        public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        public async Task ConfigureAsync(ExecutionOptions executionOptions)
         {
-            var context = ((GraphQLExecutionContext)options.UserContext!).Context;
+            var context = ((GraphQLExecutionContext)executionOptions.UserContext!).Context;
 
-            var model = await GetModelAsync(context.App);
-
-            return await model.ExecuteAsync(options);
+            executionOptions.Schema = await GetSchemaAsync(context.App);
         }
 
-        public async Task<GraphQLModel> GetModelAsync(IAppEntity app)
+        public async Task<GraphQLSchema> GetSchemaAsync(IAppEntity app)
         {
             var entry = await GetModelEntryAsync(app);
 
@@ -84,15 +84,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private async Task<CacheEntry> CreateModelAsync(IAppEntity app)
         {
-            var allSchemas = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
+            var schemas = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
 
-            var hash = await schemasHash.ComputeHashAsync(app, allSchemas);
+            var hash = await schemasHash.ComputeHashAsync(app, schemas);
 
             return new CacheEntry(
-                new GraphQLModel(app,
-                    allSchemas,
-                    serviceProvider.GetRequiredService<SharedTypes>(),
-                    serviceProvider.GetRequiredService<ISemanticLog>()),
+                new Builder(app, serviceProvider.GetRequiredService<SharedTypes>()).BuildSchema(schemas),
                 hash,
                 SystemClock.Instance.GetCurrentInstant());
         }

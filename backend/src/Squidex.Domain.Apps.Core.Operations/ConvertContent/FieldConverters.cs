@@ -13,6 +13,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public delegate ContentFieldData? FieldConverter(ContentFieldData data, IRootField field);

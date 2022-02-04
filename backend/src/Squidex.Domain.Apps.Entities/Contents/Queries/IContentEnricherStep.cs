@@ -9,6 +9,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public delegate Task<(ISchemaEntity Schema, ResolvedComponents Components)> ProvideSchema(DomainId id);

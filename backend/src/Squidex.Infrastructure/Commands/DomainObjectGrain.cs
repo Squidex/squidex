@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected DomainObjectGrain(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider);
 
             domainObject = serviceProvider.GetRequiredService<T>();
         }

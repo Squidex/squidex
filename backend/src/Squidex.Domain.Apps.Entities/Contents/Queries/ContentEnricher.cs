@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, bool cloneData, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(content, nameof(content));
+            Guard.NotNull(content);
 
             var enriched = await EnrichInternalAsync(Enumerable.Repeat(content, 1), cloneData, context, ct);
 
@@ -37,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context,
             CancellationToken ct)
         {
-            Guard.NotNull(contents, nameof(contents));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(contents);
+            Guard.NotNull(context);
 
             return EnrichInternalAsync(contents, false, context, ct);
         }

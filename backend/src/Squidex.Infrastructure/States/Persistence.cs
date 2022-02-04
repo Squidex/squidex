@@ -189,7 +189,7 @@ namespace Squidex.Infrastructure.States
 
         public async Task WriteEventsAsync(IReadOnlyList<Envelope<IEvent>> events)
         {
-            Guard.NotEmpty(events, nameof(events));
+            Guard.NotEmpty(events);
 
             var oldVersion = EtagVersion.Any;
 

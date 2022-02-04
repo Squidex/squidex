@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
+using GraphQLSchema = GraphQL.Types.Schema;
 using Schema = Squidex.Domain.Apps.Core.Schemas.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -119,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_create_empty_schema()
         {
-            var model = await CreateSut().GetModelAsync(TestApp.Default);
+            var model = await CreateSut().GetSchemaAsync(TestApp.Default);
 
             Assert.NotNull(model);
         }
@@ -132,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     NamedId.Of(DomainId.NewGuid(), "content"),
                     new Schema("content").Publish());
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
             Assert.NotNull(model);
         }
@@ -146,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     new Schema("content").Publish()
                         .AddUI(1, "ui", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
             Assert.NotNull(model);
         }
@@ -160,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     new Schema("content").Publish()
                         .AddComponent(1, "component", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
             Assert.NotNull(model);
         }
@@ -174,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     new Schema("content")
                         .AddString(1, "myField", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var model = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
             Assert.NotNull(model);
         }
@@ -188,9 +189,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     new Schema("content").Publish()
                         .AddString(1, "myField", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            Assert.Contains(model.Schema.AllTypes, x => x.Name == "ContentEntity");
+            Assert.Contains(graphQLSchema.AllTypes, x => x.Name == "ContentEntity");
         }
 
         [Fact]
@@ -202,9 +203,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     new Schema("my-schema").Publish()
                         .AddString(1, "content", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(model, "MySchema");
+            var type = FindDataType(graphQLSchema, "MySchema");
 
             Assert.Contains(type?.Fields, x => x.Name == "content");
         }
@@ -218,9 +219,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     new Schema("my-schema").Publish()
                         .AddString(1, "2-field", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(model, "MySchema");
+            var type = FindDataType(graphQLSchema, "MySchema");
 
             Assert.Contains(type?.Fields, x => x.Name == "gql_2Field");
         }
@@ -235,9 +236,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         .AddString(1, "my-field", Partitioning.Invariant)
                         .AddString(2, "my_field", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(model, "MySchema");
+            var type = FindDataType(graphQLSchema, "MySchema");
 
             Assert.Contains(type?.Fields, x => x.Name == "myField");
             Assert.Contains(type?.Fields, x => x.Name == "myField2");
@@ -254,9 +255,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             new ComponentFieldProperties())
                         .AddString(2, "my-string", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(model, "MySchema");
+            var type = FindDataType(graphQLSchema, "MySchema");
 
             Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponent");
         }
@@ -272,9 +273,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             new ComponentsFieldProperties())
                         .AddString(2, "my-string", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(model, "MySchema");
+            var type = FindDataType(graphQLSchema, "MySchema");
 
             Assert.DoesNotContain(type?.Fields, x => x.Name == "myComponents");
         }
@@ -290,16 +291,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             new ReferencesFieldProperties { SchemaId = DomainId.NewGuid() })
                         .AddString(2, "my-string", Partitioning.Invariant));
 
-            var model = await CreateSut(schema).GetModelAsync(TestApp.Default);
+            var graphQLSchema = await CreateSut(schema).GetSchemaAsync(TestApp.Default);
 
-            var type = FindDataType(model, "MySchema");
+            var type = FindDataType(graphQLSchema, "MySchema");
 
             Assert.DoesNotContain(type?.Fields, x => x.Name == "myReferences");
         }
 
-        private static IObjectGraphType? FindDataType(GraphQLModel model, string schema)
+        private static IObjectGraphType? FindDataType(GraphQLSchema graphQLSchema, string schema)
         {
-            var type = (IObjectGraphType)model.Schema.AllTypes.Single(x => x.Name == schema);
+            var type = (IObjectGraphType)graphQLSchema.AllTypes.Single(x => x.Name == schema);
 
             return (IObjectGraphType?)type.GetField("flatData")?.ResolvedType?.Flatten();
         }

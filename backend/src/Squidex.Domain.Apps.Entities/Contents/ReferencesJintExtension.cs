@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task GetReferencesAsync(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(callback);
 
             var ids = new List<DomainId>();
 

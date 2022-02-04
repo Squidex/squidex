@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             var appId = app.Id;
 

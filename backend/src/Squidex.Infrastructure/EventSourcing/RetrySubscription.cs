@@ -22,8 +22,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public RetrySubscription(IEventSubscriber eventSubscriber, Func<IEventSubscriber, IEventSubscription> eventSubscriptionFactory)
         {
-            Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
-            Guard.NotNull(eventSubscriptionFactory, nameof(eventSubscriptionFactory));
+            Guard.NotNull(eventSubscriber);
+            Guard.NotNull(eventSubscriptionFactory);
 
             this.eventSubscriber = eventSubscriber;
             this.eventSubscriptionFactory = eventSubscriptionFactory;

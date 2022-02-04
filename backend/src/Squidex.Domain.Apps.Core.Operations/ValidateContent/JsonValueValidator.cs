@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public static bool IsValid(IField field, IJsonValue value, IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(field, nameof(field));
-            Guard.NotNull(value, nameof(value));
+            Guard.NotNull(field);
+            Guard.NotNull(value);
 
             var args = new Args(value, jsonSerializer);
 

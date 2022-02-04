@@ -110,7 +110,7 @@ namespace Squidex.Infrastructure.Log
         public Task LogAsync(Request request,
             CancellationToken ct = default)
         {
-            Guard.NotNull(request, nameof(request));
+            Guard.NotNull(request);
 
             if (!IsEnabled)
             {

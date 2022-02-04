@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities
 
         protected OperationContextBase(IServiceProvider serviceProvider, Func<TSnapShot> snapshot)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(snapshot, nameof(snapshot));
+            Guard.NotNull(serviceProvider);
+            Guard.NotNull(snapshot);
 
             this.serviceProvider = serviceProvider;
             this.snapshot = snapshot;

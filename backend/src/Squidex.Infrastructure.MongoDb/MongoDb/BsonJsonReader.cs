@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonJsonReader(IBsonReader bsonReader)
         {
-            Guard.NotNull(bsonReader, nameof(bsonReader));
+            Guard.NotNull(bsonReader);
 
             this.bsonReader = bsonReader;
         }

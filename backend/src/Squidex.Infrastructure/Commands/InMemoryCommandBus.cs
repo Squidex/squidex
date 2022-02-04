@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task<CommandContext> PublishAsync(ICommand command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var context = new CommandContext(command, this);
 

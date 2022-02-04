@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupReader(IJsonSerializer serializer, Stream stream)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(serializer);
 
             this.serializer = serializer;
 
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public Task<Stream> OpenBlobAsync(string name,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             var entry = GetEntry(name);
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public async Task<T> ReadJsonAsync<T>(string name,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             var entry = GetEntry(name);
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public Task<bool> HasFileAsync(string name,
             CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
             var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
@@ -100,8 +100,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter,
             [EnumeratorCancellation] CancellationToken ct = default)
         {
-            Guard.NotNull(formatter, nameof(formatter));
-            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
+            Guard.NotNull(formatter);
+            Guard.NotNull(streamNameResolver);
 
             while (!ct.IsCancellationRequested)
             {

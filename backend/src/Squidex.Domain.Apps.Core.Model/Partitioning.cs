@@ -7,6 +7,8 @@
 
 using Squidex.Infrastructure;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core
 {
     public delegate IFieldPartitioning PartitionResolver(Partitioning key);
@@ -20,7 +22,7 @@ namespace Squidex.Domain.Apps.Core
 
         public Partitioning(string key)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             Key = key;
         }

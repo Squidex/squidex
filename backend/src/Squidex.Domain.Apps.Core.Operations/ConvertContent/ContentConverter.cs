@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         public static ContentData Convert(this ContentData content, Schema schema, params FieldConverter[] converters)
         {
-            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(schema);
 
             var result = new ContentData(content.Count);
 

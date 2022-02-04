@@ -134,7 +134,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public static IJsonValue Create(double value)
         {
-            Guard.ValidNumber(value, nameof(value));
+            Guard.ValidNumber(value);
 
             if (value == 0)
             {

@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindByHashAsync(Context context, string hash, string fileName, long fileSize,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("AssetQueryService/FindByHashAsync"))
             {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindBySlugAsync(Context context, string slug,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("AssetQueryService/FindBySlugAsync"))
             {
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindGlobalAsync(Context context, DomainId id,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("AssetQueryService/FindGlobalAsync"))
             {
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IEnrichedAssetEntity?> FindAsync(Context context, DomainId id, long version = EtagVersion.Any,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("AssetQueryService/FindAsync"))
             {
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, DomainId? parentId, Q q,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             if (q == null)
             {

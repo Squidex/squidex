@@ -559,7 +559,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 replace();
             ";
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
 
             var vars2 = new ScriptVars(vars)
             {

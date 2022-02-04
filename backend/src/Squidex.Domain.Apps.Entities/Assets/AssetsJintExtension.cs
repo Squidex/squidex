@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task GetTextAsync(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(callback);
 
             if (input is not ObjectWrapper objectWrapper)
             {
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task GetReferencesAsync(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(callback);
 
             var ids = new List<DomainId>();
 

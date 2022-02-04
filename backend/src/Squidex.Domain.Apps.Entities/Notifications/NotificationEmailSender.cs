@@ -57,8 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         public Task SendUsageAsync(IUser user, string appName, long usage, long usageLimit)
         {
-            Guard.NotNull(user, nameof(user));
-            Guard.NotNull(appName, nameof(appName));
+            Guard.NotNull(user);
+            Guard.NotNull(appName);
 
             var vars = new TemplatesVars
             {
@@ -75,9 +75,9 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         public Task SendInviteAsync(IUser assigner, IUser user, string appName)
         {
-            Guard.NotNull(assigner, nameof(assigner));
-            Guard.NotNull(user, nameof(user));
-            Guard.NotNull(appName, nameof(appName));
+            Guard.NotNull(assigner);
+            Guard.NotNull(user);
+            Guard.NotNull(appName);
 
             var vars = new TemplatesVars { Assigner = assigner, AppName = appName };
 

@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task<IEnrichedContentEntity?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/FindAsync"))
             {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q q,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/QueryAsync"))
             {
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, Q q,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             using (Telemetry.Activities.StartActivity("ContentQueryService/QueryAsync"))
             {
@@ -181,8 +181,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task<ISchemaEntity?> GetSchemaAsync(Context context, string schemaIdOrName,
             CancellationToken ct = default)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNullOrEmpty(schemaIdOrName, nameof(schemaIdOrName));
+            Guard.NotNull(context);
+            Guard.NotNullOrEmpty(schemaIdOrName);
 
             ISchemaEntity? schema = null;
 

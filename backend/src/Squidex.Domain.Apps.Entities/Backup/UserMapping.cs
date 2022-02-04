@@ -23,14 +23,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public UserMapping(RefToken initiator)
         {
-            Guard.NotNull(initiator, nameof(initiator));
+            Guard.NotNull(initiator);
 
             this.initiator = initiator;
         }
 
         public void Backup(RefToken token)
         {
-            Guard.NotNull(token, nameof(token));
+            Guard.NotNull(token);
 
             if (!token.IsUser)
             {
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public void Backup(string userId)
         {
-            Guard.NotNullOrEmpty(userId, nameof(userId));
+            Guard.NotNullOrEmpty(userId);
 
             if (!userMap.ContainsKey(userId))
             {
@@ -53,8 +53,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public async Task StoreAsync(IBackupWriter writer, IUserResolver userResolver,
             CancellationToken ct = default)
         {
-            Guard.NotNull(writer, nameof(writer));
-            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(writer);
+            Guard.NotNull(userResolver);
 
             var users = await userResolver.QueryManyAsync(userMap.Keys.ToArray(), ct);
 
@@ -66,8 +66,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public async Task RestoreAsync(IBackupReader reader, IUserResolver userResolver,
             CancellationToken ct = default)
         {
-            Guard.NotNull(reader, nameof(reader));
-            Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(reader);
+            Guard.NotNull(userResolver);
 
             var json = await reader.ReadJsonAsync<Dictionary<string, string>>(UsersFile, ct);
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public bool TryMap(string userId, out RefToken result)
         {
-            Guard.NotNullOrEmpty(userId, nameof(userId));
+            Guard.NotNullOrEmpty(userId);
 
             result = initiator;
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public bool TryMap(RefToken token, out RefToken result)
         {
-            Guard.NotNull(token, nameof(token));
+            Guard.NotNull(token);
 
             result = initiator;
 

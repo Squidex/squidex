@@ -4,6 +4,7 @@
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
     <LangVersion>10.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
+	<NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,16 +21,16 @@
     <PackageReference Include="Fluid.Core.Squidex" Version="1.0.0-beta" />
 	<PackageReference Include="GeoJSON.Net" Version="1.2.19" />
 	<PackageReference Include="Jint" Version="3.0.0-beta-2036" />
-	<PackageReference Include="Meziantou.Analyzer" Version="1.0.680">
+	<PackageReference Include="Meziantou.Analyzer" Version="1.0.689">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.6.6" />
+    <PackageReference Include="NJsonSchema" Version="10.6.7" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
-    <PackageReference Include="System.Linq.Async" Version="5.1.0" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="ValueTaskSupplement" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>

@@ -51,9 +51,9 @@ namespace Squidex.Web
 
         public void AddLink(string rel, string method, string href, string? metadata = null)
         {
-            Guard.NotNullOrEmpty(rel, nameof(rel));
-            Guard.NotNullOrEmpty(href, nameof(href));
-            Guard.NotNullOrEmpty(method, nameof(method));
+            Guard.NotNullOrEmpty(rel);
+            Guard.NotNullOrEmpty(href);
+            Guard.NotNullOrEmpty(method);
 
             Links[rel] = new ResourceLink { Href = href, Method = method, Metadata = metadata };
         }

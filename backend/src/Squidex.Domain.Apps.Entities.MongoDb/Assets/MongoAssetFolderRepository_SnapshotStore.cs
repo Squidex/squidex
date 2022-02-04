@@ -14,6 +14,8 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderDomainObject.State>, IDeleter

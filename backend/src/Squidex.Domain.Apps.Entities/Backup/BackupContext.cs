@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public BackupContext(DomainId appId, IUserMapping userMapping, IBackupWriter writer)
             : base(appId, userMapping)
         {
-            Guard.NotNull(writer, nameof(writer));
+            Guard.NotNull(writer);
 
             Writer = writer;
         }

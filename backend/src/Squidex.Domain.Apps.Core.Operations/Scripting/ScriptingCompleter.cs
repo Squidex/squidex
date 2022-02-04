@@ -21,14 +21,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public IReadOnlyList<ScriptingValue> ContentScript(FilterSchema dataSchema)
         {
-            Guard.NotNull(dataSchema, nameof(dataSchema));
+            Guard.NotNull(dataSchema);
 
             return new Process(descriptors).Content(dataSchema, ScriptScope.ContentScript | ScriptScope.Transform);
         }
 
         public IReadOnlyList<ScriptingValue> ContentTrigger(FilterSchema dataSchema)
         {
-            Guard.NotNull(dataSchema, nameof(dataSchema));
+            Guard.NotNull(dataSchema);
 
             return new Process(descriptors).Content(dataSchema, ScriptScope.ContentTrigger);
         }
