@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateFilters
 
             void CheckField(IField field)
             {
-                if (!field.IsForApi())
+                if (!field.IsForApi(true))
                 {
                     Assert.DoesNotContain(field.Name, filterProperties);
                 }
