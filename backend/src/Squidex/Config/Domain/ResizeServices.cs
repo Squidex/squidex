@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using Squidex.Assets;
-using Squidex.Assets.ImageMagick;
-using Squidex.Assets.ImageSharp;
 using Squidex.Assets.Remote;
 
 namespace Squidex.Config.Domain

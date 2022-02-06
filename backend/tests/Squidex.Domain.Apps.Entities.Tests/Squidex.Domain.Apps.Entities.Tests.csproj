@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="Microsoft.Orleans.TestingHost" Version="3.6.0" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
-    <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
+    <PackageReference Include="Squidex.Caching.Orleans" Version="1.9.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.4.1" />

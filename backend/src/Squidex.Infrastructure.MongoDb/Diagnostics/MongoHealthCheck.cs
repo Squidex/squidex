@@ -10,11 +10,11 @@ using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.Diagnostics
 {
-    public sealed class MongoDBHealthCheck : IHealthCheck
+    public sealed class MongoHealthCheck : IHealthCheck
     {
         private readonly IMongoDatabase mongoDatabase;
 
-        public MongoDBHealthCheck(IMongoDatabase mongoDatabase)
+        public MongoHealthCheck(IMongoDatabase mongoDatabase)
         {
             this.mongoDatabase = mongoDatabase;
         }

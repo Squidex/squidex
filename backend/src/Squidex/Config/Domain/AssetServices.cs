@@ -18,6 +18,8 @@ using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
+using tusdotnet.Interfaces;
 
 namespace Squidex.Config.Domain
 {
@@ -49,11 +51,17 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryParser>()
                 .AsSelf();
 
-            services.AddSingletonAs<RebuildFiles>()
-                .AsSelf();
-
             services.AddTransientAs<AssetTagsDeleter>()
                 .As<IDeleter>();
+
+            services.AddSingletonAs<AssetTusRunner>()
+                .AsSelf();
+
+            services.AddSingletonAs<AssetTusStore>()
+                .As<ITusStore>();
+
+            services.AddSingletonAs<RebuildFiles>()
+                .AsSelf();
 
             services.AddTransientAs<AssetHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
@@ -87,6 +95,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<SvgAssetMetadataSource>()
                 .As<IAssetMetadataSource>();
+
+            services.AddSingletonAs<GrainBootstrap<IAssetCleanupGrain>>()
+                .AsSelf();
         }
 
         public static void AddSquidexAssetInfrastructure(this IServiceCollection services, IConfiguration config)
@@ -176,10 +187,12 @@ namespace Squidex.Config.Domain
                 }
             });
 
-            services.AddSingletonAs(c => new DelegateInitializer(
-                    c.GetRequiredService<IAssetStore>().GetType().Name,
-                    c.GetRequiredService<IAssetStore>().InitializeAsync))
-                .As<IInitializable>();
+            services.AddSingletonAs(c =>
+            {
+                var service = c.GetRequiredService<IAssetStore>();
+
+                return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
+            }).As<IInitializable>();
         }
     }
 }

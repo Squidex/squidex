@@ -58,16 +58,13 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = AppCacheKey(appId);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is IAppEntity found)
+            var app = await localCache.GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var app = await indexForApps.GetAppAsync(appId, canCache, ct);
+                return indexForApps.GetAppAsync(appId, canCache, ct);
+            });
 
             if (app != null)
             {
-                localCache.Add(cacheKey, app);
                 localCache.Add(AppCacheKey(app.Name), app);
             }
 
@@ -79,16 +76,13 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = AppCacheKey(appName);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is IAppEntity found)
+            var app = await localCache.GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var app = await indexForApps.GetAppAsync(appName, canCache, ct);
+                return indexForApps.GetAppAsync(appName, canCache, ct);
+            });
 
             if (app != null)
             {
-                localCache.Add(cacheKey, app);
                 localCache.Add(AppCacheKey(app.Id), app);
             }
 
@@ -100,16 +94,13 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = SchemaCacheKey(appId, name);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is ISchemaEntity found)
+            var schema = await localCache.GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var schema = await indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
+                return indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
+            });
 
             if (schema != null)
             {
-                localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
             }
 
@@ -121,16 +112,13 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = SchemaCacheKey(appId, id);
 
-            if (localCache.TryGetValue(cacheKey, out var cached) && cached is ISchemaEntity found)
+            var schema = await localCache.GetOrCreate(cacheKey, () =>
             {
-                return found;
-            }
-
-            var schema = await indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
+                return indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
+            });
 
             if (schema != null)
             {
-                localCache.Add(cacheKey, schema);
                 localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
             }
 
@@ -140,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities
         public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
             CancellationToken ct = default)
         {
-            var apps = await localCache.GetOrCreateAsync($"GetUserApps({userId})", () =>
+            var apps = await localCache.GetOrCreate($"GetUserApps({userId})", () =>
             {
                 return indexForApps.GetAppsForUserAsync(userId, permissions, ct);
             });
@@ -151,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities
         public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var schemas = await localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", () =>
+            var schemas = await localCache.GetOrCreate($"GetSchemasAsync({appId})", () =>
             {
                 return indexForSchemas.GetSchemasAsync(appId, ct);
             });
@@ -168,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities
         public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var rules = await localCache.GetOrCreateAsync($"GetRulesAsync({appId})", () =>
+            var rules = await localCache.GetOrCreate($"GetRulesAsync({appId})", () =>
             {
                 return indexForRules.GetRulesAsync(appId, ct);
             });
