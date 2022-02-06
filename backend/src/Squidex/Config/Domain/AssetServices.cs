@@ -58,7 +58,7 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<AssetTusStore>()
-                .As<ITusStore>();
+                .As<ITusStore>().As<ITusExpirationStore>();
 
             services.AddSingletonAs<RebuildFiles>()
                 .AsSelf();
