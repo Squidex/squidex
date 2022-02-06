@@ -131,7 +131,7 @@ namespace TestSuite.ApiTests
 
             Assert.NotEmpty(reportedProgress);
             Assert.NotNull(reportedAsset);
-            Assert.Equal(4, numReads);
+            Assert.True(numReads > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
             {
@@ -300,7 +300,7 @@ namespace TestSuite.ApiTests
 
             Assert.NotEmpty(reportedProgress);
             Assert.NotNull(reportedAsset);
-            Assert.Equal(4, numReads);
+            Assert.True(numReads > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
             {
