@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
@@ -21,13 +22,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public abstract Context Context { get; }
 
-        protected QueryExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery)
+        public IServiceProvider Services { get; }
+
+        protected QueryExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
+            IServiceProvider services)
         {
             Guard.NotNull(assetQuery);
             Guard.NotNull(contentQuery);
+            Guard.NotNull(services);
 
             this.assetQuery = assetQuery;
             this.contentQuery = contentQuery;
+
+            Services = services;
         }
 
         public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version,
@@ -140,6 +147,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
 
             return ids.Select(cachedContents.GetOrDefault).NotNull().ToList();
+        }
+
+        public T Resolve<T>() where T : class
+        {
+            var key = typeof(T).Name;
+
+            if (TryGetValue(key, out var stored) && stored is T typed)
+            {
+                return typed;
+            }
+
+            typed = Services.GetRequiredService<T>();
+
+            this[key] = typed;
+
+            return typed;
         }
     }
 }

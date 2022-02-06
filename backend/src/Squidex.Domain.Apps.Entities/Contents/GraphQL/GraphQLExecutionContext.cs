@@ -6,13 +6,10 @@
 // ==========================================================================
 
 using GraphQL.DataLoader;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -22,37 +19,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
         private static readonly List<IEnrichedContentEntity> EmptyContents = new List<IEnrichedContentEntity>();
         private readonly IDataLoaderContextAccessor dataLoaders;
-        private readonly IUserResolver userResolver;
-
-        public IUrlGenerator UrlGenerator { get; }
-
-        public ICommandBus CommandBus { get; }
-
-        public ISemanticLog Log { get; }
 
         public override Context Context { get; }
 
-        public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
-            Context context,
-            IDataLoaderContextAccessor dataLoaders,
-            ICommandBus commandBus,
-            IUrlGenerator urlGenerator,
-            IUserResolver userResolver,
-            ISemanticLog log)
-            : base(assetQuery, contentQuery)
+        public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery, IServiceProvider services,
+            Context context, IDataLoaderContextAccessor dataLoaders)
+            : base(assetQuery, contentQuery, services)
         {
             this.dataLoaders = dataLoaders;
-            this.userResolver = userResolver;
-
-            CommandBus = commandBus;
-
-            UrlGenerator = urlGenerator;
 
             Context = context.Clone(b => b
                 .WithoutCleanup()
                 .WithoutContentEnrichment());
-
-            Log = log;
         }
 
         public async Task<IUser?> FindUserAsync(RefToken refToken,
@@ -93,34 +71,38 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value,
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
 
             if (ids == null)
             {
-                return Task.FromResult<IReadOnlyList<IEnrichedAssetEntity>>(EmptyAssets);
+                return EmptyAssets;
             }
 
             var dataLoader = GetAssetsLoader();
 
-            return LoadManyAsync(dataLoader, ids, ct);
+            var result = await dataLoader.LoadAsync(ids).GetResultAsync(ct);
+
+            return result?.NotNull().ToList() ?? EmptyAssets;
         }
 
-        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value,
+        public async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
 
             if (ids == null)
             {
-                return Task.FromResult<IReadOnlyList<IEnrichedContentEntity>>(EmptyContents);
+                return EmptyContents;
             }
 
             var dataLoader = GetContentsLoader();
 
-            return LoadManyAsync(dataLoader, ids, ct);
+            var result = await dataLoader.LoadAsync(ids).GetResultAsync(ct);
+
+            return result?.NotNull().ToList() ?? EmptyContents;
         }
 
         private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
@@ -150,18 +132,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return dataLoaders.Context.GetOrAddBatchLoader<string, IUser>(nameof(GetUserLoader),
                 async (batch, ct) =>
                 {
-                    var result = await userResolver.QueryManyAsync(batch.ToArray(), ct);
+                    var result = await Resolve<IUserResolver>().QueryManyAsync(batch.ToArray(), ct);
 
                     return result;
                 });
-        }
-
-        private static async Task<IReadOnlyList<T>> LoadManyAsync<TKey, T>(IDataLoader<TKey, T> dataLoader, ICollection<TKey> keys,
-            CancellationToken ct) where T : class
-        {
-            var contents = await Task.WhenAll(keys.Select(x => dataLoader.LoadAsync(x).GetResultAsync(ct)));
-
-            return contents.NotNull().ToList();
         }
 
         private static ICollection<DomainId>? ParseIds(IJsonValue value)
