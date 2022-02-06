@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = AppCacheKey(appId);
 
-            var app = await localCache.GetOrCreate(cacheKey, () =>
+            var app = await GetOrCreate(cacheKey, () =>
             {
                 return indexForApps.GetAppAsync(appId, canCache, ct);
             });
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = AppCacheKey(appName);
 
-            var app = await localCache.GetOrCreate(cacheKey, () =>
+            var app = await GetOrCreate(cacheKey, () =>
             {
                 return indexForApps.GetAppAsync(appName, canCache, ct);
             });
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = SchemaCacheKey(appId, name);
 
-            var schema = await localCache.GetOrCreate(cacheKey, () =>
+            var schema = await GetOrCreate(cacheKey, () =>
             {
                 return indexForSchemas.GetSchemaAsync(appId, name, canCache, ct);
             });
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var cacheKey = SchemaCacheKey(appId, id);
 
-            var schema = await localCache.GetOrCreate(cacheKey, () =>
+            var schema = await GetOrCreate(cacheKey, () =>
             {
                 return indexForSchemas.GetSchemaAsync(appId, id, canCache, ct);
             });
@@ -128,40 +128,43 @@ namespace Squidex.Domain.Apps.Entities
         public async Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions,
             CancellationToken ct = default)
         {
-            var apps = await localCache.GetOrCreate($"GetUserApps({userId})", () =>
+            var apps = await GetOrCreate($"GetUserApps({userId})", () =>
             {
-                return indexForApps.GetAppsForUserAsync(userId, permissions, ct);
+                return indexForApps.GetAppsForUserAsync(userId, permissions, ct)!;
             });
 
-            return apps;
+            return apps?.ToList() ?? new List<IAppEntity>();
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var schemas = await localCache.GetOrCreate($"GetSchemasAsync({appId})", () =>
+            var schemas = await GetOrCreate($"GetSchemasAsync({appId})", () =>
             {
-                return indexForSchemas.GetSchemasAsync(appId, ct);
+                return indexForSchemas.GetSchemasAsync(appId, ct)!;
             });
 
-            foreach (var schema in schemas)
+            if (schemas != null)
             {
-                localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
-                localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+                foreach (var schema in schemas)
+                {
+                    localCache.Add(SchemaCacheKey(appId, schema.Id), schema);
+                    localCache.Add(SchemaCacheKey(appId, schema.SchemaDef.Name), schema);
+                }
             }
 
-            return schemas;
+            return schemas?.ToList() ?? new List<ISchemaEntity>();
         }
 
         public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
             CancellationToken ct = default)
         {
-            var rules = await localCache.GetOrCreate($"GetRulesAsync({appId})", () =>
+            var rules = await GetOrCreate($"GetRulesAsync({appId})", () =>
             {
-                return indexForRules.GetRulesAsync(appId, ct);
+                return indexForRules.GetRulesAsync(appId, ct)!;
             });
 
-            return rules.ToList();
+            return rules?.ToList() ?? new List<IRuleEntity>();
         }
 
         public async Task<IRuleEntity?> GetRuleAsync(DomainId appId, DomainId id,
@@ -170,6 +173,28 @@ namespace Squidex.Domain.Apps.Entities
             var rules = await GetRulesAsync(appId, ct);
 
             return rules.Find(x => x.Id == id);
+        }
+
+        public async Task<T?> GetOrCreate<T>(object key, Func<Task<T?>> creator) where T : class
+        {
+            if (localCache.TryGetValue(key, out var value))
+            {
+                switch (value)
+                {
+                    case T typed:
+                        return typed;
+                    case Task<T?> typedTask:
+                        return await typedTask;
+                    default:
+                        return null;
+                }
+            }
+
+            var result = creator();
+
+            localCache.Add(key, result);
+
+            return await result;
         }
 
         private static string AppCacheKey(DomainId appId)
