@@ -22,9 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public override Context Context { get; }
 
-        public GraphQLExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery, IServiceProvider services,
-            Context context, IDataLoaderContextAccessor dataLoaders)
-            : base(assetQuery, contentQuery, services)
+        public GraphQLExecutionContext(IServiceProvider serviceProvider, IDataLoaderContextAccessor dataLoaders, Context context)
+            : base(serviceProvider)
         {
             this.dataLoaders = dataLoaders;
 

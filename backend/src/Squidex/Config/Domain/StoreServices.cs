@@ -194,9 +194,9 @@ namespace Squidex.Config.Domain
             return Singletons<IMongoClient>.GetOrAdd(configuration, s => new MongoClient(s));
         }
 
-        private static IMongoDatabase GetDatabase(IServiceProvider service, string name)
+        private static IMongoDatabase GetDatabase(IServiceProvider serviceProvider, string name)
         {
-            return service.GetRequiredService<IMongoClient>().GetDatabase(name);
+            return serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(name);
         }
     }
 }

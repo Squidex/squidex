@@ -30,6 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly ISchemasHash schemasHash;
         private readonly IServiceProvider serviceProvider;
         private readonly GraphQLOptions options;
+        private readonly SharedTypes sharedTypes;
 
         private sealed record CacheEntry(GraphQLSchema Model, string Hash, Instant Created);
 
@@ -45,6 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.schemasHash = schemasHash;
             this.serviceProvider = serviceProvider;
             this.options = options.Value;
+
+            sharedTypes = serviceProvider.GetRequiredService<SharedTypes>();
         }
 
         public async Task ConfigureAsync(ExecutionOptions executionOptions)
@@ -88,10 +91,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var hash = await schemasHash.ComputeHashAsync(app, schemas);
 
-            return new CacheEntry(
-                new Builder(app, serviceProvider.GetRequiredService<SharedTypes>()).BuildSchema(schemas),
-                hash,
-                SystemClock.Instance.GetCurrentInstant());
+            return new CacheEntry(new Builder(app, sharedTypes).BuildSchema(schemas),
+                hash, SystemClock.Instance.GetCurrentInstant());
         }
 
         private static object CreateCacheKey(DomainId appId, string etag)

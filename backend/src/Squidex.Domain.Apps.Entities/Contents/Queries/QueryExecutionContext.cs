@@ -17,30 +17,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly SemaphoreSlim maxRequests = new SemaphoreSlim(10);
         private readonly ConcurrentDictionary<DomainId, IEnrichedContentEntity?> cachedContents = new ConcurrentDictionary<DomainId, IEnrichedContentEntity?>();
         private readonly ConcurrentDictionary<DomainId, IEnrichedAssetEntity?> cachedAssets = new ConcurrentDictionary<DomainId, IEnrichedAssetEntity?>();
-        private readonly IContentQueryService contentQuery;
-        private readonly IAssetQueryService assetQuery;
 
         public abstract Context Context { get; }
 
         public IServiceProvider Services { get; }
 
-        protected QueryExecutionContext(IAssetQueryService assetQuery, IContentQueryService contentQuery,
-            IServiceProvider services)
+        protected QueryExecutionContext(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(assetQuery);
-            Guard.NotNull(contentQuery);
-            Guard.NotNull(services);
+            Guard.NotNull(serviceProvider);
 
-            this.assetQuery = assetQuery;
-            this.contentQuery = contentQuery;
-
-            Services = services;
+            Services = serviceProvider;
         }
 
         public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version,
             CancellationToken ct)
         {
-            return contentQuery.FindAsync(Context, schemaIdOrName, id, version, ct);
+            return Resolve<IContentQueryService>().FindAsync(Context, schemaIdOrName, id, version, ct);
         }
 
         public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(Q q,
@@ -51,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await maxRequests.WaitAsync(ct);
             try
             {
-                assets = await assetQuery.QueryAsync(Context, null, q, ct);
+                assets = await Resolve<IAssetQueryService>().QueryAsync(Context, null, q, ct);
             }
             finally
             {
@@ -74,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await maxRequests.WaitAsync(ct);
             try
             {
-                contents = await contentQuery.QueryAsync(Context, schemaIdOrName, q, ct);
+                contents = await Resolve<IContentQueryService>().QueryAsync(Context, schemaIdOrName, q, ct);
             }
             finally
             {
@@ -103,7 +95,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 await maxRequests.WaitAsync(ct);
                 try
                 {
-                    assets = await assetQuery.QueryAsync(Context, null, Q.Empty.WithIds(notLoadedAssets).WithoutTotal(), ct);
+                    var q = Q.Empty.WithIds(notLoadedAssets).WithoutTotal();
+
+                    assets = await Resolve<IAssetQueryService>().QueryAsync(Context, null, q, ct);
                 }
                 finally
                 {
@@ -133,7 +127,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 await maxRequests.WaitAsync(ct);
                 try
                 {
-                    contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(notLoadedContents).WithoutTotal(), ct);
+                    var q = Q.Empty.WithIds(notLoadedContents).WithoutTotal();
+
+                    contents = await Resolve<IContentQueryService>().QueryAsync(Context, q, ct);
                 }
                 finally
                 {
