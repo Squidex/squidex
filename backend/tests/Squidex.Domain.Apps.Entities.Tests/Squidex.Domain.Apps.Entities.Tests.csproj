@@ -25,7 +25,7 @@
     <PackageReference Include="GraphQL" Version="4.7.1" />
     <PackageReference Include="GraphQL.NewtonsoftJson" Version="4.7.1" />
     <PackageReference Include="Lorem.Universal.Net" Version="4.0.80" />
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.689">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.694">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
