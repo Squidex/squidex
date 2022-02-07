@@ -91,82 +91,80 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_upload_asset_using_tus_in_chunks()
         {
-            // STEP 1: Create asset
-            var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
-
-            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
-            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
-
-            var numUploads = 0;
-            var reportedException = (Exception)null;
-            var reportedProgress = new List<int>();
-            var reportedAsset = (AssetDto)null;
-            var fileId = (string)null;
-
-            await using (pausingFile.Data)
+            for (var i = 0; i < 5; i++)
             {
-                using var cts = new CancellationTokenSource(5000);
+                // STEP 1: Create asset
+                var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
-                while (reportedAsset == null)
+                var pausingStream = new PauseStream(fileParameter.Data, 0.5);
+                var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
+                var numUploads = 0;
+                var reportedException = (Exception)null;
+                var reportedProgress = new List<int>();
+                var reportedAsset = (AssetDto)null;
+                var fileId = (string)null;
+
+                await using (pausingFile.Data)
                 {
-                    pausingStream.Reset();
+                    using var cts = new CancellationTokenSource(5000);
 
-                    if (pausingStream.Position == pausingStream.Length)
+                    while (reportedAsset == null)
                     {
-                        throw new InvalidOperationException("Stream end reached.");
-                    }
+                        pausingStream.Reset();
 
-                    await _.Assets.UploadNewAssetAsync(_.AppName, pausingFile, new AssetUploadOptions
-                    {
-                        ProgressHandler = new AssetDelegatingProgressHandler
+                        await _.Assets.UploadNewAssetAsync(_.AppName, pausingFile, new AssetUploadOptions
                         {
-                            OnCreatedAsync = (@event, _) =>
+                            ProgressHandler = new AssetDelegatingProgressHandler
                             {
-                                fileId = @event.FileId;
-                                return Task.CompletedTask;
-                            },
-                            OnProgressAsync = (@event, _) =>
-                            {
-                                reportedProgress.Add(@event.Progress);
-                                return Task.CompletedTask;
-                            },
-                            OnCompletedAsync = (@event, _) =>
-                            {
-                                reportedAsset = @event.Asset;
-                                return Task.CompletedTask;
-                            },
-                            OnFailedAsync = (@event, _) =>
-                            {
-                                if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                OnCreatedAsync = (@event, _) =>
                                 {
-                                    reportedException = @event.Exception;
+                                    fileId = @event.FileId;
+                                    return Task.CompletedTask;
+                                },
+                                OnProgressAsync = (@event, _) =>
+                                {
+                                    reportedProgress.Add(@event.Progress);
+                                    return Task.CompletedTask;
+                                },
+                                OnCompletedAsync = (@event, _) =>
+                                {
+                                    reportedAsset = @event.Asset;
+                                    return Task.CompletedTask;
+                                },
+                                OnFailedAsync = (@event, _) =>
+                                {
+                                    if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        reportedException = @event.Exception;
+                                    }
+
+                                    return Task.CompletedTask;
                                 }
+                            },
+                            FileId = fileId
+                        }, cts.Token);
 
-                                return Task.CompletedTask;
-                            }
-                        },
-                        FileId = fileId
-                    }, cts.Token);
+                        Assert.Null(reportedException);
 
-                    Assert.Null(reportedException);
+                        await Task.Delay(50, cts.Token);
 
-                    await Task.Delay(50, cts.Token);
-
-                    numUploads++;
+                        numUploads++;
+                    }
                 }
-            }
 
-            Assert.NotEmpty(reportedProgress);
-            Assert.NotNull(reportedAsset);
-            Assert.Null(reportedException);
-            Assert.True(numUploads > 1);
+                Assert.NotEmpty(reportedProgress);
+                Assert.NotNull(reportedAsset);
+                Assert.Null(reportedException);
+                Assert.True(numUploads > 1);
 
-            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
-            {
-                var downloaded = await _.DownloadAsync(reportedAsset);
+                await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+                {
+                    var downloaded = await _.DownloadAsync(reportedAsset);
 
-                // Should dowload with correct size.
-                Assert.Equal(stream.Length, downloaded.Length);
+                    // Should dowload with correct size.
+                    Assert.Equal(stream.Length, downloaded.Length);
+                }
             }
         }
 
@@ -283,86 +281,84 @@ namespace TestSuite.ApiTests
         [Fact]
         public async Task Should_replace_asset_using_tus_in_chunks()
         {
-            // STEP 1: Create asset
-            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
-
-
-            // STEP 2: Reupload asset
-            var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
-
-            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
-            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
-
-            var numUploads = 0;
-            var reportedException = (Exception)null;
-            var reportedProgress = new List<int>();
-            var reportedAsset = (AssetDto)null;
-            var fileId = (string)null;
-
-            await using (pausingFile.Data)
+            for (var i = 0; i < 5; i++)
             {
-                using var cts = new CancellationTokenSource(5000);
+                // STEP 1: Create asset
+                var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
-                while (reportedAsset == null)
+
+                // STEP 2: Reupload asset
+                var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
+
+                var pausingStream = new PauseStream(fileParameter.Data, 0.5);
+                var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
+                var numUploads = 0;
+                var reportedException = (Exception)null;
+                var reportedProgress = new List<int>();
+                var reportedAsset = (AssetDto)null;
+                var fileId = (string)null;
+
+                await using (pausingFile.Data)
                 {
-                    pausingStream.Reset();
+                    using var cts = new CancellationTokenSource(5000);
 
-                    if (pausingStream.Position == pausingStream.Length)
+                    while (reportedAsset == null)
                     {
-                        throw new InvalidOperationException("Stream end reached.");
-                    }
+                        pausingStream.Reset();
 
-                    await _.Assets.UploadExistingAssetAsync(_.AppName, asset_1.Id, pausingFile, new AssetUploadOptions
-                    {
-                        ProgressHandler = new AssetDelegatingProgressHandler
+                        await _.Assets.UploadExistingAssetAsync(_.AppName, asset_1.Id, pausingFile, new AssetUploadOptions
                         {
-                            OnCreatedAsync = (@event, _) =>
+                            ProgressHandler = new AssetDelegatingProgressHandler
                             {
-                                fileId = @event.FileId;
-                                return Task.CompletedTask;
-                            },
-                            OnProgressAsync = (@event, _) =>
-                            {
-                                reportedProgress.Add(@event.Progress);
-                                return Task.CompletedTask;
-                            },
-                            OnCompletedAsync = (@event, _) =>
-                            {
-                                reportedAsset = @event.Asset;
-                                return Task.CompletedTask;
-                            },
-                            OnFailedAsync = (@event, _) =>
-                            {
-                                if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                OnCreatedAsync = (@event, _) =>
                                 {
-                                    reportedException = @event.Exception;
+                                    fileId = @event.FileId;
+                                    return Task.CompletedTask;
+                                },
+                                OnProgressAsync = (@event, _) =>
+                                {
+                                    reportedProgress.Add(@event.Progress);
+                                    return Task.CompletedTask;
+                                },
+                                OnCompletedAsync = (@event, _) =>
+                                {
+                                    reportedAsset = @event.Asset;
+                                    return Task.CompletedTask;
+                                },
+                                OnFailedAsync = (@event, _) =>
+                                {
+                                    if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        reportedException = @event.Exception;
+                                    }
+
+                                    return Task.CompletedTask;
                                 }
+                            },
+                            FileId = fileId
+                        }, cts.Token);
 
-                                return Task.CompletedTask;
-                            }
-                        },
-                        FileId = fileId
-                    }, cts.Token);
+                        Assert.Null(reportedException);
 
-                    Assert.Null(reportedException);
+                        await Task.Delay(50, cts.Token);
 
-                    await Task.Delay(50, cts.Token);
-
-                    numUploads++;
+                        numUploads++;
+                    }
                 }
-            }
 
-            Assert.NotEmpty(reportedProgress);
-            Assert.NotNull(reportedAsset);
-            Assert.Null(reportedException);
-            Assert.True(numUploads > 1);
+                Assert.NotEmpty(reportedProgress);
+                Assert.NotNull(reportedAsset);
+                Assert.Null(reportedException);
+                Assert.True(numUploads > 1);
 
-            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
-            {
-                var downloaded = await _.DownloadAsync(reportedAsset);
+                await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+                {
+                    var downloaded = await _.DownloadAsync(reportedAsset);
 
-                // Should dowload with correct size.
-                Assert.Equal(stream.Length, downloaded.Length);
+                    // Should dowload with correct size.
+                    Assert.Equal(stream.Length, downloaded.Length);
+                }
             }
         }
 
