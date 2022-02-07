@@ -15,17 +15,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Calculate Version
-        env:
-          BUILD_NUMBER: ${{ github.run_number }}
-        run: |
-          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
-
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Calculate Version
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "BUILD_NUMBER=$(($BUILD_NUMBER + 5967))" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

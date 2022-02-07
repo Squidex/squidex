@@ -4,7 +4,7 @@ concurrency: release
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   build:
@@ -116,8 +116,8 @@ jobs:
         id: version
         uses: rishabhgupta/split-by@v1
         with:
-          string: '${{ env.GITHUB_REF_SLUG }}'
-          split-by: '.'
+          string: "${{ env.GITHUB_REF_SLUG }}"
+          split-by: "."
 
       - name: Get Image From Cache
         uses: actions/cache@v2
