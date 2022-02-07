@@ -321,7 +321,7 @@ namespace TestSuite.ApiTests
 
                     while (true)
                     {
-                        var length = await _.Assets.GetUploadProgressAsync(_.AppName, fileId, cts.Token);
+                        var length = await _.Assets.GetUploadProgressAsync(_.AppName, asset_1.Id, fileId, cts.Token);
 
                         if (length > previousProgress || reportedAsset != null)
                         {
@@ -633,7 +633,7 @@ namespace TestSuite.ApiTests
 
                 if (totalRead >= Length * pauseAfter)
                 {
-                    throw new OperationCanceledException();
+                    throw new InvalidOperationException();
                 }
 
                 var bytesRead = await base.ReadAsync(buffer, cancellationToken);
