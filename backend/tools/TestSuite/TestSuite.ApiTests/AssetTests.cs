@@ -108,8 +108,6 @@ namespace TestSuite.ApiTests
 
                 while (reportedAsset == null)
                 {
-                    var previousProgress = pausingStream.Position;
-
                     pausingStream.Reset();
 
                     await _.Assets.UploadNewAssetAsync(_.AppName, pausingFile, new AssetUploadOptions
@@ -132,17 +130,7 @@ namespace TestSuite.ApiTests
                         FileId = fileId
                     }, cts.Token);
 
-                    while (true)
-                    {
-                        var length = await _.Assets.GetUploadProgressAsync(_.AppName, fileId, cts.Token);
-
-                        if (length > previousProgress || reportedAsset != null)
-                        {
-                            break;
-                        }
-
-                        await Task.Delay(20, cts.Token);
-                    }
+                    await Task.Delay(50, cts.Token);
 
                     numReads++;
                 }
@@ -295,8 +283,6 @@ namespace TestSuite.ApiTests
 
                 while (reportedAsset == null)
                 {
-                    var previousProgress = pausingStream.Position;
-
                     pausingStream.Reset();
 
                     await _.Assets.UploadExistingAssetAsync(_.AppName, asset_1.Id, pausingFile, new AssetUploadOptions
@@ -319,17 +305,7 @@ namespace TestSuite.ApiTests
                         FileId = fileId
                     }, cts.Token);
 
-                    while (true)
-                    {
-                        var length = await _.Assets.GetUploadProgressAsync(_.AppName, asset_1.Id, fileId, cts.Token);
-
-                        if (length > previousProgress || reportedAsset != null)
-                        {
-                            break;
-                        }
-
-                        await Task.Delay(20, cts.Token);
-                    }
+                    await Task.Delay(50, cts.Token);
 
                     numReads++;
                 }
