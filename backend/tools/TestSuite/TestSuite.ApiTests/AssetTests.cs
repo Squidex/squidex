@@ -111,6 +111,11 @@ namespace TestSuite.ApiTests
                 {
                     pausingStream.Reset();
 
+                    if (pausingStream.Position == pausingStream.Length)
+                    {
+                        throw new InvalidOperationException("Stream end reached.");
+                    }
+
                     await _.Assets.UploadNewAssetAsync(_.AppName, pausingFile, new AssetUploadOptions
                     {
                         ProgressHandler = new AssetDelegatingProgressHandler
@@ -301,6 +306,11 @@ namespace TestSuite.ApiTests
                 while (reportedAsset == null)
                 {
                     pausingStream.Reset();
+
+                    if (pausingStream.Position == pausingStream.Length)
+                    {
+                        throw new InvalidOperationException("Stream end reached.");
+                    }
 
                     await _.Assets.UploadExistingAssetAsync(_.AppName, asset_1.Id, pausingFile, new AssetUploadOptions
                     {
