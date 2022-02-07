@@ -97,7 +97,7 @@ namespace TestSuite.ApiTests
             var pausingStream = new PauseStream(fileParameter.Data, 0.25);
             var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
 
-            var numReads = 0;
+            var numUploads = 0;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
             var fileId = (string)null;
@@ -114,10 +114,13 @@ namespace TestSuite.ApiTests
                     {
                         ProgressHandler = new AssetDelegatingProgressHandler
                         {
-                            OnProgressAsync = (@event, _) =>
+                            OnCreatedAsync = (@event, _) =>
                             {
                                 fileId = @event.FileId;
-
+                                return Task.CompletedTask;
+                            },
+                            OnProgressAsync = (@event, _) =>
+                            {
                                 reportedProgress.Add(@event.Progress);
                                 return Task.CompletedTask;
                             },
@@ -132,13 +135,13 @@ namespace TestSuite.ApiTests
 
                     await Task.Delay(50, cts.Token);
 
-                    numReads++;
+                    numUploads++;
                 }
             }
 
             Assert.NotEmpty(reportedProgress);
             Assert.NotNull(reportedAsset);
-            Assert.True(numReads > 1);
+            Assert.True(numUploads > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
             {
@@ -272,7 +275,7 @@ namespace TestSuite.ApiTests
             var pausingStream = new PauseStream(fileParameter.Data, 0.25);
             var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
 
-            var numReads = 0;
+            var numUploads = 0;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
             var fileId = (string)null;
@@ -289,10 +292,13 @@ namespace TestSuite.ApiTests
                     {
                         ProgressHandler = new AssetDelegatingProgressHandler
                         {
-                            OnProgressAsync = (@event, _) =>
+                            OnCreatedAsync = (@event, _) =>
                             {
                                 fileId = @event.FileId;
-
+                                return Task.CompletedTask;
+                            },
+                            OnProgressAsync = (@event, _) =>
+                            {
                                 reportedProgress.Add(@event.Progress);
                                 return Task.CompletedTask;
                             },
@@ -307,13 +313,13 @@ namespace TestSuite.ApiTests
 
                     await Task.Delay(50, cts.Token);
 
-                    numReads++;
+                    numUploads++;
                 }
             }
 
             Assert.NotEmpty(reportedProgress);
             Assert.NotNull(reportedAsset);
-            Assert.True(numReads > 1);
+            Assert.True(numUploads > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
             {
