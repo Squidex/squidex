@@ -46,6 +46,7 @@ namespace TestSuite.ApiTests
             // STEP 1: Create asset
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
+            var reportedException = (Exception)null;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
 
@@ -64,13 +65,19 @@ namespace TestSuite.ApiTests
                         {
                             reportedAsset = @event.Asset;
                             return Task.CompletedTask;
+                        },
+                        OnFailedAsync = (@event, _) =>
+                        {
+                            reportedException = @event.Exception;
+                            return Task.CompletedTask;
                         }
                     }
                 });
             }
 
+            Assert.NotEmpty(reportedProgress);
             Assert.NotNull(reportedAsset);
-            Assert.Equal(Enumerable.Range(1, 100).ToArray(), reportedProgress.ToArray());
+            Assert.Null(reportedException);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
             {
@@ -87,18 +94,22 @@ namespace TestSuite.ApiTests
             // STEP 1: Create asset
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
+            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
+            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
             var numReads = 0;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
             var fileId = (string)null;
 
-            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
-            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
-
             await using (pausingFile.Data)
             {
-                while (pausingStream.Position < pausingStream.Length)
+                using var cts = new CancellationTokenSource(5000);
+
+                while (reportedAsset == null)
                 {
+                    var previousProgress = pausingStream.Position;
+
                     pausingStream.Reset();
 
                     await _.Assets.UploadNewAssetAsync(_.AppName, pausingFile, new AssetUploadOptions
@@ -114,16 +125,24 @@ namespace TestSuite.ApiTests
                             },
                             OnCompletedAsync = (@event, _) =>
                             {
-                                fileId = @event.FileId;
-
                                 reportedAsset = @event.Asset;
                                 return Task.CompletedTask;
                             }
                         },
                         FileId = fileId
-                    });
+                    }, cts.Token);
 
-                    await Task.Delay(200);
+                    while (true)
+                    {
+                        var length = await _.Assets.GetUploadProgressAsync(_.AppName, fileId, cts.Token);
+
+                        if (length > previousProgress || reportedAsset != null)
+                        {
+                            break;
+                        }
+
+                        await Task.Delay(20, cts.Token);
+                    }
 
                     numReads++;
                 }
@@ -211,6 +230,7 @@ namespace TestSuite.ApiTests
             // STEP 2: Reupload asset
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
+            var reportedException = (Exception)null;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
 
@@ -228,6 +248,11 @@ namespace TestSuite.ApiTests
                         OnCompletedAsync = (@event, _) =>
                         {
                             reportedAsset = @event.Asset;
+                            return Task.CompletedTask;
+                        },
+                        OnFailedAsync = (@event, _) =>
+                        {
+                            reportedException = @event.Exception;
                             return Task.CompletedTask;
                         }
                     }
@@ -256,18 +281,22 @@ namespace TestSuite.ApiTests
             // STEP 2: Reupload asset
             var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
 
+            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
+            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
             var numReads = 0;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
             var fileId = (string)null;
 
-            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
-            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
-
             await using (pausingFile.Data)
             {
-                while (pausingStream.Position < pausingStream.Length)
+                using var cts = new CancellationTokenSource(5000);
+
+                while (reportedAsset == null)
                 {
+                    var previousProgress = pausingStream.Position;
+
                     pausingStream.Reset();
 
                     await _.Assets.UploadExistingAssetAsync(_.AppName, asset_1.Id, pausingFile, new AssetUploadOptions
@@ -283,16 +312,24 @@ namespace TestSuite.ApiTests
                             },
                             OnCompletedAsync = (@event, _) =>
                             {
-                                fileId = @event.FileId;
-
                                 reportedAsset = @event.Asset;
                                 return Task.CompletedTask;
                             }
                         },
                         FileId = fileId
-                    });
+                    }, cts.Token);
 
-                    await Task.Delay(200);
+                    while (true)
+                    {
+                        var length = await _.Assets.GetUploadProgressAsync(_.AppName, fileId, cts.Token);
+
+                        if (length > previousProgress || reportedAsset != null)
+                        {
+                            break;
+                        }
+
+                        await Task.Delay(20, cts.Token);
+                    }
 
                     numReads++;
                 }
