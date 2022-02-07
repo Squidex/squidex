@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared;
@@ -443,7 +444,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 contentCommand.SchemaId = schemaId;
                 contentCommand.ExpectedVersion = fieldContext.GetArgument("expectedVersion", EtagVersion.Any);
 
-                var commandContext = await context.CommandBus.PublishAsync(contentCommand);
+                var commandContext = await context.Resolve<ICommandBus>().PublishAsync(contentCommand);
 
                 return commandContext.PlainResult!;
             });

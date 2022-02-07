@@ -251,17 +251,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 
         private static readonly IFieldResolver Url = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetContent(asset.AppId, asset.Id.ToString());
+            var urlGenerator = context.Resolve<IUrlGenerator>();
+
+            return urlGenerator.AssetContent(asset.AppId, asset.Id.ToString());
         });
 
         private static readonly IFieldResolver SourceUrl = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetSource(asset.AppId, asset.Id, asset.FileVersion);
+            var urlGenerator = context.Resolve<IUrlGenerator>();
+
+            return urlGenerator.AssetSource(asset.AppId, asset.Id, asset.FileVersion);
         });
 
         private static readonly IFieldResolver ThumbnailUrl = Resolve((asset, _, context) =>
         {
-            return context.UrlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
+            var urlGenerator = context.Resolve<IUrlGenerator>();
+
+            return urlGenerator.AssetThumbnail(asset.AppId, asset.Id.ToString(), asset.Type);
         });
 
         private static IFieldResolver Resolve<T>(Func<IEnrichedAssetEntity, IResolveFieldContext, GraphQLExecutionContext, T> resolver)

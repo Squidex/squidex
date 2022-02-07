@@ -36,18 +36,21 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly ITagService tagService;
+        private readonly AssetTusRunner assetTusRunner;
 
         public AssetsController(
             ICommandBus commandBus,
             IAssetQueryService assetQuery,
             IAssetUsageTracker assetStatsRepository,
             IAppPlansProvider appPlansProvider,
-            ITagService tagService)
+            ITagService tagService,
+            AssetTusRunner assetTusRunner)
             : base(commandBus)
         {
+            this.appPlansProvider = appPlansProvider;
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
-            this.appPlansProvider = appPlansProvider;
+            this.assetTusRunner = assetTusRunner;
             this.tagService = tagService;
         }
 
@@ -219,6 +222,43 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
+        /// Upload a new asset using tus.io.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 201 => Asset created.
+        /// 400 => Asset request not valid.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// Use the tus protocol to upload an asset.
+        /// </remarks>
+        [OpenApiIgnore]
+        [Route("apps/{app}/assets/tus/{**fileId}")]
+        [ProducesResponseType(typeof(AssetDto), 201)]
+        [AssetRequestSizeLimit]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsCreate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PostAssetTus(string app)
+        {
+            var url = Url.Action(null, new { app, fileId = (object?)null })!;
+
+            var (result, file) = await assetTusRunner.InvokeAsync(HttpContext, url);
+
+            if (file != null)
+            {
+                var command = CreateAssetDto.ToCommand(file);
+
+                var response = await InvokeCommandAsync(command);
+
+                return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Bulk update assets.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -303,6 +343,42 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var response = await InvokeCommandAsync(command);
 
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Replace asset content using tus.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the asset.</param>
+        /// <returns>
+        /// 200 => Asset updated.
+        /// 400 => Asset request not valid.
+        /// 413 => Asset exceeds the maximum upload size.
+        /// 404 => Asset or app not found.
+        /// </returns>
+        /// <remarks>
+        /// Use the tus protocol to upload an asset.
+        /// </remarks>
+        [OpenApiIgnore]
+        [Route("apps/{app}/assets/{id}/content/tus/{**fileId}")]
+        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
+        [AssetRequestSizeLimit]
+        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpload)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutAssetContentTus(string app, DomainId id)
+        {
+            var (result, file) = await assetTusRunner.InvokeAsync(HttpContext, Url.Action(null, new { app, id })!);
+
+            if (file != null)
+            {
+                var command = new UpdateAsset { File = file, AssetId = id };
+
+                var response = await InvokeCommandAsync(command);
+
+                return Ok(response);
+            }
+
+            return result;
         }
 
         /// <summary>

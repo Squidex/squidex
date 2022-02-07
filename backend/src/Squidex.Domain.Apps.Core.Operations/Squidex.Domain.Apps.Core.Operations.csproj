@@ -21,7 +21,7 @@
     <PackageReference Include="Fluid.Core.Squidex" Version="1.0.0-beta" />
 	<PackageReference Include="GeoJSON.Net" Version="1.2.19" />
 	<PackageReference Include="Jint" Version="3.0.0-beta-2036" />
-	<PackageReference Include="Meziantou.Analyzer" Version="1.0.689">
+	<PackageReference Include="Meziantou.Analyzer" Version="1.0.694">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>

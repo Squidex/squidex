@@ -38,6 +38,28 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [FromQuery]
         public bool Duplicate { get; set; }
 
+        public static CreateAsset ToCommand(AssetTusFile file)
+        {
+            var command = new CreateAsset { File = file };
+
+            if (file.Metadata.TryGetValue("id", out var id) && !string.IsNullOrWhiteSpace(id))
+            {
+                command.AssetId = DomainId.Create(id);
+            }
+
+            if (file.Metadata.TryGetValue("parentId", out var parentId) && !string.IsNullOrWhiteSpace(parentId))
+            {
+                command.ParentId = DomainId.Create(parentId);
+            }
+
+            if (file.Metadata.TryGetValue("duplicate", out var duplicate) && bool.TryParse(duplicate, out var parsed))
+            {
+                command.Duplicate = parsed;
+            }
+
+            return command;
+        }
+
         public CreateAsset ToCommand(AssetFile file)
         {
             var command = SimpleMapper.Map(this, new CreateAsset { File = file });

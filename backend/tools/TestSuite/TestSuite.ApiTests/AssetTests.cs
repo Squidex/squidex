@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Assets;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
@@ -33,6 +34,136 @@ namespace TestSuite.ApiTests
             await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
             {
                 var downloaded = await _.DownloadAsync(asset_1);
+
+                // Should dowload with correct size.
+                Assert.Equal(stream.Length, downloaded.Length);
+            }
+        }
+
+        [Fact]
+        public async Task Should_upload_asset_using_tus()
+        {
+            // STEP 1: Create asset
+            var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
+
+            var reportedException = (Exception)null;
+            var reportedProgress = new List<int>();
+            var reportedAsset = (AssetDto)null;
+
+            await using (fileParameter.Data)
+            {
+                await _.Assets.UploadNewAssetAsync(_.AppName, fileParameter, new AssetUploadOptions
+                {
+                    ProgressHandler = new AssetDelegatingProgressHandler
+                    {
+                        OnProgressAsync = (@event, _) =>
+                        {
+                            reportedProgress.Add(@event.Progress);
+                            return Task.CompletedTask;
+                        },
+                        OnCompletedAsync = (@event, _) =>
+                        {
+                            reportedAsset = @event.Asset;
+                            return Task.CompletedTask;
+                        },
+                        OnFailedAsync = (@event, _) =>
+                        {
+                            reportedException = @event.Exception;
+                            return Task.CompletedTask;
+                        }
+                    }
+                });
+            }
+
+            Assert.NotEmpty(reportedProgress);
+            Assert.NotNull(reportedAsset);
+            Assert.Null(reportedException);
+
+            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+            {
+                var downloaded = await _.DownloadAsync(reportedAsset);
+
+                // Should dowload with correct size.
+                Assert.Equal(stream.Length, downloaded.Length);
+            }
+        }
+
+        [Fact]
+        public async Task Should_upload_asset_using_tus_in_chunks()
+        {
+            // STEP 1: Create asset
+            var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
+
+            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
+            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
+            var numUploads = 0;
+            var reportedException = (Exception)null;
+            var reportedProgress = new List<int>();
+            var reportedAsset = (AssetDto)null;
+            var fileId = (string)null;
+
+            await using (pausingFile.Data)
+            {
+                using var cts = new CancellationTokenSource(5000);
+
+                while (reportedAsset == null)
+                {
+                    pausingStream.Reset();
+
+                    if (pausingStream.Position == pausingStream.Length)
+                    {
+                        throw new InvalidOperationException("Stream end reached.");
+                    }
+
+                    await _.Assets.UploadNewAssetAsync(_.AppName, pausingFile, new AssetUploadOptions
+                    {
+                        ProgressHandler = new AssetDelegatingProgressHandler
+                        {
+                            OnCreatedAsync = (@event, _) =>
+                            {
+                                fileId = @event.FileId;
+                                return Task.CompletedTask;
+                            },
+                            OnProgressAsync = (@event, _) =>
+                            {
+                                reportedProgress.Add(@event.Progress);
+                                return Task.CompletedTask;
+                            },
+                            OnCompletedAsync = (@event, _) =>
+                            {
+                                reportedAsset = @event.Asset;
+                                return Task.CompletedTask;
+                            },
+                            OnFailedAsync = (@event, _) =>
+                            {
+                                if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    reportedException = @event.Exception;
+                                }
+
+                                return Task.CompletedTask;
+                            }
+                        },
+                        FileId = fileId
+                    }, cts.Token);
+
+                    Assert.Null(reportedException);
+
+                    await Task.Delay(50, cts.Token);
+
+                    numUploads++;
+                }
+            }
+
+            Assert.NotEmpty(reportedProgress);
+            Assert.NotNull(reportedAsset);
+            Assert.Null(reportedException);
+            Assert.True(numUploads > 1);
+
+            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+            {
+                var downloaded = await _.DownloadAsync(reportedAsset);
 
                 // Should dowload with correct size.
                 Assert.Equal(stream.Length, downloaded.Length);
@@ -92,6 +223,143 @@ namespace TestSuite.ApiTests
             await using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
             {
                 var downloaded = await _.DownloadAsync(asset_2);
+
+                // Should dowload with correct size.
+                Assert.Equal(stream.Length, downloaded.Length);
+            }
+        }
+
+        [Fact]
+        public async Task Should_replace_asset_using_tus()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Reupload asset
+            var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
+
+            var reportedException = (Exception)null;
+            var reportedProgress = new List<int>();
+            var reportedAsset = (AssetDto)null;
+
+            await using (fileParameter.Data)
+            {
+                await _.Assets.UploadExistingAssetAsync(_.AppName, asset_1.Id, fileParameter, new AssetUploadOptions
+                {
+                    ProgressHandler = new AssetDelegatingProgressHandler
+                    {
+                        OnProgressAsync = (@event, _) =>
+                        {
+                            reportedProgress.Add(@event.Progress);
+                            return Task.CompletedTask;
+                        },
+                        OnCompletedAsync = (@event, _) =>
+                        {
+                            reportedAsset = @event.Asset;
+                            return Task.CompletedTask;
+                        },
+                        OnFailedAsync = (@event, _) =>
+                        {
+                            reportedException = @event.Exception;
+                            return Task.CompletedTask;
+                        }
+                    }
+                });
+            }
+
+            Assert.NotNull(reportedAsset);
+            Assert.Equal(Enumerable.Range(1, 100).ToArray(), reportedProgress.ToArray());
+
+            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+            {
+                var downloaded = await _.DownloadAsync(reportedAsset);
+
+                // Should dowload with correct size.
+                Assert.Equal(stream.Length, downloaded.Length);
+            }
+        }
+
+        [Fact]
+        public async Task Should_replace_asset_using_tus_in_chunks()
+        {
+            // STEP 1: Create asset
+            var asset_1 = await _.UploadFileAsync("Assets/logo-squared.png", "image/png");
+
+
+            // STEP 2: Reupload asset
+            var fileParameter = FileParameter.FromPath("Assets/SampleVideo_1280x720_1mb.mp4");
+
+            var pausingStream = new PauseStream(fileParameter.Data, 0.25);
+            var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
+
+            var numUploads = 0;
+            var reportedException = (Exception)null;
+            var reportedProgress = new List<int>();
+            var reportedAsset = (AssetDto)null;
+            var fileId = (string)null;
+
+            await using (pausingFile.Data)
+            {
+                using var cts = new CancellationTokenSource(5000);
+
+                while (reportedAsset == null)
+                {
+                    pausingStream.Reset();
+
+                    if (pausingStream.Position == pausingStream.Length)
+                    {
+                        throw new InvalidOperationException("Stream end reached.");
+                    }
+
+                    await _.Assets.UploadExistingAssetAsync(_.AppName, asset_1.Id, pausingFile, new AssetUploadOptions
+                    {
+                        ProgressHandler = new AssetDelegatingProgressHandler
+                        {
+                            OnCreatedAsync = (@event, _) =>
+                            {
+                                fileId = @event.FileId;
+                                return Task.CompletedTask;
+                            },
+                            OnProgressAsync = (@event, _) =>
+                            {
+                                reportedProgress.Add(@event.Progress);
+                                return Task.CompletedTask;
+                            },
+                            OnCompletedAsync = (@event, _) =>
+                            {
+                                reportedAsset = @event.Asset;
+                                return Task.CompletedTask;
+                            },
+                            OnFailedAsync = (@event, _) =>
+                            {
+                                if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    reportedException = @event.Exception;
+                                }
+
+                                return Task.CompletedTask;
+                            }
+                        },
+                        FileId = fileId
+                    }, cts.Token);
+
+                    Assert.Null(reportedException);
+
+                    await Task.Delay(50, cts.Token);
+
+                    numUploads++;
+                }
+            }
+
+            Assert.NotEmpty(reportedProgress);
+            Assert.NotNull(reportedAsset);
+            Assert.Null(reportedException);
+            Assert.True(numUploads > 1);
+
+            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+            {
+                var downloaded = await _.DownloadAsync(reportedAsset);
 
                 // Should dowload with correct size.
                 Assert.Equal(stream.Length, downloaded.Length);
@@ -355,6 +623,43 @@ namespace TestSuite.ApiTests
             var asset_2 = await _.UploadFileAsync("Assets/logo-wide.png", "image/png");
 
             Assert.NotEqual(asset_1.FileSize, asset_2.FileSize);
+        }
+
+        public class PauseStream : DelegateStream
+        {
+            private readonly double pauseAfter = 1;
+            private int totalRead;
+
+            public PauseStream(Stream innerStream, double pauseAfter)
+                : base(innerStream)
+            {
+                this.pauseAfter = pauseAfter;
+            }
+
+            public void Reset()
+            {
+                totalRead = 0;
+            }
+
+            public override async ValueTask<int> ReadAsync(Memory<byte> buffer,
+                CancellationToken cancellationToken = default)
+            {
+                if (Position >= Length)
+                {
+                    return 0;
+                }
+
+                if (totalRead >= Length * pauseAfter)
+                {
+                    throw new InvalidOperationException("PAUSED");
+                }
+
+                var bytesRead = await base.ReadAsync(buffer, cancellationToken);
+
+                totalRead += bytesRead;
+
+                return bytesRead;
+            }
         }
     }
 }

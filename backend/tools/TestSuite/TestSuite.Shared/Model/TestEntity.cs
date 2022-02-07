@@ -10,6 +10,8 @@ using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace TestSuite.Model
 {
     public sealed class TestEntity : Content<TestEntityData>

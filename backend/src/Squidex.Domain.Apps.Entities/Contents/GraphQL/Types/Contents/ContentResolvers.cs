@@ -7,6 +7,7 @@
 
 using GraphQL;
 using GraphQL.Resolvers;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Infrastructure;
@@ -24,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public static readonly IFieldResolver Url = Resolve((content, _, context) =>
         {
-            var appId = content.AppId;
+            var urlGenerator = context.Resolve<IUrlGenerator>();
 
-            return context.UrlGenerator.ContentUI(appId, content.SchemaId, content.Id);
+            return urlGenerator.ContentUI(content.AppId, content.SchemaId, content.Id);
         });
 
         public static readonly IFieldResolver FlatData = Resolve((content, c, context) =>

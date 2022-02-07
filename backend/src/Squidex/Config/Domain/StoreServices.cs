@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Migrations.Migrations.MongoDb;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
@@ -34,6 +35,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Domain.Users.MongoDb;
+using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
@@ -96,7 +98,10 @@ namespace Squidex.Config.Domain
                         .As<IMigration>();
 
                     services.AddHealthChecks()
-                        .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
+                        .AddCheck<MongoHealthCheck>("MongoDB", tags: new[] { "node" });
+
+                    services.AddSingletonAs<MongoAssetKeyValueStore<TusMetadata>>()
+                        .As<IAssetKeyValueStore<TusMetadata>>();
 
                     services.AddSingletonAs<MongoRequestLogRepository>()
                         .As<IRequestLogRepository>();
@@ -175,6 +180,13 @@ namespace Squidex.Config.Domain
 
             services.AddSingleton(typeof(IPersistenceFactory<>),
                 typeof(Store<>));
+
+            services.AddSingletonAs(c =>
+            {
+                var service = c.GetRequiredService<IAssetKeyValueStore<TusMetadata>>();
+
+                return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
+            }).As<IInitializable>();
         }
 
         private static IMongoClient GetClient(string configuration)
@@ -182,9 +194,9 @@ namespace Squidex.Config.Domain
             return Singletons<IMongoClient>.GetOrAdd(configuration, s => new MongoClient(s));
         }
 
-        private static IMongoDatabase GetDatabase(IServiceProvider service, string name)
+        private static IMongoDatabase GetDatabase(IServiceProvider serviceProvider, string name)
         {
-            return service.GetRequiredService<IMongoClient>().GetDatabase(name);
+            return serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(name);
         }
     }
 }
