@@ -98,6 +98,7 @@ namespace TestSuite.ApiTests
             var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
 
             var numUploads = 0;
+            var reportedException = (Exception)null;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
             var fileId = (string)null;
@@ -128,10 +129,21 @@ namespace TestSuite.ApiTests
                             {
                                 reportedAsset = @event.Asset;
                                 return Task.CompletedTask;
+                            },
+                            OnFailedAsync = (@event, _) =>
+                            {
+                                if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    reportedException = @event.Exception;
+                                }
+
+                                return Task.CompletedTask;
                             }
                         },
                         FileId = fileId
                     }, cts.Token);
+
+                    Assert.Null(reportedException);
 
                     await Task.Delay(50, cts.Token);
 
@@ -141,6 +153,7 @@ namespace TestSuite.ApiTests
 
             Assert.NotEmpty(reportedProgress);
             Assert.NotNull(reportedAsset);
+            Assert.Null(reportedException);
             Assert.True(numUploads > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
@@ -276,6 +289,7 @@ namespace TestSuite.ApiTests
             var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType);
 
             var numUploads = 0;
+            var reportedException = (Exception)null;
             var reportedProgress = new List<int>();
             var reportedAsset = (AssetDto)null;
             var fileId = (string)null;
@@ -306,10 +320,21 @@ namespace TestSuite.ApiTests
                             {
                                 reportedAsset = @event.Asset;
                                 return Task.CompletedTask;
+                            },
+                            OnFailedAsync = (@event, _) =>
+                            {
+                                if (!@event.Exception.ToString().Contains("PAUSED", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    reportedException = @event.Exception;
+                                }
+
+                                return Task.CompletedTask;
                             }
                         },
                         FileId = fileId
                     }, cts.Token);
+
+                    Assert.Null(reportedException);
 
                     await Task.Delay(50, cts.Token);
 
@@ -319,6 +344,7 @@ namespace TestSuite.ApiTests
 
             Assert.NotEmpty(reportedProgress);
             Assert.NotNull(reportedAsset);
+            Assert.Null(reportedException);
             Assert.True(numUploads > 1);
 
             await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
@@ -615,7 +641,7 @@ namespace TestSuite.ApiTests
 
                 if (totalRead >= Length * pauseAfter)
                 {
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException("PAUSED");
                 }
 
                 var bytesRead = await base.ReadAsync(buffer, cancellationToken);
