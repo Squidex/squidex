@@ -42,65 +42,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
             switch (context.Command)
             {
-                case CreateAsset createAsset:
-                    {
-                        var tempFile = context.ContextId.ToString();
-
-                        try
-                        {
-                            await EnrichWithHashAndUploadAsync(createAsset, tempFile);
-
-                            if (!createAsset.Duplicate)
-                            {
-                                var existing =
-                                    await assetQuery.FindByHashAsync(contextProvider.Context,
-                                        createAsset.FileHash,
-                                        createAsset.File.FileName,
-                                        createAsset.File.FileSize);
-
-                                if (existing != null)
-                                {
-                                    context.Complete(new AssetDuplicate(existing));
-
-                                    await next(context);
-                                    return;
-                                }
-                            }
-
-                            await EnrichWithMetadataAsync(createAsset);
-
-                            await base.HandleAsync(context, next);
-                        }
-                        finally
-                        {
-                            await assetFileStore.DeleteAsync(tempFile);
-
-                            await createAsset.File.DisposeAsync();
-                        }
-
-                        break;
-                    }
-
-                case MoveAsset move:
-                    {
-                        await base.HandleAsync(context, next);
-
-                        break;
-                    }
+                case CreateAsset create:
+                    await UploadWithDuplicateCheckAsync(context, create, create.Duplicate, next);
+                    break;
 
                 case UpsertAsset upsert:
-                    {
-                        await UploadAndHandleAsync(context, next, upsert);
+                    await UploadWithDuplicateCheckAsync(context, upsert, upsert.Duplicate, next);
+                    break;
 
-                        break;
-                    }
+                case MoveAsset move:
+                    await base.HandleAsync(context, next);
+                    break;
 
                 case UpdateAsset upload:
-                    {
-                        await UploadAndHandleAsync(context, next, upload);
-
-                        break;
-                    }
+                    await UploadAndHandleAsync(context, upload, next);
+                    break;
 
                 default:
                     await base.HandleAsync(context, next);
@@ -108,14 +64,32 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        private async Task UploadAndHandleAsync(CommandContext context, NextDelegate next, UploadAssetCommand upload)
+        private async Task UploadWithDuplicateCheckAsync(CommandContext context, UploadAssetCommand command, bool duplicate, NextDelegate next)
         {
             var tempFile = context.ContextId.ToString();
 
             try
             {
-                await EnrichWithHashAndUploadAsync(upload, tempFile);
-                await EnrichWithMetadataAsync(upload);
+                await EnrichWithHashAndUploadAsync(command, tempFile);
+
+                if (!duplicate)
+                {
+                    var existing =
+                        await assetQuery.FindByHashAsync(contextProvider.Context,
+                            command.FileHash,
+                            command.File.FileName,
+                            command.File.FileSize);
+
+                    if (existing != null)
+                    {
+                        context.Complete(new AssetDuplicate(existing));
+
+                        await next(context);
+                        return;
+                    }
+                }
+
+                await EnrichWithMetadataAsync(command);
 
                 await base.HandleAsync(context, next);
             }
@@ -123,7 +97,26 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             {
                 await assetFileStore.DeleteAsync(tempFile);
 
-                await upload.File.DisposeAsync();
+                await command.File.DisposeAsync();
+            }
+        }
+
+        private async Task UploadAndHandleAsync(CommandContext context, UploadAssetCommand command, NextDelegate next)
+        {
+            var tempFile = context.ContextId.ToString();
+
+            try
+            {
+                await EnrichWithHashAndUploadAsync(command, tempFile);
+                await EnrichWithMetadataAsync(command);
+
+                await base.HandleAsync(context, next);
+            }
+            finally
+            {
+                await assetFileStore.DeleteAsync(tempFile);
+
+                await command.File.DisposeAsync();
             }
         }
 

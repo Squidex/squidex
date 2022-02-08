@@ -248,7 +248,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (file != null)
             {
-                var command = CreateAssetDto.ToCommand(file);
+                var command = UpsertAssetDto.ToCommand(file);
 
                 var response = await InvokeCommandAsync(command);
 
@@ -343,42 +343,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var response = await InvokeCommandAsync(command);
 
             return Ok(response);
-        }
-
-        /// <summary>
-        /// Replace asset content using tus.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
-        /// <returns>
-        /// 200 => Asset updated.
-        /// 400 => Asset request not valid.
-        /// 413 => Asset exceeds the maximum upload size.
-        /// 404 => Asset or app not found.
-        /// </returns>
-        /// <remarks>
-        /// Use the tus protocol to upload an asset.
-        /// </remarks>
-        [OpenApiIgnore]
-        [Route("apps/{app}/assets/{id}/content/tus/{**fileId}")]
-        [ProducesResponseType(typeof(AssetDto), StatusCodes.Status200OK)]
-        [AssetRequestSizeLimit]
-        [ApiPermissionOrAnonymous(Permissions.AppAssetsUpload)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetContentTus(string app, DomainId id)
-        {
-            var (result, file) = await assetTusRunner.InvokeAsync(HttpContext, Url.Action(null, new { app, id })!);
-
-            if (file != null)
-            {
-                var command = new UpdateAsset { File = file, AssetId = id };
-
-                var response = await InvokeCommandAsync(command);
-
-                return Ok(response);
-            }
-
-            return result;
         }
 
         /// <summary>

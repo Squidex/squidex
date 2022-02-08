@@ -170,10 +170,36 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         [Fact]
         public async Task Upsert_should_upload_file()
         {
-            await HandleAsync(new UpsertAsset { File = file }, CreateAsset(1));
+            await HandleAsync(new UpsertAsset { File = file, Duplicate = false }, CreateAsset(1));
 
             AssertAssetHasBeenUploaded(1);
             AssertMetadataEnriched();
+        }
+
+        [Fact]
+        public async Task Upsert_should_not_return_duplicate_result_if_file_with_same_hash_found_but_duplicate_allowed()
+        {
+            var result = CreateAsset();
+
+            SetupSameHashAsset(file.FileName, file.FileSize, out _);
+
+            var context =
+                await HandleAsync(new UpsertAsset { File = file },
+                    result);
+
+            Assert.Same(result, context.Result<IEnrichedAssetEntity>());
+        }
+
+        [Fact]
+        public async Task Upsert_should_return_duplicate_result_if_file_with_same_hash_found()
+        {
+            SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
+
+            var context =
+                await HandleAsync(new UpsertAsset { File = file, Duplicate = false },
+                    CreateAsset());
+
+            Assert.Same(duplicate, context.Result<AssetDuplicate>().Asset);
         }
 
         [Fact]
