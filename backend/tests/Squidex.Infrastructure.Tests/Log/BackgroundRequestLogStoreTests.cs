@@ -7,8 +7,8 @@
 
 using System.Globalization;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.Log
@@ -27,7 +27,9 @@ namespace Squidex.Infrastructure.Log
 
             options.StoreEnabled = true;
 
-            sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, A.Fake<ISemanticLog>())
+            var log = A.Fake<ILogger<BackgroundRequestLogStore>>();
+
+            sut = new BackgroundRequestLogStore(Options.Create(options), requestLogRepository, log)
             {
                 ForceWrite = true
             };

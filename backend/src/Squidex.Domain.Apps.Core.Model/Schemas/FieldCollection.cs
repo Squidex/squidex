@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (ById.ContainsKey(field.Id))
             {
-                throw new ArgumentException($"A field with id {field.Id} already exists.", nameof(field));
+                throw new ArgumentException($"A field with ID {field.Id} already exists.", nameof(field));
             }
 
             return new FieldCollection<T>(fieldsOrdered.Union(Enumerable.Repeat(field, 1)));

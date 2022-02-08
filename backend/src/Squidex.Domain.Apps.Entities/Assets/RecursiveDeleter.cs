@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ICommandBus commandBus;
         private readonly IAssetRepository assetRepository;
         private readonly IAssetFolderRepository assetFolderRepository;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RecursiveDeleter> log;
         private readonly HashSet<string> consumingTypes;
 
         public string Name
@@ -38,11 +38,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
             IAssetRepository assetRepository,
             IAssetFolderRepository assetFolderRepository,
             TypeNameRegistry typeNameRegistry,
-            ISemanticLog log)
+            ILogger<RecursiveDeleter> log)
         {
             this.commandBus = commandBus;
             this.assetRepository = assetRepository;
             this.assetFolderRepository = assetFolderRepository;
+
             this.log = log;
 
             // Compute the event types names once for performance reasons and use hashset for extensibility.
@@ -76,9 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, w => w
-                            .WriteProperty("action", "DeleteAssetsRecursive")
-                            .WriteProperty("status", "Failed"));
+                        log.LogError(ex, "Failed to delete asset recursively.");
                     }
                 }
 

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Notifo.SDK;
@@ -30,14 +31,14 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly NotifoOptions options;
         private readonly IUrlGenerator urlGenerator;
         private readonly IUserResolver userResolver;
-        private readonly ISemanticLog log;
+        private readonly ILogger<NotifoService> log;
         private readonly IClock clock;
         private readonly INotifoClient? client;
 
         public NotifoService(IOptions<NotifoOptions> options,
             IUrlGenerator urlGenerator,
             IUserResolver userResolver,
-            ISemanticLog log,
+            ILogger<NotifoService> log,
             IClock clock)
         {
             this.options = options.Value;
@@ -136,16 +137,11 @@ namespace Squidex.Domain.Apps.Entities.History
             }
             catch (NotifoException ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "RegisterToNotifo")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("details", ex.ToString()));
+                log.LogError(ex, "Failed to register user in notifo: {details}.", ex.ToString());
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "RegisterToNotifo")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to register user in notifo.");
             }
         }
 
@@ -196,16 +192,11 @@ namespace Squidex.Domain.Apps.Entities.History
             }
             catch (NotifoException ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "RegisterToNotifo")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("details", ex.ToString()));
+                log.LogError(ex, "Failed to push user to notifo: {details}.", ex.ToString());
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "RegisterToNotifo")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to push user to notifo.");
             }
         }
 

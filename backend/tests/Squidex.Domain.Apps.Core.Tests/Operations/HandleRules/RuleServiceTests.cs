@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -18,7 +19,6 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTriggerV2));
 
-            var log = A.Fake<ISemanticLog>();
+            var log = A.Fake<ILogger<RuleService>>();
 
             sut = new RuleService(Options.Create(new RuleOptions()),
                 new[] { ruleTriggerHandler },

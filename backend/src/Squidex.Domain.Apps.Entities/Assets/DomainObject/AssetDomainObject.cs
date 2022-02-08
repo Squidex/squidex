@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -14,7 +15,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     {
         private readonly IServiceProvider serviceProvider;
 
-        public AssetDomainObject(IPersistenceFactory<State> factory, ISemanticLog log,
+        public AssetDomainObject(IPersistenceFactory<State> factory, ILogger<AssetDomainObject> log,
             IServiceProvider serviceProvider)
             : base(factory, log)
         {

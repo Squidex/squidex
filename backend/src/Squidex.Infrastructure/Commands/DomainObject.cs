@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Log;
@@ -16,7 +17,7 @@ namespace Squidex.Infrastructure.Commands
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly SnapshotList<T> snapshots = new SnapshotList<T>();
         private readonly IPersistenceFactory<T> factory;
-        private readonly ISemanticLog log;
+        private readonly ILogger log;
         private IPersistence<T>? persistence;
         private bool isLoaded;
         private DomainId uniqueId;
@@ -42,7 +43,7 @@ namespace Squidex.Infrastructure.Commands
             set => snapshots.Capacity = value;
         }
 
-        protected DomainObject(IPersistenceFactory<T> factory, ISemanticLog log)
+        protected DomainObject(IPersistenceFactory<T> factory, ILogger log)
         {
             Guard.NotNull(factory);
             Guard.NotNull(log);
@@ -120,14 +121,14 @@ namespace Squidex.Infrastructure.Commands
             }
             else
             {
-                var logContext = (id: uniqueId.ToString(), name: GetType().Name);
-
-                using (log.MeasureInformation(logContext, (ctx, w) => w
-                    .WriteProperty("action", "ActivateDomainObject")
-                    .WriteProperty("domainObjectType", ctx.name)
-                    .WriteProperty("domainObjectKey", ctx.id)))
+                var watch = ValueStopwatch.StartNew();
+                try
                 {
                     await ReadAsync();
+                }
+                finally
+                {
+                    log.LogInformation("Activated domain object of type {type} with ID {id} in {time}.", GetType(), UniqueId, watch.Stop());
                 }
             }
 
@@ -347,9 +348,7 @@ namespace Squidex.Infrastructure.Commands
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, w => w
-                            .WriteProperty("action", "RepairSnapshot")
-                            .WriteProperty("status", "Failed"));
+                        log.LogError(ex, "Failed to repair snapshot for domain object of type {type} with ID {id}.", GetType(), UniqueId);
                     }
                 }
             }

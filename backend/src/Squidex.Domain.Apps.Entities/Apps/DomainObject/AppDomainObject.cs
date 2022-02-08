@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
@@ -16,7 +17,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log,
-            InitialSettings initialPatterns,
+        public AppDomainObject(IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
+            InitialSettings initialSettings,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
-            this.initialSettings = initialPatterns;
+            this.initialSettings = initialSettings;
         }
 
         protected override bool IsDeleted(State snapshot)

@@ -111,6 +111,7 @@ namespace Squidex.Infrastructure.Plugins
                 var status = exceptions.Count > 0 ? "CompletedWithErrors" : "Completed";
 
                 log.LogInformation(w => w
+                    .WriteProperty("message", "Plugins loaded.")
                     .WriteProperty("action", "pluginsLoaded")
                     .WriteProperty("status", status)
                     .WriteArray("errors", e =>

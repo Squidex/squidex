@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Orleans;
 using Orleans.Runtime;
@@ -21,13 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentRepository contentRepository;
         private readonly ICommandBus commandBus;
         private readonly IClock clock;
-        private readonly ISemanticLog log;
+        private readonly ILogger<ContentSchedulerGrain> log;
 
         public ContentSchedulerGrain(
             IContentRepository contentRepository,
             ICommandBus commandBus,
             IClock clock,
-            ISemanticLog log)
+            ILogger<ContentSchedulerGrain> log)
         {
             this.clock = clock;
 
@@ -91,10 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
             catch (Exception ex)
             {
-                log.LogError(ex, content.Id.ToString(), (logContentId, w) => w
-                    .WriteProperty("action", "ChangeStatusScheduled")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("contentId", logContentId));
+                log.LogError(ex, "Failed to execute scheduled status change for content '{contentId}'.", content.Id);
             }
         }
 

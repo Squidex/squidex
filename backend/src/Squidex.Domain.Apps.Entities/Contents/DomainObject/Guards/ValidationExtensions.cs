@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.DefaultValues;
@@ -16,7 +17,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 new ContentValidator(operation.Partition(),
                     validationContext,
                     operation.Resolve<IEnumerable<IValidatorsFactory>>(),
-                    operation.Resolve<ISemanticLog>());
+                    operation.Resolve<ILogger<ContentValidator>>());
 
             return validator;
         }

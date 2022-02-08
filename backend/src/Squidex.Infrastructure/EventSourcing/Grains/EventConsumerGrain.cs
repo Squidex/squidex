@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Log;
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IGrainState<EventConsumerState> state;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
-        private readonly ISemanticLog log;
+        private readonly ILogger<EventConsumerGrain> log;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
         private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
@@ -34,7 +35,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IGrainState<EventConsumerState> state,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            ISemanticLog log)
+            ILogger<EventConsumerGrain> log)
         {
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
@@ -68,9 +69,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 }
                 catch (Exception ex)
                 {
-                    log.LogFatal(ex, w => w
-                        .WriteProperty("action", "CompleteConsumer")
-                        .WriteProperty("status", "Failed"));
+                    log.LogCritical(ex, "Failed to complete consumer.");
                 }
             }
         }
@@ -222,11 +221,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                         ex = new AggregateException(ex, unsubscribeException);
                     }
 
-                    log.LogFatal(ex, w => w
-                        .WriteProperty("action", caller)
-                        .WriteProperty("status", "Failed")
-                        .WriteProperty("eventPosition", position)
-                        .WriteProperty("eventConsumer", eventConsumer!.Name));
+                    log.LogCritical(ex, "Failed to update consumer {consumer} at position {position} from {caller}.",
+                        eventConsumer!.Name, position, caller);
 
                     State = previousState.Stopped(ex);
                 }
@@ -244,21 +240,19 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private async Task ClearAsync()
         {
-            var logContext = (actionId: Guid.NewGuid().ToString(), consumer: eventConsumer!.Name);
-
-            log.LogDebug(logContext, (ctx, w) => w
-                .WriteProperty("action", "EventConsumerReset")
-                .WriteProperty("actionId", ctx.actionId)
-                .WriteProperty("status", "Started")
-                .WriteProperty("eventConsumer", ctx.consumer));
-
-            using (log.MeasureInformation(logContext, (ctx, w) => w
-                .WriteProperty("action", "EventConsumerReset")
-                .WriteProperty("actionId", ctx.actionId)
-                .WriteProperty("status", "Completed")
-                .WriteProperty("eventConsumer", ctx.consumer)))
+            if (log.IsEnabled(LogLevel.Debug))
             {
-                await eventConsumer.ClearAsync();
+                log.LogDebug("Event consumer {consumer} reset started", eventConsumer!.Name);
+            }
+
+            var watch = ValueStopwatch.StartNew();
+            try
+            {
+                await eventConsumer!.ClearAsync();
+            }
+            finally
+            {
+                log.LogDebug("Event consumer {consumer} reset completed after {time}ms.", eventConsumer!.Name, watch.Stop());
             }
         }
 

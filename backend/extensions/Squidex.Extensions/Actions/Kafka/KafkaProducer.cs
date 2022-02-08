@@ -11,10 +11,10 @@ using Avro.Generic;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 using Schema = Avro.Schema;
 
 namespace Squidex.Extensions.Actions.Kafka
@@ -26,7 +26,7 @@ namespace Squidex.Extensions.Actions.Kafka
         private readonly ISchemaRegistryClient schemaRegistry;
         private readonly IJsonSerializer jsonSerializer;
 
-        public KafkaProducer(IOptions<KafkaProducerOptions> options, ISemanticLog log, IJsonSerializer jsonSerializer)
+        public KafkaProducer(IOptions<KafkaProducerOptions> options, ILogger<KafkaProducer> log, IJsonSerializer jsonSerializer)
         {
             this.jsonSerializer = jsonSerializer;
 
@@ -62,49 +62,44 @@ namespace Squidex.Extensions.Actions.Kafka
             }
         }
 
-        private static void LogMessage(ISemanticLog log, LogMessage message)
+        private static void LogMessage(ILogger<KafkaProducer> log, LogMessage message)
         {
-            var level = SemanticLogLevel.Information;
+            var level = LogLevel.Information;
 
             switch (message.Level)
             {
                 case SyslogLevel.Emergency:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Alert:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Critical:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Error:
-                    level = SemanticLogLevel.Error;
+                    level = LogLevel.Error;
                     break;
                 case SyslogLevel.Warning:
-                    level = SemanticLogLevel.Warning;
+                    level = LogLevel.Warning;
                     break;
                 case SyslogLevel.Notice:
-                    level = SemanticLogLevel.Information;
+                    level = LogLevel.Information;
                     break;
                 case SyslogLevel.Info:
-                    level = SemanticLogLevel.Information;
+                    level = LogLevel.Information;
                     break;
                 case SyslogLevel.Debug:
-                    level = SemanticLogLevel.Debug;
+                    level = LogLevel.Debug;
                     break;
             }
 
-            log.Log(level, null, w => w
-                 .WriteProperty("action", "KafkaAction")
-                 .WriteProperty("name", message.Name)
-                 .WriteProperty("message", message.Message));
+            log.Log(level, "Kafka log {name}: {message}.", message.Name, message.Message);
         }
 
-        private static void LogError(ISemanticLog log, Error error)
+        private static void LogError(ILogger<KafkaProducer> log, Error error)
         {
-            log.LogWarning(w => w
-                .WriteProperty("action", "KafkaError")
-                .WriteProperty("reason", error.Reason));
+            log.LogWarning("Kafka error with {code} and {reason}.", error.Code, error.Reason);
         }
 
         public async Task SendAsync(KafkaJob job,

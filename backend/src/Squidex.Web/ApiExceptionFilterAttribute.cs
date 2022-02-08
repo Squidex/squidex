@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Squidex.Log;
 
 namespace Squidex.Web
@@ -32,10 +33,9 @@ namespace Squidex.Web
 
             if (unhandled != null)
             {
-                var log = context.HttpContext.RequestServices.GetRequiredService<ISemanticLog>();
+                var log = context.HttpContext.RequestServices.GetRequiredService<ILogger<ApiExceptionFilterAttribute>>();
 
-                log.LogError(unhandled, w => w
-                    .WriteProperty("message", "An unexpected exception has occurred."));
+                log.LogError(unhandled, "An unexpected exception has occurred.");
             }
 
             context.Result = GetResult(error);

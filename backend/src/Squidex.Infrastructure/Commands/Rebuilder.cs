@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Squidex.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
@@ -22,7 +23,7 @@ namespace Squidex.Infrastructure.Commands
         private readonly ILocalCache localCache;
         private readonly IEventStore eventStore;
         private readonly IServiceProvider serviceProvider;
-        private readonly ISemanticLog log;
+        private readonly ILogger<Rebuilder> log;
 
         private static class Factory<T, TState> where T : DomainObject<TState> where TState : class, IDomainState<TState>, new()
         {
@@ -38,12 +39,12 @@ namespace Squidex.Infrastructure.Commands
             ILocalCache localCache,
             IEventStore eventStore,
             IServiceProvider serviceProvider,
-            ISemanticLog log)
+            ILogger<Rebuilder> log)
         {
             this.eventStore = eventStore;
             this.serviceProvider = serviceProvider;
-            this.log = log;
             this.localCache = localCache;
+            this.log = log;
         }
 
         public virtual Task RebuildAsync<T, TState>(string filter, int batchSize,
@@ -119,11 +120,7 @@ namespace Squidex.Infrastructure.Commands
                                 }
                                 catch (Exception ex)
                                 {
-                                    log.LogWarning(ex, w => w
-                                        .WriteProperty("reason", "CorruptData")
-                                        .WriteProperty("domainObjectId", id.ToString())
-                                        .WriteProperty("domainObjectType", typeof(T).Name));
-
+                                    log.LogWarning(ex, "Found corrupt domain object of type {type} with ID {id}.", typeof(T), id);
                                     Interlocked.Increment(ref handlerErrors);
                                 }
                             }

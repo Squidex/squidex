@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -17,13 +18,12 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 {
     public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject.State>
     {
-        public SchemaDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log)
+        public SchemaDomainObject(IPersistenceFactory<State> persistence, ILogger<SchemaDomainObject> log)
             : base(persistence, log)
         {
         }

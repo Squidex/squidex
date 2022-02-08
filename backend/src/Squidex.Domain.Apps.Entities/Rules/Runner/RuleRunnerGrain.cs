@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
 using Squidex.Caching;
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IRuleService ruleService;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RuleRunnerGrain> log;
         private CancellationTokenSource? currentJobToken;
         private IGrainReminder? currentReminder;
         private bool isStopping;
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             IEventDataFormatter eventDataFormatter,
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService,
-            ISemanticLog log)
+            ILogger<RuleRunnerGrain> log)
         {
             this.state = state;
             this.appProvider = appProvider;
@@ -187,10 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "runRule")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("ruleId", currentState.RuleId?.ToString()));
+                log.LogError(ex, "Failed to run rule with ID {ruleId}.", currentState.RuleId);
             }
             finally
             {
@@ -234,9 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         throw job.EnrichmentError;
                     }
 
-                    log.LogWarning(job.EnrichmentError, w => w
-                        .WriteProperty("action", "runRule")
-                        .WriteProperty("status", "failedPartially"));
+                    log.LogWarning(job.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.", context.RuleId);
                 }
             }
         }
@@ -276,9 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                         throw;
                     }
 
-                    log.LogWarning(ex, w => w
-                        .WriteProperty("action", "runRule")
-                        .WriteProperty("status", "failedPartially"));
+                    log.LogWarning(ex, "Failed to run rule with ID {ruleId}, continue with next job.", context.RuleId);
                 }
                 finally
                 {

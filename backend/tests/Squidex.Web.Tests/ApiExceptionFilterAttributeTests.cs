@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
@@ -24,7 +25,7 @@ namespace Squidex.Web
 {
     public class ApiExceptionFilterAttributeTests
     {
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<ApiExceptionFilterAttribute> log = A.Fake<ILogger<ApiExceptionFilterAttribute>>();
         private readonly ApiExceptionFilterAttribute sut = new ApiExceptionFilterAttribute();
 
         [Fact]
@@ -59,7 +60,7 @@ namespace Squidex.Web
                 "property5[0].property6: Error5"
             }, ((ErrorDto)result.Value!).Details);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -72,7 +73,7 @@ namespace Squidex.Web
 
             Assert.IsType<NotFoundResult>(context.Result);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -85,7 +86,7 @@ namespace Squidex.Web
 
             Validate(500, context.Result, null);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, context.Exception, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<Exception>(3) == context.Exception)
                 .MustHaveHappened();
         }
 
@@ -98,7 +99,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -111,7 +112,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception, "ERROR_CODE_XYZ");
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -124,7 +125,7 @@ namespace Squidex.Web
 
             Validate(400, context.Result, context.Exception);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -137,7 +138,7 @@ namespace Squidex.Web
 
             Validate(409, context.Result, context.Exception, "OBJECT_CONFLICT");
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -150,7 +151,7 @@ namespace Squidex.Web
 
             Validate(410, context.Result, context.Exception, "OBJECT_DELETED");
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -163,7 +164,7 @@ namespace Squidex.Web
 
             Validate(412, context.Result, context.Exception, "OBJECT_VERSION_CONFLICT");
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -176,7 +177,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, context.Exception, "FORBIDDEN");
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -189,7 +190,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, context.Exception, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<Exception>(3) == context.Exception)
                 .MustHaveHappened();
         }
 
@@ -202,7 +203,7 @@ namespace Squidex.Web
 
             Validate(403, context.Result, null);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log)
                 .MustNotHaveHappened();
         }
 
@@ -238,7 +239,7 @@ namespace Squidex.Web
         {
             var services = A.Fake<IServiceProvider>();
 
-            A.CallTo(() => services.GetService(typeof(ISemanticLog)))
+            A.CallTo(() => services.GetService(typeof(ILogger<ApiExceptionFilterAttribute>)))
                 .Returns(log);
 
             var httpContext = new DefaultHttpContext

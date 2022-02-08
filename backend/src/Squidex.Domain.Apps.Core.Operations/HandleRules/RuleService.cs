@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
@@ -29,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private readonly IEventEnricher eventEnricher;
         private readonly IJsonSerializer jsonSerializer;
         private readonly IClock clock;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RuleService> log;
 
         public RuleService(
             IOptions<RuleOptions> ruleOptions,
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             IEventEnricher eventEnricher,
             IJsonSerializer jsonSerializer,
             IClock clock,
-            ISemanticLog log,
+            ILogger<RuleService> log,
             TypeNameRegistry typeNameRegistry)
         {
             this.typeNameRegistry = typeNameRegistry;
@@ -286,9 +287,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                             });
                         }
 
-                        log.LogError(ex, w => w
-                            .WriteProperty("action", "createRuleJobFromEvent")
-                            .WriteProperty("status", "Failed"));
+                        log.LogError(ex, "Failed to create rule jobs from event.");
                     }
                 }
             }
@@ -296,9 +295,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 jobs.Add(JobResult.Failed(ex));
 
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "createRuleJob")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to create rule job.");
             }
         }
 

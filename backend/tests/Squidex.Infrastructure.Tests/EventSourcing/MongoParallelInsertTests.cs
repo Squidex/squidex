@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Orleans.Internal;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.TestHelpers;
-using Squidex.Log;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
     public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreReplicaSetFixture>
     {
         private readonly IGrainState<EventConsumerState> grainState = A.Fake<IGrainState<EventConsumerState>>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<EventConsumerGrain> log = A.Fake<ILogger<EventConsumerGrain>>();
         private readonly IEventDataFormatter eventDataFormatter;
 
         public MongoEventStoreFixture _ { get; }
@@ -155,7 +155,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 IGrainState<EventConsumerState> state,
                 IEventStore eventStore,
                 IEventDataFormatter eventDataFormatter,
-                ISemanticLog log)
+                ILogger<EventConsumerGrain> log)
                 : base(eventConsumerFactory, state, eventStore, eventDataFormatter, log)
             {
             }

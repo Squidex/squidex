@@ -10,7 +10,6 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -27,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserResolver userResolver;
-        private readonly ISemanticLog log;
+        private readonly ILogger<UsersController> log;
 
         static UsersController()
         {
@@ -46,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             IHttpClientFactory httpClientFactory,
             IUserPictureStore userPictureStore,
             IUserResolver userResolver,
-            ISemanticLog log)
+            ILogger<UsersController> log)
             : base(commandBus)
         {
             this.httpClientFactory = httpClientFactory;
@@ -99,9 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", nameof(GetUsers))
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to return users, returning empty results.");
             }
 
             return Ok(Array.Empty<UserDto>());
@@ -134,9 +131,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", nameof(GetUser))
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to return user, returning empty results.");
             }
 
             return NotFound();
@@ -209,9 +204,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", nameof(GetUser))
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to return user picture, returning fallback image.");
             }
 
             return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");

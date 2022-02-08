@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
                 if (existingId != default)
                 {
-                    throw new ValidationException(T.Get("apps.nameAlreadyExists"));
+                    throw new ValidationException(T.Get("schemas.nameAlreadyExists"));
                 }
             }
             catch

@@ -12,6 +12,7 @@ using GraphQL.Execution;
 using GraphQL.NewtonsoftJson;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Squidex.Caching;
@@ -26,7 +27,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Xunit;
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         DataLoaderDocumentListener>()
                     .AddSingleton<IDataLoaderContextAccessor,
                         DataLoaderContextAccessor>()
-                    .AddSingleton(A.Fake<ISemanticLog>())
+                    .AddSingleton(A.Fake<ILoggerFactory>())
                     .AddSingleton(appProvider)
                     .AddSingleton(assetQuery)
                     .AddSingleton(commandBus)

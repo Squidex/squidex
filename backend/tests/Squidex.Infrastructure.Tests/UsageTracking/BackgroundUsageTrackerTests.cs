@@ -7,7 +7,7 @@
 
 using FakeItEasy;
 using FluentAssertions;
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Squidex.Infrastructure.UsageTracking
@@ -17,7 +17,6 @@ namespace Squidex.Infrastructure.UsageTracking
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
         private readonly IUsageRepository usageStore = A.Fake<IUsageRepository>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly string key = Guid.NewGuid().ToString();
         private readonly DateTime date = DateTime.Today;
         private readonly BackgroundUsageTracker sut;
@@ -25,6 +24,8 @@ namespace Squidex.Infrastructure.UsageTracking
         public BackgroundUsageTrackerTests()
         {
             ct = cts.Token;
+
+            var log = A.Fake<ILogger<BackgroundUsageTracker>>();
 
             sut = new BackgroundUsageTracker(usageStore, log)
             {

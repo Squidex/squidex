@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -27,7 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentSchedulerGrainTests()
         {
-            sut = new ContentSchedulerGrain(contentRepository, commandBus, clock, A.Fake<ISemanticLog>());
+            var log = A.Fake<ILogger<ContentSchedulerGrain>>();
+
+            sut = new ContentSchedulerGrain(contentRepository, commandBus, clock, log);
         }
 
         [Fact]

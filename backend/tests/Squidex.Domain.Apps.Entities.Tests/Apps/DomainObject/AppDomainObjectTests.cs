@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -15,7 +16,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -67,7 +67,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 }
             };
 
-            sut = new AppDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), initialSettings, appPlansProvider, appPlansBillingManager, userResolver);
+            var log = A.Fake<ILogger<AppDomainObject>>();
+
+            sut = new AppDomainObject(PersistenceFactory, log,
+                initialSettings,
+                appPlansProvider,
+                appPlansBillingManager,
+                userResolver);
 #pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
 #pragma warning restore MA0056 // Do not call overridable members in constructor

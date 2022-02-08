@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Orleans;
+using Orleans.Runtime;
 using Squidex.Infrastructure.Validation;
 using Squidex.Log;
 using Xunit;
@@ -15,13 +17,13 @@ namespace Squidex.Infrastructure.Orleans
 {
     public class LoggingFilterTests
     {
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILoggerFactory logFactory = A.Fake<ILoggerFactory>();
         private readonly IIncomingGrainCallContext context = A.Fake<IIncomingGrainCallContext>();
         private readonly LoggingFilter sut;
 
         public LoggingFilterTests()
         {
-            sut = new LoggingFilter(log);
+            sut = new LoggingFilter(logFactory);
         }
 
         [Fact]
@@ -29,7 +31,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             await sut.Invoke(context);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(() => logFactory.CreateLogger(A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -41,19 +43,29 @@ namespace Squidex.Infrastructure.Orleans
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.Invoke(context));
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(() => logFactory.CreateLogger(A<string>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_log_exception_and_forward_it()
         {
+            var log = A.Fake<ILogger>();
+
+            var grain = A.Fake<IAddressable>();
+
             A.CallTo(() => context.Invoke())
                 .Throws(new InvalidOperationException());
 
+            A.CallTo(() => context.Grain)
+                .Returns(grain);
+
+            A.CallTo(() => logFactory.CreateLogger(A<string>._))
+                .Returns(log);
+
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.Invoke(context));
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();
         }
     }

@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -22,7 +23,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
@@ -104,11 +104,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             patched = patch.MergeInto(data);
 
-            var log = A.Fake<ISemanticLog>();
+            var log = A.Fake<ILogger<ContentDomainObject>>();
 
             var serviceProvider =
                 new ServiceCollection()
                     .AddSingleton(appProvider)
+                    .AddSingleton(A.Fake<ILogger<ContentValidator>>())
                     .AddSingleton(log)
                     .AddSingleton(contentWorkflow)
                     .AddSingleton(contentRepository)

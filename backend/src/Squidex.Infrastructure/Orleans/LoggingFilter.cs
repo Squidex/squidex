@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Squidex.Log;
 
@@ -12,11 +13,11 @@ namespace Squidex.Infrastructure.Orleans
 {
     public sealed class LoggingFilter : IIncomingGrainCallFilter
     {
-        private readonly ISemanticLog log;
+        private readonly ILoggerFactory logFactory;
 
-        public LoggingFilter(ISemanticLog log)
+        public LoggingFilter(ILoggerFactory logFactory)
         {
-            this.log = log;
+            this.logFactory = logFactory;
         }
 
         public async Task Invoke(IIncomingGrainCallContext context)
@@ -48,11 +49,9 @@ namespace Squidex.Infrastructure.Orleans
 
         private void Log(IIncomingGrainCallContext context, Exception ex)
         {
-            log.LogError(ex, w => w
-                .WriteProperty("action", "GrainInvoked")
-                .WriteProperty("status", "Failed")
-                .WriteProperty("grain", context.Grain.ToString())
-                .WriteProperty("grainMethod", context.ImplementationMethod.ToString()));
+            var log = logFactory.CreateLogger(context.Grain.GetType());
+
+            log.LogError(ex, "Failed to execute method of grain.", context.ImplementationMethod);
         }
     }
 }

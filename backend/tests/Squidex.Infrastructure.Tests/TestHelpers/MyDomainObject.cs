@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.TestHelpers
         }
 
         public MyDomainObject(IPersistenceFactory<MyDomainState> factory)
-           : base(factory, A.Dummy<ISemanticLog>())
+           : base(factory, A.Dummy<ILogger>())
         {
         }
 

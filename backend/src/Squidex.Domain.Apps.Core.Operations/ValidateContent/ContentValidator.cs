@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
         private readonly IEnumerable<IValidatorsFactory> factories;
-        private readonly ISemanticLog log;
+        private readonly ILogger<ContentValidator> log;
         private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
 
         public IReadOnlyCollection<ValidationError> Errors
@@ -29,7 +29,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             get => errors;
         }
 
-        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories, ISemanticLog log)
+        public ContentValidator(PartitionResolver partitionResolver, ValidationContext context, IEnumerable<IValidatorsFactory> factories,
+            ILogger<ContentValidator> log)
         {
             Guard.NotNull(context);
             Guard.NotNull(factories);

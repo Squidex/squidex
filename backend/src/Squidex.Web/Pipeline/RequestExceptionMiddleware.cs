@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
@@ -26,7 +27,7 @@ namespace Squidex.Web.Pipeline
             this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IActionResultExecutor<ObjectResult> writer, ISemanticLog log)
+        public async Task InvokeAsync(HttpContext context, IActionResultExecutor<ObjectResult> writer, ILogger<RequestExceptionMiddleware> log)
         {
             if (TryGetErrorCode(context, out var statusCode) && IsErrorStatusCode(statusCode))
             {
@@ -42,7 +43,7 @@ namespace Squidex.Web.Pipeline
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w.WriteProperty("message", "An unexpected exception has occurred."));
+                log.LogError(ex, "An unexpected exception has occurred.");
 
                 if (!context.Response.HasStarted)
                 {

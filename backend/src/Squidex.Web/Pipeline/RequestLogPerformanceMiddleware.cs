@@ -41,8 +41,9 @@ namespace Squidex.Web.Pipeline
 
                     log.LogInformation((elapsedMs, context), (ctx, w) =>
                     {
-                        w.WriteObject("filters", ctx.context, LogFilters);
+                        w.WriteProperty("message", "HTTP request executed.");
                         w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
+                        w.WriteObject("filters", ctx.context, LogFilters);
                     });
                 }
             }

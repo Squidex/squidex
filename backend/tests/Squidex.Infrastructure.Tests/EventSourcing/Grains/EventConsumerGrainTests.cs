@@ -7,10 +7,10 @@
 
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Orleans.Storage;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.TestHelpers;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 IGrainState<EventConsumerState> state,
                 IEventStore eventStore,
                 IEventDataFormatter eventDataFormatter,
-                ISemanticLog log)
+                ILogger<EventConsumerGrain> log)
                 : base(eventConsumerFactory, state, eventStore, eventDataFormatter, log)
             {
             }
@@ -59,7 +59,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventDataFormatter formatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly StoredEvent storedEvent;
         private readonly EventData eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
         private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
@@ -101,6 +100,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             A.CallTo(() => formatter.ParseIfKnown(storedEvent))
                 .Returns(envelope);
+
+            var log = A.Fake<ILogger<EventConsumerGrain>>();
 
             sut = new MyEventConsumerGrain(
                 x => eventConsumer,

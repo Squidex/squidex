@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
@@ -19,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
     {
         private readonly IEmailSender emailSender;
         private readonly IUrlGenerator urlGenerator;
-        private readonly ISemanticLog log;
+        private readonly ILogger<NotificationEmailSender> log;
         private readonly NotificationEmailTextOptions texts;
 
         private sealed class TemplatesVars
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             IOptions<NotificationEmailTextOptions> texts,
             IEmailSender emailSender,
             IUrlGenerator urlGenerator,
-            ISemanticLog log)
+            ILogger<NotificationEmailSender> log)
         {
             this.texts = texts.Value;
             this.emailSender = emailSender;
@@ -101,13 +102,13 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         {
             if (string.IsNullOrWhiteSpace(emailBody))
             {
-                LogWarning($"No email subject configured for {template}");
+                log.LogWarning("Cannot send email to {email}: No email subject configured for template {template}.", template, user.Email);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(emailSubj))
             {
-                LogWarning($"No email body configured for {template}");
+                log.LogWarning("Cannot send email to {email}: No email body configured for template {template}.", template, user.Email);
                 return;
             }
 
@@ -124,20 +125,9 @@ namespace Squidex.Domain.Apps.Entities.Notifications
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "SendNotification")
-                    .WriteProperty("status", "Failed"));
-
+                log.LogError(ex, "Failed to send notification to {email}.", user.Email);
                 throw;
             }
-        }
-
-        private void LogWarning(string reason)
-        {
-            log.LogWarning(w => w
-                .WriteProperty("action", "SendNotification")
-                .WriteProperty("status", "Failed")
-                .WriteProperty("reason", reason));
         }
 
         private static string Format(string text, TemplatesVars vars)

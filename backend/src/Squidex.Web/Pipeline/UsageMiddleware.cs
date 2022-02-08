@@ -34,7 +34,6 @@ namespace Squidex.Web.Pipeline
             var usageBody = SetUsageBody(context);
 
             var watch = ValueStopwatch.StartNew();
-
             try
             {
                 await next(context);
@@ -70,8 +69,8 @@ namespace Squidex.Web.Pipeline
                         request.UserId = context.User.OpenIdSubject();
                         request.UserClientId = clientId;
 
-#pragma warning disable MA0040 // Flow the cancellation token
-                        await usageLog.LogAsync(appId.Value, request);
+                        // Do not flow cancellation token because it is too important.
+                        await usageLog.LogAsync(appId.Value, request, default);
 
                         if (request.Costs > 0)
                         {
@@ -81,9 +80,9 @@ namespace Squidex.Web.Pipeline
                                 request.UserClientId,
                                 request.Costs,
                                 request.ElapsedMs,
-                                request.Bytes);
+                                request.Bytes,
+                                default);
                         }
-#pragma warning restore MA0040 // Flow the cancellation token
                     }
                 }
             }

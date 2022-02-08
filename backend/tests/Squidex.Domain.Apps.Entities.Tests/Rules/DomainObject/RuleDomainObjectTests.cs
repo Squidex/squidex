@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -13,7 +14,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
@@ -37,7 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         public RuleDomainObjectTests()
         {
-            sut = new RuleDomainObject(PersistenceFactory, A.Dummy<ISemanticLog>(), appProvider, ruleEnqueuer);
+            var log = A.Fake<ILogger<RuleDomainObject>>();
+
+            sut = new RuleDomainObject(PersistenceFactory, log, appProvider, ruleEnqueuer);
 #pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
 #pragma warning restore MA0056 // Do not call overridable members in constructor

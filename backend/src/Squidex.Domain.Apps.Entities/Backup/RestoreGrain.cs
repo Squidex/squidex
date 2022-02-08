@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ICommandBus commandBus;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RestoreGrain> log;
         private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IUserResolver userResolver;
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
             IUserResolver userResolver,
-            ISemanticLog log)
+            ILogger<RestoreGrain> log)
         {
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
@@ -129,11 +130,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var handlers = CreateHandlers();
 
-            var logContext = (
-                jobId: CurrentJob.Id.ToString(),
-                jobUrl: CurrentJob.Url.ToString()
-            );
-
             var ct = default(CancellationToken);
 
             using (Telemetry.Activities.StartActivity("RestoreBackup"))
@@ -146,11 +142,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     Log("  * Restore all objects like app, schemas and contents");
                     Log("  * Complete the restore operation for all objects");
 
-                    log.LogInformation(logContext, (ctx, w) => w
-                        .WriteProperty("action", "restore")
-                        .WriteProperty("status", "started")
-                        .WriteProperty("operationId", ctx.jobId)
-                        .WriteProperty("url", ctx.jobUrl));
+                    log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.",
+                        CurrentJob.Id,
+                        CurrentJob.Url);
 
                     using (var reader = await DownloadAsync())
                     {
@@ -188,13 +182,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     Log("Completed, Yeah!");
 
-                    log.LogInformation(logContext, (ctx, w) =>
-                    {
-                        w.WriteProperty("action", "restore");
-                        w.WriteProperty("status", "completed");
-                        w.WriteProperty("operationId", ctx.jobId);
-                        w.WriteProperty("url", ctx.jobUrl);
-                    });
+                    log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.",
+                        CurrentJob.Id,
+                        CurrentJob.Url);
                 }
                 catch (Exception ex)
                 {
@@ -215,13 +205,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     CurrentJob.Status = JobStatus.Failed;
 
-                    log.LogError(ex, logContext, (ctx, w) =>
-                    {
-                        w.WriteProperty("action", "restore");
-                        w.WriteProperty("status", "failed");
-                        w.WriteProperty("operationId", ctx.jobId);
-                        w.WriteProperty("url", ctx.jobUrl);
-                    });
+                    log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.",
+                        CurrentJob.Id,
+                        CurrentJob.Url);
                 }
                 finally
                 {
@@ -279,10 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, appId.ToString(), (logOperationId, w) => w
-                            .WriteProperty("action", "cleanupRestore")
-                            .WriteProperty("status", "failed")
-                            .WriteProperty("operationId", logOperationId));
+                        log.LogError(ex, "Failed to clean up restore.");
                     }
                 }
             }

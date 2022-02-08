@@ -241,7 +241,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
                 if (string.IsNullOrWhiteSpace(email))
                 {
-                    throw new DomainException(T.Get("login.noEmailAddress"));
+                    throw new DomainException(T.Get("users.noEmailAddress"));
                 }
 
                 var values = new UserValues

@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Email;
-using Squidex.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly IUser assigner = UserMocks.User("1", "1@email.com", "user1");
         private readonly IUser assigned = UserMocks.User("2", "2@email.com", "user2");
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<NotificationEmailSender> log = A.Fake<ILogger<NotificationEmailSender>>();
         private readonly string appName = "my-app";
         private readonly string appUI = "my-ui";
         private readonly NotificationEmailTextOptions texts = new NotificationEmailTextOptions();
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Notifications
 
         private void MustLogWarning()
         {
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                 .MustHaveHappened();
         }
     }
