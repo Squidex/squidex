@@ -8,7 +8,6 @@
 using Esprima;
 using Esprima.Ast;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal
 {

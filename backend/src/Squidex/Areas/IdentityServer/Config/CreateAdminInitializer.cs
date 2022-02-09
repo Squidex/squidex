@@ -12,7 +12,6 @@ using Squidex.Domain.Users;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
@@ -85,11 +84,9 @@ namespace Squidex.Areas.IdentityServer.Config
                         }
                         catch (Exception ex)
                         {
-                            var log = serviceProvider.GetRequiredService<ISemanticLog>();
+                            var log = serviceProvider.GetRequiredService<ILogger<CreateAdminInitializer>>();
 
-                            log.LogError(ex, w => w
-                                .WriteProperty("action", "createAdmin")
-                                .WriteProperty("status", "failed"));
+                            log.LogError(ex, "Failed to create administrator.");
                         }
                     }
                 }

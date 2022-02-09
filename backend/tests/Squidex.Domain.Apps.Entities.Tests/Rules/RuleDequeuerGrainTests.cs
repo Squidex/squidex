@@ -6,12 +6,12 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleDequeuerGrainTests
     {
         private readonly IClock clock = A.Fake<IClock>();
-        private readonly ISemanticLog log = A.Dummy<ISemanticLog>();
+        private readonly ILogger<RuleDequeuerGrain> log = A.Dummy<ILogger<RuleDequeuerGrain>>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly IRuleService ruleService = A.Fake<IRuleService>();
         private readonly RuleDequeuerGrain sut;
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.QueryAsync();
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();
         }
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.HandleAsync(@event);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();
         }
 
@@ -124,12 +124,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             if (result == RuleResult.Failed)
             {
-                A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<Exception?>._, A<LogFormatter>._))
+                A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                     .MustHaveHappened();
             }
             else
             {
-                A.CallTo(() => log.Log(SemanticLogLevel.Warning, A<Exception?>._, A<LogFormatter>._))
+                A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                     .MustNotHaveHappened();
             }
 

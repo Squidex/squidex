@@ -835,9 +835,6 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Jouw e-mailadres is ingesteld op privé in Github. Stel het in op openbaar om Github-login te gebruiken.</value>
   </data>
-  <data name="login.noEmailAddress" xml:space="preserve">
-    <value>We cannot get the email address from authentication provider.</value>
-  </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>Er wordt al een andere regel uitgevoerd.</value>
   </data>
@@ -1089,6 +1086,9 @@
   </data>
   <data name="users.logout.title" xml:space="preserve">
     <value>Uitloggen</value>
+  </data>
+  <data name="users.noEmailAddress" xml:space="preserve">
+    <value>We cannot get the email address from authentication provider.</value>
   </data>
   <data name="users.profile.addLoginDone" xml:space="preserve">
     <value>Login succesvol toegevoegd.</value>

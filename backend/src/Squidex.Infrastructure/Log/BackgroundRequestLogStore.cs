@@ -6,16 +6,16 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Timers;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.Log
 {
     public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
     {
         private readonly IRequestLogRepository logRepository;
-        private readonly ISemanticLog log;
+        private readonly ILogger<BackgroundRequestLogStore> log;
         private readonly CompletionTimer timer;
         private readonly RequestLogStoreOptions options;
         private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Log
         public bool IsEnabled => options.StoreEnabled;
 
         public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
-            IRequestLogRepository logRepository, ISemanticLog log)
+            IRequestLogRepository logRepository, ILogger<BackgroundRequestLogStore> log)
         {
             this.options = options.Value;
 
@@ -84,9 +84,7 @@ namespace Squidex.Infrastructure.Log
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "TrackUsage")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to track usage in background.");
             }
         }
 

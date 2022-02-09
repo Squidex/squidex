@@ -7,13 +7,13 @@
 
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            var log = A.Fake<ISemanticLog>();
+            var log = A.Fake<ILogger<AssetFolderDomainObject>>();
 
             var serviceProvider =
                 new ServiceCollection()

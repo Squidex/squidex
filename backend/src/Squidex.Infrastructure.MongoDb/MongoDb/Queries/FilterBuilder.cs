@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
             {
                 if (!supportsSearch)
                 {
-                    throw new ValidationException(T.Get("queries.fullTextNotSupported"));
+                    throw new ValidationException(T.Get("common.fullTextNotSupported"));
                 }
 
                 return (Builders<TDocument>.Filter.Text(query.FullText), false);

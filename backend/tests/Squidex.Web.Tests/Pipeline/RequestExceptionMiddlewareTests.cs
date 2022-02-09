@@ -10,14 +10,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Squidex.Web.Pipeline
 {
     public class RequestExceptionMiddlewareTests
     {
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<RequestExceptionMiddleware> log = A.Fake<ILogger<RequestExceptionMiddleware>>();
         private readonly IActionResultExecutor<ObjectResult> resultWriter = A.Fake<IActionResultExecutor<ObjectResult>>();
         private readonly IHttpResponseFeature responseFeature = A.Fake<IHttpResponseFeature>();
         private readonly HttpContext httpContext = new DefaultHttpContext();
@@ -113,7 +113,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.InvokeAsync(httpContext, resultWriter, log);
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Error, ex, A<LogFormatter>._))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Error)
                 .MustHaveHappened();
         }
 

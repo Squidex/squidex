@@ -9,7 +9,6 @@ using System.Text.Encodings.Web;
 using Fluid;
 using Fluid.Ast;
 using Fluid.Values;
-using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;

@@ -5,18 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class AggregateValidator : IValidator
     {
         private readonly IValidator[]? validators;
-        private readonly ISemanticLog log;
+        private readonly ILogger<ContentValidator> log;
 
-        public AggregateValidator(IEnumerable<IValidator>? validators, ISemanticLog log)
+        public AggregateValidator(IEnumerable<IValidator>? validators,
+            ILogger<ContentValidator> log)
         {
             this.validators = validators?.ToArray();
 
@@ -34,9 +35,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "validateField")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to validate fields.");
 
                 addError(context.Path, T.Get("contents.validation.error"));
             }

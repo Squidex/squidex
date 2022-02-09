@@ -6,45 +6,23 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
     public class LogCommandMiddlewareTests
     {
-        private readonly MyLog log = new MyLog();
+        private readonly ILogger<LogCommandMiddleware> log = A.Fake<ILogger<LogCommandMiddleware>>();
         private readonly LogCommandMiddleware sut;
         private readonly ICommand command = A.Dummy<ICommand>();
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
 
-        private sealed class MyLog : ISemanticLog
-        {
-            public Dictionary<SemanticLogLevel, int> LogLevels { get; } = new Dictionary<SemanticLogLevel, int>();
-
-            public void Log<T>(SemanticLogLevel logLevel, T context, Exception? exception, LogFormatter<T> action)
-            {
-                LogLevels[logLevel] = LogLevels.GetOrDefault(logLevel) + 1;
-            }
-
-            public void Log(SemanticLogLevel logLevel, Exception? exception, LogFormatter action)
-            {
-                LogLevels[logLevel] = LogLevels.GetOrDefault(logLevel) + 1;
-            }
-
-            public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)
-            {
-                throw new NotSupportedException();
-            }
-
-            public ISemanticLog CreateScope(ILogAppender appender)
-            {
-                throw new NotSupportedException();
-            }
-        }
-
         public LogCommandMiddlewareTests()
         {
+            A.CallTo(() => log.IsEnabled(A<LogLevel>._))
+                .Returns(true);
+
             sut = new LogCommandMiddleware(log);
         }
 
@@ -60,11 +38,11 @@ namespace Squidex.Infrastructure.Commands
                 return Task.CompletedTask;
             });
 
-            Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
-            {
-                [SemanticLogLevel.Debug] = 1,
-                [SemanticLogLevel.Information] = 2
-            });
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
+                .MustHaveHappened();
+
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
+                .MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -77,12 +55,14 @@ namespace Squidex.Infrastructure.Commands
                 await sut.HandleAsync(context, c => throw new InvalidOperationException());
             });
 
-            Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
-            {
-                [SemanticLogLevel.Debug] = 1,
-                [SemanticLogLevel.Information] = 1,
-                [SemanticLogLevel.Error] = 1
-            });
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
+                .MustHaveHappened();
+
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
+                .MustHaveHappened();
+
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Error)
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -92,12 +72,14 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.HandleAsync(context, c => Task.CompletedTask);
 
-            Assert.Equal(log.LogLevels, new Dictionary<SemanticLogLevel, int>
-            {
-                [SemanticLogLevel.Debug] = 1,
-                [SemanticLogLevel.Information] = 2,
-                [SemanticLogLevel.Fatal] = 1
-            });
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Debug)
+                .MustHaveHappened();
+
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Information)
+                .MustHaveHappenedTwiceExactly();
+
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical)
+                .MustHaveHappened();
         }
     }
 }

@@ -835,9 +835,6 @@
   <data name="login.githubPrivateEmail" xml:space="preserve">
     <value>Il tuo indirizzo email è impostato su privato in Github. Impostalo come pubblico per poter utilizzare il login Github.</value>
   </data>
-  <data name="login.noEmailAddress" xml:space="preserve">
-    <value>We cannot get the email address from authentication provider.</value>
-  </data>
   <data name="rules.ruleAlreadyRunning" xml:space="preserve">
     <value>È in esecuzione un'altra regola.</value>
   </data>
@@ -1089,6 +1086,9 @@
   </data>
   <data name="users.logout.title" xml:space="preserve">
     <value>Esci</value>
+  </data>
+  <data name="users.noEmailAddress" xml:space="preserve">
+    <value>We cannot get the email address from authentication provider.</value>
   </data>
   <data name="users.profile.addLoginDone" xml:space="preserve">
     <value>La login è stata aggiunta con successo.</value>

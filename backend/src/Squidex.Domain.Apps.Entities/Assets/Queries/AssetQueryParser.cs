@@ -8,7 +8,6 @@
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using NJsonSchema;
 using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;

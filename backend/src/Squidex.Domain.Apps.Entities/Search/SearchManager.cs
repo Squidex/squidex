@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 
 namespace Squidex.Domain.Apps.Entities.Search
 {
@@ -13,9 +13,9 @@ namespace Squidex.Domain.Apps.Entities.Search
     {
         private static readonly SearchResults Empty = new SearchResults();
         private readonly IEnumerable<ISearchSource> searchSources;
-        private readonly ISemanticLog log;
+        private readonly ILogger<SearchManager> log;
 
-        public SearchManager(IEnumerable<ISearchSource> searchSources, ISemanticLog log)
+        public SearchManager(IEnumerable<ISearchSource> searchSources, ILogger<SearchManager> log)
         {
             this.searchSources = searchSources;
 
@@ -46,11 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Search
             }
             catch (Exception ex)
             {
-                log.LogError(ex, query, (c, w) => w
-                    .WriteProperty("operation", "search")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("query", query));
-
+                log.LogError(ex, "Failed to execute search from source {source} with query '{query}'.", source, query);
                 return Empty;
             }
         }

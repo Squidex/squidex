@@ -7,9 +7,9 @@
 
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -21,10 +21,10 @@ namespace Squidex.Domain.Users
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
         private readonly IEnumerable<IUserEvents> userEvents;
-        private readonly ISemanticLog log;
+        private readonly ILogger<DefaultUserService> log;
 
         public DefaultUserService(UserManager<IdentityUser> userManager, IUserFactory userFactory,
-            IEnumerable<IUserEvents> userEvents, ISemanticLog log)
+            IEnumerable<IUserEvents> userEvents, ILogger<DefaultUserService> log)
         {
             this.userManager = userManager;
             this.userFactory = userFactory;
@@ -207,9 +207,7 @@ namespace Squidex.Domain.Users
                 }
                 catch (Exception ex2)
                 {
-                    log.LogError(ex2, w => w
-                        .WriteProperty("action", "CleanupUser")
-                        .WriteProperty("status", "Failed"));
+                    log.LogError(ex2, "Failed to cleanup user after creation failed.");
                 }
 
                 throw;

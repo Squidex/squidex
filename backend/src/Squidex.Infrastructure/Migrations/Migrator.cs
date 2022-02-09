@@ -5,19 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Migrations
 {
     public sealed class Migrator
     {
-        private readonly ISemanticLog log;
         private readonly IMigrationStatus migrationStatus;
         private readonly IMigrationPath migrationPath;
+        private readonly ILogger<Migrator> log;
 
         public int LockWaitMs { get; set; } = 500;
 
-        public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath, ISemanticLog log)
+        public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath,
+            ILogger<Migrator> log)
         {
             this.migrationStatus = migrationStatus;
             this.migrationPath = migrationPath;
@@ -50,28 +51,19 @@ namespace Squidex.Infrastructure.Migrations
                     {
                         var name = migration.ToString()!;
 
-                        log.LogInformation(w => w
-                            .WriteProperty("action", "Migration")
-                            .WriteProperty("status", "Started")
-                            .WriteProperty("migrator", name));
+                        log.LogInformation("Migration {migration} started.", name);
 
                         try
                         {
-                            using (log.MeasureInformation(w => w
-                                .WriteProperty("action", "Migration")
-                                .WriteProperty("status", "Completed")
-                                .WriteProperty("migrator", name)))
-                            {
-                                await migration.UpdateAsync(ct);
-                            }
+                            var watch = ValueStopwatch.StartNew();
+
+                            await migration.UpdateAsync(ct);
+
+                            log.LogInformation("Migration {migration} completed after {time}ms.", name, watch.Stop());
                         }
                         catch (Exception ex)
                         {
-                            log.LogFatal(ex, w => w
-                                .WriteProperty("action", "Migration")
-                                .WriteProperty("status", "Failed")
-                                .WriteProperty("migrator", name));
-
+                            log.LogCritical(ex, "Migration {migration} failed.", name);
                             throw new MigrationFailedException(name, ex);
                         }
                     }
@@ -94,10 +86,7 @@ namespace Squidex.Infrastructure.Migrations
             {
                 while (!await migrationStatus.TryLockAsync(ct))
                 {
-                    log.LogInformation(w => w
-                        .WriteProperty("action", "Migrate")
-                        .WriteProperty("mesage", $"Waiting {LockWaitMs}ms to acquire lock."));
-
+                    log.LogInformation("Could not acquire lock to start migrating. Tryping again in {time}ms.", LockWaitMs);
                     await Task.Delay(LockWaitMs, ct);
                 }
             }

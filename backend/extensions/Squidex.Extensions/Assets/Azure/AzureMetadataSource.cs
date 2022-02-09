@@ -7,19 +7,19 @@
 
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 
 namespace Squidex.Extensions.Assets.Azure
 {
     public sealed class AzureMetadataSource : IAssetMetadataSource
     {
         private const long MaxSize = 5 * 1025 * 1024;
-        private readonly ISemanticLog log;
+        private readonly ILogger<AzureMetadataSource> log;
         private readonly ComputerVisionClient client;
         private readonly char[] trimChars =
         {
@@ -36,7 +36,8 @@ namespace Squidex.Extensions.Assets.Azure
 
         public int Order => int.MaxValue;
 
-        public AzureMetadataSource(IOptions<AzureMetadataSourceOptions> options, ISemanticLog log)
+        public AzureMetadataSource(IOptions<AzureMetadataSourceOptions> options,
+            ILogger<AzureMetadataSource> log)
         {
             client = new ComputerVisionClient(new ApiKeyServiceClientCredentials(options.Value.ApiKey))
             {
@@ -82,9 +83,7 @@ namespace Squidex.Extensions.Assets.Azure
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "EnrichWithAzure")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to enrich asset.");
             }
         }
 

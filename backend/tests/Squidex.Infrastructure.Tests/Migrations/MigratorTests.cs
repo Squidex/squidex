@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Squidex.Infrastructure.Migrations
@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Migrations
         private readonly CancellationToken ct;
         private readonly IMigrationStatus status = A.Fake<IMigrationStatus>();
         private readonly IMigrationPath path = A.Fake<IMigrationPath>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<Migrator> log = A.Fake<ILogger<Migrator>>();
         private readonly List<(int From, int To, IMigration Migration)> migrations = new List<(int From, int To, IMigration Migration)>();
 
         public sealed class InMemoryStatus : IMigrationStatus
@@ -216,7 +216,7 @@ namespace Squidex.Infrastructure.Migrations
 
             await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync(ct));
 
-            A.CallTo(() => log.Log(SemanticLogLevel.Fatal, ex, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Critical && x.GetArgument<Exception>(3) == ex)
                 .MustHaveHappened();
 
             A.CallTo(() => migrator_1_2.UpdateAsync(ct))

@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly IUser assigner = UserMocks.User("1");
         private readonly IUser assignee = UserMocks.User("2");
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<InvitationEventConsumer> log = A.Fake<ILogger<InvitationEventConsumer>>();
         private readonly string assignerId = DomainId.NewGuid().ToString();
         private readonly string assigneeId = DomainId.NewGuid().ToString();
         private readonly string appName = "my-app";
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         private void MustLogWarning()
         {
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                 .MustHaveHappened();
         }
 

@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Invitation
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         private static readonly Duration MaxAge = Duration.FromDays(2);
         private readonly INotificationSender emailSender;
         private readonly IUserResolver userResolver;
-        private readonly ISemanticLog log;
+        private readonly ILogger<InvitationEventConsumer> log;
 
         public string Name
         {
@@ -31,7 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             get { return "^app-";  }
         }
 
-        public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver, ISemanticLog log)
+        public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver,
+            ILogger<InvitationEventConsumer> log)
         {
             this.emailSender = emailSender;
             this.userResolver = userResolver;
@@ -74,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                 if (assigner == null)
                 {
-                    LogWarning($"Assigner {assignerId} not found");
+                    log.LogWarning("Failed to invite user: Assigner {assignerId} not found.", assignerId);
                     return;
                 }
 
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                 if (assignee == null)
                 {
-                    LogWarning($"Assignee {assigneeId} not found");
+                    log.LogWarning("Failed to invite user: Assignee {assigneeId} not found.", assigneeId);
                     return;
                 }
 
@@ -90,14 +91,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                 await emailSender.SendInviteAsync(assigner, assignee, appName);
             }
-        }
-
-        private void LogWarning(string reason)
-        {
-            log.LogWarning(w => w
-                .WriteProperty("action", "InviteUser")
-                .WriteProperty("status", "Failed")
-                .WriteProperty("reason", reason));
         }
     }
 }

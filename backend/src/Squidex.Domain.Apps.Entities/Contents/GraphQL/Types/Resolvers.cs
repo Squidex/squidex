@@ -7,9 +7,9 @@
 
 using GraphQL;
 using GraphQL.Resolvers;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -62,11 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
                 catch (Exception ex)
                 {
-                    executionContext.Resolve<ISemanticLog>().LogWarning(ex, w => w
-                        .WriteProperty("action", "resolveField")
-                        .WriteProperty("status", "failed")
-                        .WriteProperty("field", context.FieldDefinition.Name));
+                    var logFactory = executionContext.Resolve<ILoggerFactory>();
 
+                    logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
                     throw;
                 }
             }
@@ -104,11 +102,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
                 catch (Exception ex)
                 {
-                    executionContext.Resolve<ISemanticLog>().LogWarning(ex, w => w
-                        .WriteProperty("action", "resolveField")
-                        .WriteProperty("status", "failed")
-                        .WriteProperty("field", context.FieldDefinition.Name));
+                    var logFactory = executionContext.Resolve<ILoggerFactory>();
 
+                    logFactory.CreateLogger("GraphQL").LogError(ex, "Failed to resolve field {field}.", context.FieldDefinition.Name);
                     throw;
                 }
             }

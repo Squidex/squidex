@@ -7,13 +7,13 @@
 
 using System.Collections.Concurrent;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Log;
 using Squidex.Shared;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     public sealed class AssetsBulkUpdateCommandMiddleware : ICommandMiddleware
     {
         private readonly IContextProvider contextProvider;
-        private readonly ISemanticLog log;
+        private readonly ILogger<AssetsBulkUpdateCommandMiddleware> log;
 
         private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command)
         {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
         }
 
-        public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider, ISemanticLog log)
+        public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider, ILogger<AssetsBulkUpdateCommandMiddleware> log)
         {
             this.contextProvider = contextProvider;
             this.log = log;
@@ -139,11 +139,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "BulkContent")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("jobIndex", task.JobIndex)
-                    .WriteProperty("jobType", task.CommandJob.Type.ToString()));
+                log.LogError(ex, "Faield to execute asset bulk job with index {index} of type {type}.",
+                    task.JobIndex,
+                    task.CommandJob.Type);
 
                 task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
             }
@@ -163,11 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "BulkContent")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("jobIndex", task.JobIndex)
-                    .WriteProperty("jobType", task.CommandJob.Type.ToString()));
+                log.LogError(ex, "Faield to execute asset bulk job with index {index} of type {type}.",
+                    task.JobIndex,
+                    task.CommandJob.Type);
 
                 task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
                 return null;

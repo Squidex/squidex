@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
@@ -13,7 +14,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private readonly IAppProvider appProvider;
         private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleDomainObject(IPersistenceFactory<State> factory, ISemanticLog log,
+        public RuleDomainObject(IPersistenceFactory<State> factory, ILogger<RuleDomainObject> log,
             IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
             : base(factory, log)
         {

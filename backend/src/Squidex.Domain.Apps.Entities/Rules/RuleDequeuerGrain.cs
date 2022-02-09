@@ -7,6 +7,7 @@
 
 using System.Collections.Concurrent;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Orleans;
 using Orleans.Runtime;
@@ -15,7 +16,6 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
@@ -26,12 +26,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IRuleService ruleService;
         private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
         private readonly IClock clock;
-        private readonly ISemanticLog log;
+        private readonly ILogger<RuleDequeuerGrain> log;
 
         public RuleDequeuerGrain(
             IRuleService ruleService,
             IRuleEventRepository ruleEventRepository,
-            ISemanticLog log, IClock clock)
+            ILogger<RuleDequeuerGrain> log,
+            IClock clock)
         {
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
@@ -77,9 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "QueryRuleEvents")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to query rule events.");
             }
         }
 
@@ -115,19 +114,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                 if (response.Status == RuleResult.Failed)
                 {
-                    log.LogWarning(response.Exception!, w => w
-                        .WriteProperty("action", "SendRuleEvent")
-                        .WriteProperty("status", "Failed")
-                        .WriteProperty("ruleId", @event.Job.RuleId.ToString())
-                        .WriteProperty("ruleDescription", @event.Job.Description)
-                        .WriteProperty("dump", response.Dump));
+                    log.LogWarning(response.Exception, "Failed to execute rule event with rule id {ruleId}/{description}: {dump}",
+                        @event.Job.RuleId,
+                        @event.Job.Description,
+                        response.Dump);
                 }
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "SendRuleEvent")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to execute rule event with internal error.");
             }
             finally
             {

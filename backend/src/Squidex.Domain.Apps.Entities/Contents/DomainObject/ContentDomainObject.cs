@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -17,7 +18,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
     {
         private readonly IServiceProvider serviceProvider;
 
-        public ContentDomainObject(IPersistenceFactory<State> persistence, ISemanticLog log,
+        public ContentDomainObject(IPersistenceFactory<State> persistence, ILogger<ContentDomainObject> log,
             IServiceProvider serviceProvider)
             : base(persistence, log)
         {

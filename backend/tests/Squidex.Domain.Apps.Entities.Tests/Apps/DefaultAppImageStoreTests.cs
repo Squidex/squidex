@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.UploadAsync(appId, stream);
 
-            A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, CancellationToken.None))
+            A.CallTo(() => assetStore.UploadAsync(fileName, stream, true, default))
                 .MustHaveHappened();
         }
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.DownloadAsync(appId, stream);
 
-            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(fileName, stream, default, default))
                 .MustHaveHappened();
         }
 

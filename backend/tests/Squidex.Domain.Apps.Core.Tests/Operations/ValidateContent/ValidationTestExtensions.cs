@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -13,7 +14,6 @@ using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -140,7 +140,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private sealed class ValidatorBuilder
         {
-            private static readonly ISemanticLog Log = A.Fake<ISemanticLog>();
             private static readonly IValidatorsFactory Default = new DefaultValidatorsFactory();
             private readonly IValidatorsFactory? validatorFactory;
             private readonly ValidationContext validationContext;
@@ -153,17 +152,21 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             public ContentValidator ContentValidator(PartitionResolver partitionResolver)
             {
-                return new ContentValidator(partitionResolver, validationContext, CreateFactories(), Log);
+                var log = A.Fake<ILogger<ContentValidator>>();
+
+                return new ContentValidator(partitionResolver, validationContext, CreateFactories(), log);
+            }
+
+            private IValidator CreateValueValidator(IField field)
+            {
+                var log = A.Fake<ILogger<ContentValidator>>();
+
+                return new FieldValidator(new AggregateValidator(CreateValueValidators(field), log), field);
             }
 
             public IValidator ValueValidator(IField field)
             {
                 return CreateValueValidator(field);
-            }
-
-            private IValidator CreateValueValidator(IField field)
-            {
-                return new FieldValidator(new AggregateValidator(CreateValueValidators(field), Log), field);
             }
 
             private IEnumerable<IValidator> CreateValueValidators(IField field)

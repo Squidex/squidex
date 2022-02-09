@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Timers;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
@@ -16,13 +16,14 @@ namespace Squidex.Infrastructure.UsageTracking
         private const int Intervall = 60 * 1000;
         private const string FallbackCategory = "*";
         private readonly IUsageRepository usageRepository;
-        private readonly ISemanticLog log;
+        private readonly ILogger<BackgroundUsageTracker> log;
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters> jobs = new ConcurrentDictionary<(string Key, string Category, DateTime Date), Counters>();
 
         public bool ForceWrite { get; set; }
 
-        public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
+        public BackgroundUsageTracker(IUsageRepository usageRepository,
+            ILogger<BackgroundUsageTracker> log)
         {
             this.usageRepository = usageRepository;
 
@@ -78,9 +79,7 @@ namespace Squidex.Infrastructure.UsageTracking
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "TrackUsage")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to track usage in background.");
             }
         }
 

@@ -41,7 +41,7 @@
   "apps.removeImage": "Afbeelding verwijderen",
   "apps.removeImageFailed": "Verwijderen van app-afbeelding is mislukt. Laad opnieuw.",
   "apps.updateFailed": "Update app mislukt. Laad opnieuw.",
-  "apps.updateSettingsFailed": "Faield to update UI settings. Please reload.",
+  "apps.updateSettingsFailed": "Failed to update UI settings. Please reload.",
   "apps.uploadImage": "Zet een bestand neer om de app-afbeelding te vervangen. Gebruik een vierkant formaat.",
   "apps.uploadImageButton": "Upload bestand",
   "apps.uploadImageFailed": "Uploaden van afbeelding is mislukt. Laad opnieuw.",

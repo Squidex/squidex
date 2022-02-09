@@ -7,6 +7,7 @@
 
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Backup.State;
@@ -16,7 +17,6 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -26,14 +26,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
+        private readonly IGrainState<BackupState> state;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupArchiveStore backupArchiveStore;
         private readonly IClock clock;
         private readonly IServiceProvider serviceProvider;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
-        private readonly ISemanticLog log;
-        private readonly IGrainState<BackupState> state;
+        private readonly ILogger<BackupGrain> log;
         private readonly IUserResolver userResolver;
         private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
@@ -46,8 +46,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IEventStore eventStore,
             IGrainState<BackupState> state,
             IServiceProvider serviceProvider,
-            ISemanticLog log,
-            IUserResolver userResolver)
+            IUserResolver userResolver,
+            ILogger<BackupGrain> log)
         {
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;
@@ -79,9 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             foreach (var backup in state.Value.Jobs)
             {
-#pragma warning disable MA0040 // Flow the cancellation token
-                await backupArchiveStore.DeleteAsync(backup.Id);
-#pragma warning restore MA0040 // Flow the cancellation token
+                await backupArchiveStore.DeleteAsync(backup.Id, default);
             }
 
             TryDeactivateOnIdle();
@@ -201,10 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             catch (Exception ex)
             {
-                log.LogError(ex, job.Id.ToString(), (ctx, w) => w
-                    .WriteProperty("action", "makeBackup")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("backupId", ctx));
+                log.LogError(ex, "Faield to make backup with backup id '{backupId}'.", job.Id);
 
                 job.Status = JobStatus.Failed;
             }
@@ -275,10 +270,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             catch (Exception ex)
             {
-                log.LogError(ex, job.Id.ToString(), (logOperationId, w) => w
-                    .WriteProperty("action", "deleteBackup")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("operationId", logOperationId));
+                log.LogError(ex, "Failed to make remove with backup id '{backupId}'.", job.Id);
             }
 
             state.Value.Jobs.Remove(job);
