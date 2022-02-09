@@ -1,7 +1,7 @@
-<div class="field" [class.fullscreen]="isFullscreen" *ngIf="formModel">
+<div class="field" [class.expanded]="isExpanded" *ngIf="formModel">
     <div class="buttons-container" *ngIf="canUnset">
         <div class="buttons">
-            <button type="button" class="btn btn-sm btn-outline-secondary force" (click)="toggleFullscreen()">
+            <button type="button" class="btn btn-sm btn-outline-secondary force" (click)="toggleExpanded()">
                 <i class="icon-fullscreen"></i>
             </button>
     
@@ -28,6 +28,8 @@
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
             <sqx-iframe-editor [url]="field.properties.editorUrl" #editor
                 [context]="formContext"
+                [expanded]="isExpanded"
+                (expandedChange)="toggleExpanded()"
                 [formControlBinding]="$any(fieldForm)"
                 [formValue]="form.valueChanges | async"
                 [formIndex]="index"

@@ -12,7 +12,7 @@
         font-weight: normal;
     }
 
-    &.fullscreen {
+    &.expanded {
         @include absolute(0, 0, 0, 0);
         background-color: $color-white;
         border: 0;
