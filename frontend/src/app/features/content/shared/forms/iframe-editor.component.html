@@ -1,5 +1,7 @@
 <div #container>
-    <iframe #iframe scrolling="no" width="100%" [style.height]="0" [attr.src]="computedUrl | sqxSafeResourceUrl"></iframe>
+    <div #inner [class.fullscreen]="snapshot.isFullscreen">
+        <iframe #iframe scrolling="no" width="100%" [style.height]="0" [attr.src]="computedUrl | sqxSafeResourceUrl"></iframe>
+    </div>
 </div>
 
 <ng-container *sqxModal="assetsDialog">

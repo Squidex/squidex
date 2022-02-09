@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, Types } from '@app/shared';
@@ -17,6 +17,9 @@ import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoVa
 })
 export class FieldEditorComponent implements OnChanges {
     public readonly uniqueId = MathHelper.guid();
+
+    @Output()
+    public expandedChange = new EventEmitter();
 
     @Input()
     public form!: EditContentForm;
@@ -49,7 +52,7 @@ export class FieldEditorComponent implements OnChanges {
     public editor!: ElementRef;
 
     public isEmpty?: Observable<boolean>;
-    public isFullscreen = false;
+    public isExpanded = false;
 
     public get field() {
         return this.formModel.field;
@@ -79,8 +82,8 @@ export class FieldEditorComponent implements OnChanges {
         }
     }
 
-    public toggleFullscreen() {
-        this.isFullscreen = !this.isFullscreen;
+    public toggleExpanded() {
+        this.isExpanded = !this.isExpanded;
     }
 
     public unset() {

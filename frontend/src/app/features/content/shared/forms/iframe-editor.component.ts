@@ -5,11 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DialogModel, DialogService, disabled$, StatefulComponent, Types, value$ } from '@app/framework';
 import { AppsState, AssetDto, computeEditorUrl } from '@app/shared';
+
+interface State {
+    // True, when the editor is shown as fullscreen.
+    isFullscreen: boolean;
+}
 
 @Component({
     selector: 'sqx-iframe-editor[context][formField][formIndex][formValue][formControlBinding]',
@@ -17,7 +22,7 @@ import { AppsState, AssetDto, computeEditorUrl } from '@app/shared';
     templateUrl: './iframe-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IFrameEditorComponent extends StatefulComponent<{}> implements OnChanges, OnDestroy {
+export class IFrameEditorComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private value: any;
     private isInitialized = false;
     private isDisabled = false;
@@ -25,6 +30,18 @@ export class IFrameEditorComponent extends StatefulComponent<{}> implements OnCh
 
     @ViewChild('iframe', { static: false })
     public iframe!: ElementRef<HTMLIFrameElement>;
+
+    @ViewChild('container', { static: false })
+    public container!: ElementRef<HTMLElement>;
+
+    @ViewChild('inner', { static: false })
+    public inner!: ElementRef<HTMLElement>;
+
+    @Output()
+    public expandedChange = new EventEmitter();
+
+    @Input()
+    public expanded = false;
 
     @Input()
     public context: any = {};
@@ -64,11 +81,15 @@ export class IFrameEditorComponent extends StatefulComponent<{}> implements OnCh
         private readonly renderer: Renderer2,
         private readonly router: Router,
     ) {
-        super(changeDetector, {});
+        super(changeDetector, {
+            isFullscreen: false,
+        });
     }
 
     public ngOnDestroy() {
         super.ngOnDestroy();
+
+        this.toggleFullscreen(false);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -76,12 +97,16 @@ export class IFrameEditorComponent extends StatefulComponent<{}> implements OnCh
             this.sendFormValue();
         }
 
-        if (changes['language']) {
-            this.sendLanguage();
-        }
-
         if (changes['formIndex']) {
             this.sendMoved();
+        }
+
+        if (changes['expanded']) {
+            this.sendExpanded();
+        }
+
+        if (changes['language']) {
+            this.sendLanguage();
         }
 
         if (changes['formControlBinding']) {
@@ -112,6 +137,8 @@ export class IFrameEditorComponent extends StatefulComponent<{}> implements OnCh
                 this.isInitialized = true;
 
                 this.sendInit();
+                this.sendFullscreen();
+                this.sendExpanded();
                 this.sendFormValue();
                 this.sendLanguage();
                 this.sendDisabled();
@@ -125,6 +152,18 @@ export class IFrameEditorComponent extends StatefulComponent<{}> implements OnCh
                 const { url } = event.data;
 
                 this.router.navigateByUrl(url);
+            } else if (type === 'fullscreen') {
+                const { mode } = event.data;
+
+                if (mode !== this.snapshot.isFullscreen) {
+                    this.toggleFullscreen(mode);
+                }
+            } else if (type === 'expanded') {
+                const { mode } = event.data;
+
+                if (mode !== this.expanded) {
+                    this.expandedChange.emit();
+                }
             } else if (type === 'valueChanged') {
                 const { value } = event.data;
 
@@ -206,6 +245,14 @@ export class IFrameEditorComponent extends StatefulComponent<{}> implements OnCh
         this.sendMessage('valueChanged', { value: this.value });
     }
 
+    private sendFullscreen() {
+        this.sendMessage('fullscreenChanged', { fullscreen: this.snapshot.isFullscreen });
+    }
+
+    private sendExpanded() {
+        this.sendMessage('expandedChanged', { expanded: this.expanded });
+    }
+
     private sendDisabled() {
         this.sendMessage('disabled', { isDisabled: this.isDisabled });
     }
@@ -226,6 +273,20 @@ export class IFrameEditorComponent extends StatefulComponent<{}> implements OnCh
         if (Types.isNumber(this.formIndex)) {
             this.sendMessage('moved', { index: this.formIndex });
         }
+    }
+
+    private toggleFullscreen(isFullscreen: boolean) {
+        this.next({ isFullscreen });
+
+        let target = this.container.nativeElement;
+
+        if (isFullscreen) {
+            target = document.body;
+        }
+
+        this.renderer.appendChild(target, this.inner.nativeElement);
+
+        this.sendFullscreen();
     }
 
     private sendMessage(type: string, payload: any) {
