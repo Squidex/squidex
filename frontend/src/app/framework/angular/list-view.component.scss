@@ -1,12 +1,20 @@
 @import 'mixins';
 @import 'vars';
 
+%transition-opacity {
+    transition: opacity .2s ease;
+}
+
+%disabled {
+    pointer-events: none;
+}
+
 :host {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     overflow: hidden;
-    padding: 0;
+    position: relative;
 }
 
 .inner {
@@ -18,10 +26,6 @@
         padding-bottom: .5rem !important;
         padding-top: .5rem !important;
     }
-}
-
-%transition-opacity {
-    transition: opacity .2s ease;
 }
 
 .list {
@@ -96,16 +100,13 @@
     overflow: visible;
 }
 
-%disabled {
-    pointer-events: none;
-}
-
 .loading-indicator {
     @extend %disabled;
     opacity: .5;
 }
 
 .loader {
-    @include absolute(20%, 0, auto, 0);
+    @include absolute(50%, 0, auto, 0);
     @extend %disabled;
+    margin-top: -.5rem;
 }

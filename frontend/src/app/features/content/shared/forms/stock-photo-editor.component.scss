@@ -5,26 +5,6 @@ $color-user-background: rgba(0, 0, 0, 50%);
 $color-background: #000;
 $height: 300px;
 
-.col-image {
-    @include force-width(400px);
-
-    &.expand {
-        @include force-width(100%);
-    }
-
-    img {
-        max-width: 100%;
-    }
-}
-
-.value {
-    padding-right: 2.5rem;
-
-    &-clear {
-        @include absolute(0, 0, auto, auto);
-    }
-}
-
 .preview {
     @include force-height($height);
     align-items: center;
@@ -46,25 +26,27 @@ $height: 300px;
     }
 }
 
-sqx-list-view {
-    border: 1px solid $color-input;
-    border-radius: .25rem;
-    height: $height;
-    margin-top: .5rem;
+.spin2 {
+    font-size: 14px;
 }
 
-.icon {
-    @include absolute($height * .5, auto, auto, 5px);
-    color: $color-border;
-    font-size: 30px;
-    font-weight: lighter;
+.search {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 1rem;
+    width: 300px;
+}
+
+.empty {
+    @include absolute(40%, 0, null, 0);
 }
 
 .photos {
     column-gap: 0;
     column-width: 200px;
-    margin-left: -1rem;
     margin-right: -1rem;
+    margin-left: 0;
+    min-height: 300px;
 }
 
 .photo {

@@ -33,7 +33,7 @@ describe('StockPhotoService', () => {
                 images = result;
             });
 
-            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&pageSize=100');
+            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&page=1');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
