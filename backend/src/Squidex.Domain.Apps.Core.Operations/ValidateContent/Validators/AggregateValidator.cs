@@ -8,7 +8,6 @@
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
@@ -17,7 +16,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         private readonly IValidator[]? validators;
         private readonly ILogger<ContentValidator> log;
 
-        public AggregateValidator(IEnumerable<IValidator>? validators, ILogger<ContentValidator> log)
+        public AggregateValidator(IEnumerable<IValidator>? validators,
+            ILogger<ContentValidator> log)
         {
             this.validators = validators?.ToArray();
 

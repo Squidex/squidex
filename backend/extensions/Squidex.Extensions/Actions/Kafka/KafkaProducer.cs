@@ -26,7 +26,8 @@ namespace Squidex.Extensions.Actions.Kafka
         private readonly ISchemaRegistryClient schemaRegistry;
         private readonly IJsonSerializer jsonSerializer;
 
-        public KafkaProducer(IOptions<KafkaProducerOptions> options, ILogger<KafkaProducer> log, IJsonSerializer jsonSerializer)
+        public KafkaProducer(IOptions<KafkaProducerOptions> options, IJsonSerializer jsonSerializer,
+            ILogger<KafkaProducer> log)
         {
             this.jsonSerializer = jsonSerializer;
 

@@ -10,7 +10,6 @@ using GraphQL.Resolvers;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {

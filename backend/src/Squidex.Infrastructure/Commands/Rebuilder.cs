@@ -12,7 +12,6 @@ using Squidex.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Log;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 

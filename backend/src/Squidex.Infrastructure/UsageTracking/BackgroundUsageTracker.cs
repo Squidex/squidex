@@ -8,7 +8,6 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Timers;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.UsageTracking
 {

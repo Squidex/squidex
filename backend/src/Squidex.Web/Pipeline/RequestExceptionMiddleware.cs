@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {
@@ -27,7 +26,8 @@ namespace Squidex.Web.Pipeline
             this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IActionResultExecutor<ObjectResult> writer, ILogger<RequestExceptionMiddleware> log)
+        public async Task InvokeAsync(HttpContext context, IActionResultExecutor<ObjectResult> writer,
+            ILogger<RequestExceptionMiddleware> log)
         {
             if (TryGetErrorCode(context, out var statusCode) && IsErrorStatusCode(statusCode))
             {

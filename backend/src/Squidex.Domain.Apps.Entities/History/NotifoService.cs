@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 

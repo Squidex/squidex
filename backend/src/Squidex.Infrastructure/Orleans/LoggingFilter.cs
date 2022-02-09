@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.Logging;
 using Orleans;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.Orleans
 {

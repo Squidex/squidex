@@ -10,7 +10,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Invitation

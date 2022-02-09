@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.Migrations
 {

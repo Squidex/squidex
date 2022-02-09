@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Runtime;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Infrastructure.Orleans

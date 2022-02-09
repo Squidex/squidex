@@ -32,7 +32,7 @@ namespace Squidex.Domain.Users
 
             await sut.UploadAsync(userId, stream);
 
-            A.CallTo(() => assetStore.UploadAsync(file, stream, true, CancellationToken.None))
+            A.CallTo(() => assetStore.UploadAsync(file, stream, true, default))
                 .MustHaveHappened();
         }
 
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Users
 
             await sut.DownloadAsync(userId, stream);
 
-            A.CallTo(() => assetStore.DownloadAsync(file, stream, default, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(file, stream, default, default))
                 .MustHaveHappened();
         }
     }

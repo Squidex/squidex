@@ -8,7 +8,6 @@
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -43,7 +42,8 @@ namespace Squidex.Infrastructure.Commands
             set => snapshots.Capacity = value;
         }
 
-        protected DomainObject(IPersistenceFactory<T> factory, ILogger log)
+        protected DomainObject(IPersistenceFactory<T> factory,
+            ILogger log)
         {
             Guard.NotNull(factory);
             Guard.NotNull(log);

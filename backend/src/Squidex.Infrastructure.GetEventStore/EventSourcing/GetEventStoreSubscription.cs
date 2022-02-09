@@ -30,7 +30,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
-                async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event, CancellationToken ct)
+                async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event,
+                    CancellationToken ct)
                 {
                     var storedEvent = Formatter.Read(@event, prefix, serializer);
 

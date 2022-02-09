@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {

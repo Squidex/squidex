@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Xunit;
 
 #pragma warning disable MA0015 // Specify the parameter name in ArgumentException

@@ -36,7 +36,8 @@ namespace Squidex.Extensions.Assets.Azure
 
         public int Order => int.MaxValue;
 
-        public AzureMetadataSource(IOptions<AzureMetadataSourceOptions> options, ILogger<AzureMetadataSource> log)
+        public AzureMetadataSource(IOptions<AzureMetadataSourceOptions> options,
+            ILogger<AzureMetadataSource> log)
         {
             client = new ComputerVisionClient(new ApiKeyServiceClientCredentials(options.Value.ApiKey))
             {

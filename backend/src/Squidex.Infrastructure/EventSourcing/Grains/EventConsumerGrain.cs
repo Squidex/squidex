@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
