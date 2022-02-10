@@ -29,11 +29,11 @@ describe('StockPhotoService', () => {
         inject([StockPhotoService, HttpTestingController], (stockPhotoService: StockPhotoService, httpMock: HttpTestingController) => {
             let images: ReadonlyArray<StockPhotoDto>;
 
-            stockPhotoService.getImages('my-query').subscribe(result => {
+            stockPhotoService.getImages('my-query', 4).subscribe(result => {
                 images = result;
             });
 
-            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&pageSize=100');
+            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&page=4');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -64,7 +64,7 @@ describe('StockPhotoService', () => {
                 images = result;
             });
 
-            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&pageSize=100');
+            const req = httpMock.expectOne('https://stockphoto.squidex.io/?query=my-query&page=1');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

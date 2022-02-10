@@ -21,6 +21,14 @@
             }
         }
     }
+
+    &.preview {
+        background-color: $color-input;
+        border: 0;
+        border-radius: $border-radius;
+        opacity: .4;
+        pointer-events: none;
+    }
 }
 
 //
@@ -133,14 +141,6 @@
     }
 }
 
-
-.preview {
-    background-color: $color-input;
-    border: 0;
-    border-radius: $border-radius;
-    opacity: .4;
-    pointer-events: none;
-}
 
 //
 // Control Dropdown item

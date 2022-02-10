@@ -175,6 +175,10 @@ hr {
     display: none;
 }
 
+.hidden-important {
+    display: none !important;
+}
+
 // Hidden helper (fast *ngIf replacement)
 .invisible {
     visibility: hidden;

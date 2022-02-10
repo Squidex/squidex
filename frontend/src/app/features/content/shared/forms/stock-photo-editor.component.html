@@ -1,41 +1,52 @@
-<div class="row g-0" (sqxResizeCondition)="setCompact($event)" [sqxResizeMinWidth]="600" [sqxResizeMaxWidth]="0">
-    <div class="col-auto col-image" [class.expand]="snapshot.isCompact">
-        <input class="form-control value" [formControl]="valueControl" readonly>
 
-        <button type="button" class="btn btn-text-secondary value-clear" (click)="reset()">
-            <i class="icon-close"></i>
-        </button>
+<div class="input-group">
+    <button type="button" class="btn btn-outline-secondary" (click)="reset()" [disabled]="!valueControl.value">
+        <i class="icon-close"></i>
+    </button>
 
-        <div *ngIf="stockPhotoThumbnail | async; let url; else noThumb" class="preview">
-            <img [src]="url">
-        </div>
+    <button type="button" class="btn btn-outline-secondary" (click)="searchDialog.show()">
+        <i class="icon-search"></i>
+    </button>
 
-        <ng-template #noThumb>
-            <div class="preview preview-empty">
-                {{ 'contents.stockPhotoEmpty' | sqxTranslate }}
-            </div>
-        </ng-template>
-    </div>
-
-    <div class="col ps-4" *ngIf="!snapshot.isCompact">
-        <i class="icon-angle-left icon"></i>
-
-        <input class="form-control" [formControl]="stockPhotoSearch" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}">
-
-        <sqx-list-view [isLoading]="snapshot.isLoading" [table]="true">
-            <div class="photos">
-                <ng-container *ngIf="stockPhotos | async; let photos; trackBy: trackByPhoto">
-                    <div *ngFor="let photo of photos" class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
-                        <img [src]="photo.thumbUrl">
-
-                        <div class="photo-user">
-                            <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick>
-                                {{photo.user}}
-                            </a>
-                        </div>
-                    </div>
-                </ng-container>
-            </div>
-        </sqx-list-view>
-    </div>
+    <input class="form-control" [formControl]="valueControl" readonly>
 </div>
+
+<div *ngIf="stockPhotoThumbnail | async; let url;" class="preview mt-1" [class.hidden-important]="snapshot.thumbnailStatus === 'Failed'">
+    <img [src]="url" (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()">
+
+    <i class="icon-spinner2 spin2" [class.hidden-important]="snapshot.thumbnailStatus === 'Loaded'"></i>
+</div>
+
+<ng-container *sqxModal="searchDialog">
+    <sqx-modal-dialog size="lg" [fullHeight]="true" (close)="searchDialog.hide()">
+        <ng-container title>
+            <input class="form-control search" [formControl]="stockPhotoSearch" sqxFocusOnInit placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}">
+            
+            <i *ngIf="snapshot.isLoading" class="icon-spinner2 spin2"></i>
+        </ng-container>
+
+        <ng-container content>
+            <div class="photos">
+                <div *ngFor="let photo of snapshot.stockPhotos; trackBy: trackByPhoto" class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
+                    <img [src]="photo.thumbUrl">
+
+                    <div class="photo-user">
+                        <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick>
+                            {{photo.user}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty small text-muted text-center" *ngIf="snapshot.stockPhotos.length === 0">
+                {{ 'contents.stockPhotoSearchEmpty' | sqxTranslate }}
+            </div>
+
+            <div class="mt-4 text-center" *ngIf="snapshot.hasMore">
+                <button class="btn btn-outline-secondary" type="button" (click)="loadMore()" [disabled]="snapshot.isLoading">
+                    {{ 'common.loadMore' | sqxTranslate }} <i *ngIf="snapshot.isLoading" class="icon-spinner2 spin2"></i>
+                </button>
+            </div>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

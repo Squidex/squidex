@@ -27,8 +27,8 @@ export class StockPhotoService {
     ) {
     }
 
-    public getImages(query: string): Observable<ReadonlyArray<StockPhotoDto>> {
-        const url = `https://stockphoto.squidex.io/?query=${query}&pageSize=100`;
+    public getImages(query: string, page = 1): Observable<ReadonlyArray<StockPhotoDto>> {
+        const url = `https://stockphoto.squidex.io/?query=${query}&page=${page}`;
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
