@@ -113,7 +113,7 @@ class FieldRuleTemplate {
 
     public createControl(_: any, fieldNames?: ReadonlyArray<string>) {
         return new ExtendedFormGroup({
-            name: new FormControl('Disable',
+            action: new FormControl('Disable',
                 Validators.required,
             ),
             field: new FormControl(fieldNames?.[0],

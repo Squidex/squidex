@@ -24,7 +24,7 @@
 
     &.preview {
         background-color: $color-input;
-        border: 0;
+        border-color: $color-input;
         border-radius: $border-radius;
         opacity: .4;
         pointer-events: none;
