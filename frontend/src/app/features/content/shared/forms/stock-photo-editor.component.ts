@@ -24,6 +24,9 @@ interface State {
 
     // True if more photos are available.
     hasMore?: boolean;
+
+    // The status of the thumbnail.
+    thumbnailStatus?: 'Loaded' | 'Failed';
 }
 
 type Request = { search?: string; page: number };
@@ -46,7 +49,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     public valueControl = new FormControl('');
 
     public stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
-    public stockPhotoThumbnail = valueProjection$(this.valueControl, x => thumbnail(x, 400) || x);
+    public stockPhotoThumbnail = valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x);
     public stockPhotoSearch = new FormControl('');
 
     public searchDialog = new DialogModel();
@@ -60,6 +63,12 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
     }
 
     public ngOnInit() {
+        this.own(
+            value$(this.valueControl)
+                .subscribe(() => {
+                    this.next({ thumbnailStatus: undefined });
+                }));
+
         this.own(
             value$(this.stockPhotoSearch)
                 .subscribe(search => {
@@ -90,6 +99,7 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
                 }),
                 tap(({ request, result }) => {
                     this.next(s => ({
+                        ...s,
                         isLoading: false,
                         isDisabled: s.isDisabled,
                         stockPhotos: request.page > 1 ? [...s.stockPhotos, ...result] : result,
@@ -132,6 +142,14 @@ export class StockPhotoEditorComponent extends StatefulControlComponent<State, s
         const request = this.stockPhotoRequests.value;
 
         this.stockPhotoRequests.next({ search: request.search, page: request.page + 1 });
+    }
+
+    public onThumbnailLoaded() {
+        this.next({ thumbnailStatus: 'Loaded' });
+    }
+
+    public onThumbnailFailed() {
+        this.next({ thumbnailStatus: 'Failed' });
     }
 
     public isSelected(photo: StockPhotoDto) {

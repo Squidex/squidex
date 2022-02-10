@@ -3,26 +3,22 @@
 
 $color-user-background: rgba(0, 0, 0, 50%);
 $color-background: #000;
-$height: 300px;
 
 .preview {
-    @include force-height($height);
     align-items: center;
     background: $color-background;
     border: 0;
-    border-radius: .25rem;
-    color: $color-white;
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    margin-top: .5rem;
+    border-radius: 0;
+    color: white;
+    text-align: center;
 
-    &-empty {
-        padding: 1rem;
+    i {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
     }
 
     img {
-        max-height: $height;
+        max-width: 100%;
     }
 }
 
@@ -46,7 +42,6 @@ $height: 300px;
     column-width: 200px;
     margin-right: -1rem;
     margin-left: 0;
-    min-height: 300px;
 }
 
 .photo {

@@ -1,6 +1,6 @@
 
 <div class="input-group">
-    <button type="button" class="btn btn-outline-secondary" (click)="reset()">
+    <button type="button" class="btn btn-outline-secondary" (click)="reset()" [disabled]="!valueControl.value">
         <i class="icon-close"></i>
     </button>
 
@@ -11,15 +11,11 @@
     <input class="form-control" [formControl]="valueControl" readonly>
 </div>
 
-<div *ngIf="stockPhotoThumbnail | async; let url; else noThumb" class="preview">
-    <img [src]="url">
-</div>
+<div *ngIf="stockPhotoThumbnail | async; let url;" class="preview mt-1" [class.hidden-important]="snapshot.thumbnailStatus === 'Failed'">
+    <img [src]="url" (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()">
 
-<ng-template #noThumb>
-    <div class="preview preview-empty">
-        {{ 'contents.stockPhotoEmpty' | sqxTranslate }}
-    </div>
-</ng-template>
+    <i class="icon-spinner2 spin2" [class.hidden-important]="snapshot.thumbnailStatus === 'Loaded'"></i>
+</div>
 
 <ng-container *sqxModal="searchDialog">
     <sqx-modal-dialog size="lg" [fullHeight]="true" (close)="searchDialog.hide()">
