@@ -46,13 +46,17 @@ namespace Squidex.Web.Pipeline
             sut = new CachingFilter(cachingManager);
         }
 
-        [Fact]
-        public async Task Should_return_304_for_same_etags()
+        [Theory]
+        [InlineData("13", "13")]
+        [InlineData("13", "W/13")]
+        [InlineData("W/13", "13")]
+        [InlineData("W/13", "W/13")]
+        public async Task Should_return_304_for_same_etags(string ifNoneMatch, string etag)
         {
             httpContext.Request.Method = HttpMethods.Get;
-            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = "W/13";
+            httpContext.Request.Headers[HeaderNames.IfNoneMatch] = ifNoneMatch;
 
-            httpContext.Response.Headers[HeaderNames.ETag] = "W/13";
+            httpContext.Response.Headers[HeaderNames.ETag] = etag;
 
             await sut.OnActionExecutionAsync(executingContext, Next());
 

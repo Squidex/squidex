@@ -38,7 +38,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (command.ExpectedVersion == EtagVersion.Auto)
             {
-                if (TryParseEtag(httpContext, out var expectedVersion))
+                if (httpContext.TryParseEtagVersion(HeaderNames.IfMatch, out var expectedVersion))
                 {
                     command.ExpectedVersion = expectedVersion;
                 }
@@ -63,26 +63,6 @@ namespace Squidex.Web.CommandMiddlewares
         private static void SetResponsEtag(HttpContext httpContext, long version)
         {
             httpContext.Response.Headers[HeaderNames.ETag] = version.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static bool TryParseEtag(HttpContext httpContext, out long version)
-        {
-            version = default;
-
-            if (httpContext.Request.Headers.TryGetString(HeaderNames.IfMatch, out var etag))
-            {
-                if (etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
-                {
-                    etag = etag[2..];
-                }
-
-                if (long.TryParse(etag, NumberStyles.Any, CultureInfo.InvariantCulture, out version))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

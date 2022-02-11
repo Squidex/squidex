@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
@@ -206,7 +207,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return NotFound();
             }
 
-            var response = ContentDto.FromContent(content, Resources);
+            var response = Deferred.Response(() =>
+            {
+                return ContentDto.FromContent(content, Resources);
+            });
+
+            Response.Headers[HeaderNames.ETag] = content.ToEtag();
 
             return Ok(response);
         }

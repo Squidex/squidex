@@ -8,6 +8,8 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 
@@ -57,6 +59,28 @@ namespace Squidex.Web
         public static string ToEtag<T>(this T entity) where T : IEntity, IEntityWithVersion
         {
             return entity.Version.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static bool TryParseEtagVersion(this HttpContext httpContext, string header, out long version)
+        {
+            version = default;
+
+            if (httpContext.Request.Headers.TryGetString(header, out var etag))
+            {
+                var span = etag.AsSpan();
+
+                if (span.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
+                {
+                    span = span[2..];
+                }
+
+                if (long.TryParse(span, NumberStyles.Any, CultureInfo.InvariantCulture, out version))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
