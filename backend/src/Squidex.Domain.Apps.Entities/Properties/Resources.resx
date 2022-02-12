@@ -126,6 +126,9 @@
   <data name="ScriptingGetAssetText" xml:space="preserve">
     <value>Get the text of an asset. Encodings: base64,ascii,unicode,utf8</value>
   </data>
+  <data name="ScriptingGetBlurHash" xml:space="preserve">
+    <value>Gets the blur hash of an asset if it is an image or null otherwise.</value>
+  </data>
   <data name="ScriptingGetReference" xml:space="preserve">
     <value>Queries the content item with the specified ID and invokes the callback with an array of contents.</value>
   </data>
@@ -133,9 +136,15 @@
     <value>Queries the content items with the specified IDs and invokes the callback with an array of contents.</value>
   </data>
   <data name="ScriptingIncrementCounter" xml:space="preserve">
+    <value>Increments the counter with the given name and returns the value (OBSOLETE).</value>
+  </data>
+  <data name="ScriptingIncrementCounterV2" xml:space="preserve">
     <value>Increments the counter with the given name and returns the value.</value>
   </data>
   <data name="ScriptingResetCounter" xml:space="preserve">
+    <value>Resets the counter with the given name to zero (OBSOLETE).</value>
+  </data>
+  <data name="ScriptingResetCounterV2" xml:space="preserve">
     <value>Resets the counter with the given name to zero.</value>
   </data>
 </root>

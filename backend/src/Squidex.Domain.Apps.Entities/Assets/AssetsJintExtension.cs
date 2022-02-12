@@ -11,19 +11,21 @@ using Jint.Native;
 using Jint.Runtime;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetsJintExtension : IJintExtension, IScriptDescriptor
     {
         private delegate void GetAssetsDelegate(JsValue references, Action<JsValue> callback);
-        private delegate void GetAssetTextDelegate(JsValue references, Action<JsValue> callback, JsValue encoding);
+        private delegate void GetAssetTextDelegate(JsValue asset, Action<JsValue> callback, JsValue? encoding);
+        private delegate void GetBlurHashDelegate(JsValue asset, Action<JsValue> callback, JsValue? componentX, JsValue? componentY);
         private readonly IServiceProvider serviceProvider;
 
         public AssetsJintExtension(IServiceProvider serviceProvider)
@@ -34,6 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public void ExtendAsync(ScriptExecutionContext context)
         {
             AddAssetText(context);
+            AddAssetBlurHash(context);
             AddAsset(context);
         }
 
@@ -45,8 +48,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             describe(JsonType.Function, "getAsset(ids, callback)",
                 Resources.ScriptingGetAsset);
 
-            describe(JsonType.Function, "getAssetText(asset, callback, encoding)",
+            describe(JsonType.Function, "getAssetText(asset, callback, encoding?)",
                 Resources.ScriptingGetAssetText);
+
+            describe(JsonType.Function, "getBlurHash(asset, callback, componentX?, componentY?)",
+                Resources.ScriptingGetBlurHash);
         }
 
         private void AddAsset(ScriptExecutionContext context)
@@ -61,138 +67,184 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return;
             }
 
-            var action = new GetAssetsDelegate((references, callback) => GetAssets(context, appId, user, references, callback));
+            var getAssets = new GetAssetsDelegate((references, callback) =>
+            {
+                GetAssets(context, appId, user, references, callback);
+            });
 
-            context.Engine.SetValue("getAsset", action);
-            context.Engine.SetValue("getAssets", action);
+            context.Engine.SetValue("getAsset", getAssets);
+            context.Engine.SetValue("getAssets", getAssets);
         }
 
         private void AddAssetText(ScriptExecutionContext context)
         {
-            var action = new GetAssetTextDelegate((references, callback, encoding) => GetText(context, references, callback, encoding));
+            var action = new GetAssetTextDelegate((references, callback, encoding) =>
+            {
+                GetText(context, references, callback, encoding);
+            });
 
             context.Engine.SetValue("getAssetText", action);
         }
 
-        private void GetText(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
+        private void AddAssetBlurHash(ScriptExecutionContext context)
         {
-            GetTextAsync(context, input, callback, encoding).Forget();
+            var getBlurHash = new GetBlurHashDelegate((input, callback, componentX, componentY) =>
+            {
+                GetBlurHash(context, input, callback, componentX, componentY);
+            });
+
+            context.Engine.SetValue("getAssetBlurHash", getBlurHash);
         }
 
-        private async Task GetTextAsync(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue encoding)
+        private void GetText(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue? encoding)
         {
             Guard.NotNull(callback);
 
-            if (input is not ObjectWrapper objectWrapper)
+            context.Schedule(async (scheduler, ct) =>
             {
-                callback(JsValue.FromObject(context.Engine, "ErrorNoAsset"));
-                return;
-            }
-
-            async Task ResolveAssetText(DomainId appId, DomainId id, long fileSize, long fileVersion)
-            {
-                if (fileSize > 256_000)
+                if (input is not ObjectWrapper objectWrapper)
                 {
-                    callback(JsValue.FromObject(context.Engine, "ErrorTooBig"));
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
                     return;
                 }
 
-                context.MarkAsync();
-
-                try
+                async Task ResolveAssetText(AssetRef asset)
                 {
+                    if (asset.FileSize > 256_000)
+                    {
+                        scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorTooBig"));
+                        return;
+                    }
+
                     var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
+                    try
+                    {
+                        var text = await asset.GetTextAsync(encoding?.ToString(), assetFileStore, ct);
 
-                    var encoded = await assetFileStore.GetTextAsync(appId, id, fileVersion, encoding?.ToString());
-
-                    // Reset the time contraints and other constraints so that our awaiting does not count as script time.
-                    context.Engine.ResetConstraints();
-
-                    callback(JsValue.FromObject(context.Engine, encoded));
+                        scheduler.Run(callback, JsValue.FromObject(context.Engine, text));
+                    }
+                    catch
+                    {
+                        scheduler.Run(callback, JsValue.Null);
+                    }
                 }
-                catch (Exception ex)
+
+                switch (objectWrapper.Target)
                 {
-                    context.Fail(ex);
+                    case IAssetEntity asset:
+                        await ResolveAssetText(asset.ToRef());
+                        break;
+
+                    case EnrichedAssetEvent e:
+                        await ResolveAssetText(e.ToRef());
+                        break;
+
+                    default:
+                        scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                        break;
                 }
-            }
+            });
+        }
 
-            switch (objectWrapper.Target)
+        private void GetBlurHash(ScriptExecutionContext context, JsValue input, Action<JsValue> callback, JsValue? componentX, JsValue? componentY)
+        {
+            Guard.NotNull(callback);
+
+            context.Schedule(async (scheduler, ct) =>
             {
-                case IAssetEntity asset:
-                    await ResolveAssetText(asset.AppId.Id, asset.Id, asset.FileSize, asset.FileVersion);
+                if (input is not ObjectWrapper objectWrapper)
+                {
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
                     return;
+                }
 
-                case EnrichedAssetEvent @event:
-                    await ResolveAssetText(@event.AppId.Id, @event.Id, @event.FileSize, @event.FileVersion);
-                    return;
-            }
+                async Task ResolveHashAsync(AssetRef asset)
+                {
+                    if (asset.FileSize > 512_000 || asset.Type != AssetType.Image)
+                    {
+                        scheduler.Run(callback, JsValue.Null);
+                        return;
+                    }
 
-            callback(JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                    var options = new BlurOptions();
+
+                    if (componentX?.IsNumber() == true)
+                    {
+                        options.ComponentX = (int)componentX.AsNumber();
+                    }
+
+                    if (componentY?.IsNumber() == true)
+                    {
+                        options.ComponentX = (int)componentX.AsNumber();
+                    }
+
+                    var assetThumbnailGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
+                    var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
+                    try
+                    {
+                        var hash = await asset.GetBlurHashAsync(options, assetFileStore, assetThumbnailGenerator, ct);
+
+                        scheduler.Run(callback, JsValue.FromObject(context.Engine, hash));
+                    }
+                    catch
+                    {
+                        scheduler.Run(callback, JsValue.Null);
+                    }
+                }
+
+                switch (objectWrapper.Target)
+                {
+                    case IAssetEntity asset:
+                        await ResolveHashAsync(asset.ToRef());
+                        break;
+
+                    case EnrichedAssetEvent @event:
+                        await ResolveHashAsync(@event.ToRef());
+                        break;
+
+                    default:
+                        scheduler.Run(callback, JsValue.FromObject(context.Engine, "ErrorNoAsset"));
+                        break;
+                }
+            });
         }
 
         private void GetAssets(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
-            GetReferencesAsync(context, appId, user, references, callback).Forget();
-        }
-
-        private async Task GetReferencesAsync(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
-        {
             Guard.NotNull(callback);
 
-            var ids = new List<DomainId>();
+            context.Schedule(async (scheduler, ct) =>
+            {
+                var ids = references.ToIds();
 
-            if (references.IsString())
-            {
-                ids.Add(DomainId.Create(references.ToString()));
-            }
-            else if (references.IsArray())
-            {
-                foreach (var value in references.AsArray())
+                if (ids.Count == 0)
                 {
-                    if (value.IsString())
-                    {
-                        ids.Add(DomainId.Create(value.ToString()));
-                    }
+                    var emptyAssets = Array.Empty<IEnrichedAssetEntity>();
+
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyAssets));
+                    return;
                 }
-            }
 
-            if (ids.Count == 0)
-            {
-                var emptyAssets = Array.Empty<IEnrichedAssetEntity>();
-
-                callback(JsValue.FromObject(context.Engine, emptyAssets));
-                return;
-            }
-
-            context.MarkAsync();
-
-            try
-            {
-                var app = await GetAppAsync(appId);
+                var app = await GetAppAsync(appId, ct);
 
                 var requestContext =
                     new Context(user, app).Clone(b => b
                         .WithoutTotal());
 
                 var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
-                var assetItems = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), context.CancellationToken);
+                var assetItems = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
 
-                // Reset the time contraints and other constraints so that our awaiting does not count as script time.
-                context.Engine.ResetConstraints();
-
-                callback(JsValue.FromObject(context.Engine, assetItems.ToArray()));
-            }
-            catch (Exception ex)
-            {
-                context.Fail(ex);
-            }
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, assetItems.ToArray()));
+                return;
+            });
         }
 
-        private async Task<IAppEntity> GetAppAsync(DomainId appId)
+        private async Task<IAppEntity> GetAppAsync(DomainId appId,
+            CancellationToken ct)
         {
             var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
 
-            var app = await appProvider.GetAppAsync(appId);
+            var app = await appProvider.GetAppAsync(appId, false, ct);
 
             if (app == null)
             {

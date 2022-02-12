@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,6 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -40,7 +38,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 return;
             }
 
-            var action = new GetReferencesDelegate((references, callback) => GetReferences(context, appId, user, references, callback));
+            var action = new GetReferencesDelegate((references, callback) =>
+            {
+                GetReferences(context, appId, user, references, callback);
+            });
 
             context.Engine.SetValue("getReference", action);
             context.Engine.SetValue("getReferences", action);
@@ -57,42 +58,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
         {
-            GetReferencesAsync(context, appId, user, references, callback).Forget();
-        }
-
-        private async Task GetReferencesAsync(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user, JsValue references, Action<JsValue> callback)
-        {
             Guard.NotNull(callback);
 
-            var ids = new List<DomainId>();
+            context.Schedule(async (scheduler, ct) =>
+            {
+                var ids = references.ToIds();
 
-            if (references.IsString())
-            {
-                ids.Add(DomainId.Create(references.ToString()));
-            }
-            else if (references.IsArray())
-            {
-                foreach (var value in references.AsArray())
+                if (ids.Count == 0)
                 {
-                    if (value.IsString())
-                    {
-                        ids.Add(DomainId.Create(value.ToString()));
-                    }
+                    var emptyContents = Array.Empty<IEnrichedContentEntity>();
+
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyContents));
+                    return;
                 }
-            }
 
-            if (ids.Count == 0)
-            {
-                var emptyContents = Array.Empty<IEnrichedContentEntity>();
-
-                callback(JsValue.FromObject(context.Engine, emptyContents));
-                return;
-            }
-
-            context.MarkAsync();
-
-            try
-            {
                 var app = await GetAppAsync(appId);
 
                 var requestContext =
@@ -102,18 +81,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         .WithoutTotal());
 
                 var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
+                var contentItems = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
 
-                var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), context.CancellationToken);
-
-                // Reset the time contraints and other constraints so that our awaiting does not count as script time.
-                context.Engine.ResetConstraints();
-
-                callback(JsValue.FromObject(context.Engine, contents.ToArray()));
-            }
-            catch (Exception ex)
-            {
-                context.Fail(ex);
-            }
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, contentItems.ToArray()));
+            });
         }
 
         private async Task<IAppEntity> GetAppAsync(DomainId appId)

@@ -8,8 +8,11 @@
 using System.Text.Encodings.Web;
 using Fluid;
 using Fluid.Ast;
+using Fluid.Tags;
 using Fluid.Values;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.ValidateContent;
@@ -21,32 +24,33 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private static readonly FluidValue ErrorNullAsset = FluidValue.Create(null);
         private static readonly FluidValue ErrorNoAsset = new StringValue("NoAsset");
+        private static readonly FluidValue ErrorNoImage = new StringValue("NoImage");
         private static readonly FluidValue ErrorTooBig = new StringValue("ErrorTooBig");
         private readonly IServiceProvider serviceProvider;
 
-        private sealed class AssetTag : AppTag
+        private sealed class AssetTag : ArgumentsTag
         {
-            private readonly IAssetQueryService assetQuery;
+            private readonly IServiceProvider serviceProvider;
 
             public AssetTag(IServiceProvider serviceProvider)
-                : base(serviceProvider)
             {
-                assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
+                this.serviceProvider = serviceProvider;
             }
 
-            public override async ValueTask<Completion> WriteToAsync(TextWriter writer, TextEncoder encoder, TemplateContext context, FilterArgument[] arguments)
+            public override async ValueTask<Completion> WriteToAsync(TextWriter writer,
+                TextEncoder encoder, TemplateContext context, FilterArgument[] arguments)
             {
                 if (arguments.Length == 2 && context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
                 {
                     var id = await arguments[1].Expression.EvaluateAsync(context);
 
-                    var content = await ResolveAssetAsync(AppProvider, assetQuery, enrichedEvent.AppId.Id, id);
+                    var asset = await ResolveAssetAsync(serviceProvider, enrichedEvent.AppId.Id, id);
 
-                    if (content != null)
+                    if (asset != null)
                     {
                         var name = (await arguments[0].Expression.EvaluateAsync(context)).ToStringValue();
 
-                        context.SetValue(name, content);
+                        context.SetValue(name, asset);
                     }
                 }
 
@@ -75,15 +79,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void AddAssetFilter()
         {
-            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
-
-            var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
-
             TemplateContext.GlobalFilters.AddAsyncFilter("asset", async (input, arguments, context) =>
             {
                 if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
                 {
-                    var asset = await ResolveAssetAsync(appProvider, assetQuery, enrichedEvent.AppId.Id, input);
+                    var asset = await ResolveAssetAsync(serviceProvider, enrichedEvent.AppId.Id, input);
 
                     if (asset == null)
                     {
@@ -99,8 +99,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void AddAssetTextFilter()
         {
-            var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
-
             TemplateContext.GlobalFilters.AddAsyncFilter("assetText", async (input, arguments, context) =>
             {
                 if (input is not ObjectValue objectValue)
@@ -108,15 +106,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     return ErrorNoAsset;
                 }
 
-                async Task<FluidValue> ResolveAssetText(DomainId appId, DomainId id, long fileSize, long fileVersion)
+                async Task<FluidValue> ResolveAssetTextAsync(AssetRef asset)
                 {
-                    if (fileSize > 256_000)
+                    if (asset.FileSize > 256_000)
                     {
                         return ErrorTooBig;
                     }
 
+                    var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
+
                     var encoding = arguments.At(0).ToStringValue()?.ToUpperInvariant();
-                    var encoded = await assetFileStore.GetTextAsync(appId, id, fileVersion, encoding);
+                    var encoded = await asset.GetTextAsync(encoding, assetFileStore, default);
 
                     return new StringValue(encoded);
                 }
@@ -124,10 +124,64 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 switch (objectValue.ToObjectValue())
                 {
                     case IAssetEntity asset:
-                        return await ResolveAssetText(asset.AppId.Id, asset.Id, asset.FileSize, asset.FileVersion);
+                        return await ResolveAssetTextAsync(asset.ToRef());
 
                     case EnrichedAssetEvent @event:
-                        return await ResolveAssetText(@event.AppId.Id, @event.Id, @event.FileSize, @event.FileVersion);
+                        return await ResolveAssetTextAsync(@event.ToRef());
+                }
+
+                return ErrorNoAsset;
+            });
+
+            TemplateContext.GlobalFilters.AddAsyncFilter("assetBlurHash", async (input, arguments, context) =>
+            {
+                if (input is not ObjectValue objectValue)
+                {
+                    return ErrorNoAsset;
+                }
+
+                async Task<FluidValue> ResolveAssetHashAsync(AssetRef asset)
+                {
+                    if (asset.FileSize > 512_000)
+                    {
+                        return ErrorTooBig;
+                    }
+
+                    if (asset.Type != AssetType.Image)
+                    {
+                        return ErrorNoImage;
+                    }
+
+                    var options = new BlurOptions();
+
+                    var arg0 = arguments.At(0);
+                    var arg1 = arguments.At(1);
+
+                    if (arg0.Type == FluidValues.Number)
+                    {
+                        options.ComponentX = (int)arg0.ToNumberValue();
+                    }
+
+                    if (arg1.Type == FluidValues.Number)
+                    {
+                        options.ComponentX = (int)arg1.ToNumberValue();
+                    }
+
+                    var assetFileStore = serviceProvider.GetRequiredService<IAssetFileStore>();
+                    var assetThumbnailGenerator = serviceProvider.GetRequiredService<IAssetThumbnailGenerator>();
+
+                    var blur = await asset.GetBlurHashAsync(options, assetFileStore, assetThumbnailGenerator, default);
+
+                    return new StringValue(blur);
+                }
+
+                switch (objectValue.ToObjectValue())
+                {
+                    case IAssetEntity asset:
+                        return await ResolveAssetHashAsync(asset.ToRef());
+
+                    case EnrichedAssetEvent @event:
+                        return await ResolveAssetHashAsync(@event.ToRef());
                 }
 
                 return ErrorNoAsset;
@@ -139,8 +193,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
             factory.RegisterTag("asset", new AssetTag(serviceProvider));
         }
 
-        private static async Task<IAssetEntity?> ResolveAssetAsync(IAppProvider appProvider, IAssetQueryService assetQuery, DomainId appId, FluidValue id)
+        private static async Task<IAssetEntity?> ResolveAssetAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
         {
+            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
+
             var app = await appProvider.GetAppAsync(appId);
 
             if (app == null)
@@ -154,9 +210,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 Context.Admin(app).Clone(b => b
                     .WithoutTotal());
 
-            var asset = await assetQuery.FindAsync(requestContext, domainId);
+            var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
+            var assetItem = await assetQuery.FindAsync(requestContext, domainId);
 
-            return asset;
+            return assetItem;
         }
     }
 }
