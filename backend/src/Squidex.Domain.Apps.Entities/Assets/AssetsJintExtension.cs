@@ -227,14 +227,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 var app = await GetAppAsync(appId, ct);
 
+                if (app == null)
+                {
+                    var emptyAssets = Array.Empty<IEnrichedAssetEntity>();
+
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyAssets));
+                    return;
+                }
+
+                var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
+
                 var requestContext =
                     new Context(user, app).Clone(b => b
                         .WithoutTotal());
 
-                var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
-                var assetItems = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
+                var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
 
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, assetItems.ToArray()));
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, assets.ToArray()));
                 return;
             });
         }

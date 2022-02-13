@@ -206,14 +206,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var domainId = DomainId.Create(id.ToStringValue());
 
+            var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
+
             var requestContext =
                 Context.Admin(app).Clone(b => b
                     .WithoutTotal());
 
-            var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
-            var assetItem = await assetQuery.FindAsync(requestContext, domainId);
+            var asset = await assetQuery.FindAsync(requestContext, domainId);
 
-            return assetItem;
+            return asset;
         }
     }
 }

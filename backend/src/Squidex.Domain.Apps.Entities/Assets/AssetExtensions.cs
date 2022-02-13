@@ -5,11 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
-using Squidex.Assets;
-using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Infrastructure.ObjectPool;
-
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public static class AssetExtensions

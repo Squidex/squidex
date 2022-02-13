@@ -74,16 +74,25 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 var app = await GetAppAsync(appId);
 
+                if (app == null)
+                {
+                    var emptyContents = Array.Empty<IEnrichedContentEntity>();
+
+                    scheduler.Run(callback, JsValue.FromObject(context.Engine, emptyContents));
+                    return;
+                }
+
+                var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
+
                 var requestContext =
                     new Context(user, app).Clone(b => b
                         .WithoutContentEnrichment()
                         .WithUnpublished()
                         .WithoutTotal());
 
-                var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
-                var contentItems = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
+                var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
 
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, contentItems.ToArray()));
+                scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.ToArray()));
             });
         }
 

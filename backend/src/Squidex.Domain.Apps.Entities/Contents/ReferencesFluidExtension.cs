@@ -108,18 +108,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             var domainId = DomainId.Create(id.ToStringValue());
-            var domainIds = new List<DomainId> { domainId };
+
+            var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
             var requestContext =
                 Context.Admin(app).Clone(b => b
+                    .WithoutContentEnrichment()
                     .WithUnpublished()
                     .WithoutTotal());
 
-            var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
-            var contentItems = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainIds));
-            var contentItem = contentItems.FirstOrDefault();
+            var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainId));
 
-            return contentItem;
+            return contents.FirstOrDefault();
         }
     }
 }
