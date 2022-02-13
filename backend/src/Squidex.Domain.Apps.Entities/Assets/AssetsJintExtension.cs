@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             describe(JsonType.Function, "getAssetText(asset, callback, encoding?)",
                 Resources.ScriptingGetAssetText);
 
-            describe(JsonType.Function, "getBlurHash(asset, callback, componentX?, componentY?)",
+            describe(JsonType.Function, "getAssetBlurHash(asset, callback, x?, y?)",
                 Resources.ScriptingGetBlurHash);
         }
 

@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 new AssetsJintExtension(services)
             };
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, A<CancellationToken>._))
                 .Returns(Mocks.App(appId));
 
             sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -86,10 +86,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_resolve_asset()
         {
-            var (vars, asset) = SetupAssetVars();
+            var (vars, assets) = SetupAssetsVars(1);
 
             var expected = $@"
-                Text: {asset.FileName} {asset.Id}
+                Text: {assets[0].FileName} {assets[0].Id}
             ";
 
             var script = @"
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_resolve_assets()
         {
-            var (vars, assets) = SetupAssetsVars();
+            var (vars, assets) = SetupAssetsVars(2);
 
             var expected = $@"
                 Text: {assets[0].FileName} {assets[0].Id}
@@ -131,9 +131,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [MemberData(nameof(Encodings))]
         public async Task Should_resolve_text(string encoding)
         {
-            var (vars, asset) = SetupAssetVars();
+            var (vars, assets) = SetupAssetsVars(1);
 
-            SetupText(asset.ToRef(), Encode(encoding, "hello+assets"));
+            SetupText(assets[0].ToRef(), Encode(encoding, "hello+assets"));
 
             var expected = @"
                 Text: hello+assets
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_not_resolve_text_if_too_big()
         {
-            var (vars, _) = SetupAssetVars(1_000_000);
+            var (vars, _) = SetupAssetsVars(1, 1_000_000);
 
             var expected = @"
                 Text: ErrorTooBig
@@ -217,9 +217,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_resolve_blur_hash()
         {
-            var (vars, asset) = SetupAssetVars();
+            var (vars, assets) = SetupAssetsVars(1);
 
-            SetupBlurHash(asset.ToRef(), "Hash");
+            SetupBlurHash(assets[0].ToRef(), "Hash");
 
             var expected = @"
                 Hash: Hash
@@ -242,9 +242,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_not_resolve_blur_hash_if_too_big()
         {
-            var (vars, asset) = SetupAssetVars(1_000_000);
+            var (vars, assets) = SetupAssetsVars(1, 1_000_000);
 
-            SetupBlurHash(asset.ToRef(), "Hash");
+            SetupBlurHash(assets[0].ToRef(), "Hash");
 
             var expected = @"
                 Hash: null
@@ -267,9 +267,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_not_resolve_blue_hash_if_not_an_image()
         {
-            var (vars, asset) = SetupAssetVars(type: AssetType.Audio);
+            var (vars, assets) = SetupAssetsVars(1, type: AssetType.Audio);
 
-            SetupBlurHash(asset.ToRef(), "Hash");
+            SetupBlurHash(assets[0].ToRef(), "Hash");
 
             var expected = @"
                 Hash: null
@@ -336,10 +336,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Invokes(x => x.GetArgument<Stream>(4)?.Write(bytes));
         }
 
-        private (ScriptVars, IAssetEntity) SetupAssetVars(int fileSize = 100, AssetType type = AssetType.Image)
+        private (ScriptVars, IAssetEntity[]) SetupAssetsVars(int count, int fileSize = 100, AssetType type = AssetType.Image)
         {
-            var assetId = DomainId.NewGuid();
-            var asset = CreateAsset(assetId, 1, fileSize, type);
+            var assets = Enumerable.Range(0, count).Select(x => CreateAsset(1, fileSize, type)).ToArray();
+            var assetIds = assets.Select(x => x.Id);
 
             var user = new ClaimsPrincipal();
 
@@ -347,11 +347,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId)));
+                            .AddInvariant(JsonValue.Array(assetIds)));
 
             A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, asset));
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetIds), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(2, assets));
 
             var vars = new ScriptVars
             {
@@ -361,45 +361,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 ["user"] = user
             };
 
-            return (vars, asset);
+            return (vars, assets);
         }
 
-        private (ScriptVars, IAssetEntity[]) SetupAssetsVars(int fileSize = 100, AssetType type = AssetType.Image)
-        {
-            var assetId1 = DomainId.NewGuid();
-            var asset1 = CreateAsset(assetId1, 1, fileSize, type);
-            var assetId2 = DomainId.NewGuid();
-            var asset2 = CreateAsset(assetId1, 2, fileSize, type);
-
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("assets",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId1, assetId2)));
-
-            A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, asset1, asset2));
-
-            var vars = new ScriptVars
-            {
-                ["data"] = data,
-                ["appId"] = appId.Id,
-                ["appName"] = appId.Name,
-                ["user"] = user
-            };
-
-            return (vars, new[] { asset1, asset2 });
-        }
-
-        private IEnrichedAssetEntity CreateAsset(DomainId assetId, int index, int fileSize = 100, AssetType type = AssetType.Image)
+        private IEnrichedAssetEntity CreateAsset(int index, int fileSize = 100, AssetType type = AssetType.Image)
         {
             return new AssetEntity
             {
                 AppId = appId,
-                Id = assetId,
+                Id = DomainId.NewGuid(),
                 FileSize = fileSize,
                 FileName = $"file{index}.jpg",
                 MimeType = "image/jpg",

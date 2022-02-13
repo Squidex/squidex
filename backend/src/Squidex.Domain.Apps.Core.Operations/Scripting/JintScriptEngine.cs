@@ -19,6 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
@@ -125,12 +126,22 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private ScriptExecutionContext<T> CreateEngine<T>(ScriptOptions options, CancellationToken ct) where T : class
         {
+            if (Debugger.IsAttached)
+            {
+                ct = default;
+            }
+
             var engine = new Engine(engineOptions =>
             {
                 engineOptions.AddObjectConverter(DefaultConverter.Instance);
                 engineOptions.SetReferencesResolver(NullPropagation.Instance);
                 engineOptions.Strict();
-                engineOptions.TimeoutInterval(timeoutScript);
+
+                if (!Debugger.IsAttached)
+                {
+                    engineOptions.TimeoutInterval(timeoutScript);
+                    engineOptions.CancellationToken(ct);
+                }
             });
 
             if (options.CanDisallow)
@@ -183,7 +194,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
-            if (scope == ScriptScope.Transform)
+            if (scope.HasFlag(ScriptScope.Transform) || scope.HasFlag(ScriptScope.ContentScript))
             {
                 describe(JsonType.Function, "replace()",
                     Resources.ScriptingReplace);

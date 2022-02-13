@@ -121,7 +121,7 @@
     <value>Queries the asset with the specified ID and invokes the callback with an array of assets.</value>
   </data>
   <data name="ScriptingGetAssets" xml:space="preserve">
-    <value>ueries the assets with the specified IDs and invokes the callback with an array of assets.</value>
+    <value>Queries the assets with the specified IDs and invokes the callback with an array of assets.</value>
   </data>
   <data name="ScriptingGetAssetText" xml:space="preserve">
     <value>Get the text of an asset. Encodings: base64,ascii,unicode,utf8</value>

@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ueries the assets with the specified IDs and invokes the callback with an array of assets..
+        ///   Looks up a localized string similar to Queries the assets with the specified IDs and invokes the callback with an array of assets..
         /// </summary>
         internal static string ScriptingGetAssets {
             get {

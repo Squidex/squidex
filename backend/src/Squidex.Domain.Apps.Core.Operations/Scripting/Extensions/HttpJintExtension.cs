@@ -36,19 +36,19 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
-            describe(JsonType.Function, "getJSON(url, callback, ?headers)",
+            describe(JsonType.Function, "getJSON(url, callback, headers?)",
                 Resources.ScriptingGetJSON);
 
-            describe(JsonType.Function, "postJSON(url, body, callback, ?headers)",
+            describe(JsonType.Function, "postJSON(url, body, callback, headers?)",
                 Resources.ScriptingPostJSON);
 
-            describe(JsonType.Function, "putJSON(url, body, callback, ?headers)",
+            describe(JsonType.Function, "putJSON(url, body, callback, headers?)",
                 Resources.ScriptingPutJson);
 
-            describe(JsonType.Function, "patchJSON(url, body, callback, headers)",
+            describe(JsonType.Function, "patchJSON(url, body, callback, headers?)",
                 Resources.ScriptingPatchJson);
 
-            describe(JsonType.Function, "deleteJSON(url, body, callback, headers)",
+            describe(JsonType.Function, "deleteJSON(url, body, callback, headers?)",
                 Resources.ScriptingDeleteJson);
         }
 
