@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using Esprima;
 using Jint;
 using Jint.Native;
@@ -19,7 +20,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {

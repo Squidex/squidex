@@ -22,7 +22,6 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -31,7 +30,6 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
-using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace Squidex.Config.Domain
 {
@@ -121,18 +119,6 @@ namespace Squidex.Config.Domain
 
                 ConfigureJson(TypeNameHandling.None, options.SerializerSettings);
             });
-
-            return builder;
-        }
-
-        public static IGraphQLBuilder AddSquidexWriter(this IGraphQLBuilder builder)
-        {
-            builder.Register<IDocumentWriter>(c =>
-            {
-                var serializer = new NewtonsoftJsonSerializer(ConfigureJson(TypeNameHandling.None));
-
-                return new DefaultDocumentWriter(serializer);
-            }, ServiceLifetime.Singleton);
 
             return builder;
         }

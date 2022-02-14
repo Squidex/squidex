@@ -8,7 +8,6 @@
 using Jint;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Text;
-using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
