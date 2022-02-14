@@ -55,28 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_resolve_reference()
         {
-            var referenceId1 = DomainId.NewGuid();
-            var reference1 = CreateReference(referenceId1, 1);
-
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("references",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(referenceId1)));
-
-            A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceId1), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(1, reference1));
-
-            var vars = new ScriptVars
-            {
-                ["appId"] = appId.Id,
-                ["data"] = data,
-                ["dataOld"] = null,
-                ["user"] = user
-            };
+            var (vars, _) = SetupReferenceVars(1);
 
             var expected = @"
                 Text: Hello 1 World 1
@@ -97,30 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_resolve_references()
         {
-            var referenceId1 = DomainId.NewGuid();
-            var reference1 = CreateReference(referenceId1, 1);
-            var referenceId2 = DomainId.NewGuid();
-            var reference2 = CreateReference(referenceId1, 2);
-
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("references",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(referenceId1, referenceId2)));
-
-            A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceId1, referenceId2), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, reference1, reference2));
-
-            var vars = new ScriptVars
-            {
-                ["appId"] = appId.Id,
-                ["data"] = data,
-                ["dataOld"] = null,
-                ["user"] = user
-            };
+            var (vars, _) = SetupReferenceVars(2);
 
             var expected = @"
                 Text: Hello 1 World 1
@@ -140,7 +96,35 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(Cleanup(expected), Cleanup(result));
         }
 
-        private static IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
+        private (ScriptVars, IContentEntity[]) SetupReferenceVars(int count)
+        {
+            var references = Enumerable.Range(0, count).Select((x, i) => CreateReference(i + 1)).ToArray();
+            var referenceIds = references.Select(x => x.Id);
+
+            var user = new ClaimsPrincipal();
+
+            var data =
+                new ContentData()
+                    .AddField("references",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(referenceIds)));
+
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceIds), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(2, references));
+
+            var vars = new ScriptVars
+            {
+                ["appId"] = appId.Id,
+                ["data"] = data,
+                ["dataOld"] = null,
+                ["user"] = user
+            };
+
+            return (vars, references);
+        }
+
+        private static IEnrichedContentEntity CreateReference(int index)
         {
             return new ContentEntity
             {
@@ -152,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         .AddField("field2",
                             new ContentFieldData()
                                 .AddInvariant(JsonValue.Create($"World {index}"))),
-                Id = referenceId
+                Id = DomainId.NewGuid()
             };
         }
 

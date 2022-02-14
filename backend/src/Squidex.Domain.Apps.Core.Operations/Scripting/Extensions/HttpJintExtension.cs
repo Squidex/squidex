@@ -11,7 +11,6 @@ using Jint.Native;
 using Jint.Native.Json;
 using Jint.Runtime;
 using Squidex.Domain.Apps.Core.Properties;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 {
@@ -28,28 +27,28 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public void ExtendAsync(ScriptExecutionContext context)
         {
-            AdBodyMethod(context, HttpMethod.Patch, "patchJSON");
-            AdBodyMethod(context, HttpMethod.Post, "postJSON");
-            AdBodyMethod(context, HttpMethod.Put, "putJSON");
+            AddBodyMethod(context, HttpMethod.Patch, "patchJSON");
+            AddBodyMethod(context, HttpMethod.Post, "postJSON");
+            AddBodyMethod(context, HttpMethod.Put, "putJSON");
             AddMethod(context, HttpMethod.Delete, "deleteJSON");
             AddMethod(context, HttpMethod.Get, "getJSON");
         }
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
-            describe(JsonType.Function, "getJSON(url, callback, ?headers)",
+            describe(JsonType.Function, "getJSON(url, callback, headers?)",
                 Resources.ScriptingGetJSON);
 
-            describe(JsonType.Function, "postJSON(url, body, callback, ?headers)",
+            describe(JsonType.Function, "postJSON(url, body, callback, headers?)",
                 Resources.ScriptingPostJSON);
 
-            describe(JsonType.Function, "putJSON(url, body, callback, ?headers)",
+            describe(JsonType.Function, "putJSON(url, body, callback, headers?)",
                 Resources.ScriptingPutJson);
 
-            describe(JsonType.Function, "patchJSON(url, body, callback, headers)",
+            describe(JsonType.Function, "patchJSON(url, body, callback, headers?)",
                 Resources.ScriptingPatchJson);
 
-            describe(JsonType.Function, "deleteJSON(url, body, callback, headers)",
+            describe(JsonType.Function, "deleteJSON(url, body, callback, headers?)",
                 Resources.ScriptingDeleteJson);
         }
 
@@ -57,62 +56,51 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
         {
             var action = new HttpJson((url, callback, headers) =>
             {
-                RequestAsync(context, method, url, null, callback, headers).Forget();
+                Request(context, method, url, null, callback, headers);
             });
 
             context.Engine.SetValue(name, action);
         }
 
-        private void AdBodyMethod(ScriptExecutionContext context, HttpMethod method, string name)
+        private void AddBodyMethod(ScriptExecutionContext context, HttpMethod method, string name)
         {
             var action = new HttpJsonWithBody((url, body, callback, headers) =>
             {
-                RequestAsync(context, method, url, body, callback, headers).Forget();
+                Request(context, method, url, body, callback, headers);
             });
 
             context.Engine.SetValue(name, action);
         }
 
-        private async Task RequestAsync(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers)
+        private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers)
         {
-            if (callback == null)
+            context.Schedule(async (scheduler, ct) =>
             {
-                context.Fail(new JavaScriptException("Callback cannot be null."));
-                return;
-            }
+                if (callback == null)
+                {
+                    throw new JavaScriptException("Callback cannot be null.");
+                }
 
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            {
-                context.Fail(new JavaScriptException("URL is not valid."));
-                return;
-            }
+                if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                {
+                    throw new JavaScriptException("URL is not valid.");
+                }
 
-            context.MarkAsync();
-
-            try
-            {
                 using (var httpClient = httpClientFactory.CreateClient())
                 {
                     using (var request = CreateRequest(context, method, uri, body, headers))
                     {
-                        using (var response = await httpClient.SendAsync(request, context.CancellationToken))
+                        using (var response = await httpClient.SendAsync(request, ct))
                         {
                             response.EnsureSuccessStatusCode();
 
-                            var responseObject = await ParseResponse(context, response);
+                            var responseObject = await ParseResponseasync(context, response, ct);
 
-                            // Reset the time contraints and other constraints so that our awaiting does not count as script time.
-                            context.Engine.ResetConstraints();
-
-                            callback(responseObject);
+                            scheduler.Run(callback, responseObject);
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                context.Fail(ex);
-            }
+            });
         }
 
         private static HttpRequestMessage CreateRequest(ScriptExecutionContext context, HttpMethod method, Uri uri, JsValue? body, JsValue? headers)
@@ -151,16 +139,17 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
             return request;
         }
 
-        private static async Task<JsValue> ParseResponse(ScriptExecutionContext context, HttpResponseMessage response)
+        private static async Task<JsValue> ParseResponseasync(ScriptExecutionContext context, HttpResponseMessage response,
+            CancellationToken ct)
         {
-            var responseString = await response.Content.ReadAsStringAsync(context.CancellationToken);
+            var responseString = await response.Content.ReadAsStringAsync(ct);
 
-            context.CancellationToken.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested();
 
             var jsonParser = new JsonParser(context.Engine);
             var jsonValue = jsonParser.Parse(responseString);
 
-            context.CancellationToken.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested();
 
             return jsonValue;
         }

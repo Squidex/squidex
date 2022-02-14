@@ -194,11 +194,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             };
 
             const string script = @"
-                async = true;
-
                 var x = 0;
 
-                getJSON('http://squidex.io', function(result) {
+                getJSON('http://mockup.squidex.io', function(result) {
                     complete();
                 });                    
             ";
@@ -258,11 +256,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             };
 
             const string script = @"
-                async = true;
-
                 var data = ctx.data;
 
-                getJSON('http://squidex.io', function(result) {
+                getJSON('http://mockup.squidex.io', function(result) {
                     data.operation = { iv: result.key };
 
                     replace(data);
@@ -288,7 +284,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             const string script = @"
                 var data = ctx.data;
 
-                getJSON('http://squidex.io', function(result) {
+                getJSON('http://mockup.squidex.io', function(result) {
                     data.operation = { iv: result.key };
 
                     replace(data);
@@ -302,7 +298,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
-        public async Task TransformAsync_should_timeout_if_replace_never_called()
+        public async Task TransformAsync_should_not_timeout_if_replace_never_called()
         {
             var vars = new ScriptVars
             {
@@ -312,16 +308,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             };
 
             const string script = @"
-                async = true;
-
                 var data = ctx.data;
 
-                getJSON('http://squidex.io', function(result) {
+                getJSON('http://cloud.squidex.io/healthz', function(result) {
                     data.operation = { iv: result.key };
                 });
             ";
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.TransformAsync(vars, script, contentOptions));
+            await sut.TransformAsync(vars, script, contentOptions);
         }
 
         [Fact]

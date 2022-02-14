@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -25,9 +26,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetsJintExtensionTests : IClassFixture<TranslationsFixture>
     {
-        private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
+        private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly JintScriptEngine sut;
 
@@ -36,8 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var services =
                 new ServiceCollection()
                     .AddSingleton(appProvider)
-                    .AddSingleton(assetQuery)
                     .AddSingleton(assetFileStore)
+                    .AddSingleton(assetQuery)
+                    .AddSingleton(assetThumbnailGenerator)
                     .BuildServiceProvider();
 
             var extensions = new IJintExtension[]
@@ -45,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 new AssetsJintExtension(services)
             };
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, A<CancellationToken>._))
                 .Returns(Mocks.App(appId));
 
             sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -57,13 +60,36 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 extensions);
         }
 
+        public static IEnumerable<object[]> Encodings()
+        {
+            yield return new object[] { "ascii" };
+            yield return new object[] { "unicode" };
+            yield return new object[] { "utf8" };
+            yield return new object[] { "base64" };
+        }
+
+        public static byte[] Encode(string encoding, string text)
+        {
+            switch (encoding)
+            {
+                case "base64":
+                    return Convert.FromBase64String(text);
+                case "ascii":
+                    return Encoding.ASCII.GetBytes(text);
+                case "unicode":
+                    return Encoding.Unicode.GetBytes(text);
+                default:
+                    return Encoding.UTF8.GetBytes(text);
+            }
+        }
+
         [Fact]
         public async Task Should_resolve_asset()
         {
-            var (vars, asset) = SetupAssetVars();
+            var (vars, assets) = SetupAssetsVars(1);
 
             var expected = $@"
-                Text: {asset.FileName} {asset.Id}
+                Text: {assets[0].FileName} {assets[0].Id}
             ";
 
             var script = @"
@@ -81,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_resolve_assets()
         {
-            var (vars, assets) = SetupAssetsVars();
+            var (vars, assets) = SetupAssetsVars(2);
 
             var expected = $@"
                 Text: {assets[0].FileName} {assets[0].Id}
@@ -101,25 +127,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Equal(Cleanup(expected), Cleanup(result));
         }
 
-        [Fact]
-        public async Task Should_resolve_asset_text()
+        [Theory]
+        [MemberData(nameof(Encodings))]
+        public async Task Should_resolve_text(string encoding)
         {
-            var (vars, asset) = SetupAssetVars();
+            var (vars, assets) = SetupAssetsVars(1);
 
-            SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
+            SetupText(assets[0].ToRef(), Encode(encoding, "hello+assets"));
 
             var expected = @"
-                Text: Hello Asset
+                Text: hello+assets
             ";
 
-            var script = @"
-                getAssets(data.assets.iv, function (assets) {
-                    getAssetText(assets[0], function (text) {
-                        var result = `Text: ${text}`;
+            var script = $@"
+                getAssets(data.assets.iv, function (assets) {{
+                    getAssetText(assets[0], function (text) {{
+                        var result = `Text: ${{text}}`;
 
                         complete(result);
-                    });
-                });";
+                    }}, '{encoding}');
+                }});";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -127,109 +154,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_resolve_asset_text_with_utf8()
+        public async Task Should_not_resolve_text_if_too_big()
         {
-            var (vars, asset) = SetupAssetVars();
-
-            SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
-
-            var expected = @"
-                Text: Hello Asset
-            ";
-
-            var script = @"
-                getAssets(data.assets.iv, function (assets) {
-                    getAssetText(assets[0], function (text) {
-                        var result = `Text: ${text}`;
-
-                        complete(result);
-                    }, 'utf8');
-                });";
-
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
-
-            Assert.Equal(Cleanup(expected), Cleanup(result));
-        }
-
-        [Fact]
-        public async Task Should_resolve_asset_text_with_unicode()
-        {
-            var (vars, asset) = SetupAssetVars();
-
-            SetupText(asset.Id, Encoding.Unicode.GetBytes("Hello Asset"));
-
-            var expected = @"
-                Text: Hello Asset
-            ";
-
-            var script = @"
-                getAssets(data.assets.iv, function (assets) {
-                    getAssetText(assets[0], function (text) {
-                        var result = `Text: ${text}`;
-
-                        complete(result);
-                    }, 'unicode');
-                });";
-
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
-
-            Assert.Equal(Cleanup(expected), Cleanup(result));
-        }
-
-        [Fact]
-        public async Task Should_resolve_asset_text_with_ascii()
-        {
-            var (vars, asset) = SetupAssetVars();
-
-            SetupText(asset.Id, Encoding.ASCII.GetBytes("Hello Asset"));
-
-            var expected = @"
-                Text: Hello Asset
-            ";
-
-            var script = @"
-                getAssets(data.assets.iv, function (assets) {
-                    getAssetText(assets[0], function (text) {
-                        var result = `Text: ${text}`;
-
-                        complete(result);
-                    }, 'ascii');
-                });";
-
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
-
-            Assert.Equal(Cleanup(expected), Cleanup(result));
-        }
-
-        [Fact]
-        public async Task Should_resolve_asset_text_with_base64()
-        {
-            var (vars, asset) = SetupAssetVars();
-
-            SetupText(asset.Id, Encoding.UTF8.GetBytes("Hello Asset"));
-
-            var expected = @"
-                Text: SGVsbG8gQXNzZXQ=
-            ";
-
-            var script = @"
-                getAssets(data.assets.iv, function (assets) {
-                    getAssetText(assets[0], function (text) {
-                        var result = `Text: ${text}`;
-
-                        complete(result);
-                    }, 'base64');
-                });";
-
-            var result = (await sut.ExecuteAsync(vars, script)).ToString();
-
-            Assert.Equal(Cleanup(expected), Cleanup(result));
-        }
-
-        [Fact]
-        public async Task Should_not_resolve_asset_text_if_too_big()
-        {
-            var (vars, _) = SetupAssetVars(1_000_000);
+            var (vars, _) = SetupAssetsVars(1, 1_000_000);
 
             var expected = @"
                 Text: ErrorTooBig
@@ -252,8 +179,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .MustNotHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_resolve_asset_text_from_event()
+        [Theory]
+        [MemberData(nameof(Encodings))]
+        public async Task Should_resolve_text_from_event(string encoding)
         {
             var @event = new EnrichedAssetEvent
             {
@@ -263,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 AppId = appId
             };
 
-            SetupText(@event.Id, Encoding.UTF8.GetBytes("Hello Asset"));
+            SetupText(@event.ToRef(), Encode(encoding, "hello+assets"));
 
             var vars = new ScriptVars
             {
@@ -271,14 +199,39 @@ namespace Squidex.Domain.Apps.Entities.Assets
             };
 
             var expected = @"
-                Text: Hello Asset
+                Text: hello+assets
+            ";
+
+            var script = $@"
+                getAssetText(event, function (text) {{
+                    var result = `Text: ${{text}}`;
+
+                    complete(result);
+                }}, '{encoding}');";
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_resolve_blur_hash()
+        {
+            var (vars, assets) = SetupAssetsVars(1);
+
+            SetupBlurHash(assets[0].ToRef(), "Hash");
+
+            var expected = @"
+                Hash: Hash
             ";
 
             var script = @"
-                getAssetText(event, function (text) {
-                    var result = `Text: ${text}`;
+                getAssets(data.assets.iv, function (assets) {
+                    getAssetBlurHash(assets[0], function (text) {
+                        var result = `Hash: ${text}`;
 
-                    complete(result);
+                        complete(result);
+                    });
                 });";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
@@ -287,15 +240,68 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_not_resolve_asset_text_from_event_if_too_big()
+        public async Task Should_not_resolve_blur_hash_if_too_big()
+        {
+            var (vars, assets) = SetupAssetsVars(1, 1_000_000);
+
+            SetupBlurHash(assets[0].ToRef(), "Hash");
+
+            var expected = @"
+                Hash: null
+            ";
+
+            var script = @"
+                getAssets(data.assets.iv, function (assets) {
+                    getAssetBlurHash(assets[0], function (text) {
+                        var result = `Hash: ${text}`;
+
+                        complete(result);
+                    });
+                });";
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_not_resolve_blue_hash_if_not_an_image()
+        {
+            var (vars, assets) = SetupAssetsVars(1, type: AssetType.Audio);
+
+            SetupBlurHash(assets[0].ToRef(), "Hash");
+
+            var expected = @"
+                Hash: null
+            ";
+
+            var script = @"
+                getAssets(data.assets.iv, function (assets) {
+                    getAssetBlurHash(assets[0], function (text) {
+                        var result = `Hash: ${text}`;
+
+                        complete(result);
+                    });
+                });";
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_resolve_blur_hash_from_event()
         {
             var @event = new EnrichedAssetEvent
             {
                 Id = DomainId.NewGuid(),
+                AssetType = AssetType.Image,
                 FileVersion = 0,
-                FileSize = 1_000_000,
+                FileSize = 100,
                 AppId = appId
             };
+
+            SetupBlurHash(@event.ToRef(), "Hash");
 
             var vars = new ScriptVars
             {
@@ -303,11 +309,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             };
 
             var expected = @"
-                Text: ErrorTooBig
+                Text: Hash
             ";
 
             var script = @"
-                getAssetText(event, function (text) {
+                getAssetBlurHash(event, function (text) {
                     var result = `Text: ${text}`;
 
                     complete(result);
@@ -316,26 +322,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
             Assert.Equal(Cleanup(expected), Cleanup(result));
-
-            A.CallTo(() => assetFileStore.DownloadAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
-                .MustNotHaveHappened();
         }
 
-        private void SetupText(DomainId id, byte[] bytes)
+        private void SetupBlurHash(AssetRef asset, string hash)
         {
-            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, id, 0, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
-                .Invokes(x =>
-                {
-                    var stream = x.GetArgument<Stream>(4)!;
-
-                    stream.Write(bytes);
-                });
+            A.CallTo(() => assetThumbnailGenerator.ComputeBlurHashAsync(A<Stream>._, asset.MimeType, A<BlurOptions>._, A<CancellationToken>._))
+                .Returns(hash);
         }
 
-        private (ScriptVars, IAssetEntity) SetupAssetVars(int fileSize = 100)
+        private void SetupText(AssetRef asset, byte[] bytes)
         {
-            var assetId = DomainId.NewGuid();
-            var asset = CreateAsset(assetId, 1, fileSize);
+            A.CallTo(() => assetFileStore.DownloadAsync(appId.Id, asset.Id, asset.FileVersion, null, A<Stream>._, A<BytesRange>._, A<CancellationToken>._))
+                .Invokes(x => x.GetArgument<Stream>(4)?.Write(bytes));
+        }
+
+        private (ScriptVars, IAssetEntity[]) SetupAssetsVars(int count, int fileSize = 100, AssetType type = AssetType.Image)
+        {
+            var assets = Enumerable.Range(0, count).Select(x => CreateAsset(1, fileSize, type)).ToArray();
+            var assetIds = assets.Select(x => x.Id);
 
             var user = new ClaimsPrincipal();
 
@@ -343,11 +347,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 new ContentData()
                     .AddField("assets",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId)));
+                            .AddInvariant(JsonValue.Array(assetIds)));
 
             A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, asset));
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetIds), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(2, assets));
 
             var vars = new ScriptVars
             {
@@ -357,47 +361,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 ["user"] = user
             };
 
-            return (vars, asset);
+            return (vars, assets);
         }
 
-        private (ScriptVars, IAssetEntity[]) SetupAssetsVars(int fileSize = 100)
-        {
-            var assetId1 = DomainId.NewGuid();
-            var asset1 = CreateAsset(assetId1, 1, fileSize);
-            var assetId2 = DomainId.NewGuid();
-            var asset2 = CreateAsset(assetId1, 2, fileSize);
-
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("assets",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(assetId1, assetId2)));
-
-            A.CallTo(() => assetQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), null, A<Q>.That.HasIds(assetId1, assetId2), A<CancellationToken>._))
-                .Returns(ResultList.CreateFrom(2, asset1, asset2));
-
-            var vars = new ScriptVars
-            {
-                ["data"] = data,
-                ["appId"] = appId.Id,
-                ["appName"] = appId.Name,
-                ["user"] = user
-            };
-
-            return (vars, new[] { asset1, asset2 });
-        }
-
-        private IEnrichedAssetEntity CreateAsset(DomainId assetId, int index, int fileSize = 100)
+        private IEnrichedAssetEntity CreateAsset(int index, int fileSize = 100, AssetType type = AssetType.Image)
         {
             return new AssetEntity
             {
                 AppId = appId,
-                Id = assetId,
+                Id = DomainId.NewGuid(),
                 FileSize = fileSize,
                 FileName = $"file{index}.jpg",
+                MimeType = "image/jpg",
+                Type = type
             };
         }
 

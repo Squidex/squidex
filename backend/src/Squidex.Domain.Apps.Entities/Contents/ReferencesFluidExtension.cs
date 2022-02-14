@@ -8,6 +8,7 @@
 using System.Text.Encodings.Web;
 using Fluid;
 using Fluid.Ast;
+using Fluid.Tags;
 using Fluid.Values;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -23,23 +24,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private static readonly FluidValue ErrorNullReference = FluidValue.Create(null);
         private readonly IServiceProvider serviceProvider;
 
-        private sealed class ReferenceTag : AppTag
+        private sealed class ReferenceTag : ArgumentsTag
         {
-            private readonly IContentQueryService contentQuery;
+            private readonly IServiceProvider serviceProvider;
 
             public ReferenceTag(IServiceProvider serviceProvider)
-                : base(serviceProvider)
             {
-                contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
+                this.serviceProvider = serviceProvider;
             }
 
-            public override async ValueTask<Completion> WriteToAsync(TextWriter writer, TextEncoder encoder, TemplateContext context, FilterArgument[] arguments)
+            public override async ValueTask<Completion> WriteToAsync(TextWriter writer,
+                TextEncoder encoder, TemplateContext context, FilterArgument[] arguments)
             {
                 if (arguments.Length == 2 && context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
                 {
                     var id = await arguments[1].Expression.EvaluateAsync(context);
 
-                    var content = await ResolveContentAsync(AppProvider, contentQuery, enrichedEvent.AppId.Id, id);
+                    var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, id);
 
                     if (content != null)
                     {
@@ -72,15 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void AddReferenceFilter()
         {
-            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
-
-            var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
-
             TemplateContext.GlobalFilters.AddAsyncFilter("reference", async (input, arguments, context) =>
             {
                 if (context.GetValue("event")?.ToObjectValue() is EnrichedEvent enrichedEvent)
                 {
-                    var content = await ResolveContentAsync(appProvider, contentQuery, enrichedEvent.AppId.Id, input);
+                    var content = await ResolveContentAsync(serviceProvider, enrichedEvent.AppId.Id, input);
 
                     if (content == null)
                     {
@@ -99,8 +96,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             factory.RegisterTag("reference", new ReferenceTag(serviceProvider));
         }
 
-        private static async Task<IContentEntity?> ResolveContentAsync(IAppProvider appProvider, IContentQueryService contentQuery, DomainId appId, FluidValue id)
+        private static async Task<IContentEntity?> ResolveContentAsync(IServiceProvider serviceProvider, DomainId appId, FluidValue id)
         {
+            var appProvider = serviceProvider.GetRequiredService<IAppProvider>();
+
             var app = await appProvider.GetAppAsync(appId);
 
             if (app == null)
@@ -109,17 +108,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             var domainId = DomainId.Create(id.ToStringValue());
-            var domainIds = new List<DomainId> { domainId };
+
+            var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
             var requestContext =
                 Context.Admin(app).Clone(b => b
+                    .WithoutContentEnrichment()
                     .WithUnpublished()
                     .WithoutTotal());
 
-            var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainIds));
-            var content = contents.FirstOrDefault();
+            var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(domainId));
 
-            return content;
+            return contents.FirstOrDefault();
         }
     }
 }

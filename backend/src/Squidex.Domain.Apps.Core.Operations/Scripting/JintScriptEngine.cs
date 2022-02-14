@@ -19,6 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
+using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
@@ -49,30 +50,20 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
-                    var tcs = new TaskCompletionSource<IJsonValue>();
+                    var context =
+                        CreateEngine<IJsonValue>(options, combined.Token)
+                            .Extend(vars, options)
+                            .Extend(extensions)
+                            .ExtendAsync(extensions);
 
-                    await using (combined.Token.Register(() => tcs.TrySetCanceled(combined.Token)))
+                    context.Engine.SetValue("complete", new Action<JsValue?>(value =>
                     {
-                        var context =
-                            CreateEngine(options)
-                                .Extend(vars, options)
-                                .Extend(extensions)
-                                .ExtendAsync(extensions, tcs.TrySetException, combined.Token);
+                        context.Complete(JsonMapper.Map(value));
+                    }));
 
-                        context.Engine.SetValue("complete", new Action<JsValue?>(value =>
-                        {
-                            tcs.TrySetResult(JsonMapper.Map(value));
-                        }));
+                    var result = Execute(context.Engine, script);
 
-                        var result = Execute(context.Engine, script);
-
-                        if (!context.IsAsync)
-                        {
-                            tcs.TrySetResult(JsonMapper.Map(result));
-                        }
-
-                        return await tcs.Task;
-                    }
+                    return await context.CompleteAsync() ?? JsonMapper.Map(result);
                 }
             }
         }
@@ -87,50 +78,33 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct))
                 {
-                    var tcs = new TaskCompletionSource<ContentData>();
+                    var context =
+                        CreateEngine<ContentData>(options, combined.Token)
+                            .Extend(vars, options)
+                            .Extend(extensions)
+                            .ExtendAsync(extensions);
 
-                    await using (combined.Token.Register(() => tcs.TrySetCanceled(combined.Token)))
+                    context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
                     {
-                        var context =
-                            CreateEngine(options)
-                                .Extend(vars, options)
-                                .Extend(extensions)
-                                .ExtendAsync(extensions, tcs.TrySetException, combined.Token);
+                        context.Complete(vars.Data!);
+                    }));
 
-                        context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
+                    context.Engine.SetValue("replace", new Action(() =>
+                    {
+                        var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
+
+                        if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
                         {
-                            tcs.TrySetResult(vars.Data!);
-                        }));
-
-                        context.Engine.SetValue("replace", new Action(() =>
-                        {
-                            var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
-
-                            if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
+                            if (!context.IsCompleted && data.TryUpdate(out var modified))
                             {
-                                if (!tcs.Task.IsCompleted)
-                                {
-                                    if (data.TryUpdate(out var modified))
-                                    {
-                                        tcs.TrySetResult(modified);
-                                    }
-                                    else
-                                    {
-                                        tcs.TrySetResult(vars.Data!);
-                                    }
-                                }
+                                context.Complete(modified);
                             }
-                        }));
-
-                        Execute(context.Engine, script);
-
-                        if (!context.IsAsync)
-                        {
-                            tcs.TrySetResult(vars.Data!);
                         }
+                    }));
 
-                        return await tcs.Task;
-                    }
+                    Execute(context.Engine, script);
+
+                    return await context.CompleteAsync() ?? vars.Data!;
                 }
             }
         }
@@ -141,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             Guard.NotNullOrEmpty(script);
 
             var context =
-                CreateEngine(options)
+                CreateEngine<object>(options, default)
                     .Extend(vars, options)
                     .Extend(extensions);
 
@@ -150,14 +124,24 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return JsonMapper.Map(result);
         }
 
-        private ScriptExecutionContext CreateEngine(ScriptOptions options)
+        private ScriptExecutionContext<T> CreateEngine<T>(ScriptOptions options, CancellationToken ct) where T : class
         {
+            if (Debugger.IsAttached)
+            {
+                ct = default;
+            }
+
             var engine = new Engine(engineOptions =>
             {
                 engineOptions.AddObjectConverter(DefaultConverter.Instance);
                 engineOptions.SetReferencesResolver(NullPropagation.Instance);
                 engineOptions.Strict();
-                engineOptions.TimeoutInterval(timeoutScript);
+
+                if (!Debugger.IsAttached)
+                {
+                    engineOptions.TimeoutInterval(timeoutScript);
+                    engineOptions.CancellationToken(ct);
+                }
             });
 
             if (options.CanDisallow)
@@ -175,9 +159,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 extension.Extend(engine);
             }
 
-            var context = new ScriptExecutionContext(engine);
-
-            return context;
+            return new ScriptExecutionContext<T>(engine, ct);
         }
 
         private JsValue Execute(Engine engine, string script)
@@ -212,7 +194,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
-            if (scope == ScriptScope.Transform)
+            if (scope.HasFlag(ScriptScope.Transform) || scope.HasFlag(ScriptScope.ContentScript))
             {
                 describe(JsonType.Function, "replace()",
                     Resources.ScriptingReplace);

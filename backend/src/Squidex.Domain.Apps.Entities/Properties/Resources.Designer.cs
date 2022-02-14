@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ueries the assets with the specified IDs and invokes the callback with an array of assets..
+        ///   Looks up a localized string similar to Queries the assets with the specified IDs and invokes the callback with an array of assets..
         /// </summary>
         internal static string ScriptingGetAssets {
             get {
@@ -84,6 +84,15 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         internal static string ScriptingGetAssetText {
             get {
                 return ResourceManager.GetString("ScriptingGetAssetText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gets the blur hash of an asset if it is an image or null otherwise..
+        /// </summary>
+        internal static string ScriptingGetBlurHash {
+            get {
+                return ResourceManager.GetString("ScriptingGetBlurHash", resourceCulture);
             }
         }
         
@@ -106,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Increments the counter with the given name and returns the value..
+        ///   Looks up a localized string similar to Increments the counter with the given name and returns the value (OBSOLETE)..
         /// </summary>
         internal static string ScriptingIncrementCounter {
             get {
@@ -115,11 +124,29 @@ namespace Squidex.Domain.Apps.Entities.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resets the counter with the given name to zero..
+        ///   Looks up a localized string similar to Increments the counter with the given name and returns the value..
+        /// </summary>
+        internal static string ScriptingIncrementCounterV2 {
+            get {
+                return ResourceManager.GetString("ScriptingIncrementCounterV2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resets the counter with the given name to zero (OBSOLETE)..
         /// </summary>
         internal static string ScriptingResetCounter {
             get {
                 return ResourceManager.GetString("ScriptingResetCounter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resets the counter with the given name to zero..
+        /// </summary>
+        internal static string ScriptingResetCounterV2 {
+            get {
+                return ResourceManager.GetString("ScriptingResetCounterV2", resourceCulture);
             }
         }
     }

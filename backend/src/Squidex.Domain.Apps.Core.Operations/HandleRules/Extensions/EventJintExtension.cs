@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
-            if ((scope & ScriptScope.ContentTrigger) == ScriptScope.ContentTrigger)
+            if (scope.HasFlag(ScriptScope.ContentTrigger))
             {
                 describe(JsonType.Function, "contentAction",
                     Resources.ScriptingContentAction);
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
                     Resources.ScriptingContentUrl);
             }
 
-            if ((scope & ScriptScope.AssetTrigger) == ScriptScope.AssetTrigger)
+            if (scope.HasFlag(ScriptScope.AssetTrigger))
             {
                 describe(JsonType.Function, "assetContentUrl",
                 Resources.ScriptingAssetContentUrl);

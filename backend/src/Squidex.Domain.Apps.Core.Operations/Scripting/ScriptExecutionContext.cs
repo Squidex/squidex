@@ -6,42 +6,96 @@
 // ==========================================================================
 
 using Jint;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Text;
+using System.Diagnostics;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class ScriptExecutionContext : ScriptContext
+    public abstract class ScriptExecutionContext : ScriptContext
     {
-        private Func<Exception, bool>? completion;
-
         public Engine Engine { get; }
 
-        public CancellationToken CancellationToken { get; private set; }
-
-        public bool IsAsync { get; private set; }
-
-        internal ScriptExecutionContext(Engine engine)
+        protected ScriptExecutionContext(Engine engine)
         {
             Engine = engine;
         }
 
-        public void MarkAsync()
+        public abstract void Schedule(Func<IScheduler, CancellationToken, Task> action);
+    }
+
+#pragma warning disable MA0048 // File name must match type name
+    public interface IScheduler
+#pragma warning restore MA0048 // File name must match type name
+    {
+        void Run(Action? action);
+
+        void Run<T>(Action<T>? action, T argument);
+    }
+
+    public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, IScheduler where T : class
+    {
+        private readonly TaskCompletionSource<T?> tcs = new TaskCompletionSource<T?>();
+        private readonly CancellationToken cancellationToken;
+        private int pendingTasks;
+
+        public bool IsCompleted
         {
-            IsAsync = true;
+            get => tcs.Task.Status == TaskStatus.RanToCompletion || tcs.Task.Status == TaskStatus.Faulted;
         }
 
-        public void Fail(Exception exception)
+        internal ScriptExecutionContext(Engine engine, CancellationToken cancellationToken)
+            : base(engine)
         {
-            completion?.Invoke(exception);
+            this.cancellationToken = cancellationToken;
         }
 
-        public ScriptExecutionContext ExtendAsync(IEnumerable<IJintExtension> extensions, Func<Exception, bool> completion,
-            CancellationToken ct)
+        public Task<T?> CompleteAsync()
         {
-            CancellationToken = ct;
+            if (pendingTasks <= 0)
+            {
+                tcs.TrySetResult(null);
+            }
 
-            this.completion = completion;
+            return tcs.Task.WithCancellation(cancellationToken);
+        }
 
+        public void Complete(T value)
+        {
+            tcs.TrySetResult(value);
+        }
+
+        public override void Schedule(Func<IScheduler, CancellationToken, Task> action)
+        {
+            if (IsCompleted)
+            {
+                return;
+            }
+
+            async Task ScheduleAsync()
+            {
+                try
+                {
+                    Interlocked.Increment(ref pendingTasks);
+
+                    await action(this, cancellationToken);
+
+                    if (Interlocked.Decrement(ref pendingTasks) <= 0)
+                    {
+                        tcs.TrySetResult(null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    tcs.TrySetException(ex);
+                }
+            }
+
+            ScheduleAsync().Forget();
+        }
+
+        public ScriptExecutionContext<T> ExtendAsync(IEnumerable<IJintExtension> extensions)
+        {
             foreach (var extension in extensions)
             {
                 extension.ExtendAsync(this);
@@ -50,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return this;
         }
 
-        public ScriptExecutionContext Extend(IEnumerable<IJintExtension> extensions)
+        public ScriptExecutionContext<T> Extend(IEnumerable<IJintExtension> extensions)
         {
             foreach (var extension in extensions)
             {
@@ -60,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             return this;
         }
 
-        public ScriptExecutionContext Extend(ScriptVars vars, ScriptOptions options)
+        public ScriptExecutionContext<T> Extend(ScriptVars vars, ScriptOptions options)
         {
             var engine = Engine;
 
@@ -94,6 +148,28 @@ namespace Squidex.Domain.Apps.Core.Scripting
             engine.SetValue("async", true);
 
             return this;
+        }
+
+        void IScheduler.Run(Action? action)
+        {
+            if (IsCompleted || action == null)
+            {
+                return;
+            }
+
+            Engine.ResetConstraints();
+            action();
+        }
+
+        void IScheduler.Run<TArg>(Action<TArg>? action, TArg argument)
+        {
+            if (IsCompleted || action == null)
+            {
+                return;
+            }
+
+            Engine.ResetConstraints();
+            action(argument);
         }
     }
 }
