@@ -16,7 +16,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public sealed class RuleRegistry : ITypeProvider
+    public sealed class RuleTypeProvider : ITypeProvider
     {
         private const string ActionSuffix = "Action";
         private const string ActionSuffixV2 = "ActionV2";
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get => actionTypes;
         }
 
-        public RuleRegistry(IEnumerable<RuleActionRegistration>? registrations = null)
+        public RuleTypeProvider(IEnumerable<RuleActionRegistration>? registrations = null)
         {
             if (registrations != null)
             {

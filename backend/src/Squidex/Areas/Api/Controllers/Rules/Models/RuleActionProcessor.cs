@@ -17,9 +17,9 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     public sealed class RuleActionProcessor : IDocumentProcessor
     {
-        private readonly RuleRegistry ruleRegistry;
+        private readonly RuleTypeProvider ruleRegistry;
 
-        public RuleActionProcessor(RuleRegistry ruleRegistry)
+        public RuleActionProcessor(RuleTypeProvider ruleRegistry)
         {
             this.ruleRegistry = ruleRegistry;
         }
