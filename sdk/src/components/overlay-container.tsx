@@ -40,8 +40,6 @@ export const OverlayContainer = (props: OverlayContainerProps) => {
         function listen(event: MouseEvent) {
             const element = event.target as HTMLElement;
 
-            console.log(element);
-
             if (!element || isToolbar(element)) {
                 return;
             }
