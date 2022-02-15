@@ -93,7 +93,6 @@ namespace Squidex.Config.Web
                     options.EnableMetrics = false;
                 })
                 .AddSchema<DummySchema>()
-                .AddSquidexWriter()
                 .AddSystemTextJson()
                 .AddDataLoader();
 
