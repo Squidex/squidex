@@ -181,12 +181,12 @@ namespace Squidex.Config.Domain
             services.AddSingleton(typeof(IPersistenceFactory<>),
                 typeof(Store<>));
 
-            services.AddSingletonAs(c =>
+            services.AddSingletonAs<IInitializable>(c =>
             {
                 var service = c.GetRequiredService<IAssetKeyValueStore<TusMetadata>>();
 
                 return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
-            }).As<IInitializable>();
+            });
         }
 
         private static IMongoClient GetClient(string configuration)

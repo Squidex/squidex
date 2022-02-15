@@ -187,12 +187,12 @@ namespace Squidex.Config.Domain
                 }
             });
 
-            services.AddSingletonAs(c =>
+            services.AddSingletonAs<IInitializable>(c =>
             {
                 var service = c.GetRequiredService<IAssetStore>();
 
                 return new DelegateInitializer(service.GetType().Name, service.InitializeAsync);
-            }).As<IInitializable>();
+            });
         }
     }
 }
