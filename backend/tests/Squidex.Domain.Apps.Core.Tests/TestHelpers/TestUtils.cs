@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
-                    .Map(new FieldRegistry())
+                    .Map(new FieldTypeProvider())
                     .Map(new RuleRegistry())
                     .MapUnmapped(typeof(TestUtils).Assembly);
 

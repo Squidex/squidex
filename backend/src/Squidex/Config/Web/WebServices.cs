@@ -94,6 +94,7 @@ namespace Squidex.Config.Web
                 })
                 .AddSchema<DummySchema>()
                 .AddSystemTextJson()
+                .AddSquidexJson() // Use Newtonsoft.JSON for custom converters.
                 .AddDataLoader();
 
             services.AddSingletonAs<DummySchema>()

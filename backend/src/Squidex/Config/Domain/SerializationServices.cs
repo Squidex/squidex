@@ -7,9 +7,9 @@
 
 using System.Security.Claims;
 using GraphQL;
-using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.NewtonsoftJson;
+using GraphQL.Server;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -30,6 +30,7 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
+using IGraphQLBuilder = GraphQL.DI.IGraphQLBuilder;
 
 namespace Squidex.Config.Domain
 {
@@ -44,7 +45,6 @@ namespace Squidex.Config.Domain
                 new CompareOperatorJsonConverter(),
                 new ContentFieldDataConverter(),
                 new EnvelopeHeadersConverter(),
-                new ExecutionResultJsonConverter(new ErrorInfoProvider()),
                 new JsonValueConverter(),
                 new StringEnumConverter(),
                 new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
@@ -82,7 +82,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AutoAssembyTypeProvider<SquidexMigrations>>()
                 .As<ITypeProvider>();
 
-            services.AddSingletonAs<FieldRegistry>()
+            services.AddSingletonAs<FieldTypeProvider>()
                 .As<ITypeProvider>();
 
             services.AddSingletonAs<NewtonsoftJsonSerializer>()
@@ -118,6 +118,24 @@ namespace Squidex.Config.Domain
                 options.AllowInputFormatterExceptionMessages = false;
 
                 ConfigureJson(TypeNameHandling.None, options.SerializerSettings);
+            });
+
+            return builder;
+        }
+
+        public static IGraphQLBuilder AddSquidexJson(this IGraphQLBuilder builder)
+        {
+            builder.AddDocumentWriter(c =>
+            {
+                var errorInfoProvider = c.GetRequiredService<IErrorInfoProvider>();
+
+                return new DocumentWriter(options =>
+                {
+                    options.ContractResolver = new ExecutionResultContractResolver(new ErrorInfoProvider());
+
+                    options.Converters.Add(new JsonValueConverter());
+                    options.Converters.Add(new WriteonlyGeoJsonConverter());
+                });
             });
 
             return builder;
