@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetEventPosition<T>(this Envelope<T> envelope, string value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.EventNumber, JsonValue.Create(value));
+            envelope.Headers[CommonHeaders.EventNumber] = JsonValue.Create(value);
 
             return envelope;
         }
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.EventStreamNumber, JsonValue.Create(value));
+            envelope.Headers[CommonHeaders.EventStreamNumber] = JsonValue.Create(value);
 
             return envelope;
         }
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.CommitId, JsonValue.Create(value));
+            envelope.Headers[CommonHeaders.CommitId] = JsonValue.Create(value);
 
             return envelope;
         }
@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, DomainId value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.AggregateId, JsonValue.Create(value));
+            envelope.Headers[CommonHeaders.AggregateId] = JsonValue.Create(value);
 
             return envelope;
         }
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.EventId, JsonValue.Create(value));
+            envelope.Headers[CommonHeaders.EventId] = JsonValue.Create(value);
 
             return envelope;
         }
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.Timestamp, JsonValue.Create(value));
+            envelope.Headers[CommonHeaders.Timestamp] = JsonValue.Create(value);
 
             return envelope;
         }
@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetRestored<T>(this Envelope<T> envelope, bool value = true) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.Restored, JsonValue.Create(value));
+            envelope.Headers[CommonHeaders.Restored] = JsonValue.Create(value);
 
             return envelope;
         }
@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Guid GetGuid(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue(key, out var v) && v is JsonString s && Guid.TryParse(s.ToString(), out var guid))
+            if (obj.TryGetValue(key, out var v) && v is JsonString s && Guid.TryParse(v.ToString(), out var guid))
             {
                 return guid;
             }
