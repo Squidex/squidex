@@ -7,29 +7,32 @@
 
 using System.ComponentModel;
 using Newtonsoft.Json;
-using Squidex.Infrastructure.Json;
-using JsonException = Squidex.Infrastructure.Json.JsonException;
 
-namespace Squidex.Infrastructure.Queries.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class CompareOperatorJsonConverter : JsonConverter, ISupportedTypes
+    public sealed class TypeConverterJsonConverter<T> : JsonConverter, ISupportedTypes
     {
-        private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(CompareOperator));
+        private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
 
         public IEnumerable<Type> SupportedTypes
         {
-            get { yield return typeof(CompareOperator); }
+            get { yield return typeof(T); }
         }
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return default(T);
+            }
+
             try
             {
                 return typeConverter.ConvertFromInvariantString(reader.Value?.ToString()!);
             }
-            catch (InvalidCastException ex)
+            catch (Exception ex)
             {
-                throw new JsonException(ex.Message);
+                throw new JsonException("Error while converting from string.", ex);
             }
         }
 
@@ -40,7 +43,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
         public override bool CanConvert(Type objectType)
         {
-            return SupportedTypes.Contains(objectType);
+            return objectType == typeof(T);
         }
     }
 }

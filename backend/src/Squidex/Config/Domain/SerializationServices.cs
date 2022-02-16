@@ -42,9 +42,7 @@ namespace Squidex.Config.Domain
             settings.Converters.Add(new StringEnumConverter());
 
             settings.ContractResolver = new ConverterContractResolver(
-                new CompareOperatorJsonConverter(),
                 new ContentFieldDataConverter(),
-                new EnvelopeHeadersConverter(),
                 new JsonValueConverter(),
                 new StringEnumConverter(),
                 new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
@@ -56,6 +54,7 @@ namespace Squidex.Config.Domain
                 new SurrogateConverter<Schema, SchemaSurrogate>(),
                 new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
                 new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
+                new TypeConverterJsonConverter<CompareOperator>(),
                 new WriteonlyGeoJsonConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;

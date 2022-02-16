@@ -50,9 +50,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry),
 
                 ContractResolver = new ConverterContractResolver(
-                    new CompareOperatorJsonConverter(),
                     new ContentFieldDataConverter(),
-                    new EnvelopeHeadersConverter(),
                     new JsonValueConverter(),
                     new StringEnumConverter(),
                     new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
@@ -64,6 +62,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new SurrogateConverter<Schema, SchemaSurrogate>(),
                     new SurrogateConverter<WorkflowStep, WorkflowStepSurrogate>(),
                     new SurrogateConverter<WorkflowTransition, WorkflowTransitionSurrogate>(),
+                    new TypeConverterJsonConverter<CompareOperator>(),
                     new WriteonlyGeoJsonConverter()),
 
                 TypeNameHandling = typeNameHandling

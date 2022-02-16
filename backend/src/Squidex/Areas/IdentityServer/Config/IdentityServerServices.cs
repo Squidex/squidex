@@ -85,6 +85,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     });
 
                     builder.SetConfigurationEndpointUris("/identity-server/.well-known/openid-configuration");
+                    builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                     builder.DisableAccessTokenEncryption();
 
@@ -94,8 +95,6 @@ namespace Squidex.Areas.IdentityServer.Config
                         Scopes.Roles,
                         Constants.ScopeApi,
                         Constants.ScopePermissions);
-
-                    builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                     builder.AllowClientCredentialsFlow();
                     builder.AllowImplicitFlow();
@@ -135,6 +134,9 @@ namespace Squidex.Areas.IdentityServer.Config
 
                 options.UserinfoEndpointUris.Add(
                      new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/userinfo", false)));
+
+                options.CryptographyEndpointUris.Add(
+                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/.well-known/jwks", false)));
 
                 options.Issuer = new Uri(urlGenerator.BuildUrl(issuerUrl, false));
             });

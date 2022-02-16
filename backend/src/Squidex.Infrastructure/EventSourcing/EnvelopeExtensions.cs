@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetEventPosition<T>(this Envelope<T> envelope, string value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.EventNumber, value);
+            envelope.Headers.Add(CommonHeaders.EventNumber, JsonValue.Create(value));
 
             return envelope;
         }
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.EventStreamNumber, value);
+            envelope.Headers.Add(CommonHeaders.EventStreamNumber, JsonValue.Create(value));
 
             return envelope;
         }
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.CommitId, value.ToString());
+            envelope.Headers.Add(CommonHeaders.CommitId, JsonValue.Create(value));
 
             return envelope;
         }
@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, DomainId value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.AggregateId, value.ToString());
+            envelope.Headers.Add(CommonHeaders.AggregateId, JsonValue.Create(value));
 
             return envelope;
         }
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.EventId, value.ToString());
+            envelope.Headers.Add(CommonHeaders.EventId, JsonValue.Create(value));
 
             return envelope;
         }
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.Timestamp, value.ToString());
+            envelope.Headers.Add(CommonHeaders.Timestamp, JsonValue.Create(value));
 
             return envelope;
         }
@@ -93,12 +93,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetRestored<T>(this Envelope<T> envelope, bool value = true) where T : class, IEvent
         {
-            envelope.Headers.Add(CommonHeaders.Restored, value);
+            envelope.Headers.Add(CommonHeaders.Restored, JsonValue.Create(value));
 
             return envelope;
         }
 
-        public static long GetLong(this JsonObject obj, string key)
+        public static long GetLong(this EnvelopeHeaders obj, string key)
         {
             if (obj.TryGetValue(key, out var v))
             {
@@ -115,9 +115,9 @@ namespace Squidex.Infrastructure.EventSourcing
             return 0;
         }
 
-        public static Guid GetGuid(this JsonObject obj, string key)
+        public static Guid GetGuid(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue<JsonString>(key, out var v) && Guid.TryParse(v.ToString(), out var guid))
+            if (obj.TryGetValue(key, out var v) && v is JsonString s && Guid.TryParse(s.ToString(), out var guid))
             {
                 return guid;
             }
@@ -125,9 +125,9 @@ namespace Squidex.Infrastructure.EventSourcing
             return default;
         }
 
-        public static Instant GetInstant(this JsonObject obj, string key)
+        public static Instant GetInstant(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue<JsonString>(key, out var v) && InstantPattern.ExtendedIso.Parse(v.ToString()).TryGetValue(default, out var instant))
+            if (obj.TryGetValue(key, out var v) && v is JsonString s && InstantPattern.ExtendedIso.Parse(s.ToString()).TryGetValue(default, out var instant))
             {
                 return instant;
             }
@@ -135,7 +135,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return default;
         }
 
-        public static string GetString(this JsonObject obj, string key)
+        public static string GetString(this EnvelopeHeaders obj, string key)
         {
             if (obj.TryGetValue(key, out var v))
             {
@@ -145,11 +145,11 @@ namespace Squidex.Infrastructure.EventSourcing
             return string.Empty;
         }
 
-        public static bool GetBoolean(this JsonObject obj, string key)
+        public static bool GetBoolean(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue<JsonBoolean>(key, out var v))
+            if (obj.TryGetValue(key, out var v) && v is JsonBoolean boolean)
             {
-                return v.Value;
+                return boolean.Value;
             }
 
             return false;

@@ -37,12 +37,11 @@ namespace Squidex.Infrastructure.TestHelpers
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry ?? new TypeNameRegistry()),
 
                 ContractResolver = new ConverterContractResolver(
-                    new CompareOperatorJsonConverter(),
                     new JsonValueConverter(),
                     new StringEnumConverter(),
                     new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
                     new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
-                    new EnvelopeHeadersConverter()),
+                    new TypeConverterJsonConverter<CompareOperator>()),
 
                 TypeNameHandling = TypeNameHandling.Auto
             }.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);

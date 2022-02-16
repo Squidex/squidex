@@ -188,8 +188,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 ClientSecret = Constants.ClientInternalSecret,
                 RedirectUris =
                 {
-                    new Uri(urlGenerator.BuildUrl($"{Constants.PrefixPortal}/signin-internal", false)),
-                    new Uri(urlGenerator.BuildUrl($"{Constants.PrefixOrleans}/signin-internal", false))
+                    new Uri(urlGenerator.BuildUrl("/signin-internal", false)),
                 },
                 Permissions =
                 {
