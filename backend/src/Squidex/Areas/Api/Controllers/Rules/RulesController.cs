@@ -34,14 +34,14 @@ namespace Squidex.Areas.Api.Controllers.Rules
         private readonly IRuleEventRepository ruleEventsRepository;
         private readonly IRuleQueryService ruleQuery;
         private readonly IRuleRunnerService ruleRunnerService;
-        private readonly RuleRegistry ruleRegistry;
+        private readonly RuleTypeProvider ruleRegistry;
 
         public RulesController(ICommandBus commandBus,
             IAppProvider appProvider,
             IRuleEventRepository ruleEventsRepository,
             IRuleQueryService ruleQuery,
             IRuleRunnerService ruleRunnerService,
-            RuleRegistry ruleRegistry,
+            RuleTypeProvider ruleRegistry,
             EventJsonSchemaGenerator eventJsonSchemaGenerator)
             : base(commandBus)
         {

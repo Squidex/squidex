@@ -83,7 +83,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EventJsonSchemaGenerator>()
                 .AsSelf();
 
-            services.AddSingletonAs<RuleRegistry>()
+            services.AddSingletonAs<RuleTypeProvider>()
                 .As<ITypeProvider>().AsSelf();
 
             services.AddSingletonAs<EventJintExtension>()
@@ -104,7 +104,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
                 .AsSelf();
 
-            services.AddInitializer<RuleRegistry>("Serializer (Rules)", registry =>
+            services.AddInitializer<RuleTypeProvider>("Serializer (Rules)", registry =>
             {
                 RuleActionConverter.Mapping = registry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
             }, -1);

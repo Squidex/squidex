@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
+using TestSuite.Model;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
@@ -61,6 +62,42 @@ namespace TestSuite.ApiTests
         public sealed class CityData
         {
             public string Name { get; set; }
+        }
+
+        [Fact]
+        public async Task Should_query_json()
+        {
+            // STEP 1: Create a content with JSON.
+            var content_0 = await _.Contents.CreateAsync(new TestEntityData
+            {
+                Json = JToken.FromObject(new
+                {
+                    value = 1,
+                    obj = new
+                    {
+                        value = 2
+                    }
+                })
+            }, ContentCreateOptions.AsPublish);
+
+
+            // STEP 2: Query this content.
+            var query = new
+            {
+                query = @"
+                {
+                    findMyWritesContent(id: ""<ID>"") {
+                        flatData {
+                            json
+                        }   
+                    }
+                }".Replace("<ID>", content_0.Id, StringComparison.Ordinal)
+            };
+
+            var result1 = await _.Contents.GraphQlAsync<JToken>(query);
+
+            Assert.Equal(1, result1["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
+            Assert.Equal(2, result1["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
         }
 
         [Fact]

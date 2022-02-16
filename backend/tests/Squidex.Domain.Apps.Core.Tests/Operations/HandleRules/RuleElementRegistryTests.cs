@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleElementRegistryTests
     {
-        private readonly RuleRegistry sut = new RuleRegistry();
+        private readonly RuleTypeProvider sut = new RuleTypeProvider();
 
         private abstract class MyRuleActionHandler : RuleActionHandler<MyRuleAction, string>
         {

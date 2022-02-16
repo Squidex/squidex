@@ -41,8 +41,8 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
-                    .Map(new FieldRegistry())
-                    .Map(new RuleRegistry())
+                    .Map(new FieldTypeProvider())
+                    .Map(new RuleTypeProvider())
                     .MapUnmapped(typeof(TestUtils).Assembly);
 
             var serializerSettings = new JsonSerializerSettings
