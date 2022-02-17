@@ -46,9 +46,9 @@ namespace Squidex.Infrastructure.Queries.Json
                 return new LogicalFilter<IJsonValue>(LogicalFilterType.Or, Or);
             }
 
-            if (!string.IsNullOrWhiteSpace(Path) && Op != null)
+            if (!string.IsNullOrWhiteSpace(Path))
             {
-                return new CompareFilter<IJsonValue>(Path, Op.Value, Value ?? JsonValue.Null);
+                return new CompareFilter<IJsonValue>(Path, Op ?? CompareOperator.Equals, Value ?? JsonValue.Null);
             }
 
             throw new JsonException(Errors.InvalidJsonStructure());

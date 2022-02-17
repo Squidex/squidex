@@ -39,6 +39,16 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_convert_comparison_without_operator()
+        {
+            var json = new { path = "property" };
+
+            var filter = SerializeAndDeserialize(json);
+
+            Assert.Equal("property == null", filter.ToString());
+        }
+
+        [Fact]
         public void Should_convert_comparison_empty()
         {
             var json = new { path = "property", op = "empty" };
@@ -137,14 +147,6 @@ namespace Squidex.Infrastructure.Queries
         public void Should_throw_exception_for_missing_path()
         {
             var json = new { op = "invalid", value = 12 };
-
-            Assert.ThrowsAny<JsonException>(() => SerializeAndDeserialize(json));
-        }
-
-        [Fact]
-        public void Should_throw_exception_for_missing_operator()
-        {
-            var json = new { path = "property", value = 12 };
 
             Assert.ThrowsAny<JsonException>(() => SerializeAndDeserialize(json));
         }
