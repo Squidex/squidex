@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Guid GetGuid(this EnvelopeHeaders obj, string key)
         {
-            if (obj.TryGetValue(key, out var v) && v is JsonString s && Guid.TryParse(v.ToString(), out var guid))
+            if (obj.TryGetValue(key, out var v) && v is JsonString s && Guid.TryParse(s.ToString(), out var guid))
             {
                 return guid;
             }

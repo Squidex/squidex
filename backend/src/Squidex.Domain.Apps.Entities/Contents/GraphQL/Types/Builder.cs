@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public EnumerationGraphType GetEnumeration<T>(string name, string prefix, IEnumerable<T> values)
         {
-            return enumTypes.GetOrAdd(name, x => new FieldEnumType<T>(name, string prefix, values));
+            return enumTypes.GetOrAdd(name, x => new FieldEnumType<T>(name, prefix, values));
         }
 
         public IEnumerable<KeyValuePair<SchemaInfo, ContentGraphType>> GetAllContentTypes()
