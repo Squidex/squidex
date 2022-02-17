@@ -45,26 +45,32 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new StringFieldProperties())
                     .AddString(3, "my-localized-string", Partitioning.Language,
                         new StringFieldProperties())
-                    .AddNumber(4, "my-number", Partitioning.Invariant,
+                    .AddString(4, "my-string-enum", Partitioning.Invariant,
+                        new StringFieldProperties { AllowedValues = ReadonlyList.Create("A", "B", "C") })
+                    .AddNumber(5, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .AddAssets(5, "my-assets", Partitioning.Invariant,
+                    .AddNumber(6, "my-number-enum", Partitioning.Invariant,
+                        new NumberFieldProperties { AllowedValues = ReadonlyList.Create(1.0, 2.0, 3.0) })
+                    .AddAssets(7, "my-assets", Partitioning.Invariant,
                         new AssetsFieldProperties())
-                    .AddBoolean(6, "my-boolean", Partitioning.Invariant,
+                    .AddBoolean(8, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties())
-                    .AddDateTime(7, "my-datetime", Partitioning.Invariant,
+                    .AddDateTime(9, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties())
-                    .AddReferences(8, "my-references", Partitioning.Invariant,
+                    .AddReferences(10, "my-references", Partitioning.Invariant,
                         new ReferencesFieldProperties { SchemaId = Ref1Id.Id })
-                    .AddReferences(9, "my-union", Partitioning.Invariant,
+                    .AddReferences(11, "my-union", Partitioning.Invariant,
                         new ReferencesFieldProperties())
-                    .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
+                    .AddGeolocation(12, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties())
-                    .AddComponent(11, "my-component", Partitioning.Invariant,
+                    .AddComponent(13, "my-component", Partitioning.Invariant,
                         new ComponentFieldProperties { SchemaId = Ref1Id.Id })
-                    .AddComponents(12, "my-components", Partitioning.Invariant,
+                    .AddComponents(14, "my-components", Partitioning.Invariant,
                         new ComponentsFieldProperties { SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
-                    .AddTags(13, "my-tags", Partitioning.Invariant,
+                    .AddTags(15, "my-tags", Partitioning.Invariant,
                         new TagsFieldProperties())
+                    .AddTags(16, "my-tags-enum", Partitioning.Invariant,
+                        new TagsFieldProperties { AllowedValues = ReadonlyList.Create("A", "B", "C") })
                     .AddArray(100, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean",
                             new BooleanFieldProperties())

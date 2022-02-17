@@ -69,23 +69,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return AllTypes.Json;
         }
 
-        public IGraphType? Visit(IField<NumberFieldProperties> field, FieldInfo args)
-        {
-            return AllTypes.Float;
-        }
-
         public IGraphType? Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
             return AllTypes.Strings;
         }
 
+        public IGraphType? Visit(IField<NumberFieldProperties> field, FieldInfo args)
+        {
+            if (field.Properties?.AllowedValues?.Count > 0)
+            {
+                return builder.GetEnumeration(args.EnumName, "Number", field.Properties.AllowedValues);
+            }
+
+            return AllTypes.Float;
+        }
+
         public IGraphType? Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
+            if (field.Properties?.AllowedValues?.Count > 0)
+            {
+                return builder.GetEnumeration(args.EnumName, "String", field.Properties.AllowedValues);
+            }
+
             return AllTypes.String;
         }
 
         public IGraphType? Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
+            if (field.Properties?.AllowedValues?.Count > 0)
+            {
+                var @enum = builder.GetEnumeration(args.EnumName, "Tag", field.Properties.AllowedValues);
+
+                return new ListGraphType(new NonNullGraphType(@enum));
+            }
+
             return AllTypes.Strings;
         }
 
