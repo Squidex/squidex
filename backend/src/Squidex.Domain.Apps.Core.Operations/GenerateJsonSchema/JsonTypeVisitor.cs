@@ -81,12 +81,30 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<AssetsFieldProperties> field, Args args)
         {
-            return JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+            var property = JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+
+            property.Default = field.Properties.DefaultValue;
+
+            if (field.Properties.MinItems != null)
+            {
+                property.MinItems = field.Properties.MinItems.Value;
+            }
+
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            return JsonTypeBuilder.BooleanProperty();
+            var property = JsonTypeBuilder.BooleanProperty();
+
+            property.Default = field.Properties.DefaultValue;
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<ComponentFieldProperties> field, Args args)
@@ -104,12 +122,28 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             BuildComponent(itemSchema, field.Properties.SchemaIds, args);
 
-            return JsonTypeBuilder.ArrayProperty(itemSchema);
+            var property = JsonTypeBuilder.ArrayProperty(itemSchema);
+
+            if (field.Properties.MinItems != null)
+            {
+                property.MinItems = field.Properties.MinItems.Value;
+            }
+
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<DateTimeFieldProperties> field, Args args)
         {
-            return JsonTypeBuilder.DateTimeProperty();
+            var property = JsonTypeBuilder.DateTimeProperty();
+
+            property.Default = field.Properties.DefaultValue?.ToString();
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<GeolocationFieldProperties> field, Args args)
@@ -130,6 +164,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             var property = JsonTypeBuilder.NumberProperty();
 
+            property.Default = field.Properties.DefaultValue;
+
             if (field.Properties.MinValue != null)
             {
                 property.Minimum = (decimal)field.Properties.MinValue.Value;
@@ -147,12 +183,24 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             var property = JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
 
-            property.Format = GeoJson.Format;
+            property.Default = field.Properties.DefaultValue;
+
+            if (field.Properties.MinItems != null)
+            {
+                property.MinItems = field.Properties.MinItems.Value;
+            }
+
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
 
             property.ExtensionData = new Dictionary<string, object>
             {
                 ["schemaIds"] = field.Properties.SchemaIds ?? ReadonlyList.Empty<DomainId>()
             };
+
+            property.UniqueItems = !field.Properties.AllowDuplicates;
 
             return property;
         }
@@ -160,6 +208,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         public JsonSchemaProperty? Visit(IField<StringFieldProperties> field, Args args)
         {
             var property = JsonTypeBuilder.StringProperty();
+
+            property.Default = field.Properties.DefaultValue;
 
             property.MaxLength = field.Properties.MaxLength;
             property.MinLength = field.Properties.MinLength;
@@ -181,7 +231,21 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public JsonSchemaProperty? Visit(IField<TagsFieldProperties> field, Args args)
         {
-            return JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+            var property = JsonTypeBuilder.ArrayProperty(JsonTypeBuilder.String());
+
+            property.Default = field.Properties.DefaultValue;
+
+            if (field.Properties.MinItems != null)
+            {
+                property.MinItems = field.Properties.MinItems.Value;
+            }
+
+            if (field.Properties.MaxItems != null)
+            {
+                property.MaxItems = field.Properties.MaxItems.Value;
+            }
+
+            return property;
         }
 
         public JsonSchemaProperty? Visit(IField<UIFieldProperties> field, Args args)
