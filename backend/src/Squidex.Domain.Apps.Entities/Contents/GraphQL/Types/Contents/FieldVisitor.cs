@@ -164,17 +164,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<NumberFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Float, JsonNumber, null);
+            var type = AllTypes.Float;
+
+            if (field.Properties?.AllowedValues?.Count > 0)
+            {
+                type = builder.GetEnumeration(args.EnumName, "Number", field.Properties.AllowedValues);
+            }
+
+            return (type, JsonNumber, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.String, JsonString, null);
+            var type = AllTypes.String;
+
+            if (field.Properties?.AllowedValues?.Count > 0)
+            {
+                type = builder.GetEnumeration(args.EnumName, "String", field.Properties.AllowedValues);
+            }
+
+            return (type, JsonString, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
-            return (AllTypes.Strings, JsonStrings, null);
+            var type = AllTypes.Strings;
+
+            if (field.Properties?.AllowedValues?.Count > 0)
+            {
+                var @enum = builder.GetEnumeration(args.EnumName, "Tag", field.Properties.AllowedValues);
+
+                type = new ListGraphType(new NonNullGraphType(@enum));
+            }
+
+            return (type, JsonStrings, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
