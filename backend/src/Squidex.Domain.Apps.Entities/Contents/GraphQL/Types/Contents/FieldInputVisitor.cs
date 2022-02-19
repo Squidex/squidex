@@ -76,34 +76,41 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IGraphType? Visit(IField<NumberFieldProperties> field, FieldInfo args)
         {
-            if (field.Properties?.AllowedValues?.Count > 0)
-            {
-                return builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
-            }
-
             return AllTypes.Float;
         }
 
         public IGraphType? Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
-            if (field.Properties?.AllowedValues?.Count > 0)
+            var type = AllTypes.String;
+
+            if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {
-                return builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+
+                if (@enum != null)
+                {
+                    type = @enum;
+                }
             }
 
-            return AllTypes.String;
+            return type;
         }
 
         public IGraphType? Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
-            if (field.Properties?.AllowedValues?.Count > 0)
+            var type = AllTypes.Strings;
+
+            if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {
                 var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
 
-                return new ListGraphType(new NonNullGraphType(@enum));
+                if (@enum != null)
+                {
+                    type = new ListGraphType(new NonNullGraphType(@enum));
+                }
             }
 
-            return AllTypes.Strings;
+            return type;
         }
 
         public IGraphType? Visit(IField<UIFieldProperties> field, FieldInfo args)

@@ -7,6 +7,7 @@
 
 using GraphQL;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -49,6 +50,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             finally
             {
                 DefaultPools.StringBuilder.Return(sb);
+            }
+        }
+
+        public static bool IsValidName(this string? name, NamedElement type)
+        {
+            try
+            {
+                NameValidator.ValidateDefault(name!, type);
+
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
