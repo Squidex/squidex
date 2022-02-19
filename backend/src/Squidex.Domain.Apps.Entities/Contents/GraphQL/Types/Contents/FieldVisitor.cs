@@ -164,23 +164,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<NumberFieldProperties> field, FieldInfo args)
         {
-            var type = AllTypes.Float;
-
-            if (field.Properties?.AllowedValues?.Count > 0)
-            {
-                type = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
-            }
-
-            return (type, JsonNumber, null);
+            return (AllTypes.Float, JsonNumber, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
             var type = AllTypes.String;
 
-            if (field.Properties?.AllowedValues?.Count > 0)
+            if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {
-                type = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+
+                if (@enum != null)
+                {
+                    type = @enum;
+                }
             }
 
             return (type, JsonString, null);
@@ -190,11 +188,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             var type = AllTypes.Strings;
 
-            if (field.Properties?.AllowedValues?.Count > 0)
+            if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {
                 var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
 
-                type = new ListGraphType(new NonNullGraphType(@enum));
+                if (@enum != null)
+                {
+                    type = new ListGraphType(new NonNullGraphType(@enum));
+                }
             }
 
             return (type, JsonStrings, null);

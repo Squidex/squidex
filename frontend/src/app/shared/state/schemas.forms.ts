@@ -326,6 +326,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     public visitString() {
         this.config['allowedValues'] = new FormControl(undefined);
         this.config['contentType'] = new FormControl(undefined);
+        this.config['createEnum'] = new FormControl(undefined);
         this.config['defaultValue'] = new FormControl(undefined);
         this.config['defaultValues'] = new FormControl(undefined);
         this.config['folderId'] = new FormControl(undefined);
@@ -343,6 +344,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
 
     public visitTags() {
         this.config['allowedValues'] = new FormControl(undefined);
+        this.config['createEnum'] = new FormControl(undefined);
         this.config['defaultValue'] = new FormControl(undefined);
         this.config['defaultValues'] = new FormControl(undefined);
         this.config['maxItems'] = new FormControl(undefined);

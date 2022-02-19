@@ -45,6 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               myString {
                 iv
               }
+              myStringEnum {
+                iv
+              }
               myLocalizedString {
                 de_DE
               }
@@ -88,6 +91,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               myTags {
                 iv
               }
+              myTagsEnum {
+                iv
+              }
               myArray {
                 iv {
                   nestedNumber
@@ -123,6 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
               myJson
               myJsonValue: myJson(path: ""value"")
               myString
+              myStringEnum
               myLocalizedString
               myNumber
               myBoolean
@@ -146,6 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 }
               }
               myTags
+              myTagsEnum
               myArray {
                 nestedNumber
                 nestedBoolean
@@ -164,6 +172,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-string",
                         new ContentFieldData()
                             .AddInvariant(null))
+                    .AddField("my-string-enum",
+                        new ContentFieldData()
+                            .AddInvariant("EnumA"))
                     .AddField("my-assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId.ToString())))
@@ -179,6 +190,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-tags",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array("tag1", "tag2")))
+                    .AddField("my-tags-enum",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array("EnumA", "EnumB")))
                     .AddField("my-references",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(refId.ToString())))
@@ -353,6 +367,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     iv = (string?)null,
                 },
+                ["myStringEnum"] = new
+                {
+                    iv = "EnumA",
+                },
                 ["myLocalizedString"] = new
                 {
                     de_DE = "de-DE"
@@ -407,6 +425,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         "tag1",
                         "tag2"
+                    }
+                },
+                ["myTagsEnum"] = new
+                {
+                    iv = new[]
+                    {
+                        "EnumA",
+                        "EnumB"
                     }
                 },
                 ["myArray"] = new
@@ -475,6 +501,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 ["myString"] = new
                 {
                     iv = (string?)null,
+                },
+                ["myStringEnum"] = new
+                {
+                    iv = "EnumA",
                 },
                 ["myLocalizedString"] = new
                 {
@@ -558,6 +588,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         "tag2"
                     }
                 },
+                ["myTagsEnum"] = new
+                {
+                    iv = new[]
+                    {
+                        "EnumA",
+                        "EnumB"
+                    }
+                },
                 ["myArray"] = new
                 {
                     iv = new[]
@@ -589,6 +627,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 },
                 ["myJsonValue"] = 1,
                 ["myString"] = null,
+                ["myStringEnum"] = "EnumA",
                 ["myLocalizedString"] = "de-DE",
                 ["myNumber"] = 1.0,
                 ["myBoolean"] = true,
@@ -640,6 +679,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     "tag1",
                     "tag2"
+                },
+                ["myTagsEnum"] = new[]
+                {
+                    "EnumA",
+                    "EnumB"
                 },
                 ["myArray"] = new[]
                 {

@@ -6,29 +6,30 @@
 // ==========================================================================
 
 using GraphQL.Types;
-using Squidex.Text;
+using GraphQL.Utilities;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public sealed class FieldEnumType<T> : EnumerationGraphType
+    public sealed class FieldEnumType : EnumerationGraphType
     {
-        public FieldEnumType(string name, IEnumerable<T> values)
+        public FieldEnumType(string name, IEnumerable<string> values)
         {
             Name = name;
 
-            // Avoid conflicts with duplicate names.
-            var names = new Names();
-
             foreach (var value in values)
             {
-                if (!Equals(value, null))
-                {
-                    // Get rid of special characters.
-                    var valueName = value.ToString()!.Slugify().ToPascalCase();
-
-                    AddValue(names[valueName], null, value);
-                }
+                AddValue(value, null, value);
             }
+        }
+
+        public static FieldEnumType? TryCreate(string name, IEnumerable<string> values)
+        {
+            if (!values.All(x => x.IsValidName(NamedElement.EnumValue)) || !values.Any())
+            {
+                return null;
+            }
+
+            return new FieldEnumType(name, values);
         }
     }
 }

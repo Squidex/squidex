@@ -429,6 +429,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
 
     public readonly allowedValues?: ReadonlyArray<string>;
+    public readonly createEnum: boolean = false;
     public readonly defaultValue?: string;
     public readonly defaultValues?: DefaultValue<string>;
     public readonly editor: StringFieldEditor = 'Input';
@@ -466,6 +467,7 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Tags';
 
     public readonly allowedValues?: ReadonlyArray<string>;
+    public readonly createEnum: boolean = false;
     public readonly defaultValue?: ReadonlyArray<string>;
     public readonly defaultValues?: DefaultValue<ReadonlyArray<string>>;
     public readonly editor: TagsFieldEditor = 'Tags';

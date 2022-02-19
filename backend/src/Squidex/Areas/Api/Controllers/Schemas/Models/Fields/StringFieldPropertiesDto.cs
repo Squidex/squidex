@@ -84,6 +84,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public bool InlineEditable { get; set; }
 
         /// <summary>
+        /// Indicates whether GraphQL Enum should be created.
+        /// </summary>
+        public bool CreateEnum { get; init; }
+
+        /// <summary>
         /// How the string content should be interpreted.
         /// </summary>
         public StringContentType ContentType { get; set; }

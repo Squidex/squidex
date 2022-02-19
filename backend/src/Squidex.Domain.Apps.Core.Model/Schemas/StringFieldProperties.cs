@@ -39,6 +39,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool InlineEditable { get; init; }
 
+        public bool CreateEnum { get; init; }
+
         public StringContentType ContentType { get; init; }
 
         public StringFieldEditor Editor { get; init; }

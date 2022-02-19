@@ -39,6 +39,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public ReadonlyList<string>? AllowedValues { get; set; }
 
         /// <summary>
+        /// Indicates whether GraphQL Enum should be created.
+        /// </summary>
+        public bool CreateEnum { get; init; }
+
+        /// <summary>
         /// The editor that is used to manage this field.
         /// </summary>
         public TagsFieldEditor Editor { get; set; }

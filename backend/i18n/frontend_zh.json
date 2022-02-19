@@ -787,6 +787,8 @@
   "schemas.export.recreateFields": "重新创建字段",
   "schemas.export.synchronize": "同步",
   "schemas.field.allowedValues": "允许的值",
+  "schemas.field.createEnum": "Generate GraphQL Enum.",
+  "schemas.field.createEnumHint": "Check this checkbox to create a GraphQL enumeration for this field.",
   "schemas.field.defaultValue": "Default Value",
   "schemas.field.defaultValues": "默认值",
   "schemas.field.defaultValuesHint": "设置每种语言的默认值并覆盖默认值属性（如果已定义）。仅在真正需要时才使用它。",

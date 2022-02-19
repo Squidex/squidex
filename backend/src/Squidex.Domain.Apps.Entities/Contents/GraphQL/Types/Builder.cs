@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = new Dictionary<SchemaInfo, ComponentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
-        private readonly Dictionary<string, EnumerationGraphType> enumTypes = new Dictionary<string, EnumerationGraphType>();
+        private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new Dictionary<string, EnumerationGraphType?>();
         private readonly FieldVisitor fieldVisitor;
         private readonly FieldInputVisitor fieldInputVisitor;
         private readonly PartitionResolver partitionResolver;
@@ -151,9 +151,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return componentTypes.GetOrDefault(schema);
         }
 
-        public EnumerationGraphType GetEnumeration<T>(string name, IEnumerable<T> values)
+        public EnumerationGraphType? GetEnumeration(string name, IEnumerable<string> values)
         {
-            return enumTypes.GetOrAdd(name, x => new FieldEnumType<T>(name, values));
+            return enumTypes.GetOrAdd(name, x => FieldEnumType.TryCreate(name, values));
         }
 
         public IEnumerable<KeyValuePair<SchemaInfo, ContentGraphType>> GetAllContentTypes()

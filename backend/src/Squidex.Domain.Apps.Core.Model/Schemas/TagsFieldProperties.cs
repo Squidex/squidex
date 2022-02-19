@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxItems { get; init; }
 
+        public bool CreateEnum { get; init; }
+
         public TagsFieldEditor Editor { get; init; }
 
         public TagsFieldNormalization Normalization { get; init; }

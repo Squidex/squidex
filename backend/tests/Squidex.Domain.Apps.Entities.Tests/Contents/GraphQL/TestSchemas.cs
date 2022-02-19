@@ -36,6 +36,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .Publish()
                     .AddString(1, "schemaRef2Field", Partitioning.Invariant));
 
+            var enums = ReadonlyList.Create("EnumA", "EnumB", "EnumC");
+
             Default = Mocks.Schema(TestApp.DefaultId, DefaultId,
                 new Schema(DefaultId.Name)
                     .Publish()
@@ -43,34 +45,32 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new JsonFieldProperties())
                     .AddString(2, "my-string", Partitioning.Invariant,
                         new StringFieldProperties())
-                    .AddString(3, "my-localized-string", Partitioning.Language,
+                    .AddString(3, "my-string-enum", Partitioning.Invariant,
+                        new StringFieldProperties { AllowedValues = enums, CreateEnum = true })
+                    .AddString(4, "my-localized-string", Partitioning.Language,
                         new StringFieldProperties())
-                    .AddString(4, "my-string-enum", Partitioning.Invariant,
-                        new StringFieldProperties { AllowedValues = ReadonlyList.Create("A", "B", "C") })
                     .AddNumber(5, "my-number", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .AddNumber(6, "my-number-enum", Partitioning.Invariant,
-                        new NumberFieldProperties { AllowedValues = ReadonlyList.Create(1.0, 2.0, 3.0) })
-                    .AddAssets(7, "my-assets", Partitioning.Invariant,
+                    .AddAssets(6, "my-assets", Partitioning.Invariant,
                         new AssetsFieldProperties())
-                    .AddBoolean(8, "my-boolean", Partitioning.Invariant,
+                    .AddBoolean(7, "my-boolean", Partitioning.Invariant,
                         new BooleanFieldProperties())
-                    .AddDateTime(9, "my-datetime", Partitioning.Invariant,
+                    .AddDateTime(8, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties())
-                    .AddReferences(10, "my-references", Partitioning.Invariant,
+                    .AddReferences(9, "my-references", Partitioning.Invariant,
                         new ReferencesFieldProperties { SchemaId = Ref1Id.Id })
-                    .AddReferences(11, "my-union", Partitioning.Invariant,
+                    .AddReferences(10, "my-union", Partitioning.Invariant,
                         new ReferencesFieldProperties())
-                    .AddGeolocation(12, "my-geolocation", Partitioning.Invariant,
+                    .AddGeolocation(11, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties())
-                    .AddComponent(13, "my-component", Partitioning.Invariant,
+                    .AddComponent(12, "my-component", Partitioning.Invariant,
                         new ComponentFieldProperties { SchemaId = Ref1Id.Id })
-                    .AddComponents(14, "my-components", Partitioning.Invariant,
+                    .AddComponents(13, "my-components", Partitioning.Invariant,
                         new ComponentsFieldProperties { SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
-                    .AddTags(15, "my-tags", Partitioning.Invariant,
+                    .AddTags(14, "my-tags", Partitioning.Invariant,
                         new TagsFieldProperties())
-                    .AddTags(16, "my-tags-enum", Partitioning.Invariant,
-                        new TagsFieldProperties { AllowedValues = ReadonlyList.Create("A", "B", "C") })
+                    .AddTags(15, "my-tags-enum", Partitioning.Invariant,
+                        new TagsFieldProperties { AllowedValues = enums, CreateEnum = true })
                     .AddArray(100, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean",
                             new BooleanFieldProperties())
