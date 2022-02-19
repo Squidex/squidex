@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             if (field.Properties?.AllowedValues?.Count > 0)
             {
-                return builder.GetEnumeration(args.EnumName, "Number", field.Properties.AllowedValues);
+                return builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
             }
 
             return AllTypes.Float;
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             if (field.Properties?.AllowedValues?.Count > 0)
             {
-                return builder.GetEnumeration(args.EnumName, "String", field.Properties.AllowedValues);
+                return builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
             }
 
             return AllTypes.String;
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             if (field.Properties?.AllowedValues?.Count > 0)
             {
-                var @enum = builder.GetEnumeration(args.EnumName, "Tag", field.Properties.AllowedValues);
+                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
 
                 return new ListGraphType(new NonNullGraphType(@enum));
             }
