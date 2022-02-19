@@ -11,6 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class Names
     {
+        // Reserver names that are used for other GraphQL types.
         private static readonly HashSet<string> ReservedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "Asset",
@@ -23,7 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             "JsonPrimitive",
             "User"
         };
-
         private readonly Dictionary<string, int> takenNames = new Dictionary<string, int>();
 
         public string this[string name, bool isEntity = true]
@@ -44,6 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 name = $"{name}Entity";
             }
 
+            // Avoid duplicate names.
             if (!takenNames.TryGetValue(name, out var offset))
             {
                 takenNames[name] = 0;
@@ -52,6 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             takenNames[name] = ++offset;
 
+            // Add + 1 to all offsets for backwards-compatibility.
             return $"{name}{offset + 1}";
         }
     }

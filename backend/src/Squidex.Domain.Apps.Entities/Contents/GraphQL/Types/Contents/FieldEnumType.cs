@@ -16,13 +16,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             Name = name;
 
+            // Avoid conflicts with duplicate names.
             var names = new Names();
 
             foreach (var value in values)
             {
                 if (!Equals(value, null))
                 {
-                    AddValue(names[value.ToString()!.Slugify().ToPascalCase()], null, value);
+                    // Get rid of special characters.
+                    var valueName = value.ToString()!.Slugify().ToPascalCase();
+
+                    AddValue(names[valueName], null, value);
                 }
             }
         }
