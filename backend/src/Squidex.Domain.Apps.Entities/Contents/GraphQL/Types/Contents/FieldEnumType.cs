@@ -12,35 +12,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     public sealed class FieldEnumType<T> : EnumerationGraphType
     {
-        public FieldEnumType(string name, string prefix, IEnumerable<T> values)
+        public FieldEnumType(string name, IEnumerable<T> values)
         {
             Name = name;
 
-            var index = 0;
+            var names = new Names();
 
             foreach (var value in values)
             {
-                AddValue(BuildName(value, prefix, index), null, value);
-
-                index++;
+                if (!Equals(value, null))
+                {
+                    AddValue(names[value.ToString()!.Slugify().ToPascalCase()], null, value);
+                }
             }
-        }
-
-        private static string BuildName(T value, string prefix, int index)
-        {
-            var name = value!.ToString()!.Slugify().ToPascalCase();
-
-            if (string.IsNullOrEmpty(name))
-            {
-                name = $"{prefix}_{index}";
-            }
-
-            if (!char.IsLetter(name[0]))
-            {
-                name = $"{prefix}_{name}";
-            }
-
-            return name;
         }
     }
 }
