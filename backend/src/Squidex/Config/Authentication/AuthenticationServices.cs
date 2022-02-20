@@ -35,7 +35,7 @@ namespace Squidex.Config.Authentication
                 options.LoginPath = "/identity-server/account/login";
                 options.LogoutPath = "/identity-server/account/login";
 
-                options.Cookie.Name = ".sq.auth";
+                options.Cookie.Name = ".sq.auth2";
 
                 if (urlsOptions.BaseUrl?.StartsWith("https://", StringComparison.OrdinalIgnoreCase) == true)
                 {
