@@ -9,6 +9,7 @@ using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -38,6 +39,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public FieldType QueryAssets => queryAssets.Value;
 
         public FieldType QueryAssetsWithTotal => queryAssetsWithTotal.Value;
+
+        public CacheDirective MemoryCacheDirective { get; } = new CacheDirective();
 
         public SharedTypes(IUrlGenerator urlGenerator)
         {

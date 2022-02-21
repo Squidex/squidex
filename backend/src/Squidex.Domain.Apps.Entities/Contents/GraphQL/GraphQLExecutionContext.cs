@@ -22,8 +22,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public override Context Context { get; }
 
-        public GraphQLExecutionContext(IServiceProvider serviceProvider, IDataLoaderContextAccessor dataLoaders, Context context)
-            : base(serviceProvider)
+        public GraphQLExecutionContext(
+            IDataLoaderContextAccessor dataLoaders,
+            IAssetQueryService assetQuery,
+            IAssetCache assetCache,
+            IContentQueryService contentQuery,
+            IContentCache contentCache,
+            IServiceProvider serviceProvider,
+            Context context)
+            : base(assetQuery, assetCache, contentQuery, contentCache, serviceProvider)
         {
             this.dataLoaders = dataLoaders;
 
@@ -70,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value,
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
@@ -80,14 +87,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return EmptyAssets;
             }
 
-            var dataLoader = GetAssetsLoader();
+            async Task<IReadOnlyList<IEnrichedAssetEntity>> LoadAsync(IEnumerable<DomainId> ids)
+            {
+                var result = await GetAssetsLoader().LoadAsync(ids).GetResultAsync(ct);
 
-            var result = await dataLoader.LoadAsync(ids).GetResultAsync(ct);
+                return result?.NotNull().ToList() ?? EmptyAssets;
+            }
 
-            return result?.NotNull().ToList() ?? EmptyAssets;
+            if (cacheDuration > TimeSpan.Zero)
+            {
+                var assets = await AssetCache.CacheOrQueryAsync(ids, async pendingIds =>
+                {
+                    return await LoadAsync(pendingIds);
+                }, cacheDuration);
+
+                return assets;
+            }
+
+            return await LoadAsync(ids);
         }
 
-        public async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value,
+        public async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
@@ -97,11 +117,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return EmptyContents;
             }
 
-            var dataLoader = GetContentsLoader();
+            async Task<IReadOnlyList<IEnrichedContentEntity>> LoadAsync(IEnumerable<DomainId> ids)
+            {
+                var result = await GetContentsLoader().LoadAsync(ids).GetResultAsync(ct);
 
-            var result = await dataLoader.LoadAsync(ids).GetResultAsync(ct);
+                return result?.NotNull().ToList() ?? EmptyContents;
+            }
 
-            return result?.NotNull().ToList() ?? EmptyContents;
+            if (cacheDuration > TimeSpan.Zero)
+            {
+                var contents = await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>
+                {
+                    return await LoadAsync(pendingIds);
+                }, cacheDuration);
+
+                return contents.ToList();
+            }
+
+            return await LoadAsync(ids);
         }
 
         private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
@@ -137,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 });
         }
 
-        private static ICollection<DomainId>? ParseIds(IJsonValue value)
+        private static List<DomainId>? ParseIds(IJsonValue value)
         {
             try
             {

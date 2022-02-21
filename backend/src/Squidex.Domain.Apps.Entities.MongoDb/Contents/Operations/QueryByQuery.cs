@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             return Filter.And(filters);
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds,  ClrQuery? query,
+        private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, IEnumerable<DomainId> schemaIds, ClrQuery? query,
             DomainId referenced, RefToken? createdBy)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>

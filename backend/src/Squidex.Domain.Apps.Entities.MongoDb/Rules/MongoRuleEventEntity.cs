@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         [BsonElement]
         public Instant? NextAttempt { get; set; }
 
-        DomainId IEntity.Id
+        DomainId IWithId<DomainId>.Id
         {
             get => JobId;
         }

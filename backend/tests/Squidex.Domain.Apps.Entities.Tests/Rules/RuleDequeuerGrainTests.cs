@@ -92,12 +92,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Theory]
-        [InlineData(0, 0,   RuleResult.Success, RuleJobResult.Success)]
-        [InlineData(0, 5,   RuleResult.Timeout, RuleJobResult.Retry)]
-        [InlineData(1, 60,  RuleResult.Timeout, RuleJobResult.Retry)]
-        [InlineData(2, 360, RuleResult.Failed,  RuleJobResult.Retry)]
-        [InlineData(3, 720, RuleResult.Failed,  RuleJobResult.Retry)]
-        [InlineData(4, 0,   RuleResult.Failed,  RuleJobResult.Failed)]
+        [InlineData(0, 0, RuleResult.Success, RuleJobResult.Success)]
+        [InlineData(0, 5, RuleResult.Timeout, RuleJobResult.Retry)]
+        [InlineData(1, 60, RuleResult.Timeout, RuleJobResult.Retry)]
+        [InlineData(2, 360, RuleResult.Failed, RuleJobResult.Retry)]
+        [InlineData(3, 720, RuleResult.Failed, RuleJobResult.Retry)]
+        [InlineData(4, 0, RuleResult.Failed, RuleJobResult.Failed)]
         public async Task Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
         {
             var actionData = "{}";

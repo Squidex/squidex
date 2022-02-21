@@ -360,7 +360,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     Schemas = ReadonlyList.Create(
                         new ContentChangedTriggerSchemaV2
                         {
-                            SchemaId = schemaId.Id, Condition = condition
+                            SchemaId = schemaId.Id,
+                            Condition = condition
                         })
                 };
             }

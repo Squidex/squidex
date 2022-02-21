@@ -16,7 +16,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private static readonly ParserOptions DefaultParserOptions = new ParserOptions
         {
-            AdaptRegexp = true, Tolerant = true
+            AdaptRegexp = true,
+            Tolerant = true
         };
 
         private readonly IMemoryCache cache;

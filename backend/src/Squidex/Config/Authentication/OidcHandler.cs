@@ -15,7 +15,7 @@ namespace Squidex.Config.Authentication
     {
         private readonly MyIdentityOptions options;
 
-        public OidcHandler(MyIdentityOptions options )
+        public OidcHandler(MyIdentityOptions options)
         {
             this.options = options;
         }

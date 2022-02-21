@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 IUser? user;
                 try
                 {
-                     user = await userResolver.FindByIdAsync(actor.Identifier);
+                    user = await userResolver.FindByIdAsync(actor.Identifier);
                 }
                 catch
                 {

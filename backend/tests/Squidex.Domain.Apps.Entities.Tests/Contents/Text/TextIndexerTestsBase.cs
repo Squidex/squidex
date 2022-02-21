@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await SearchText(expected: ids1, text: "V3", target: SearchScope.All);
             await SearchText(expected: ids1, text: "V3", target: SearchScope.Published);
-            }
+        }
 
         [Fact]
         public async Task Should_simulate_new_version()

@@ -5,18 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
+
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentOptions
+    public sealed class ContentCache : QueryCache<DomainId, IEnrichedContentEntity>, IContentCache
     {
-        public bool CanCache { get; set; }
-
-        public int DefaultPageSize { get; set; } = 200;
-
-        public int MaxResults { get; set; } = 200;
-
-        public TimeSpan TimeoutFind { get; set; } = TimeSpan.FromSeconds(1);
-
-        public TimeSpan TimeoutQuery { get; set; } = TimeSpan.FromSeconds(5);
+        public ContentCache(IMemoryCache? memoryCache, IOptions<ContentOptions> options)
+            : base(options.Value.CanCache ? memoryCache : null)
+        {
+        }
     }
 }

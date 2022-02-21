@@ -120,7 +120,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             var command = new CreateComment
             {
-                Text = "Hi @invalid@squidex.io", IsMention = true
+                Text = "Hi @invalid@squidex.io",
+                IsMention = true
             };
 
             var context = CrateCommandContext(command);

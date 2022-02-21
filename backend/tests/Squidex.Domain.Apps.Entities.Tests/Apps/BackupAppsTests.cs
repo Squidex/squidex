@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             ct = cts.Token;
 
-            sut = new BackupApps(rebuilder, appImageStore, appsIndex,  appUISettings);
+            sut = new BackupApps(rebuilder, appImageStore, appsIndex, appUISettings);
         }
 
         [Fact]

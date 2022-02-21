@@ -105,7 +105,7 @@ namespace Squidex.Extensions.Text.ElasticSearch
                 {
                     ["geoObject"] = new
                     {
-                        type ="geo_point"
+                        type = "geo_point"
                     }
                 }
             };

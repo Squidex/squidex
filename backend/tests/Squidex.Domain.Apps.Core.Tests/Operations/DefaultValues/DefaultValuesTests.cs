@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.Assets(1, "1", Partitioning.Invariant,
-                    new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("1", "2" ) });
+                    new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("1", "2") });
 
             Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }

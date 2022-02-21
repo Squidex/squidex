@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using GraphQL;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
@@ -15,7 +16,7 @@ using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public static class Extensions
+    public static class SharedExtensions
     {
         internal static string BuildODataQuery(this IResolveFieldContext context)
         {
@@ -122,6 +123,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             return type;
+        }
+
+        public static TimeSpan CacheDuration(this IResolveFieldContext context)
+        {
+            var cacheDirective = context.FieldAst.Directives?.Find("cache");
+
+            if (cacheDirective != null)
+            {
+                var duration = cacheDirective.Arguments?.ValueFor("duration");
+
+                if (duration is IntValue value && value.Value > 0)
+                {
+                    return TimeSpan.FromSeconds(value.Value);
+                }
+            }
+
+            return TimeSpan.Zero;
         }
     }
 }

@@ -79,6 +79,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             newSchema.RegisterType(SharedTypes.ComponentInterface);
             newSchema.RegisterType(SharedTypes.ContentInterface);
 
+            newSchema.Directives.Register(SharedTypes.MemoryCacheDirective);
+
             if (schemaInfos.Any())
             {
                 var mutations = new AppMutationsGraphType(this, schemaInfos);

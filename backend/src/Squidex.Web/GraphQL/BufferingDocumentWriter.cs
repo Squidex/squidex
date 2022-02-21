@@ -21,7 +21,7 @@ namespace Squidex.Web.GraphQL
             documentWriter = new DocumentWriter(action);
         }
 
-        public async Task WriteAsync<T>(Stream stream, T value, 
+        public async Task WriteAsync<T>(Stream stream, T value,
             CancellationToken cancellationToken = default)
         {
             await using (var bufferStream = new FileBufferingWriteStream())

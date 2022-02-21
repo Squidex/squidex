@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get => FieldCollection.ByName;
         }
 
-        public FieldCollection<NestedField> FieldCollection { get; private set;  } = FieldCollection<NestedField>.Empty;
+        public FieldCollection<NestedField> FieldCollection { get; private set; } = FieldCollection<NestedField>.Empty;
 
         public ArrayField(long id, string name, Partitioning partitioning, NestedField[] fields, ArrayFieldProperties? properties = null, IFieldSettings? settings = null)
             : base(id, name, partitioning, properties, settings)
