@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
@@ -15,16 +14,32 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public abstract class QueryExecutionContext : Dictionary<string, object>
     {
         private readonly SemaphoreSlim maxRequests = new SemaphoreSlim(10);
-        private readonly ConcurrentDictionary<DomainId, IEnrichedContentEntity?> cachedContents = new ConcurrentDictionary<DomainId, IEnrichedContentEntity?>();
-        private readonly ConcurrentDictionary<DomainId, IEnrichedAssetEntity?> cachedAssets = new ConcurrentDictionary<DomainId, IEnrichedAssetEntity?>();
 
         public abstract Context Context { get; }
 
+        protected IAssetQueryService AssetQuery { get; }
+
+        protected IAssetCache AssetCache { get; }
+
+        protected IContentCache ContentCache { get; }
+
+        protected IContentQueryService ContentQuery { get; }
+
         public IServiceProvider Services { get; }
 
-        protected QueryExecutionContext(IServiceProvider serviceProvider)
+        protected QueryExecutionContext(
+            IAssetQueryService assetQuery,
+            IAssetCache assetCache,
+            IContentQueryService contentQuery,
+            IContentCache contentCache,
+            IServiceProvider serviceProvider)
         {
             Guard.NotNull(serviceProvider);
+
+            AssetQuery = assetQuery;
+            AssetCache = assetCache;
+            ContentQuery = contentQuery;
+            ContentCache = contentCache;
 
             Services = serviceProvider;
         }
@@ -32,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version,
             CancellationToken ct)
         {
-            return Resolve<IContentQueryService>().FindAsync(Context, schemaIdOrName, id, version, ct);
+            return ContentQuery.FindAsync(Context, schemaIdOrName, id, version, ct);
         }
 
         public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(Q q,
@@ -43,17 +58,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await maxRequests.WaitAsync(ct);
             try
             {
-                assets = await Resolve<IAssetQueryService>().QueryAsync(Context, null, q, ct);
+                assets = await AssetQuery.QueryAsync(Context, null, q, ct);
             }
             finally
             {
                 maxRequests.Release();
             }
 
-            foreach (var asset in assets)
-            {
-                cachedAssets[asset.Id] = asset;
-            }
+            AssetCache.SetMany(assets.Select(x => (x.Id, x))!);
 
             return assets;
         }
@@ -66,83 +78,58 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await maxRequests.WaitAsync(ct);
             try
             {
-                contents = await Resolve<IContentQueryService>().QueryAsync(Context, schemaIdOrName, q, ct);
+                contents = await ContentQuery.QueryAsync(Context, schemaIdOrName, q, ct);
             }
             finally
             {
                 maxRequests.Release();
             }
 
-            foreach (var content in contents)
-            {
-                cachedContents[content.Id] = content;
-            }
+            ContentCache.SetMany(contents.Select(x => (x.Id, x))!);
 
             return contents;
         }
 
-        public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(ICollection<DomainId> ids,
+        public virtual async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IEnumerable<DomainId> ids,
             CancellationToken ct)
         {
             Guard.NotNull(ids);
 
-            var notLoadedAssets = new HashSet<DomainId>(ids.Where(id => !cachedAssets.ContainsKey(id)));
-
-            if (notLoadedAssets.Count > 0)
+            return await AssetCache.CacheOrQueryAsync(ids, async pendingIds =>
             {
-                IResultList<IEnrichedAssetEntity> assets;
-
                 await maxRequests.WaitAsync(ct);
                 try
                 {
-                    var q = Q.Empty.WithIds(notLoadedAssets).WithoutTotal();
+                    var q = Q.Empty.WithIds(pendingIds).WithoutTotal();
 
-                    assets = await Resolve<IAssetQueryService>().QueryAsync(Context, null, q, ct);
+                    return await AssetQuery.QueryAsync(Context, null, q, ct);
                 }
                 finally
                 {
                     maxRequests.Release();
                 }
-
-                foreach (var asset in assets)
-                {
-                    cachedAssets[asset.Id] = asset;
-                }
-            }
-
-            return ids.Select(cachedAssets.GetOrDefault).NotNull().ToList();
+            });
         }
 
-        public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(ICollection<DomainId> ids,
+        public virtual async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IEnumerable<DomainId> ids,
             CancellationToken ct)
         {
             Guard.NotNull(ids);
 
-            var notLoadedContents = ids.Where(id => !cachedContents.ContainsKey(id)).ToList();
-
-            if (notLoadedContents.Count > 0)
+            return await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>
             {
-                IResultList<IEnrichedContentEntity> contents;
-
                 await maxRequests.WaitAsync(ct);
                 try
                 {
-                    var q = Q.Empty.WithIds(notLoadedContents).WithoutTotal();
+                    var q = Q.Empty.WithIds(pendingIds).WithoutTotal();
 
-                    contents = await Resolve<IContentQueryService>().QueryAsync(Context, q, ct);
+                    return await ContentQuery.QueryAsync(Context, q, ct);
                 }
                 finally
                 {
                     maxRequests.Release();
                 }
-
-                foreach (var content in contents)
-                {
-                    cachedContents[content.Id] = content;
-                }
-            }
-
-            return ids.Select(cachedContents.GetOrDefault).NotNull().ToList();
+            });
         }
 
         public T Resolve<T>() where T : class

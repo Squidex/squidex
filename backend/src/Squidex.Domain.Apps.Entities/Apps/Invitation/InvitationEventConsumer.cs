@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public string EventsFilter
         {
-            get { return "^app-";  }
+            get { return "^app-"; }
         }
 
         public InvitationEventConsumer(INotificationSender emailSender, IUserResolver userResolver,

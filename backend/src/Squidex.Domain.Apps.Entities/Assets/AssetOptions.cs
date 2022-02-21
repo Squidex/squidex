@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         public bool FolderPerApp { get; set; } = false;
 
+        public bool CanCache { get; set; }
+
         public int DefaultPageSize { get; set; } = 200;
 
         public int MaxResults { get; set; } = 200;

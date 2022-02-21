@@ -294,7 +294,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("ref2",
                             new ContentFieldData()
                                 .AddInvariant(JsonValue.Array(ref2.Select(x => x.ToString())))),
-                SchemaId = schemaId, AppId = appId,
+                SchemaId = schemaId,
+                AppId = appId,
                 Version = 0
             };
         }
@@ -312,7 +313,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("number",
                             new ContentFieldData()
                                 .AddInvariant(number)),
-                SchemaId = refSchemaId, AppId = appId,
+                SchemaId = refSchemaId,
+                AppId = appId,
                 Version = version
             };
         }

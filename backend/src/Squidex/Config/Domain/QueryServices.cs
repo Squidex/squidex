@@ -25,9 +25,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<UrlGenerator>(c, exposeSourceUrl))
                 .As<IUrlGenerator>();
 
-            services.AddSingletonAs<SharedTypes>()
-                .AsSelf();
-
             services.AddSingletonAs<InstantGraphType>()
                 .AsSelf();
 

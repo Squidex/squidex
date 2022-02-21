@@ -40,6 +40,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<CounterDeleter>()
                 .As<IDeleter>();
 
+            services.AddTransientAs<ContentCache>()
+                .As<IContentCache>();
+
             services.AddSingletonAs<DefaultValidatorsFactory>()
                 .As<IValidatorsFactory>();
 

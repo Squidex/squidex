@@ -80,7 +80,7 @@ namespace Squidex.Infrastructure.Queries.Json
         {
             try
             {
-               return jsonSerializer.Deserialize<Query<IJsonValue>>(json);
+                return jsonSerializer.Deserialize<Query<IJsonValue>>(json);
             }
             catch (JsonException ex)
             {

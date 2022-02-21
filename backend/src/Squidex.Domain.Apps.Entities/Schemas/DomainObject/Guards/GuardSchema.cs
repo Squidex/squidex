@@ -199,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards
 
             if (field.Properties == null)
             {
-               e(Not.Defined(nameof(field.Properties)), $"{prefix}.{nameof(field.Properties)}");
+                e(Not.Defined(nameof(field.Properties)), $"{prefix}.{nameof(field.Properties)}");
             }
             else
             {

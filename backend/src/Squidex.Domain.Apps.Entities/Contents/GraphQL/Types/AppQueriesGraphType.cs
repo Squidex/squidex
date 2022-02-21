@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         public AppQueriesGraphType(Builder builder, IEnumerable<SchemaInfo> schemaInfos)
         {
-            AddField(builder.SharedTypes.FindAsset);
-            AddField(builder.SharedTypes.QueryAssets);
-            AddField(builder.SharedTypes.QueryAssetsWithTotal);
+            AddField(SharedTypes.FindAsset);
+            AddField(SharedTypes.QueryAssets);
+            AddField(SharedTypes.QueryAssetsWithTotal);
 
             foreach (var schemaInfo in schemaInfos)
             {

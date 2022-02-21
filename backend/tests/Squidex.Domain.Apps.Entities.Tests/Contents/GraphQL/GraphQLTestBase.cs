@@ -44,6 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         protected readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         protected readonly Context requestContext;
+        private CachingGraphQLResolver sut;
 
         public GraphQLTestBase()
         {
@@ -84,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private async Task<ExecutionResult> ExcecuteAsync(ExecutionOptions options, Context context)
         {
-            var sut = CreateSut(TestSchemas.Default, TestSchemas.Ref1, TestSchemas.Ref2);
+            sut ??= CreateSut(TestSchemas.Default, TestSchemas.Ref1, TestSchemas.Ref2);
 
             options.UserContext = ActivatorUtilities.CreateInstance<GraphQLExecutionContext>(sut.Services, context)!;
 
@@ -111,10 +112,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 new ServiceCollection()
                     .AddMemoryCache()
                     .AddTransient<GraphQLExecutionContext>()
+                    .Configure<AssetOptions>(x =>
+                    {
+                        x.CanCache = true;
+                    })
+                    .Configure<ContentOptions>(x =>
+                    {
+                        x.CanCache = true;
+                    })
                     .AddSingleton<IDocumentExecutionListener,
                         DataLoaderDocumentListener>()
                     .AddSingleton<IDataLoaderContextAccessor,
                         DataLoaderContextAccessor>()
+                    .AddTransient<IAssetCache,
+                        AssetCache>()
+                    .AddTransient<IContentCache,
+                        ContentCache>()
+                    .AddSingleton<IUrlGenerator,
+                        FakeUrlGenerator>()
                     .AddSingleton(A.Fake<ILoggerFactory>())
                     .AddSingleton(appProvider)
                     .AddSingleton(assetQuery)
@@ -124,9 +139,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton<InstantGraphType>()
                     .AddSingleton<JsonGraphType>()
                     .AddSingleton<JsonNoopGraphType>()
-                    .AddSingleton<SharedTypes>()
-                    .AddSingleton<IUrlGenerator,
-                        FakeUrlGenerator>()
                     .BuildServiceProvider();
 
             var schemasHash = A.Fake<ISchemasHash>();

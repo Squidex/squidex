@@ -34,7 +34,8 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 {
                     schema.DiscriminatorObject = new OpenApiDiscriminator
                     {
-                        JsonInheritanceConverter = new RuleActionConverter(), PropertyName = "actionType"
+                        JsonInheritanceConverter = new RuleActionConverter(),
+                        PropertyName = "actionType"
                     };
 
                     schema.Properties["actionType"] = new JsonSchemaProperty

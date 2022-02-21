@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             }
 
-            AddResolvedInterface(builder.SharedTypes.ComponentInterface);
+            AddResolvedInterface(SharedTypes.ComponentInterface);
         }
 
         private static Func<object, bool> CheckType(string schemaId)

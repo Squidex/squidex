@@ -54,6 +54,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<AssetTagsDeleter>()
                 .As<IDeleter>();
 
+            services.AddTransientAs<AssetCache>()
+                .As<IAssetCache>();
+
             services.AddSingletonAs<AssetTusRunner>()
                 .AsSelf();
 

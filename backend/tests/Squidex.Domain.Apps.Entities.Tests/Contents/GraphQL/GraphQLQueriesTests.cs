@@ -428,7 +428,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), 
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                     A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(0, contentRef));
 
@@ -473,6 +473,122 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_also_fetch_referenced_contents_from_flat_data_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    flatData {
+                      myReferences {
+                        id
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        flatData = new
+                        {
+                            myReferences = new[]
+                            {
+                                new
+                                {
+                                    id = contentRefId
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_cache_referenced_contents_from_flat_data_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    flatData {
+                      myReferences @cache(duration: 1000) {
+                        id
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result1 = await ExecuteAsync(new ExecutionOptions { Query = query });
+            var result2 = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        flatData = new
+                        {
+                            myReferences = new[]
+                            {
+                                new
+                                {
+                                    id = contentRefId
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result1);
+            AssertResult(expected, result2);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
         public async Task Should_also_fetch_referencing_contents_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
@@ -496,7 +612,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentRefId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), 
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                     A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, contentRef));
 
@@ -561,7 +677,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentRefId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), 
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                     A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, contentRef));
 
@@ -675,7 +791,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }
                 }", contentId);
 
-            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), 
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
                     A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, content));
 

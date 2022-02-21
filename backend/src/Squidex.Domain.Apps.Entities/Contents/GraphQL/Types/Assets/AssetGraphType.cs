@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
 {
     internal sealed class AssetGraphType : ObjectGraphType<IEnrichedAssetEntity>
     {
-        public AssetGraphType(bool canGenerateSourceUrl)
+        public AssetGraphType()
         {
             // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "Asset";
@@ -235,16 +235,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
                 Description = FieldDescriptions.EditToken
             });
 
-            if (canGenerateSourceUrl)
+            AddField(new FieldType
             {
-                AddField(new FieldType
-                {
-                    Name = "sourceUrl",
-                    ResolvedType = AllTypes.NonNullString,
-                    Resolver = SourceUrl,
-                    Description = FieldDescriptions.AssetSourceUrl
-                });
-            }
+                Name = "sourceUrl",
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = SourceUrl,
+                Description = FieldDescriptions.AssetSourceUrl
+            });
 
             Description = "An asset";
         }
