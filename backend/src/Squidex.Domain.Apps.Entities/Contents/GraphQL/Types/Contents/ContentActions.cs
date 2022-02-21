@@ -172,6 +172,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
                     fieldContext.CancellationToken);
             });
+
+            public static readonly IFieldResolver References = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
+            {
+                var query = fieldContext.BuildODataQuery();
+
+                var q = Q.Empty.WithODataQuery(query).WithReferencing(source.Id).WithoutTotal();
+
+                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+                    fieldContext.CancellationToken);
+            });
+
+            public static readonly IFieldResolver ReferencesWithTotal = Resolvers.Async<IContentEntity, object?>(async (source, fieldContext, context) =>
+            {
+                var query = fieldContext.BuildODataQuery();
+
+                var q = Q.Empty.WithODataQuery(query).WithReferencing(source.Id);
+
+                return await context.QueryContentsAsync(fieldContext.FieldDefinition.SchemaId(), q,
+                    fieldContext.CancellationToken);
+            });
         }
 
         public static class Create
