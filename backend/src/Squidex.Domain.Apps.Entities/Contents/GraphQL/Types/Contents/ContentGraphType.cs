@@ -14,25 +14,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
-        private readonly DomainId schemaId;
-
         public ContentGraphType(SchemaInfo schemaInfo)
         {
             // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.ContentType;
-
-            IsTypeOf = CheckType;
-
-            schemaId = schemaInfo.Schema.Id;
-        }
-
-        private bool CheckType(object value)
-        {
-            return value is IContentEntity content && content.SchemaId?.Id == schemaId;
         }
 
         public void Initialize(Builder builder, SchemaInfo schemaInfo, IEnumerable<SchemaInfo> allSchemas)
         {
+            var schemaId = schemaInfo.Schema.Id;
+
+            IsTypeOf = value =>
+            {
+                return value is IContentEntity content && content.SchemaId?.Id == schemaId;
+            };
+
             AddField(ContentFields.Id);
             AddField(ContentFields.Version);
             AddField(ContentFields.Created);
@@ -74,9 +70,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 });
             }
 
-            foreach (var other in allSchemas.Where(IsReferencingThis))
+            foreach (var other in allSchemas.Where(x => IsReference(x, schemaInfo)))
             {
                 AddReferencingQueries(builder, other);
+            }
+
+            foreach (var other in allSchemas.Where(x => IsReference(schemaInfo, x)))
+            {
+                AddReferencesQueries(builder, other);
             }
 
             AddResolvedInterface(builder.SharedTypes.ContentInterface);
@@ -109,12 +110,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             }).WithSchemaId(referencingSchemaInfo);
         }
 
-        private bool IsReferencingThis(SchemaInfo other)
+        private void AddReferencesQueries(Builder builder, SchemaInfo referencesSchemaInfo)
         {
-            return other.Schema.SchemaDef.Fields.Any(IsReferencingThis);
+            var contentType = builder.GetContentType(referencesSchemaInfo);
+
+            AddField(new FieldType
+            {
+                Name = $"references{referencesSchemaInfo.TypeName}Contents",
+                Arguments = ContentActions.QueryOrReferencing.Arguments,
+                ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
+                Resolver = ContentActions.QueryOrReferencing.References,
+                Description = $"Query {referencesSchemaInfo.DisplayName} content items."
+            }).WithSchemaId(referencesSchemaInfo);
+
+            var contentResultsTyp = builder.GetContentResultType(referencesSchemaInfo);
+
+            AddField(new FieldType
+            {
+                Name = $"references{referencesSchemaInfo.TypeName}ContentsWithTotal",
+                Arguments = ContentActions.QueryOrReferencing.Arguments,
+                ResolvedType = contentResultsTyp,
+                Resolver = ContentActions.QueryOrReferencing.ReferencesWithTotal,
+                Description = $"Query {referencesSchemaInfo.DisplayName} content items with total count."
+            }).WithSchemaId(referencesSchemaInfo);
         }
 
-        private bool IsReferencingThis(IField field)
+        private static bool IsReference(SchemaInfo from, SchemaInfo to)
+        {
+            return from.Schema.SchemaDef.Fields.Any(x => IsReferencing(x, to.Schema.Id));
+        }
+
+        private static bool IsReferencing(IField field, DomainId schemaId)
         {
             switch (field)
             {
@@ -124,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         reference.Properties.SchemaIds.Count == 0 ||
                         reference.Properties.SchemaIds.Contains(schemaId);
                 case IArrayField arrayField:
-                    return arrayField.Fields.Any(IsReferencingThis);
+                    return arrayField.Fields.Any(x => IsReferencing(x, schemaId));
             }
 
             return false;
