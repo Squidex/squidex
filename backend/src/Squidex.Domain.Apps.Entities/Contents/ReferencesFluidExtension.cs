@@ -62,6 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
         {
             memberAccessStrategy.Register<IContentEntity>();
+            memberAccessStrategy.Register<IWithId<DomainId>>();
             memberAccessStrategy.Register<IEntity>();
             memberAccessStrategy.Register<IEntityWithCreatedBy>();
             memberAccessStrategy.Register<IEntityWithLastModifiedBy>();

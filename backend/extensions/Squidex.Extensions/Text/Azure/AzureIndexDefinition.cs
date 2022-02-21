@@ -12,7 +12,7 @@ namespace Squidex.Extensions.Text.Azure
 {
     public static class AzureIndexDefinition
     {
-        private static readonly Dictionary<string, (string Field, string Analyzer)> FieldAnalyzers = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, (string Field, string Analyzer)> FieldAnalyzers = new (StringComparer.OrdinalIgnoreCase)
         {
             ["iv"] = ("iv", LexicalAnalyzerName.StandardLucene.ToString()),
             ["zh"] = ("zh", LexicalAnalyzerName.ZhHansLucene.ToString())

@@ -17,7 +17,7 @@ namespace Squidex.Extensions.Assets.Azure
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            var options = config.GetSection("assets:azurecognitive").Get<AzureMetadataSourceOptions>() ?? new();
+            var options = config.GetSection("assets:azurecognitive").Get<AzureMetadataSourceOptions>() ?? new ();
 
             if (options.IsConfigured())
             {

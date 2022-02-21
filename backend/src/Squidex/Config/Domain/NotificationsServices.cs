@@ -17,7 +17,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddSquidexNotifications(this IServiceCollection services, IConfiguration config)
         {
-            var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>() ?? new();
+            var emailOptions = config.GetSection("email:smtp").Get<SmtpOptions>() ?? new ();
 
             if (emailOptions.IsConfigured())
             {

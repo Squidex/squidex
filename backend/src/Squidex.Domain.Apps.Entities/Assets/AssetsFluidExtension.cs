@@ -67,6 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             memberAccessStrategy.Register<IAssetEntity>();
             memberAccessStrategy.Register<IAssetInfo>();
+            memberAccessStrategy.Register<IWithId<DomainId>>();
             memberAccessStrategy.Register<IEntity>();
             memberAccessStrategy.Register<IEntityWithCreatedBy>();
             memberAccessStrategy.Register<IEntityWithLastModifiedBy>();
