@@ -81,12 +81,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver Assets = CreateValueResolver((value, fieldContext, context) =>
         {
-            return context.GetReferencedAssetsAsync(value, fieldContext.CacheDuration(), fieldContext.CancellationToken);
+            var cacheDuration = fieldContext.CacheDuration();
+
+            return context.GetReferencedAssetsAsync(value, cacheDuration, fieldContext.CancellationToken);
         });
 
         private static readonly IFieldResolver References = CreateValueResolver((value, fieldContext, context) =>
         {
-            return context.GetReferencedContentsAsync(value, fieldContext.CacheDuration(), fieldContext.CancellationToken);
+            var cacheDuration = fieldContext.CacheDuration();
+
+            return context.GetReferencedContentsAsync(value, cacheDuration, fieldContext.CancellationToken);
         });
 
         private readonly Builder builder;

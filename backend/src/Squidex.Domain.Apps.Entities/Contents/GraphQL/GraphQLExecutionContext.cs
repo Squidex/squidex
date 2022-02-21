@@ -174,13 +174,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             try
             {
-                var result = new List<DomainId>();
+                List<DomainId>? result = null;
 
                 if (value is JsonArray array)
                 {
                     foreach (var id in array)
                     {
-                        result.Add(DomainId.Create(id.ToString()));
+                        if (id is JsonString jsonString)
+                        {
+                            result ??= new List<DomainId>();
+                            result.Add(DomainId.Create(jsonString.Value));
+                        }
                     }
                 }
 
