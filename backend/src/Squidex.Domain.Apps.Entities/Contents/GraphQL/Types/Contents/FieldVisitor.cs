@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<AssetsFieldProperties> field, FieldInfo args)
         {
-            return (builder.SharedTypes.AssetsList, Assets, null);
+            return (SharedTypes.AssetsList, Assets, null);
         }
 
         public (IGraphType?, IFieldResolver?, QueryArguments?) Visit(IField<BooleanFieldProperties> field, FieldInfo args)

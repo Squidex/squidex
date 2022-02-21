@@ -30,18 +30,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly PartitionResolver partitionResolver;
         private readonly List<SchemaInfo> allSchemas = new List<SchemaInfo>();
 
-        public SharedTypes SharedTypes { get; }
-
         static Builder()
         {
             ValueConverter.Register<string, DomainId>(DomainId.Create);
             ValueConverter.Register<string, Status>(x => new Status(x));
         }
 
-        public Builder(IAppEntity app, SharedTypes sharedTypes)
+        public Builder(IAppEntity app)
         {
-            SharedTypes = sharedTypes;
-
             partitionResolver = app.PartitionResolver();
 
             fieldVisitor = new FieldVisitor(this);

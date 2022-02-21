@@ -137,7 +137,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton<InstantGraphType>()
                     .AddSingleton<JsonGraphType>()
                     .AddSingleton<JsonNoopGraphType>()
-                    .AddSingleton<SharedTypes>()
                     .AddSingleton<IUrlGenerator,
                         FakeUrlGenerator>()
                     .BuildServiceProvider();

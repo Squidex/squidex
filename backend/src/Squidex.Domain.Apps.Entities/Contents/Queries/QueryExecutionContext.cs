@@ -14,22 +14,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     public abstract class QueryExecutionContext : Dictionary<string, object>
     {
         private readonly SemaphoreSlim maxRequests = new SemaphoreSlim(10);
-        private readonly IAssetQueryService assetQuery;
-        private readonly IAssetCache assetCache;
-        private readonly IContentQueryService contentQuery;
-        private readonly IContentCache contentCache;
 
         public abstract Context Context { get; }
 
-        public IContentCache ContentCache
-        {
-            get => contentCache;
-        }
+        protected IAssetQueryService AssetQuery { get; }
 
-        public IAssetCache AssetCache
-        {
-            get => assetCache;
-        }
+        protected IAssetCache AssetCache { get; }
+
+        protected IContentCache ContentCache { get; }
+
+        protected IContentQueryService ContentQuery { get; }
 
         public IServiceProvider Services { get; }
 
@@ -42,10 +36,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(serviceProvider);
 
-            this.assetQuery = assetQuery;
-            this.assetCache = assetCache;
-            this.contentQuery = contentQuery;
-            this.contentCache = contentCache;
+            AssetQuery = assetQuery;
+            AssetCache = assetCache;
+            ContentQuery = contentQuery;
+            ContentCache = contentCache;
 
             Services = serviceProvider;
         }
@@ -53,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public virtual Task<IEnrichedContentEntity?> FindContentAsync(string schemaIdOrName, DomainId id, long version,
             CancellationToken ct)
         {
-            return contentQuery.FindAsync(Context, schemaIdOrName, id, version, ct);
+            return ContentQuery.FindAsync(Context, schemaIdOrName, id, version, ct);
         }
 
         public virtual async Task<IResultList<IEnrichedAssetEntity>> QueryAssetsAsync(Q q,
@@ -64,14 +58,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await maxRequests.WaitAsync(ct);
             try
             {
-                assets = await assetQuery.QueryAsync(Context, null, q, ct);
+                assets = await AssetQuery.QueryAsync(Context, null, q, ct);
             }
             finally
             {
                 maxRequests.Release();
             }
 
-            assetCache.SetMany(assets.Select(x => (x.Id, x))!);
+            AssetCache.SetMany(assets.Select(x => (x.Id, x))!);
 
             return assets;
         }
@@ -84,14 +78,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             await maxRequests.WaitAsync(ct);
             try
             {
-                contents = await contentQuery.QueryAsync(Context, schemaIdOrName, q, ct);
+                contents = await ContentQuery.QueryAsync(Context, schemaIdOrName, q, ct);
             }
             finally
             {
                 maxRequests.Release();
             }
 
-            contentCache.SetMany(contents.Select(x => (x.Id, x))!);
+            ContentCache.SetMany(contents.Select(x => (x.Id, x))!);
 
             return contents;
         }
@@ -101,14 +95,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(ids);
 
-            return await assetCache.CacheOrQueryAsync(ids, async pendingIds =>
+            return await AssetCache.CacheOrQueryAsync(ids, async pendingIds =>
             {
                 await maxRequests.WaitAsync(ct);
                 try
                 {
                     var q = Q.Empty.WithIds(pendingIds).WithoutTotal();
 
-                    return await assetQuery.QueryAsync(Context, null, q, ct);
+                    return await AssetQuery.QueryAsync(Context, null, q, ct);
                 }
                 finally
                 {
@@ -122,14 +116,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             Guard.NotNull(ids);
 
-            return await contentCache.CacheOrQueryAsync(ids, async pendingIds =>
+            return await ContentCache.CacheOrQueryAsync(ids, async pendingIds =>
             {
                 await maxRequests.WaitAsync(ct);
                 try
                 {
                     var q = Q.Empty.WithIds(pendingIds).WithoutTotal();
 
-                    return await contentQuery.QueryAsync(Context, q, ct);
+                    return await ContentQuery.QueryAsync(Context, q, ct);
                 }
                 finally
                 {
