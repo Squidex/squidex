@@ -128,6 +128,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         AssetCache>()
                     .AddTransient<IContentCache,
                         ContentCache>()
+                    .AddSingleton<IUrlGenerator,
+                        FakeUrlGenerator>()
                     .AddSingleton(A.Fake<ILoggerFactory>())
                     .AddSingleton(appProvider)
                     .AddSingleton(assetQuery)
@@ -137,8 +139,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton<InstantGraphType>()
                     .AddSingleton<JsonGraphType>()
                     .AddSingleton<JsonNoopGraphType>()
-                    .AddSingleton<IUrlGenerator,
-                        FakeUrlGenerator>()
                     .BuildServiceProvider();
 
             var schemasHash = A.Fake<ISchemasHash>();
