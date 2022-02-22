@@ -33,6 +33,9 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     public itemMove = new EventEmitter<number>();
 
     @Output()
+    public itemExpanded = new EventEmitter<number>();
+
+    @Output()
     public clone = new EventEmitter();
 
     @Input()
@@ -110,10 +113,14 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
 
     public collapse() {
         this.next({ isExpanded: false });
+
+        this.itemExpanded.emit();
     }
 
     public expand() {
         this.next({ isExpanded: true, isExpandedOnce: true });
+
+        this.itemExpanded.emit();
     }
 
     public moveTop() {

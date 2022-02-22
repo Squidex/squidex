@@ -6,6 +6,7 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -42,6 +43,9 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
 
     @ViewChildren(ArrayItemComponent)
     public children!: QueryList<ArrayItemComponent>;
+
+    @ViewChildren(CdkVirtualScrollViewport)
+    public viewport?: QueryList<CdkVirtualScrollViewport>;
 
     public isArray = false;
 
@@ -123,6 +127,10 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
         this.reset();
     }
 
+    public onExpanded() {
+        this.viewport?.first?.checkViewportSize();
+    }
+
     public collapseAll() {
         this.children.forEach(child => {
             child.collapse();
@@ -131,6 +139,8 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
         if (this.formLevel === 0) {
             this.localStore.setBoolean(this.expandedKey(), true);
         }
+
+        this.onExpanded();
     }
 
     public expandAll() {
@@ -141,6 +151,8 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
         if (this.formLevel === 0) {
             this.localStore.setBoolean(this.expandedKey(), false);
         }
+
+        this.onExpanded();
     }
 
     private reset() {

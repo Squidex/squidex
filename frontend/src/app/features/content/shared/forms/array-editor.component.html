@@ -1,6 +1,6 @@
 <ng-container *ngIf="formModel.itemChanges | async; let items">
     <div class="array-container" *ngIf="items.length > 0">
-        <div class="cdk-container" *ngIf="items.length <= 5;"
+        <div class="cdk-container" *ngIf="items.length <= 20;"
             cdkDropList
             [cdkDropListDisabled]="false"
             [cdkDropListData]="items"
@@ -10,6 +10,7 @@
                 cdkDragLockAxis="y">
                 <sqx-array-item
                     [canUnset]="canUnset"
+                    (clone)="addCopy(itemForm)"
                     [form]="form"
                     [formContext]="formContext"
                     [formLevel]="formLevel + 1"
@@ -19,20 +20,20 @@
                     [isDisabled]="isDisabled | async"
                     [isFirst]="isFirst"
                     [isLast]="isLast"
-                    [language]="language"
-                    [languages]="languages"
-                    (clone)="addCopy(itemForm)"
                     (itemRemove)="removeItem(i)"
-                    (itemMove)="move(itemForm, $event)" >
+                    (itemMove)="move(itemForm, $event)" 
+                    [language]="language"
+                    [languages]="languages">
                     <i cdkDragHandle class="icon-drag2"></i>
                 </sqx-array-item>
             </div>
         </div>
 
-        <cdk-virtual-scroll-viewport autosize *ngIf="items.length > 5">
+        <cdk-virtual-scroll-viewport autosize *ngIf="items.length > 20" #viewport>
             <div *cdkVirtualFor="let itemForm of items; index as i; last as isLast; first as isFirst" class="table-drag item">
                 <sqx-array-item
                     [canUnset]="canUnset"
+                    (clone)="addCopy(itemForm)"
                     [form]="form"
                     [formContext]="formContext"
                     [formLevel]="formLevel + 1"
@@ -42,11 +43,11 @@
                     [isDisabled]="isDisabled | async"
                     [isFirst]="isFirst"
                     [isLast]="isLast"
-                    [language]="language"
-                    [languages]="languages"
-                    (clone)="addCopy(itemForm)"
+                    (itemExpanded)="onExpanded()"
                     (itemRemove)="removeItem(i)"
-                    (itemMove)="move(itemForm, $event)" >
+                    (itemMove)="move(itemForm, $event)"
+                    [language]="language"
+                    [languages]="languages">
                 </sqx-array-item>
             </div>
         </cdk-virtual-scroll-viewport>
