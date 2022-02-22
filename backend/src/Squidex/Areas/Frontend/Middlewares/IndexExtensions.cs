@@ -71,7 +71,8 @@ namespace Squidex.Areas.Frontend.Middlewares
                     }
                 }
 
-                uiOptions.More["culture"] = CultureInfo.CurrentUICulture.Name;
+                json["more"] ??= new JObject();
+                json["more"]!["culture"] = CultureInfo.CurrentUICulture.Name;
 
                 scripts.Add($"var options = {json.ToString(Formatting.Indented)};");
             }
