@@ -1,4 +1,4 @@
-<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [hasTabs]="true">
+<sqx-modal-dialog (close)="emitComplete()" size="lg" [fullHeight]="true" [hasTabs]="false">
     <ng-container title>
         {{ 'assets.selectMany' | sqxTranslate }}
     </ng-container>
@@ -21,9 +21,10 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="{{ 'assets.searchByName' | sqxTranslate }}" 
-                            [enableShortcut]="true">
+                            [enableShortcut]="true"
+                            [queriesTypes]="'common.assets' | sqxTranslate"
                             (queryChange)="search($event)"
-                            [query]="assetsState.query | async" 
+                            [query]="assetsState.query | async">
                         </sqx-search-form>
                     </div>
                 </div>
