@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <cdk-virtual-scroll-viewport autosize *ngIf="items.length > 20" #viewport>
+        <cdk-virtual-scroll-viewport autosize *ngIf="items.length > 20">
             <div *cdkVirtualFor="let itemForm of items; index as i; last as isLast; first as isFirst" class="table-drag item">
                 <sqx-array-item
                     [canUnset]="canUnset"
