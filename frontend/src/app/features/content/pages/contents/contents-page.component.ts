@@ -27,7 +27,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public schema!: SchemaDto;
 
-    public tableView!: TableFields;
+    public tableFields!: TableFields;
     public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
@@ -93,7 +93,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.schema = schema;
 
-                    this.tableView = new TableFields(this.uiState, schema);
+                    this.tableFields = new TableFields(this.uiState, schema);
 
                     const initial =
                         this.contentsRoute.mapTo(this.contentsState)

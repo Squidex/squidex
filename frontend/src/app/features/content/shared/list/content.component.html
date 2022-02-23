@@ -54,7 +54,12 @@
         </ng-container>
     </td>
 
-    <td *ngFor="let field of listFields" [sqxContentListCell]="field" [sqxStopClick]="shouldStop(field)">
+    <td *ngFor="let field of listFields" 
+        sqxContentListCell
+        sqxContentListCellResize
+        [field]="field"
+        [fields]="listSettings"
+        [sqxStopClick]="shouldStop(field)">
         <sqx-content-list-field
             [field]="field"
             [patchForm]="patchForm?.form"
@@ -63,5 +68,6 @@
             [language]="language">
         </sqx-content-list-field>
     </td>
+
+    <td></td>
 </tr>
-<tr class="spacer"></tr>

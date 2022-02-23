@@ -23,8 +23,12 @@
     padding: 0 $panel-padding;
 
     &.tabled {
-        padding-bottom: .5rem !important;
-        padding-top: .5rem !important;
+        padding-bottom: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    &.tabled2 {
+        padding: 0 !important;
     }
 }
 

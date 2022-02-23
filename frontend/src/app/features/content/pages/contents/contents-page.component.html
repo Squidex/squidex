@@ -35,7 +35,7 @@
     </ng-container>
 
     <ng-container>
-        <ng-container *ngIf="tableView.listFields | async; let listFields">    
+        <ng-container *ngIf="tableFields.listFields | async; let listFields">    
             <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [table]="true">
                 <ng-container topHeader>
                     <div class="selection" *ngIf="selectionCount > 0">
@@ -65,9 +65,9 @@
                         <ng-container *sqxModal="tableViewModal">
                             <sqx-dropdown-menu [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-right">
                                 <sqx-custom-view-editor
-                                    [allFields]="tableView.allFields" 
-                                    (fieldNamesChange)="tableView.updateFields($event)"
-                                    [fieldNames]="$any(tableView.listFieldNames | async)">
+                                    [allFields]="tableFields.allFields" 
+                                    (fieldNamesChange)="tableFields.updateFields($event)"
+                                    [fieldNames]="$any(tableFields.listFieldNames | async)">
                                 </sqx-custom-view-editor>
                             </sqx-dropdown-menu>
                         </ng-container>
@@ -75,7 +75,7 @@
                 </ng-container>
 
                 <ng-container header>
-                    <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" #header>
+                    <table class="table table-items table-fixed" [sqxContentListWidth]="listFields" [fields]="tableFields" #header>
                         <thead>
                             <tr>
                                 <th class="cell-select">
@@ -88,9 +88,13 @@
                                     </div>
                                 </th>
                                 <th class="cell-actions cell-actions-left">
-                                    {{ 'common.actions' | sqxTranslate }}
+                                    <span class="truncate">{{ 'common.actions' | sqxTranslate }}</span>
                                 </th>
-                                <th *ngFor="let field of listFields" [sqxContentListCell]="field">
+                                <th *ngFor="let field of listFields" 
+                                    sqxContentListCell
+                                    sqxContentListCellResize
+                                    [field]="field"
+                                    [fields]="tableFields">
                                     <sqx-content-list-header
                                         [field]="field"
                                         (queryChange)="search($event)"
@@ -98,6 +102,7 @@
                                         [language]="language">
                                     </sqx-content-list-header>
                                 </th>
+                                <th></th>
                             </tr>
                         </thead>
                     </table>
@@ -105,18 +110,19 @@
 
                 <ng-container>
                     <div class="table-container">
-                        <table class="table table-items table-fixed" [style.minWidth]="listFields | sqxContentListWidth" [sqxSyncWidth]="header">
+                        <table class="table table-center table-fixed" [sqxContentListWidth]="listFields" [fields]="tableFields" [sqxSyncWidth]="header">
                             <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent" 
                                 [sqxContent]="content"
                                 (clone)="clone(content)"
                                 (delete)="delete(content)"
                                 (selectedChange)="selectItem(content, $event)"
+                                [selected]="isItemSelected(content)"
                                 (statusChange)="changeStatus(content, $event)"
                                 [cloneable]="contentsState.snapshot.canCreate"
                                 [language]="language"
                                 [link]="[content.id, 'history']"
                                 [listFields]="listFields"
-                                [selected]="isItemSelected(content)">
+                                [listSettings]="tableFields">
                             </tbody>
                         </table>
                     </div>

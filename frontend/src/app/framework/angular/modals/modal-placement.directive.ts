@@ -148,6 +148,8 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
             modalRect,
             offsetX: this.offsetX,
             offsetY: this.offsetY,
+            spaceX: this.spaceX,
+            spaceY: this.spaceY,
             targetRect,
         };
 
