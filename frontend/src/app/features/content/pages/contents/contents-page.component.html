@@ -36,7 +36,7 @@
 
     <ng-container>
         <ng-container *ngIf="tableFields.listFields | async; let listFields">    
-            <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [table]="true">
+            <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [tableNoPadding]="true">
                 <ng-container topHeader>
                     <div class="selection" *ngIf="selectionCount > 0">
                         {{ 'contents.selectionCount' | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
