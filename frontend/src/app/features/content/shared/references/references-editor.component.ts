@@ -104,7 +104,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
 
     public remove(content: ContentDto) {
         if (content && !this.snapshot.isDisabled) {
-            this.setContentItems(this.snapshot.contentItems.filter(x => x.id !== content.id));
+            this.setContentItems(this.snapshot.contentItems.removedBy('id', content));
 
             this.updateValue();
         }

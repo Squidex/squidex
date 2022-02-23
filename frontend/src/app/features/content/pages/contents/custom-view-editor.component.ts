@@ -48,7 +48,7 @@ export class CustomViewEditorComponent implements OnChanges {
     }
 
     public removeField(field: string) {
-        this.updateFieldNames(this.listFields.filter(x => x !== field));
+        this.updateFieldNames(this.listFields.removed(field));
     }
 
     private updateFieldNames(fieldNames: ReadonlyArray<string>) {
