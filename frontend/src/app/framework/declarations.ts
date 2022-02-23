@@ -7,6 +7,7 @@
 
 export * from './angular/avatar.component';
 export * from './angular/code.component';
+export * from './angular/compensate-scrollbar.directive';
 export * from './angular/dropdown-menu.component';
 export * from './angular/external-link.directive';
 export * from './angular/forms/confirm-click.directive';
