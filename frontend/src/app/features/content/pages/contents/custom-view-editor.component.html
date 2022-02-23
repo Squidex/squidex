@@ -9,9 +9,9 @@
 
     <div
         cdkDropList
-        [cdkDropListData]="fieldNames"
+        [cdkDropListData]="listFields"
         (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let field of fieldNames" cdkDrag>
+        <div *ngFor="let field of listFields" cdkDrag>
             <i class="icon-drag2 drag-handle"></i> 
             
             <div class="form-check">

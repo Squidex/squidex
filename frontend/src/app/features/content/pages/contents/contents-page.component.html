@@ -66,8 +66,9 @@
                             <sqx-dropdown-menu [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-right">
                                 <sqx-custom-view-editor
                                     [allFields]="tableFields.allFields" 
-                                    (fieldNamesChange)="tableFields.updateFields($event)"
-                                    [fieldNames]="$any(tableFields.listFieldNames | async)">
+                                    (listFieldsChange)="tableFields.updateFields($event)"
+                                    [listFields]="$any(tableFields.listFieldNames | async)"
+                                    (reset)="tableFields.reset()">
                                 </sqx-custom-view-editor>
                             </sqx-dropdown-menu>
                         </ng-container>

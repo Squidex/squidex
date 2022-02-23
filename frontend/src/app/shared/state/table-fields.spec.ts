@@ -8,7 +8,7 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DateTime, Version } from '@app/framework';
-import { createProperties, MetaFields, RootFieldDto, SchemaDto, TableField, TableFields, TableSizes, UIState } from '@app/shared/internal';
+import { createProperties, MetaFields, RootFieldDto, SchemaDto, TableField, TableFields, TableSettings, TableSizes, UIState } from '@app/shared/internal';
 
 describe('TableFields', () => {
     let uiState: IMock<UIState>;
@@ -33,8 +33,8 @@ describe('TableFields', () => {
     });
 
     const INVALID_CONFIGS = [
-        { case: 'empty', fields: [] },
-        { case: 'invalid', fields: ['invalid'] },
+        { case: 'blank', fields: [] },
+        { case: 'broken', fields: ['invalid'] },
     ];
 
     INVALID_CONFIGS.forEach(test => {
@@ -43,11 +43,8 @@ describe('TableFields', () => {
             let fieldNames: ReadonlyArray<string>;
             let fieldSizes: TableSizes;
 
-            uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-                .returns(() => of(test.fields));
-
-            uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-                .returns(() => of({ 'field': 100 }));
+            uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+                .returns(() => of(({ fields: test.fields, sizes: { field: 100 } })));
 
             const tableFields = new TableFields(uiState.object, schema);
 
@@ -83,17 +80,14 @@ describe('TableFields', () => {
 
     INVALID_CONFIGS.forEach(test => {
         it(`should remove ui state if config is ${test.case}`, () => {
-            uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-                .returns(() => of([]));
-
-            uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-                .returns(() => of({}));
+            uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+                .returns(() => of(({})));
 
             const tableFields = new TableFields(uiState.object, schema);
 
             tableFields.updateFields(test.fields, true);
 
-            uiState.verify(x => x.removeUser('schemas.my-schema.view'), Times.once());
+            uiState.verify(x => x.removeUser('schemas.my-schema.config'), Times.once());
 
             expect().nothing();
         });
@@ -103,13 +97,8 @@ describe('TableFields', () => {
         let fields: ReadonlyArray<TableField>;
         let fieldNames: ReadonlyArray<string>;
 
-        const config = ['invalid', MetaFields.version];
-
-        uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-            .returns(() => of(config));
-
-        uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-            .returns(() => of({}));
+        uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+            .returns(() => of(({ fields: ['invalid', MetaFields.version] })));
 
         const tableFields = new TableFields(uiState.object, schema);
 
@@ -131,49 +120,44 @@ describe('TableFields', () => {
     });
 
     it('should update config if fields are saved', () => {
-        uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-            .returns(() => of([]));
-
-        uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-            .returns(() => of({}));
+        uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+            .returns(() => of(({})));
 
         const tableFields = new TableFields(uiState.object, schema);
 
-        tableFields.updateFields(['invalid', MetaFields.version], true);
+        const config = ['invalid', MetaFields.version];
 
-        uiState.verify(x => x.set('schemas.my-schema.view', [MetaFields.version], true), Times.once());
+        tableFields.updateFields(config, true);
+
+        uiState.verify(x => x.set('schemas.my-schema.config', { fields: [MetaFields.version], sizes: {} }, true), Times.once());
 
         expect().nothing();
     });
 
     it('should remove config if fields are saved', () => {
-        uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-            .returns(() => of([]));
-
-        uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-            .returns(() => of({}));
+        uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+            .returns(() => of(({})));
 
         const tableFields = new TableFields(uiState.object, schema);
 
         tableFields.updateFields([], true);
 
-        uiState.verify(x => x.removeUser('schemas.my-schema.view'), Times.once());
+        uiState.verify(x => x.removeUser('schemas.my-schema.config'), Times.once());
 
         expect().nothing();
     });
 
     it('should update config if fields are only updated', () => {
-        uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-            .returns(() => of([]));
-
-        uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-            .returns(() => of({}));
+        uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+            .returns(() => of(({})));
 
         const tableFields = new TableFields(uiState.object, schema);
 
-        tableFields.updateFields(['invalid', MetaFields.version], false);
+        const config = ['invalid', MetaFields.version];
 
-        uiState.verify(x => x.set('schemas.my-schema.view', [MetaFields.version], true), Times.never());
+        tableFields.updateFields(config, false);
+
+        uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
         expect().nothing();
     });
@@ -181,11 +165,8 @@ describe('TableFields', () => {
     it('should update config if sizes are saved', () => {
         let fieldSizes: TableSizes;
 
-        uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-            .returns(() => of([]));
-
-        uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-            .returns(() => of({}));
+        uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+            .returns(() => of(({})));
 
         const tableFields = new TableFields(uiState.object, schema);
 
@@ -195,19 +176,16 @@ describe('TableFields', () => {
 
         tableFields.updateSize(MetaFields.version, 100, true);
 
-        uiState.verify(x => x.set('schemas.my-schema.sizes', { [MetaFields.version]: 100 }, true), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.config', { fields: [], sizes: { [MetaFields.version]: 100 } }, true), Times.once());
 
         expect(fieldSizes!).toEqual({ [MetaFields.version]: 100 });
     });
 
     it('should update config if sizes are only updated', () => {
         let fieldSizes: TableSizes;
-    
-        uiState.setup(x => x.getUser<string[]>('schemas.my-schema.view', []))
-            .returns(() => of([]));
 
-        uiState.setup(x => x.getUser<TableSizes>('schemas.my-schema.sizes', {}))
-            .returns(() => of({}));
+        uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+            .returns(() => of(({})));
 
         const tableFields = new TableFields(uiState.object, schema);
 
@@ -217,7 +195,7 @@ describe('TableFields', () => {
 
         tableFields.updateSize(MetaFields.version, 100, false);
 
-        uiState.verify(x => x.set('schemas.my-schema.sizes', It.isAny(), true), Times.never());
+        uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
         expect(fieldSizes!).toEqual({ [MetaFields.version]: 100 });
     });

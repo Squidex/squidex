@@ -13,18 +13,19 @@ import { UIState } from './ui.state';
 const META_FIELD_NAMES = Object.values(MetaFields);
 
 export type TableSizes = { [name: string]: number };
+export type TableSettings = { fields?: ReadonlyArray<string>; sizes?: TableSizes };
 
 export class TableFields {
     private readonly listSizes$ = new BehaviorSubject<TableSizes>({});
-    private readonly listField$ = new BehaviorSubject<ReadonlyArray<TableField>>([]);
+    private readonly listFields$ = new BehaviorSubject<ReadonlyArray<TableField>>([]);
     private readonly listFieldName$ = new BehaviorSubject<ReadonlyArray<string>>([]);
-    private readonly settingsKeyNames: string;
-    private readonly settingsKeySizes: string;
+    private readonly settingsKey: string;
+    private settings: TableSettings = {};
 
     public readonly allFields: ReadonlyArray<string>;
 
     public get listFields(): Observable<ReadonlyArray<TableField>> {
-        return this.listField$;
+        return this.listFields$;
     }
 
     public get listFieldNames(): Observable<ReadonlyArray<string>> {
@@ -41,48 +42,65 @@ export class TableFields {
     ) {
         this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
 
-        this.settingsKeyNames = `schemas.${this.schema.name}.view`;
-        this.settingsKeySizes = `schemas.${this.schema.name}.sizes`;
+        this.settingsKey = `schemas.${this.schema.name}.config`;
 
-        this.uiState.getUser<string[]>(this.settingsKeyNames, []).pipe(take(1))
-            .subscribe(fieldNames => {
-                this.updateFields(fieldNames, false);
+        this.uiState.getUser<TableSettings>(this.settingsKey, {}).pipe(take(1))
+            .subscribe(settings => {
+                this.settings = settings;
+                
+                this.updateByConfig(false);
             });
+    }
 
-        this.uiState.getUser<TableSizes>(this.settingsKeySizes, {}).pipe(take(1))
-            .subscribe(fieldSizes => {
-                this.listSizes$.next(fieldSizes);
-            });
+    public reset() {
+        this.settings = {};
+
+        this.updateByConfig(true);
     }
 
     public updateSize(fieldName: string, size: number, save = true) {
-        let sizes = { ...this.listSizes$.value };
+        this.settings.sizes = { ...this.listSizes$.value, [fieldName]: size };
 
-        sizes[fieldName] = size;
-
-        if (save) {
-            this.uiState.set(this.settingsKeySizes, sizes, true);
-        }
-
-        this.listSizes$.next(sizes);
+        this.updateByConfig(save);
     }
 
     public updateFields(fieldNames: ReadonlyArray<string>, save = true) {
-        fieldNames = fieldNames.filter(x => this.allFields.indexOf(x) >= 0);
+        this.settings.fields = fieldNames.filter(x => this.allFields.indexOf(x) >= 0);
 
-        if (fieldNames.length === 0) {
-            fieldNames = this.schema.defaultListFields.map(x => x['name'] || x);
+        this.updateByConfig(save);
+    }
 
-            if (save) {
-                this.uiState.removeUser(this.settingsKeyNames);
-            }
-        } else if (save) {
-            this.uiState.set(this.settingsKeyNames, fieldNames, true);
+    private updateByConfig(save = true) {
+        let { fields, sizes } = this.settings;
+
+        if (!fields) {
+            fields = [];
+        } else {
+            fields = fields.filter(x => this.allFields.indexOf(x) >= 0);
+
+            this.settings.fields = [...fields];
         }
 
-        const fields: ReadonlyArray<TableField> = fieldNames.map(n => this.schema.fields.find(f => f.name === n) || n);
+        if (!sizes) {
+            sizes = {};
+        }
 
-        this.listField$.next(fields);
-        this.listFieldName$.next(fieldNames);
+        if (save) {
+            if (Object.keys(sizes).length === 0 && fields.length === 0) {
+                this.uiState.removeUser(this.settingsKey);                
+            } else {
+                this.uiState.set(this.settingsKey, { sizes, fields }, true);
+            }
+        }
+
+        if (fields.length === 0) {
+            fields = this.schema.defaultListFields.map(x => x['name'] || x);
+        }
+
+        const tableFields = fields.map(n => this.schema.fields.find(f => f.name === n) || n);
+
+        this.listSizes$.next(sizes);
+        this.listFields$.next(tableFields);
+        this.listFieldName$.next(fields);
     }
 }

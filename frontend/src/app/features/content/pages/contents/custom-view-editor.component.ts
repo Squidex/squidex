@@ -9,17 +9,20 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 @Component({
-    selector: 'sqx-custom-view-editor[allFields][fieldNames]',
+    selector: 'sqx-custom-view-editor[allFields][listFields]',
     styleUrls: ['./custom-view-editor.component.scss'],
     templateUrl: './custom-view-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomViewEditorComponent implements OnChanges {
     @Output()
-    public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
+    public reset = new EventEmitter();
+
+    @Output()
+    public listFieldsChange = new EventEmitter<ReadonlyArray<string>>();
 
     @Input()
-    public fieldNames!: string[];
+    public listFields!: string[];
 
     @Input()
     public allFields!: ReadonlyArray<string>;
@@ -27,7 +30,7 @@ export class CustomViewEditorComponent implements OnChanges {
     public fieldsNotAdded!: ReadonlyArray<string>;
 
     public ngOnChanges() {
-        this.fieldsNotAdded = this.allFields.filter(n => this.fieldNames.indexOf(n) < 0);
+        this.fieldsNotAdded = this.allFields.filter(n => this.listFields.indexOf(n) < 0);
     }
 
     public drop(event: CdkDragDrop<string[], any>) {
@@ -37,18 +40,18 @@ export class CustomViewEditorComponent implements OnChanges {
     }
 
     public resetDefault() {
-        this.updateFieldNames([]);
+        this.reset.emit();
     }
 
     public addField(field: string) {
-        this.updateFieldNames([...this.fieldNames, field]);
+        this.updateFieldNames([...this.listFields, field]);
     }
 
     public removeField(field: string) {
-        this.updateFieldNames(this.fieldNames.filter(x => x !== field));
+        this.updateFieldNames(this.listFields.filter(x => x !== field));
     }
 
     private updateFieldNames(fieldNames: ReadonlyArray<string>) {
-        this.fieldNamesChange.emit(fieldNames);
+        this.listFieldsChange.emit(fieldNames);
     }
 }
