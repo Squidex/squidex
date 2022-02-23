@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BehaviorSubject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { MetaFields, SchemaDto, TableField } from './../services/schemas.service';
+import { State, Types } from '@app/framework';
+import { MetaFields, SchemaDto } from './../services/schemas.service';
 import { UIState } from './ui.state';
 
 const META_FIELD_NAMES = Object.values(MetaFields);
@@ -15,92 +15,87 @@ const META_FIELD_NAMES = Object.values(MetaFields);
 export type TableSizes = { [name: string]: number };
 export type TableSettings = { fields?: ReadonlyArray<string>; sizes?: TableSizes };
 
-export class TableFields {
-    private readonly listSizes$ = new BehaviorSubject<TableSizes>({});
-    private readonly listFields$ = new BehaviorSubject<ReadonlyArray<TableField>>([]);
-    private readonly listFieldName$ = new BehaviorSubject<ReadonlyArray<string>>([]);
+export class TableFields extends State<Required<TableSettings>> {
     private readonly settingsKey: string;
-    private settings: TableSettings = {};
 
-    public readonly allFields: ReadonlyArray<string>;
+    public readonly schemaFields: ReadonlyArray<string>;
+    public readonly schemaDefaults: ReadonlyArray<string>;
 
-    public get listFields(): Observable<ReadonlyArray<TableField>> {
-        return this.listFields$;
-    }
+    public listSizes =
+        this.project(x => x.sizes);
+        
+    public configuredFields =
+        this.project(x => x.fields);
 
-    public get listFieldNames(): Observable<ReadonlyArray<string>> {
-        return this.listFieldName$;
-    }
+    public listFieldNames =
+        this.projectFrom(this.configuredFields, x => x.length === 0 ? this.schemaDefaults : x);
 
-    public get listSizes(): Observable<TableSizes> {
-        return this.listSizes$;
-    }
+    public listFields =
+        this.projectFrom(this.listFieldNames, x => x.map(n => this.schema.fields.find(f => f.name === n) || n));
 
     constructor(
         private readonly uiState: UIState,
         private readonly schema: SchemaDto,
     ) {
-        this.allFields = [...this.schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
+        super({ fields: [], sizes: {} });
+
+        this.schemaFields = [...schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
+        this.schemaDefaults = schema.defaultListFields.map(x => x['name'] || x);
 
         this.settingsKey = `schemas.${this.schema.name}.config`;
 
         this.uiState.getUser<TableSettings>(this.settingsKey, {}).pipe(take(1))
             .subscribe(settings => {
-                this.settings = settings;
-                
-                this.updateByConfig(false);
+                if (!Types.isArrayOfString(settings.fields)) {
+                    settings.fields = [];
+                }
+
+                if (!Types.isObject(settings.sizes)) {
+                    settings.sizes = {};
+                }
+
+                this.publishSizes(settings.sizes);
+                this.publishFields(settings.fields);
             });
     }
 
     public reset() {
-        this.settings = {};
+        super.resetState();
 
-        this.updateByConfig(true);
+        this.saveConfig();
     }
 
-    public updateSize(fieldName: string, size: number, save = true) {
-        this.settings.sizes = { ...this.listSizes$.value, [fieldName]: size };
-
-        this.updateByConfig(save);
-    }
-
-    public updateFields(fieldNames: ReadonlyArray<string>, save = true) {
-        this.settings.fields = fieldNames.filter(x => this.allFields.indexOf(x) >= 0);
-
-        this.updateByConfig(save);
-    }
-
-    private updateByConfig(save = true) {
-        let { fields, sizes } = this.settings;
-
-        if (!fields) {
-            fields = [];
-        } else {
-            fields = fields.filter(x => this.allFields.indexOf(x) >= 0);
-
-            this.settings.fields = [...fields];
-        }
-
-        if (!sizes) {
-            sizes = {};
-        }
+    public updateSize(field: string, size: number, save = true) {
+        this.publishSizes({ ...this.snapshot.sizes, [field]: size });
 
         if (save) {
-            if (Object.keys(sizes).length === 0 && fields.length === 0) {
-                this.uiState.removeUser(this.settingsKey);                
-            } else {
-                this.uiState.set(this.settingsKey, { sizes, fields }, true);
-            }
+            this.saveConfig();
         }
+    }
 
-        if (fields.length === 0) {
-            fields = this.schema.defaultListFields.map(x => x['name'] || x);
+    public updateFields(fields: ReadonlyArray<string>, save = true) {
+        this.publishFields(fields);
+
+        if (save) {
+            this.saveConfig();
         }
+    }
 
-        const tableFields = fields.map(n => this.schema.fields.find(f => f.name === n) || n);
+    private publishSizes(sizes: TableSizes) {
+        this.next({ sizes });    
+    }
 
-        this.listSizes$.next(sizes);
-        this.listFields$.next(tableFields);
-        this.listFieldName$.next(fields);
+    private publishFields(fields: ReadonlyArray<string>) {
+        this.next({ fields: fields.filter(x => this.schemaFields.indexOf(x) >= 0) });
+    }
+
+    private saveConfig() {
+        const { sizes, fields } = this.snapshot;
+
+        if (Object.keys(sizes).length === 0 && fields.length === 0) {
+            this.uiState.removeUser(this.settingsKey);                
+        } else {
+            this.uiState.set(this.settingsKey, this.snapshot, true);
+        }
     }
 }

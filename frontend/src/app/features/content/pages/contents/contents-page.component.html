@@ -65,7 +65,7 @@
                         <ng-container *sqxModal="tableViewModal">
                             <sqx-dropdown-menu [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-right">
                                 <sqx-custom-view-editor
-                                    [allFields]="tableFields.allFields" 
+                                    [allFields]="tableFields.schemaFields" 
                                     (listFieldsChange)="tableFields.updateFields($event)"
                                     [listFields]="$any(tableFields.listFieldNames | async)"
                                     (reset)="tableFields.reset()">

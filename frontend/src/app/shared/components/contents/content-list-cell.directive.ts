@@ -192,6 +192,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     private mouseUp?: Function;
     private mouseDown?: Function;
     private mouseBlur?: Function;
+    private documentBlur?: Function;
     private startOffset = 0;
     private startWidth = 0;
     private fieldName?: string;
@@ -212,10 +213,12 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     }
 
     public ngOnDestroy() {
-        this.mouseMove?.();
-        this.mouseUp?.();
         this.mouseDown?.();
+        this.mouseDown = undefined;
         this.mouseBlur?.();
+        this.mouseBlur = undefined;
+        
+        this.resetMovement();
     }
   
     public ngOnInit() {  
@@ -241,6 +244,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
 
         this.mouseMove = this.renderer.listen('document', 'mousemove', this.onMouseMove);
         this.mouseUp = this.renderer.listen('document', 'mouseup', this.onMouseUp);
+        this.documentBlur = this.renderer.listen('document', 'blur', this.onBlur);
 
         this.startOffset = event.pageX;
         this.startWidth = this.element.nativeElement.offsetWidth;
@@ -261,11 +265,23 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
             return;
         }
 
+        this.resetMovement();
+
         const width = this.startWidth + (event.pageX - this.startOffset);
   
         this.tableFields.updateSize(this.fieldName, width, true);
-
-        this.mouseMove?.();
-        this.mouseUp?.();
     };
-  }
+
+    private onBlur = () => {
+        this.resetMovement();
+    };
+
+    private resetMovement() {
+        this.mouseMove?.();
+        this.mouseMove = undefined;
+        this.mouseUp?.();
+        this.mouseUp = undefined;
+        this.documentBlur?.();
+        this.documentBlur = undefined;
+    }
+}

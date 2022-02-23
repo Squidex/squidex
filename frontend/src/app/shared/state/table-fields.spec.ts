@@ -38,7 +38,7 @@ describe('TableFields', () => {
     ];
 
     INVALID_CONFIGS.forEach(test => {
-        it(`should provide default fields if config is ${test.case}`, async () => {
+        it(`should provide default fields if config is ${test.case}`, () => {
             let fields: ReadonlyArray<TableField>;
             let fieldNames: ReadonlyArray<string>;
             let fieldSizes: TableSizes;
@@ -198,5 +198,46 @@ describe('TableFields', () => {
         uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
         expect(fieldSizes!).toEqual({ [MetaFields.version]: 100 });
+    });
+
+    it('should provide default fields if reset', () => {
+        let fields: ReadonlyArray<TableField>;
+        let fieldNames: ReadonlyArray<string>;
+        let fieldSizes: TableSizes;
+
+        uiState.setup(x => x.getUser<TableSettings>('schemas.my-schema.config', {}))
+            .returns(() => of(({ fields: [MetaFields.version], sizes: { field: 100 } })));
+
+        const tableFields = new TableFields(uiState.object, schema);
+
+        tableFields.listFields.subscribe(result => {
+            fields = result;
+        });
+
+        tableFields.listFieldNames.subscribe(result => {
+            fieldNames = result;
+        });
+
+        tableFields.listSizes.subscribe(result => {
+            fieldSizes = result;
+        });
+
+        tableFields.reset();
+
+        expect(fields!).toEqual([
+            MetaFields.lastModifiedByAvatar,
+            schema.fields[0],
+            MetaFields.statusColor,
+            MetaFields.lastModified,
+        ]);
+
+        expect(fieldNames!).toEqual([
+            MetaFields.lastModifiedByAvatar,
+            schema.fields[0].name,
+            MetaFields.statusColor,
+            MetaFields.lastModified,
+        ]);
+
+        expect(fieldSizes!).toEqual({});
     });
 });
