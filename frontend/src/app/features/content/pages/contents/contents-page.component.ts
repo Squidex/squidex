@@ -199,11 +199,9 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                for (const action in this.selectionStatuses) {
-                    if (this.selectionStatuses.hasOwnProperty(action)) {
-                        if (!content.statusUpdates.find(x => x.status === action)) {
-                            delete this.selectionStatuses[action];
-                        }
+                for (const action of Object.keys(this.selectionStatuses)) {
+                    if (!content.statusUpdates.find(x => x.status === action)) {
+                        delete this.selectionStatuses[action];
                     }
                 }
 

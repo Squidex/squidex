@@ -60,7 +60,7 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
                     }));
 
             if (Types.is(this.formModel.field.properties, ComponentFieldPropertiesDto)) {
-                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).filter(x => !!x) || [];
+                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).defined() || [];
             }
         }
     }

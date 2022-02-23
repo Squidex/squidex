@@ -192,13 +192,10 @@ export class LanguagesState extends State<Snapshot> {
             language,
             fallbackLanguages:
                 language.fallback
-                    .map(l => languages.find(x => x.iso2Code === l)).filter(x => !!x)
-                    .map(l => l!),
+                    .map(l => languages.find(x => x.iso2Code === l)).defined(),
             fallbackLanguagesNew:
                 languages
-                    .filter(l =>
-                        language.iso2Code !== l.iso2Code &&
-                        language.fallback.indexOf(l.iso2Code) < 0)
+                    .filter(l => language.iso2Code !== l.iso2Code && !language.fallback.includes(l.iso2Code))
                     .sortByString(x => x.englishName),
         };
     }

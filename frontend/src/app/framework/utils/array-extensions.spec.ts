@@ -129,6 +129,27 @@ describe('ArrayExtensions', () => {
         expect(array_1).toEqual([]);
     });
 
+    it('should returned defined only', () => {
+        const array_0 = [0, 1, 2, false, '', null, undefined];
+        const array_1 = array_0.defined();
+
+        expect(array_1).toEqual([1, 2]);
+    });
+
+    it('should return true if array include item', () => {
+        const array_0 = [0, 1, 2];
+
+        expect(array_0.includes(0)).toBeTrue();
+        expect(array_0.includes(1)).toBeTrue();
+    });
+
+    it('should return false if array does not include item', () => {
+        const array_0 = [0, 1, 2];
+
+        expect(array_0.includes(3)).toBeFalse();
+        expect(array_0.includes(4)).toBeFalse();
+    });
+
     it('should convert to map', () => {
         const array_0 = [{ id: 'A', value: 1 }, { id: 'B', value: 2 }, { id: 'B', value: 3 }];
         const map = array_0.toMap(x => x.id);

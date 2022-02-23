@@ -86,11 +86,9 @@ export class ContentDto {
 
         const updates: StatusInfo[] = [];
 
-        for (const link in links) {
-            if (links.hasOwnProperty(link) && link.startsWith('status/')) {
-                const status = link.substr(7);
-
-                updates.push({ status, color: links[link].metadata! });
+        for (const [key, link] of Object.entries(links)) {
+            if (key.startsWith('status/')) {
+                updates.push({ status: key.substring(7), color: link.metadata! });
             }
         }
 

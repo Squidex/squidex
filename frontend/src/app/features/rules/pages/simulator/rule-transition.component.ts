@@ -31,7 +31,7 @@ export class RuleTransitionComponent {
             return null;
         }
 
-        const result = this.event?.skipReasons.filter(x => errors.indexOf(x) >= 0).map(x => `rules.simulation.error${x}`);
+        const result = this.event?.skipReasons.filter(x => errors.includes(x)).map(x => `rules.simulation.error${x}`);
 
         if (result?.length === 0) {
             return null;

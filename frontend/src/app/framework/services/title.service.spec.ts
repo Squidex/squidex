@@ -18,7 +18,7 @@ describe('TitleService', () => {
         localizer = Mock.ofType<LocalizerService>();
 
         localizer.setup(x => x.getOrKey(It.isAnyString()))
-            .returns((key: string) => key.substr(5));
+            .returns((key: string) => key.substring(5));
     });
 
     it('should instantiate', () => {

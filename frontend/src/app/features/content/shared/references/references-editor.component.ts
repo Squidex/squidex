@@ -71,7 +71,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
                 this.contentsResolver.resolveMany(contentIds)
                     .subscribe({
                         next: ({ items }) => {
-                            this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).filter(r => !!r));
+                            this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
 
                             if (this.snapshot.contentItems.length !== contentIds.length) {
                                 this.updateValue();

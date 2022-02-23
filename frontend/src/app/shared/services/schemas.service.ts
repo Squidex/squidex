@@ -141,13 +141,9 @@ export class SchemaDto {
         const cleanup = (source: any, ...exclude: string[]): any => {
             const clone = {};
 
-            for (const key in source) {
-                if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0 && key.indexOf('can') !== 0) {
-                    const value = source[key];
-
-                    if (!Types.isUndefined(value) && !Types.isNull(value)) {
-                        clone[key] = value;
-                    }
+            for (const [key, value] of Object.entries(source)) {
+                if (!exclude.includes(key) && key.indexOf('can') !== 0 && !Types.isUndefined(value) && !Types.isNull(value)) {
+                    clone[key] = value;
                 }
             }
 

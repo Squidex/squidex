@@ -27,7 +27,7 @@ export class SchemaMustNotBeSingletonGuard implements CanActivate {
                 take(1),
                 tap(schema => {
                     if (schema.type === 'Singleton') {
-                        if (state.url.indexOf('/new') >= 0) {
+                        if (state.url.includes('/new')) {
                             const parentUrl = state.url.slice(0, state.url.indexOf(route.url[route.url.length - 1].path));
 
                             this.router.navigate([parentUrl, schema.id]);

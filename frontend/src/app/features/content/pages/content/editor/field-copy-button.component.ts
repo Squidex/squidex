@@ -41,7 +41,7 @@ export class FieldCopyButtonComponent implements OnChanges {
         this.copySource = language;
         this.copyTargets = [];
 
-        this.languageCodes = this.languages.map(x => x.iso2Code).filter(x => x !== language);
+        this.languageCodes = this.languages.map(x => x.iso2Code).removed(language);
     }
 
     public copy() {

@@ -86,7 +86,7 @@ export class TableFields extends State<Required<TableSettings>> {
     }
 
     private publishFields(fields: ReadonlyArray<string>) {
-        this.next({ fields: fields.filter(x => this.schemaFields.indexOf(x) >= 0) });
+        this.next({ fields: fields.filter(x => this.schemaFields.includes(x)) });
     }
 
     private saveConfig() {

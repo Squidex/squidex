@@ -57,7 +57,7 @@ export class NotifoComponent implements AfterViewInit, OnChanges, OnDestroy {
 
                 const options: any = { apiUrl: this.notifoApiUrl, userToken: this.notifoApiKey };
 
-                if (this.notifoApiUrl.indexOf('localhost:5002') >= 0) {
+                if (this.notifoApiUrl.includes('localhost:5002')) {
                     options.styleUrl = 'https://localhost:3002/notifo-sdk.css';
                 }
 

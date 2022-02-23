@@ -171,7 +171,7 @@ export class UsersState extends State<Snapshot> {
         return this.usersService.deleteUser(user).pipe(
             tap(() => {
                 this.next(s => {
-                    const users = s.users.filter(x => x.id !== user.id);
+                    const users = s.users.removedBy('id', user);
 
                     const selectedUser =
                         s.selectedUser?.id !== user.id ?

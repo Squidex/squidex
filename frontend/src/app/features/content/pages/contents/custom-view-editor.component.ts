@@ -30,7 +30,7 @@ export class CustomViewEditorComponent implements OnChanges {
     public fieldsNotAdded!: ReadonlyArray<string>;
 
     public ngOnChanges() {
-        this.fieldsNotAdded = this.allFields.filter(n => this.listFields.indexOf(n) < 0);
+        this.fieldsNotAdded = this.allFields.filter(n => !this.listFields.includes(n));
     }
 
     public drop(event: CdkDragDrop<string[], any>) {

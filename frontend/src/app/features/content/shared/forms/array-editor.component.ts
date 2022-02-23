@@ -75,7 +75,7 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
             const maxItems = this.formModel.field.properties['maxItems'] || Number.MAX_VALUE;
 
             if (Types.is(this.formModel.field.properties, ComponentsFieldPropertiesDto)) {
-                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).filter(x => !!x) || [];
+                this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).defined() || [];
             } else {
                 this.isArray = true;
             }

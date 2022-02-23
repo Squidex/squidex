@@ -84,7 +84,7 @@ export class TitleService {
 
         let title = '';
 
-        const cleaned = path.map(x => x.localized).filter(x => !!x);
+        const cleaned = path.map(x => x.localized).defined();
 
         if (cleaned.length > 0) {
             title = cleaned.join(separator || ' | ');

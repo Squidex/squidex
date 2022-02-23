@@ -23,7 +23,7 @@ export class Version {
 
     private trimmed(): string {
         if (this.value.startsWith('W/')) {
-            return this.value.substr(2);
+            return this.value.substring(2);
         } else {
             return this.value;
         }

@@ -21,11 +21,11 @@ export class ErrorDetailsDto {
         if (propertySeparator > 0 && propertySeparator < originalMessage.length - 1) {
             this.properties =
                 originalMessage
-                    .substr(0, propertySeparator)
+                    .substring(0, propertySeparator)
                     .split(', ')
                     .map(x => x.trim()).filter(x => x.length > 0);
 
-            this.message = originalMessage.substr(propertySeparator + 2);
+            this.message = originalMessage.substring(propertySeparator + 2);
         } else {
             this.message = originalMessage;
         }

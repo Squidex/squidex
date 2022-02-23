@@ -97,16 +97,14 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         const errorMessages: string[] = [];
 
         if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
-            for (const key in this.control.errors) {
-                if (this.control.errors.hasOwnProperty(key)) {
-                    const message = formatError(this.localizer, this.controlDisplayName, key, this.control.errors[key], this.control.value);
+            for (const [key, error] of Object.entries(this.control.errors)) {
+                const message = formatError(this.localizer, this.controlDisplayName, key, error, this.control.value);
 
-                    if (Types.isString(message)) {
-                        errorMessages.push(message);
-                    } else if (Types.isArray(message)) {
-                        for (const error of message) {
-                            errorMessages.push(error);
-                        }
+                if (Types.isString(message)) {
+                    errorMessages.push(message);
+                } else if (Types.isArray(message)) {
+                    for (const error of message) {
+                        errorMessages.push(error);
                     }
                 }
             }

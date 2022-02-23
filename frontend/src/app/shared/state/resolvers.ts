@@ -58,7 +58,7 @@ abstract class ResolverBase<T extends { id: string }, TResult extends { items: R
     private async buildPromise(promises: Promise<T | undefined>[]) {
         const promise = await Promise.all(promises);
 
-        return this.createResult(promise.filter(x => !!x) as any);
+        return this.createResult(promise.defined() as any);
     }
 
     private resolvePending() {

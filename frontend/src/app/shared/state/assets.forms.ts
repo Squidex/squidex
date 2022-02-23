@@ -72,7 +72,7 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
             const index = asset.fileName.lastIndexOf('.');
 
             if (index > 0) {
-                result.fileName += asset.fileName.substr(index);
+                result.fileName += asset.fileName.substring(index);
             }
 
             if (result.fileName === asset.fileName) {
@@ -113,7 +113,7 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
             const index = fileName.lastIndexOf('.');
 
             if (index > 0) {
-                fileName = fileName.substr(0, index);
+                fileName = fileName.substring(0, index);
             }
 
             result.fileName = fileName;
@@ -122,20 +122,16 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
         if (Types.isObject(value.metadata)) {
             result.metadata = [];
 
-            for (const name in value.metadata) {
-                if (value.metadata.hasOwnProperty(name)) {
-                    const raw = value.metadata[name];
+            for (const [name, raw] of Object.entries(value.metadata)) {
+                let converted = '';
 
-                    let converted = '';
-
-                    if (Types.isString(raw)) {
-                        converted = raw;
-                    } else if (!Types.isUndefined(raw) && !Types.isNull(raw)) {
-                        converted = JSON.stringify(raw);
-                    }
-
-                    result.metadata.push({ name, value: converted });
+                if (Types.isString(raw)) {
+                    converted = raw;
+                } else if (!Types.isUndefined(raw) && !Types.isNull(raw)) {
+                    converted = JSON.stringify(raw);
                 }
+
+                result.metadata.push({ name, value: converted });
             }
         }
 
@@ -152,7 +148,7 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
                 const index = asset.fileName.lastIndexOf('.');
 
                 if (index > 0) {
-                    slug += asset.fileName.substr(index);
+                    slug += asset.fileName.substring(index);
                 }
             }
 

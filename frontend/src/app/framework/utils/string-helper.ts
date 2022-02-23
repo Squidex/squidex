@@ -21,7 +21,7 @@ export module StringHelper {
     }
 
     export function appendToUrl(url: string, key: string, value?: any, ambersand = false) {
-        if (url.indexOf('?') >= 0 || ambersand) {
+        if (url.includes('?') || ambersand) {
             url += '&';
         } else {
             url += '?';

@@ -196,7 +196,7 @@ export class CalendarPageComponent implements AfterViewInit, OnDestroy {
             content.referenceFields
                 .map(f => getContentValue(content, this.language, f, false))
                 .map(v => v.formatted)
-                .filter(v => !!v)
+                .defined()
                 .join(', ')
             || this.localizer.getOrKey('common.noValue');
 

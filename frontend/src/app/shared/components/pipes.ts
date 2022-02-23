@@ -182,8 +182,8 @@ function split(token: string) {
     const index = token.indexOf(':');
 
     if (index > 0 && index < token.length - 1) {
-        const type = token.substr(0, index);
-        const name = token.substr(index + 1);
+        const type = token.substring(0, index);
+        const name = token.substring(index + 1);
 
         return { type, id: name };
     }

@@ -13,9 +13,9 @@ export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
     const result: { [key: string]: any } = {};
 
     while (snapshot) {
-        for (const key in snapshot.data) {
-            if (snapshot.data.hasOwnProperty(key) && !result[key]) {
-                result[key] = snapshot.data[key];
+        for (const [key, value] of Object.entries(snapshot.data)) {
+            if (!result[key]) {
+                result[key] = value;
             }
         }
 
@@ -30,9 +30,9 @@ export function allParams(value: ActivatedRouteSnapshot | ActivatedRoute): Param
     const result: { [key: string]: any } = {};
 
     while (snapshot) {
-        for (const key in snapshot.params) {
-            if (snapshot.params.hasOwnProperty(key) && !result[key]) {
-                result[key] = snapshot.params[key];
+        for (const [key, value] of Object.entries(snapshot.params)) {
+            if (!result[key]) {
+                result[key] = value;
             }
         }
 

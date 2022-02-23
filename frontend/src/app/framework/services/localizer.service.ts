@@ -39,7 +39,7 @@ export class LocalizerService {
         let text = this.translations[key];
 
         if (!text) {
-            if (this.shouldLog && !key.indexOf(' ')) {
+            if (this.shouldLog && !key.includes(' ')) {
                 // eslint-disable-next-line no-console
                 console.warn(`Missing i18n key: ${key}`);
             }
