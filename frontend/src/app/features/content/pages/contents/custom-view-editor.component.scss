@@ -18,3 +18,7 @@
     padding-left: 2rem;
     padding-right: .5rem;
 }
+
+.cdk-drag-preview {
+    z-index: 9000 !important;
+}
