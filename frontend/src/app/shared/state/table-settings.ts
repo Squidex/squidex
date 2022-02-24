@@ -38,11 +38,11 @@ export class TableSettings extends State<Snapshot> {
     public fieldWrappings =
         this.project(x => x.wrappings);
         
-    public configuredFields =
+    public fields =
         this.project(x => x.fields);
 
     public listFieldNames =
-        this.projectFrom(this.configuredFields, x => x.length === 0 ? this.schemaDefaults : x);
+        this.projectFrom(this.fields, x => x.length === 0 ? this.schemaDefaults : x);
 
     public listFields =
         this.projectFrom(this.listFieldNames, x => x.map(n => this.schema.fields.find(f => f.name === n) || n));
@@ -133,9 +133,9 @@ export class TableSettings extends State<Snapshot> {
     }
 
     private saveConfig() {
-        const { sizes, fields, wrappings: wraps } = this.snapshot;
+        const { sizes, fields, wrappings } = this.snapshot;
 
-        if (Object.keys(sizes).length === 0 && Object.keys(wraps).length === 0 && fields.length === 0) {
+        if (Object.keys(sizes).length === 0 && Object.keys(wrappings).length === 0 && fields.length === 0) {
             this.uiState.removeUser(this.settingsKey);                
         } else {
             this.uiState.set(this.settingsKey, this.snapshot, true);

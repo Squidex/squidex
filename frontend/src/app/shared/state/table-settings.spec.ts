@@ -76,6 +76,10 @@ describe('TableSettings', () => {
                 fieldSizes = result;
             });
 
+            tableSettings.fieldWrappings.subscribe(result => {
+                fieldWrappings = result;
+            });
+
             expect(listFields!).toEqual([
                 MetaFields.lastModifiedByAvatar,
                 schema.fields[0],
@@ -92,10 +96,12 @@ describe('TableSettings', () => {
 
             expect(fieldSizes!).toEqual({ 
                 field1: 100,
+                field2: 200,
             });
         
             expect(fieldWrappings!).toEqual({ 
-                field2: true,
+                field3: true,
+                field4: false,
             });
         });
     });
@@ -253,7 +259,7 @@ describe('TableSettings', () => {
             fieldWrappings = result;
         });
 
-        tableSettings.toggleWrapping(MetaFields.version, true);
+        tableSettings.toggleWrapping(MetaFields.version, false);
 
         uiState.verify(x => x.set('schemas.my-schema.config', It.isAny(), true), Times.never());
 
