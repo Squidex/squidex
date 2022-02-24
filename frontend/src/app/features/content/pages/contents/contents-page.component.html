@@ -35,7 +35,7 @@
     </ng-container>
 
     <ng-container>
-        <ng-container *ngIf="tableFields.listFields | async; let listFields">    
+        <ng-container *ngIf="tableSettings.listFields | async; let listFields">    
             <sqx-list-view [isLoading]="contentsState.isLoading | async" [syncedHeader]="true" [tableNoPadding]="true">
                 <ng-container topHeader>
                     <div class="selection" *ngIf="selectionCount > 0">
@@ -65,10 +65,10 @@
                         <ng-container *sqxModal="tableViewModal">
                             <sqx-dropdown-menu [sqxAnchoredTo]="buttonSettings" [scrollY]="true" position="bottom-right">
                                 <sqx-custom-view-editor
-                                    [allFields]="tableFields.schemaFields" 
-                                    (listFieldsChange)="tableFields.updateFields($event)"
-                                    [listFields]="$any(tableFields.listFieldNames | async)"
-                                    (reset)="tableFields.reset()">
+                                    [allFields]="tableSettings.schemaFields" 
+                                    (listFieldsChange)="tableSettings.updateFields($event)"
+                                    [listFields]="$any(tableSettings.listFieldNames | async)"
+                                    (reset)="tableSettings.reset()">
                                 </sqx-custom-view-editor>
                             </sqx-dropdown-menu>
                         </ng-container>
@@ -76,7 +76,7 @@
                 </ng-container>
 
                 <ng-container header>
-                    <table class="table table-items table-fixed" [sqxContentListWidth]="listFields" [fields]="tableFields" #header>
+                    <table class="table table-items table-fixed" [sqxContentListWidth]="listFields" [fields]="tableSettings" #header>
                         <thead>
                             <tr>
                                 <th class="cell-select">
@@ -95,7 +95,7 @@
                                     sqxContentListCell
                                     sqxContentListCellResize
                                     [field]="field"
-                                    [fields]="tableFields">
+                                    [fields]="tableSettings">
                                     <sqx-content-list-header
                                         [field]="field"
                                         (queryChange)="search($event)"
@@ -111,7 +111,7 @@
 
                 <ng-container>
                     <div class="table-container">
-                        <table class="table table-center table-fixed" [sqxContentListWidth]="listFields" [fields]="tableFields" [sqxSyncWidth]="header">
+                        <table class="table table-center table-fixed" [sqxContentListWidth]="listFields" [fields]="tableSettings" [sqxSyncWidth]="header">
                             <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent" 
                                 [sqxContent]="content"
                                 (clone)="clone(content)"
@@ -122,8 +122,8 @@
                                 [cloneable]="contentsState.snapshot.canCreate"
                                 [language]="language"
                                 [link]="[content.id, 'history']"
-                                [listFields]="listFields"
-                                [listSettings]="tableFields">
+                                [tableFields]="listFields"
+                                [tableSettings]="tableSettings">
                             </tbody>
                         </table>
                     </div>

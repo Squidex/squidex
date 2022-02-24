@@ -10,7 +10,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, switchSafe, TableFields, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, switchSafe, TableSettings, TempService, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -27,7 +27,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public schema!: SchemaDto;
 
-    public tableFields!: TableFields;
+    public tableSettings!: TableSettings;
     public tableViewModal = new ModalModel();
 
     public searchModal = new ModalModel();
@@ -93,7 +93,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.schema = schema;
 
-                    this.tableFields = new TableFields(this.uiState, schema);
+                    this.tableSettings = new TableSettings(this.uiState, schema);
 
                     const initial =
                         this.contentsRoute.mapTo(this.contentsState)

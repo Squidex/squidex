@@ -18,7 +18,7 @@ declare type UnsubscribeFunction = () => void;
 export class ResourceOwner implements OnDestroy {
     private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
 
-    public own<T>(subscription: Subscription | UnsubscribeFunction | Observable<T>) {
+    public own<T>(subscription: Subscription | UnsubscribeFunction | Observable<T> | null | undefined) {
         if (subscription) {
             if (Types.isFunction(subscription['subscribe'])) {
                 const observable = <Observable<T>>subscription;

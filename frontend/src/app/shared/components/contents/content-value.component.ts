@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { HtmlValue, Types } from '@app/shared/internal';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ResourceOwner } from '@app/framework';
+import { RootFieldDto, TableField } from '@app/shared';
+import { FieldWrappings, HtmlValue, TableSettings, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-value[value]',
@@ -14,11 +16,56 @@ import { HtmlValue, Types } from '@app/shared/internal';
     templateUrl: './content-value.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentValueComponent {
+export class ContentValueComponent extends ResourceOwner implements OnChanges {
     @Input()
     public value!: any;
 
+    @Input()
+    public field!: TableField;
+
+    @Input()
+    public fields?: TableSettings;
+
+    public wrapping = false;
+
+    public get isString() {
+        return Types.is(this.field, RootFieldDto) && this.field.properties.fieldType === 'String';
+    }
+
     public get isPlain() {
         return !Types.is(this.value, HtmlValue);
+    }
+
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef,
+    ) {
+        super();
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['fields']) {
+            this.unsubscribeAll();
+
+            this.own(this.fields?.fieldWrappings
+                .subscribe(wrappings => {
+                    this.updateWrapping(wrappings);
+                }));
+        }
+    }
+
+    public toggle() {
+        this.fields?.toggleWrapping(this.field?.['name']);
+    }
+
+    private updateWrapping(wrappings: FieldWrappings) {
+        const wrapping = wrappings[this.field?.['name']];
+
+        if (wrapping === this.wrapping) {
+            return;
+        }
+
+        this.wrapping = wrapping;
+
+        this.changeDetector.detectChanges();
     }
 }

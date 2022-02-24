@@ -22,6 +22,7 @@ td {
     border-bottom: 1px solid $color-border;
     border-left: 1px solid $color-white;
     border-top: 0 !important;
+    position: relative;
     vertical-align: middle;
 
     &.cell-select {

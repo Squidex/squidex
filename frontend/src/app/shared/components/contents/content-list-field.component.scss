@@ -1,6 +1,10 @@
 @import 'mixins';
 @import 'vars';
 
+:host {
+    display: block;
+}
+
 .icon-caret-right {
     color: $color-text-decent;
     margin-left: 5px;

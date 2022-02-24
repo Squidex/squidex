@@ -12,17 +12,31 @@ import { UIState } from './ui.state';
 
 const META_FIELD_NAMES = Object.values(MetaFields);
 
-export type TableSizes = { [name: string]: number };
-export type TableSettings = { fields?: ReadonlyArray<string>; sizes?: TableSizes };
+export type FieldSizes = { [name: string]: number };
+export type FieldWrappings = { [name: string]: boolean };
 
-export class TableFields extends State<Required<TableSettings>> {
+interface Snapshot {
+    // The table fields in the right order.
+    fields: ReadonlyArray<string>;
+
+    // The sizes of the columns if overriden.
+    sizes: FieldSizes;
+
+    // True to enable wrapping.
+    wrappings: FieldWrappings;
+}
+
+export class TableSettings extends State<Snapshot> {
     private readonly settingsKey: string;
 
     public readonly schemaFields: ReadonlyArray<string>;
     public readonly schemaDefaults: ReadonlyArray<string>;
 
-    public listSizes =
+    public fieldSizes =
         this.project(x => x.sizes);
+
+    public fieldWrappings =
+        this.project(x => x.wrappings);
         
     public configuredFields =
         this.project(x => x.fields);
@@ -37,14 +51,14 @@ export class TableFields extends State<Required<TableSettings>> {
         private readonly uiState: UIState,
         private readonly schema: SchemaDto,
     ) {
-        super({ fields: [], sizes: {} });
+        super({ fields: [], sizes: {}, wrappings: {} });
 
         this.schemaFields = [...schema.contentFields.map(x => x.name), ...META_FIELD_NAMES].sort();
         this.schemaDefaults = schema.defaultListFields.map(x => x['name'] || x);
 
         this.settingsKey = `schemas.${this.schema.name}.config`;
 
-        this.uiState.getUser<TableSettings>(this.settingsKey, {}).pipe(take(1))
+        this.uiState.getUser<any>(this.settingsKey, {}).pipe(take(1))
             .subscribe(settings => {
                 if (!Types.isArrayOfString(settings.fields)) {
                     settings.fields = [];
@@ -54,8 +68,13 @@ export class TableFields extends State<Required<TableSettings>> {
                     settings.sizes = {};
                 }
 
+                if (!Types.isObject(settings.wrappings)) {
+                    settings.wrappings = {};
+                }
+
                 this.publishSizes(settings.sizes);
                 this.publishFields(settings.fields);
+                this.publishWrappings(settings.wrappings);
             });
     }
 
@@ -66,7 +85,27 @@ export class TableFields extends State<Required<TableSettings>> {
     }
 
     public updateSize(field: string, size: number, save = true) {
-        this.publishSizes({ ...this.snapshot.sizes, [field]: size });
+        this.next(s => ({ 
+            ...s,
+            sizes: { 
+                ...s.sizes, 
+                [field]: size,
+            },
+        }));
+
+        if (save) {
+            this.saveConfig();
+        }
+    }
+
+    public toggleWrapping(field: string, save = true) {
+        this.next(s => ({ 
+            ...s,
+            wrappings: { 
+                ...s.wrappings, 
+                [field]: !s.wrappings[field],
+            },
+        }));
 
         if (save) {
             this.saveConfig();
@@ -81,8 +120,12 @@ export class TableFields extends State<Required<TableSettings>> {
         }
     }
 
-    private publishSizes(sizes: TableSizes) {
+    private publishSizes(sizes: FieldSizes) {
         this.next({ sizes });    
+    }
+
+    private publishWrappings(wrappings: FieldWrappings) {
+        this.next({ wrappings });    
     }
 
     private publishFields(fields: ReadonlyArray<string>) {
@@ -90,9 +133,9 @@ export class TableFields extends State<Required<TableSettings>> {
     }
 
     private saveConfig() {
-        const { sizes, fields } = this.snapshot;
+        const { sizes, fields, wrappings: wraps } = this.snapshot;
 
-        if (Object.keys(sizes).length === 0 && fields.length === 0) {
+        if (Object.keys(sizes).length === 0 && Object.keys(wraps).length === 0 && fields.length === 0) {
             this.uiState.removeUser(this.settingsKey);                
         } else {
             this.uiState.set(this.settingsKey, this.snapshot, true);

@@ -42,7 +42,11 @@
 }
 
 .table-container {
-    display: inline-block;
+    display: block;
+
+    .table {
+        margin: 0;
+    }
 
     .table-items {
         margin: 0;

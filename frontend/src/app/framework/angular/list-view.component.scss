@@ -67,6 +67,10 @@
         overflow-x: hidden;
         overflow-y: hidden;
 
+        &.tabled2 {
+            background-color: $color-white;
+        }
+
         .sync-inner {
             display: table-cell;
         }

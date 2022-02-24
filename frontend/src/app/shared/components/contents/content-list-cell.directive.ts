@@ -6,11 +6,11 @@
  */
 
 import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { RootFieldDto, TableFields } from '@app/shared';
-import { ContentDto, MetaFields, TableField, TableSizes, Types } from '@app/shared/internal';
+import { ResourceOwner } from '@app/framework';
+import { RootFieldDto, TableSettings } from '@app/shared';
+import { ContentDto, MetaFields, TableField, FieldSizes, Types } from '@app/shared/internal';
 
-export function getCellWidth(field: TableField, sizes: TableSizes | undefined | null) {
+export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
     if (Types.is(field, RootFieldDto)) {
         field = field.name;
     }
@@ -68,33 +68,29 @@ export class ContentsColumnsPipe implements PipeTransform {
 @Directive({
     selector: '[sqxContentListWidth]',
 })
-export class ContentListWidthDirective implements OnChanges, OnDestroy {
-    private subscription?: Subscription;
-    private sizes?: TableSizes;
+export class ContentListWidthDirective extends ResourceOwner implements OnChanges {
+    private sizes?: FieldSizes;
     private size = -1;
 
     @Input('sqxContentListWidth')
     public fields!: ReadonlyArray<TableField>;
 
     @Input('fields')
-    public set tableFields(value: TableFields | undefined | null) {
-        this.subscription?.unsubscribe();
-        this.subscription = value?.listSizes.subscribe(sizes => {
+    public set tableSettings(value: TableSettings | undefined | null) {
+        this.unsubscribeAll();
+
+        this.own(value?.fieldSizes.subscribe(sizes => {
             this.sizes = sizes;
 
             this.updateSize();
-        });
+        }));
     }
 
     constructor(
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.subscription?.unsubscribe();
-        this.subscription = undefined;
+        super();
     }
 
     public ngOnChanges() {
@@ -127,36 +123,32 @@ export class ContentListWidthDirective implements OnChanges, OnDestroy {
 @Directive({
     selector: '[sqxContentListCell]',
 })
-export class ContentListCellDirective implements OnChanges, OnDestroy {
-    private subscription?: Subscription;
-    private sizes?: TableSizes;
+export class ContentListCellDirective extends ResourceOwner implements OnChanges {
+    private sizes?: FieldSizes;
     private size = -1;
     private fieldName?: string;
 
-    @Input('field')
+    @Input()
     public set field(value: TableField) {
         this.fieldName = Types.is(value, RootFieldDto) ? value.name : value;
     }
 
     @Input('fields')
-    public set tableFields(value: TableFields | undefined | null) {
-        this.subscription?.unsubscribe();
-        this.subscription = value?.listSizes.subscribe(sizes => {
+    public set tableFields(value: TableSettings | undefined | null) {
+        this.unsubscribeAll();
+
+        this.own(value?.fieldSizes.subscribe(sizes => {
             this.sizes = sizes;
 
             this.updateSize();
-        });
+        }));
     }
 
     constructor(
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.subscription?.unsubscribe();
-        this.subscription = undefined;
+        super();
     }
 
     public ngOnChanges() {
@@ -198,13 +190,16 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     private fieldName?: string;
     private resizer: any;
 
-    @Input('field')
+    @Input()
     public set field(value: TableField) {
         this.fieldName = Types.is(value, RootFieldDto) ? value.name : undefined;
     }
 
     @Input('fields')
-    public tableFields?: TableFields;
+    public tableFields?: TableSettings;
+
+    @Input()
+    public minimumWidth = 50;
 
     constructor(
         private readonly element: ElementRef<HTMLTableCellElement>,
@@ -254,10 +249,12 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         if (!this.mouseMove || !this.tableFields || !this.fieldName) {
             return;
         }
-  
-        const width = this.startWidth + (event.pageX - this.startOffset);
-  
-        this.tableFields.updateSize(this.fieldName, width, false);
+
+        try {
+            this.updateWidth(event, false);
+        } catch {
+            this.resetMovement();
+        }
     };
   
     private onMouseUp = (event: MouseEvent) => {
@@ -265,16 +262,26 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
             return;
         }
 
-        this.resetMovement();
-
-        const width = this.startWidth + (event.pageX - this.startOffset);
-  
-        this.tableFields.updateSize(this.fieldName, width, true);
+        try {
+            this.updateWidth(event, true);
+        } finally {
+            this.resetMovement();
+        }
     };
 
     private onBlur = () => {
         this.resetMovement();
     };
+
+    private updateWidth(event: MouseEvent, save: boolean) {
+        let width = this.startWidth + (event.pageX - this.startOffset);
+
+        if (width < this.minimumWidth) {
+            width = this.minimumWidth;
+        }
+  
+        this.tableFields!.updateSize(this.fieldName!, width, save);
+    }
 
     private resetMovement() {
         this.mouseMove?.();
