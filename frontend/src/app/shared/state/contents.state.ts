@@ -79,7 +79,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.project(x => x.statuses);
 
     public statusQueries =
-        this.projectFrom(this.statuses, buildStatusQueries);
+        this.projectFrom(this.statuses, getStatusQueries);
 
     public get appName() {
         return this.appsState.appName;
@@ -448,7 +448,7 @@ export class ComponentContentsState extends ContentsStateBase {
     }
 }
 
-function buildStatusQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<SavedQuery> {
+function getStatusQueries(statuses: ReadonlyArray<StatusInfo> | undefined): ReadonlyArray<SavedQuery> {
     return statuses?.map(buildStatusQuery) || [];
 }
 

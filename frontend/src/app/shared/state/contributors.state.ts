@@ -12,7 +12,7 @@ import { DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, 
 import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from './../services/contributors.service';
 import { AppsState } from './apps.state';
 
-interface Snapshot extends ListState {
+interface Snapshot extends ListState<string> {
     // The current contributors.
     contributors: ReadonlyArray<ContributorDto>;
 
@@ -38,7 +38,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.query);
 
     public queryRegex =
-        this.projectFrom(this.query, x => (x ? new RegExp(x, 'i') : undefined));
+        this.projectFrom(this.query, x => getRegex(x));
 
     public maxContributors =
         this.project(x => x.maxContributors);
@@ -157,6 +157,10 @@ export class ContributorsState extends State<Snapshot> {
     private get version() {
         return this.snapshot.version;
     }
+}
+
+function getRegex(query?: string): RegExp | undefined {
+    return query ? new RegExp(query, 'i') : undefined;
 }
 
 function getFilteredContributors(snapshot: Snapshot) {

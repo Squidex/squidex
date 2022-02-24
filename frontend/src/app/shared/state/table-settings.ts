@@ -7,7 +7,7 @@
 
 import { take } from 'rxjs/operators';
 import { State, Types } from '@app/framework';
-import { MetaFields, SchemaDto } from './../services/schemas.service';
+import { MetaFields, SchemaDto, TableField } from './../services/schemas.service';
 import { UIState } from './ui.state';
 
 const META_FIELD_NAMES = Object.values(MetaFields);
@@ -42,10 +42,10 @@ export class TableSettings extends State<Snapshot> {
         this.project(x => x.fields);
 
     public listFieldNames =
-        this.projectFrom(this.fields, x => x.length === 0 ? this.schemaDefaults : x);
+        this.projectFrom(this.fields, x => this.getListFieldNames(x));
 
     public listFields =
-        this.projectFrom(this.listFieldNames, x => x.map(n => this.schema.fields.find(f => f.name === n) || n));
+        this.projectFrom(this.listFieldNames, x => this.getListFields(x));
 
     constructor(
         private readonly uiState: UIState,
@@ -140,5 +140,13 @@ export class TableSettings extends State<Snapshot> {
         } else {
             this.uiState.set(this.settingsKey, this.snapshot, true);
         }
+    }
+
+    private getListFields(names: ReadonlyArray<string>): ReadonlyArray<TableField> {
+        return names.map(n => this.schema.fields.find(f => f.name === n) || n);
+    }
+
+    private getListFieldNames(names: ReadonlyArray<string>): ReadonlyArray<string> {
+        return names.length === 0 ? this.schemaDefaults : names;
     }
 }
