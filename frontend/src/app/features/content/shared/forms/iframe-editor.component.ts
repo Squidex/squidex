@@ -226,7 +226,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
     }
 
     public updatedisabled(isDisabled: boolean) {
-        if (isDisabled !== this.isDisabled) {
+        if (this.isDisabled !== isDisabled) {
             this.isDisabled = isDisabled;
 
             this.sendDisabled();
