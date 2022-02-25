@@ -22,7 +22,7 @@ pipeline {
   parameters {
     string(name: 'tag', description: 'The tag to deploy', defaultValue: 'latest')
     choice(name: 'cluster', choices: ['staging', 'production'], description: 'The Kubernetes Cluster to deploy to')
-    choice(name: 'namespace', choices: ['content-dev', 'content-v1', 'content-v2'], description: 'The environment to deploy squidex to')
+    choice(name: 'namespace', choices: ['content-dev', 'content-v1', 'content-v2', 'content-v2upgrade'], description: 'The environment to deploy squidex to')
    }
   stages {
     stage('Checkout') {
