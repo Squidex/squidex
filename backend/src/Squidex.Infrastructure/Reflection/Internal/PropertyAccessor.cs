@@ -57,9 +57,8 @@ namespace Squidex.Infrastructure.Reflection.Internal
 
         private readonly IPropertyAccessor internalAccessor;
 
-        public PropertyAccessor(Type targetType, PropertyInfo propertyInfo)
+        public PropertyAccessor(PropertyInfo propertyInfo)
         {
-            Guard.NotNull(targetType);
             Guard.NotNull(propertyInfo);
 
             var type = typeof(PropertyWrapper<,>).MakeGenericType(propertyInfo.DeclaringType!, propertyInfo.PropertyType);

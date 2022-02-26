@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.ComponentModel;
 using System.Globalization;
 using Squidex.Infrastructure.Reflection.Internal;
 
@@ -56,6 +57,41 @@ namespace Squidex.Infrastructure.Reflection
                 try
                 {
                     var converted = Convert.ChangeType(value, targetType, culture);
+
+                    SetValue(target, converted);
+                }
+                catch
+                {
+                    return;
+                }
+            }
+        }
+
+        private sealed class TypeConverterPropertyMapper : PropertyMapper
+        {
+            private readonly TypeConverter converter;
+
+            public TypeConverterPropertyMapper(
+                PropertyAccessor sourceAccessor,
+                PropertyAccessor targetAccessor,
+                TypeConverter converter)
+                : base(sourceAccessor, targetAccessor)
+            {
+                this.converter = converter;
+            }
+
+            public override void MapProperty(object source, object target, CultureInfo culture)
+            {
+                var value = GetValue(source);
+
+                if (value == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    var converted = converter.ConvertFrom(null, culture, value);
 
                     SetValue(target, converted);
                 }
@@ -126,21 +162,33 @@ namespace Squidex.Infrastructure.Reflection
                     if (sourceType == targetType)
                     {
                         Mappers.Add(new PropertyMapper(
-                            new PropertyAccessor(sourceClassType, sourceProperty),
-                            new PropertyAccessor(targetClassType, targetProperty)));
+                            new PropertyAccessor(sourceProperty),
+                            new PropertyAccessor(targetProperty)));
                     }
                     else if (targetType == typeof(string))
                     {
                         Mappers.Add(new StringConversionPropertyMapper(
-                            new PropertyAccessor(sourceClassType, sourceProperty),
-                            new PropertyAccessor(targetClassType, targetProperty)));
+                            new PropertyAccessor(sourceProperty),
+                            new PropertyAccessor(targetProperty)));
                     }
-                    else if (sourceType.Implements<IConvertible>() || targetType.Implements<IConvertible>())
+                    else
                     {
-                        Mappers.Add(new ConversionPropertyMapper(
-                            new PropertyAccessor(sourceClassType, sourceProperty),
-                            new PropertyAccessor(targetClassType, targetProperty),
-                            targetType));
+                        var converter = TypeDescriptor.GetConverter(targetType);
+
+                        if (converter.CanConvertFrom(sourceType))
+                        {
+                            Mappers.Add(new TypeConverterPropertyMapper(
+                                new PropertyAccessor(sourceProperty),
+                                new PropertyAccessor(targetProperty),
+                                converter));
+                        }
+                        else if (sourceType.Implements<IConvertible>() || targetType.Implements<IConvertible>())
+                        {
+                            Mappers.Add(new ConversionPropertyMapper(
+                                new PropertyAccessor(sourceProperty),
+                                new PropertyAccessor(targetProperty),
+                                targetType));
+                        }
                     }
                 }
             }

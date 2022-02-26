@@ -102,17 +102,31 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
-        public void Should_map_nullables()
+        public void Should_map_from_nullable()
         {
-            var obj1 = new Class1<bool?, bool?>
+            var obj1 = new Class1<long?, long?>
             {
-                P1 = true,
-                P2 = true
+                P1 = 6,
+                P2 = 8
             };
-            var obj2 = SimpleMapper.Map(obj1, new Class2<bool, bool>());
+            var obj2 = SimpleMapper.Map(obj1, new Class2<long, long>());
 
-            Assert.True(obj2.P2);
-            Assert.False(obj2.P3);
+            Assert.Equal(8, obj2.P2);
+            Assert.Equal(0, obj2.P3);
+        }
+
+        [Fact]
+        public void Should_map_to_nullable()
+        {
+            var obj1 = new Class1<long, long>
+            {
+                P1 = 6,
+                P2 = 8
+            };
+            var obj2 = SimpleMapper.Map(obj1, new Class2<long?, long?>());
+
+            Assert.Equal(8, obj2.P2);
+            Assert.Null(obj2.P3);
         }
 
         [Fact]
