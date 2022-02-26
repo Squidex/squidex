@@ -43,8 +43,8 @@ export class FieldListComponent implements OnChanges {
             allFields = [...allFields, ...META_FIELD_NAMES];
         }
 
-        this.fieldsAdded = this.fieldNames.filter(n => allFields.indexOf(n) >= 0);
-        this.fieldsNotAdded = allFields.filter(n => this.fieldNames.indexOf(n) < 0);
+        this.fieldsAdded = this.fieldNames.filter(n => allFields.includes(n));
+        this.fieldsNotAdded = allFields.filter(n => !this.fieldNames.includes(n));
     }
 
     public drop(event: CdkDragDrop<string[]>) {

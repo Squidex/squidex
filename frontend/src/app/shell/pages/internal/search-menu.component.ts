@@ -53,7 +53,7 @@ export class SearchMenuComponent {
 
     public selectResult(result: SearchResultDto) {
         if (Types.is(result, SearchResultDto)) {
-            const relativeUrl = result.url.substr(this.apiUrl.value.length);
+            const relativeUrl = result.url.substring(this.apiUrl.value.length);
 
             this.router.navigateByUrl(relativeUrl);
 

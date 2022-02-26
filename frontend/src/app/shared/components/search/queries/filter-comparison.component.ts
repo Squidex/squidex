@@ -77,7 +77,7 @@ export class FilterComparisonComponent implements OnChanges {
 
         this.operators = this.model.operators[this.field?.schema.type!] || [];
 
-        if (this.operators.indexOf(this.filter.op) < 0) {
+        if (!this.operators.includes(this.filter.op)) {
             this.filter.op = this.operators[0];
         }
 

@@ -131,7 +131,7 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
             content.referenceFields
                 .map(f => getContentValue(content, this.language, f, false))
                 .map(v => v.formatted)
-                .filter(v => !!v)
+                .defined()
                 .join(', ')
             || this.localizer.getOrKey('common.noValue');
 

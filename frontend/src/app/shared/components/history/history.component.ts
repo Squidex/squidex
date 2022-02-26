@@ -41,12 +41,8 @@ export class HistoryComponent {
         if (channel) {
             const params = allParams(this.route);
 
-            for (const key in params) {
-                if (params.hasOwnProperty(key)) {
-                    const value = params[key];
-
-                    channel = channel.replace(`{${key}}`, value);
-                }
+            for (const [key, value] of Object.entries(params)) {
+                channel = channel.replace(`{${key}}`, value);
             }
         }
 

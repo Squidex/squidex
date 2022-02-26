@@ -51,7 +51,7 @@ export class AssetDto {
         const index = this.fileName.lastIndexOf('.');
 
         if (index > 0) {
-            return this.fileName.substr(0, index);
+            return this.fileName.substring(0, index);
         } else {
             return this.fileName;
         }

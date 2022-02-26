@@ -30,13 +30,9 @@ export class Model<T> {
 
         const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 
-        for (const key in values) {
-            if (values.hasOwnProperty(key)) {
-                const value = values[key];
-
-                if (value || !validOnly) {
-                    clone[key] = value;
-                }
+        for (const [key, value] of Object.entries(values)) {
+            if (value || !validOnly) {
+                clone[key] = value;
             }
         }
 

@@ -88,11 +88,9 @@ export module Types {
         }
 
         if (Types.isObject(value)) {
-            for (const key in value) {
-                if (value.hasOwnProperty(key)) {
-                    if (!isEmpty(value[key])) {
-                        return false;
-                    }
+            for (const item of Object.values(value)) {
+                if (!isEmpty(item)) {
+                    return false;
                 }
             }
 
@@ -116,8 +114,6 @@ export module Types {
     }
 
     export function clone<T>(lhs: T): T {
-        const any: any = lhs;
-
         if (Types.isArray(lhs)) {
             const result = [];
 
@@ -129,10 +125,8 @@ export module Types {
         } else if (Types.isObject(lhs)) {
             const result = {};
 
-            for (const key in any) {
-                if (any.hasOwnProperty(key)) {
-                    result[key] = clone(lhs[key]);
-                }
+            for (const [key, value] of Object.entries(lhs)) {
+                result[key] = clone(value);
             }
 
             return result as any;

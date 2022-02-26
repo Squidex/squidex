@@ -157,7 +157,7 @@ export class SchemasState extends State<Snapshot> {
         return this.schemasService.deleteSchema(this.appName, schema, schema.version).pipe(
             tap(() => {
                 this.next(s => {
-                    const schemas = s.schemas.filter(x => x.id !== schema.id);
+                    const schemas = s.schemas.removedBy('id', schema);
 
                     const selectedSchema =
                         s.selectedSchema?.id !== schema.id ?
@@ -462,7 +462,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         const lastSeparatorIndex = name.lastIndexOf(NESTED_CATEGORY_SEPARATOR);
 
         if (lastSeparatorIndex >= 0) {
-            displayName = displayName.substr(lastSeparatorIndex + 1);
+            displayName = displayName.substring(lastSeparatorIndex + 1);
         }
 
         category = {
@@ -479,7 +479,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
 
         if (lastSeparatorIndex >= 0) {
             // Recurse back creating all the parents of this category
-            const parentName = name.substr(0, lastSeparatorIndex);
+            const parentName = name.substring(0, lastSeparatorIndex);
             const parentCategory = getOrCreateCategory(parentName);
 
             parentCategory.categories.push(category);

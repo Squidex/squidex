@@ -69,10 +69,10 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         this.projectFrom(this.tagsUnsorted, getSortedTags);
 
     public tagsNames =
-        this.projectFrom(this.tagsUnsorted, x => Object.keys(x));
+        this.projectFrom(this.tagsUnsorted, getTagNames);
 
     public selectedTagNames =
-        this.projectFrom(this.tagsSelected, x => Object.keys(x));
+        this.projectFrom(this.tagsSelected, getTagNames);
 
     public assets =
         this.project(x => x.assets);
@@ -422,6 +422,10 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     private get appName() {
         return this.appsState.appName;
     }
+}
+
+function getTagNames(tags: object): ReadonlyArray<string> {
+    return Object.keys(tags);
 }
 
 function isReferrerError(error?: ErrorDto) {

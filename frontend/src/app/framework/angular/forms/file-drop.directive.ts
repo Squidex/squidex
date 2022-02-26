@@ -193,7 +193,7 @@ export class FileDropDirective {
     }
 
     private isAllowed(file: { type: string }) {
-        return !this.allowedFiles || this.allowedFiles.indexOf(file.type) >= 0;
+        return !this.allowedFiles || this.allowedFiles.includes(file.type);
     }
 
     private isImage(file: { type: string }) {

@@ -18,13 +18,13 @@
 
 <ng-container *ngIf="syncedHeader">
     <div class="list-header synced" [class.loading-indicator]="isLoading" #headerElement>
-        <div class="sync-inner inner" #header>
+        <div class="sync-inner inner" [class.tabled2]="tableNoPadding" #header>
             <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
         </div>
     </div>
     
     <div class="list-content synced" [class.loading-indicator]="isLoading" [sqxSyncScrolling]="header">
-        <div class="inner" [class.tabled]="table">
+        <div class="inner" [class.tabled]="table" [class.tabled2]="tableNoPadding">
             <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
         </div>
     </div>

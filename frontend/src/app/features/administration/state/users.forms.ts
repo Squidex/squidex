@@ -50,7 +50,7 @@ export class UserForm extends Form<ExtendedFormGroup, UpdateUserDto, UserDto> {
     }
 
     protected transformSubmit(value: any) {
-        const permissions = value['permissions'].split('\n').filter((x: any) => !!x);
+        const permissions = value['permissions'].split('\n').defined();
 
         return { ...value, permissions };
     }

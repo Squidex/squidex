@@ -92,7 +92,7 @@ class ComponentRules implements ComponentRules {
             return EMPTY_RULES;
         }
 
-        const pathField = form.fieldPath.substr(this.parentPath.length + 1);
+        const pathField = form.fieldPath.substring(this.parentPath.length + 1);
         const pathSimplified = pathField.replace('.iv.', '.');
 
         return rules.filter(x => x.field === pathField || x.field === pathSimplified);

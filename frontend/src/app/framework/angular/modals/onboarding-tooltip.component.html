@@ -1,8 +1,10 @@
 <ng-container *sqxModal="tooltipModal">
     <div class="onboarding-rect" 
         [sqxAnchoredTo]="for" 
-        [offsetX]="4" 
-        [offsetY]="4" 
+        [offsetX]="-4" 
+        [offsetY]="-4"
+        [spaceX]="4"
+        [spaceY]="4"
         [adjustWidth]="true"
         [adjustHeight]="true"
         anchorX="left-to-left"
@@ -10,8 +12,10 @@
 
     <div class="onboarding-help" 
         [sqxAnchoredTo]="for" 
-        [offsetX]="4" 
-        [offsetY]="4"
+        [offsetX]="-4" 
+        [offsetY]="-4"
+        [spaceX]="4"
+        [spaceY]="4"
         [position]="position" @fade>
         <small class="onboarding-text">
             <ng-content></ng-content>

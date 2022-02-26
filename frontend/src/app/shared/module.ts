@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 import { MentionModule } from 'angular-mentions';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { SqxFrameworkModule } from '@app/framework';
-import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetFolderDropdownItemComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetScriptsState, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentListCellDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthPipe, ContentMustExistGuard, ContentsColumnsPipe, ContentSelectorComponent, ContentSelectorItemComponent, ContentsService, ContentsState, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, FilterOperatorPipe, GeolocationEditorComponent, GraphQlService, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, LoadSchemasGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, ReferenceInputComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, TableHeaderComponent, TranslationsService, UIService, UIState, UnsetAppGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WatchingUsersComponent, WorkflowsService, WorkflowsState } from './declarations';
+import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, AppsState, AssetComponent, AssetDialogComponent, AssetFolderComponent, AssetFolderDialogComponent, AssetFolderDropdownComponent, AssetFolderDropdownItemComponent, AssetHistoryComponent, AssetPathComponent, AssetPreviewUrlPipe, AssetScriptsState, AssetsListComponent, AssetsSelectorComponent, AssetsService, AssetsState, AssetTextEditorComponent, AssetUploaderComponent, AssetUploaderState, AssetUrlPipe, AuthInterceptor, AuthService, AutoSaveService, BackupsService, BackupsState, ClientsService, ClientsState, CommentComponent, CommentsComponent, CommentsService, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentListHeaderComponent, ContentListWidthDirective, ContentMustExistGuard, ContentsColumnsPipe, ContentSelectorComponent, ContentSelectorItemComponent, ContentsService, ContentsState, ContentStatusComponent, ContentValueComponent, ContentValueEditorComponent, ContributorsService, ContributorsState, FileIconPipe, FilterComparisonComponent, FilterLogicalComponent, FilterNodeComponent, FilterOperatorPipe, GeolocationEditorComponent, GraphQlService, HelpComponent, HelpMarkdownPipe, HelpService, HistoryComponent, HistoryListComponent, HistoryMessagePipe, HistoryService, ImageCropperComponent, ImageFocusPointComponent, LanguagesService, LanguagesState, LoadAppsGuard, LoadLanguagesGuard, LoadSchemasGuard, MarkdownEditorComponent, MustBeAuthenticatedGuard, MustBeNotAuthenticatedGuard, NewsService, NotifoComponent, PlansService, PlansState, PreviewableType, QueryComponent, QueryListComponent, QueryPathComponent, ReferenceInputComponent, RichEditorComponent, RolesService, RolesState, RuleEventsState, RuleMustExistGuard, RuleSimulatorState, RulesService, RulesState, SavedQueriesComponent, SchemaCategoryComponent, SchemaMustExistGuard, SchemaMustExistPublishedGuard, SchemaMustNotBeSingletonGuard, SchemasService, SchemasState, SchemaTagSource, SearchFormComponent, SearchService, SortingComponent, StockPhotoService, TableHeaderComponent, TranslationsService, UIService, UIState, UnsetAppGuard, UsagesService, UserDtoPicture, UserIdPicturePipe, UserNamePipe, UserNameRefPipe, UserPicturePipe, UserPictureRefPipe, UsersProviderService, UsersService, WatchingUsersComponent, WorkflowsService, WorkflowsState } from './declarations';
 
 @NgModule({
     imports: [
@@ -41,9 +41,10 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         CommentComponent,
         CommentsComponent,
         ContentListCellDirective,
+        ContentListCellResizeDirective,
         ContentListFieldComponent,
         ContentListHeaderComponent,
-        ContentListWidthPipe,
+        ContentListWidthDirective,
         ContentsColumnsPipe,
         ContentSelectorComponent,
         ContentSelectorItemComponent,
@@ -100,9 +101,10 @@ import { AppFormComponent, AppLanguagesService, AppMustExistGuard, AppsService, 
         CommentComponent,
         CommentsComponent,
         ContentListCellDirective,
+        ContentListCellResizeDirective,
         ContentListFieldComponent,
         ContentListHeaderComponent,
-        ContentListWidthPipe,
+        ContentListWidthDirective,
         ContentsColumnsPipe,
         ContentSelectorComponent,
         ContentSelectorItemComponent,

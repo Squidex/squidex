@@ -14,9 +14,13 @@ interface ReadonlyArray<T> {
 
     removed(value?: T): ReadonlyArray<T>;
 
+    defined(): ReadonlyArray<NonNullable<T>>;
+
     sorted(): ReadonlyArray<T>;
 
     sortedByString(selector: (value: T) => string): ReadonlyArray<T>;
+
+    includes(value: T): boolean;
 
     toMap(selector: (value: T) => string): { [key: string]: T };
 }
@@ -32,15 +36,19 @@ interface Array<T> {
 
     removeBy(field: keyof T, value: T): Array<T>;
 
-    removed(value: T): ReadonlyArray<T>;
+    removed(value: T): Array<T>;
 
     remove(value: T): Array<T>;
+
+    defined(): ReadonlyArray<NonNullable<T>>;
 
     sorted(): ReadonlyArray<T>;
 
     sortedByString(selector: (value: T) => string): ReadonlyArray<T>;
 
     sortByString(selector: (value: T) => string): Array<T>;
+
+    includes(value: T): boolean;
 
     toMap(selector: (value: T) => string): { [key: string]: T };
 }
@@ -148,6 +156,18 @@ Array.prototype.sorted = function() {
 
     return copy;
 };
+
+Array.prototype.defined = function() {
+    const self: any[] = this;
+
+    return self.filter(x => !!x);
+}
+
+Array.prototype.includes = function<T>(value: T) {
+    const self: any[] = this;
+
+    return self.indexOf(value) >= 0;
+}
 
 Array.prototype.sortedByString = function<T>(selector: (value: T) => string) {
     const self: ReadonlyArray<any> = this;

@@ -23,8 +23,12 @@
     padding: 0 $panel-padding;
 
     &.tabled {
-        padding-bottom: .5rem !important;
+        padding-bottom: .25rem !important;
         padding-top: .5rem !important;
+    }
+
+    &.tabled2 {
+        padding: 0 !important;
     }
 }
 
@@ -62,6 +66,10 @@
         flex-shrink: 0;
         overflow-x: hidden;
         overflow-y: hidden;
+
+        &.tabled2 {
+            background-color: $color-white;
+        }
 
         .sync-inner {
             display: table-cell;

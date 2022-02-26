@@ -44,6 +44,9 @@ export class ListViewComponent extends StatefulComponent<State> implements After
     public table?: boolean | null;
 
     @Input()
+    public tableNoPadding?: boolean | null;
+
+    @Input()
     public isLoaded: boolean | undefined | null = true;
 
     @Input()

@@ -69,7 +69,7 @@ export class FileIconPipe implements PipeTransform {
         if (mimeParts.length === 2 && mimeParts[0].toLowerCase() === 'video') {
             mimeIcon = 'video';
         } else {
-            mimeIcon = KNOWN_TYPES.indexOf(asset.fileType) >= 0 ? asset.fileType : 'generic';
+            mimeIcon = KNOWN_TYPES.includes(asset.fileType) ? asset.fileType : 'generic';
         }
 
         return `./images/asset_${mimeIcon}.svg`;
@@ -82,7 +82,7 @@ export class FileIconPipe implements PipeTransform {
 })
 export class PreviewableType implements PipeTransform {
     public transform(asset: { fileSize: number; fileType: string }): boolean {
-        return PREVIEW_TYPES.indexOf(asset.fileType) >= 0 && asset.fileSize < 25_000_000;
+        return PREVIEW_TYPES.includes(asset.fileType) && asset.fileSize < 25_000_000;
     }
 }
 

@@ -71,7 +71,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
                 this.contentsResolver.resolveMany(contentIds)
                     .subscribe({
                         next: ({ items }) => {
-                            this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).filter(r => !!r));
+                            this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
 
                             if (this.snapshot.contentItems.length !== contentIds.length) {
                                 this.updateValue();
@@ -104,7 +104,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
 
     public remove(content: ContentDto) {
         if (content && !this.snapshot.isDisabled) {
-            this.setContentItems(this.snapshot.contentItems.filter(x => x.id !== content.id));
+            this.setContentItems(this.snapshot.contentItems.removedBy('id', content));
 
             this.updateValue();
         }

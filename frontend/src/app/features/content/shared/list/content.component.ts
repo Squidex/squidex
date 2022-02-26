@@ -6,12 +6,12 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, RootFieldDto, TableField, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentListFieldComponent, ContentsState, ModalModel, PatchContentForm, RootFieldDto, TableField, TableSettings, Types } from '@app/shared';
 
 /* tslint:disable: component-selector */
 
 @Component({
-    selector: '[sqxContent][language][listFields]',
+    selector: '[sqxContent][language][tableFields][tableSettings]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,7 +36,10 @@ export class ContentComponent implements OnChanges {
     public language!: AppLanguageDto;
 
     @Input()
-    public listFields!: ReadonlyArray<TableField>;
+    public tableFields!: ReadonlyArray<TableField>;
+
+    @Input()
+    public tableSettings!: TableSettings;
 
     @Input()
     public cloneable?: boolean | null;
@@ -71,7 +74,7 @@ export class ContentComponent implements OnChanges {
         }
 
         if (this.patchAllowed && (changes['listFields'] || changes['language'])) {
-            this.patchForm = new PatchContentForm(this.listFields, this.language);
+            this.patchForm = new PatchContentForm(this.tableFields, this.language);
         }
     }
 

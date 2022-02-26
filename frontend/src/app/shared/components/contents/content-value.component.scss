@@ -1,8 +1,28 @@
 @import 'mixins';
 @import 'vars';
 
+/* stylelint-disable */
+
 .html-value {
     position: relative;
+}
+
+:host {
+    display: block;
+
+    .btn {
+        @include absolute(.5rem, .25rem);
+        background-color: $color-white;
+        border: 1px solid $color-border;
+        border-radius: $border-radius;
+        display: none;
+    }
+
+    &:hover {
+        .btn {
+            display: block;
+        }
+    }
 }
 
 :host ::ng-deep {
@@ -14,11 +34,21 @@
         top: 50%;
     }
 
-    span {
-        @include truncate;
-    }
-
     img + span {
         padding-left: 60px;
     }
+
+    .html-value {
+        span {
+            @include truncate;
+        }
+    }
+}
+
+.value-container {
+    max-height: 10rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    word-wrap: break-word;
 }

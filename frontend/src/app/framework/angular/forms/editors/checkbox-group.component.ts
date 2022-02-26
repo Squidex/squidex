@@ -163,7 +163,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
         let checkedValues: TagValue[] = [];
 
         if (Types.isArray(obj) && obj.length > 0) {
-            checkedValues = this.valuesSorted.filter(x => obj.indexOf(x.value) >= 0);
+            checkedValues = this.valuesSorted.filter(x => obj.includes(x.value));
         }
 
         this.next({ checkedValues });
@@ -184,7 +184,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     }
 
     public isChecked(value: TagValue) {
-        return this.snapshot.checkedValues.indexOf(value) >= 0;
+        return this.snapshot.checkedValues.includes(value);
     }
 
     public trackByValue(_index: number, tag: TagValue) {

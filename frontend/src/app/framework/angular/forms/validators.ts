@@ -143,7 +143,7 @@ export module ValidatorsEx {
         return (control: AbstractControl) => {
             const value: T = control.value;
 
-            if (allowed.indexOf(value) < 0) {
+            if (!allowed.includes(value)) {
                 return { validvalues: false };
             }
 

@@ -48,7 +48,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     }
 
     private update() {
-        if (this.languages && this.languages.length > 0 && (!this.language || this.languages.indexOf(this.language) < 0)) {
+        if (this.languages?.length > 0 && (!this.language || !this.languages.includes(this.language))) {
             const selectedLanguage =
                 this.languages.find(l => l.isMasterLanguage) ||
                 this.languages[0];

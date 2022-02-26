@@ -286,24 +286,18 @@ function parseWorkflows(response: any) {
 function parseWorkflow(workflow: any) {
     const { id, name, initial, schemaIds, _links } = workflow;
 
-    const steps: WorkflowStep[] = [];
-    const transitions: WorkflowTransition[] = [];
+    const resultSteps: WorkflowStep[] = [];
+    const resultTransitions: WorkflowTransition[] = [];
 
-    for (const stepName in workflow.steps) {
-        if (workflow.steps.hasOwnProperty(stepName)) {
-            const { transitions: srcTransitions, ...step } = workflow.steps[stepName];
+    for (const [stepName, stepValue] of Object.entries(workflow.steps)) {
+        const { transitions, ...step } = stepValue as any;
 
-            steps.push({ name: stepName, isLocked: stepName === 'Published', ...step });
+        resultSteps.push({ name: stepName, isLocked: stepName === 'Published', ...step });
 
-            for (const to in srcTransitions) {
-                if (srcTransitions.hasOwnProperty(to)) {
-                    const transition = srcTransitions[to];
-
-                    transitions.push({ from: stepName, to, ...transition });
-                }
-            }
+        for (const [to, transition] of Object.entries(transitions)) {
+            resultTransitions.push({ from: stepName, to, ...transition as any });
         }
     }
 
-    return new WorkflowDto(_links, id, name, initial, schemaIds, steps, transitions);
+    return new WorkflowDto(_links, id, name, initial, schemaIds, resultSteps, resultTransitions);
 }

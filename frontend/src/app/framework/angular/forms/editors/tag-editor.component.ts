@@ -109,7 +109,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
         if (this.addInput.value) {
             const query = this.addInput.value;
 
-            const items = this.suggestionsSorted.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
+            const items = this.suggestionsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.items.find(x => x.id === s.id));
 
             this.next({
                 suggestedIndex: -1,
@@ -169,7 +169,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
                         if (!query) {
                             return [];
                         } else if (Types.isArray(this.suggestionsSorted)) {
-                            return this.suggestionsSorted.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
+                            return this.suggestionsSorted.filter(s => s.lowerCaseName.includes(query) && !this.snapshot.items.find(x => x.id === s.id));
                         } else {
                             return [];
                         }
