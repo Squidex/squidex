@@ -788,7 +788,7 @@
   "schemas.export.synchronize": "Synchronize",
   "schemas.field.allowedValues": "Allowed Values",
   "schemas.field.createEnum": "Generate GraphQL Enum.",
-  "schemas.field.createEnumHint": "Check this checkbox to create a GraphQL enumeration for this field.",
+  "schemas.field.createEnumHint": "Generate a GraphQL enumeration for this field. The input format is not compatible with a string anymore and can be a breaking change for your client.",
   "schemas.field.defaultValue": "Default Value",
   "schemas.field.defaultValues": "Default Values",
   "schemas.field.defaultValuesHint": "Set the default value per language and override the default value property, if defined. Only use it if really needed.",
