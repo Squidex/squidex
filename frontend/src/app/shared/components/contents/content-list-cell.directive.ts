@@ -184,7 +184,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     private mouseUp?: Function;
     private mouseDown?: Function;
     private mouseBlur?: Function;
-    private documentBlur?: Function;
+    private windowBlur?: Function;
     private startOffset = 0;
     private startWidth = 0;
     private fieldName?: string;
@@ -239,7 +239,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
 
         this.mouseMove = this.renderer.listen('document', 'mousemove', this.onMouseMove);
         this.mouseUp = this.renderer.listen('document', 'mouseup', this.onMouseUp);
-        this.documentBlur = this.renderer.listen('document', 'blur', this.onBlur);
+        this.windowBlur = this.renderer.listen('window', 'blur', this.onBlur);
 
         this.startOffset = event.pageX;
         this.startWidth = this.element.nativeElement.offsetWidth;
@@ -288,7 +288,7 @@ export class ContentListCellResizeDirective implements OnInit, OnDestroy {
         this.mouseMove = undefined;
         this.mouseUp?.();
         this.mouseUp = undefined;
-        this.documentBlur?.();
-        this.documentBlur = undefined;
+        this.windowBlur?.();
+        this.windowBlur = undefined;
     }
 }
