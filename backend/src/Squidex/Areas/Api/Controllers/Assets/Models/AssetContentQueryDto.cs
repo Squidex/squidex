@@ -91,7 +91,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// True to force a new resize even if it already stored.
         /// </summary>
         [FromQuery(Name = "format")]
-        public ImageFormat Format { get; set; }
+        public ImageFormat? Format { get; set; }
 
         public ResizeOptions ToResizeOptions(IAssetEntity asset)
         {
