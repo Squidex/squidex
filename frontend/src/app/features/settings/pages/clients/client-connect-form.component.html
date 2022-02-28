@@ -112,7 +112,7 @@
                     <h5><span class="badge rounded-pill badge-dark">3</span> {{ 'clients.connectWizard.cliStep3' | sqxTranslate }}</h5>
 
                     <p>                 
-                        <sqx-code>sq config add {{appName}} {{appName}}:{{client.id}} {{client.secret}} -u {{apiUrl.value}}</sqx-code>
+                        <sqx-code>sq config add {{appName}} {{appName}}:{{client.id}} {{client.secret}} -u {{apiUrl.value}} --use</sqx-code>
                         
                         <sqx-form-hint>
                             {{ 'clients.connectWizard.cliStep3Hint' | sqxTranslate }}
