@@ -47,8 +47,9 @@ export class CompensateScrollbarDirective extends ResourceOwner implements Resiz
 
         const element = this.element.nativeElement;
 
-        const scrollWidth = element.clientWidth;
-        const scollbarWidth = element.offsetWidth - scrollWidth;
+        const clientWidth = element.clientWidth;
+        const scrollWidth = element.scrollWidth;
+        const scollbarWidth = clientWidth === scrollWidth ? element.offsetWidth - clientWidth : 0;
 
         if (this.previousScrollbarWidth == scollbarWidth) {
             return;
