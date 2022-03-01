@@ -94,6 +94,17 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 
         public FilterSchema? Visit(IField<StringFieldProperties> field, Args args)
         {
+            if (field.Properties.AllowedValues?.Count > 0)
+            {
+                return new FilterSchema(FilterSchemaType.String)
+                {
+                    Extra = new
+                    {
+                        options = field.Properties.AllowedValues
+                    }
+                };
+            }
+
             return FilterSchema.String;
         }
 

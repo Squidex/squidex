@@ -26,6 +26,7 @@ export type FilterFieldUI =
     'Reference' |
     'None' |
     'Number' |
+    'Select' |
     'String' |
     'Status' |
     'Unsupported' |
@@ -52,6 +53,8 @@ export function getFilterUI(comparison: FilterComparison, field: FilterableField
         return 'Status';
     } else if (type === 'String' && extra?.editor === 'User') {
         return 'User';
+    } else if (type === 'String' && extra?.options) {
+        return 'Select';
     } else if (type === 'String') {
         return 'String';
     } else if (type === 'StringArray' && extra?.schemaIds) {

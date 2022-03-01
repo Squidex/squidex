@@ -39,6 +39,23 @@
                 [ngModel]="filter.value"
                 (ngModelChange)="changeValue($event)" />
         </ng-container>
+        <ng-container *ngSwitchCase="'Reference'">
+            <sqx-reference-input [schemaIds]="field.schema.extra?.schemaIds"
+                mode="Single"
+                [ngModel]="filter.value"
+                (ngModelChange)="changeValue($event)"
+                [language]="language"
+                [languages]="languages">
+            </sqx-reference-input>
+        </ng-container>
+        <ng-container *ngSwitchCase="'Select'">
+            <select class="form-select"
+                [ngModel]="filter.value"
+                (ngModelChange)="changeValue($event)">
+                <option [ngValue]="null"></option>
+                <option *ngFor="let value of field.schema.extra?.options" [ngValue]="value">{{value}}</option>
+            </select>
+        </ng-container>
         <ng-container *ngSwitchCase="'Status'">
             <sqx-dropdown 
                 valueProperty="status"
@@ -50,6 +67,11 @@
                     <i class="icon-circle" [style.color]="status.color"></i> {{status.status}}
                 </ng-template>
             </sqx-dropdown>
+        </ng-container>
+        <ng-container *ngSwitchCase="'String'">
+            <input type="text" class="form-control" *ngIf="!field.schema.extra"
+                [ngModel]="filter.value"
+                (ngModelChange)="changeValue($event)" />
         </ng-container>
         <ng-container *ngSwitchCase="'User'">
             <ng-container *ngIf="contributorsState.isLoaded | async; else noPermission">
@@ -72,24 +94,10 @@
                 </sqx-dropdown>
             </ng-container>
             <ng-template #noPermission>
-                <input type="text" class="form-control" *ngIf="!field.schema.extra"
+                <input type="text" class="form-control"
                     [ngModel]="filter.value"
                     (ngModelChange)="changeValue($event)" />
             </ng-template>
-        </ng-container>
-        <ng-container *ngSwitchCase="'String'">
-            <input type="text" class="form-control" *ngIf="!field.schema.extra"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)" />
-        </ng-container>
-        <ng-container *ngSwitchCase="'Reference'">
-            <sqx-reference-input [schemaIds]="field.schema.extra?.schemaIds"
-                mode="Single"
-                [ngModel]="filter.value"
-                (ngModelChange)="changeValue($event)"
-                [language]="language"
-                [languages]="languages">
-            </sqx-reference-input>
         </ng-container>
         <ng-container *ngSwitchCase="'Unsupported'">
             {{ 'common.notSupported' | sqxTranslate }}
