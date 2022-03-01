@@ -273,10 +273,8 @@ export class WorkflowsService {
     }
 }
 
-function parseWorkflows(response: any) {
-    const raw: any[] = response.items;
-
-    const items = raw.map(parseWorkflow);
+function parseWorkflows(response: { items: any[]; errors: string[] } & Resource) {
+    const items = response.items.map(parseWorkflow);
 
     const { errors, _links } = response;
 

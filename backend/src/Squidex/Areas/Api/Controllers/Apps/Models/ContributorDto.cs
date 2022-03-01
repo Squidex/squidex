@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string? Role { get; set; }
 
-        public static ContributorDto FromIdAndRole(string id, string role)
+        public static ContributorDto FromDomain(string id, string role)
         {
             var result = new ContributorDto { ContributorId = id, Role = role };
 

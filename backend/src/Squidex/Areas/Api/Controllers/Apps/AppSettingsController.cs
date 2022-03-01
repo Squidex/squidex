@@ -82,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private AppSettingsDto GetResponse(IAppEntity result)
         {
-            return AppSettingsDto.FromApp(result, Resources);
+            return AppSettingsDto.FromDomain(result, Resources);
         }
     }
 }

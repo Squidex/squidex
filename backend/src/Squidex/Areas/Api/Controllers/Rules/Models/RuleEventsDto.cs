@@ -25,12 +25,12 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public long Total { get; set; }
 
-        public static RuleEventsDto FromRuleEvents(IResultList<IRuleEventEntity> ruleEvents, Resources resources, DomainId? ruleId)
+        public static RuleEventsDto FromDomain(IResultList<IRuleEventEntity> ruleEvents, Resources resources, DomainId? ruleId)
         {
             var result = new RuleEventsDto
             {
                 Total = ruleEvents.Total,
-                Items = ruleEvents.Select(x => RuleEventDto.FromRuleEvent(x, resources)).ToArray()
+                Items = ruleEvents.Select(x => RuleEventDto.FromDomain(x, resources)).ToArray()
             };
 
             return result.CreateLinks(resources, ruleId);

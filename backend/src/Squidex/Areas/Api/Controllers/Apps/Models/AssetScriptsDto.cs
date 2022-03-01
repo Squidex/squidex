@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetScriptsDto FromApp(IAppEntity app, Resources resources)
+        public static AssetScriptsDto FromDomain(IAppEntity app, Resources resources)
         {
             var result = SimpleMapper.Map(app.AssetScripts, new AssetScriptsDto());
 

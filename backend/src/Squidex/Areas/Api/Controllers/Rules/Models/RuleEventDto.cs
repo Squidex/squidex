@@ -64,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public RuleJobResult JobResult { get; set; }
 
-        public static RuleEventDto FromRuleEvent(IRuleEventEntity ruleEvent, Resources resources)
+        public static RuleEventDto FromDomain(IRuleEventEntity ruleEvent, Resources resources)
         {
             var result = new RuleEventDto();
 

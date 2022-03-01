@@ -83,7 +83,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
 
             var response = Deferred.Response(() =>
             {
-                return CommentsDto.FromResult(result);
+                return CommentsDto.FromDomain(result);
             });
 
             Response.Headers[HeaderNames.ETag] = result.Version.ToString(CultureInfo.InvariantCulture);
@@ -113,7 +113,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
 
             await CommandBus.PublishAsync(command);
 
-            var response = CommentDto.FromCommand(command);
+            var response = CommentDto.FromDomain(command);
 
             return CreatedAtAction(nameof(GetComments), new { app, commentsId }, response);
         }

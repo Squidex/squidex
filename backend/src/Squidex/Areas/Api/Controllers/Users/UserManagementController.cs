@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var users = await userService.QueryAsync(query, take, skip, HttpContext.RequestAborted);
 
-            var response = UsersDto.FromResults(users, users.Total, Resources);
+            var response = UsersDto.FromDomain(users, users.Total, Resources);
 
             return Ok(response);
         }
@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 return NotFound();
             }
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var user = await userService.CreateAsync(request.Email, request.ToValues(), ct: HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var user = await userService.UpdateAsync(id, request.ToValues(), ct: HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             var user = await userService.LockAsync(id, HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -115,7 +115,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             var user = await userService.UnlockAsync(id, HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }

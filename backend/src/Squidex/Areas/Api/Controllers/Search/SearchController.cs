@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Search
         {
             var result = await searchManager.SearchAsync(query, Context, HttpContext.RequestAborted);
 
-            var response = result.Select(SearchResultDto.FromSearchResult).ToArray();
+            var response = result.Select(SearchResultDto.FromDomain).ToArray();
 
             return Ok(response);
         }

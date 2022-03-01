@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [LocalizedRequired]
         public RuleElementPropertyDto[] Properties { get; set; }
 
-        public static RuleElementDto FromDefinition(RuleActionDefinition definition)
+        public static RuleElementDto FromDomain(RuleActionDefinition definition)
         {
             var result = SimpleMapper.Map(definition, new RuleElementDto());
 

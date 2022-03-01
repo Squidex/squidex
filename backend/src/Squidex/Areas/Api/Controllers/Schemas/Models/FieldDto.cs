@@ -59,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public List<NestedFieldDto>? Nested { get; set; }
 
-        public static NestedFieldDto FromField(NestedField field)
+        public static NestedFieldDto FromDomain(NestedField field)
         {
             var properties = FieldPropertiesDtoFactory.Create(field.RawProperties);
 
@@ -74,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             return result;
         }
 
-        public static FieldDto FromField(RootField field)
+        public static FieldDto FromDomain(RootField field)
         {
             var properties = FieldPropertiesDtoFactory.Create(field.RawProperties);
 
@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
                 foreach (var nestedField in arrayField.Fields)
                 {
-                    result.Nested.Add(FromField(nestedField));
+                    result.Nested.Add(FromDomain(nestedField));
                 }
             }
 

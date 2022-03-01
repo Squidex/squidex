@@ -31,20 +31,18 @@ namespace Squidex.Areas.Api.Controllers.Search.Models
         /// </summary>
         public string? Label { get; set; }
 
-        public static SearchResultDto FromSearchResult(SearchResult searchResult)
+        public static SearchResultDto FromDomain(SearchResult searchResult)
         {
-            var result = new SearchResultDto();
+            var result = SimpleMapper.Map(searchResult, new SearchResultDto());
 
-            SimpleMapper.Map(searchResult, result);
-
-            result.CreateLinks(searchResult);
-
-            return result;
+            return result.CreateLinks(searchResult);
         }
 
-        protected virtual void CreateLinks(SearchResult searchResult)
+        protected SearchResultDto CreateLinks(SearchResult searchResult)
         {
             AddGetLink("url", searchResult.Url);
+
+            return this;
         }
     }
 }

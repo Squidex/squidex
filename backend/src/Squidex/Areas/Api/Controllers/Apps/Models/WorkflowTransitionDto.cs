@@ -21,9 +21,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string[]? Roles { get; set; }
 
-        public static WorkflowTransitionDto FromWorkflowTransition(WorkflowTransition transition)
+        public static WorkflowTransitionDto FromDomain(WorkflowTransition transition)
         {
-            return new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
+            var result = new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
+
+            return result;
         }
 
         public WorkflowTransition ToWorkflowTransition()

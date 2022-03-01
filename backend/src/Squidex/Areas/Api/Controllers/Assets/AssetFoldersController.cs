@@ -59,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetFoldersDto.FromAssets(folders, path, Resources);
+                return AssetFoldersDto.FromDomain(folders, path, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = folders.ToEtag();
@@ -168,7 +168,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            return AssetFolderDto.FromAssetFolder(context.Result<IAssetFolderEntity>(), Resources);
+            return AssetFolderDto.FromDomain(context.Result<IAssetFolderEntity>(), Resources);
         }
 
         private Task<IReadOnlyList<IAssetFolderEntity>> GetAssetPathAsync(DomainId parentId, AssetFolderScope scope)

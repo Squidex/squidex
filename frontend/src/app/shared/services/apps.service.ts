@@ -313,7 +313,7 @@ export class AppsService {
     }
 }
 
-function parseApp(response: any) {
+function parseApp(response: any & Resource) {
     return new AppDto(response._links,
         response.id,
         DateTime.parseISO(response.created), response.createdBy,
@@ -329,7 +329,7 @@ function parseApp(response: any) {
         response.roleProperties);
 }
 
-function parseAppSettings(response: any) {
+function parseAppSettings(response: any & Resource) {
     return new AppSettingsDto(response._links,
         response.hideScheduler,
         response.patterns.map((x: any) => {

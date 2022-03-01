@@ -32,7 +32,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static PatternDto FromPattern(Pattern pattern)
         {
-            return SimpleMapper.Map(pattern, new PatternDto());
+            var result = SimpleMapper.Map(pattern, new PatternDto());
+
+            return result;
         }
 
         public Pattern ToPattern()

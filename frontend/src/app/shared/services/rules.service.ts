@@ -236,9 +236,7 @@ export class RulesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const actions = parseActions(body);
-
-                return actions;
+                return parseActions(body);
             }),
             pretifyError('i18n:rules.loadFailed'));
     }
@@ -246,11 +244,9 @@ export class RulesService {
     public getRules(appName: string): Observable<RulesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return this.http.get<{ items: [] } & Resource & { runningRuleId?: string }>(url).pipe(
-            map(({ items, _links, runningRuleId }) => {
-                const rules = items.map(parseRule);
-
-                return new RulesDto(rules, _links, runningRuleId);
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseRules(body);
             }),
             pretifyError('i18n:rules.loadFailed'));
     }
@@ -344,11 +340,9 @@ export class RulesService {
     public getEvents(appName: string, take: number, skip: number, ruleId?: string): Observable<RuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}&ruleId=${ruleId || ''}`);
 
-        return this.http.get<{ items: any[]; total: number } & Resource>(url).pipe(
-            map(({ items, total, _links }) => {
-                const ruleEvents = items.map(parseRuleEvent);
-
-                return new RuleEventsDto(total, ruleEvents, _links);
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseEvents(body);
             }),
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
@@ -356,11 +350,9 @@ export class RulesService {
     public getSimulatedEvents(appName: string, ruleId: string): Observable<SimulatedRuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${ruleId}/simulate`);
 
-        return this.http.get<{ items: any[]; total: number } & Resource>(url).pipe(
-            map(({ items, total, _links }) => {
-                const simulatedRuleEvents = items.map(parseSimulatedRuleEvent);
-
-                return new SimulatedRuleEventsDto(total, simulatedRuleEvents, _links);
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseSimulatedEvents(body);
             }),
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
@@ -388,6 +380,24 @@ export class RulesService {
             }),
             pretifyError('i18n:rules.ruleEvents.cancelFailed'));
     }
+}
+
+function parseSimulatedEvents(response: { items: any[]; total: number } & Resource) {
+    const simulatedRuleEvents = response.items.map(parseSimulatedRuleEvent);
+
+    return new SimulatedRuleEventsDto(response.total, simulatedRuleEvents, response._links);
+}
+
+function parseEvents(response: { items: any[]; total: number } & Resource) {
+    const ruleEvents = response.items.map(parseRuleEvent);
+
+    return new RuleEventsDto(response.total, ruleEvents, response._links);
+}
+
+function parseRules(response: { items: any[]; runningRuleId?: string } & Resource) {
+    const rules = response.items.map(parseRule);
+
+    return new RulesDto(rules, response._links, response.runningRuleId);
 }
 
 function parseActions(response: any) {

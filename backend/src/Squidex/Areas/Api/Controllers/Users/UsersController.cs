@@ -67,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission]
         public IActionResult GetUserResources()
         {
-            var response = ResourcesDto.FromResources(Resources);
+            var response = ResourcesDto.FromDomain(Resources);
 
             return Ok(response);
         }
@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             {
                 var users = await userResolver.QueryByEmailAsync(query, HttpContext.RequestAborted);
 
-                var response = users.Select(x => UserDto.FromUser(x, Resources)).ToArray();
+                var response = users.Select(x => UserDto.FromDomain(x, Resources)).ToArray();
 
                 return Ok(response);
             }
@@ -124,7 +124,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                 if (entity != null)
                 {
-                    var response = UserDto.FromUser(entity, Resources);
+                    var response = UserDto.FromDomain(entity, Resources);
 
                     return Ok(response);
                 }
