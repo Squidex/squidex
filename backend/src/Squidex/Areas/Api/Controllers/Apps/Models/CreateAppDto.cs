@@ -20,11 +20,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
 
-        /// <summary>
-        /// Initialize the app with the inbuilt template.
-        /// </summary>
-        public string? Template { get; set; }
-
         public CreateApp ToCommand()
         {
             return SimpleMapper.Map(this, new CreateApp());
