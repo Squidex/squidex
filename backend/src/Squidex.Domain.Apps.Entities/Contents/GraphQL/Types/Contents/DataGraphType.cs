@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     var fieldGraphType = new ObjectGraphType
                     {
                         // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-                        Name = fieldInfo.LocalizedType
+                        Name = fieldInfo.LocalizedTypeDynamic
                     };
 
                     foreach (var partitionKey in partitioning.AllKeys)

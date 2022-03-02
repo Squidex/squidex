@@ -96,6 +96,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string LocalizedType { get; }
 
+        public string LocalizedTypeDynamic { get; }
+
         public string LocalizedInputType { get; }
 
         public string NestedType { get; }
@@ -121,6 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             EnumName = names[$"{fieldName}Enum"];
             LocalizedInputType = names[$"{typeName}InputDto"];
             LocalizedType = names[$"{typeName}Dto"];
+            LocalizedTypeDynamic = names[$"{typeName}Dto__Dynamic"];
             NestedInputType = names[$"{typeName}ChildInputDto"];
             NestedType = names[$"{typeName}ChildDto"];
             ReferenceType = names[$"{typeName}UnionDto"];
