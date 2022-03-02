@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Name { get; set; }
 
+        public string? Template { get; set; }
+
         [IgnoreDataMember]
         public override DomainId AggregateId
         {
