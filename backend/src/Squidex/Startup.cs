@@ -94,7 +94,7 @@ namespace Squidex
 
             app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixIdentityServer, StringComparison.OrdinalIgnoreCase), builder =>
             {
-                builder.UseExceptionHandler("/error");
+                builder.UseExceptionHandler("/identity-server/error");
             });
 
             app.UseWhen(c => c.Request.Path.StartsWithSegments(Constants.PrefixApi, StringComparison.OrdinalIgnoreCase), builder =>
