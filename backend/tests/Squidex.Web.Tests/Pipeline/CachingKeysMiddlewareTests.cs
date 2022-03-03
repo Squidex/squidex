@@ -306,7 +306,31 @@ namespace Squidex.Web.Pipeline
                 cachingManager.AddDependency(12);
             });
 
-            Assert.True(httpContext.Response.Headers[HeaderNames.ETag].ToString().Length > 20);
+            var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.StartsWith("W/", etag, StringComparison.Ordinal);
+            Assert.True(etag.Length > 20);
+        }
+
+        [Fact]
+        public async Task Should_generate_strong_etag_from_ids_and_versions()
+        {
+            var id1 = DomainId.NewGuid();
+            var id2 = DomainId.NewGuid();
+
+            cachingOptions.StrongETag = true;
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddDependency(id2, 12);
+                cachingManager.AddDependency(12);
+            });
+
+            var etag = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.False(etag.StartsWith("W/", StringComparison.Ordinal));
+            Assert.True(etag.Length > 20);
         }
 
         [Fact]

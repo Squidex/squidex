@@ -36,6 +36,8 @@ namespace Squidex.Web.Pipeline
             {
                 var httpContext = (HttpContext)_;
 
+                cachingManager.Finish(httpContext);
+
                 if (httpContext.Response.Headers.TryGetString(HeaderNames.ETag, out var etag))
                 {
                     if (!cachingOptions.StrongETag && !ETagUtils.IsWeakEtag(etag))
@@ -43,8 +45,6 @@ namespace Squidex.Web.Pipeline
                         httpContext.Response.Headers[HeaderNames.ETag] = ETagUtils.ToWeakEtag(etag);
                     }
                 }
-
-                cachingManager.Finish(httpContext);
 
                 return Task.CompletedTask;
             }, context);

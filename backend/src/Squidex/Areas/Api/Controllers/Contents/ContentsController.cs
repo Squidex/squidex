@@ -212,8 +212,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return ContentDto.FromContent(content, Resources);
             });
 
-            Response.Headers[HeaderNames.ETag] = content.ToEtag();
-
             return Ok(response);
         }
 
