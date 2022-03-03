@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.DeleteAsync(appId, assetId, ct);
 
-            A.CallTo(() => assetStore.DeleteByPrefixAsync($"{appId}/", ct))
+            A.CallTo(() => assetStore.DeleteByPrefixAsync($"{appId}/{assetId}", ct))
                 .MustHaveHappened();
         }
 
