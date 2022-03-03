@@ -19,7 +19,7 @@
     
     <ng-template #noSchema>
         <ng-container *ngIf="schemasList.length > 1">
-            <button type="button" class="btn btn-outline-success dropdown-toggle" (click)="schemasDropdown.show()" #buttonSelect>
+            <button type="button" class="btn btn-outline-success dropdown-toggle" [disabled]="isDisabled | async" (click)="schemasDropdown.show()" #buttonSelect>
                 {{ 'contents.addComponent' | sqxTranslate}}
             </button>
             
@@ -32,7 +32,7 @@
             </ng-container>
         </ng-container>
         <ng-container *ngIf="schemasList.length === 1">
-            <button type="button" class="btn btn-outline-success" (click)="setSchema(schemasList[0])">
+            <button type="button" class="btn btn-outline-success" [disabled]="isDisabled | async" (click)="setSchema(schemasList[0])">
                 {{ 'contents.addComponent' | sqxTranslate}}
             </button>
         </ng-container>

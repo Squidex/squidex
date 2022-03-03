@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, Types } from '@app/shared';
+import { Observable } from 'rxjs';
+import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, EditContentForm, FieldDto, FieldSection, ModalModel, ResourceOwner, SchemaDto, Types } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -43,6 +44,8 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
     public schemasDropdown = new ModalModel();
     public schemasList: ReadonlyArray<SchemaDto> = [];
 
+    public isDisabled?: Observable<boolean>;
+
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
     ) {
@@ -52,6 +55,8 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
             this.unsubscribeAll();
+            
+            this.isDisabled = disabled$(this.formModel.form);
 
             this.own(
                 this.formModel.form.valueChanges
