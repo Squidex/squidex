@@ -175,7 +175,7 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     private resetContentNames(rebuild: boolean) {
         const success = this.isValid && !this.isLoadingFailed;
 
-        this.onDisabled(!success);
+        this.onDisabled(!success || this.snapshot.isDisabled);
 
         if (success && rebuild) {
             const contentNames: ContentName[] = [

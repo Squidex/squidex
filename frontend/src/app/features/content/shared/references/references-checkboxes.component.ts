@@ -118,7 +118,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     private resetConverterState() {
         const success = this.isValid && this.contentItems && this.contentItems.length > 0;
 
-        this.onDisabled(!success);
+        this.onDisabled(!success || this.snapshot.isDisabled);
 
         let converter: ReferencesTagsConverter;
 
