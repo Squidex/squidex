@@ -247,9 +247,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
                 user = await userService.FindByEmailAsync(email!, HttpContext.RequestAborted);
 
-                // If we have a login, we reject this user, otherwise you can login to an account you do not own.
+                // User might not have a login or password if the user got invited.
                 if (user != null && await HasLoginAsync(user))
                 {
+                    // If we have a login, we reject this user, otherwise you can login to an account you do not own.
                     user = null;
                 }
 
@@ -285,6 +286,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
             else if (user != null && !user.Claims.HasConsent() && !identityOptions.NoConsent)
             {
+                // This should actually never happen, because user should not be null, when logged in.
                 return RedirectToAction(nameof(Consent), new { returnUrl });
             }
             else
