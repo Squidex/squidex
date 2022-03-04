@@ -228,8 +228,9 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
 
             var isLoggedIn = result.Succeeded;
+            var isLocked = false;
 
-            IUser? user;
+            IUser? user = null;
 
             if (isLoggedIn)
             {
@@ -244,24 +245,41 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                     throw new DomainException(T.Get("users.noEmailAddress"));
                 }
 
-                var values = new UserValues
+                user = await userService.FindByEmailAsync(email!, HttpContext.RequestAborted);
+
+                // If we have a login, we reject this user, otherwise you can login to an account you do not own.
+                if (user != null && await HasLoginAsync(user))
                 {
-                    CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList()
-                };
+                    user = null;
+                }
 
-                user = await userService.CreateAsync(email, values, identityOptions.LockAutomatically, HttpContext.RequestAborted);
-
-                await userService.AddLoginAsync(user.Id, login, HttpContext.RequestAborted);
-
-                (isLoggedIn, var locked) = await LoginAsync(login);
-
-                if (locked)
+                if (user == null)
                 {
-                    return View(nameof(LockedOut));
+                    var values = new UserValues
+                    {
+                        CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList()
+                    };
+
+                    var locked = identityOptions.LockAutomatically;
+
+                    // Try to create a user. If the user exists an exception message is shown to the user.
+                    user = await userService.CreateAsync(email!, values, locked, HttpContext.RequestAborted);
+                }
+
+                if (user != null)
+                {
+                    await userService.AddLoginAsync(user.Id, login, HttpContext.RequestAborted);
+
+                    // Login might fail if the user is locked out.
+                    (isLoggedIn, isLocked) = await LoginAsync(login);
                 }
             }
 
-            if (!isLoggedIn)
+            if (isLocked)
+            {
+                return View(nameof(LockedOut));
+            }
+            else if (!isLoggedIn)
             {
                 return RedirectToAction(nameof(Login));
             }
@@ -273,6 +291,18 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             {
                 return RedirectToReturnUrl(returnUrl);
             }
+        }
+
+        private async Task<bool> HasLoginAsync(IUser user)
+        {
+            if (await userService.HasPasswordAsync(user, HttpContext.RequestAborted))
+            {
+                return true;
+            }
+
+            var logins = await userService.GetLoginsAsync(user, HttpContext.RequestAborted);
+
+            return logins.Count > 0;
         }
 
         private async Task<(bool Success, bool Locked)> LoginAsync(UserLoginInfo externalLogin)
