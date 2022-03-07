@@ -28,12 +28,12 @@ export class ApiTrafficCardComponent implements OnChanges {
     @Output()
     public isStackedChange = new EventEmitter<boolean>();
 
+    public chartData: any;
+    public chartSummary = 0;
+
     public get chartOptions() {
         return this.isStacked ? ChartOptions.Stacked : ChartOptions.Default;
     }
-
-    public chartData: any;
-    public chartSummary = 0;
 
     public ngOnChanges(changes: SimpleChanges) {
         if (this.usage && changes['usage']) {

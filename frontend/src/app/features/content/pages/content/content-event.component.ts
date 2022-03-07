@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ContentDto, HistoryEventDto } from '@app/shared';
 
 @Component({
@@ -29,10 +29,12 @@ export class ContentEventComponent implements OnChanges {
 
     public canLoadOrCompare = false;
 
-    public ngOnChanges() {
-        this.canLoadOrCompare =
-            (this.event.eventType === 'ContentUpdatedEvent' ||
-             this.event.eventType === 'ContentCreatedEventV2') &&
-            !this.event.version.eq(this.content.version);
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['event']) {
+            this.canLoadOrCompare =
+                (this.event.eventType === 'ContentUpdatedEvent' ||
+                this.event.eventType === 'ContentCreatedEventV2') &&
+                !this.event.version.eq(this.content.version);
+        }
     }
 }

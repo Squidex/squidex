@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ScheduleDto } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { LocalizerService, ScheduleDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-status[status][statusColor]',
@@ -14,7 +14,7 @@ import { ScheduleDto } from '@app/shared';
     templateUrl: './content-status.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentStatusComponent {
+export class ContentStatusComponent implements OnChanges {
     @Input()
     public status!: string;
 
@@ -33,6 +33,8 @@ export class ContentStatusComponent {
     @Input()
     public small?: boolean | null;
 
+    public tooltipText = '';
+
     public get isMultiline() {
         return this.layout === 'multiline';
     }
@@ -41,11 +43,20 @@ export class ContentStatusComponent {
         return this.layout === 'text';
     }
 
-    public get tooltipText() {
-        if (this.scheduled) {
-            return `Will be set to '${this.scheduled.status}' at ${this.scheduled.dueTime.toStringFormat('PPpp')}`;
-        } else {
-            return this.status;
+    constructor(
+        private readonly localizer: LocalizerService,
+    ) {
+    }
+
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['scheduled']) {
+            if (this.scheduled) {
+                const args = { status: this.scheduled.status, time: this.scheduled.dueTime.toStringFormat('PPpp') };
+
+                this.tooltipText = this.localizer.getOrKey('contents.scheduledTooltip', args);
+            } else {
+                this.tooltipText = this.status;
+            }
         }
     }
 }

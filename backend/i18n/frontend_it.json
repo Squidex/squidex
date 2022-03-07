@@ -483,6 +483,7 @@
   "contents.scheduledBy": "by",
   "contents.scheduledTo": "a",
   "contents.scheduledToLabel": "Scheduled to",
+  "contents.scheduledTooltip": "Will be set to '{status}' at {time}.",
   "contents.schemasPageTitle": "Contenuti",
   "contents.searchPlaceholder": "Ricerca testuale",
   "contents.searchSchemasPlaceholder": "Cerca schemi...",

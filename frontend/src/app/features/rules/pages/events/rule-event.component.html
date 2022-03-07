@@ -1,6 +1,6 @@
 <tr [class.expanded]="expanded" class="table-items-row">
     <td class="cell-label">
-        <span class="badge rounded-pill badge-{{jobResultClass}}">{{event.jobResult}}</span>
+        <span class="badge rounded-pill badge-{{event.jobResult | sqxRuleClass}}">{{event.jobResult}}</span>
     </td>
     <td class="cell-40">
         <span class="truncate">{{event.eventName}}</span>
@@ -25,7 +25,7 @@
         
         <div class="row g-0 event-stats align-items-center">
             <div class="col-3">
-                <span class="badge rounded-pill badge-{{resultClass}}">{{event.result}}</span>
+                <span class="badge rounded-pill badge-{{event.result | sqxRuleClass}}">{{event.result}}</span>
             </div>
             <div class="col-2">
                 {{ 'rules.ruleEvents.numAttemptsLabel' | sqxTranslate }}: {{event.numCalls}}

@@ -31,16 +31,16 @@ export class FieldWizardComponent implements OnInit {
     @Output()
     public complete = new EventEmitter();
 
-    public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
-    }
-
     public fieldTypes = fieldTypes;
     public field!: FieldDto;
 
     public addFieldForm = new AddFieldForm();
 
     public editForm?: EditFieldForm;
+
+    public get isLocalizable() {
+        return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
+    }
 
     constructor(
         private readonly schemasState: SchemasState,

@@ -17,6 +17,7 @@ export * from './shared/actions/formattable-input.component';
 export * from './shared/actions/generic-action.component';
 export * from './shared/rule-element.component';
 export * from './shared/rule-icon.component';
+export * from './shared/pipes';
 export * from './shared/triggers/asset-changed-trigger.component';
 export * from './shared/triggers/comment-trigger.component';
 export * from './shared/triggers/content-changed-trigger.component';

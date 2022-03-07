@@ -25,12 +25,9 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
 
     public versionRead = -1;
     public versionReceived = -1;
+    public unread = 0;
 
     public userToken = '';
-
-    public get unread() {
-        return Math.max(0, this.versionReceived - this.versionRead);
-    }
 
     public isNotifoConfigured = false;
 
@@ -49,6 +46,8 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
 
         this.versionRead = localStore.getInt(CONFIG_KEY, -1);
         this.versionReceived = this.versionRead;
+
+        this.updateVersion();
 
         const commentsUrl = `users/${authService.user!.id}/notifications`;
 
@@ -87,6 +86,8 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
     }
 
     private updateVersion() {
+        this.unread = Math.max(0, this.versionReceived - this.versionRead);
+
         if (this.modalMenu.isOpen) {
             this.versionRead = this.versionReceived;
 
