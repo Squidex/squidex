@@ -45,6 +45,7 @@ export * from './angular/http/http-extensions';
 export * from './angular/http/loading.interceptor';
 export * from './angular/image-source.directive';
 export * from './angular/image-url.directive';
+export * from './angular/if-once.directive';
 export * from './angular/language-selector.component';
 export * from './angular/layout-container.directive';
 export * from './angular/layout.component';

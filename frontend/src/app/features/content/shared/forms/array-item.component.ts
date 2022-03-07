@@ -5,19 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, StatefulComponent, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FieldSection, invalid$, ObjectFormBase, RootFieldDto, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
-
-interface State {
-    // True when the item is expanded.
-    isExpanded: boolean;
-
-    // True when the item is expanded at least once.
-    isExpandedOnce: boolean;
-}
 
 @Component({
     selector: 'sqx-array-item[form][formContext][formLevel][formModel][index][language][languages]',
@@ -25,7 +17,7 @@ interface State {
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArrayItemComponent extends StatefulComponent<State> implements OnChanges, OnInit {
+export class ArrayItemComponent implements OnChanges {
     @Output()
     public itemRemove = new EventEmitter();
 
@@ -77,29 +69,16 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
     @ViewChildren(ComponentSectionComponent)
     public sections!: QueryList<ComponentSectionComponent>;
 
-    public isCollapsed = false;
     public isInvalid?: Observable<boolean>;
     public isInvalidComponent?: Observable<boolean>;
+    public isCollapsed?: Observable<boolean | null>;
 
     public title?: Observable<string>;
-
-    constructor(changeDetector: ChangeDetectorRef,
-    ) {
-        super(changeDetector, {
-            isExpanded: false,
-            isExpandedOnce: false,
-        });
-    }
-
-    public ngOnInit() {
-        if (!this.isCollapsedInitial) {
-            this.expand();
-        }
-    }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
             this.isInvalid = invalid$(this.formModel.form);
+            this.isCollapsed = this.formModel.collapsedChanges;
 
             if (Types.is(this.formModel, ComponentForm)) {
                 this.isInvalidComponent = this.formModel.schemaChanges.pipe(map(x => !x));
@@ -109,16 +88,22 @@ export class ArrayItemComponent extends StatefulComponent<State> implements OnCh
 
             this.title = valueProjection$(this.formModel.form, () => getTitle(this.formModel));
         }
+
+        if (changes['formModel'] || changes['isCollapsedInitial']) {
+            if (this.isCollapsedInitial && this.formModel.collapsed === null) {
+                this.collapse();
+            }
+        }
     }
 
     public collapse() {
-        this.next({ isExpanded: false });
+        this.formModel.collapse();
 
         this.itemExpanded.emit();
     }
 
     public expand() {
-        this.next({ isExpanded: true, isExpandedOnce: true });
+        this.formModel.expand();
 
         this.itemExpanded.emit();
     }
