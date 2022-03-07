@@ -71,14 +71,16 @@ export class ArrayItemComponent implements OnChanges {
 
     public isInvalid?: Observable<boolean>;
     public isInvalidComponent?: Observable<boolean>;
-    public isCollapsed?: Observable<boolean | null>;
 
     public title?: Observable<string>;
+
+    public get isCollapsed() {
+        return this.formModel.collapsedChanges;
+    }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
             this.isInvalid = invalid$(this.formModel.form);
-            this.isCollapsed = this.formModel.collapsedChanges;
 
             if (Types.is(this.formModel, ComponentForm)) {
                 this.isInvalidComponent = this.formModel.schemaChanges.pipe(map(x => !x));
