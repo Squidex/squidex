@@ -69,9 +69,9 @@ namespace Squidex.Web.Pipeline
                 }
             }
 
-            public void AddDependency(object? value)
+            public void AddDependency<T>(T value)
             {
-                if (value != null)
+                if (value is not null)
                 {
                     try
                     {
@@ -135,7 +135,7 @@ namespace Squidex.Web.Pipeline
 
                         if (stringBuilder.Length > 0)
                         {
-                            response.Headers.Add("Surrogate-Key", stringBuilder.ToString());
+                            response.Headers["Surrogate-Key"] = stringBuilder.ToString();
                         }
                     }
                     finally
@@ -150,7 +150,7 @@ namespace Squidex.Web.Pipeline
                 }
             }
 
-            public void AddHeader(string header)
+            public void AddHeader(string header, StringValues values)
             {
                 if (!string.IsNullOrWhiteSpace(header))
                 {
@@ -163,6 +163,11 @@ namespace Squidex.Web.Pipeline
                     finally
                     {
                         slimLock.ExitWriteLock();
+                    }
+
+                    foreach (var value in values)
+                    {
+                        AddDependency(value);
                     }
                 }
             }
@@ -208,7 +213,7 @@ namespace Squidex.Web.Pipeline
             cacheContext?.AddDependency(key.ToString(), version);
         }
 
-        public void AddDependency(object? value)
+        public void AddDependency<T>(T value)
         {
             var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
 
@@ -217,9 +222,23 @@ namespace Squidex.Web.Pipeline
 
         public void AddHeader(string header)
         {
-            var cacheContext = httpContextAccessor.HttpContext?.Features.Get<CacheContext>();
+            var httpContext = httpContextAccessor.HttpContext;
 
-            cacheContext?.AddHeader(header);
+            if (httpContext == null)
+            {
+                return;
+            }
+
+            var cacheContext = httpContext.Features.Get<CacheContext>();
+
+            if (cacheContext == null)
+            {
+                return;
+            }
+
+            httpContext.Request.Headers.TryGetValue(header, out var value);
+
+            cacheContext?.AddHeader(header, value);
         }
 
         public void Finish(HttpContext httpContext)

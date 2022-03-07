@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
             A.CallTo(() => requestCache.AddDependency(source.UniqueId, source.Version))
                 .MustHaveHappened();
 
-            A.CallTo(() => requestCache.AddDependency(null))
+            A.CallTo(() => requestCache.AddDependency<Instant?>(null))
                 .MustNotHaveHappened();
         }
 

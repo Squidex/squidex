@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-auto">
                     <ng-container *ngIf="schemaCategory.countSchemasInSubtree > 0; else noSchemas">
-                        <span class="badge rounded-pill badge-secondary">{{schemaCategory.countSchemasInSubtreeFiltered}}</span>
+                        <span class="badge rounded-pill bg-secondary">{{schemaCategory.countSchemasInSubtreeFiltered}}</span>
                     </ng-container>
                     <ng-template #noSchemas>
                         <button type="button" class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit(schemaCategory.name)" *ngIf="schemaCategory.name">

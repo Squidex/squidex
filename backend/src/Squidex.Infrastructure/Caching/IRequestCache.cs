@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Caching
     {
         void AddDependency(DomainId key, long version);
 
-        void AddDependency(object? value);
+        void AddDependency<T>(T value);
 
         void AddHeader(string header);
     }
