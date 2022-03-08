@@ -294,6 +294,58 @@ namespace Squidex.Web.Pipeline
         }
 
         [Fact]
+        public async Task Should_add_header_to_etag()
+        {
+            var id1 = DomainId.NewGuid();
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+            });
+
+            var etag1 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            httpContext.Response.Headers.Remove(HeaderNames.ETag);
+            httpContext.Request.Headers["X-Custom"] = "123";
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddHeader("X-Custom");
+            });
+
+            var etag2 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.NotEqual(etag1, etag2);
+        }
+
+        [Fact]
+        public async Task Should_not_add_header_to_etag_if_not_found()
+        {
+            var id1 = DomainId.NewGuid();
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+            });
+
+            var etag1 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            httpContext.Response.Headers.Remove(HeaderNames.ETag);
+            httpContext.Request.Headers["X-Other"] = "123";
+
+            await MakeRequestAsync(() =>
+            {
+                cachingManager.AddDependency(id1, 12);
+                cachingManager.AddHeader("X-Custom");
+            });
+
+            var etag2 = httpContext.Response.Headers[HeaderNames.ETag].ToString();
+
+            Assert.Equal(etag1, etag2);
+        }
+
+        [Fact]
         public async Task Should_generate_etag_from_ids_and_versions()
         {
             var id1 = DomainId.NewGuid();
