@@ -8,7 +8,7 @@
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-import { AppsState } from '@app/shared';
+import { AppsState } from '@app/shared/internal';
 import { AppMustExistGuard } from './app-must-exist.guard';
 
 describe('AppMustExistGuard', () => {

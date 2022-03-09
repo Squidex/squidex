@@ -8,7 +8,7 @@
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AuthService, UIOptions } from '@app/shared';
+import { AuthService, UIOptions } from '@app/shared/internal';
 import { MustBeNotAuthenticatedGuard } from './must-be-not-authenticated.guard';
 
 describe('MustBeNotAuthenticatedGuard', () => {

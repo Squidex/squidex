@@ -6,8 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { FilterableField } from '@app/shared';
-import { QueryModel } from '@app/shared/internal';
+import { FilterableField, QueryModel } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-query-path[model]',
