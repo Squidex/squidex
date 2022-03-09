@@ -146,6 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var contentLength = (long?)null;
             var contentCallback = (FileCallback?)null;
+            var contentType = request.Format?.ToMimeType() ?? asset.MimeType;
 
             if (asset.Type == AssetType.Image && resizeOptions.IsValid)
             {
@@ -183,7 +184,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 };
             }
 
-            return new FileCallbackResult(asset.MimeType, contentCallback)
+            return new FileCallbackResult(contentType, contentCallback)
             {
                 EnableRangeProcessing = contentLength > 0,
                 ErrorAs404 = true,
