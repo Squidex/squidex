@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
@@ -64,11 +64,13 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
         });
     }
 
-    public ngOnChanges() {
-        if (this.formSection?.separator && this.schema) {
-            const isCollapsed = this.localStore.getBoolean(this.expandedKey());
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['formSection' || changes['schema']]) {
+            if (this.formSection?.separator && this.schema) {
+                const isCollapsed = this.localStore.getBoolean(this.expandedKey());
 
-            this.next({ isCollapsed });
+                this.next({ isCollapsed });
+            }
         }
     }
 

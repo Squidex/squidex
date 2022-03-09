@@ -1,12 +1,12 @@
 <tr [class.expanded]="expanded" class="table-items-row">
     <td class="cell-label">
-        <span class="badge rounded-pill bg-{{statusClass}}">{{status}}</span>
+        <span class="badge rounded-pill badge-{{event | sqxSimulatedRuleEventStatus | sqxRuleClass}}">{{event | sqxSimulatedRuleEventStatus}}</span>
     </td>
     <td class="cell-40">
         <span class="truncate">{{event.eventName}}</span>
     </td>
     <td class="cell-40">
-        <small class="truncate">{{event.skipReasons.join(', ')}}</small>
+        <small class="truncate">{{event.skipReasons | sqxJoin}}</small>
     </td>
     <td class="cell-actions">
         <button type="button" class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()">
@@ -53,7 +53,7 @@
                                 <div class="history-state">
                                     <label>{{ 'rules.actionData' | sqxTranslate }}</label>
 
-                                    <sqx-code-editor [ngModel]="data" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
+                                    <sqx-code-editor [ngModel]="event.actionData" valueMode="Json" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
                                 </div>
 
                                 <sqx-rule-transition text='rules.simulation.actionExecuted'></sqx-rule-transition>

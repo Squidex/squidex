@@ -46,38 +46,4 @@ export class SimulatedRuleEventComponent {
     public errorsAfterEvent = ERRORS_AFTER_EVENT;
     public errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
     public errorsFailed = ERRORS_FAILED;
-
-    public get data() {
-        let result = this.event.actionData;
-
-        if (result) {
-            try {
-                result = JSON.stringify(JSON.parse(result), null, 2);
-            } catch {
-                result = this.event.actionData;
-            }
-        }
-
-        return result;
-    }
-
-    public get status() {
-        if (this.event.error) {
-            return 'Failed';
-        } else if (this.event.skipReasons.length > 0) {
-            return 'Skipped';
-        } else {
-            return 'Success';
-        }
-    }
-
-    public get statusClass() {
-        if (this.event.error) {
-            return 'danger';
-        } else if (this.event.skipReasons.length > 0) {
-            return 'warning';
-        } else {
-            return 'success';
-        }
-    }
 }

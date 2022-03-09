@@ -50,10 +50,6 @@ export class RoleComponent implements OnChanges {
     @ViewChild('addInput', { static: false })
     public addPermissionInput!: AutocompleteComponent;
 
-    public get halfSchemas() {
-        return Math.ceil(this.schemas.length / 2);
-    }
-
     public descriptions = DESCRIPTIONS;
 
     public propertiesList = Settings.AppProperties;
@@ -66,6 +62,10 @@ export class RoleComponent implements OnChanges {
     public addPermissionForm = new AddPermissionForm();
 
     public editForm = new EditRoleForm();
+
+    public get halfSchemas() {
+        return Math.ceil(this.schemas.length / 2);
+    }
 
     constructor(
         private readonly rolesState: RolesState,

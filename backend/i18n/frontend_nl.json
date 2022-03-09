@@ -483,6 +483,7 @@
   "contents.scheduledBy": "door",
   "contents.scheduledTo": "naar",
   "contents.scheduledToLabel": "Ingepland tot",
+  "contents.scheduledTooltip": "Will be set to '{status}' at {time}.",
   "contents.schemasPageTitle": "Inhoud",
   "contents.searchPlaceholder": "Zoeken in volledige tekst",
   "contents.searchSchemasPlaceholder": "Zoek schema's ...",

@@ -58,11 +58,11 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
         this.setDisabledState(value === true);
     }
 
+    public control = new FormControl('');
+
     public get isValid() {
         return !!this.schemaId && !!this.language;
     }
-
-    public control = new FormControl('');
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly contentsResolver: ResolveContents,

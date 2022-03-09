@@ -48,6 +48,11 @@ export class ContentFieldComponent implements OnChanges {
     @Input()
     public languages!: ReadonlyArray<AppLanguageDto>;
 
+    public showAllControls = false;
+
+    public isDifferent?: Observable<boolean>;
+    public isInvalid?: Observable<boolean>;
+
     @HostBinding('class')
     public get class() {
         return this.isHalfWidth ? 'col-6 half-field' : 'col-12';
@@ -60,11 +65,6 @@ export class ContentFieldComponent implements OnChanges {
     public get isTranslatable() {
         return this.formModel.field.properties.fieldType === 'String' && this.formModel.field.isLocalizable && this.languages.length > 1;
     }
-
-    public showAllControls = false;
-
-    public isDifferent?: Observable<boolean>;
-    public isInvalid?: Observable<boolean>;
 
     constructor(
         private readonly appsState: AppsState,

@@ -27,8 +27,8 @@ export class AssetFolderDropdownItemComponent {
     @Output()
     public selectNode = new EventEmitter<AssetFolderDropdowNode>();
 
-    public get style() {
-        return { paddingLeft: `${this.nodeLevel}rem` };
+    public get paddingLeft() {
+        return `${this.nodeLevel}rem`;
     }
 
     constructor(
