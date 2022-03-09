@@ -1,7 +1,7 @@
 <div class="input-group">
-    <input class="form-control" readonly [ngModel]="snapshot.selectedName" (click)="contentSelectorDialog.show()" />
+    <input class="form-control" readonly [ngModel]="snapshot.selectedName" (click)="openDialog()" />
 
-    <button type="button" class="btn btn-outline-secondary" (click)="selectContent()" sqxStopClick>
+    <button type="button" class="btn btn-outline-secondary" [disabled]="snapshot.isDisabled" (click)="selectContent()" sqxStopClick>
         <i class="icon-close"></i>
     </button>
 </div>

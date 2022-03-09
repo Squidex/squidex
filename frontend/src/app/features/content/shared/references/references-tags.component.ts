@@ -158,7 +158,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     private resetConverterState(rebuild: boolean) {
         const success = this.isValid && !this.isLoadingFailed;
 
-        this.onDisabled(!success);
+        this.onDisabled(!success || this.snapshot.isDisabled);
 
         if (rebuild) {
             const converter = new ReferencesTagsConverter(this.language, this.contents, this.localizer);

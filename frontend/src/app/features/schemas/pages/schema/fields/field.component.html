@@ -22,15 +22,15 @@
             </div>
             <div class="col col-tags flex-nowrap">
                 <div class="float-end">
-                    <span class="ms-1 badge rounded-pill badge-danger"  *ngIf="field.isLocked">
+                    <span class="ms-1 badge rounded-pill bg-danger"  *ngIf="field.isLocked">
                         {{ 'schemas.field.lockedMarker' | sqxTranslate }}
                     </span>
 
-                    <span class="ms-1 badge rounded-pill badge-success" *ngIf="!field.isDisabled">
+                    <span class="ms-1 badge rounded-pill bg-success" *ngIf="!field.isDisabled">
                         {{ 'schemas.field.enabledMarker' | sqxTranslate }}
                     </span>
 
-                    <span class="ms-1 badge rounded-pill badge-danger"  *ngIf="field.isDisabled">
+                    <span class="ms-1 badge rounded-pill bg-danger"  *ngIf="field.isDisabled">
                         {{ 'schemas.field.disabledMarker' | sqxTranslate }}
                     </span>
                 </div>

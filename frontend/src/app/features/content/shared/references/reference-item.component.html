@@ -12,8 +12,8 @@
     </td>
 
     <td class="cell-valid" *ngIf="validityVisible">
-        <span class="badge rounded-pill badge-success" *ngIf="valid === true">VALID</span>
-        <span class="badge rounded-pill badge-danger" *ngIf="valid === false">INVALID</span>
+        <span class="badge rounded-pill bg-success" *ngIf="valid === true">VALID</span>
+        <span class="badge rounded-pill bg-danger" *ngIf="valid === false">INVALID</span>
     </td>
 
     <td sqxContentListCell="meta.status.color">
@@ -21,8 +21,8 @@
     </td>
 
     <td class="cell-label" *ngIf="!isCompact">
-        <div class="badge-container d-flex align-items-center">
-            <span class="badge badge-primary rounded-pill truncate-inline">{{content.schemaDisplayName}}</span>
+        <div class="bg-container d-flex align-items-center">
+            <span class="badge bg-primary rounded-pill truncate-inline">{{content.schemaDisplayName}}</span>
         </div>
     </td>
 

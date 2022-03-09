@@ -86,6 +86,14 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
             });
     }
 
+    public openDialog() {
+        if (this.snapshot.isDisabled) {
+            return;
+        }
+
+        this.contentSelectorDialog.show();
+    }
+
     public select(contents: ReadonlyArray<ContentDto>) {
         if (contents.length > 0) {
             this.selectContent(contents[0]);
@@ -95,6 +103,10 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
     }
 
     public selectContent(selectedContent?: ContentDto) {
+        if (this.snapshot.isDisabled) {
+            return;
+        }
+        
         const id = selectedContent?.id;
 
         if (id) {

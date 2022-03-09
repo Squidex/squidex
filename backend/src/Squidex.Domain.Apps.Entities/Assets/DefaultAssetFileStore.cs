@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             if (options.FolderPerApp)
             {
-                return assetStore.DeleteByPrefixAsync($"{appId}/", ct);
+                return assetStore.DeleteByPrefixAsync($"{appId}/{id}", ct);
             }
             else
             {

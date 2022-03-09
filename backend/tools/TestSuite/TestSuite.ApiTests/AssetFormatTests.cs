@@ -87,6 +87,25 @@ namespace TestSuite.ApiTests
             await AssertImageAsync(asset);
         }
 
+        [Fact]
+        public async Task Should_upload_image_bmp_and_resize()
+        {
+            var asset = await _.UploadFileAsync("Assets/SampleImage_700kb.bmp", "image/bmp");
+
+            await AssertImageAsync(asset);
+        }
+
+        [Fact]
+        public async Task Should_upload_image_bmp_and_encode_to_webp()
+        {
+            var asset = await _.UploadFileAsync("Assets/SampleImage_700kb.bmp", "image/bmp");
+
+            var (size, type) = await GetReformattedLength(asset.Id, "WEBP");
+
+            Assert.True(size < asset.FileSize);
+            Assert.Equal("image/webp", type);
+        }
+
         private async Task AssertImageAsync(AssetDto asset)
         {
             // Should parse image metadata.
@@ -189,6 +208,25 @@ namespace TestSuite.ApiTests
                     await stream.CopyToAsync(buffer);
 
                     return buffer.Length;
+                }
+            }
+        }
+
+        private async Task<(long, string)> GetReformattedLength(string imageId, string format)
+        {
+            var url = $"{_.ClientManager.GenerateImageUrl(imageId)}?format={format}";
+
+            using (var httpClient = _.ClientManager.CreateHttpClient())
+            {
+                var response = await httpClient.GetAsync(url);
+
+                await using (var stream = await response.Content.ReadAsStreamAsync())
+                {
+                    var buffer = new MemoryStream();
+
+                    await stream.CopyToAsync(buffer);
+
+                    return (buffer.Length, response.Content.Headers.ContentType.ToString());
                 }
             }
         }
