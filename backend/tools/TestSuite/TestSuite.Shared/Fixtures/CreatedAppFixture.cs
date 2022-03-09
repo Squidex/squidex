@@ -44,6 +44,21 @@ namespace TestSuite.Fixtures
 
                         await Apps.PostContributorAsync(AppName, invite);
                     }
+
+                    try
+                    {
+                        await Apps.PostLanguageAsync(AppName, new AddLanguageDto
+                        {
+                            Language = "de"
+                        });
+                    }
+                    catch (SquidexManagementException ex)
+                    {
+                        if (ex.StatusCode != 400)
+                        {
+                            throw;
+                        }
+                    }
                 }).Wait();
 
                 isCreated = true;
