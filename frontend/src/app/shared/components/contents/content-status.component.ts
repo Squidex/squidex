@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { LocalizerService, ScheduleDto } from '@app/shared';
+import { LocalizerService } from '@app/framework';
+import { ScheduleDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-status[status][statusColor]',

@@ -7,8 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { ResourceOwner } from '@app/framework';
-import { RootFieldDto, TableField } from '@app/shared';
-import { FieldWrappings, HtmlValue, TableSettings, Types } from '@app/shared/internal';
+import { FieldWrappings, HtmlValue, RootFieldDto, TableField, TableSettings, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-content-value[value]',
