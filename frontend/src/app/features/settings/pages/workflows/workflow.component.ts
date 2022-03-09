@@ -55,10 +55,13 @@ export class WorkflowComponent implements OnChanges {
         }
 
         this.workflowsState.update(this.workflow)
-            .subscribe(() => {
-                this.error = null;
-            }, (error: ErrorDto) => {
-                this.error = error;
+            .subscribe({
+                next: () => {
+                    this.error = null;
+                }, 
+                error: (error: ErrorDto) => {
+                    this.error = error;
+                },
             });
     }
 

@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient, HttpHeaders, HTTP_INTERCEPTORS } from '@angular/common/http';
+/* eslint-disable deprecation/deprecation */
+
+import { HTTP_INTERCEPTORS, HttpClient, HttpHeaders } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';

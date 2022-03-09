@@ -6,8 +6,9 @@
  */
 
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, distinctUntilChanged, Observable } from 'rxjs';
-import { debounceTimeSafe, Form, FormArrayTemplate, TemplatedFormArray, Types, ExtendedFormGroup, value$ } from '@app/framework';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
 import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
 import { AppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto } from './../services/languages.service';

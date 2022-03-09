@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable deprecation/deprecation */
+
 export module Keys {
     const ALT = 18;
     const COMMA = 188;

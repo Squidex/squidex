@@ -176,7 +176,7 @@ describe('AssetsState', () => {
             assetsState.search(query).subscribe();
 
             expect(assetsState.snapshot.query).toEqual(query);
-            expect(assetsState.snapshot.ref).toBeNull(null);
+            expect(assetsState.snapshot.ref).toBeNull();
         });
     });
 

@@ -798,11 +798,11 @@ describe('ContentForm', () => {
                         const a = form[key];
                         const e = test[key];
 
-                        expect(a).toBe(e, `Expected ${key} of ${path} to be <${e}>, but found <${a}>.`);
+                        expect(a).withContext(`Expected ${key} of ${path} to be <${e}>, but found <${a}>.`).toEqual(e);
                     }
                 }
             } else {
-                expect(form).not.toBeNull(`Expected to find form ${path}, but form not found.`);
+                expect(form).withContext(`Expected to find form ${path}, but form not found.`).not.toBeNull();
             }
         }
     });

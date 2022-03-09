@@ -7,7 +7,8 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
-import { Observable, map, tap } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { UsersState } from '@app/features/administration/internal';
 import { allParams } from '@app/framework';
 

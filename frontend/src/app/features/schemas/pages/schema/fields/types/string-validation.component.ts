@@ -8,7 +8,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, StringFieldPropertiesDto, STRING_CONTENT_TYPES, Types, value$ } from '@app/shared';
+import { AppSettingsDto, FieldDto, hasNoValue$, hasValue$, LanguageDto, ModalModel, PatternDto, ResourceOwner, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Types, value$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation[field][fieldForm][languages][properties][schema][settings]',

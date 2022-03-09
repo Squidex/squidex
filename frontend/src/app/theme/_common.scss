@@ -112,6 +112,24 @@ hr {
     h4 {
         margin-top: 1rem;
     }
+
+    pre {
+        @include text-code;
+        background: $color-code-background;
+        margin: .25rem 0;
+        padding-left: .5rem;
+        padding-right: 3rem;
+    }
+
+    table {
+        width: 100%;
+
+        td, th {
+            border: 1px solid $color-border;
+            border-radius: 0;
+            padding: .25rem .5rem;
+        }
+    }
 }
 
 //

@@ -9,7 +9,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
-import { filter, map, startWith } from 'rxjs/operators';
+import { filter, map, startWith } from 'rxjs';
 import { LayoutContainerDirective } from './layout-container.directive';
 
 @Component({

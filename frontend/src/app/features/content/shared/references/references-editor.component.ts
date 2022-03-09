@@ -8,7 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppLanguageDto, ContentDto, ResolveContents, DialogModel, sorted, StatefulControlComponent, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, DialogModel, ResolveContents, sorted, StatefulControlComponent, Types } from '@app/shared';
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true,
