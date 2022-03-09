@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public JsonObject RoleProperties { get; set; } = EmptyObject;
 
-        public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, Resources resources)
+        public static AppDto FromDomain(IAppEntity app, string userId, bool isFrontend, Resources resources)
         {
             var result = SimpleMapper.Map(app, new AppDto());
 

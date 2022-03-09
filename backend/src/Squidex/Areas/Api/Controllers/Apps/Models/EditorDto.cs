@@ -25,9 +25,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public string Url { get; set; }
 
-        public static EditorDto FromEditor(Editor editor)
+        public static EditorDto FromDomain(Editor editor)
         {
-            return SimpleMapper.Map(editor, new EditorDto());
+            var result = SimpleMapper.Map(editor, new EditorDto());
+
+            return result;
         }
 
         public Editor ToEditor()

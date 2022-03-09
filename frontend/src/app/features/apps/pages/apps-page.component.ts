@@ -17,7 +17,6 @@ import { Settings } from '@app/shared/state/settings';
 })
 export class AppsPageComponent implements OnInit {
     public addAppDialog = new DialogModel();
-    public addAppTemplate = '';
 
     public onboardingDialog = new DialogModel();
 
@@ -66,8 +65,7 @@ export class AppsPageComponent implements OnInit {
             });
     }
 
-    public createNewApp(template: string) {
-        this.addAppTemplate = template;
+    public createNewApp() {
         this.addAppDialog.show();
     }
 

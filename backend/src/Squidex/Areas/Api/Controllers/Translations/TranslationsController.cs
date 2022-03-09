@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Translations
         public async Task<IActionResult> PostTranslation(string app, [FromBody] TranslateDto request)
         {
             var result = await translator.TranslateAsync(request.Text, request.TargetLanguage, request.SourceLanguage, HttpContext.RequestAborted);
-            var response = TranslationDto.FromTranslation(result);
+            var response = TranslationDto.FromDomain(result);
 
             return Ok(response);
         }

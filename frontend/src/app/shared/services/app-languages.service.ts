@@ -107,10 +107,8 @@ export class AppLanguagesService {
     }
 }
 
-function parseLanguages(response: any) {
-    const raw: any[] = response.items;
-
-    const items = raw.map(item =>
+function parseLanguages(response: { items: any[] } & Resource) {
+    const items = response.items.map(item =>
         new AppLanguageDto(item._links,
             item.iso2Code,
             item.englishName,
@@ -118,7 +116,7 @@ function parseLanguages(response: any) {
             item.isOptional,
             item.fallback || []));
 
-    const _links = response._links;
+    const { _links } = response;
 
     return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }

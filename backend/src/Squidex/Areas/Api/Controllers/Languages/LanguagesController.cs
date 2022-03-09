@@ -41,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         {
             var response = Deferred.Response(() =>
             {
-                return Language.AllLanguages.Select(LanguageDto.FromLanguage).ToArray();
+                return Language.AllLanguages.Select(LanguageDto.FromDomain).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = "1";

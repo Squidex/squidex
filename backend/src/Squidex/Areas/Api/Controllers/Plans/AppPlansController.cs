@@ -52,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
             var response = Deferred.Response(() =>
             {
-                return AppPlansDto.FromApp(App, appPlansProvider, hasPortal);
+                return AppPlansDto.FromDomain(App, appPlansProvider, hasPortal);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();

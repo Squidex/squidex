@@ -19,37 +19,37 @@ namespace Squidex.Web
         [JsonProperty("_links")]
         public Dictionary<string, ResourceLink> Links { get; } = new Dictionary<string, ResourceLink>();
 
-        public void AddSelfLink(string href)
+        protected void AddSelfLink(string href)
         {
             AddGetLink("self", href);
         }
 
-        public void AddGetLink(string rel, string href, string? metadata = null)
+        protected void AddGetLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "GET", href, metadata);
         }
 
-        public void AddPatchLink(string rel, string href, string? metadata = null)
+        protected void AddPatchLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "PATCH", href, metadata);
         }
 
-        public void AddPostLink(string rel, string href, string? metadata = null)
+        protected void AddPostLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "POST", href, metadata);
         }
 
-        public void AddPutLink(string rel, string href, string? metadata = null)
+        protected void AddPutLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "PUT", href, metadata);
         }
 
-        public void AddDeleteLink(string rel, string href, string? metadata = null)
+        protected void AddDeleteLink(string rel, string href, string? metadata = null)
         {
             AddLink(rel, "DELETE", href, metadata);
         }
 
-        public void AddLink(string rel, string method, string href, string? metadata = null)
+        protected void AddLink(string rel, string method, string href, string? metadata = null)
         {
             Guard.NotNullOrEmpty(rel);
             Guard.NotNullOrEmpty(href);

@@ -45,12 +45,12 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         [LocalizedRequired]
         public IEnumerable<string> Permissions { get; set; }
 
-        public static UserDto FromUser(IUser user, Resources resources)
+        public static UserDto FromDomain(IUser user, Resources resources)
         {
-            var userPermssions = user.Claims.Permissions().ToIds();
-            var userName = user.Claims.DisplayName()!;
+            var result = SimpleMapper.Map(user, new UserDto());
 
-            var result = SimpleMapper.Map(user, new UserDto { DisplayName = userName, Permissions = userPermssions });
+            result.DisplayName = user.Claims.DisplayName()!;
+            result.Permissions = user.Claims.Permissions().ToIds();
 
             return result.CreateLinks(resources);
         }

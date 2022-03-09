@@ -19,14 +19,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public AppLanguageDto[] Items { get; set; }
 
-        public static AppLanguagesDto FromApp(IAppEntity app, Resources resources)
+        public static AppLanguagesDto FromDomain(IAppEntity app, Resources resources)
         {
             var config = app.Languages;
 
             var result = new AppLanguagesDto
             {
                 Items = config.Languages
-                    .Select(x => AppLanguageDto.FromLanguage(x.Key, x.Value, config))
+                    .Select(x => AppLanguageDto.FromDomain(x.Key, x.Value, config))
                     .Select(x => x.CreateLinks(resources, app))
                     .OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code)
                     .ToArray()

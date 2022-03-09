@@ -24,9 +24,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         [LocalizedRequired]
         public string Color { get; set; }
 
-        public static StatusInfoDto FromStatusInfo(StatusInfo statusInfo)
+        public static StatusInfoDto FromDomain(StatusInfo statusInfo)
         {
-            return new StatusInfoDto { Status = statusInfo.Status, Color = statusInfo.Color };
+            var result = new StatusInfoDto { Status = statusInfo.Status, Color = statusInfo.Color };
+
+            return result;
         }
     }
 }

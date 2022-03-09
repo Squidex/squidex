@@ -135,10 +135,8 @@ export class ClientsService {
     }
 }
 
-function parseClients(response: any): ClientsPayload {
-    const raw: any[] = response.items;
-
-    const items = raw.map(item =>
+function parseClients(response: { items: any[] } & Resource): ClientsPayload {
+    const items = response.items.map(item =>
         new ClientDto(item._links,
             item.id,
             item.name || item.id,
@@ -148,7 +146,7 @@ function parseClients(response: any): ClientsPayload {
             item.apiTrafficLimit,
             item.allowAnonymous));
 
-    const _links = response._links;
+    const { _links } = response;
 
     return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }

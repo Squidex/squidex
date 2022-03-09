@@ -38,17 +38,21 @@ export class SearchService {
     public getResults(appName: string, query: string): Observable<ReadonlyArray<SearchResultDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/search/?query=${encodeURIComponent(query)}`);
 
-        return this.http.get<ReadonlyArray<any>>(url).pipe(
+        return this.http.get<any[]>(url).pipe(
             map(body => {
-                const results = body.map(item =>
-                    new SearchResultDto(
-                        item._links,
-                        item.name,
-                        item.type,
-                        item.label));
-
-                return results;
+                return parseResults(body);
             }),
             pretifyError('i18n:search.searchFailed'));
     }
 }
+
+function parseResults(body: any[]) {
+    const results = body.map(item => new SearchResultDto(
+        item._links,
+        item.name,
+        item.type,
+        item.label));
+
+    return results;
+}
+

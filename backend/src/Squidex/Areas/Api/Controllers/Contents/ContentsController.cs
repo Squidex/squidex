@@ -209,7 +209,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.Response(() =>
             {
-                return ContentDto.FromContent(content, Resources);
+                return ContentDto.FromDomain(content, Resources);
             });
 
             return Ok(response);
@@ -331,7 +331,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return NotFound();
             }
 
-            var response = ContentDto.FromContent(content, Resources);
+            var response = ContentDto.FromDomain(content, Resources);
 
             return Ok(response.Data);
         }
@@ -391,7 +391,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -422,7 +422,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -658,7 +658,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IEnrichedContentEntity>();
-            var response = ContentDto.FromContent(result, Resources);
+            var response = ContentDto.FromDomain(result, Resources);
 
             return response;
         }

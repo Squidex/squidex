@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 import { ApiUrlConfig, AppsState, CreateAppForm } from '@app/shared/internal';
 
 @Component({
@@ -17,9 +17,6 @@ import { ApiUrlConfig, AppsState, CreateAppForm } from '@app/shared/internal';
 export class AppFormComponent {
     @Output()
     public complete = new EventEmitter();
-
-    @Input()
-    public template = '';
 
     public createForm = new CreateAppForm();
 
@@ -37,9 +34,7 @@ export class AppFormComponent {
         const value = this.createForm.submit();
 
         if (value) {
-            const request = { ...value, template: this.template };
-
-            this.appsStore.create(request)
+            this.appsStore.create(value)
                 .subscribe({
                     next: () => {
                         this.emitComplete();

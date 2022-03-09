@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates
+namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AlwaysCreateClientCommandMiddlewareTests
     {

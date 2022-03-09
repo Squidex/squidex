@@ -82,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private AssetScriptsDto GetResponse(IAppEntity result)
         {
-            return AssetScriptsDto.FromApp(result, Resources);
+            return AssetScriptsDto.FromDomain(result, Resources);
         }
     }
 }

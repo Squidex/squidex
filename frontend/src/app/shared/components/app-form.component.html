@@ -1,13 +1,7 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createApp()">
     <sqx-modal-dialog (close)="emitComplete()">
         <ng-container title>
-            <ng-container *ngIf="template; else noTemplate">
-                {{ 'apps.createWithTemplate' | sqxTranslate: { template: template } }}
-            </ng-container>
-
-            <ng-template #noTemplate>
-                {{ 'apps.create' | sqxTranslate }}
-            </ng-template>
+            {{ 'apps.create' | sqxTranslate }}
         </ng-container>
 
         <ng-container content>

@@ -82,17 +82,19 @@ export class HistoryService {
 
         return this.http.get<any[]>(url, options).pipe(
             map(body => {
-                const history = body.map(item =>
-                    new HistoryEventDto(
-                        item.eventId,
-                        item.actor,
-                        item.eventType,
-                        item.message,
-                        DateTime.parseISO(item.created),
-                        new Version(item.version.toString())));
-
-                return history;
+                return parseHistory(body);
             }),
             pretifyError('i18n:history.loadFailed'));
     }
 }
+
+function parseHistory(response: any[]) {
+    return response.map(item => new HistoryEventDto(
+        item.eventId,
+        item.actor,
+        item.eventType,
+        item.message,
+        DateTime.parseISO(item.created),
+        new Version(item.version.toString())));
+}
+

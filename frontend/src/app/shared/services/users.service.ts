@@ -40,12 +40,7 @@ export class UsersService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                const users = body.map(item =>
-                    new UserDto(
-                        item.id,
-                        item.displayName));
-
-                return users;
+                return parseUsers(body);
             }),
             pretifyError('i18n:users.loadFailed'));
     }
@@ -55,11 +50,7 @@ export class UsersService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const user = new UserDto(
-                    body.id,
-                    body.displayName);
-
-                return user;
+                return parseUser(body);
             }),
             pretifyError('i18n:users.loadUserFailed'));
     }
@@ -74,3 +65,14 @@ export class UsersService {
             pretifyError('i18n:users.loadUserFailed'));
     }
 }
+
+function parseUsers(response: any[]) {
+    return response.map(parseUser);
+}
+
+function parseUser(response: any) {
+    return new UserDto(
+        response.id,
+        response.displayName);
+}
+

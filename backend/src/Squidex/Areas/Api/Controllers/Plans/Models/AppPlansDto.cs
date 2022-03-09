@@ -34,19 +34,19 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// </summary>
         public bool HasPortal { get; set; }
 
-        public static AppPlansDto FromApp(IAppEntity app, IAppPlansProvider plans, bool hasPortal)
+        public static AppPlansDto FromDomain(IAppEntity app, IAppPlansProvider plans, bool hasPortal)
         {
             var (_, planId) = plans.GetPlanForApp(app);
 
-            var response = new AppPlansDto
+            var result = new AppPlansDto
             {
                 CurrentPlanId = planId,
-                Plans = plans.GetAvailablePlans().Select(PlanDto.FromPlan).ToArray(),
+                Plans = plans.GetAvailablePlans().Select(PlanDto.FromDomain).ToArray(),
                 PlanOwner = app.Plan?.Owner.Identifier,
                 HasPortal = hasPortal
             };
 
-            return response;
+            return result;
         }
     }
 }

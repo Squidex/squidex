@@ -35,8 +35,13 @@ export class TranslationsService {
 
         return this.http.post<any>(url, request).pipe(
             map(body => {
-                return new TranslationDto(body.result, body.text);
+                return parseTranslation(body);
             }),
             pretifyError('i18n:translate.translateFailed'));
     }
 }
+
+function parseTranslation(body: any): TranslationDto {
+    return new TranslationDto(body.result, body.text);
+}
+

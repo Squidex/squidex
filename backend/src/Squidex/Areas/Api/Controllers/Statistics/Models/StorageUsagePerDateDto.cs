@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// </summary>
         public long TotalSize { get; set; }
 
-        public static StorageUsagePerDateDto FromStats(AssetStats stats)
+        public static StorageUsagePerDateDto FromDomain(AssetStats stats)
         {
             var result = new StorageUsagePerDateDto
             {

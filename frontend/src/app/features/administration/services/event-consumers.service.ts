@@ -9,16 +9,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks } from '@app/shared';
+import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks, ResultSet } from '@app/shared';
 
-export class EventConsumersDto {
-    public readonly _links: ResourceLinks;
-
-    constructor(
-        public readonly items: ReadonlyArray<EventConsumerDto>, links?: ResourceLinks,
-    ) {
-        this._links = links || {};
-    }
+export class EventConsumersDto extends ResultSet<EventConsumerDto> {
 }
 
 export class EventConsumerDto {
@@ -55,11 +48,9 @@ export class EventConsumersService {
     public getEventConsumers(): Observable<EventConsumersDto> {
         const url = this.apiUrl.buildUrl('/api/event-consumers');
 
-        return this.http.get<{ items: any[] } & Resource>(url).pipe(
-            map(({ items, _links }) => {
-                const eventConsumers = items.map(parseEventConsumer);
-
-                return new EventConsumersDto(eventConsumers, _links);
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseEventConsumers(body);
             }),
             pretifyError('i18n:eventConsumers.loadFailed'));
     }
@@ -101,9 +92,14 @@ export class EventConsumersService {
     }
 }
 
+function parseEventConsumers(response: { items: any[] } & Resource) {
+    const items = response.items.map(parseEventConsumer);
+
+    return new EventConsumersDto(items.length, items, response._links);
+}
+
 function parseEventConsumer(response: any): EventConsumerDto {
-    return new EventConsumerDto(
-        response._links,
+    return new EventConsumerDto(response._links,
         response.name,
         response.count,
         response.isStopped,
