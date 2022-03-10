@@ -9,7 +9,8 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
-    public sealed record Template(string Name, string Title, string Description, bool IsStarter)
+    public sealed class TemplatesOptions
     {
+        public TemplateRepository[] Repositories { get; set; }
     }
 }

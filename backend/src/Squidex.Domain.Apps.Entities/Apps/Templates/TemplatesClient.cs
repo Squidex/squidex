@@ -5,22 +5,51 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Net;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
     public sealed class TemplatesClient
     {
-        private const string DetailUrl = "https://raw.githubusercontent.com/Squidex/templates/main";
-        private const string OverviewUrl = "https://raw.githubusercontent.com/Squidex/templates/main/README.md";
         private static readonly Regex Regex = new Regex("\\* \\[(?<Title>.*)\\]\\((?<Name>.*)\\/README\\.md\\): (?<Description>.*)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly TemplatesOptions options;
 
-        public TemplatesClient(IHttpClientFactory httpClientFactory)
+        public TemplatesClient(IHttpClientFactory httpClientFactory, IOptions<TemplatesOptions> options)
         {
             this.httpClientFactory = httpClientFactory;
+
+            this.options = options.Value;
+        }
+
+        public async Task<string?> GetRepositoryUrl(string name,
+            CancellationToken ct = default)
+        {
+            using (var httpClient = httpClientFactory.CreateClient())
+            {
+                var result = new List<Template>();
+
+                foreach (var repository in options.Repositories.OrEmpty())
+                {
+                    var url = $"{repository.ContentUrl}/README.md";
+
+                    var text = await httpClient.GetStringAsync(url, ct);
+
+                    foreach (Match match in Regex.Matches(text))
+                    {
+                        var currentName = match.Groups["Name"].Value;
+
+                        if (currentName == name)
+                        {
+                            return $"{repository.GitUrl ?? repository.ContentUrl}?folder={name}";
+                        }
+                    }
+                }
+
+                return null;
+            }
         }
 
         public async Task<List<Template>> GetTemplatesAsync(
@@ -28,18 +57,24 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
-                var url = OverviewUrl;
-
-                var text = await httpClient.GetStringAsync(url, ct);
-
                 var result = new List<Template>();
 
-                foreach (Match match in Regex.Matches(text))
+                foreach (var repository in options.Repositories.OrEmpty())
                 {
-                    result.Add(new Template(
-                        match.Groups["Name"].Value,
-                        match.Groups["Title"].Value,
-                        match.Groups["Description"].Value));
+                    var url = $"{repository.ContentUrl}/README.md";
+
+                    var text = await httpClient.GetStringAsync(url, ct);
+
+                    foreach (Match match in Regex.Matches(text))
+                    {
+                        var title = match.Groups["Title"].Value;
+
+                        result.Add(new Template(
+                            match.Groups["Name"].Value,
+                            title,
+                            match.Groups["Description"].Value,
+                            title.StartsWith("Starter ", StringComparison.OrdinalIgnoreCase)));
+                    }
                 }
 
                 return result;
@@ -53,17 +88,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             using (var httpClient = httpClientFactory.CreateClient())
             {
-                var url = $"{DetailUrl}/{name}/README.md";
-
-                var response = await httpClient.GetAsync(url, ct);
-
-                if (response.StatusCode == HttpStatusCode.NotFound)
+                foreach (var repository in options.Repositories.OrEmpty())
                 {
-                    return null;
-                }
+                    var url = $"{repository.ContentUrl}/{name}/README.md";
 
-                return await response.Content.ReadAsStringAsync(ct);
+                    var response = await httpClient.GetAsync(url, ct);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return await response.Content.ReadAsStringAsync(ct);
+                    }
+                }
             }
+
+            return null;
         }
     }
 }

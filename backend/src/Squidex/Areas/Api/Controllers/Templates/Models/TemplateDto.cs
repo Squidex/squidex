@@ -32,6 +32,11 @@ namespace Squidex.Areas.Api.Controllers.Templates.Models
         [LocalizedRequired]
         public string Description { get; set; }
 
+        /// <summary>
+        /// True, if the template is a starter.
+        /// </summary>
+        public bool IsStarter { get; set; }
+
         public static TemplateDto FromDomain(Template template, Resources resources)
         {
             var result = SimpleMapper.Map(template, new TemplateDto());

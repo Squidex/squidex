@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
@@ -21,7 +22,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             A.CallTo(() => httpClientFactory.CreateClient(null))
                 .Returns(new HttpClient());
 
-            sut = new TemplatesClient(httpClientFactory);
+            sut = new TemplatesClient(httpClientFactory, Options.Create(new TemplatesOptions
+            {
+                Repositories = new[]
+                {
+                    new TemplateRepository
+                    {
+                        ContentUrl = "https://raw.githubusercontent.com/Squidex/templates/main"
+                    }
+                }
+            }));
         }
 
         [Fact]
@@ -30,6 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             var templates = await sut.GetTemplatesAsync();
 
             Assert.NotEmpty(templates);
+            Assert.Contains(templates, x => x.IsStarter == true);
         }
 
         [Fact]
@@ -42,6 +53,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                 var details = await sut.GetDetailAsync(template.Name);
 
                 Assert.NotNull(details);
+            }
+        }
+
+        [Fact]
+        public async Task Should_get_repository_from_templates()
+        {
+            var templates = await sut.GetTemplatesAsync();
+
+            foreach (var template in templates)
+            {
+                var repository = await sut.GetRepositoryUrl(template.Name);
+
+                Assert.NotNull(repository);
             }
         }
 

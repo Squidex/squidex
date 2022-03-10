@@ -21,6 +21,7 @@ export class TemplateDto {
         public readonly name: string,
         public readonly title: string,
         public readonly description: string,
+        public readonly isStarter: boolean,
     ) {
         this._links = links;
     }
@@ -72,7 +73,8 @@ function parseTemplates(response: { items: any[] } & Resource) {
         new TemplateDto(item._links,
             item.name,
             item.title,
-            item.description));
+            item.description,
+            item.isStarter));
 
     return new TemplatesDto(items.length, items, response._links);
 }

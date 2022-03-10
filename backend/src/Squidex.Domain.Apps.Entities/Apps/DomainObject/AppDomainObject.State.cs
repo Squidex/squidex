@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return UpdateContributors(e, (e, c) => c.Remove(e.ContributorId));
 
                     case AppClientAttached e:
-                        return UpdateClients(e, (e, c) => c.Add(e.Id, e.Secret));
+                        return UpdateClients(e, (e, c) => c.Add(e.Id, e.Secret, e.Role));
 
                     case AppClientUpdated e:
                         return UpdateClients(e, (e, c) => c.Update(e.Id, e.Name, e.Role, e.ApiCallsLimit, e.ApiTrafficLimit, e.AllowAnonymous));
