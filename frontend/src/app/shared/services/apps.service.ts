@@ -122,7 +122,7 @@ export type AssetScripts =
     Readonly<{ [name: string]: string | null }>;
 
 export type CreateAppDto =
-    Readonly<{ name: string; template?: string }>;
+    Readonly<{ name: string }>;
 
 export type UpdateAppDto =
     Readonly<{ label?: string; description?: string }>;
