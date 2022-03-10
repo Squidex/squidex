@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
@@ -96,6 +97,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ContentsSearchSource>()
                 .As<ISearchSource>();
+
+            services.AddSingletonAs<TemplatesClient>()
+                .AsSelf();
 
             services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
                 .AsSelf();

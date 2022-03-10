@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { DateTimeFieldPropertiesDto, DATETIME_FIELD_EDITORS, FieldDto, FloatConverter } from '@app/shared';
+import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConverter } from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-ui[field][fieldForm][properties]',

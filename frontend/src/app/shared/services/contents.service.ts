@@ -136,9 +136,6 @@ export type ContentsBySchedule =
 type ContentsByQuery =
     Readonly<{ query?: Query; skip?: number; take?: number }> & ContentsQuery;
 
-type ContentsResponse =
-    Readonly<{ total: number; items: []; statuses: StatusInfo[] } & Resource>;
-
 @Injectable()
 export class ContentsService {
     constructor(
@@ -163,11 +160,9 @@ export class ContentsService {
             };
         }
 
-        return this.http.post<ContentsResponse>(url, body, options).pipe(
-            map(({ total, items, statuses, _links }) => {
-                const contents = items.map(parseContent);
-
-                return new ContentsDto(statuses, total, contents, _links);
+        return this.http.post<any>(url, body, options).pipe(
+            map(body => {
+                return parseContents(body);
             }),
             pretifyError('i18n:contents.loadFailed'));
     }
@@ -204,11 +199,9 @@ export class ContentsService {
             };
         }
 
-        return this.http.post<ContentsResponse>(url, body, options).pipe(
-            map(({ total, items, statuses, _links }) => {
-                const contents = items.map(parseContent);
-
-                return new ContentsDto(statuses, total, contents, _links);
+        return this.http.post<any>(url, body, options).pipe(
+            map(body => {
+                return parseContents(body);
             }),
             pretifyError('i18n:contents.loadFailed'));
     }
@@ -228,11 +221,9 @@ export class ContentsService {
             };
         }
 
-        return this.http.get<ContentsResponse>(url, options).pipe(
-            map(({ total, items, statuses, _links }) => {
-                const contents = items.map(parseContent);
-
-                return new ContentsDto(statuses, total, contents, _links);
+        return this.http.get<any>(url, options).pipe(
+            map(body => {
+                return parseContents(body);
             }),
             pretifyError('i18n:contents.loadFailed'));
     }
@@ -242,11 +233,9 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/referencing?${fullQuery}`);
 
-        return this.http.get<ContentsResponse>(url).pipe(
-            map(({ total, items, statuses, _links }) => {
-                const contents = items.map(parseContent);
-
-                return new ContentsDto(statuses, total, contents, _links);
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseContents(body);
             }),
             pretifyError('i18n:contents.loadFailed'));
     }
@@ -399,7 +388,13 @@ function buildQuery(q?: ContentsByQuery) {
     return body;
 }
 
-function parseContent(response: any) {
+function parseContents(response: { items: any[]; total: number; statuses: any } & Resource) {
+    const items = response.items.map(parseContent);
+
+    return new ContentsDto(response.statuses, response.total, items, response._links);
+}
+
+function parseContent(response: any & Resource) {
     return new ContentDto(response._links,
         response.id,
         DateTime.parseISO(response.created), response.createdBy,

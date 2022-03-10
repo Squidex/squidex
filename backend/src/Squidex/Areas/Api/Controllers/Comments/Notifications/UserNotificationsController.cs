@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
 
             var response = Deferred.Response(() =>
             {
-                return CommentsDto.FromResult(result);
+                return CommentsDto.FromDomain(result);
             });
 
             Response.Headers[HeaderNames.ETag] = result.Version.ToString(CultureInfo.InvariantCulture);

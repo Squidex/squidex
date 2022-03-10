@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, from, of, shareReplay } from 'rxjs';
+import { from, Observable, of, shareReplay } from 'rxjs';
 import { UIOptions } from '@app/framework';
 import { AssetDto, AssetsDto, AssetsService } from './../services/assets.service';
 import { ContentDto, ContentsDto, ContentsService } from './../services/contents.service';

@@ -123,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [LocalizedRequired]
         public List<FieldDto> Fields { get; set; }
 
-        public static SchemaDto FromSchema(ISchemaEntity schema, Resources resources)
+        public static SchemaDto FromDomain(ISchemaEntity schema, Resources resources)
         {
             var result = new SchemaDto();
 
@@ -132,13 +132,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
-            result.FieldRules = schema.SchemaDef.FieldRules.Select(FieldRuleDto.FromFieldRule).ToList();
+            result.FieldRules = schema.SchemaDef.FieldRules.Select(FieldRuleDto.FromDomain).ToList();
 
             result.Fields = new List<FieldDto>();
 
             foreach (var field in schema.SchemaDef.Fields)
             {
-                result.Fields.Add(FieldDto.FromField(field));
+                result.Fields.Add(FieldDto.FromDomain(field));
             }
 
             result.CreateLinks(resources);

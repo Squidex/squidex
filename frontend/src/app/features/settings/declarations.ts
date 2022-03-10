@@ -26,6 +26,8 @@ export * from './pages/roles/role-add-form.component';
 export * from './pages/roles/role.component';
 export * from './pages/roles/roles-page.component';
 export * from './pages/settings/settings-page.component';
+export * from './pages/templates/template.component';
+export * from './pages/templates/templates-page.component';
 export * from './pages/workflows/workflow-add-form.component';
 export * from './pages/workflows/workflow-diagram.component';
 export * from './pages/workflows/workflow-step.component';

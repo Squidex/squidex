@@ -126,7 +126,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetsDto.FromAssets(assets, Resources);
+                return AssetsDto.FromDomain(assets, Resources);
             });
 
             return Ok(response);
@@ -155,7 +155,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetsDto.FromAssets(assets, Resources);
+                return AssetsDto.FromDomain(assets, Resources);
             });
 
             return Ok(response);
@@ -186,7 +186,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = Deferred.Response(() =>
             {
-                return AssetDto.FromAsset(asset, Resources);
+                return AssetDto.FromDomain(asset, Resources);
             });
 
             return Ok(response);
@@ -280,7 +280,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -452,11 +452,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (context.PlainResult is AssetDuplicate created)
             {
-                return AssetDto.FromAsset(created.Asset, Resources, true);
+                return AssetDto.FromDomain(created.Asset, Resources, true);
             }
             else
             {
-                return AssetDto.FromAsset(context.Result<IEnrichedAssetEntity>(), Resources);
+                return AssetDto.FromDomain(context.Result<IEnrichedAssetEntity>(), Resources);
             }
         }
 

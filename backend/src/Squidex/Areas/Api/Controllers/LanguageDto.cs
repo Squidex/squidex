@@ -31,9 +31,11 @@ namespace Squidex.Areas.Api.Controllers
         [LocalizedRequired]
         public string NativeName { get; set; }
 
-        public static LanguageDto FromLanguage(Language language)
+        public static LanguageDto FromDomain(Language language)
         {
-            return SimpleMapper.Map(language, new LanguageDto());
+            var result = SimpleMapper.Map(language, new LanguageDto());
+
+            return result;
         }
     }
 }

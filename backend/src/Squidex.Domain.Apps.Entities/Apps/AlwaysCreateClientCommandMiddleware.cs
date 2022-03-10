@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates
+namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AlwaysCreateClientCommandMiddleware : ICommandMiddleware
     {

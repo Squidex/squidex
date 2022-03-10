@@ -6,7 +6,7 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, hasNoValue$, hasValue$, TemplatedFormArray, ExtendedFormGroup } from '@app/framework';
+import { ExtendedFormGroup, Form, hasNoValue$, hasValue$, TemplatedFormArray } from '@app/framework';
 import { CreateRoleDto, RoleDto, UpdateRoleDto } from './../services/roles.service';
 
 export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {

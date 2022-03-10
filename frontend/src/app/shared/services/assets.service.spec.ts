@@ -275,13 +275,12 @@ describe('AssetsService', () => {
 
     it('should return proper error if upload failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            let asset: AssetDto;
             let error: ErrorDto;
 
-            assetsService.postAssetFile('my-app', null!).subscribe(result => {
-                asset = <AssetDto>result;
-            }, e => {
-                error = e;
+            assetsService.postAssetFile('my-app', null!).subscribe({
+                error: e => {
+                    error = e;
+                },
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
@@ -291,7 +290,6 @@ describe('AssetsService', () => {
 
             req.flush({}, { status: 413, statusText: 'Payload too large' });
 
-            expect(asset!).toBeUndefined();
             expect(error!).toEqual(new ErrorDto(413, 'i18n:assets.fileTooBig'));
         }));
 
@@ -327,13 +325,12 @@ describe('AssetsService', () => {
                 },
             };
 
-            let asset: AssetDto;
             let error: ErrorDto;
 
-            assetsService.putAssetFile('my-app', resource, null!, version).subscribe(result => {
-                asset = <AssetDto>result;
-            }, e => {
-                error = e;
+            assetsService.putAssetFile('my-app', resource, null!, version).subscribe({
+                error: e => {
+                    error = e;
+                },
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123/content');
@@ -343,7 +340,6 @@ describe('AssetsService', () => {
 
             req.flush({}, { status: 413, statusText: 'Payload too large' });
 
-            expect(asset!).toBeUndefined();
             expect(error!).toEqual(new ErrorDto(413, 'i18n:assets.fileTooBig'));
         }));
 

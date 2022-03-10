@@ -8,7 +8,7 @@
 /* eslint-disable no-useless-escape */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, hasNoValue$, ExtendedFormGroup, ValidatorsEx } from '@app/framework';
+import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
 import { ClientDto, CreateClientDto, UpdateClientDto } from './../services/clients.service';
 
 export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, ClientDto> {

@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         {
             var jobs = await backupService.GetBackupsAsync(AppId, HttpContext.RequestAborted);
 
-            var response = BackupJobsDto.FromBackups(jobs, Resources);
+            var response = BackupJobsDto.FromDomain(jobs, Resources);
 
             return Ok(response);
         }

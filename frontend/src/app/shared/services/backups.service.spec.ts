@@ -109,13 +109,12 @@ describe('BackupsService', () => {
 
     it('should throw error if get restore return non 404',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
-            let restore: RestoreDto | null;
             let error: any;
 
-            backupsService.getRestore().subscribe(result => {
-                restore = result;
-            }, err => {
-                error = err;
+            backupsService.getRestore().subscribe({
+                error: e => {
+                    error = e;
+                },
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/restore');
@@ -125,7 +124,6 @@ describe('BackupsService', () => {
 
             req.flush({}, { status: 500, statusText: '500' });
 
-            expect(restore!).toBeUndefined();
             expect(error)!.toBeDefined();
         }));
 

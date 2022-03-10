@@ -129,7 +129,7 @@ export function parseRoles(response: any) {
             item.properties,
             item.isDefaultRole));
 
-    const _links = response._links;
+    const { _links } = response;
 
     return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }

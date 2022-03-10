@@ -6,8 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, map, Observable, Subject } from 'rxjs';
 
 interface Message {
     // The target.

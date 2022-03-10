@@ -172,12 +172,6 @@ export type AssetsByIds =
 export type AssetsByQuery =
     Readonly<{ query?: Query; skip?: number; tags?: Tags; take?: number; parentId?: string }>;
 
-type AssetsResponse =
-    Readonly<{ total: number; items: any[]; folders: any[] } & Resource>;
-
-type AssetFolderResponse =
-    Readonly<{ total: number; items: any[]; folders: any[]; path: any[] } & Resource>;
-
 @Injectable()
 export class AssetsService {
     constructor(
@@ -216,11 +210,9 @@ export class AssetsService {
             };
         }
 
-        return this.http.post<AssetsResponse>(url, body, options).pipe(
-            map(({ total, items, _links }) => {
-                const assets = items.map(parseAsset);
-
-                return new AssetsDto(total, assets, _links);
+        return this.http.post<any>(url, body, options).pipe(
+            map(body => {
+                return parseAssets(body);
             }),
             pretifyError('i18n:assets.loadFailed'));
     }
@@ -228,12 +220,9 @@ export class AssetsService {
     public getAssetFolders(appName: string, parentId: string, scope: AssetFolderScope): Observable<AssetFoldersDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders?parentId=${parentId}&scope=${scope}`);
 
-        return this.http.get<AssetFolderResponse>(url).pipe(
-            map(({ total, items, path, _links }) => {
-                const assetFolders = items.map(parseAssetFolder);
-                const assetPath = path.map(parseAssetFolder);
-
-                return new AssetFoldersDto(total, assetFolders, assetPath, _links);
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseAssetFolders(body);
             }),
             pretifyError('i18n:assets.loadFoldersFailed'));
     }
@@ -243,9 +232,7 @@ export class AssetsService {
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
-                const body = payload.body;
-
-                return parseAsset(body);
+                return parseAsset(payload.body);
             }),
             pretifyError('i18n:assets.loadFailed'));
     }
@@ -459,6 +446,12 @@ function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef)
     return body;
 }
 
+function parseAssets(response: { items: any[]; total: number } & Resource) {
+    const items = response.items.map(parseAsset);
+
+    return new AssetsDto(response.total, items, response._links);
+}
+
 function parseAsset(response: any) {
     return new AssetDto(response._links, response._meta,
         response.id,
@@ -478,6 +471,13 @@ function parseAsset(response: any) {
         response.metadata,
         response.slug,
         response.tags || []);
+}
+
+function parseAssetFolders(response: { items: any[]; path: any[]; total: number } & Resource) {
+    const assetFolders = response.items.map(parseAssetFolder);
+    const assetPath = response.path.map(parseAssetFolder);
+
+    return new AssetFoldersDto(response.total, assetFolders, assetPath, response._links);
 }
 
 function parseAssetFolder(response: any) {

@@ -9,7 +9,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import GraphiQL from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AppsState, GraphQlService } from '@app/shared';
 
@@ -32,7 +32,7 @@ export class GraphQLPageComponent implements AfterViewInit {
         ReactDOM.render(
             React.createElement(GraphiQL, {
                 fetcher: (params: any) => {
-                    return this.request(params);
+                    return firstValueFrom(this.request(params));
                 },
             }),
             this.graphiQLContainer.nativeElement,
@@ -41,7 +41,6 @@ export class GraphQLPageComponent implements AfterViewInit {
 
     private request(params: any) {
         return this.graphQlService.query(this.appsState.appName, params).pipe(
-                catchError(response => of(response.error)))
-            .toPromise();
+                catchError(response => of(response.error)));
     }
 }

@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             var response = Deferred.Response(() =>
             {
-                return ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
+                return ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDomain(x.Value));
             });
 
             Response.Headers[HeaderNames.ETag] = etag;
@@ -305,7 +305,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             var simulation = await ruleRunnerService.SimulateAsync(rule, HttpContext.RequestAborted);
 
-            var response = SimulatedRuleEventsDto.FromSimulatedRuleEvents(simulation);
+            var response = SimulatedRuleEventsDto.FromDomain(simulation);
 
             return Ok(response);
         }
@@ -350,7 +350,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take, HttpContext.RequestAborted);
 
-            var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources, ruleId);
+            var response = RuleEventsDto.FromDomain(ruleEvents, Resources, ruleId);
 
             return Ok(response);
         }
@@ -476,7 +476,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
             var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id, HttpContext.RequestAborted);
 
             var result = context.Result<IEnrichedRuleEntity>();
-            var response = RuleDto.FromRule(result, runningRuleId == null, ruleRunnerService, Resources);
+            var response = RuleDto.FromDomain(result, runningRuleId == null, ruleRunnerService, Resources);
 
             return response;
         }

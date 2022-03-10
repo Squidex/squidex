@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto, REFERENCES_FIELD_EDITORS } from '@app/shared';
+import { FieldDto, REFERENCES_FIELD_EDITORS, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-ui[field][fieldForm][properties]',
