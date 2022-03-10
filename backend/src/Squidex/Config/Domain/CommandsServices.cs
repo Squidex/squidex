@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
+using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Comments.DomainObject;
@@ -63,6 +64,12 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CustomCommandMiddlewareRunner>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<TemplateCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<AlwaysCreateClientCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<RestrictAppsCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
@@ -106,9 +113,6 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<SingletonCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<AlwaysCreateClientCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()

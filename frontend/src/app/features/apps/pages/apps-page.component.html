@@ -35,6 +35,20 @@
                 </sqx-form-hint>
             </div>
         </div>
+
+        <div class="card card-template card-href" *ngFor="let template of templates | async" (click)="createNewApp(template)">
+            <div class="card-body">
+                <div class="card-image">
+                    <img src="./images/add-template.svg">
+                </div>
+
+                <h3 class="card-title">{{template.title}}</h3>
+
+                <sqx-form-hint>
+                    {{template.description}}
+                </sqx-form-hint>
+            </div>
+        </div>
     </div>
 
     <div *ngIf="info" class="apps-section">
@@ -43,7 +57,7 @@
 </div>
 
 <ng-container *sqxModal="addAppDialog">
-    <sqx-app-form (complete)="addAppDialog.hide()"></sqx-app-form>
+    <sqx-app-form [template]="addAppTemplate" (complete)="addAppDialog.hide()"></sqx-app-form>
 </ng-container>
 
 <ng-container *sqxModal="onboardingDialog">

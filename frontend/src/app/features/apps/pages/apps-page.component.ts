@@ -6,8 +6,9 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { take } from 'rxjs/operators';
-import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, UIOptions, UIState } from '@app/shared';
+import { Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+import { AppDto, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, NewsService, OnboardingService, TemplateDto, TemplatesState, UIOptions, UIState } from '@app/shared';
 import { Settings } from '@app/shared/state/settings';
 
 @Component({
@@ -17,6 +18,7 @@ import { Settings } from '@app/shared/state/settings';
 })
 export class AppsPageComponent implements OnInit {
     public addAppDialog = new DialogModel();
+    public addAppTemplate?: TemplateDto;
 
     public onboardingDialog = new DialogModel();
 
@@ -25,6 +27,10 @@ export class AppsPageComponent implements OnInit {
 
     public info = '';
 
+    public templates: Observable<TemplateDto[]> =
+        this.templatesState.templates.pipe(
+            map(x => x.filter(t => t.isStarter)));
+
     constructor(
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
@@ -32,6 +38,7 @@ export class AppsPageComponent implements OnInit {
         private readonly localStore: LocalStoreService,
         private readonly newsService: NewsService,
         private readonly onboardingService: OnboardingService,
+        private readonly templatesState: TemplatesState,
         private readonly uiOptions: UIOptions,
     ) {
         if (uiOptions.get('showInfo')) {
@@ -63,9 +70,12 @@ export class AppsPageComponent implements OnInit {
                         });
                 }
             });
+
+        this.templatesState.load();
     }
 
-    public createNewApp() {
+    public createNewApp(template?: TemplateDto) {
+        this.addAppTemplate = template;
         this.addAppDialog.show();
     }
 

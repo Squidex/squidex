@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
-    public sealed record Template(string Name, string Title, string Description, bool IsStarter)
+    public sealed class TemplatesOptions
     {
+        public TemplateRepository[] Repositories { get; set; }
     }
 }

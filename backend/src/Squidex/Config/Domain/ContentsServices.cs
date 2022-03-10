@@ -29,6 +29,9 @@ namespace Squidex.Config.Domain
             services.Configure<ContentOptions>(config,
                 "contents");
 
+            services.Configure<TemplatesOptions>(config,
+                "templates");
+
             services.AddSingletonAs(c => new Lazy<IContentQueryService>(c.GetRequiredService<IContentQueryService>))
                 .AsSelf();
 
