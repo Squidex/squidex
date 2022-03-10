@@ -1,0 +1,17 @@
+@import 'mixins';
+@import 'vars';
+
+h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    margin-top: .5rem;
+}
+
+.help {
+    ::ng-deep {
+        h1 {
+            display: none;
+        }
+    }
+}
