@@ -47,14 +47,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             await next(context);
 
-            if (context.IsCompleted && context.Command is CreateApp createApp && !string.IsNullOrWhiteSpace(createApp.Template))
+            if (context.IsCompleted && context.Command is CreateApp createApp)
             {
                 await ApplyTemplateAsync(context.Result<IAppEntity>(), createApp.Template);
             }
         }
 
-        private async Task ApplyTemplateAsync(IAppEntity app, string template)
+        private async Task ApplyTemplateAsync(IAppEntity app, string? template)
         {
+            if (string.IsNullOrWhiteSpace(template))
+            {
+                return;
+            }
+
             var repository = await templatesClient.GetRepositoryUrl(template);
 
             if (string.IsNullOrEmpty(repository))
