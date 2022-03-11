@@ -148,7 +148,7 @@ export class UsersState extends State<Snapshot> {
             tap(updated => {
                 this.replaceUser(updated);
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     public lock(user: UserDto): Observable<UserDto> {
