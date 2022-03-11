@@ -54,7 +54,7 @@ export class ContentStatusComponent implements OnChanges {
             if (this.scheduled) {
                 const args = { status: this.scheduled.status, time: this.scheduled.dueTime.toStringFormat('PPpp') };
 
-                this.tooltipText = this.localizer.getOrKey('contents.scheduledTooltip', args);
+                this.tooltipText = this.localizer.getOrKey('i18n:contents.scheduledTooltip', args);
             } else {
                 this.tooltipText = this.status;
             }

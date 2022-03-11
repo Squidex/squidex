@@ -694,12 +694,6 @@
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
     <value>Gebruiker is uitgesloten.</value>
   </data>
-  <data name="exception.invalidJsonQuery" xml:space="preserve">
-    <value>Json-query niet geldig: {message}</value>
-  </data>
-  <data name="exception.invalidJsonQueryJson" xml:space="preserve">
-    <value>Json-query is niet geldig json: {message}</value>
-  </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
     <value>Entiteit ({id}) bestaat al.</value>
   </data>
@@ -910,9 +904,6 @@
   <data name="search.schemaResult" xml:space="preserve">
     <value>{name} Schema</value>
   </data>
-  <data name="security.passwordStolen" xml:space="preserve">
-    <value>Dit wachtwoord is eerder verschenen bij een datalek en mag nooit worden gebruikt. Als je het ooit eerder hebt gebruikt, verander het dan!</value>
-  </data>
   <data name="setup.createUser.button" xml:space="preserve">
     <value>Create User</value>
   </data>
@@ -978,15 +969,6 @@
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
-  </data>
-  <data name="setup.webpack.headline" xml:space="preserve">
-    <value>webpack error</value>
-  </data>
-  <data name="setup.webpack.text" xml:space="preserve">
-    <value>You have to run webpack dev server to run the frontend in Development mode. More information in the documenation: </value>
-  </data>
-  <data name="setup.webpack.title" xml:space="preserve">
-    <value>webpack error</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>Deze bewerking is niet toegestaan, je account is mogelijk vergrendeld.</value>
