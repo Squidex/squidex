@@ -51,6 +51,8 @@ namespace Squidex.Extensions.Actions.Discourse
 
             var ruleJob = new DiscourseJob
             {
+                ApiKey = action.ApiKey,
+                ApiUserName = action.ApiUsername,
                 RequestUrl = url,
                 RequestBody = requestBody
             };
@@ -73,6 +75,9 @@ namespace Squidex.Extensions.Actions.Discourse
                     Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
                 })
                 {
+                    request.Headers.TryAddWithoutValidation("Api-Key", job.ApiKey);
+                    request.Headers.TryAddWithoutValidation("Api-Username", job.ApiUserName);
+
                     return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
                 }
             }
@@ -81,6 +86,10 @@ namespace Squidex.Extensions.Actions.Discourse
 
     public sealed class DiscourseJob
     {
+        public string ApiKey { get; set; }
+
+        public string ApiUserName { get; set; }
+
         public string RequestUrl { get; set; }
 
         public string RequestBody { get; set; }
