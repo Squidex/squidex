@@ -41,6 +41,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_not_set_image_height_and_width_metadata_when_file_does_not_have_those_values()
+        {
+            var command = Command("SampleAudio_0.4mb.mp3");
+
+            await sut.EnhanceAsync(command);
+
+            Assert.Null(command.Metadata.GetPixelWidth());
+            Assert.Null(command.Metadata.GetPixelHeight());
+        }
+
+        [Fact]
         public async Task Should_provide_metadata_for_audio()
         {
             var command = Command("SampleAudio_0.4mb.mp3");

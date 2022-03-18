@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     var pw = file.Properties.PhotoWidth;
                     var ph = file.Properties.PhotoHeight;
 
-                    if (pw > 0 && pw > 0)
+                    if (pw > 0 && ph > 0)
                     {
                         command.Metadata.SetPixelWidth(pw);
                         command.Metadata.SetPixelHeight(ph);
