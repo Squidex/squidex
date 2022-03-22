@@ -6,23 +6,25 @@
 // ==========================================================================
 
 using System.Globalization;
-using Microsoft.Extensions.Logging;
 using Squidex.CLI.Commands.Implementation;
 using Squidex.Infrastructure;
-using ILog = Microsoft.Extensions.Logging.ILogger;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
-    public sealed class StringLogger : CLI.Commands.Implementation.ILogger, ILogLine
+    public sealed class StringLogger : ILogger, ILogLine
     {
         private const int MaxActionLength = 40;
-        private readonly ILog log;
+        private readonly ISemanticLog log;
+        private readonly string template;
         private readonly List<string> lines = new List<string>();
         private readonly List<string> errors = new List<string>();
         private string startedLine = string.Empty;
 
-        public StringLogger(ILog log)
+        public StringLogger(string template, ISemanticLog log)
         {
+            this.template = template;
+
             this.log = log;
         }
 
@@ -30,7 +32,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             var mesage = string.Join('\n', lines);
 
-            log.LogInformation("CLI executed with full logs {steps}.", mesage);
+            log.LogInformation(w => w
+                .WriteProperty("message", $"CLI executed or template {template}.")
+                .WriteProperty("template", template)
+                .WriteArray("steps", a =>
+                {
+                    foreach (var line in lines)
+                    {
+                        a.WriteValue(line);
+                    }
+                }));
 
             if (errors.Count > 0)
             {

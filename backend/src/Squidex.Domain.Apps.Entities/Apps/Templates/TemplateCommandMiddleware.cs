@@ -21,6 +21,7 @@ using Squidex.ClientLibrary.Configuration;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
@@ -28,13 +29,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     {
         private readonly TemplatesClient templatesClient;
         private readonly IUrlGenerator urlGenerator;
-        private readonly ILogger<TemplateCommandMiddleware> log;
+        private readonly ISemanticLog log;
 
         public TemplateCommandMiddleware(TemplatesClient templatesClient, IUrlGenerator urlGenerator,
-            ILogger<TemplateCommandMiddleware> log)
+            ISemanticLog log)
         {
             this.templatesClient = templatesClient;
             this.urlGenerator = urlGenerator;
+
             this.log = log;
         }
 
@@ -59,11 +61,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             if (string.IsNullOrEmpty(repository))
             {
-                log.LogWarning("Cannot find template {template}.", template);
+                log.LogWarning(w => w
+                    .WriteProperty("message", "Template not found.")
+                    .WriteProperty("template", template));
                 return;
             }
 
-            using (var cliLog = new StringLogger(log))
+            using (var cliLog = new StringLogger(template, log))
             {
                 var session = CreateSession(app);
 
