@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.CLI.Commands.Implementation;
 using Squidex.CLI.Commands.Implementation.FileSystem;
 using Squidex.CLI.Commands.Implementation.Sync;
@@ -27,20 +28,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     {
         private readonly TemplatesClient templatesClient;
         private readonly IUrlGenerator urlGenerator;
-        private readonly ISynchronizer[] targets =
-        {
-            new AppSynchronizer(CLILogger.Instance),
-            new AssetFoldersSynchronizer(CLILogger.Instance),
-            new AssetsSynchronizer(CLILogger.Instance),
-            new RulesSynchronizer(CLILogger.Instance),
-            new SchemasSynchronizer(CLILogger.Instance),
-            new WorkflowsSynchronizer(CLILogger.Instance),
-        };
+        private readonly ILogger<TemplateCommandMiddleware> log;
 
-        public TemplateCommandMiddleware(TemplatesClient templatesClient, IUrlGenerator urlGenerator)
+        public TemplateCommandMiddleware(TemplatesClient templatesClient, IUrlGenerator urlGenerator,
+            ILogger<TemplateCommandMiddleware> log)
         {
             this.templatesClient = templatesClient;
             this.urlGenerator = urlGenerator;
+            this.log = log;
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
@@ -64,17 +59,31 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             if (string.IsNullOrEmpty(repository))
             {
+                log.LogWarning("Cannot find template {template}.", template);
                 return;
             }
 
-            var session = CreateSession(app);
-
-            var syncService = await CreateSyncServiceAsync(repository, session);
-            var syncOptions = new SyncOptions();
-
-            foreach (var target in targets.OrderBy(x => x.Name))
+            using (var cliLog = new StringLogger(log))
             {
-                await target.ImportAsync(syncService, syncOptions, session);
+                var session = CreateSession(app);
+
+                var syncService = await CreateSyncServiceAsync(repository, session);
+                var syncOptions = new SyncOptions();
+
+                var targets = new ISynchronizer[]
+                {
+                    new AppSynchronizer(cliLog),
+                    new AssetFoldersSynchronizer(cliLog),
+                    new AssetsSynchronizer(cliLog),
+                    new RulesSynchronizer(cliLog),
+                    new SchemasSynchronizer(cliLog),
+                    new WorkflowsSynchronizer(cliLog),
+                };
+
+                foreach (var target in targets.OrderBy(x => x.Name))
+                {
+                    await target.ImportAsync(syncService, syncOptions, session);
+                }
             }
         }
 
