@@ -320,6 +320,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .MustHaveHappened();
         }
 
+        [Fact]
+        public async Task Should_forward_registation()
+        {
+            await sut.RegisterAsync(appId.Id, appId.Name);
+
+            A.CallTo(() => cache.AddAsync(appId.Id, appId.Name))
+                .MustHaveHappened();
+        }
+
         private (IAppEntity, IAppGrain) CreateApp(long version = 0, bool fromClient = false, bool isArchived = false)
         {
             var app = A.Fake<IAppEntity>();

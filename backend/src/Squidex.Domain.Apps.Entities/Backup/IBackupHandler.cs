@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return Task.CompletedTask;
         }
 
-        public Task CompleteRestoreAsync(RestoreContext context)
+        public Task CompleteRestoreAsync(RestoreContext context, string appName)
         {
             return Task.CompletedTask;
         }

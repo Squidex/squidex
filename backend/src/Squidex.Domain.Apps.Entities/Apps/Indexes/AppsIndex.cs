@@ -34,6 +34,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             this.grainCache = grainCache;
         }
 
+        public Task RegisterAsync(DomainId id, string name,
+            CancellationToken ct = default)
+        {
+            return Cache().AddAsync(id, name);
+        }
+
         public Task RemoveReservationAsync(string? token,
             CancellationToken ct = default)
         {

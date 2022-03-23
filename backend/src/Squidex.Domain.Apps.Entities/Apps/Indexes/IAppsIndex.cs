@@ -24,6 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         Task<string?> ReserveAsync(DomainId id, string name,
             CancellationToken ct = default);
 
+        Task RegisterAsync(DomainId id, string name,
+            CancellationToken ct = default);
+
         Task RemoveReservationAsync(string? token,
             CancellationToken ct = default);
     }

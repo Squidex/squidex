@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Telemetry.Activities.StartActivity($"{handler.GetType().Name}/CompleteRestoreAsync"))
                             {
-                                await handler.CompleteRestoreAsync(runningContext);
+                                await handler.CompleteRestoreAsync(runningContext, CurrentJob.NewAppName!);
                             }
 
                             Log($"Completed {handler.Name}");
