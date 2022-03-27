@@ -62,6 +62,14 @@ export class SchemasState extends State<Snapshot> {
     public categoryNames =
         this.projectFrom2(this.schemas, this.addedCategories, (s, c) => buildCategoryNames(c, s));
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     public get schemaId() {
         return this.snapshot.selectedSchema?.id || '';
     }
@@ -351,10 +359,6 @@ export class SchemasState extends State<Snapshot> {
         } else if (updateText) {
             this.dialogs.notifyInfo('i18n:common.nothingChanged');
         }
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }
 

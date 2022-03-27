@@ -133,7 +133,12 @@
                                 {{ 'rules.actionHint' | sqxTranslate }}
                             </sqx-form-alert>
         
-                            <sqx-generic-action [actionForm]="currentAction.form"></sqx-generic-action>
+                            <sqx-generic-action 
+                                [actionForm]="currentAction.form"
+                                [trigger]="currentTrigger"
+                                [triggerType]="currentTrigger?.type"
+                                [appName]="rulesState.appName">
+                            </sqx-generic-action>
                         </ng-container>
                 
                         <ng-template #actionSelector>        

@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection.Internal;
 using Squidex.Shared.Users;
@@ -25,10 +26,37 @@ namespace Squidex.Domain.Apps.Core.Scripting
     public sealed class ScriptingCompleter
     {
         private readonly IEnumerable<IScriptDescriptor> descriptors;
+        private static readonly FilterSchema DynamicData = new FilterSchema(FilterSchemaType.Object)
+        {
+            Fields = ReadonlyList.Create(
+                new FilterField(new FilterSchema(FilterSchemaType.Object), "my-field"),
+                new FilterField(FilterSchema.String, "my-field.iv"))
+        };
 
         public ScriptingCompleter(IEnumerable<IScriptDescriptor> descriptors)
         {
             this.descriptors = descriptors;
+        }
+
+        public IReadOnlyList<ScriptingValue> Trigger(string type)
+        {
+            Guard.NotNull(type);
+
+            switch (type)
+            {
+                case "AssetChanged":
+                    return AssetTrigger();
+                case "Comment":
+                    return CommentTrigger();
+                case "ContentChanged":
+                    return ContentTrigger(DynamicData);
+                case "SchemaChanged":
+                    return SchemaTrigger();
+                case "Usage":
+                    return UsageTrigger();
+                default:
+                    return new List<ScriptingValue>();
+            }
         }
 
         public IReadOnlyList<ScriptingValue> ContentScript(FilterSchema dataSchema)

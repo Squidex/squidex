@@ -6,13 +6,10 @@
 // ==========================================================================
 
 using FakeItEasy;
-using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Xunit;
 
@@ -29,8 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var schema =
                 new Schema("simple")
-                    .AddString(1, "my-invariant", Partitioning.Invariant)
-                    .AddString(2, "my-localized", Partitioning.Language);
+                    .AddString(1, "my-field", Partitioning.Invariant);
 
             dataSchema = schema.BuildDataSchema(LanguagesConfig.English.ToResolver(), ResolvedComponents.Empty);
 
@@ -63,20 +59,14 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     "ctx.appName",
                     "ctx.contentId",
                     "ctx.data",
-                    "ctx.data['my-invariant']",
-                    "ctx.data['my-invariant'].iv",
-                    "ctx.data['my-localized']",
-                    "ctx.data['my-localized'].en",
+                    "ctx.data['my-field']",
+                    "ctx.data['my-field'].iv",
                     "ctx.dataOld",
-                    "ctx.dataOld['my-invariant']",
-                    "ctx.dataOld['my-invariant'].iv",
-                    "ctx.dataOld['my-localized']",
-                    "ctx.dataOld['my-localized'].en",
+                    "ctx.dataOld['my-field']",
+                    "ctx.dataOld['my-field'].iv",
                     "ctx.oldData",
-                    "ctx.oldData['my-invariant']",
-                    "ctx.oldData['my-invariant'].iv",
-                    "ctx.oldData['my-localized']",
-                    "ctx.oldData['my-localized'].en",
+                    "ctx.oldData['my-field']",
+                    "ctx.oldData['my-field'].iv",
                     "ctx.oldStatus",
                     "ctx.operation",
                     "ctx.permanent",
@@ -84,51 +74,6 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     "ctx.schemaName",
                     "ctx.status",
                     "ctx.statusOld"
-                });
-        }
-
-        [Fact]
-        public void Should_describe_content_trigger()
-        {
-            var result = sut.ContentTrigger(dataSchema);
-
-            AssertCompletion(result,
-                PresetActor("event.actor"),
-                PresetUser("event.user"),
-                new[]
-                {
-                    "event",
-                    "event.appId",
-                    "event.appId.id",
-                    "event.appId.name",
-                    "event.created",
-                    "event.createdBy",
-                    "event.createdBy.identifier",
-                    "event.createdBy.type",
-                    "event.data",
-                    "event.data['my-invariant']",
-                    "event.data['my-invariant'].iv",
-                    "event.data['my-localized']",
-                    "event.data['my-localized'].en",
-                    "event.dataOld",
-                    "event.dataOld['my-invariant']",
-                    "event.dataOld['my-invariant'].iv",
-                    "event.dataOld['my-localized']",
-                    "event.dataOld['my-localized'].en",
-                    "event.lastModified",
-                    "event.lastModifiedBy",
-                    "event.lastModifiedBy.identifier",
-                    "event.lastModifiedBy.type",
-                    "event.id",
-                    "event.name",
-                    "event.newStatus",
-                    "event.schemaId",
-                    "event.schemaId.id",
-                    "event.schemaId.name",
-                    "event.status",
-                    "event.timestamp",
-                    "event.type",
-                    "event.version"
                 });
         }
 
@@ -176,10 +121,77 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
+        public void Should_describe_content_trigger()
+        {
+            var result = sut.ContentTrigger(dataSchema);
+
+            AssertContentTrigger(result);
+        }
+
+        [Fact]
+        public void Should_describe_dynamic_content_trigger()
+        {
+            var result = sut.Trigger("ContentChanged");
+
+            AssertContentTrigger(result);
+        }
+
+        private static void AssertContentTrigger(IReadOnlyList<ScriptingValue> result)
+        {
+            AssertCompletion(result,
+                PresetActor("event.actor"),
+                PresetUser("event.user"),
+                new[]
+                {
+                    "event",
+                    "event.appId",
+                    "event.appId.id",
+                    "event.appId.name",
+                    "event.created",
+                    "event.createdBy",
+                    "event.createdBy.identifier",
+                    "event.createdBy.type",
+                    "event.data",
+                    "event.data['my-field']",
+                    "event.data['my-field'].iv",
+                    "event.dataOld",
+                    "event.dataOld['my-field']",
+                    "event.dataOld['my-field'].iv",
+                    "event.lastModified",
+                    "event.lastModifiedBy",
+                    "event.lastModifiedBy.identifier",
+                    "event.lastModifiedBy.type",
+                    "event.id",
+                    "event.name",
+                    "event.newStatus",
+                    "event.schemaId",
+                    "event.schemaId.id",
+                    "event.schemaId.name",
+                    "event.status",
+                    "event.timestamp",
+                    "event.type",
+                    "event.version"
+                });
+        }
+
+        [Fact]
         public void Should_describe_asset_trigger()
         {
             var result = sut.AssetTrigger();
 
+            AssertAssetTrigger(result);
+        }
+
+        [Fact]
+        public void Should_describe_dynamicasset_trigger()
+        {
+            var result = sut.Trigger("AssetChanged");
+
+            AssertAssetTrigger(result);
+        }
+
+        private void AssertAssetTrigger(IReadOnlyList<ScriptingValue> result)
+        {
             AssertCompletion(result,
                 PresetActor("event.actor"),
                 PresetUser("event.user"),
@@ -224,6 +236,19 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var result = sut.CommentTrigger();
 
+            AssertCommentTrigger(result);
+        }
+
+        [Fact]
+        public void Should_describe_dynamic_comment_trigger()
+        {
+            var result = sut.Trigger("Comment");
+
+            AssertCommentTrigger(result);
+        }
+
+        private static void AssertCommentTrigger(IReadOnlyList<ScriptingValue> result)
+        {
             AssertCompletion(result,
                 PresetActor("event.actor"),
                 PresetUser("event.user"),
@@ -246,6 +271,19 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var result = sut.SchemaTrigger();
 
+            AssertSchemaTrigger(result);
+        }
+
+        [Fact]
+        public void Should_describe_dynamic_schema_trigger()
+        {
+            var result = sut.Trigger("SchemaChanged");
+
+            AssertSchemaTrigger(result);
+        }
+
+        private static void AssertSchemaTrigger(IReadOnlyList<ScriptingValue> result)
+        {
             AssertCompletion(result,
                 PresetActor("event.actor"),
                 PresetUser("event.user"),
@@ -270,6 +308,19 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var result = sut.UsageTrigger();
 
+            AssertUsageTrigger(result);
+        }
+
+        [Fact]
+        public void Should_describe_dynamic_usage_trigger()
+        {
+            var result = sut.Trigger("Usage");
+
+            AssertUsageTrigger(result);
+        }
+
+        private static void AssertUsageTrigger(IReadOnlyList<ScriptingValue> result)
+        {
             AssertCompletion(result,
                 new[]
                 {

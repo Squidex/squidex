@@ -59,6 +59,10 @@ export class ContributorsState extends State<Snapshot> {
         return this.appsState.appId;
     }
 
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly contributorsService: ContributorsService,
@@ -148,10 +152,6 @@ export class ContributorsState extends State<Snapshot> {
             total: items.length,
             version,
         }, 'Loading Success / Updated');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 
     private get version() {

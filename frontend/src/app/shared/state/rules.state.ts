@@ -69,6 +69,14 @@ export class RulesState extends State<Snapshot> {
     public runningRule =
         this.projectFrom2(this.rules, this.runningRuleId, (r, id) => r.find(x => x.id === id));
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
@@ -215,9 +223,5 @@ export class RulesState extends State<Snapshot> {
 
             return { ...s, rules, selectedRule };
         }, 'Updated');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }

@@ -7,7 +7,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AnalyticsService, ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, ResourceLinks, sanitize, Version } from '@app/shared/internal';
+import { AnalyticsService, ApiUrlConfig, AssetCompletions, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, ResourceLinks, sanitize, Version } from '@app/shared/internal';
 
 describe('AssetsService', () => {
     const version = new Version('1');
@@ -451,6 +451,24 @@ describe('AssetsService', () => {
             req.flush(assetFolderResponse(22));
 
             expect(assetFolder!).toEqual(createAssetFolder(22));
+        }));
+
+    it('should make get request to get completions',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+            let completions: AssetCompletions;
+
+            assetsService.getCompletions('my-app').subscribe(result => {
+                completions = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/completion');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([]);
+
+            expect(completions!).toEqual([]);
         }));
 
     function assetResponse(id: number, suffix = '', parentId?: string) {

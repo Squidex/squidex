@@ -210,6 +210,9 @@ export class SimulatedRuleEventDto {
     }
 }
 
+export type RuleCompletions =
+    ReadonlyArray<{ path: string; description: string; type: string }>;
+
 export type ActionsDto =
     Readonly<{ [name: string]: RuleElementDto }>;
 
@@ -379,6 +382,12 @@ export class RulesService {
                 this.analytics.trackEvent('Rule', 'EventsCancelled', appName);
             }),
             pretifyError('i18n:rules.ruleEvents.cancelFailed'));
+    }
+
+    public getCompletions(appName: string, actionType: string): Observable<RuleCompletions> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/completion/${actionType}`);
+
+        return this.http.get<RuleCompletions>(url);
     }
 }
 
