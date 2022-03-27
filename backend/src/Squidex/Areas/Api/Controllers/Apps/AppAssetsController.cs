@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </summary>
         /// <param name="app">The name of the app to get the asset scripts for.</param>
         /// <returns>
-        /// 200 => App asset scripts returned.
+        /// 200 => Asset scripts returned.
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(AssetScriptsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetSScriptsRead)]
         [ApiCosts(0)]
-        public IActionResult GetScripts(string app)
+        public IActionResult GetAssetScripts(string app)
         {
             var response = Deferred.Response(() =>
             {
@@ -54,8 +54,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app to update.</param>
         /// <param name="request">The values to update.</param>
         /// <returns>
-        /// 200 => App updated.
-        /// 400 => App request not valid.
+        /// 200 => Asset scripts updated.
+        /// 400 => Asset request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPut]
@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(AssetScriptsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppAssetsScriptsUpdate)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PutScripts(string app, [FromBody] UpdateAssetScriptsDto request)
+        public async Task<IActionResult> PutAssetScripts(string app, [FromBody] UpdateAssetScriptsDto request)
         {
             var response = await InvokeCommandAsync(request.ToCommand());
 

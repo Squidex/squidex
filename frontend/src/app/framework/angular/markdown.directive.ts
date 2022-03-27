@@ -36,6 +36,9 @@ export class MarkdownDirective implements OnChanges {
     public inline = true;
 
     @Input()
+    public html = false;
+
+    @Input()
     public optional = false;
 
     constructor(
@@ -59,7 +62,7 @@ export class MarkdownDirective implements OnChanges {
             html = marked(this.markdown, { renderer });
         }
 
-        if (!html || html === this.markdown || html.indexOf('<') < 0) {
+        if (!this.html && (!html || html === this.markdown || html.indexOf('<') < 0)) {
             this.renderer.setProperty(this.element.nativeElement, 'textContent', html);
         } else {
             this.renderer.setProperty(this.element.nativeElement, 'innerHTML', html);

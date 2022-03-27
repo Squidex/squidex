@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;

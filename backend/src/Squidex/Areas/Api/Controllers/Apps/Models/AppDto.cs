@@ -225,7 +225,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.IsAllowed(Shared.Permissions.AppAssetsScriptsUpdate, Name, additional: permissions))
             {
-                AddDeleteLink("assets/scripts", resources.Url<AppAssetsController>(x => nameof(x.GetScripts), values));
+                AddDeleteLink("assets/scripts", resources.Url<AppAssetsController>(x => nameof(x.GetAssetScripts), values));
             }
 
             AddGetLink("settings", resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));

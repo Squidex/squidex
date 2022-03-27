@@ -335,9 +335,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public async Task<IActionResult> GetScriptCompletion(string app, string schema)
+        public async Task<IActionResult> GetScriptCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
         {
-            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
             var completion = completer.ContentScript(await BuildModel());
 
             return Ok(completion);
@@ -348,9 +348,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public async Task<IActionResult> GetScriptTriggerCompletion(string app, string schema)
+        public async Task<IActionResult> GetScriptTriggerCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
         {
-            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
             var completion = completer.ContentTrigger(await BuildModel());
 
             return Ok(completion);
@@ -374,7 +374,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-            return Schema.SchemaDef.BuildDataSchema(App.PartitionResolver(), components).Flatten();
+            return Schema.SchemaDef.BuildDataSchema(App.PartitionResolver(), components);
         }
 
         private Task<ISchemaEntity?> GetSchemaAsync(string schema)

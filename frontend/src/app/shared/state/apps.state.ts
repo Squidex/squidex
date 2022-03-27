@@ -33,12 +33,12 @@ export class AppsState extends State<Snapshot> {
     public selectedSettings =
         this.project(s => s.selectedSettings);
 
-    public get appName() {
-        return this.snapshot.selectedApp?.name || '';
-    }
-
     public get appId() {
         return this.snapshot.selectedApp?.id || '';
+    }
+
+    public get appName() {
+        return this.snapshot.selectedApp?.name || '';
     }
 
     constructor(

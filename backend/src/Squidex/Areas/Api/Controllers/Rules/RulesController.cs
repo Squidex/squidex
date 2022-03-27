@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NodaTime;
+using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -467,6 +469,19 @@ namespace Squidex.Areas.Api.Controllers.Rules
             }
 
             return Content(schema.ToJson(), "application/json");
+        }
+
+        [HttpGet]
+        [Route("apps/{app}/rules/completion/{triggerType}")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public IActionResult GetScriptCompletion(string app, string triggerType,
+            [FromServices] ScriptingCompleter completer)
+        {
+            var completion = completer.Trigger(triggerType);
+
+            return Ok(completion);
         }
 
         private async Task<RuleDto> InvokeCommandAsync(ICommand command)

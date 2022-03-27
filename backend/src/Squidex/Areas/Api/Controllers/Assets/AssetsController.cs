@@ -425,9 +425,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public IActionResult GetScriptCompletion(string app, string schema)
+        public IActionResult GetScriptCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
         {
-            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
             var completion = completer.AssetScript();
 
             return Ok(completion);
@@ -438,9 +438,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiPermissionOrAnonymous]
         [ApiCosts(1)]
         [OpenApiIgnore]
-        public IActionResult GetScriptTriggerCompletion(string app, string schema)
+        public IActionResult GetScriptTriggerCompletion(string app, string schema,
+            [FromServices] ScriptingCompleter completer)
         {
-            var completer = HttpContext.RequestServices.GetRequiredService<ScriptingCompleter>();
             var completion = completer.AssetTrigger();
 
             return Ok(completion);

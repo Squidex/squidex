@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var content = new ContentData();
 
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = content
             };
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(10.0));
 
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = content
             };
@@ -150,13 +150,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 throw 'Error';
             ";
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(new ScriptVars(), script));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(new DataScriptVars(), script));
         }
 
         [Fact]
         public async Task TransformAsync_should_throw_exception_if_script_failed()
         {
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = new ContentData()
             };
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_return_original_content_if_not_replaced()
         {
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = new ContentData()
             };
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_return_original_content_if_not_replaced_async()
         {
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = new ContentData()
             };
@@ -217,7 +217,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant("MyOperation"));
 
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = content,
                 ["dataOld"] = null,
@@ -248,7 +248,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(42));
 
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = content,
                 ["dataOld"] = null,
@@ -274,7 +274,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_not_ignore_transformation_if_async_not_set()
         {
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = new ContentData(),
                 ["dataOld"] = null,
@@ -300,7 +300,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task TransformAsync_should_not_timeout_if_replace_never_called()
         {
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = new ContentData(),
                 ["dataOld"] = null,
@@ -338,7 +338,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                         new ContentFieldData()
                             .AddInvariant(10.0));
 
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = content
             };
@@ -385,7 +385,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             userIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, "2"));
 
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["data"] = content,
                 ["dataOld"] = oldContent,
@@ -539,7 +539,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public async Task Should_share_vars_between_execution_for_transform()
         {
-            var vars = new ScriptVars
+            var vars = new DataScriptVars
             {
                 ["value"] = 13
             };
@@ -557,10 +557,18 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             sut.Execute(vars, script1, new ScriptOptions { AsContext = true });
 #pragma warning restore MA0042 // Do not use blocking calls in an async method
 
-            var vars2 = new ScriptVars(vars)
+            var vars2 = new DataScriptVars()
             {
-                Data = new ContentData()
+                ["data"] = new ContentData()
             };
+
+            foreach (var (key, value) in vars)
+            {
+                if (!vars2.ContainsKey(key))
+                {
+                    vars2[key] = value;
+                }
+            }
 
             var result = await sut.TransformAsync(vars2, script2, new ScriptOptions { AsContext = true });
 

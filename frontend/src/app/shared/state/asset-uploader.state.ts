@@ -44,6 +44,14 @@ export class AssetUploaderState extends State<Snapshot> {
     public uploads =
         this.project(x => x.uploads);
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
@@ -147,9 +155,5 @@ export class AssetUploaderState extends State<Snapshot> {
 
             return { ...s, uploads };
         }, 'Upload Started');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }

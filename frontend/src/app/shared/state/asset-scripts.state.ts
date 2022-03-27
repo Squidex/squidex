@@ -46,6 +46,14 @@ export class AssetScriptsState extends State<Snapshot> {
     public canUpdate =
         this.project(x => x.canUpdate === true);
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly appsService: AppsService,
@@ -98,10 +106,6 @@ export class AssetScriptsState extends State<Snapshot> {
             resource: payload,
             version,
         }, 'Loading Success / Updated');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 
     private get version() {

@@ -115,9 +115,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!string.IsNullOrWhiteSpace(condition?.Expression) && data != null)
             {
-                var vars = new ScriptVars
+                var vars = new DataScriptVars
                 {
-                    ["data"] = data
+                    Data = data
                 };
 
                 return scriptEngine.Evaluate(vars, condition.Expression);

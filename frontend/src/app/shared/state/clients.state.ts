@@ -45,6 +45,14 @@ export class ClientsState extends State<Snapshot> {
     public canCreate =
         this.project(x => x.canCreate === true);
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly clientsService: ClientsService,
@@ -112,10 +120,6 @@ export class ClientsState extends State<Snapshot> {
             isLoading: false,
             version,
         }, 'Loading Success / Updated');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 
     private get version() {

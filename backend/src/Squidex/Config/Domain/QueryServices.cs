@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Web.Services;
 

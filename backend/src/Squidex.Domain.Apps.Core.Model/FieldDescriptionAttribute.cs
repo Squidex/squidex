@@ -5,19 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Scripting
+namespace Squidex.Domain.Apps.Core
 {
-    [Flags]
-    public enum ScriptScope
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class FieldDescriptionAttribute : Attribute
     {
-        Async,
-        AssetScript,
-        AssetTrigger,
-        ContentScript,
-        ContentTrigger,
-        Transform,
-        SchemaTrigger,
-        UsageTrigger,
-        CommentTrigger
+        public string Name { get; }
+
+        public FieldDescriptionAttribute(string name)
+        {
+            Name = name;
+        }
     }
 }

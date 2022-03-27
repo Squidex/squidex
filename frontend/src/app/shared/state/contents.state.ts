@@ -81,12 +81,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public statusQueries =
         this.projectFrom(this.statuses, getStatusQueries);
 
-    public get appName() {
-        return this.appsState.appName;
-    }
-
     public get appId() {
         return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
     }
 
     protected constructor(name: string,

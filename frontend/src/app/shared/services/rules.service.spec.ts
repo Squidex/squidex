@@ -8,6 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { AnalyticsService, ApiUrlConfig, DateTime, Resource, ResourceLinks, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, Version } from '@app/shared/internal';
+import { RuleCompletions } from '..';
 import { SimulatedRuleEventDto, SimulatedRuleEventsDto } from './rules.service';
 
 describe('RulesService', () => {
@@ -359,6 +360,24 @@ describe('RulesService', () => {
             expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({});
+        }));
+
+    it('should make get request to get completions',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+            let completions: RuleCompletions;
+
+            rulesService.getCompletions('my-app', 'TriggerType').subscribe(result => {
+                completions = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/completion/TriggerType');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush([]);
+
+            expect(completions!).toEqual([]);
         }));
 
     function ruleResponse(id: number, suffix = '') {

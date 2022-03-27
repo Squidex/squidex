@@ -43,6 +43,14 @@ export class RuleEventsState extends State<Snapshot> {
     public canCancelAll =
         this.project(x => hasAnyLink(x.links, 'cancel'));
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
@@ -139,10 +147,6 @@ export class RuleEventsState extends State<Snapshot> {
         }
 
         return this.loadInternal(false);
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }
 

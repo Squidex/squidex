@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Actor" xml:space="preserve">
+    <value>The user or client that triggered the event or command.</value>
+  </data>
+  <data name="ActorIdentifier" xml:space="preserve">
+    <value>The ID of this actor.</value>
+  </data>
+  <data name="ActorType" xml:space="preserve">
+    <value>The type of this actor.</value>
+  </data>
   <data name="AppId" xml:space="preserve">
     <value>The ID of the current app.</value>
   </data>
@@ -198,11 +207,23 @@
   <data name="Command" xml:space="preserve">
     <value>The executed command.</value>
   </data>
+  <data name="CommentMentionedUser" xml:space="preserve">
+    <value>The user when someone is mentioned with '@'.</value>
+  </data>
+  <data name="CommentText" xml:space="preserve">
+    <value>The text of the comment.</value>
+  </data>
+  <data name="CommentUrl" xml:space="preserve">
+    <value>The URL pointing to the source of the comment.</value>
+  </data>
   <data name="ComponentField" xml:space="preserve">
     <value>{0} field ({1} component).</value>
   </data>
   <data name="ComponentSchemaId" xml:space="preserve">
     <value>The schema id to identity the component type.</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>The content.</value>
   </data>
   <data name="ContentArrayField" xml:space="preserve">
     <value>{0} nested field.</value>
@@ -306,8 +327,26 @@
   <data name="EntityVersion" xml:space="preserve">
     <value>The version of the objec.</value>
   </data>
+  <data name="Event" xml:space="preserve">
+    <value>The actual event.</value>
+  </data>
+  <data name="EventName" xml:space="preserve">
+    <value>The name of the event.</value>
+  </data>
+  <data name="EventTimestamp" xml:space="preserve">
+    <value>The event timestamp.</value>
+  </data>
+  <data name="EventType" xml:space="preserve">
+    <value>The type of the event, e.g. 'Created' or 'Updated'.</value>
+  </data>
   <data name="JsonPath" xml:space="preserve">
     <value>The path to the json value.</value>
+  </data>
+  <data name="NamedId" xml:space="preserve">
+    <value>The ID part of this ID.</value>
+  </data>
+  <data name="NamedName" xml:space="preserve">
+    <value>The name part of this ID.</value>
   </data>
   <data name="Operation" xml:space="preserve">
     <value>The current operation.</value>
@@ -336,26 +375,35 @@
   <data name="QueryVersion" xml:space="preserve">
     <value>The optional version of the content to retrieve an older instance (not cached).</value>
   </data>
+  <data name="SchemaId" xml:space="preserve">
+    <value>The ID of the schema.</value>
+  </data>
+  <data name="UsageCallsCurrent" xml:space="preserve">
+    <value>The current number of calls.</value>
+  </data>
+  <data name="UsageCallsLimit" xml:space="preserve">
+    <value>The configured usage limit.</value>
+  </data>
   <data name="User" xml:space="preserve">
     <value>Information about the current user.</value>
   </data>
   <data name="UserClaims" xml:space="preserve">
-    <value>The additional properties of the user.</value>
+    <value>The additional properties of this user.</value>
   </data>
   <data name="UserDisplayName" xml:space="preserve">
-    <value>The display name of the user.</value>
+    <value>The display name of this user.</value>
   </data>
   <data name="UserEmail" xml:space="preserve">
-    <value>The email address of the current user.</value>
+    <value>The email address ofthis  user.</value>
   </data>
   <data name="UserId" xml:space="preserve">
-    <value>The ID of the user.</value>
+    <value>The ID of this user.</value>
   </data>
   <data name="UserIsClient" xml:space="preserve">
-    <value>True when the current user is a client, which is typically the case when the request is made from the API.</value>
+    <value>True when this user is a client, which is typically the case when the request is made from the API.</value>
   </data>
   <data name="UserIsUser" xml:space="preserve">
-    <value>True when the current user is a user, which is typically the case when the request is made in the UI.</value>
+    <value>True when this user is a user, which is typically the case when the request is made in the UI.</value>
   </data>
   <data name="UsersClaimsValue" xml:space="preserve">
     <value>The list of additional properties that have the name 'name'.</value>

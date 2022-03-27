@@ -34,6 +34,14 @@ export class RuleSimulatorState extends State<Snapshot> {
     public isLoading =
         this.project(x => x.isLoading === true);
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
@@ -85,9 +93,5 @@ export class RuleSimulatorState extends State<Snapshot> {
 
     public selectRule(ruleId?: string) {
         this.resetState({ ruleId }, 'Select Rule');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }

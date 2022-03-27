@@ -99,8 +99,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId, false, default))
                 .Returns((app, schema));
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), default))
-                .ReturnsLazily(x => Task.FromResult(x.GetArgument<ScriptVars>(0)!.Data!));
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), default))
+                .ReturnsLazily(x => Task.FromResult(x.GetArgument<DataScriptVars>(0)!.Data!));
 
             patched = patch.MergeInto(data);
 
@@ -150,9 +150,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -173,9 +173,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -197,9 +197,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -250,9 +250,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -273,9 +273,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -297,9 +297,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), default))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -321,7 +321,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentUpdated { Data = otherData })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -343,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentUpdated { Data = otherData })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -367,9 +367,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
                 .MustHaveHappened();
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -423,7 +423,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentUpdated { Data = otherData })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -447,7 +447,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentUpdated { Data = otherData })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -464,7 +464,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             Assert.Single(LastEvents);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -496,7 +496,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentUpdated { Data = patched })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -520,7 +520,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentUpdated { Data = patched })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -537,7 +537,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             Assert.Single(LastEvents);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<update-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -559,7 +559,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -581,7 +581,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -604,7 +604,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -613,7 +613,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             var command = new ChangeContentStatus { Status = Status.Draft };
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
                 .Returns(otherData);
 
             await ExecuteCreateAsync();
@@ -632,7 +632,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, Status.Published), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -656,7 +656,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Change, Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -680,7 +680,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Published, Status = Status.Published })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(ScriptVars(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Published, Status.Draft), "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -707,7 +707,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusScheduled { Status = Status.Published, DueTime = dueTime })
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -735,7 +735,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -763,7 +763,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentSchedulingCancelled())
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<change-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), default))
                 .MustNotHaveHappened();
         }
 
@@ -845,7 +845,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     CreateContentEvent(new ContentDeleted())
                 );
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -863,7 +863,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
             Assert.Empty(LastEvents);
 
-            A.CallTo(() => scriptEngine.ExecuteAsync(ScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), default))
+            A.CallTo(() => scriptEngine.ExecuteAsync(DataScriptVars(data, null, Status.Draft), "<delete-script>", ScriptOptions(), default))
                 .MustHaveHappened();
         }
 
@@ -969,17 +969,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
         }
 
-        private ScriptVars ScriptVars(ContentData? newData, ContentData? oldData, Status newStatus)
+        private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus)
         {
-            return A<ScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, default));
+            return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, default));
         }
 
-        private ScriptVars ScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
+        private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
         {
-            return A<ScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, oldStatus));
+            return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, oldStatus));
         }
 
-        private bool Matches(ScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
+        private bool Matches(DataScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
         {
             return
                 Equals(x["contentId"], contentId) &&

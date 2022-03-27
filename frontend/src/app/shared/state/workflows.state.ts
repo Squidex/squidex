@@ -49,6 +49,14 @@ export class WorkflowsState extends State<Snapshot> {
     public canCreate =
         this.project(x => x.canCreate === true);
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
@@ -119,10 +127,6 @@ export class WorkflowsState extends State<Snapshot> {
             version,
             workflows,
         }, 'Loading Success / Updated');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 
     private get version() {
