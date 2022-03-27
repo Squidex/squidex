@@ -587,7 +587,7 @@ describe('SchemasService', () => {
                 completions = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-completion/completion');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/completion');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

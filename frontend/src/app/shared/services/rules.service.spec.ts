@@ -366,11 +366,11 @@ describe('RulesService', () => {
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let completions: RuleCompletions;
 
-            rulesService.getCompletions('my-app', 'actionType').subscribe(result => {
+            rulesService.getCompletions('my-app', 'TriggerType').subscribe(result => {
                 completions = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/completion/ActionType');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/completion/TriggerType');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
