@@ -31,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             public const string OldData = "oldData";
             public const string OldStatus = "oldStatus";
             public const string Operation = "operation";
+            public const string Permanent = "permanent";
             public const string SchemaId = "achemaId";
             public const string SchemaName = "achemaName";
             public const string Status = "status";
@@ -110,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             return TransformAsync(operation, script, vars);
         }
 
-        public static Task ExecuteDeleteScriptAsync(this ContentOperation operation)
+        public static Task ExecuteDeleteScriptAsync(this ContentOperation operation, bool permanent)
         {
             var script = operation.SchemaDef.Scripts.Delete;
 
@@ -126,6 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 [ScriptKeys.OldData] = null,
                 [ScriptKeys.OldStatus] = operation.Snapshot.EditingStatus(),
                 [ScriptKeys.Operation] = "Delete",
+                [ScriptKeys.Permanent] = permanent,
                 [ScriptKeys.Status] = operation.Snapshot.EditingStatus(),
                 [ScriptKeys.StatusOld] = default(Status)
             });
@@ -147,8 +149,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         {
             vars[ScriptKeys.AppId] = operation.App.Id;
             vars[ScriptKeys.AppName] = operation.App.Name;
-            vars[ScriptKeys.Command] = operation.Command;
-            vars[ScriptKeys.Content] = operation.Snapshot;
             vars[ScriptKeys.ContentId] = operation.CommandId;
             vars[ScriptKeys.SchemaId] = operation.Schema.Id;
             vars[ScriptKeys.SchemaName] = operation.Schema.SchemaDef.Name;

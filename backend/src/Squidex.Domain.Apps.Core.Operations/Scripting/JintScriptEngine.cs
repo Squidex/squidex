@@ -194,20 +194,25 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
+            if (scope.HasFlag(ScriptScope.ContentTrigger) || scope.HasFlag(ScriptScope.AssetTrigger))
+            {
+                return;
+            }
+
             if (scope.HasFlag(ScriptScope.Transform) || scope.HasFlag(ScriptScope.ContentScript))
             {
                 describe(JsonType.Function, "replace()",
                     Resources.ScriptingReplace);
             }
 
-            describe(JsonType.Function, "disallow()",
+            describe(JsonType.Function, "disallow(reason)",
                 Resources.ScriptingDisallow);
-
-            describe(JsonType.Function, "complete()",
-                Resources.ScriptingComplete);
 
             describe(JsonType.Function, "reject(reason)",
                 Resources.ScriptingReject);
+
+            describe(JsonType.Function, "complete()",
+                Resources.ScriptingComplete);
         }
     }
 }

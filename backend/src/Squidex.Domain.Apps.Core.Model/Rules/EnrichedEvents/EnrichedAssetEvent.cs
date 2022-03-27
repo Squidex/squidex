@@ -25,19 +25,29 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         public RefToken LastModifiedBy { get; set; }
 
+        public DomainId ParentId { get; }
+
         public string MimeType { get; set; }
 
         public string FileName { get; set; }
 
+        public string FileHash { get; set; }
+
+        public string Slug { get; set; }
+
         public long FileVersion { get; set; }
 
         public long FileSize { get; set; }
+
+        public bool IsProtected { get; set; }
 
         public int? PixelWidth { get; set; }
 
         public int? PixelHeight { get; set; }
 
         public AssetType AssetType { get; set; }
+
+        public AssetMetadata Metadata { get; }
 
         public bool IsImage
         {

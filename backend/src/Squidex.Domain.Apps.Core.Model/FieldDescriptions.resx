@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Actor" xml:space="preserve">
+    <value>The user that triggered the event or command.</value>
+  </data>
+  <data name="ActorIdentifier" xml:space="preserve">
+    <value>The ID of the user or client.</value>
+  </data>
+  <data name="ActorType" xml:space="preserve">
+    <value>The type of the actor.</value>
+  </data>
   <data name="AppId" xml:space="preserve">
     <value>The ID of the current app.</value>
   </data>
@@ -198,11 +207,23 @@
   <data name="Command" xml:space="preserve">
     <value>The executed command.</value>
   </data>
+  <data name="CommentMentionedUser" xml:space="preserve">
+    <value>The user when someone is mentioned with '@'.</value>
+  </data>
+  <data name="CommentText" xml:space="preserve">
+    <value>The text of the comment.</value>
+  </data>
+  <data name="CommentUrl" xml:space="preserve">
+    <value>The URL pointing to the source of the comment.</value>
+  </data>
   <data name="ComponentField" xml:space="preserve">
     <value>{0} field ({1} component).</value>
   </data>
   <data name="ComponentSchemaId" xml:space="preserve">
     <value>The schema id to identity the component type.</value>
+  </data>
+  <data name="Content" xml:space="preserve">
+    <value>The content.</value>
   </data>
   <data name="ContentArrayField" xml:space="preserve">
     <value>{0} nested field.</value>
@@ -306,6 +327,18 @@
   <data name="EntityVersion" xml:space="preserve">
     <value>The version of the objec.</value>
   </data>
+  <data name="Event" xml:space="preserve">
+    <value>The actual event.</value>
+  </data>
+  <data name="EventName" xml:space="preserve">
+    <value>The name of the event.</value>
+  </data>
+  <data name="EventTimestamp" xml:space="preserve">
+    <value>The event timestamp.</value>
+  </data>
+  <data name="EventType" xml:space="preserve">
+    <value>The type of the event, e.g. 'Created' or 'Updated'.</value>
+  </data>
   <data name="JsonPath" xml:space="preserve">
     <value>The path to the json value.</value>
   </data>
@@ -335,6 +368,12 @@
   </data>
   <data name="QueryVersion" xml:space="preserve">
     <value>The optional version of the content to retrieve an older instance (not cached).</value>
+  </data>
+  <data name="UsageCallsCurrent" xml:space="preserve">
+    <value>The current number of calls.</value>
+  </data>
+  <data name="UsageCallsLimit" xml:space="preserve">
+    <value>The configured usage limit.</value>
   </data>
   <data name="User" xml:space="preserve">
     <value>Information about the current user.</value>

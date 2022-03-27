@@ -31,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
             public const string Asset = "asset";
             public const string AssetId = "assetId";
             public const string Command = "command";
+            public const string Id = "id";
             public const string FileHash = "fileHash";
             public const string FileName = "fileName";
             public const string FileSize = "fileSize";
@@ -123,6 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
                 // Use a dictionary for better performance, because no reflection is involved.
                 [ScriptKeys.Command] = new Dictionary<string, object?>
                 {
+                    [ScriptKeys.IsProtected] = annotate.IsProtected,
                     [ScriptKeys.Metadata] = annotate.Metadata?.Mutable(),
                     [ScriptKeys.FileName] = annotate.FileName,
                     [ScriptKeys.FileSlug] = annotate.Slug,

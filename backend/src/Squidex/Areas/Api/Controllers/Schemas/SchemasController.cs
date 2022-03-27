@@ -374,7 +374,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
 
-            return Schema.SchemaDef.BuildDataSchema(App.PartitionResolver(), components).Flatten();
+            return Schema.SchemaDef.BuildDataSchema(App.PartitionResolver(), components);
         }
 
         private Task<ISchemaEntity?> GetSchemaAsync(string schema)

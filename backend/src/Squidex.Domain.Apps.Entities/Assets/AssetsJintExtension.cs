@@ -42,6 +42,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
+            if (!scope.HasFlag(ScriptScope.Async))
+            {
+                return;
+            }
+
             describe(JsonType.Function, "getAssets(ids, callback)",
                 Resources.ScriptingGetAssets);
 

@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Extensions
             if (scope.HasFlag(ScriptScope.AssetTrigger))
             {
                 describe(JsonType.Function, "assetContentUrl",
-                Resources.ScriptingAssetContentUrl);
+                    Resources.ScriptingAssetContentUrl);
 
                 describe(JsonType.Function, "assetContentAppUrl",
                     Resources.ScriptingAssetContentAppUrl);

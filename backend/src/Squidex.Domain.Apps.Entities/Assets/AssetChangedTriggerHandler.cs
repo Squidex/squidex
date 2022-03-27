@@ -56,6 +56,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 SimpleMapper.Map(asset, result);
 
                 result.Actor = asset.LastModifiedBy;
+                result.PixelHeight = asset.Metadata.GetPixelHeight();
+                result.PixelWidth = asset.Metadata.GetPixelWidth();
                 result.Name = "AssetQueried";
 
                 yield return result;
@@ -78,6 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 SimpleMapper.Map(asset, result);
 
+                result.PixelHeight = asset.Metadata.GetPixelHeight();
+                result.PixelWidth = asset.Metadata.GetPixelWidth();
                 result.AssetType = asset.Type;
             }
 

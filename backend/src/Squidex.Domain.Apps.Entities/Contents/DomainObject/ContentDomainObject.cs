@@ -413,7 +413,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             if (!c.DoNotScript)
             {
-                await operation.ExecuteDeleteScriptAsync();
+                await operation.ExecuteDeleteScriptAsync(c.Permanent);
             }
 
             if (c.CheckReferrers)
