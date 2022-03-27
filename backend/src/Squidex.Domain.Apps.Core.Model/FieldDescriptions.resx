@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Actor" xml:space="preserve">
-    <value>The user that triggered the event or command.</value>
+    <value>The user or client that triggered the event or command.</value>
   </data>
   <data name="ActorIdentifier" xml:space="preserve">
-    <value>The ID of the user or client.</value>
+    <value>The ID of this actor.</value>
   </data>
   <data name="ActorType" xml:space="preserve">
-    <value>The type of the actor.</value>
+    <value>The type of this actor.</value>
   </data>
   <data name="AppId" xml:space="preserve">
     <value>The ID of the current app.</value>
@@ -342,6 +342,12 @@
   <data name="JsonPath" xml:space="preserve">
     <value>The path to the json value.</value>
   </data>
+  <data name="NamedId" xml:space="preserve">
+    <value>The ID part of this ID.</value>
+  </data>
+  <data name="NamedName" xml:space="preserve">
+    <value>The name part of this ID.</value>
+  </data>
   <data name="Operation" xml:space="preserve">
     <value>The current operation.</value>
   </data>
@@ -369,6 +375,9 @@
   <data name="QueryVersion" xml:space="preserve">
     <value>The optional version of the content to retrieve an older instance (not cached).</value>
   </data>
+  <data name="SchemaId" xml:space="preserve">
+    <value>The ID of the schema.</value>
+  </data>
   <data name="UsageCallsCurrent" xml:space="preserve">
     <value>The current number of calls.</value>
   </data>
@@ -379,22 +388,22 @@
     <value>Information about the current user.</value>
   </data>
   <data name="UserClaims" xml:space="preserve">
-    <value>The additional properties of the user.</value>
+    <value>The additional properties of this user.</value>
   </data>
   <data name="UserDisplayName" xml:space="preserve">
-    <value>The display name of the user.</value>
+    <value>The display name of this user.</value>
   </data>
   <data name="UserEmail" xml:space="preserve">
-    <value>The email address of the current user.</value>
+    <value>The email address ofthis  user.</value>
   </data>
   <data name="UserId" xml:space="preserve">
-    <value>The ID of the user.</value>
+    <value>The ID of this user.</value>
   </data>
   <data name="UserIsClient" xml:space="preserve">
-    <value>True when the current user is a client, which is typically the case when the request is made from the API.</value>
+    <value>True when this user is a client, which is typically the case when the request is made from the API.</value>
   </data>
   <data name="UserIsUser" xml:space="preserve">
-    <value>True when the current user is a user, which is typically the case when the request is made in the UI.</value>
+    <value>True when this user is a user, which is typically the case when the request is made in the UI.</value>
   </data>
   <data name="UsersClaimsValue" xml:space="preserve">
     <value>The list of additional properties that have the name 'name'.</value>

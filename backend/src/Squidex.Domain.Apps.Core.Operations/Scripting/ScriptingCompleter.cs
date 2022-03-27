@@ -5,9 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections;
+using System.Globalization;
+using System.Reflection;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
+using NodaTime;
+using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Reflection.Internal;
+using Squidex.Shared.Users;
+using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
@@ -24,14 +35,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             Guard.NotNull(dataSchema);
 
-            return new Process(descriptors).ContentScript(dataSchema.Flatten());
+            return new Process(descriptors, dataSchema.Flatten()).ContentScript();
         }
 
         public IReadOnlyList<ScriptingValue> ContentTrigger(FilterSchema dataSchema)
         {
             Guard.NotNull(dataSchema);
 
-            return new Process(descriptors).ContentTrigger(dataSchema.Flatten());
+            return new Process(descriptors, dataSchema.Flatten()).ContentTrigger();
         }
 
         public IReadOnlyList<ScriptingValue> AssetScript()
@@ -65,10 +76,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
             private readonly Stack<string> prefixes = new Stack<string>();
             private readonly Dictionary<string, ScriptingValue> result = new Dictionary<string, ScriptingValue>();
             private readonly IEnumerable<IScriptDescriptor> descriptors;
+            private readonly FilterSchema? dataSchema;
 
-            public Process(IEnumerable<IScriptDescriptor> descriptors)
+            public Process(IEnumerable<IScriptDescriptor> descriptors, FilterSchema? dataSchema = null)
             {
                 this.descriptors = descriptors;
+                this.dataSchema = dataSchema;
             }
 
             private IReadOnlyList<ScriptingValue> Build()
@@ -78,19 +91,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> SchemaTrigger()
             {
-                var scope = ScriptScope.SchemaTrigger;
+                AddHelpers(ScriptScope.SchemaTrigger);
 
-                AddHelpers(scope);
-
-                AddObject("event", FieldDescriptions.Context, () =>
+                AddObject("event", FieldDescriptions.Event, () =>
                 {
-                    AddEvent();
-
-                    AddString("schemaId.id",
-                        FieldDescriptions.ContentSchemaId);
-
-                    AddString("schemaId.name",
-                        FieldDescriptions.ContentSchemaName);
+                    AddType(typeof(EnrichedSchemaEvent));
                 });
 
                 return Build();
@@ -98,22 +103,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> CommentTrigger()
             {
-                var scope = ScriptScope.ContentTrigger;
+                AddHelpers(ScriptScope.CommentTrigger);
 
-                AddHelpers(scope);
-
-                AddObject("event", FieldDescriptions.Context, () =>
+                AddObject("event", FieldDescriptions.Event, () =>
                 {
-                    AddEvent();
-
-                    AddUser("mentionedUser",
-                        FieldDescriptions.CommentMentionedUser);
-
-                    AddString("text",
-                        FieldDescriptions.CommentText);
-
-                    AddString("url",
-                        FieldDescriptions.CommentUrl);
+                    AddType(typeof(EnrichedCommentEvent));
                 });
 
                 return Build();
@@ -121,25 +115,17 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> UsageTrigger()
             {
-                var scope = ScriptScope.ContentTrigger;
+                AddHelpers(ScriptScope.UsageTrigger);
 
-                AddHelpers(scope);
-
-                AddObject("event", FieldDescriptions.Context, () =>
+                AddObject("event", FieldDescriptions.Event, () =>
                 {
-                    AddEvent();
-
-                    AddNumber("callsCurrent",
-                        FieldDescriptions.UsageCallsCurrent);
-
-                    AddNumber("callsLimit",
-                        FieldDescriptions.UsageCallsLimit);
+                    AddType(typeof(EnrichedUsageExceededEvent));
                 });
 
                 return Build();
             }
 
-            public IReadOnlyList<ScriptingValue> ContentScript(FilterSchema dataSchema)
+            public IReadOnlyList<ScriptingValue> ContentScript()
             {
                 var scope = ScriptScope.ContentScript | ScriptScope.Transform | ScriptScope.Async;
 
@@ -147,54 +133,21 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 AddObject("ctx", FieldDescriptions.Context, () =>
                 {
-                    AddScript();
-
-                    AddString("contentId",
-                        FieldDescriptions.EntityId);
-
-                    AddString("permanent",
-                        FieldDescriptions.EntityRequestDeletePermanent);
-
-                    AddString("schemaId",
-                        FieldDescriptions.ContentSchemaId);
-
-                    AddString("schemaName",
-                        FieldDescriptions.ContentSchemaName);
-
-                    AddString("status",
-                        FieldDescriptions.ContentStatus);
-
-                    AddString("statusOld",
-                        FieldDescriptions.ContentStatusOld);
-
-                    AddObject("data", FieldDescriptions.ContentData, () =>
-                    {
-                        AddData(dataSchema);
-                    });
-
-                    AddObject("dataOld", FieldDescriptions.ContentDataOld, () =>
-                    {
-                        AddData(dataSchema);
-                    });
+                    AddType(typeof(ContentScriptVars));
                 });
 
                 return Build();
             }
 
-            public IReadOnlyList<ScriptingValue> ContentTrigger(FilterSchema dataSchema)
+            public IReadOnlyList<ScriptingValue> ContentTrigger()
             {
                 var scope = ScriptScope.ContentTrigger;
 
                 AddHelpers(scope);
 
-                AddObject("event", FieldDescriptions.Context, () =>
+                AddObject("event", FieldDescriptions.Event, () =>
                 {
-                    AddEntity().AddEvent().AddContent(dataSchema);
-
-                    AddObject("dataOld", FieldDescriptions.ContentDataOld, () =>
-                    {
-                        AddData(dataSchema);
-                    });
+                    AddType(typeof(EnrichedContentEvent));
                 });
 
                 return Build();
@@ -202,28 +155,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> AssetTrigger()
             {
-                var scope = ScriptScope.AssetTrigger;
+                AddHelpers(ScriptScope.AssetTrigger);
 
-                AddHelpers(scope);
-
-                AddObject("event", FieldDescriptions.Context, () =>
+                AddObject("event", FieldDescriptions.Event, () =>
                 {
-                    AddAsset().AddEntity().AddEvent();
-
-                    AddString("assetType",
-                        FieldDescriptions.AssetType);
-
-                    AddNumber("fileVersion",
-                        FieldDescriptions.AssetFileVersion);
-
-                    AddNumber("isImage",
-                        FieldDescriptions.AssetIsImage);
-
-                    AddNumber("pixelHeight",
-                        FieldDescriptions.AssetPixelHeight);
-
-                    AddNumber("pixelWidth",
-                        FieldDescriptions.AssetPixelWidth);
+                    AddType(typeof(EnrichedAssetEvent));
                 });
 
                 return Build();
@@ -231,204 +167,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> AssetScript()
             {
-                var scope = ScriptScope.AssetScript | ScriptScope.Async;
-
-                AddHelpers(scope);
+                AddHelpers(ScriptScope.AssetScript | ScriptScope.Async);
 
                 AddObject("ctx", FieldDescriptions.Event, () =>
                 {
-                    AddScript();
-
-                    AddString("assetId",
-                        FieldDescriptions.EntityId);
-
-                    AddObject("command", FieldDescriptions.Command, () =>
-                    {
-                        AddAsset();
-
-                        AddString("parentPath",
-                            FieldDescriptions.AssetParentPath);
-
-                        AddString("permanent",
-                            FieldDescriptions.EntityRequestDeletePermanent);
-
-                        AddArray("tags",
-                            FieldDescriptions.AssetTags);
-                    });
-
-                    AddObject("asset", FieldDescriptions.Asset, () =>
-                    {
-                        AddAsset();
-
-                        AddNumber("fileVersion",
-                            FieldDescriptions.AssetFileVersion);
-
-                        AddArray("tags",
-                            FieldDescriptions.AssetTags);
-                    });
+                    AddType(typeof(AssetScriptVars));
                 });
 
                 return Build();
-            }
-
-            private Process AddContent(FilterSchema dataSchema)
-            {
-                AddString("newStatus",
-                    FieldDescriptions.ContentStatusOld);
-
-                AddString("status",
-                    FieldDescriptions.ContentStatus);
-
-                AddString("schemaId.id",
-                    FieldDescriptions.ContentSchemaId);
-
-                AddString("schemaId.name",
-                    FieldDescriptions.ContentSchemaName);
-
-                AddObject("data", FieldDescriptions.ContentData, () =>
-                {
-                    AddData(dataSchema);
-                });
-
-                return this;
-            }
-
-            private Process AddAsset()
-            {
-                AddString("fileHash",
-                    FieldDescriptions.AssetFileHash);
-
-                AddString("fileName",
-                    FieldDescriptions.AssetFileName);
-
-                AddNumber("fileSize",
-                    FieldDescriptions.AssetFileSize);
-
-                AddString("mimeType",
-                    FieldDescriptions.AssetMimeType);
-
-                AddBoolean("isProtected",
-                    FieldDescriptions.AssetIsProtected);
-
-                AddString("parentId",
-                    FieldDescriptions.AssetParentId);
-
-                AddString("slug",
-                    FieldDescriptions.AssetSlug);
-
-                AddObject("metadata", FieldDescriptions.AssetMetadata, () =>
-                {
-                    AddArray("name",
-                        FieldDescriptions.AssetMetadataValue);
-                });
-
-                return this;
-            }
-
-            private Process AddEntity()
-            {
-                AddString("id",
-                    FieldDescriptions.EntityId);
-
-                AddString("appId.id",
-                    FieldDescriptions.AppId);
-
-                AddString("appId.name",
-                    FieldDescriptions.AppName);
-
-                AddString("created",
-                    FieldDescriptions.EntityCreated);
-
-                AddString("createdBy",
-                    FieldDescriptions.EntityCreatedBy);
-
-                AddString("lastModified",
-                    FieldDescriptions.EntityLastModified);
-
-                AddString("lastModifiedBy",
-                    FieldDescriptions.EntityLastModifiedBy);
-
-                AddString("version",
-                    FieldDescriptions.EntityVersion);
-
-                return this;
-            }
-
-            private Process AddScript()
-            {
-                AddString("appId",
-                        FieldDescriptions.AppId);
-
-                AddString("appName",
-                    FieldDescriptions.AppName);
-
-                AddString("operation",
-                    FieldDescriptions.Operation);
-
-                return AddUser();
-            }
-
-            private Process AddEvent()
-            {
-                AddString("appId.id",
-                    FieldDescriptions.AppId);
-
-                AddString("appId.name",
-                    FieldDescriptions.AppName);
-
-                AddString("name",
-                    FieldDescriptions.EventName);
-
-                AddString("timestamp",
-                    FieldDescriptions.EventTimestamp);
-
-                AddString("type",
-                    FieldDescriptions.EventType);
-
-                AddString("version",
-                    FieldDescriptions.EntityVersion);
-
-                return AddActor().AddUser();
-            }
-
-            private Process AddActor()
-            {
-                AddObject("actor", FieldDescriptions.Actor, () =>
-                {
-                    AddString("identifier",
-                        FieldDescriptions.ActorIdentifier);
-
-                    AddString("type",
-                        FieldDescriptions.ActorType);
-                });
-
-                return this;
-            }
-
-            private Process AddUser(string? name = null, string? description = null)
-            {
-                AddObject(name ?? "user", description ?? FieldDescriptions.User, () =>
-                {
-                    AddString("id",
-                        FieldDescriptions.UserId);
-
-                    AddString("email",
-                        FieldDescriptions.UserEmail);
-
-                    AddBoolean("isClient",
-                        FieldDescriptions.UserIsClient);
-
-                    AddBoolean("isUser",
-                        FieldDescriptions.UserIsUser);
-
-                    AddObject("claims", FieldDescriptions.UserClaims, () =>
-                    {
-                        AddArray("name",
-                            FieldDescriptions.UsersClaimsValue);
-                    });
-                });
-
-                return this;
             }
 
             private void AddHelpers(ScriptScope scope)
@@ -439,9 +185,122 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 }
             }
 
-            private void AddData(FilterSchema dataSchema)
+            private void AddType(Type type)
             {
-                if (dataSchema.Fields == null)
+                foreach (var (name, description, propertyTypeOrNullable) in GetFields(type))
+                {
+                    var propertyType = Nullable.GetUnderlyingType(propertyTypeOrNullable) ?? propertyTypeOrNullable;
+
+                    if (propertyType.IsEnum ||
+                        propertyType == typeof(string) ||
+                        propertyType == typeof(DomainId) ||
+                        propertyType == typeof(Instant) ||
+                        propertyType == typeof(Status))
+                    {
+                        AddString(name, description);
+                    }
+                    else if (propertyType == typeof(int) || propertyType == typeof(long))
+                    {
+                        AddNumber(name, description);
+                    }
+                    else if (propertyType == typeof(bool))
+                    {
+                        AddBoolean(name, description);
+                    }
+                    else if (propertyType == typeof(AssetMetadata))
+                    {
+                        AddObject(name, description, () =>
+                        {
+                            AddString("my-name",
+                                FieldDescriptions.AssetMetadataValue);
+                        });
+                    }
+                    else if (propertyType == typeof(NamedId<DomainId>))
+                    {
+                        AddObject(name, description, () =>
+                        {
+                            AddString("id",
+                                FieldDescriptions.NamedId);
+
+                            AddString("name",
+                                FieldDescriptions.NamedName);
+                        });
+                    }
+                    else if (propertyType == typeof(RefToken))
+                    {
+                        AddObject(name, description, () =>
+                        {
+                            AddString("identifier",
+                                FieldDescriptions.ActorIdentifier);
+
+                            AddString("type",
+                                FieldDescriptions.ActorType);
+                        });
+                    }
+                    else if (propertyType == typeof(IUser) || propertyType == typeof(ClaimsPrincipal))
+                    {
+                        AddObject(name, description, () =>
+                        {
+                            AddString("id",
+                                FieldDescriptions.UserId);
+
+                            AddString("email",
+                                FieldDescriptions.UserEmail);
+
+                            AddBoolean("isClient",
+                                FieldDescriptions.UserIsClient);
+
+                            AddBoolean("isUser",
+                                FieldDescriptions.UserIsUser);
+
+                            AddObject("claims", FieldDescriptions.UserClaims, () =>
+                            {
+                                AddArray("name",
+                                    FieldDescriptions.UsersClaimsValue);
+                            });
+                        });
+                    }
+                    else if (propertyType == typeof(ContentData) && dataSchema != null)
+                    {
+                        AddObject(name, description, () =>
+                        {
+                            AddData();
+                        });
+                    }
+                    else if (GetFields(propertyType).Any())
+                    {
+                        AddObject(name, description, () =>
+                        {
+                            AddType(propertyType);
+                        });
+                    }
+                    else if (propertyType.GetInterfaces().Contains(typeof(IEnumerable)))
+                    {
+                        AddArray(name, description);
+                    }
+                }
+            }
+
+            private static IEnumerable<(string Name, string Description, Type Type)> GetFields(Type type)
+            {
+                foreach (var property in type.GetPublicProperties())
+                {
+                    var descriptionKey = property.GetCustomAttribute<FieldDescriptionAttribute>()?.Name;
+
+                    if (descriptionKey == null)
+                    {
+                        continue;
+                    }
+
+                    var description = FieldDescriptions.ResourceManager.GetString(descriptionKey, CultureInfo.InvariantCulture)!;
+
+                    yield return (property.Name.ToCamelCase(), description, property.PropertyType);
+                }
+            }
+
+            private void AddData()
+            {
+                if (dataSchema?.Fields == null)
                 {
                     return;
                 }

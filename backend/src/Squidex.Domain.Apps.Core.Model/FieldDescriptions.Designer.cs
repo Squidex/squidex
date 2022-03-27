@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user that triggered the event or command..
+        ///   Looks up a localized string similar to The user or client that triggered the event or command..
         /// </summary>
         public static string Actor {
             get {
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The ID of the user or client..
+        ///   Looks up a localized string similar to The ID of this actor..
         /// </summary>
         public static string ActorIdentifier {
             get {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type of the actor..
+        ///   Looks up a localized string similar to The type of this actor..
         /// </summary>
         public static string ActorType {
             get {
@@ -736,6 +736,24 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The ID part of this ID..
+        /// </summary>
+        public static string NamedId {
+            get {
+                return ResourceManager.GetString("NamedId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name part of this ID..
+        /// </summary>
+        public static string NamedName {
+            get {
+                return ResourceManager.GetString("NamedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The current operation..
         /// </summary>
         public static string Operation {
@@ -817,6 +835,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The ID of the schema..
+        /// </summary>
+        public static string SchemaId {
+            get {
+                return ResourceManager.GetString("SchemaId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The current number of calls..
         /// </summary>
         public static string UsageCallsCurrent {
@@ -844,7 +871,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The additional properties of the user..
+        ///   Looks up a localized string similar to The additional properties of this user..
         /// </summary>
         public static string UserClaims {
             get {
@@ -853,7 +880,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The display name of the user..
+        ///   Looks up a localized string similar to The display name of this user..
         /// </summary>
         public static string UserDisplayName {
             get {
@@ -862,7 +889,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address of the current user..
+        ///   Looks up a localized string similar to The email address ofthis  user..
         /// </summary>
         public static string UserEmail {
             get {
@@ -871,7 +898,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The ID of the user..
+        ///   Looks up a localized string similar to The ID of this user..
         /// </summary>
         public static string UserId {
             get {
@@ -880,7 +907,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to True when the current user is a client, which is typically the case when the request is made from the API..
+        ///   Looks up a localized string similar to True when this user is a client, which is typically the case when the request is made from the API..
         /// </summary>
         public static string UserIsClient {
             get {
@@ -889,7 +916,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to True when the current user is a user, which is typically the case when the request is made in the UI..
+        ///   Looks up a localized string similar to True when this user is a user, which is typically the case when the request is made in the UI..
         /// </summary>
         public static string UserIsUser {
             get {

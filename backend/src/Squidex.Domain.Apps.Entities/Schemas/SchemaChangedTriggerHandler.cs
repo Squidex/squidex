@@ -79,7 +79,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 return true;
             }
 
-            var vars = new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = new EventScriptVars
             {
                 ["event"] = @event
             };

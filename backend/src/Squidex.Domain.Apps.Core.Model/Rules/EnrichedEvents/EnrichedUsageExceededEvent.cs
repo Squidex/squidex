@@ -9,8 +9,10 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
     public sealed class EnrichedUsageExceededEvent : EnrichedEvent
     {
+        [FieldDescription(nameof(FieldDescriptions.UsageCallsCurrent))]
         public long CallsCurrent { get; set; }
 
+        [FieldDescription(nameof(FieldDescriptions.UsageCallsLimit))]
         public long CallsLimit { get; set; }
 
         public override long Partition

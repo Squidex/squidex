@@ -103,9 +103,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             if (TryGetScript(text.Trim(), out var script))
             {
-                var vars = new ScriptVars
+                // Script vars are just wrappers over dictionaries for better performance.
+                var vars = new EventScriptVars
                 {
-                    ["event"] = @event
+                    Event = @event
                 };
 
 #pragma warning disable MA0042 // Do not use blocking calls in an async method

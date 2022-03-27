@@ -5,19 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
+
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    [Flags]
-    public enum ScriptScope
+    public class DataScriptVars : ScriptVars
     {
-        Async,
-        AssetScript,
-        AssetTrigger,
-        ContentScript,
-        ContentTrigger,
-        Transform,
-        SchemaTrigger,
-        UsageTrigger,
-        CommentTrigger
+        public virtual ContentData? Data
+        {
+            get => GetValue<ContentData?>();
+            set => SetValue(value);
+        }
     }
 }

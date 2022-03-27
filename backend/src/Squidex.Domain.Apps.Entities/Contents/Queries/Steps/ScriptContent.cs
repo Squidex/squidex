@@ -14,16 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
     {
         private readonly IScriptEngine scriptEngine;
 
-        private static class ScriptKeys
-        {
-            public const string AppId = "appId";
-            public const string AppName = "appName";
-            public const string ContentId = "contentId";
-            public const string Data = "data";
-            public const string Operation = "operation";
-            public const string User = "user";
-        }
-
         public ScriptContent(IScriptEngine scriptEngine)
         {
             this.scriptEngine = scriptEngine;
@@ -48,11 +38,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                     continue;
                 }
 
-                var vars = new ScriptVars
+                var vars = new ContentScriptVars
                 {
-                    [ScriptKeys.AppId] = context.App.Id,
-                    [ScriptKeys.AppName] = context.App.Name,
-                    [ScriptKeys.User] = context.User
+                    AppId = schema.AppId.Id,
+                    AppName = schema.AppId.Name,
+                    SchemaId = schema.Id,
+                    SchemaName = schema.SchemaDef.Name,
+                    User = context.User
                 };
 
                 var preScript = schema.SchemaDef.Scripts.QueryPre;
@@ -74,14 +66,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             }
         }
 
-        private async Task TransformAsync(ScriptVars rootVars, string script, ContentEntity content,
+        private async Task TransformAsync(ContentScriptVars sharedVars, string script, ContentEntity content,
             CancellationToken ct)
         {
-            var vars = new ScriptVars(rootVars)
+            var vars = new ContentScriptVars
             {
-                [ScriptKeys.ContentId] = content.Id,
-                [ScriptKeys.Data] = content.Data,
+                ContentId = content.Id,
+                Data = content.Data,
+                DataOld = default,
+                Status = content.Status,
+                StatusOld = default
             };
+
+            foreach (var (key, value) in sharedVars)
+            {
+                if (!vars.ContainsKey(key))
+                {
+                    vars[key] = value;
+                }
+            }
 
             var options = new ScriptOptions
             {

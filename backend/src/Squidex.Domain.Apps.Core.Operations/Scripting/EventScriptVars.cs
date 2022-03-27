@@ -5,19 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    [Flags]
-    public enum ScriptScope
+    public sealed class EventScriptVars : ScriptVars
     {
-        Async,
-        AssetScript,
-        AssetTrigger,
-        ContentScript,
-        ContentTrigger,
-        Transform,
-        SchemaTrigger,
-        UsageTrigger,
-        CommentTrigger
+        public EnrichedEvent Event
+        {
+            set => SetValue(value);
+        }
     }
 }

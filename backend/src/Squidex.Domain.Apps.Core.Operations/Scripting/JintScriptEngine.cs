@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public async Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default,
+        public async Task<ContentData> TransformAsync(DataScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default)
         {
             Guard.NotNull(vars);

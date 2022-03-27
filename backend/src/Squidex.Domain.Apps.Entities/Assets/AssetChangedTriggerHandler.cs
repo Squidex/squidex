@@ -56,8 +56,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 SimpleMapper.Map(asset, result);
 
                 result.Actor = asset.LastModifiedBy;
-                result.PixelHeight = asset.Metadata.GetPixelHeight();
-                result.PixelWidth = asset.Metadata.GetPixelWidth();
+                result.PixelHeight = asset.Metadata?.GetPixelHeight();
+                result.PixelWidth = asset.Metadata?.GetPixelWidth();
                 result.Name = "AssetQueried";
 
                 yield return result;
@@ -80,8 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 SimpleMapper.Map(asset, result);
 
-                result.PixelHeight = asset.Metadata.GetPixelHeight();
-                result.PixelWidth = asset.Metadata.GetPixelWidth();
+                result.PixelHeight = asset.Metadata?.GetPixelHeight();
+                result.PixelWidth = asset.Metadata?.GetPixelWidth();
                 result.AssetType = asset.Type;
             }
 
@@ -113,9 +113,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 return true;
             }
 
-            var vars = new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = new EventScriptVars
             {
-                ["event"] = @event
+                Event = @event
             };
 
             return scriptEngine.Evaluate(vars, trigger.Condition);
