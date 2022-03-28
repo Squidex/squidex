@@ -13,7 +13,7 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 {
     public sealed class FeaturesService
     {
-        private const int FeatureVersion = 19;
+        private const int FeatureVersion = 21;
         private readonly QueryContext flatten = QueryContext.Default.Flatten();
         private readonly IContentsClient<NewsEntity, FeatureDto> client;
 
@@ -44,29 +44,37 @@ namespace Squidex.Areas.Api.Controllers.News.Service
         {
             var result = new FeaturesDto
             {
-                Version = FeatureVersion
+                Version = version
             };
 
             if (client != null && version < FeatureVersion)
             {
                 try
                 {
-                    var query = new ContentQuery
+                    var query = new ContentQuery();
+
+                    if (version == 0)
                     {
-                        Filter = $"data/version/iv ge {FeatureVersion}"
-                    };
+                        query.Filter = $"data/version/iv eq {FeatureVersion}";
+                    }
+                    else
+                    {
+                        query.Filter = $"data/version/iv le {FeatureVersion} and data/version/iv gt {version}";
+                    }
 
                     var features = await client.GetAsync(query, flatten, ct);
 
-                    result.Features = features.Items.Select(x => x.Data).ToList();
+                    result.Features.AddRange(features.Items.Select(x => x.Data).ToList());
+
+                    if (features.Items.Count > 0)
+                    {
+                        result.Version = features.Items.Max(x => x.Version);
+                    }
                 }
                 catch
                 {
-                    result.Features = new List<FeatureDto>();
                 }
             }
-
-            result.Features ??= new List<FeatureDto>();
 
             return result;
         }

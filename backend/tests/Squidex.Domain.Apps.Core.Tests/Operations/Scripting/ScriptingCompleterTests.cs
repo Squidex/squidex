@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             AssertAssetTrigger(result);
         }
 
-        private void AssertAssetTrigger(IReadOnlyList<ScriptingValue> result)
+        private static void AssertAssetTrigger(IReadOnlyList<ScriptingValue> result)
         {
             AssertCompletion(result,
                 PresetActor("event.actor"),
