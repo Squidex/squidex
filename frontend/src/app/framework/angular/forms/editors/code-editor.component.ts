@@ -46,7 +46,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     public valueFile = '';
 
     @Input()
-    public valueMode: 'String' | 'Json' = 'String';
+    public valueMode: 'String' | 'Json' | 'JsonString' = 'String';
 
     @Input()
     public maxLines: number | undefined;
@@ -92,22 +92,22 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public writeValue(obj: string) {
-        if (this.valueMode === 'Json') {
-            if (obj === null) {
+        try {
+            if (Types.isNull(obj) || Types.isUndefined(obj)) {
                 this.value = '';
+            } else if (Types.isString(obj) && this.valueMode === 'JsonString') {
+                this.value = JSON.stringify(JSON.parse(obj), undefined, 4);
+            } else if (Types.isString(obj)) {
+                this.value = obj;
+            } else if (this.valueMode === 'Json') {
+                this.value = JSON.stringify(obj, undefined, 4);
             } else {
-                try {
-                    this.value = JSON.stringify(obj, undefined, 4);
-                } catch (e) {
-                    this.value = '';
-                }
+                this.value = '';
             }
-        } else if (Types.isString(obj)) {
-            this.value = obj;
-        } else {
+        } catch {
             this.value = '';
         }
-
+    
         if (this.aceEditor) {
             this.setValue(this.value);
         }

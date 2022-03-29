@@ -9,6 +9,8 @@ using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.News.Models;
 using Squidex.ClientLibrary;
 
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+
 namespace Squidex.Areas.Api.Controllers.News.Service
 {
     public sealed class FeaturesService

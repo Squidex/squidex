@@ -53,7 +53,7 @@
                                 <div class="history-state">
                                     <label>{{ 'rules.actionData' | sqxTranslate }}</label>
 
-                                    <sqx-code-editor [ngModel]="event.actionData" valueMode="Json" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
+                                    <sqx-code-editor [ngModel]="event.actionData" valueMode="JsonString" [disabled]="true" [wordWrap]="true" height="auto" [maxLines]="20"></sqx-code-editor>
                                 </div>
 
                                 <sqx-rule-transition text="i18n:rules.simulation.actionExecuted"></sqx-rule-transition>
