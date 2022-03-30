@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
-            public AssetScripts AssetScripts { get; set; } = AssetScripts.Empty;
+            public AssetScripts AssetScripts { get; set; } = new AssetScripts();
 
             public LanguagesConfig Languages { get; set; } = LanguagesConfig.English;
 
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             private bool UpdateAssetScripts(AssetScripts? scripts)
             {
-                AssetScripts = scripts ?? AssetScripts.Empty;
+                AssetScripts = scripts ?? new AssetScripts();
 
                 return true;
             }
