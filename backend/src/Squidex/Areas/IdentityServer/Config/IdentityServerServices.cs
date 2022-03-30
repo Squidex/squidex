@@ -84,7 +84,15 @@ namespace Squidex.Areas.IdentityServer.Config
                             .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
                     });
 
-                    builder.SetConfigurationEndpointUris("/identity-server/.well-known/openid-configuration");
+                    var identityServer = Constants.PrefixIdentityServer;
+
+                    builder.SetAuthorizationEndpointUris($"{identityServer}/connect/authorize");
+                    builder.SetIntrospectionEndpointUris($"{identityServer}/connect/introspect");
+                    builder.SetLogoutEndpointUris($"{identityServer}/connect/logout");
+                    builder.SetTokenEndpointUris($"{identityServer}/connect/token");
+                    builder.SetUserinfoEndpointUris($"{identityServer}/connect/userinfo");
+                    builder.SetCryptographyEndpointUris($"{identityServer}/.well-known/jwks");
+                    builder.SetConfigurationEndpointUris($"{identityServer}/.well-known/openid-configuration");
                     builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                     builder.DisableAccessTokenEncryption();
@@ -120,25 +128,29 @@ namespace Squidex.Areas.IdentityServer.Config
 
                 var issuerUrl = Constants.PrefixIdentityServer;
 
+                /*
                 options.AuthorizationEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/authorize", false)));
+                     new Uri($"{issuerUrl}/connect/authorize", UriKind.Relative));
 
                 options.IntrospectionEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/introspect", false)));
+                     new Uri($"{issuerUrl}/connect/introspect", UriKind.Relative));
 
                 options.LogoutEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/logout", false)));
+                     new Uri($"{issuerUrl}/connect/logout", UriKind.Relative));
 
                 options.TokenEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/token", false)));
+                     new Uri($"{issuerUrl}/connect/token", UriKind.Relative));
 
                 options.UserinfoEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/userinfo", false)));
+                     new Uri($"{issuerUrl}/connect/userinfo", UriKind.Relative));
 
                 options.CryptographyEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/.well-known/jwks", false)));
+                     new Uri($"{issuerUrl}/.well-known/jwks", UriKind.Relative));
 
-                options.Issuer = new Uri(urlGenerator.BuildUrl(issuerUrl, false));
+                options.ConfigurationEndpointUris.Add(
+                     new Uri($"{issuerUrl}/.well-known/openid-configuration", UriKind.Relative));*/
+
+                options.Issuer = new Uri(urlGenerator.BuildUrl());
             });
         }
     }
