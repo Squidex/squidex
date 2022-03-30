@@ -37,6 +37,8 @@ namespace Squidex.Config
 
         public string MicrosoftTenant { get; set; }
 
+        public Dictionary<string, string[]> OidcRoleMapping { get; set; }
+
         public string OidcName { get; set; }
 
         public string OidcClient { get; set; }
@@ -57,13 +59,13 @@ namespace Squidex.Config
 
         public bool OidcGetClaimsFromUserInfoEndpoint { get; set; }
 
-        public Dictionary<string, string[]> OidcRoleMapping { get; set; }
-
         public bool AdminRecreate { get; set; }
 
         public bool AllowPasswordAuth { get; set; }
 
         public bool LockAutomatically { get; set; }
+
+        public bool MultipleDomains { get; set; }
 
         public bool NoConsent { get; set; }
 

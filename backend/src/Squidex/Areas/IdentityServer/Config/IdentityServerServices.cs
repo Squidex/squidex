@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
+using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Hosting;
@@ -84,16 +86,6 @@ namespace Squidex.Areas.IdentityServer.Config
                             .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
                     });
 
-                    var identityServer = Constants.PrefixIdentityServer;
-
-                    builder.SetAuthorizationEndpointUris($"{identityServer}/connect/authorize");
-                    builder.SetConfigurationEndpointUris($"{identityServer}/.well-known/openid-configuration");
-                    builder.SetCryptographyEndpointUris($"{identityServer}/.well-known/jwks");
-                    builder.SetIntrospectionEndpointUris($"{identityServer}/connect/introspect");
-                    builder.SetLogoutEndpointUris($"{identityServer}/connect/logout");
-                    builder.SetTokenEndpointUris($"{identityServer}/connect/token");
-                    builder.SetUserinfoEndpointUris($"{identityServer}/connect/userinfo");
-
                     builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                     builder.DisableAccessTokenEncryption();
@@ -127,8 +119,51 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 var urlGenerator = services.GetRequiredService<IUrlGenerator>();
 
-                options.Issuer = new Uri(urlGenerator.BuildUrl());
+                var identityPrefix = Constants.PrefixIdentityServer;
+                var identityOptions = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+
+                Func<string, Uri> buildUrl;
+
+                if (identityOptions.MultipleDomains)
+                {
+                    buildUrl = url => new Uri($"{identityPrefix}{url}", UriKind.Relative);
+
+                    options.Issuer = new Uri(urlGenerator.BuildUrl());
+                }
+                else
+                {
+                    buildUrl = url => new Uri(urlGenerator.BuildUrl($"{identityPrefix}{url}", false));
+
+                    options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
+                }
+
+                options.AuthorizationEndpointUris.SetEndpoint(
+                    buildUrl("/connect/authorize"));
+
+                options.IntrospectionEndpointUris.SetEndpoint(
+                    buildUrl("/connect/introspect"));
+
+                options.LogoutEndpointUris.SetEndpoint(
+                    buildUrl("/connect/logout"));
+
+                options.TokenEndpointUris.SetEndpoint(
+                    buildUrl("/connect/token"));
+
+                options.UserinfoEndpointUris.SetEndpoint(
+                    buildUrl("/connect/userinfo"));
+
+                options.CryptographyEndpointUris.SetEndpoint(
+                    buildUrl("/.well-known/jwks"));
+
+                options.ConfigurationEndpointUris.SetEndpoint(
+                    buildUrl("/.well-known/openid-configuration"));
             });
+        }
+
+        private static void SetEndpoint(this List<Uri> endpointUris, Uri uri)
+        {
+            endpointUris.Clear();
+            endpointUris.Add(uri);
         }
     }
 }
