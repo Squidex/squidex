@@ -96,7 +96,6 @@ namespace Notifo.Areas.Account.Controllers
                 }
 
                 var application = await applicationManager.FindByClientIdAsync(request.ClientId, HttpContext.RequestAborted);
-
                 if (application == null)
                 {
                     throw new InvalidOperationException("The application details cannot be found in the database.");

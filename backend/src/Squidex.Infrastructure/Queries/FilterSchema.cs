@@ -46,12 +46,10 @@ namespace Squidex.Infrastructure.Queries
                 {
                     var path = string.Join('.', pathStack.Reverse());
 
-                    var schema = field.Schema;
-
-                    if (schema.Fields != null)
+                    var schema = field.Schema with
                     {
-                        schema = schema with { Fields = null };
-                    }
+                        Fields = null
+                    };
 
                     result?.Add(field with { Path = path, Schema = schema });
                 }
