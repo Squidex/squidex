@@ -78,6 +78,33 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_remove_Descriptions_for_merged_fields()
+        {
+            var schema = new FilterSchema(FilterSchemaType.Object)
+            {
+                Fields = new[]
+                {
+                    new FilterField(FilterSchema.String, "property1", "Description1"),
+                    new FilterField(FilterSchema.String, "property2", "Description2"),
+                    new FilterField(FilterSchema.String, "property2", "Description3")
+                }.ToReadonlyList()
+            };
+
+            var expected = new FilterSchema(FilterSchemaType.Object)
+            {
+                Fields = new[]
+                {
+                    new FilterField(FilterSchema.String, "property1", "Description1"),
+                    new FilterField(FilterSchema.String, "property2")
+                }.ToReadonlyList()
+            };
+
+            var actual = schema.Flatten();
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void Should_filter_out_fields_by_predicate_when_flatten()
         {
             var schema = new FilterSchema(FilterSchemaType.Object)

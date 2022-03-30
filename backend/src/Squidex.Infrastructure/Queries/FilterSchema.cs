@@ -88,9 +88,13 @@ namespace Squidex.Infrastructure.Queries
             {
                 var firstType = group.First().Schema.Type;
 
-                if (group.All(x => x.Schema.Type == firstType))
+                if (group.Count() == 1)
                 {
                     return group.Take(1);
+                }
+                else if (group.All(x => x.Schema.Type == firstType))
+                {
+                    return group.Take(1).Select(x => x with { Description = null });
                 }
                 else
                 {
