@@ -46,14 +46,14 @@ export class SchemaCategoryComponent implements OnChanges {
     public toggle() {
         this.isCollapsed = !this.isCollapsed;
 
-        this.localStore.setBoolean(this.configKey(), this.isCollapsed);
+        this.localStore.setBoolean(this.isCollapsedKey(), this.isCollapsed);
     }
 
     public ngOnChanges() {
         if (this.schemaCategory.countSchemasInSubtreeFiltered < this.schemaCategory.countSchemasInSubtree) {
             this.isCollapsed = false;
         } else {
-            this.isCollapsed = this.localStore.getBoolean(this.configKey());
+            this.isCollapsed = this.localStore.getBoolean(this.isCollapsedKey());
         }
     }
 
@@ -98,7 +98,7 @@ export class SchemaCategoryComponent implements OnChanges {
         return category.name;
     }
 
-    private configKey(): string {
+    private isCollapsedKey(): string {
         return `squidex.schema.category.${this.schemaCategory.name}.collapsed`;
     }
 }

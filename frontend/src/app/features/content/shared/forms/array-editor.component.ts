@@ -87,7 +87,7 @@ export class ArrayEditorComponent implements OnChanges {
         }
 
         if (changes['formModel'] || changes['formLevel']) {
-            this.isCollapsedInitial = this.localStore.getBoolean(this.expandedKey()) || this.formLevel > 0;
+            this.isCollapsedInitial = this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel > 0;
         }
     }
 
@@ -129,7 +129,7 @@ export class ArrayEditorComponent implements OnChanges {
         }
 
         if (this.formLevel === 0) {
-            this.localStore.setBoolean(this.expandedKey(), true);
+            this.localStore.setBoolean(this.isCollapsedKey(), true);
         }
 
         this.scroller?.first?.invalidateAllCachedMeasurements();
@@ -141,7 +141,7 @@ export class ArrayEditorComponent implements OnChanges {
         }
 
         if (this.formLevel === 0) {
-            this.localStore.setBoolean(this.expandedKey(), false);
+            this.localStore.setBoolean(this.isCollapsedKey(), false);
         }
 
         this.scroller?.first?.invalidateAllCachedMeasurements();
@@ -153,7 +153,7 @@ export class ArrayEditorComponent implements OnChanges {
         });
     }
 
-    private expandedKey(): string {
+    private isCollapsedKey(): string {
         return Settings.Local.FIELD_COLLAPSED(this.form.schema?.id, this.formModel.field?.fieldId);
     }
 }
