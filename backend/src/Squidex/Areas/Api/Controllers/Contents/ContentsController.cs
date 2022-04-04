@@ -561,7 +561,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppContentsChangeStatusOwn)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteContentSchedule(string app, string schema, DomainId id)
+        public async Task<IActionResult> DeleteContentStatus(string app, string schema, DomainId id)
         {
             var command = new CancelContentSchedule { ContentId = id };
 
