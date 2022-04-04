@@ -119,16 +119,26 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         return this.formatArray('Asset', 'Assets');
     }
 
+    public visitComponents(_: ComponentsFieldPropertiesDto): string {
+        return this.formatArray('Component', 'Components');
+    }
+
+    public visitReferences(_: ReferencesFieldPropertiesDto): string {
+        return this.formatArray('Reference', 'References');
+    }
+
     public visitBoolean(_: BooleanFieldPropertiesDto): string {
-        return this.value ? 'Yes' : 'No';
+        return Types.booleanToString(this.value);
     }
 
     public visitComponent(_: ComponentFieldPropertiesDto): string {
-        return '{ Component }';
-    }
+        const inner = Types.objectToString(this.value, ['schemaId'], 100);
 
-    public visitComponents(_: ComponentsFieldPropertiesDto): string {
-        return this.formatArray('Component', 'Components');
+        if (inner.length > 0) {
+            return `Component: ${inner}`;
+        } else {
+            return 'Component';
+        }
     }
 
     public visitDateTime(properties: DateTimeFieldPropertiesDto): FieldValue {
@@ -145,15 +155,19 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         }
     }
 
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): string {
-        return `${this.value.longitude}, ${this.value.latitude}`;
-    }
-
     public visitJson(_: JsonFieldPropertiesDto): string {
         return '<Json />';
     }
 
+    public visitUI(_: UIFieldPropertiesDto): any {
+        return '';
+    }
+
     public visitNumber(properties: NumberFieldPropertiesDto): FieldValue {
+        if (!Types.isNumber(this.value)) {
+            return '';
+        }
+
         if (Types.isNumber(this.value) && properties.editor === 'Stars' && this.allowHtml) {
             if (this.value <= 0 || this.value > 6) {
                 return new HtmlValue(`&#9733; ${this.value}`);
@@ -167,47 +181,48 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
                 return new HtmlValue(html);
             }
         }
+
         return `${this.value}`;
     }
 
-    public visitReferences(_: ReferencesFieldPropertiesDto): string {
-        return this.formatArray('Reference', 'References');
+    public visitGeolocation(_: GeolocationFieldPropertiesDto): string {
+        if (!Types.isObject(this.value)) {
+            return '';
+        }
+
+        return `${this.value.longitude}, ${this.value.latitude}`;
     }
 
     public visitTags(_: TagsFieldPropertiesDto): string {
-        if (this.value.length) {
-            return this.value.join(', ');
-        } else {
+        if (!Types.isArrayOfString(this.value)) {
             return '';
         }
+
+        return this.value.join(', ');
     }
 
     public visitString(properties: StringFieldPropertiesDto): any {
-        if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
-            const src = thumbnail(this.value, undefined, 50);
+        if (!Types.isString(this.value)) {
+            return '';
+        }
 
-            if (src) {
-                return new HtmlValue(`<img src="${src}" />`);
-            }
+        if (properties.editor === 'StockPhoto' && this.allowHtml && this.value) {
+            return new HtmlValue(`<img src="${thumbnail(this.value, undefined, 50)}" />`);
         }
 
         return this.value;
     }
 
-    public visitUI(_: UIFieldPropertiesDto): any {
-        return '';
-    }
-
     private formatArray(singularName: string, pluralName: string) {
-        if (Types.isArray(this.value)) {
-            if (this.value.length > 1) {
-                return `${this.value.length} ${pluralName}`;
-            } else if (this.value.length === 1) {
-                return `1 ${singularName}`;
-            }
+        if (!Types.isArray(this.value)) {
+            return `0 ${pluralName}`;
         }
 
-        return `0 ${pluralName}`;
+        if (this.value.length > 1) {
+            return `${this.value.length} ${pluralName}`;
+        } else {
+            return `1 ${singularName}`;
+        }
     }
 }
 
@@ -222,7 +237,7 @@ export function thumbnail(url: string, width?: number, height?: number) {
         }
     }
 
-    return undefined;
+    return url;
 }
 
 export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<ValidatorFn>> {
@@ -265,14 +280,6 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
-    public visitBoolean(_: BooleanFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitComponent(_: ComponentFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
     public visitComponents(properties: ComponentsFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),
@@ -283,18 +290,6 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         }
 
         return validators;
-    }
-
-    public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitGeolocation(_: GeolocationFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
-    }
-
-    public visitJson(_: JsonFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
-        return [];
     }
 
     public visitNumber(properties: NumberFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
@@ -361,6 +356,26 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         }
 
         return validators;
+    }
+
+    public visitBoolean(_: BooleanFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
+    public visitComponent(_: ComponentFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
+    public visitDateTime(_: DateTimeFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
+    public visitGeolocation(_: GeolocationFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
+
+    public visitJson(_: JsonFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
     }
 
     public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValidatorFn> {

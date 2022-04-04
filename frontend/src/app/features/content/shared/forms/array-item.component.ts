@@ -140,9 +140,14 @@ export class ArrayItemComponent implements OnChanges {
 function getTitle(formModel: ObjectFormBase) {
     const value = formModel.form.value;
     const values: string[] = [];
+    
+    let valueLength = 0;
 
     if (Types.is(formModel, ComponentForm) && formModel.schema) {
-        values.push(formModel.schema.displayName);
+        const formatted = formModel.schema.displayName;
+
+        values.push(formatted);
+        valueLength += formatted.length;
     }
 
     if (Types.is(formModel.field, RootFieldDto)) {
@@ -154,6 +159,11 @@ function getTitle(formModel: ObjectFormBase) {
 
                 if (formatted) {
                     values.push(formatted);
+                    valueLength += formatted.length;
+                    
+                    if (valueLength > 30) {
+                        break;
+                    }
                 }
             }
         }

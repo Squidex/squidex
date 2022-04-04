@@ -205,4 +205,42 @@ export module Types {
 
         return target;
     }
+
+    export function booleanToString(value: boolean) {
+        return value ? 'Yes' : 'No';
+    }
+
+    export function objectToString(value: Object, exclude?: string[], maxLength = 100) {
+        let result = '';
+
+        for (const [key, property] of Object.entries(value)) {
+            let formatted = '';
+
+            if (exclude && exclude.indexOf(key) >= 0) {
+                continue;
+            }
+
+            if (Types.isString(property)) {
+                formatted = property;
+            } else if (Types.isNumber(property)) {
+                formatted = `${property}`;
+            } else if (Types.isBoolean(property)) {
+                formatted = booleanToString(property);
+            }
+
+            if (formatted) {
+                if (result.length > 0) {
+                    result += ', ';
+                }
+
+                result += formatted;
+            }
+
+            if (result.length >= maxLength) {
+                break;
+            }
+        }
+
+        return result;
+    }
 }
