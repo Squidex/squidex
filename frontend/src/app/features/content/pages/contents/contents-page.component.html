@@ -24,7 +24,11 @@
                 </sqx-search-form>
             </div>
             <div class="col-auto" *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages"></sqx-language-selector>
+                <sqx-language-selector class="languages-buttons" 
+                    (languageChange)="changeLanguage($event)"
+                    [language]="language"
+                    [languages]="languages">
+                </sqx-language-selector>
             </div>
             <div class="col-auto">
                 <button type="button" class="btn btn-success" routerLink="new" title="i18n:contents.createContentTooltip" shortcut="CTRL + U" [disabled]="(contentsState.canCreateAny | async) === false">

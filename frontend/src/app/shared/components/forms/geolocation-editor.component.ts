@@ -7,6 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { ExtendedFormGroup, LocalStoreService, ResourceLoaderService, Settings, StatefulControlComponent, Types, UIOptions, ValidatorsEx } from '@app/shared/internal';
 
 declare const L: any;
@@ -20,7 +21,7 @@ type Geolocation = { latitude: number; longitude: number };
 
 interface State {
     // True when the map should be hidden.
-    isMapHidden?: boolean;
+    isMapHidden: boolean;
 
     // True, when width less than 600 pixels.
     isCompact?: boolean;
@@ -69,8 +70,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     @ViewChild('searchBox', { static: false })
     public searchBoxInput!: ElementRef<HTMLInputElement>;
 
-    constructor(changeDetector: ChangeDetectorRef,
-        private readonly localStore: LocalStoreService,
+    constructor(changeDetector: ChangeDetectorRef, localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly uiOptions: UIOptions,
     ) {
@@ -78,13 +78,15 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             isMapHidden: localStore.getBoolean(Settings.Local.HIDE_MAP),
         });
 
+        this.changes.pipe(map(x => x.isMapHidden), distinctUntilChanged()).subscribe(value => {
+            localStore.setBoolean(Settings.Local.HIDE_MAP, value);
+        });
+
         this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
     }
 
     public hideMap(isMapHidden: boolean) {
         this.next({ isMapHidden });
-
-        this.localStore.setBoolean(Settings.Local.HIDE_MAP, isMapHidden);
     }
 
     public writeValue(obj: any) {
