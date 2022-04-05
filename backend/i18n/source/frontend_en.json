@@ -496,7 +496,7 @@
   "contents.unsavedChangesText": "You have unsaved changes. Do you want to load them now?",
   "contents.unsavedChangesTitle": "Unsaved changes",
   "contents.unsetValue": "Unset value",
-  "contents.unsetValueConfirmText": "If you unset the value you might loose your changes.\n\nDo you really want to do it?",
+  "contents.unsetValueConfirmText": "If you unset the value you might lose your changes.\n\nDo you really want to do it?",
   "contents.unsetValueConfirmTitle": "Do you want to unset the value?",
   "contents.updated": "Content updated successfully.",
   "contents.updateFailed": "Failed to update content. Please reload.",
