@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -19,21 +19,21 @@ namespace Squidex.Extensions.Actions.Twitter
         Display = "Tweet",
         Description = "Tweet an update with your twitter account.",
         ReadMore = "https://twitter.com")]
-    public sealed class TweetAction : RuleAction
+    public sealed record TweetAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Access Token", Description = " The generated access token.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string AccessToken { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Access Secret", Description = " The generated access secret.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string AccessSecret { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Text", Description = "The text that is sent as tweet to twitter.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Text { get; set; }
     }

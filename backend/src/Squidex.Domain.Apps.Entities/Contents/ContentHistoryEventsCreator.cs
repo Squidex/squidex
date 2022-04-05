@@ -1,11 +1,10 @@
 // ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;

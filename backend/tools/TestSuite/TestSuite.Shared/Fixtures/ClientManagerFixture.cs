@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.ClientLibrary;
 
 namespace TestSuite.Fixtures

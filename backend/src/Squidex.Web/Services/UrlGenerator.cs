@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -22,9 +22,6 @@ namespace Squidex.Web.Services
 
         public UrlGenerator(IGenericUrlGenerator urlGenerator, IAssetFileStore assetFileStore, bool allowAssetSourceUrl)
         {
-            Guard.NotNull(assetFileStore, nameof(assetFileStore));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.assetFileStore = assetFileStore;
 
             this.urlGenerator = urlGenerator;
@@ -64,12 +61,12 @@ namespace Squidex.Web.Services
 
         public string? AssetSource(NamedId<DomainId> appId, DomainId assetId, long fileVersion)
         {
-            return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion);
+            return assetFileStore.GeneratePublicUrl(appId.Id, assetId, fileVersion, null);
         }
 
-        public string AssetsUI(NamedId<DomainId> appId, string? query = null)
+        public string AssetsUI(NamedId<DomainId> appId, string? @ref = null)
         {
-            return urlGenerator.BuildUrl($"app/{appId.Name}/assets", false) + query != null ? $"?query={query}" : string.Empty;
+            return urlGenerator.BuildUrl($"app/{appId.Name}/assets", false) + @ref != null ? $"?ref={@ref}" : string.Empty;
         }
 
         public string BackupsUI(NamedId<DomainId> appId)
@@ -120,6 +117,11 @@ namespace Squidex.Web.Services
         public string RolesUI(NamedId<DomainId> appId)
         {
             return urlGenerator.BuildUrl($"app/{appId.Name}/settings/roles", false);
+        }
+
+        public string Root()
+        {
+            return urlGenerator.BuildUrl();
         }
 
         public string RulesUI(NamedId<DomainId> appId)

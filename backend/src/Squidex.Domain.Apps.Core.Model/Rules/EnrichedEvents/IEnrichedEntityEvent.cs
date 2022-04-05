@@ -9,8 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
-    public interface IEnrichedEntityEvent
+    public interface IEnrichedEntityEvent : IWithId<DomainId>
     {
-        DomainId Id { get; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Core
 {
@@ -21,7 +22,7 @@ namespace Squidex.Domain.Apps.Core
 
         public Partitioning(string key)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             Key = key;
         }
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Core
 
         public override int GetHashCode()
         {
-            return Key.GetHashCode();
+            return Key.GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

@@ -1,0 +1,19 @@
+<sqx-modal-dialog size="lg" (close)="close.emit()">
+    <ng-container title>
+        {{ 'news.title' | sqxTranslate }}
+    </ng-container>
+
+    <ng-container content>
+        <div class="help">
+            <h1>{{ 'news.headline' | sqxTranslate }}</h1>
+
+            <div *ngFor="let feature of features; trackBy: trackByFeature; let last = last">
+                <h4>{{feature.name}}</h4>
+
+                <div [innerHTML]="feature.text | sqxHelpMarkdown"></div>
+
+                <hr [class.hidden]="last" />
+            </div>
+        </div>
+    </ng-container>
+</sqx-modal-dialog>

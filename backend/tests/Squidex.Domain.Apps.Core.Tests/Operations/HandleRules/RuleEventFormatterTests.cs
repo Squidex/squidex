@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -32,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleEventFormatterTests
     {
-        private readonly IUser user = A.Fake<IUser>();
+        private readonly IUser user = UserMocks.User("user123", "me@email.com", "me");
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
@@ -40,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly RuleEventFormatter sut;
 
-        private class FakeContentResolver : IRuleEventFormatter
+        private sealed class FakeContentResolver : IRuleEventFormatter
         {
             public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
             {
@@ -67,15 +65,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             A.CallTo(() => urlGenerator.AssetContent(appId, assetId.ToString()))
                 .Returns("asset-content-url");
-
-            A.CallTo(() => user.Id)
-                .Returns("user123");
-
-            A.CallTo(() => user.Email)
-                .Returns("me@email.com");
-
-            A.CallTo(() => user.Claims)
-                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
 
             var formatters = new IRuleEventFormatter[]
             {
@@ -107,9 +96,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 new StringWordsJintExtension()
             };
 
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-
-            return new JintScriptEngine(cache, extensions);
+            return new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }),
+                extensions);
         }
 
         [Fact]
@@ -137,7 +130,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.ToEnvelope(@event);
 
-            Assert.Contains("MyEventName", result);
+            Assert.Contains("MyEventName", result, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -280,7 +273,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public async Task Should_return_json_string_when_array()
+        public async Task Should_return_json_string_if_array()
         {
             var @event = new EnrichedContentEvent
             {
@@ -299,7 +292,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("{'categories':['ref1','ref2','ref3']}", result?.Replace(" ", string.Empty).Replace("\"", "'"));
+            Assert.Equal("{'categories':['ref1','ref2','ref3']}", result?
+                .Replace(" ", string.Empty, StringComparison.Ordinal)
+                .Replace("\"", "'", StringComparison.Ordinal));
         }
     }
 }

@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable SA1401 // Fields must be private
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities.Backup.Model
 {

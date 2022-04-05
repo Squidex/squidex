@@ -1,12 +1,11 @@
 // ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Comments.Models;
@@ -58,10 +57,10 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
 
             var response = Deferred.Response(() =>
             {
-                return CommentsDto.FromResult(result);
+                return CommentsDto.FromDomain(result);
             });
 
-            Response.Headers[HeaderNames.ETag] = result.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = result.Version.ToString(CultureInfo.InvariantCulture);
 
             return Ok(response);
         }
@@ -96,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Comments.Notifications
 
         private void CheckPermissions(DomainId userId)
         {
-            if (!string.Equals(userId.ToString(), User.OpenIdSubject()))
+            if (!string.Equals(userId.ToString(), User.OpenIdSubject(), StringComparison.Ordinal))
             {
                 throw new DomainForbiddenException(T.Get("comments.noPermissions"));
             }

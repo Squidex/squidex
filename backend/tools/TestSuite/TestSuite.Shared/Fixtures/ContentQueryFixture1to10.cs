@@ -5,8 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using System.Globalization;
+using Newtonsoft.Json.Linq;
+using Squidex.ClientLibrary;
 using TestSuite.Model;
 
 namespace TestSuite.Fixtures
@@ -23,11 +24,26 @@ namespace TestSuite.Fixtures
         {
             Task.Run(async () =>
             {
+#pragma warning disable MA0056 // Do not call overridable members in constructor
                 Dispose();
+#pragma warning restore MA0056 // Do not call overridable members in constructor
 
                 for (var i = 10; i > 0; i--)
                 {
-                    var data = new TestEntityData { Number = i, String = i.ToString() };
+                    var text = i.ToString(CultureInfo.InvariantCulture);
+
+                    var data = new TestEntityData
+                    {
+                        String = text,
+                        Json = JObject.FromObject(new
+                        {
+                            nested1 = new
+                            {
+                                nested2 = i
+                            }
+                        }),
+                        Number = i,
+                    };
 
                     if (i % 2 == 0)
                     {
@@ -38,7 +54,7 @@ namespace TestSuite.Fixtures
                         data.Geo = new { longitude = i, latitude = i };
                     }
 
-                    await Contents.CreateAsync(data, true);
+                    await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
                 }
             }).Wait();
         }

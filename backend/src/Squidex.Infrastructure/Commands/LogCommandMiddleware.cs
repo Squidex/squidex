@@ -1,72 +1,55 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Commands
 {
     public sealed class LogCommandMiddleware : ICommandMiddleware
     {
-        private readonly ISemanticLog log;
+        private readonly ILogger<LogCommandMiddleware> log;
 
-        public LogCommandMiddleware(ISemanticLog log)
+        public LogCommandMiddleware(ILogger<LogCommandMiddleware> log)
         {
-            Guard.NotNull(log, nameof(log));
-
             this.log = log;
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
         {
-            var logContext = (id: context.ContextId.ToString(), command: context.Command.GetType().Name);
+            var type = context.Command.GetType();
 
             try
             {
-                log.LogDebug(logContext, (ctx, w) => w
-                    .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", ctx.id)
-                    .WriteProperty("status", "Started")
-                    .WriteProperty("commandType", ctx.command));
-
-                using (log.MeasureInformation(logContext, (ctx, w) => w
-                    .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", ctx.id)
-                    .WriteProperty("status", "Completed")
-                    .WriteProperty("commandType", ctx.command)))
+                if (log.IsEnabled(LogLevel.Debug))
                 {
-                    await next(context);
+                    log.LogDebug("Command {command} with ID {id} started.", type, context.ContextId);
                 }
 
-                log.LogInformation(logContext, (ctx, w) => w
-                    .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", ctx.id)
-                    .WriteProperty("status", "Succeeded")
-                    .WriteProperty("commandType", ctx.command));
+                var watch = ValueStopwatch.StartNew();
+                try
+                {
+                    await next(context);
+
+                    log.LogInformation("Command {command} with ID {id} succeeded.", type, context.ContextId);
+                }
+                finally
+                {
+                    log.LogInformation("Command {command} with ID {id} completed after {time}ms.", type, context.ContextId, watch.Stop());
+                }
             }
             catch (Exception ex)
             {
-                log.LogError(ex, logContext, (ctx, w) => w
-                    .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", ctx.id)
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("commandType", ctx.command));
-
+                log.LogError(ex, "Command {command} with ID {id} failed.", type, context.ContextId);
                 throw;
             }
 
             if (!context.IsCompleted)
             {
-                log.LogFatal(logContext, (ctx, w) => w
-                    .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", ctx.id)
-                    .WriteProperty("status", "Unhandled")
-                    .WriteProperty("commandType", ctx.command));
+                log.LogCritical("Command {command} with ID {id} not handled.", type, context.ContextId);
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             if (allowUpdate)
             {
-                var values = new { app = resources.App, name = schema, parentId, id = FieldId };
+                var values = new { app = resources.App, schema, parentId, id = FieldId };
 
                 AddPutLink("update", resources.Url<SchemaFieldsController>(x => nameof(x.PutNestedField), values));
 

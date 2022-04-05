@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 
 namespace Squidex.Infrastructure
@@ -15,6 +14,7 @@ namespace Squidex.Infrastructure
     {
         private static readonly string EmptyString = Guid.Empty.ToString();
         public static readonly DomainId Empty = default;
+        public static readonly string IdSeparator = "--";
 
         private readonly string? id;
 
@@ -60,12 +60,12 @@ namespace Squidex.Infrastructure
 
         public bool Equals(DomainId other)
         {
-            return string.Equals(ToString(), other.ToString());
+            return string.Equals(ToString(), other.ToString(), StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return ToString().GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()
@@ -95,12 +95,12 @@ namespace Squidex.Infrastructure
 
         public static DomainId Combine(NamedId<DomainId> id1, DomainId id2)
         {
-            return new DomainId($"{id1.Id}--{id2}");
+            return new DomainId($"{id1.Id}{IdSeparator}{id2}");
         }
 
         public static DomainId Combine(DomainId id1, DomainId id2)
         {
-            return new DomainId($"{id1}--{id2}");
+            return new DomainId($"{id1}{IdSeparator}{id2}");
         }
     }
 }

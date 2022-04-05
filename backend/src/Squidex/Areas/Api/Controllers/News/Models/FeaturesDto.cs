@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.News.Models
@@ -16,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.News.Models
         /// The latest features.
         /// </summary>
         [LocalizedRequired]
-        public List<FeatureDto> Features { get; set; }
+        public List<FeatureDto> Features { get; } = new List<FeatureDto>();
 
         /// <summary>
         /// The recent version.

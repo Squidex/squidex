@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using NoUpdateType = Squidex.Domain.Apps.Core.Contents.NoUpdate;
@@ -42,31 +41,31 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string[]? NoUpdateRoles { get; set; }
 
-        public static WorkflowStepDto FromWorkflowStep(WorkflowStep step)
+        public static WorkflowStepDto FromDomain(WorkflowStep step)
         {
-            var response = SimpleMapper.Map(step, new WorkflowStepDto
+            var result = SimpleMapper.Map(step, new WorkflowStepDto
             {
                 Transitions = step.Transitions.ToDictionary(
                     y => y.Key,
-                    y => WorkflowTransitionDto.FromWorkflowTransition(y.Value))
+                    y => WorkflowTransitionDto.FromDomain(y.Value))
             });
 
             if (step.NoUpdate != null)
             {
-                response.NoUpdate = true;
-                response.NoUpdateExpression = step.NoUpdate.Expression;
-                response.NoUpdateRoles = step.NoUpdate.Roles?.ToArray();
+                result.NoUpdate = true;
+                result.NoUpdateExpression = step.NoUpdate.Expression;
+                result.NoUpdateRoles = step.NoUpdate.Roles?.ToArray();
             }
 
-            return response;
+            return result;
         }
 
-        public WorkflowStep ToStep()
+        public WorkflowStep ToWorkflowStep()
         {
             return new WorkflowStep(
-                Transitions?.ToDictionary(
+                Transitions?.ToReadonlyDictionary(
                     y => y.Key,
-                    y => y.Value?.ToTransition()!),
+                    y => y.Value?.ToWorkflowTransition()!),
                 Color,
                 NoUpdate ?
                     NoUpdateType.When(NoUpdateExpression, NoUpdateRoles) :

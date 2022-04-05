@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.Queries;
@@ -42,6 +40,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
+                Filter.Exists(x => x.LastModified),
+                Filter.Exists(x => x.Id),
                 Filter.Eq(x => x.IndexedAppId, appId)
             };
 

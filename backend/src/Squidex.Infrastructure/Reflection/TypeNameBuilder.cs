@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Text;
 
 namespace Squidex.Infrastructure.Reflection
@@ -22,7 +21,7 @@ namespace Squidex.Infrastructure.Reflection
                 {
                     if (typeName.EndsWith(suffix, StringComparison.Ordinal))
                     {
-                        typeName = typeName.Substring(0, typeName.Length - suffix.Length);
+                        typeName = typeName[..^suffix.Length];
 
                         break;
                     }

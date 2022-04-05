@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Squidex.Infrastructure;
@@ -16,7 +14,7 @@ namespace Squidex.Domain.Users
 {
     public sealed class DefaultXmlRepository : IXmlRepository
     {
-        private readonly ISnapshotStore<State, string> store;
+        private readonly ISnapshotStore<State> store;
 
         [CollectionName("Identity_Xml")]
         public sealed class State
@@ -38,32 +36,26 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public DefaultXmlRepository(ISnapshotStore<State, string> store)
+        public DefaultXmlRepository(ISnapshotStore<State> store)
         {
-            Guard.NotNull(store, nameof(store));
-
             this.store = store;
         }
 
         public IReadOnlyCollection<XElement> GetAllElements()
         {
-            var result = new List<XElement>();
-
-            store.ReadAllAsync((state, _) =>
-            {
-                result.Add(state.ToXml());
-
-                return Task.CompletedTask;
-            }).Wait();
-
-            return result;
+            return GetAllElementsAsync().Result;
         }
 
         public void StoreElement(XElement element, string friendlyName)
         {
             var state = new State(element);
 
-            store.WriteAsync(friendlyName, state, EtagVersion.Any, 0);
+            store.WriteAsync(DomainId.Create(friendlyName), state, EtagVersion.Any, 0);
+        }
+
+        private async Task<IReadOnlyCollection<XElement>> GetAllElementsAsync()
+        {
+            return await store.ReadAllAsync().Select(x => x.State.ToXml()).ToListAsync();
         }
     }
 }

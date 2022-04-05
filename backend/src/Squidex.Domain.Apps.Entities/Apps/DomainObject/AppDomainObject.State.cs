@@ -1,13 +1,13 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -37,15 +37,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             public AppClients Clients { get; set; } = AppClients.Empty;
 
-            public AppPatterns Patterns { get; set; } = AppPatterns.Empty;
+            public AppSettings Settings { get; set; } = AppSettings.Empty;
 
             public AppContributors Contributors { get; set; } = AppContributors.Empty;
+
+            public AssetScripts AssetScripts { get; set; } = new AssetScripts();
 
             public LanguagesConfig Languages { get; set; } = LanguagesConfig.English;
 
             public Workflows Workflows { get; set; } = Workflows.Empty;
 
-            public bool IsArchived { get; set; }
+            public bool IsDeleted { get; set; }
 
             [IgnoreDataMember]
             public DomainId UniqueId
@@ -73,17 +75,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             return true;
                         }
 
-                    case AppImageUploaded e:
-                        return UpdateImage(e, e => e.Image);
-
-                    case AppImageRemoved e when Image != null:
-                        return UpdateImage(e, e => null);
+                    case AppSettingsUpdated e when Is.Change(Settings, e.Settings):
+                        return UpdateSettings(e.Settings);
 
                     case AppPlanChanged e when Is.Change(Plan?.PlanId, e.PlanId):
-                        return UpdatePlan(e, e => e.ToAppPlan());
+                        return UpdatePlan(e.ToPlan());
+
+                    case AppAssetsScriptsConfigured e when Is.Change(e.Scripts, AssetScripts):
+                        return UpdateAssetScripts(e.Scripts);
 
                     case AppPlanReset e when Plan != null:
-                        return UpdatePlan(e, e => null);
+                        return UpdatePlan(null);
+
+                    case AppImageUploaded e:
+                        return UpdateImage(e.Image);
+
+                    case AppImageRemoved e when Image != null:
+                        return UpdateImage(null);
 
                     case AppContributorAssigned e:
                         return UpdateContributors(e, (e, c) => c.Assign(e.ContributorId, e.Role));
@@ -92,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return UpdateContributors(e, (e, c) => c.Remove(e.ContributorId));
 
                     case AppClientAttached e:
-                        return UpdateClients(e, (e, c) => c.Add(e.Id, e.Secret));
+                        return UpdateClients(e, (e, c) => c.Add(e.Id, e.Secret, e.Role));
 
                     case AppClientUpdated e:
                         return UpdateClients(e, (e, c) => c.Update(e.Id, e.Name, e.Role, e.ApiCallsLimit, e.ApiTrafficLimit, e.AllowAnonymous));
@@ -108,15 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
                     case AppWorkflowDeleted e:
                         return UpdateWorkflows(e, (e, w) => w.Remove(e.WorkflowId));
-
-                    case AppPatternAdded e:
-                        return UpdatePatterns(e, (ev, p) => p.Add(ev.PatternId, ev.Name, ev.Pattern, ev.Message));
-
-                    case AppPatternDeleted e:
-                        return UpdatePatterns(e, (e, p) => p.Remove(e.PatternId));
-
-                    case AppPatternUpdated e:
-                        return UpdatePatterns(e, (e, p) => p.Update(e.PatternId, e.Name, e.Pattern, e.Message));
 
                     case AppRoleAdded e:
                         return UpdateRoles(e, (e, r) => r.Add(e.Name));
@@ -146,11 +145,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                             return l;
                         });
 
-                    case AppArchived:
+                    case AppDeleted:
                         {
                             Plan = null;
 
-                            IsArchived = true;
+                            IsDeleted = true;
 
                             return true;
                         }
@@ -186,15 +185,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 return !ReferenceEquals(previous, Languages);
             }
 
-            private bool UpdatePatterns<T>(T @event, Func<T, AppPatterns, AppPatterns> update)
-            {
-                var previous = Patterns;
-
-                Patterns = update(@event, previous);
-
-                return !ReferenceEquals(previous, Patterns);
-            }
-
             private bool UpdateRoles<T>(T @event, Func<T, Roles, Roles> update)
             {
                 var previous = Roles;
@@ -213,16 +203,30 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 return !ReferenceEquals(previous, Workflows);
             }
 
-            private bool UpdateImage<T>(T @event, Func<T, AppImage?> update)
+            private bool UpdateImage(AppImage? image)
             {
-                Image = update(@event);
+                Image = image;
 
                 return true;
             }
 
-            private bool UpdatePlan<T>(T @event, Func<T, AppPlan?> update)
+            private bool UpdateAssetScripts(AssetScripts? scripts)
             {
-                Plan = update(@event);
+                AssetScripts = scripts ?? new AssetScripts();
+
+                return true;
+            }
+
+            private bool UpdateSettings(AppSettings settings)
+            {
+                Settings = settings;
+
+                return true;
+            }
+
+            private bool UpdatePlan(AppPlan? plan)
+            {
+                Plan = plan;
 
                 return true;
             }

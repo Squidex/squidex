@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -23,9 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider)
         {
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(appProvider, nameof(appProvider));
-
             this.scriptEngine = scriptEngine;
 
             this.appProvider = appProvider;
@@ -36,6 +30,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
+        }
+
+        public async Task<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, null, user);
         }
 
         public async Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)
@@ -50,13 +51,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
-        }
-
-        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, ContentData data, ClaimsPrincipal? user)
-        {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, data, user);
         }
 
         public async Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user)
@@ -109,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool IsTrue(WorkflowCondition condition, ContentData data, ClaimsPrincipal? user)
+        private bool IsTrue(WorkflowCondition condition, ContentData? data, ClaimsPrincipal? user)
         {
             if (condition?.Roles != null && user != null)
             {
@@ -119,11 +113,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(condition?.Expression))
+            if (!string.IsNullOrWhiteSpace(condition?.Expression) && data != null)
             {
-                var vars = new ScriptVars
+                var vars = new DataScriptVars
                 {
-                    ["data"] = data
+                    Data = data
                 };
 
                 return scriptEngine.Evaluate(vars, condition.Expression);

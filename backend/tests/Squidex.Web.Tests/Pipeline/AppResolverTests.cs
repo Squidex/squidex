@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -47,7 +43,7 @@ namespace Squidex.Web.Pipeline
                 EndpointMetadata = new List<object>()
             });
 
-            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
+            actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
             actionExecutingContext.HttpContext = httpContext;
             actionExecutingContext.RouteData.Values["app"] = appName;
 
@@ -66,7 +62,7 @@ namespace Squidex.Web.Pipeline
         {
             SetupUser();
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
                 .Returns(Task.FromResult<IAppEntity?>(null));
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -82,7 +78,7 @@ namespace Squidex.Web.Pipeline
 
             var app = CreateApp(appName);
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -101,7 +97,7 @@ namespace Squidex.Web.Pipeline
             user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, true))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -124,7 +120,7 @@ namespace Squidex.Web.Pipeline
 
             user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, true))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -148,7 +144,7 @@ namespace Squidex.Web.Pipeline
             user.AddClaim(new Claim(OpenIdClaims.Subject, "user1"));
             user.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -171,7 +167,7 @@ namespace Squidex.Web.Pipeline
 
             var app = CreateApp(appName, appClient: "client1");
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, true))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -188,7 +184,7 @@ namespace Squidex.Web.Pipeline
 
             var app = CreateApp(appName, appClient: "client1", allowAnonymous: true);
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, true))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -196,6 +192,7 @@ namespace Squidex.Web.Pipeline
             Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(isNextCalled);
+            Assert.Contains(user.Claims, x => x.Type == OpenIdClaims.ClientId && x.Value == "client1");
         }
 
         [Fact]
@@ -210,7 +207,7 @@ namespace Squidex.Web.Pipeline
 
             actionContext.ActionDescriptor.EndpointMetadata.Add(new AllowAnonymousAttribute());
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, true))
+            A.CallTo(() => appProvider.GetAppAsync(appName, true, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -230,7 +227,7 @@ namespace Squidex.Web.Pipeline
 
             var app = CreateApp(appName);
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -248,7 +245,7 @@ namespace Squidex.Web.Pipeline
 
             var app = CreateApp(appName, appClient: "client1");
 
-            A.CallTo(() => appProvider.GetAppAsync(appName, false))
+            A.CallTo(() => appProvider.GetAppAsync(appName, false, httpContext.RequestAborted))
                 .Returns(app);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
@@ -266,7 +263,7 @@ namespace Squidex.Web.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false))
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
                 .MustNotHaveHappened();
         }
 

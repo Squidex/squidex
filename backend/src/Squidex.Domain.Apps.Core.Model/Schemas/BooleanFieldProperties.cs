@@ -1,22 +1,21 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class BooleanFieldProperties : FieldProperties
+    public sealed record BooleanFieldProperties : FieldProperties
     {
-        public LocalizedValue<bool?> DefaultValues { get; set; }
+        public LocalizedValue<bool?> DefaultValues { get; init; }
 
-        public bool? DefaultValue { get; set; }
+        public bool? DefaultValue { get; init; }
 
-        public bool InlineEditable { get; set; }
+        public bool InlineEditable { get; init; }
 
-        public BooleanFieldEditor Editor { get; set; }
+        public BooleanFieldEditor Editor { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

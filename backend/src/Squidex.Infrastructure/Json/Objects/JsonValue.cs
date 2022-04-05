@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using NodaTime;
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
@@ -35,17 +32,28 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public static JsonArray Array<T>(IEnumerable<T> values)
         {
-            return new JsonArray(values?.OfType<object>());
+            var source = values?.OfType<object?>().Select(Create).ToList() ?? new List<IJsonValue>();
+
+            return new JsonArray(source);
         }
 
         public static JsonArray Array<T>(params T?[] values)
         {
-            return new JsonArray(values?.OfType<object>());
+            var source = values?.OfType<object?>().Select(Create).ToList() ?? new List<IJsonValue>();
+
+            return new JsonArray(source);
         }
 
         public static JsonObject Object()
         {
             return new JsonObject();
+        }
+
+        public static JsonObject Object<T>(IReadOnlyDictionary<string, T> values)
+        {
+            var source = values?.ToDictionary(x => x.Key, x => Create(x.Value)) ?? new Dictionary<string, IJsonValue>();
+
+            return new JsonObject(source);
         }
 
         public static IJsonValue Create(object? value)
@@ -62,27 +70,31 @@ namespace Squidex.Infrastructure.Json.Objects
 
             switch (value)
             {
-                case string s:
-                    return Create(s);
-                case bool b:
-                    return Create(b);
-                case float f:
-                    return Create(f);
-                case double d:
-                    return Create(d);
-                case int i:
-                    return Create(i);
-                case long l:
-                    return Create(l);
-                case Guid g:
-                    return Create(g);
-                case DomainId i:
-                    return Create(i);
-                case Instant i:
-                    return Create(i);
+                case string typed:
+                    return Create(typed);
+                case bool typed:
+                    return Create(typed);
+                case float typed:
+                    return Create(typed);
+                case double typed:
+                    return Create(typed);
+                case int typed:
+                    return Create(typed);
+                case long typed:
+                    return Create(typed);
+                case Guid typed:
+                    return Create(typed);
+                case DomainId typed:
+                    return Create(typed);
+                case Instant typed:
+                    return Create(typed);
+                case object[] typed:
+                    return Array(typed);
+                case IReadOnlyDictionary<string, object?> typed:
+                    return Object(typed);
             }
 
-            throw new ArgumentException("Invalid json type");
+            throw new ArgumentException("Invalid json type", nameof(value));
         }
 
         public static IJsonValue Create(Guid value)
@@ -122,7 +134,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public static IJsonValue Create(double value)
         {
-            Guard.ValidNumber(value, nameof(value));
+            Guard.ValidNumber(value);
 
             if (value == 0)
             {

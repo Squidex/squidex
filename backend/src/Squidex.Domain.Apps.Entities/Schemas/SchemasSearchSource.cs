@@ -1,11 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -23,19 +22,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.appProvider = appProvider;
 
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<SearchResults> SearchAsync(string query, Context context)
+        public async Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 
-            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
             if (schemas.Count > 0)
             {
@@ -47,11 +44,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
                     var name = schema.SchemaDef.DisplayNameUnchanged();
 
-                    if (name.Contains(query))
+                    if (name.Contains(query, StringComparison.OrdinalIgnoreCase))
                     {
                         AddSchemaUrl(result, appId, schemaId, name);
 
-                        if (HasPermission(context, schemaId))
+                        if (schema.SchemaDef.Type != SchemaType.Component && HasPermission(context, schemaId))
                         {
                             AddContentsUrl(result, appId, schema, schemaId, name);
                         }
@@ -71,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private void AddContentsUrl(SearchResults result, NamedId<DomainId> appId, ISchemaEntity schema, NamedId<DomainId> schemaId, string name)
         {
-            if (schema.SchemaDef.IsSingleton)
+            if (schema.SchemaDef.Type == SchemaType.Singleton)
             {
                 var contentUrl = urlGenerator.ContentUI(appId, schemaId, schemaId.Id);
 

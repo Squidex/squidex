@@ -1,15 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Squidex.Infrastructure.Validation;
 using Squidex.Text;
@@ -20,7 +16,8 @@ namespace Squidex.Infrastructure
     {
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidNumber(float target, string parameterName)
+        public static void ValidNumber(float target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (float.IsNaN(target) || float.IsPositiveInfinity(target) || float.IsNegativeInfinity(target))
             {
@@ -30,7 +27,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidNumber(double target, string parameterName)
+        public static void ValidNumber(double target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (double.IsNaN(target) || double.IsPositiveInfinity(target) || double.IsNegativeInfinity(target))
             {
@@ -40,7 +38,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidSlug(string? target, string parameterName)
+        public static void ValidSlug(string? target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNullOrEmpty(target, parameterName);
 
@@ -52,7 +51,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidPropertyName(string? target, string parameterName)
+        public static void ValidPropertyName(string? target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNullOrEmpty(target, parameterName);
 
@@ -64,7 +64,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void HasType<T>(object? target, string parameterName)
+        public static void HasType<T>(object? target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target != null && target.GetType() != typeof(T))
             {
@@ -74,7 +75,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void HasType(object? target, Type? expectedType, string parameterName)
+        public static void HasType(object? target, Type? expectedType,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target != null && expectedType != null && target.GetType() != expectedType)
             {
@@ -84,7 +86,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Between<TValue>(TValue target, TValue lower, TValue upper, string parameterName) where TValue : IComparable
+        public static void Between<TValue>(TValue target, TValue lower, TValue upper,
+            [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
         {
             if (!target.IsBetween(lower, upper))
             {
@@ -94,7 +97,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Enum<TEnum>(TEnum target, string parameterName) where TEnum : struct
+        public static void Enum<TEnum>(TEnum target,
+            [CallerArgumentExpression("target")] string? parameterName = null) where TEnum : struct
         {
             if (!target.IsEnumValue())
             {
@@ -104,7 +108,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void GreaterThan<TValue>(TValue target, TValue lower, string parameterName) where TValue : IComparable
+        public static void GreaterThan<TValue>(TValue target, TValue lower,
+            [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
         {
             if (target.CompareTo(lower) <= 0)
             {
@@ -114,7 +119,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void GreaterEquals<TValue>(TValue target, TValue lower, string parameterName) where TValue : IComparable
+        public static void GreaterEquals<TValue>(TValue target, TValue lower,
+            [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
         {
             if (target.CompareTo(lower) < 0)
             {
@@ -124,7 +130,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void LessThan<TValue>(TValue target, TValue upper, string parameterName) where TValue : IComparable
+        public static void LessThan<TValue>(TValue target, TValue upper,
+            [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
         {
             if (target.CompareTo(upper) >= 0)
             {
@@ -134,7 +141,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void LessEquals<TValue>(TValue target, TValue upper, string parameterName) where TValue : IComparable
+        public static void LessEquals<TValue>(TValue target, TValue upper,
+            [CallerArgumentExpression("target")] string? parameterName = null) where TValue : IComparable
         {
             if (target.CompareTo(upper) > 0)
             {
@@ -144,7 +152,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotEmpty<TType>(IReadOnlyCollection<TType>? target, string parameterName)
+        public static void NotEmpty<TType>(IReadOnlyCollection<TType>? target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNull(target, parameterName);
 
@@ -156,7 +165,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotEmpty(Guid target, string parameterName)
+        public static void NotEmpty(Guid target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target == Guid.Empty)
             {
@@ -166,7 +176,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotEmpty(DomainId target, string parameterName)
+        public static void NotEmpty(DomainId target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target == DomainId.Empty)
             {
@@ -176,7 +187,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotNull(object? target, string parameterName)
+        public static void NotNull(object? target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (target == null)
             {
@@ -186,7 +198,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotDefault<T>(T target, string parameterName)
+        public static void NotDefault<T>(T target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             if (Equals(target, default(T)!))
             {
@@ -196,7 +209,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotNullOrEmpty(string? target, string parameterName)
+        public static void NotNullOrEmpty(string? target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNull(target, parameterName);
 
@@ -208,7 +222,8 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ValidFileName(string? target, string parameterName)
+        public static void ValidFileName(string? target,
+            [CallerArgumentExpression("target")] string? parameterName = null)
         {
             NotNullOrEmpty(target, parameterName);
 

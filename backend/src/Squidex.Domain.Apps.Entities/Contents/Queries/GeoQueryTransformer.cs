@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Queries;
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
@@ -17,21 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
     {
         public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
 
-        public readonly struct Args
-        {
-            public readonly ITextIndex TextIndex;
-
-            public readonly ISchemaEntity Schema;
-
-            public readonly Context Context;
-
-            public Args(Context context, ISchemaEntity schema, ITextIndex textIndex)
-            {
-                Context = context;
-                Schema = schema;
-                TextIndex = textIndex;
-            }
-        }
+        public record struct Args(Context Context, ISchemaEntity Schema, ITextIndex TextIndex);
 
         private GeoQueryTransformer()
         {
@@ -50,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 var field = string.Join(".", nodeIn.Path.Skip(1));
 
-                var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius);
+                var searchQuery = new GeoQuery(args.Schema.Id, field, sphere.Latitude, sphere.Longitude, sphere.Radius, 1000);
                 var searchScope = args.Context.Scope();
 
                 var ids = await args.TextIndex.SearchAsync(args.Context.App, searchQuery, searchScope);

@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Events.Assets;
@@ -39,6 +38,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             public long TotalSize { get; set; }
 
             public bool IsProtected { get; set; }
+
+            public bool IsDeleted { get; set; }
 
             public HashSet<string> Tags { get; set; }
 

@@ -1,0 +1,52 @@
+<div class="group">
+    <div class="row g-0">
+        <div class="col">
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isAnd" [disabled]="isAnd" (click)="toggleType()">
+                    AND
+                </button>
+                <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isOr" [disabled]="isOr" (click)="toggleType()">
+                    OR
+                </button>
+            </div>
+        </div>
+
+        
+        <div class="col-auto ps-2" *ngIf="!isRoot">
+            <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="filters">
+        <span class="filter-line-v"></span>
+        
+        <div class="filter mt-3" *ngFor="let filter of filters; let i = index">
+            <span class="filter-line-h"></span>
+    
+            <sqx-filter-node
+                (change)="emitChange()"
+                [filter]="filter"
+                [language]="language"
+                [languages]="languages"
+                [level]="level + 1"
+                [model]="model"
+                [statuses]="statuses"
+                (remove)="removeFilter(i)">
+            </sqx-filter-node>
+        </div>
+
+        <div class="filter filter-add mt-3">
+            <span class="filter-line-h"></span>
+
+            <button class="btn btn-outline-success btn-sm me-2" (click)="addComparison()">
+                {{ 'search.addFilter' | sqxTranslate }}
+            </button>
+            
+            <button class="btn btn-outline-success btn-sm" (click)="addLogical()" *ngIf="level < 1">
+                {{ 'search.addGroup' | sqxTranslate }}
+            </button>
+        </div>
+    </div>
+</div>

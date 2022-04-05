@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
-        public void Should_be_equal_when_data_have_same_structure()
+        public void Should_be_equal_if_data_have_same_structure()
         {
             var lhs =
                 new ContentData()
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
-        public void Should_not_be_equal_when_data_have_not_same_structure()
+        public void Should_not_be_equal_if_data_have_not_same_structure()
         {
             var lhs =
                 new ContentData()
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
-        public void Should_be_equal_fields_when_they_have_same_value()
+        public void Should_be_equal_fields_if_they_have_same_value()
         {
             var lhs =
                 new ContentFieldData()
@@ -158,6 +158,56 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             {
                 Assert.NotSame(value, source[key]);
             }
+        }
+
+        [Fact]
+        public void Should_copy_fields_from_other_data_if_they_are_equal()
+        {
+            var oldData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddInvariant(1))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddInvariant(2));
+
+            var newData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddInvariant(1))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddInvariant(3));
+
+            newData.UseSameFields(oldData);
+
+            Assert.Same(newData["field1"], oldData["field1"]);
+            Assert.NotSame(newData["field2"], oldData["field2"]);
+        }
+
+        [Fact]
+        public void Should_copy_field_values_from_other_data_if_they_are_equal()
+        {
+            var oldData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddLocalized("en", 1)
+                            .AddLocalized("de", 2));
+            var newData =
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddLocalized("en", 1)
+                            .AddLocalized("de", 3));
+
+            newData.UseSameFields(oldData);
+
+            Assert.Same(newData["field1"]!["en"], oldData["field1"]!["en"]);
+            Assert.NotSame(newData["field1"]!["de"], oldData["field1"]!["de"]);
+            Assert.NotSame(newData["field1"], oldData["field1"]);
         }
     }
 }

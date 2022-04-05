@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -15,6 +13,8 @@ namespace Squidex.Infrastructure.Validation
     [Serializable]
     public class ValidationException : DomainException
     {
+        private const string ValidationError = "VALIDATION_ERROR";
+
         public IReadOnlyList<ValidationError> Errors { get; }
 
         public ValidationException(string error, Exception? inner = null)
@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Validation
         }
 
         public ValidationException(IReadOnlyList<ValidationError> errors, Exception? inner = null)
-            : base(FormatMessage(errors), inner)
+            : base(FormatMessage(errors), ValidationError, inner)
         {
             Errors = errors;
         }
@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Validation
 
         private static string FormatMessage(IReadOnlyList<ValidationError> errors)
         {
-            Guard.NotNull(errors, nameof(errors));
+            Guard.NotNull(errors);
 
             var sb = new StringBuilder();
 

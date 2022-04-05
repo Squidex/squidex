@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
@@ -28,10 +27,10 @@ namespace Squidex.Web.Pipeline
 
         public async Task InvokeAsync(HttpContext context, ISemanticLog log)
         {
-            var watch = ValueStopwatch.StartNew();
-
-            using (Profiler.StartSession())
+            if (requestLogOptions.LogRequests)
             {
+                var watch = ValueStopwatch.StartNew();
+
                 try
                 {
                     await next(context);
@@ -40,50 +39,47 @@ namespace Squidex.Web.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    if (requestLogOptions.LogRequests)
+                    log.LogInformation((elapsedMs, context), (ctx, w) =>
                     {
-                        log.LogInformation((elapsedMs, context), (ctx, w) =>
-                        {
-                            if (requestLogOptions.LogProfiler)
-                            {
-                                Profiler.Session?.Write(w);
-                            }
-
-                            w.WriteObject("filters", ctx.context, LogFilters);
-                            w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
-                        });
-                    }
+                        w.WriteProperty("message", "HTTP request executed.");
+                        w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
+                        w.WriteObject("filters", ctx.context, LogFilters);
+                    });
                 }
+            }
+            else
+            {
+                await next(context);
             }
         }
 
-        private static void LogFilters(HttpContext httpContext, IObjectWriter c)
+        private static void LogFilters(HttpContext httpContext, IObjectWriter obj)
         {
             var app = httpContext.Context().App;
 
             if (app != null)
             {
-                c.WriteProperty("appId", app.Id.ToString());
-                c.WriteProperty("appName", app.Name);
+                obj.WriteProperty("appId", app.Id.ToString());
+                obj.WriteProperty("appName", app.Name);
             }
 
             var userId = httpContext.User.OpenIdSubject();
 
             if (!string.IsNullOrWhiteSpace(userId))
             {
-                c.WriteProperty(nameof(userId), userId);
+                obj.WriteProperty(nameof(userId), userId);
             }
 
             var clientId = httpContext.User.OpenIdClientId();
 
             if (!string.IsNullOrWhiteSpace(clientId))
             {
-                c.WriteProperty(nameof(clientId), clientId);
+                obj.WriteProperty(nameof(clientId), clientId);
             }
 
             var costs = httpContext.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
 
-            c.WriteProperty(nameof(costs), costs);
+            obj.WriteProperty(nameof(costs), costs);
         }
     }
 }

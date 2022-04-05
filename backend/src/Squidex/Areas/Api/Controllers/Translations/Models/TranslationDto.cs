@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Translations.Models
         /// </summary>
         public string? Text { get; set; }
 
-        public static TranslationDto FromTranslation(TranslationResult translation)
+        public static TranslationDto FromDomain(TranslationResult translation)
         {
             return SimpleMapper.Map(translation, new TranslationDto());
         }

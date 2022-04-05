@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public bool AsContext { get; set; }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"CanReject={CanReject}, CanDisallow={CanDisallow}, AsContext={AsContext}";
         }

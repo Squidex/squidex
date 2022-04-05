@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
 using Xunit;
@@ -51,7 +47,7 @@ namespace TestSuite.ApiTests
             // STEP 3: Check contributors
             var contributors = await _.Apps.GetContributorsAsync(appName);
 
-            // Should not client itself as a contributor.
+            // Should not add client itself as a contributor.
             Assert.Empty(contributors.Items);
 
 
@@ -63,34 +59,20 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
-        public async Task Should_create_app_with_anonymous_access()
+        public async Task Should_not_allow_creation_if_name_used()
         {
             var appName = Guid.NewGuid().ToString();
 
             // STEP 1: Create app
             var createRequest = new CreateAppDto { Name = appName };
 
-            var app = await _.Apps.PostAppAsync(createRequest);
-
-            // Should return create app with correct name.
-            Assert.Equal(appName, app.Name);
+            await _.Apps.PostAppAsync(createRequest);
 
 
-            // STEP 2: Make the client anonymous.
-            var request = new UpdateClientDto
-            {
-                AllowAnonymous = true, Role = "Owner"
-            };
+            // STEP 2: Create again and fail
+            var ex = await Assert.ThrowsAnyAsync<SquidexManagementException>(() => _.Apps.PostAppAsync(createRequest));
 
-            await _.Apps.PutClientAsync(appName, "default", request);
-
-
-            // STEP 3: Check anonymous permission
-            var url = $"{_.ClientManager.Options.Url}/api/apps/{appName}/contributors";
-
-            var response = await new HttpClient().GetAsync(url);
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(400, ex.StatusCode);
         }
 
         [Fact]

@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
 using CommandDotNet;
 using FluentValidation;
 using FluentValidation.Attributes;
 using Squidex.Translator.Processes;
 using Squidex.Translator.State;
+
+#pragma warning disable CA1822 // Mark members as static
 
 namespace Squidex.Translator
 {
@@ -85,6 +85,26 @@ namespace Squidex.Translator
                 new GenerateFrontendResources(folder, service).Run();
             }
 
+            [Command(Name = "clean-backend", Description = "Clean the backend translations.")]
+            public void CleanBackend(TranslateArguments arguments)
+            {
+                var (_, service) = Setup(arguments, "backend");
+
+                Helper.CleanOtherLocales(service);
+
+                service.Save();
+            }
+
+            [Command(Name = "clean-frontend", Description = "Clean the frontend translations.")]
+            public void CleanFrontend(TranslateArguments arguments)
+            {
+                var (_, service) = Setup(arguments, "frontend");
+
+                Helper.CleanOtherLocales(service);
+
+                service.Save();
+            }
+
             [Command(Name = "gen-keys", Description = "Generate the keys for translations.")]
             public void GenerateBackendKeys(TranslateArguments arguments)
             {
@@ -117,10 +137,22 @@ namespace Squidex.Translator
             {
                 if (!Directory.Exists(arguments.Folder))
                 {
-                    throw new ArgumentException("Folder does not exist.");
+                    throw new ArgumentException("Folder does not exist.", nameof(arguments));
                 }
 
-                var locales = new string[] { "en", "nl", "it" };
+                var supportedLocales = new string[] { "en", "nl", "it", "zh" };
+
+                var locales = supportedLocales;
+
+                if (arguments.Locales != null && arguments.Locales.Any())
+                {
+                    locales = supportedLocales.Intersect(arguments.Locales).ToArray();
+                }
+
+                if (locales.Length == 0)
+                {
+                    locales = supportedLocales;
+                }
 
                 var translationsDirectory = new DirectoryInfo(Path.Combine(arguments.Folder, "backend", "i18n"));
                 var translationsService = new TranslationService(translationsDirectory, fileName, locales, arguments.SingleWords);
@@ -140,6 +172,9 @@ namespace Squidex.Translator
 
             [Option(LongName = "report", ShortName = "r")]
             public bool Report { get; set; }
+
+            [Option(LongName = "locale", ShortName = "l")]
+            public IEnumerable<string> Locales { get; set; }
 
             public sealed class Validator : AbstractValidator<TranslateArguments>
             {

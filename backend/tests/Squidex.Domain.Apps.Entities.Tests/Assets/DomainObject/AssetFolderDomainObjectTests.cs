@@ -1,25 +1,29 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolderDomainObject.State>
     {
+        private readonly IAppEntity app;
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly DomainId parentId = DomainId.NewGuid();
         private readonly DomainId assetFolderId = DomainId.NewGuid();
         private readonly AssetFolderDomainObject sut;
@@ -31,11 +35,28 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetFolderDomainObjectTests()
         {
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
+            app = Mocks.App(AppNamedId, Language.DE);
+
+            A.CallTo(() => appProvider.GetAppAsync(AppId, false, default))
+                .Returns(app);
+
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
-            sut = new AssetFolderDomainObject(Store, A.Dummy<ISemanticLog>(), assetQuery);
+            var log = A.Fake<ILogger<AssetFolderDomainObject>>();
+
+            var serviceProvider =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(assetQuery)
+                    .AddSingleton(contentRepository)
+                    .AddSingleton(log)
+                    .BuildServiceProvider();
+
+            sut = new AssetFolderDomainObject(PersistenceFactory, log, serviceProvider);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]

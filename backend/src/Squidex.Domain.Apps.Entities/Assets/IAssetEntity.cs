@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -21,8 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         NamedId<DomainId> AppId { get; }
 
         DomainId ParentId { get; }
-
-        string MimeType { get; }
 
         bool IsProtected { get; }
 

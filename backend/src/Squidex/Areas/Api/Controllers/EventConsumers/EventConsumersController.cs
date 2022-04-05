@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
@@ -36,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumers = await GetGrain().GetConsumersAsync();
 
-            var response = EventConsumersDto.FromResults(eventConsumers.Value, Resources);
+            var response = EventConsumersDto.FromDomain(eventConsumers.Value, Resources);
 
             return Ok(response);
         }
@@ -49,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumer = await GetGrain().StartAsync(consumerName);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer, Resources);
+            var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
 
             return Ok(response);
         }
@@ -62,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumer = await GetGrain().StopAsync(consumerName);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer, Resources);
+            var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
 
             return Ok(response);
         }
@@ -75,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var eventConsumer = await GetGrain().ResetAsync(consumerName);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer, Resources);
+            var response = EventConsumerDto.FromDomain(eventConsumer, Resources);
 
             return Ok(response);
         }

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
@@ -118,6 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 var state = new TextContentState
                 {
+                    AppId = @event.AppId.Id,
                     UniqueContentId = uniqueId
                 };
 
@@ -335,10 +333,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             ITextIndex textIndex,
             ITextIndexerState textIndexerState)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(textIndex, nameof(textIndex));
-            Guard.NotNull(textIndexerState, nameof(textIndexerState));
-
             this.jsonSerializer = jsonSerializer;
             this.textIndex = textIndex;
             this.textIndexerState = textIndexerState;

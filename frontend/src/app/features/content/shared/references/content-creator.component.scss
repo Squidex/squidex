@@ -1,0 +1,10 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .modal-body {
+        background: $color-background;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}

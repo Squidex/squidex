@@ -1,0 +1,35 @@
+<div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
+    {{ 'schemas.field.empty' | sqxTranslate }}
+    
+    <button type="button" class="btn btn-success btn-sm ms-2" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
+        <i class="icon icon-plus"></i> {{ 'schemas.addField' | sqxTranslate }}
+    </button>
+</div>
+
+<ng-container *ngIf="appsState.selectedSettings| async; let settings">
+    <ng-container *ngIf="languageState.isoLanguages | async; let languages">
+        <div
+            cdkDropList
+            [cdkDropListDisabled]="!schema.canOrderFields"
+            [cdkDropListData]="schema.fields"
+            (cdkDropListDropped)="sortFields($event)">
+            <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn" class="table-drag" cdkDrag cdkDragLockAxis="y">
+                <sqx-field [field]="$any(field)" [schema]="schema" [settings]="settings" [languages]="languages">
+                    <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+                </sqx-field>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
+            <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">{{ 'schemas.addFieldButton' | sqxTranslate }}</div>
+        </button>
+    </ng-container>
+
+    <ng-container *sqxModal="addFieldDialog">
+        <sqx-field-wizard 
+            [settings]="settings"
+            [schema]="schema"
+            (complete)="addFieldDialog.hide()">
+        </sqx-field-wizard>
+    </ng-container>
+</ng-container>

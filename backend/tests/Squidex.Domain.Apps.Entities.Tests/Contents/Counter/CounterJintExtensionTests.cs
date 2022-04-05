@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -29,12 +28,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
                 new CounterJintExtension(grainFactory)
             };
 
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-
-            sut = new JintScriptEngine(cache, extensions)
-            {
-                TimeoutScript = TimeSpan.FromSeconds(1)
-            };
+            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }), extensions);
         }
 
         [Fact]
@@ -63,6 +62,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
         }
 
         [Fact]
+        public async Task Should_reset_counter_with_callback()
+        {
+            var appId = DomainId.NewGuid();
+
+            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
+                .Returns(counter);
+
+            A.CallTo(() => counter.ResetAsync("my", 4))
+                .Returns(3);
+
+            const string script = @"
+                resetCounterV2('my', function(result) {
+                    complete(result);
+                }, 4);
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["appId"] = appId
+            };
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
+
+            Assert.Equal("3", result);
+        }
+
+        [Fact]
         public void Should_increment_counter()
         {
             var appId = DomainId.NewGuid();
@@ -83,6 +109,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter
             };
 
             var result = sut.Execute(vars, script).ToString();
+
+            Assert.Equal("3", result);
+        }
+
+        [Fact]
+        public async Task Should_increment_counter_with_callback()
+        {
+            var appId = DomainId.NewGuid();
+
+            A.CallTo(() => grainFactory.GetGrain<ICounterGrain>(appId.ToString(), null))
+                .Returns(counter);
+
+            A.CallTo(() => counter.IncrementAsync("my"))
+                .Returns(3);
+
+            const string script = @"
+                incrementCounter('my', function (result) {
+                    complete(result);
+                });
+            ";
+
+            var vars = new ScriptVars
+            {
+                ["appId"] = appId
+            };
+
+            var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
             Assert.Equal("3", result);
         }

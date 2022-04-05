@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Namotion.Reflection;
 using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using Squidex.Areas.Api.Controllers.Contents.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -20,45 +20,47 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     internal sealed class Builder
     {
-        private const string ResultTotal = "total";
-        private const string ResultItems = "items";
-
         public string AppName { get; }
 
         public JsonSchema ChangeStatusSchema { get; }
 
-        public OpenApiDocument Document { get; }
+        public OpenApiDocument OpenApiDocument { get; }
+
+        public OpenApiSchemaResolver OpenApiSchemaResolver { get; }
 
         internal Builder(IAppEntity app,
             OpenApiDocument document,
             OpenApiSchemaResolver schemaResolver,
             OpenApiSchemaGenerator schemaGenerator)
         {
-            Document = document;
-
             AppName = app.Name;
 
-            ChangeStatusSchema = schemaGenerator.GenerateWithReference<JsonSchema>(typeof(ChangeStatusDto).ToContextualType(), schemaResolver);
+            OpenApiDocument = document;
+            OpenApiSchemaResolver = schemaResolver;
+
+            var changeStatusType = typeof(ChangeStatusDto).ToContextualType();
+
+            ChangeStatusSchema = schemaGenerator.GenerateWithReference<JsonSchema>(changeStatusType, schemaResolver);
         }
 
         public OperationsBuilder Shared()
         {
-            var dataSchema = ResolveSchema("DataDto", () =>
+            var dataSchema = RegisterReference("DataDto", _ =>
             {
                 return JsonSchema.CreateAnySchema();
             });
 
-            var contentSchema = ResolveSchema("ContentDto", () =>
+            var contentSchema = RegisterReference("ContentDto", _ =>
             {
-                return ContentJsonSchemaBuilder.BuildSchema("Shared", dataSchema, true);
+                return ContentJsonSchema.Build(dataSchema, true);
             });
 
-            var contentsSchema = ResolveSchema("ContentResultDto", () =>
+            var contentsSchema = RegisterReference("ContentResultDto", _ =>
             {
                 return BuildResult(contentSchema);
             });
 
-            var path = $"/content/{AppName}";
+            var path = $"api/content/{AppName}";
 
             var builder = new OperationsBuilder
             {
@@ -69,48 +71,44 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 Parent = this,
                 SchemaDisplayName = "__Shared",
                 SchemaName = "__Shared",
-                SchemaTypeName = "__Shared",
+                SchemaTypeName = "__Shared"
             };
 
-            var description = "API endpoints for operations across all schemas.";
-
-            Document.Tags.Add(new OpenApiTag { Name = "__Shared", Description = description });
+            builder.AddTag("API endpoints for operations across all schemas.");
 
             return builder;
         }
 
-        public OperationsBuilder Schema(Schema schema, bool flat)
+        public OperationsBuilder Schema(Schema schema, PartitionResolver partitionResolver, ResolvedComponents components, bool flat)
         {
             var typeName = schema.TypeName();
 
-            var displayName = schema.DisplayName();
-
-            var dataSchema = ResolveSchema($"{typeName}DataDto", () =>
+            var dataSchema = RegisterReference($"{typeName}DataDto", _ =>
             {
-                return schema.BuildDynamicJsonSchema(ResolveSchema);
+                return schema.BuildJsonSchemaDynamic(partitionResolver, components, CreateReference, false, true);
             });
 
-            var contentSchema = ResolveSchema($"{typeName}ContentDto", () =>
-            {
-                var contentDataSchema = dataSchema;
+            var contentDataSchema = dataSchema;
 
-                if (flat)
+            if (flat)
+            {
+                contentDataSchema = RegisterReference($"{typeName}FlatDataDto", _ =>
                 {
-                    contentDataSchema = ResolveSchema($"{typeName}FlatDataDto", () =>
-                    {
-                        return schema.BuildFlatJsonSchema(ResolveSchema);
-                    });
-                }
+                    return schema.BuildJsonSchemaFlat(partitionResolver, components, CreateReference, false, true);
+                });
+            }
 
-                return ContentJsonSchemaBuilder.BuildSchema(displayName, contentDataSchema, true);
+            var contentSchema = RegisterReference($"{typeName}ContentDto", _ =>
+            {
+                return ContentJsonSchema.Build(contentDataSchema, true);
             });
 
-            var contentsSchema = ResolveSchema($"{typeName}ContentResultDto", () =>
+            var contentsSchema = RegisterReference($"{typeName}ContentResultDto", _ =>
             {
                 return BuildResult(contentSchema);
             });
 
-            var path = $"/content/{AppName}/{schema.Name}";
+            var path = $"api/content/{AppName}/{schema.Name}";
 
             var builder = new OperationsBuilder
             {
@@ -119,26 +117,50 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 DataSchema = dataSchema,
                 Path = path,
                 Parent = this,
-                SchemaDisplayName = displayName,
+                SchemaDisplayName = schema.DisplayName(),
                 SchemaName = schema.Name,
                 SchemaTypeName = typeName
             };
 
-            var description = builder.FormatText("API endpoints for schema content items.");
-
-            Document.Tags.Add(new OpenApiTag { Name = displayName, Description = description });
+            builder.AddTag("API endpoints for [schema] content items.");
 
             return builder;
         }
 
-        private JsonSchema ResolveSchema(string name, Func<JsonSchema> factory)
+        private JsonSchema RegisterReference(string name, Func<string, JsonSchema> creator)
         {
             name = char.ToUpperInvariant(name[0]) + name[1..];
 
+            var reference = OpenApiDocument.Definitions.GetOrAdd(name, creator);
+
             return new JsonSchema
             {
-                Reference = Document.Definitions.GetOrAdd(name, x => factory())
+                Reference = reference
             };
+        }
+
+        private (JsonSchema, JsonSchema?) CreateReference(string name)
+        {
+            name = char.ToUpperInvariant(name[0]) + name[1..];
+
+            if (OpenApiDocument.Definitions.TryGetValue(name, out var definition))
+            {
+                var reference = new JsonSchema
+                {
+                    Reference = definition
+                };
+
+                return (reference, null);
+            }
+
+            definition = JsonTypeBuilder.Object();
+
+            OpenApiDocument.Definitions.Add(name, definition);
+
+            return (new JsonSchema
+            {
+                Reference = definition
+            }, definition);
         }
 
         private static JsonSchema BuildResult(JsonSchema contentSchema)
@@ -148,8 +170,10 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 AllowAdditionalProperties = false,
                 Properties =
                 {
-                    [ResultTotal] = SchemaBuilder.NumberProperty("The total number of content items.", true),
-                    [ResultItems] = SchemaBuilder.ArrayProperty(contentSchema, "The content items.", true)
+                    ["total"] = JsonTypeBuilder.NumberProperty(
+                        FieldDescriptions.ContentsTotal, true),
+                    ["items"] = JsonTypeBuilder.ArrayProperty(contentSchema,
+                        FieldDescriptions.ContentsItems, true)
                 },
                 Type = JsonObjectType.Object
             };

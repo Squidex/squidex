@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using NodaTime;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Notifications;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -23,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
     {
         private readonly INotificationSender notificatíonSender = A.Fake<INotificationSender>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IUser assigner = A.Fake<IUser>();
-        private readonly IUser assignee = A.Fake<IUser>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly IUser assigner = UserMocks.User("1");
+        private readonly IUser assignee = UserMocks.User("2");
+        private readonly ILogger<InvitationEventConsumer> log = A.Fake<ILogger<InvitationEventConsumer>>();
         private readonly string assignerId = DomainId.NewGuid().ToString();
         private readonly string assigneeId = DomainId.NewGuid().ToString();
         private readonly string appName = "my-app";
@@ -36,10 +35,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             A.CallTo(() => notificatíonSender.IsActive)
                 .Returns(true);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assignerId))
+            A.CallTo(() => userResolver.FindByIdAsync(assignerId, default))
                 .Returns(assigner);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assigneeId))
+            A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
                 .Returns(assignee);
 
             sut = new InvitationEventConsumer(notificatíonSender, userResolver, log);
@@ -109,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         {
             var @event = CreateEvent(RefTokenType.Subject, true);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assignerId))
+            A.CallTo(() => userResolver.FindByIdAsync(assignerId, default))
                 .Returns(Task.FromResult<IUser?>(null));
 
             await sut.On(@event);
@@ -123,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         {
             var @event = CreateEvent(RefTokenType.Subject, true);
 
-            A.CallTo(() => userResolver.FindByIdAsync(assigneeId))
+            A.CallTo(() => userResolver.FindByIdAsync(assigneeId, default))
                 .Returns(Task.FromResult<IUser?>(null));
 
             await sut.On(@event);
@@ -156,13 +155,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         private void MustLogWarning()
         {
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log" && x.GetArgument<LogLevel>(0) == LogLevel.Warning)
                 .MustHaveHappened();
         }
 
         private void MustNotResolveUser()
         {
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustNotHaveHappened();
         }
 

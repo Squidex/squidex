@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -141,7 +138,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private AppLanguagesDto GetResponse(IAppEntity result)
         {
-            return AppLanguagesDto.FromApp(result, Resources);
+            return AppLanguagesDto.FromDomain(result, Resources);
         }
 
         private static Language ParseLanguage(string language)

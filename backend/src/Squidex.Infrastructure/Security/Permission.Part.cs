@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Infrastructure.Security
 {
     public sealed partial class Permission
@@ -51,7 +49,7 @@ namespace Squidex.Infrastructure.Security
                     {
                         if (currentSpan[i] == SeparatorMain)
                         {
-                            result[j] = Parse(current.Slice(0, i));
+                            result[j] = Parse(current[..i]);
 
                             current = current[(i + 1)..];
                             currentSpan = current.Span;
@@ -107,7 +105,7 @@ namespace Squidex.Infrastructure.Security
                         {
                             if (currentSpan[i] == SeparatorAlternative)
                             {
-                                alternatives[j] = current.Slice(0, i);
+                                alternatives[j] = current[..i];
 
                                 current = current[(i + 1)..];
                                 currentSpan = current.Span;

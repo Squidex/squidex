@@ -1,12 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -22,10 +21,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             this.fields = fields;
             this.fieldType = fieldType;
+
             this.isPartial = isPartial;
         }
 
-        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value.IsNullOrUndefined())
             {
@@ -44,19 +44,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                 }
 
-                var tasks = new List<Task>();
-
-                foreach (var (fieldName, fieldConfig) in fields)
+                await AsyncHelper.WhenAllThrottledAsync(fields, async (kvp, _) =>
                 {
-                    var (isOptional, validator) = fieldConfig;
+                    var (isOptional, validator) = kvp.Value;
 
                     var fieldValue = Undefined.Value;
 
-                    if (!values.TryGetValue(fieldName, out var nestedValue))
+                    if (!values.TryGetValue(kvp.Key, out var nestedValue))
                     {
                         if (isPartial)
                         {
-                            continue;
+                            return;
                         }
                     }
                     else
@@ -64,12 +62,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         fieldValue = nestedValue!;
                     }
 
-                    var fieldContext = context.Nested(fieldName).Optional(isOptional);
+                    var fieldContext = context.Nested(kvp.Key).Optional(isOptional);
 
-                    tasks.Add(validator.ValidateAsync(fieldValue, fieldContext, addError));
-                }
-
-                await Task.WhenAll(tasks);
+                    await validator.ValidateAsync(fieldValue, fieldContext, addError);
+                });
             }
         }
     }

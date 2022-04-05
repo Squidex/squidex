@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
@@ -15,16 +13,17 @@ namespace Migrations.Migrations
 {
     public sealed class ClearSchemas : IMigration
     {
-        private readonly IStore<Guid> store;
+        private readonly IStore<SchemaDomainObject.State> store;
 
-        public ClearSchemas(IStore<Guid> store)
+        public ClearSchemas(IStore<SchemaDomainObject.State> store)
         {
             this.store = store;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
-            return store.ClearSnapshotsAsync<Guid, SchemaDomainObject.State>();
+            return store.ClearSnapshotsAsync();
         }
     }
 }

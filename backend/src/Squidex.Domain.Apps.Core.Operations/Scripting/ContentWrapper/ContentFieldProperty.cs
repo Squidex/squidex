@@ -1,10 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using Jint.Native;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -13,10 +14,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     public sealed class ContentFieldProperty : CustomProperty
     {
         private readonly ContentFieldObject contentField;
-        private IJsonValue? contentValue;
+        private IJsonValue contentValue;
         private JsValue? value;
         private bool isChanged;
 
+        [DebuggerHidden]
         protected override JsValue? CustomValue
         {
             get
@@ -33,11 +35,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             }
             set
             {
-                if (!Equals(this.value, value))
+                var newContentValue = JsonMapper.Map(value);
+
+                if (!Equals(contentValue, newContentValue))
                 {
                     this.value = value;
 
-                    contentValue = null;
+                    contentValue = newContentValue;
                     contentField.MarkChanged();
 
                     isChanged = true;
@@ -47,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
         public IJsonValue ContentValue
         {
-            get => contentValue ??= JsonMapper.Map(value);
+            get => contentValue;
         }
 
         public bool IsChanged
@@ -58,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         public ContentFieldProperty(ContentFieldObject contentField, IJsonValue? contentValue = null)
         {
             this.contentField = contentField;
-            this.contentValue = contentValue;
+            this.contentValue = contentValue ?? JsonValue.Null;
         }
     }
 }

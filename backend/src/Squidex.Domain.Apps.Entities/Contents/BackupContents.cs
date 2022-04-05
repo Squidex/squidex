@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -24,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class BackupContents : IBackupHandler
     {
+        private const int BatchSize = 100;
         private delegate void ObjectSetter(IReadOnlyDictionary<string, IJsonValue> obj, string key, IJsonValue value);
 
         private const string UrlsFile = "Urls.json";
@@ -55,31 +53,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(rebuilder, nameof(rebuilder));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.rebuilder = rebuilder;
 
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context)
+        public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
+            CancellationToken ct)
         {
             if (@event.Payload is AppCreated appCreated)
             {
                 var urls = GetUrls(appCreated.Name);
 
-                await context.Writer.WriteJsonAsync(UrlsFile, urls);
+                await context.Writer.WriteJsonAsync(UrlsFile, urls, ct);
             }
         }
 
-        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context)
+        public async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
+            CancellationToken ct)
         {
             switch (@event.Payload)
             {
                 case AppCreated appCreated:
                     assetsUrlNew = GetUrls(appCreated.Name);
-                    assetsUrlOld = await ReadUrlsAsync(context.Reader);
+                    assetsUrlOld = await ReadUrlsAsync(context.Reader, ct);
                     break;
                 case SchemaDeleted schemaDeleted:
                     contentIdsBySchemaId.Remove(schemaDeleted.SchemaId.Id);
@@ -129,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             var newValue = s.Value;
 
-                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp);
+                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {
@@ -138,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 break;
                             }
 
-                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets);
+                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {
@@ -181,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             var newValue = s.Value;
 
-                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp);
+                            newValue = newValue.Replace(assetsUrlOld!.AssetsApp, assetsUrlNew!.AssetsApp, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {
@@ -189,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 break;
                             }
 
-                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets);
+                            newValue = newValue.Replace(assetsUrlOld!.Assets, assetsUrlNew!.Assets, StringComparison.Ordinal);
 
                             if (!ReferenceEquals(newValue, s.Value))
                             {
@@ -204,27 +201,29 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         break;
 
                     case JsonObject obj:
-                        ReplaceAssetUrl(obj, FieldSetter);
+                        ReplaceAssetUrl(obj, JsonSetter);
                         break;
                 }
             }
         }
 
-        public async Task RestoreAsync(RestoreContext context)
+        public async Task RestoreAsync(RestoreContext context,
+            CancellationToken ct)
         {
             var ids = contentIdsBySchemaId.Values.SelectMany(x => x);
 
             if (ids.Any())
             {
-                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids);
+                await rebuilder.InsertManyAsync<ContentDomainObject, ContentDomainObject.State>(ids, BatchSize, ct);
             }
         }
 
-        private static async Task<Urls?> ReadUrlsAsync(IBackupReader reader)
+        private static async Task<Urls?> ReadUrlsAsync(IBackupReader reader,
+            CancellationToken ct)
         {
             try
             {
-                return await reader.ReadJsonAsync<Urls>(UrlsFile);
+                return await reader.ReadJsonAsync<Urls>(UrlsFile, ct);
             }
             catch
             {

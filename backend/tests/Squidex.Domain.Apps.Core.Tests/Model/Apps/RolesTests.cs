@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Json.Objects;
@@ -41,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Add(role);
 
-            roles_1[role].Should().BeEquivalentTo(Role.Create(role));
+            Assert.Equal(Role.Create(role), roles_1[role]);
         }
 
         [Fact]
@@ -151,7 +149,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             Assert.False(Roles.IsDefault(firstRole));
         }
 
-        [InlineData("Developer", 7)]
+        [InlineData("Developer", 6)]
         [InlineData("Editor", 4)]
         [InlineData("Reader", 2)]
         [InlineData("Owner", 1)]
@@ -166,16 +164,16 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             foreach (var permission in result.Permissions)
             {
-                Assert.StartsWith("squidex.apps.app.", permission.Id);
-                Assert.DoesNotContain("{app}", permission.Id);
+                Assert.StartsWith("squidex.apps.app.", permission.Id, StringComparison.Ordinal);
+                Assert.DoesNotContain("{app}", permission.Id, StringComparison.Ordinal);
             }
 
             Assert.Equal(permissionCount, result!.Permissions.Count);
         }
 
-        [InlineData("Developer", 17)]
-        [InlineData("Editor", 14)]
-        [InlineData("Reader", 13)]
+        [InlineData("Developer", 15)]
+        [InlineData("Editor", 13)]
+        [InlineData("Reader", 12)]
         [InlineData("Owner", 1)]
         [Theory]
         public void Should_add_extra_permissions_for_frontend_client(string name, int permissionCount)

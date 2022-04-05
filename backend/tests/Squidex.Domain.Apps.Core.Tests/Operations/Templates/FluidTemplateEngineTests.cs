@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
@@ -191,7 +189,37 @@ namespace Squidex.Domain.Apps.Core.Operations.Templates
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_template_invalid()
+        public async Task Should_compute_md5_hash()
+        {
+            var template = "{{ e.text | md5 }}";
+
+            var value = new
+            {
+                text = "HelloWorld"
+            };
+
+            var result = await RenderAync(template, value);
+
+            Assert.Equal("HelloWorld".ToMD5(), result);
+        }
+
+        [Fact]
+        public async Task Should_compute_sha256_hash()
+        {
+            var template = "{{ e.text | sha256 }}";
+
+            var value = new
+            {
+                text = "HelloWorld"
+            };
+
+            var result = await RenderAync(template, value);
+
+            Assert.Equal("HelloWorld".ToSha256(), result);
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_template_invalid()
         {
             var template = "{% for x of event %}";
 

@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Infrastructure.Reflection.Internal;
 using Xunit;
 
@@ -28,7 +27,7 @@ namespace Squidex.Infrastructure.Reflection
             string Sub2Prop { get; set; }
         }
 
-        private class MyMain
+        private sealed class MyMain
         {
             public string MainProp { get; set; }
         }

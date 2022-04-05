@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -12,20 +12,24 @@ using Squidex.Infrastructure.MongoDb;
 namespace Squidex.Infrastructure.States
 {
     [BsonIgnoreExtraElements]
-    public sealed class MongoState<T, TKey> : IVersionedEntity<TKey>
+    public class MongoState<T> : IVersionedEntity<DomainId>
     {
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
-        public TKey DocumentId { get; set; }
+        public DomainId DocumentId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("Doc")]
         [BsonJson]
-        public T Doc { get; set; }
+        public T Document { get; set; }
 
         [BsonRequired]
         [BsonElement]
         public long Version { get; set; }
+
+        public virtual void Prepare()
+        {
+        }
     }
 }

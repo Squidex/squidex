@@ -1,14 +1,12 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using Squidex.Infrastructure.Reflection.Internal;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
@@ -69,6 +67,41 @@ namespace Squidex.Infrastructure.Reflection
             }
         }
 
+        private sealed class TypeConverterPropertyMapper : PropertyMapper
+        {
+            private readonly TypeConverter converter;
+
+            public TypeConverterPropertyMapper(
+                PropertyAccessor sourceAccessor,
+                PropertyAccessor targetAccessor,
+                TypeConverter converter)
+                : base(sourceAccessor, targetAccessor)
+            {
+                this.converter = converter;
+            }
+
+            public override void MapProperty(object source, object target, CultureInfo culture)
+            {
+                var value = GetValue(source);
+
+                if (value == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    var converted = converter.ConvertFrom(null, culture, value);
+
+                    SetValue(target, converted);
+                }
+                catch
+                {
+                    return;
+                }
+            }
+        }
+
         private class PropertyMapper
         {
             private readonly PropertyAccessor sourceAccessor;
@@ -116,7 +149,7 @@ namespace Squidex.Infrastructure.Reflection
 
                 foreach (var sourceProperty in sourceProperties)
                 {
-                    var targetProperty = targetProperties.FirstOrDefault(x => x.Name == sourceProperty.Name);
+                    var targetProperty = targetProperties.Find(x => x.Name == sourceProperty.Name);
 
                     if (targetProperty == null)
                     {
@@ -129,21 +162,33 @@ namespace Squidex.Infrastructure.Reflection
                     if (sourceType == targetType)
                     {
                         Mappers.Add(new PropertyMapper(
-                            new PropertyAccessor(sourceClassType, sourceProperty),
-                            new PropertyAccessor(targetClassType, targetProperty)));
+                            new PropertyAccessor(sourceProperty),
+                            new PropertyAccessor(targetProperty)));
                     }
                     else if (targetType == typeof(string))
                     {
                         Mappers.Add(new StringConversionPropertyMapper(
-                            new PropertyAccessor(sourceClassType, sourceProperty),
-                            new PropertyAccessor(targetClassType, targetProperty)));
+                            new PropertyAccessor(sourceProperty),
+                            new PropertyAccessor(targetProperty)));
                     }
-                    else if (sourceType.Implements<IConvertible>() || targetType.Implements<IConvertible>())
+                    else
                     {
-                        Mappers.Add(new ConversionPropertyMapper(
-                            new PropertyAccessor(sourceClassType, sourceProperty),
-                            new PropertyAccessor(targetClassType, targetProperty),
-                            targetType));
+                        var converter = TypeDescriptor.GetConverter(targetType);
+
+                        if (converter.CanConvertFrom(sourceType))
+                        {
+                            Mappers.Add(new TypeConverterPropertyMapper(
+                                new PropertyAccessor(sourceProperty),
+                                new PropertyAccessor(targetProperty),
+                                converter));
+                        }
+                        else if (sourceType.Implements<IConvertible>() || targetType.Implements<IConvertible>())
+                        {
+                            Mappers.Add(new ConversionPropertyMapper(
+                                new PropertyAccessor(sourceProperty),
+                                new PropertyAccessor(targetProperty),
+                                targetType));
+                        }
                     }
                 }
             }
@@ -179,9 +224,9 @@ namespace Squidex.Infrastructure.Reflection
             where TSource : class
             where TTarget : class
         {
-            Guard.NotNull(source, nameof(source));
-            Guard.NotNull(culture, nameof(culture));
-            Guard.NotNull(target, nameof(target));
+            Guard.NotNull(source);
+            Guard.NotNull(culture);
+            Guard.NotNull(target);
 
             return ClassMapper<TSource, TTarget>.MapClass(source, target, culture);
         }

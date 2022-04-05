@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -28,7 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetsBulkUpdateCommandMiddlewareTests()
         {
-            sut = new AssetsBulkUpdateCommandMiddleware(contextProvider);
+            var log = A.Fake<ILogger<AssetsBulkUpdateCommandMiddleware>>();
+
+            sut = new AssetsBulkUpdateCommandMiddleware(contextProvider, log);
         }
 
         [Fact]
@@ -70,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_annotating()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_annotating()
         {
             SetupContext(Permissions.AppAssetsRead);
 
@@ -94,19 +95,19 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             var id = DomainId.NewGuid();
 
-            var command = BulkCommand(BulkUpdateAssetType.Move, id, parentPath: "/path/to/folder");
+            var command = BulkCommand(BulkUpdateAssetType.Move, id);
 
             var result = await PublishAsync(command);
 
             Assert.Single(result);
             Assert.Single(result, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
-            A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id && x.ParentPath == "/path/to/folder")))
+            A.CallTo(() => commandBus.PublishAsync(A<MoveAsset>.That.Matches(x => x.AssetId == id)))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_moving()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_moving()
         {
             SetupContext(Permissions.AppAssetsRead);
 
@@ -143,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_user_has_no_permission_for_deletion()
+        public async Task Should_throw_security_exception_if_user_has_no_permission_for_deletion()
         {
             SetupContext(Permissions.AppAssetsRead);
 
@@ -169,8 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             return (context.PlainResult as BulkUpdateResult)!;
         }
 
-        private BulkUpdateAssets BulkCommand(BulkUpdateAssetType type, DomainId id,
-            string? parentPath = null, string? fileName = null)
+        private BulkUpdateAssets BulkCommand(BulkUpdateAssetType type, DomainId id, string? fileName = null)
         {
             return new BulkUpdateAssets
             {
@@ -181,7 +181,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                     {
                         Type = type,
                         Id = id,
-                        ParentPath = parentPath,
                         FileName = fileName
                     }
                 }

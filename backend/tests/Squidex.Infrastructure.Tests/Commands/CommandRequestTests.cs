@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
-using System.Threading.Tasks;
+using FluentAssertions;
 using Orleans;
 using Orleans.TestingHost;
 using Squidex.Infrastructure.TestHelpers;
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Commands
 
             var serialized = sut.SerializeAndDeserialize();
 
-            Assert.Equal(sut, serialized);
+            serialized.Should().BeEquivalentTo(sut);
         }
 
         [Fact, Trait("Category", "Dependencies")]

@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
@@ -44,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool IsOptional { get; set; }
 
-        public static AppLanguageDto FromLanguage(Language language, LanguageConfig config, LanguagesConfig languages)
+        public static AppLanguageDto FromDomain(Language language, LanguageConfig config, LanguagesConfig languages)
         {
             var result = new AppLanguageDto
             {
@@ -58,9 +57,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result;
         }
 
-        public AppLanguageDto WithLinks(Resources resources, IAppEntity app)
+        public AppLanguageDto CreateLinks(Resources resources, IAppEntity app)
         {
-            var values = new { app = app.Name, language = Iso2Code };
+            var values = new { app = resources.App, language = Iso2Code };
 
             if (!IsMaster)
             {

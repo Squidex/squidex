@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
@@ -100,7 +97,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                     if (!isRead)
                     {
-                        await Task.Delay(1000);
+                        await Task.Delay(1000, stopToken.Token);
                     }
                 }
             }
@@ -114,7 +111,7 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, stopToken.Token))
                 {
-                    await eventStore.QueryAsync(async storedEvent =>
+                    await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, position, ct: combined.Token))
                     {
                         var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -130,7 +127,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                             lastRawPosition = storedEvent.EventPosition;
                         }
-                    }, streamFilter, position, combined.Token);
+                    }
                 }
             }
 
@@ -141,7 +138,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var result = new EmptyPipelineDefinition<ChangeStreamDocument<MongoEventCommit>>();
 
-            var byStream = Filtering.ByChangeInStream(streamFilter);
+            var byStream = FilterExtensions.ByChangeInStream(streamFilter);
 
             if (byStream != null)
             {

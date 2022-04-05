@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using NJsonSchema;
 using NSwag;
 using Squidex.Infrastructure;
@@ -31,22 +29,31 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public JsonSchema DataSchema { get; init; }
 
-        public string FormatText(string text)
+        public string? FormatText(string text)
         {
-            return text?.Replace("schema ", $"'{SchemaDisplayName}' ", StringComparison.OrdinalIgnoreCase)!;
+            return text?.Replace("[schema]", $"'{SchemaDisplayName}'", StringComparison.Ordinal);
+        }
+
+        public void AddTag(string description)
+        {
+            var tag = new OpenApiTag { Name = SchemaTypeName, Description = FormatText(description) };
+
+            Parent.OpenApiDocument.Tags.Add(tag);
         }
 
         public OperationBuilder AddOperation(string method, string path)
         {
+            var tag = SchemaTypeName;
+
             var operation = new OpenApiOperation
             {
                 Tags = new List<string>
                 {
-                    SchemaDisplayName
+                    tag
                 }
             };
 
-            var operations = Parent.Document.Paths.GetOrAddNew($"{Path}{path}");
+            var operations = Parent.OpenApiDocument.Paths.GetOrAddNew($"{Path}{path}");
 
             operations[method] = operation;
 

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
@@ -21,11 +19,11 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         [LocalizedRequired]
         public BackupJobDto[] Items { get; set; }
 
-        public static BackupJobsDto FromBackups(IEnumerable<IBackupJob> backups, Resources resources)
+        public static BackupJobsDto FromDomain(IEnumerable<IBackupJob> backups, Resources resources)
         {
             var result = new BackupJobsDto
             {
-                Items = backups.Select(x => BackupJobDto.FromBackup(x, resources)).ToArray()
+                Items = backups.Select(x => BackupJobDto.FromDomain(x, resources)).ToArray()
             };
 
             return result.CreateLinks(resources);

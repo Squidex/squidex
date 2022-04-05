@@ -1,9 +1,6 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Account.ConsentVM
 
 @{
-    ViewBag.ThemeColor = "white";
-    ViewBag.ThemeSize = "profile-lg";
-
     ViewBag.Title = T.Get("users.consent.title");
 }
 
@@ -14,11 +11,11 @@
     }
 }
 
-<form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model.ReturnUrl" method="post">
+<form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model!.ReturnUrl" method="post">
     <h2>@T.Get("users.consent.headline")</h2>
         
     <label for="consentToAutomatedEmails">
-        <div class="card profile-section-sm @ErrorClass("ConsentToAutomatedEmails")">
+        <div class="card card-consent @ErrorClass("ConsentToAutomatedEmails")">
             <div class="card-body">
                 <h4 class="card-title">@T.Get("users.consent.emailHeadline")</h4>
 
@@ -35,7 +32,7 @@
     </label>
 
     <label for="consentToCookies">
-        <div class="card profile-section-sm @ErrorClass("ConsentToCookies")">
+        <div class="card card-consent @ErrorClass("ConsentToCookies")">
             <div class="card-body">
                 <h4 class="card-title">@T.Get("users.consent.cookiesHeadline")</h4>
 
@@ -44,7 +41,7 @@
                         <input type="checkbox" id="consentToCookies" name="consentToCookies" value="True" />
                     </div>
                     <div class="col">
-                        @Html.Raw(T.Get("users.consent.cookiesText", new { privacyUrl = Model.PrivacyUrl }))
+                        @Html.Raw(T.Get("users.consent.cookiesText", new { privacyUrl = Model!.PrivacyUrl }))
                     </div>
                 </div>
             </div>
@@ -52,7 +49,7 @@
     </label>
 
     <label for="consentToPersonalInformation">
-        <div class="card profile-section-sm @ErrorClass("ConsentToPersonalInformation")">
+        <div class="card card-consent @ErrorClass("ConsentToPersonalInformation")">
             <div class="card-body">
                 <h4 class="card-title">@T.Get("users.consent.piiHeadline")</h4>
 

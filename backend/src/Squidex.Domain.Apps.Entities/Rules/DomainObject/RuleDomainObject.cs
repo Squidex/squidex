@@ -1,22 +1,19 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 {
@@ -25,20 +22,17 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
         private readonly IAppProvider appProvider;
         private readonly IRuleEnqueuer ruleEnqueuer;
 
-        public RuleDomainObject(IStore<DomainId> store, ISemanticLog log,
+        public RuleDomainObject(IPersistenceFactory<State> factory, ILogger<RuleDomainObject> log,
             IAppProvider appProvider, IRuleEnqueuer ruleEnqueuer)
-            : base(store, log)
+            : base(factory, log)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(ruleEnqueuer, nameof(ruleEnqueuer));
-
             this.appProvider = appProvider;
             this.ruleEnqueuer = ruleEnqueuer;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -80,8 +74,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 case EnableRule enable:
                     return UpdateReturn(enable, c =>
                     {
-                        GuardRule.CanEnable(c);
-
                         Enable(c);
 
                         return Snapshot;
@@ -90,8 +82,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 case DisableRule disable:
                     return UpdateReturn(disable, c =>
                     {
-                        GuardRule.CanDisable(c);
-
                         Disable(c);
 
                         return Snapshot;
@@ -100,8 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                 case DeleteRule delete:
                     return Update(delete, c =>
                     {
-                        GuardRule.CanDelete(delete);
-
                         Delete(c);
                     });
 
@@ -120,7 +108,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
 
         private async Task Trigger(TriggerRule command)
         {
-            var @event = SimpleMapper.Map(command, new RuleManuallyTriggered { RuleId = Snapshot.Id, AppId = Snapshot.AppId });
+            var @event = new RuleManuallyTriggered();
+
+            SimpleMapper.Map(command, @event);
+            SimpleMapper.Map(Snapshot, @event);
 
             await ruleEnqueuer.EnqueueAsync(Snapshot.RuleDef, Snapshot.Id, Envelope.Create(@event));
         }

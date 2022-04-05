@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -19,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
     {
         public static void CanAdd(AddRole command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var roles = app.Roles;
 
@@ -38,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanDelete(DeleteRole command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var roles = app.Roles;
 
@@ -69,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanUpdate(UpdateRole command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var roles = app.Roles;
 

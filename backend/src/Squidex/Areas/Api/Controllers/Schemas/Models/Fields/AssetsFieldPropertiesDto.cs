@@ -1,13 +1,13 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.ObjectModel;
+using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -22,12 +22,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value as a list of asset ids.
         /// </summary>
-        public LocalizedValue<string[]?> DefaultValues { get; set; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; set; }
 
         /// <summary>
         /// The default value as a list of asset ids.
         /// </summary>
-        public string[]? DefaultValue { get; set; }
+        public ReadonlyList<string>? DefaultValue { get; set; }
+
+        /// <summary>
+        /// The initial id to the folder.
+        /// </summary>
+        public string? FolderId { get; set; }
 
         /// <summary>
         /// The minimum allowed items for the field value.
@@ -80,9 +85,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public int? AspectHeight { get; set; }
 
         /// <summary>
-        /// Defines if the asset must be an image.
+        /// The expected type.
         /// </summary>
-        public bool MustBeImage { get; set; }
+        public AssetType? ExpectedType { get; set; }
 
         /// <summary>
         /// True to resolve first asset in the content list.
@@ -92,7 +97,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// True to resolve first image in the content list.
         /// </summary>
-        [Obsolete("Use ResolveFirst now")]
+        [Obsolete("Use 'expectedType' field now")]
+        public bool MustBeImage
+        {
+            get => ExpectedType == AssetType.Image;
+            set => ExpectedType = value ? AssetType.Image : ExpectedType;
+        }
+
+        /// <summary>
+        /// True to resolve first image in the content list.
+        /// </summary>
+        [Obsolete("Use 'resolveFirst' field now")]
         public bool ResolveImage
         {
             get => ResolveFirst;
@@ -102,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed file extensions.
         /// </summary>
-        public ReadOnlyCollection<string>? AllowedExtensions { get; set; }
+        public ReadonlyList<string>? AllowedExtensions { get; set; }
 
         /// <summary>
         /// True, if duplicate values are allowed.

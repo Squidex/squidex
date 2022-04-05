@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -90,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public Instant? LastExecuted { get; set; }
 
-        public static RuleDto FromRule(IEnrichedRuleEntity rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)
+        public static RuleDto FromDomain(IEnrichedRuleEntity rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)
         {
             var result = new RuleDto();
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Globalization;
 using System.Resources;
 using System.Text;
@@ -21,16 +20,14 @@ namespace Squidex.Infrastructure.Translations
 
         public ResourcesLocalizer(ResourceManager resourceManager)
         {
-            Guard.NotNull(resourceManager, nameof(resourceManager));
-
             this.resourceManager = resourceManager;
         }
 
         public (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null)
         {
-            Guard.NotNull(culture, nameof(culture));
-            Guard.NotNullOrEmpty(key, nameof(key));
-            Guard.NotNull(fallback, nameof(fallback));
+            Guard.NotNull(culture);
+            Guard.NotNullOrEmpty(key);
+            Guard.NotNull(fallback);
 
             var translation = GetCore(culture, key);
 
@@ -67,7 +64,7 @@ namespace Squidex.Infrastructure.Translations
 
                     indexOfEnd += indexOfStart;
 
-                    sb.Append(span.Slice(0, indexOfStart - 1));
+                    sb.Append(span[.. (indexOfStart - 1)]);
 
                     var variable = span[indexOfStart..indexOfEnd];
 
@@ -76,13 +73,13 @@ namespace Squidex.Infrastructure.Translations
 
                     if (variable.Length > 0)
                     {
-                        if (variable.EndsWith("|lower"))
+                        if (variable.EndsWith("|lower", StringComparison.OrdinalIgnoreCase))
                         {
                             variable = variable[..^6];
                             shouldLower = true;
                         }
 
-                        if (variable.EndsWith("|upper"))
+                        if (variable.EndsWith("|upper", StringComparison.OrdinalIgnoreCase))
                         {
                             variable = variable[..^6];
                             shouldUpper = true;
@@ -117,13 +114,13 @@ namespace Squidex.Infrastructure.Translations
                     {
                         if (shouldLower && !char.IsLower(variableValue[0]))
                         {
-                            sb.Append(char.ToLower(variableValue[0]));
+                            sb.Append(char.ToLower(variableValue[0], CultureInfo.InvariantCulture));
 
                             sb.Append(variableValue.AsSpan()[1..]);
                         }
                         else if (shouldUpper && !char.IsUpper(variableValue[0]))
                         {
-                            sb.Append(char.ToUpper(variableValue[0]));
+                            sb.Append(char.ToUpper(variableValue[0], CultureInfo.InvariantCulture));
 
                             sb.Append(variableValue.AsSpan()[1..]);
                         }
@@ -147,14 +144,12 @@ namespace Squidex.Infrastructure.Translations
         private string? GetCore(CultureInfo culture, string key)
         {
             var translation = resourceManager.GetString(key, culture);
-
+#if DEBUG
             if (translation == null)
             {
-#if DEBUG
                 MissingKeys.Log(key);
-#endif
             }
-
+#endif
             return translation;
         }
     }

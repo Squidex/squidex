@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 {
     public sealed class TextContentState
     {
+        public DomainId AppId { get; set; }
+
         public DomainId UniqueContentId { get; set; }
 
         public string DocIdCurrent { get; set; }
@@ -23,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public void GenerateDocIdNew()
         {
-            if (DocIdCurrent?.EndsWith("_2") != false)
+            if (DocIdCurrent?.EndsWith("_2", StringComparison.Ordinal) != false)
             {
                 DocIdNew = $"{UniqueContentId}_1";
             }
@@ -35,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.State
 
         public void GenerateDocIdCurrent()
         {
-            if (DocIdNew?.EndsWith("_2") != false)
+            if (DocIdNew?.EndsWith("_2", StringComparison.Ordinal) != false)
             {
                 DocIdCurrent = $"{UniqueContentId}_1";
             }

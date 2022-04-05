@@ -1,14 +1,13 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
@@ -41,8 +40,8 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public LanguagesConfig(Dictionary<string, LanguageConfig> languages, string master)
         {
-            Guard.NotNull(languages, nameof(languages));
-            Guard.NotNullOrEmpty(master, nameof(master));
+            Guard.NotNull(languages);
+            Guard.NotNullOrEmpty(master);
 
             Cleanup(languages, ref master);
 
@@ -54,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public LanguagesConfig MakeMaster(Language language)
         {
-            Guard.NotNull(language, nameof(language));
+            Guard.NotNull(language);
 
             return Build(languages, language);
         }
@@ -62,11 +61,11 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public LanguagesConfig Set(Language language, bool isOptional = false, params Language[]? fallbacks)
         {
-            Guard.NotNull(language, nameof(language));
+            Guard.NotNull(language);
 
             var newLanguages = new Dictionary<string, LanguageConfig>(languages)
             {
-                [language] = new LanguageConfig(isOptional, fallbacks)
+                [language] = new LanguageConfig(isOptional, ReadonlyList.Create(fallbacks))
             };
 
             return Build(newLanguages, master);
@@ -75,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         [Pure]
         public LanguagesConfig Remove(Language language)
         {
-            Guard.NotNull(language, nameof(language));
+            Guard.NotNull(language);
 
             var newLanguages = new Dictionary<string, LanguageConfig>(languages);
 

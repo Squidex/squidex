@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -33,7 +32,7 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_do_nothing_when_context_is_null()
+        public async Task Should_do_nothing_if_context_is_null()
         {
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(null!);

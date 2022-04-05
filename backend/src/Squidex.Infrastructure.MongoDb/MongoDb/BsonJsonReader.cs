@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using NewtonsoftJsonReader = Newtonsoft.Json.JsonReader;
@@ -19,7 +18,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonJsonReader(IBsonReader bsonReader)
         {
-            Guard.NotNull(bsonReader, nameof(bsonReader));
+            Guard.NotNull(bsonReader);
 
             this.bsonReader = bsonReader;
         }

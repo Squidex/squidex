@@ -1,18 +1,15 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Globalization;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure;
-using Squidex.Log;
 
 namespace Squidex.Web.Pipeline
 {
@@ -22,8 +19,6 @@ namespace Squidex.Web.Pipeline
 
         public ApiCostsFilter(UsageGate usageGate)
         {
-            Guard.NotNull(usageGate, nameof(usageGate));
-
             this.usageGate = usageGate;
         }
 
@@ -51,7 +46,7 @@ namespace Squidex.Web.Pipeline
             {
                 if (FilterDefinition.Costs > 0)
                 {
-                    using (Profiler.Trace("CheckUsage"))
+                    using (Telemetry.Activities.StartActivity("CheckUsage"))
                     {
                         var (_, clientId) = context.HttpContext.User.GetClient();
 

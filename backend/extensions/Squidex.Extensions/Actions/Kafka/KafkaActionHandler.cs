@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Kafka
 {
@@ -74,11 +72,11 @@ namespace Squidex.Extensions.Actions.Kafka
 
             foreach (var line in lines)
             {
-                var indexEqual = line.IndexOf('=');
+                var indexEqual = line.IndexOf('=', StringComparison.Ordinal);
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {
-                    var key = line.Substring(0, indexEqual);
+                    var key = line[..indexEqual];
                     var val = line[(indexEqual + 1)..];
 
                     val = await FormatAsync(val, @event);
@@ -90,13 +88,14 @@ namespace Squidex.Extensions.Actions.Kafka
             return headersDictionary;
         }
 
-        protected override async Task<Result> ExecuteJobAsync(KafkaJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(KafkaJob job,
+            CancellationToken ct = default)
         {
             try
             {
                 await kafkaProducer.SendAsync(job, ct);
 
-                return Result.Success($"Event pushed to {job.TopicName} kafka topic.");
+                return Result.Success($"Event pushed to {job.TopicName} kafka topic with {job.MessageKey} message key.");
             }
             catch (Exception ex)
             {

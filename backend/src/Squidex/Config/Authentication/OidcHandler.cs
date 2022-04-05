@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Squidex.Shared.Identity;
 
@@ -16,7 +15,7 @@ namespace Squidex.Config.Authentication
     {
         private readonly MyIdentityOptions options;
 
-        public OidcHandler(MyIdentityOptions options )
+        public OidcHandler(MyIdentityOptions options)
         {
             this.options = options;
         }
@@ -46,6 +45,7 @@ namespace Squidex.Config.Authentication
             if (!string.IsNullOrEmpty(options.OidcOnSignoutRedirectUrl))
             {
                 var logoutUri = options.OidcOnSignoutRedirectUrl;
+
                 context.Response.Redirect(logoutUri);
                 context.HandleResponse();
 

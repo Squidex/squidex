@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
@@ -29,11 +28,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The parent folder id.
         /// </summary>
         public DomainId ParentId { get; set; }
-
-        /// <summary>
-        /// The optional path to the folder.
-        /// </summary>
-        public string? ParentPath { get; set; }
 
         /// <summary>
         /// The new name of the asset.

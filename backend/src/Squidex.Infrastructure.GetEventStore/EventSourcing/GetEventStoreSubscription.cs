@@ -1,74 +1,78 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using EventStore.ClientAPI;
-using EventStore.ClientAPI.Exceptions;
+using EventStore.Client;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class GetEventStoreSubscription : IEventSubscription
     {
-        private readonly IEventStoreConnection connection;
-        private readonly IEventSubscriber subscriber;
-        private readonly IJsonSerializer serializer;
-        private readonly string? prefix;
-        private readonly EventStoreCatchUpSubscription subscription;
-        private readonly long? position;
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private StreamSubscription subscription;
 
         public GetEventStoreSubscription(
-            IEventStoreConnection connection,
             IEventSubscriber subscriber,
+            EventStoreClient client,
+            EventStoreProjectionClient projectionClient,
             IJsonSerializer serializer,
-            ProjectionClient projectionClient,
             string? position,
             string? prefix,
             string? streamFilter)
         {
-            this.connection = connection;
+            Task.Run(async () =>
+            {
+                var ct = cts.Token;
 
-            this.position = ProjectionClient.ParsePositionOrNull(position);
-            this.prefix = prefix;
+                var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
-            var streamName = AsyncHelper.Sync(() => projectionClient.CreateProjectionAsync(streamFilter));
+                async Task OnEvent(StreamSubscription subscription, ResolvedEvent @event,
+                    CancellationToken ct)
+                {
+                    var storedEvent = Formatter.Read(@event, prefix, serializer);
 
-            this.serializer = serializer;
-            this.subscriber = subscriber;
+                    await subscriber.OnEventAsync(this, storedEvent);
+                }
 
-            subscription = SubscribeToStream(streamName);
+                void OnError(StreamSubscription subscription, SubscriptionDroppedReason reason, Exception? ex)
+                {
+                    if (reason != SubscriptionDroppedReason.Disposed &&
+                        reason != SubscriptionDroppedReason.SubscriberError)
+                    {
+                        ex ??= new InvalidOperationException($"Subscription closed with reason {reason}.");
+
+                        subscriber.OnErrorAsync(this, ex);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(position))
+                {
+                    var streamPosition = position.ToPosition(true);
+
+                    subscription = await client.SubscribeToStreamAsync(streamName, streamPosition,
+                        OnEvent, true,
+                        OnError,
+                        cancellationToken: ct);
+                }
+                else
+                {
+                    subscription = await client.SubscribeToStreamAsync(streamName,
+                        OnEvent, true,
+                        OnError,
+                        cancellationToken: ct);
+                }
+            }, cts.Token);
         }
 
         public void Unsubscribe()
         {
-            subscription.Stop();
-        }
+            subscription?.Dispose();
 
-        private EventStoreCatchUpSubscription SubscribeToStream(string streamName)
-        {
-            var settings = CatchUpSubscriptionSettings.Default;
-
-            return connection.SubscribeToStreamFrom(streamName, position, settings,
-                async (s, e) =>
-                {
-                    var storedEvent = Formatter.Read(e, prefix, serializer);
-
-                    await subscriber.OnEventAsync(this, storedEvent);
-                }, null,
-                (s, reason, ex) =>
-                {
-                    if (reason != SubscriptionDropReason.ConnectionClosed &&
-                        reason != SubscriptionDropReason.UserInitiated)
-                    {
-                        ex ??= new ConnectionClosedException($"Subscription closed with reason {reason}.");
-
-                        subscriber.OnErrorAsync(this, ex);
-                    }
-                });
+            cts.Cancel();
         }
     }
 }

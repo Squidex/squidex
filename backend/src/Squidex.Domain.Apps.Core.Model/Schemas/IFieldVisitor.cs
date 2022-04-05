@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -14,6 +14,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
         T Visit(IField<AssetsFieldProperties> field, TArgs args);
 
         T Visit(IField<BooleanFieldProperties> field, TArgs args);
+
+        T Visit(IField<ComponentFieldProperties> field, TArgs args);
+
+        T Visit(IField<ComponentsFieldProperties> field, TArgs args);
 
         T Visit(IField<DateTimeFieldProperties> field, TArgs args);
 

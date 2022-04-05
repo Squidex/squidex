@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Xunit;
@@ -138,18 +135,27 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             yield return new object?[] { DomainId.Empty };
         }
 
-        private async Task<IResultList<IAssetEntity>> QueryAsync(DomainId? parentId, ClrQuery query)
+        private async Task<IResultList<IAssetEntity>> QueryAsync(DomainId? parentId, ClrQuery clrQuery)
         {
-            query.Top = 1000;
+            clrQuery.Top = 1000;
 
-            query.Skip = 100;
+            clrQuery.Skip = 100;
 
-            query.Sort = new List<SortNode>
+            if (clrQuery.Sort.Count == 0)
             {
-                new SortNode("LastModified", SortOrder.Descending)
-            };
+                clrQuery.Sort = new List<SortNode>
+                {
+                    new SortNode("LastModified", SortOrder.Descending),
+                    new SortNode("Id", SortOrder.Descending)
+                };
+            }
 
-            var assets = await _.AssetRepository.QueryAsync(_.RandomAppId(), parentId, Q.Empty.WithQuery(query));
+            var q =
+                Q.Empty
+                    .WithoutTotal()
+                    .WithQuery(clrQuery);
+
+            var assets = await _.AssetRepository.QueryAsync(_.RandomAppId(), parentId, q);
 
             return assets;
         }

@@ -1,15 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Users.MongoDb
 {

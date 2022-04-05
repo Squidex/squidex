@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using FakeItEasy;
 using Orleans;
 using Orleans.Core;
@@ -20,7 +19,7 @@ namespace Squidex.Infrastructure.Orleans
         private readonly IGrainRuntime grainRuntime = A.Fake<IGrainRuntime>();
         private readonly ActivationLimiter sut;
 
-        private class MyGrain : GrainBase
+        private sealed class MyGrain : GrainBase
         {
             public MyGrain(IGrainIdentity identity, IGrainRuntime runtime, IActivationLimit limit)
                 : base(identity, runtime)

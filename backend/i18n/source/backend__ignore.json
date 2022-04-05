@@ -30,20 +30,16 @@
     "*"
   ],
   "/Squidex.Domain.Apps.Core.Operations/ConvertContent/StringFormatter.cs": [
-    "{array.Count} {pluralName}",
-    "{lat}, {lon}",
-    "<Json />",
-    "0 {pluralName}",
-    "1 {singularName}"
+    "*"
   ],
   "/Squidex.Domain.Apps.Core.Operations/DefaultValues/DefaultValueFactory.cs": [
-    ", CultureInfo.InvariantCulture)}T00:00:00Z"
+    "*"
   ],
   "/Squidex.Domain.Apps.Core.Operations/GenerateJsonSchema/ContentSchemaBuilder.cs": [
     "*"
   ],
   "/Squidex.Domain.Apps.Core.Operations/GenerateJsonSchema/JsonSchemaExtensions.cs": [
-    "{field.Name} ({field.RawProperties.Hints})"
+    "*"
   ],
   "/Squidex.Domain.Apps.Core.Operations/HandleRules/Result.cs": [
     "*"
@@ -61,7 +57,7 @@
     "*"
   ],
   "/Squidex.Domain.Apps.Core.Operations/Scripting/ScriptOptions.cs": [
-    "CanReject={CanReject}, CanDisallow={CanDisallow}, AsContext={AsContext}"
+    "*"
   ],
   "/Squidex.Domain.Apps.Core.Operations/Templates/TemplateParseException.cs": [
     "*"

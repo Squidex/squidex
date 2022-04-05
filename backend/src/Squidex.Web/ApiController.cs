@@ -1,24 +1,24 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Web
 {
-    [Area("Api")]
+    [Area("api")]
     [ApiController]
     [ApiExceptionFilter]
     [ApiModelValidation(false)]
+    [Route(Constants.PrefixApi)]
     public abstract class ApiController : Controller
     {
         private readonly Lazy<Resources> resources;
@@ -29,7 +29,7 @@ namespace Squidex.Web
         {
             get
             {
-                var app = HttpContext.Context().App;
+                var app = HttpContext.Features.Get<IAppFeature>()?.App;
 
                 if (app == null)
                 {
@@ -37,6 +37,21 @@ namespace Squidex.Web
                 }
 
                 return app;
+            }
+        }
+
+        protected ISchemaEntity Schema
+        {
+            get
+            {
+                var schema = HttpContext.Features.Get<ISchemaFeature>()?.Schema;
+
+                if (schema == null)
+                {
+                    throw new InvalidOperationException("Not in a schema context.");
+                }
+
+                return schema;
             }
         }
 
@@ -57,21 +72,9 @@ namespace Squidex.Web
 
         protected ApiController(ICommandBus commandBus)
         {
-            Guard.NotNull(commandBus, nameof(commandBus));
-
             CommandBus = commandBus;
 
             resources = new Lazy<Resources>(() => new Resources(this));
-        }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            var request = context.HttpContext.Request;
-
-            if (!request.PathBase.HasValue || request.PathBase.Value?.EndsWith("/api", StringComparison.OrdinalIgnoreCase) != true)
-            {
-                context.Result = new RedirectResult("/");
-            }
         }
     }
 }

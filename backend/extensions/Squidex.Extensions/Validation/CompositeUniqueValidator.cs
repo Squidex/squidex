@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -30,7 +27,7 @@ namespace Squidex.Extensions.Validation
             this.contentRepository = contentRepository;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is ContentData data)
             {

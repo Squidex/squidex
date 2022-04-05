@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -24,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Docs
         {
             var vm = new DocsVM
             {
-                Specification = "~/swagger/v1/swagger.json"
+                Specification = "~/api/swagger/v1/swagger.json"
             };
 
             return View(nameof(Docs), vm);

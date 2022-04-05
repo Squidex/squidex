@@ -1,31 +1,13 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class EventData
-    {
-        public EnvelopeHeaders Headers { get; }
-
-        public string Payload { get; }
-
-        public string Type { get; set; }
-
-        public EventData(string type, EnvelopeHeaders headers, string payload)
-        {
-            Guard.NotNull(type, nameof(type));
-            Guard.NotNull(headers, nameof(headers));
-            Guard.NotNull(payload, nameof(payload));
-
-            Headers = headers;
-
-            Payload = payload;
-
-            Type = type;
-        }
-    }
+    public sealed record EventData(string Type, EnvelopeHeaders Headers, string Payload);
 }

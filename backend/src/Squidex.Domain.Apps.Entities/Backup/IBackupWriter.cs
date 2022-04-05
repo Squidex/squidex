@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -18,10 +15,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         int WrittenEvents { get; }
 
-        Task WriteBlobAsync(string name, Func<Stream, Task> handler);
+        Task<Stream> OpenBlobAsync(string name,
+            CancellationToken ct = default);
 
-        void WriteEvent(StoredEvent storedEvent);
+        void WriteEvent(StoredEvent storedEvent,
+            CancellationToken ct = default);
 
-        Task WriteJsonAsync(string name, object value);
+        Task WriteJsonAsync(string name, object value,
+            CancellationToken ct = default);
     }
 }

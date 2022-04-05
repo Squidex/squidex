@@ -1,15 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.TestHelpers;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -25,13 +21,12 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 .Select(x => new[] { x })
                 .ToList()!;
 
-        private readonly RootField<NumberFieldProperties> field_0 = Fields.Number(1, "my-field", Partitioning.Invariant);
+        private readonly RootField<NumberFieldProperties> field_0 = Fields.Number(1, "myField", Partitioning.Invariant);
 
         [Fact]
         public void Should_instantiate_field()
         {
-            Assert.True(field_0.RawProperties.IsFrozen);
-            Assert.Equal("my-field", field_0.Name);
+            Assert.Equal("myField", field_0.Name);
         }
 
         [Fact]
@@ -97,7 +92,6 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var field_1 = field_0.Update(new NumberFieldProperties { Hints = "my-hints" });
 
             Assert.Null(field_0.RawProperties.Hints);
-            Assert.True(field_1.RawProperties.IsFrozen);
             Assert.Equal("my-hints", field_1.RawProperties.Hints);
         }
 
@@ -105,13 +99,6 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_throw_exception_if_updating_with_invalid_properties_type()
         {
             Assert.Throws<ArgumentException>(() => field_0.Update(new StringFieldProperties()));
-        }
-
-        [Theory]
-        [MemberData(nameof(FieldProperties))]
-        public void Should_freeze_field_properties(FieldProperties action)
-        {
-            TestUtils.TestFreeze(action);
         }
     }
 }

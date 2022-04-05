@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 using Squidex.Hosting;
@@ -28,7 +26,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 Type = OpenApiSecuritySchemeType.OAuth2
             };
 
-            var tokenUrl = urlGenerator.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
+            var tokenUrl = urlGenerator.BuildUrl($"/{Constants.PrefixIdentityServer}/connect/token", false);
 
             security.TokenUrl = tokenUrl;
 
@@ -48,13 +46,13 @@ namespace Squidex.Areas.Api.Config.OpenApi
         {
             security.Scopes = new Dictionary<string, string>
             {
-                [Constants.ApiScope] = "Read and write access to the API"
+                [Constants.ScopeApi] = "Read and write access to the API"
             };
         }
 
         private static void SetupDescription(OpenApiSecurityScheme securityScheme, string tokenUrl)
         {
-            var securityText = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", tokenUrl);
+            var securityText = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", tokenUrl, StringComparison.Ordinal);
 
             securityScheme.Description = securityText;
         }

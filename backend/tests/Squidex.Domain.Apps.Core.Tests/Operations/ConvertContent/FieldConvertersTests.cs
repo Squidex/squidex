@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -21,8 +20,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.English.Set(Language.DE);
 
+        private static IEnumerable<object?[]> InvalidValues()
+        {
+            yield return new object?[] { null };
+            yield return new object?[] { JsonValue.Null };
+            yield return new object?[] { JsonValue.False }; // Undefined
+        }
+
         [Fact]
-        public void Should_filter_for_value_conversion()
+        public void Should_convert_data_with_value_converter()
         {
             var field = Fields.String(1, "string", Partitioning.Invariant);
 
@@ -30,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddInvariant(JsonValue.Object());
 
-            var result = FieldConverters.ForValues((value, field, parent) => null)(source, field);
+            var result = FieldConverters.ForValues(ResolvedComponents.Empty, (value, field, parent) => null)(source, field);
 
             var expected = new ContentFieldData();
 
@@ -38,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_same_values_when_excluding_changed_types_if_all_values_are_valid()
+        public void Should_return_field_data_if_excluding_changed_types_and_all_values_are_valid()
         {
             var field = Fields.Number(1, "number", Partitioning.Invariant);
 
@@ -49,11 +55,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result = FieldConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, field);
 
-            Assert.Same(source, result);
+            Assert.Equal(source, result);
         }
 
         [Fact]
-        public void Should_return_null_when_excluding_changed_types_if_any_value_is_invalid()
+        public void Should_return_null_if_excluding_changed_types_and_one_value_is_invalid()
         {
             var field = Fields.Number(1, "number", Partitioning.Invariant);
 
@@ -68,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_same_values_if_field_not_hidden()
+        public void Should_return_field_data_if_field_not_hidden()
         {
             var field = Fields.String(1, "string", Partitioning.Language);
 
@@ -76,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result = FieldConverters.ExcludeHidden(source, field);
 
-            Assert.Same(source, result);
+            Assert.Equal(source, result);
         }
 
         [Fact]
@@ -110,8 +116,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             Assert.Equal(expected, result);
         }
 
-        [Fact]
-        public void Should_resolve_languages_and_resolve_master_language_from_invariant()
+        [Theory]
+        [MemberData(nameof(InvalidValues))]
+        public void Should_resolve_master_language_from_invariant(IJsonValue? value)
         {
             var field = Fields.String(1, "string", Partitioning.Language);
 
@@ -119,6 +126,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddLocalized("iv", "A")
                     .AddLocalized("it", "B");
+
+            if (value != JsonValue.False)
+            {
+                source["en"] = value!;
+            }
 
             var expected =
                 new ContentFieldData()
@@ -130,7 +142,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_same_values_if_resolving_languages_from_invariant_field()
+        public void Should_not_resolve_master_language_if_not_found()
         {
             var field = Fields.String(1, "string", Partitioning.Invariant);
 
@@ -138,11 +150,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var result = FieldConverters.ResolveLanguages(languagesConfig)(source, field);
 
-            Assert.Same(source, result);
+            Assert.Equal(source, result);
         }
 
         [Fact]
-        public void Should_resolve_invariant_and_use_direct_value()
+        public void Should_resolve_invariant()
         {
             var field = Fields.String(1, "string", Partitioning.Invariant);
 
@@ -159,8 +171,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             Assert.Equal(expected, result);
         }
 
-        [Fact]
-        public void Should_resolve_invariant_and_resolve_invariant_from_master_language()
+        [Theory]
+        [MemberData(nameof(InvalidValues))]
+        public void Should_resolve_invariant_from_master_language(IJsonValue? value)
         {
             var field = Fields.String(1, "string", Partitioning.Invariant);
 
@@ -168,6 +181,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddLocalized("de", "DE")
                     .AddLocalized("en", "EN");
+
+            if (value != JsonValue.False)
+            {
+                source[InvariantPartitioning.Key] = value!;
+            }
 
             var expected =
                 new ContentFieldData()
@@ -179,7 +197,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_resolve_invariant_and_resolve_invariant_from_first_language()
+        public void Should_resolve_invariant_from_first_language()
         {
             var field = Fields.String(1, "string", Partitioning.Invariant);
 
@@ -198,7 +216,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_same_values_if_resolving_invariant_from_language_field()
+        public void Should_not_resolve_invariant_if_not_found()
         {
             var field = Fields.String(1, "string", Partitioning.Language);
 
@@ -209,8 +227,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             Assert.Same(source, result);
         }
 
-        [Fact]
-        public void Should_return_language_from_fallback_if_found()
+        [Theory]
+        [MemberData(nameof(InvalidValues))]
+        public void Should_resolve_from_fallback_language_if_found(IJsonValue? value)
         {
             var field = Fields.String(1, "string", Partitioning.Language);
 
@@ -225,12 +244,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddLocalized("en", "EN")
                     .AddLocalized("it", "IT");
 
+            if (value != JsonValue.False)
+            {
+                source["de"] = value!;
+            }
+
             var expected =
                 new ContentFieldData()
                     .AddLocalized("en", "EN")
-                    .AddLocalized("de", "EN")
                     .AddLocalized("it", "IT")
-                    .AddLocalized("es", "IT");
+                    .AddLocalized("es", "IT")
+                    .AddLocalized("de", "EN");
 
             var result = FieldConverters.ResolveFallbackLanguages(config)(source, field);
 

@@ -18,16 +18,16 @@ namespace Squidex.Extensions.Actions.Comment
         IconColor = "#3389ff",
         Display = "Create comment",
         Description = "Create a comment for a content event.")]
-    public sealed class CommentAction : RuleAction
+    public sealed record CommentAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Text", Description = "The comment text.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Text { get; set; }
 
         [Display(Name = "Client", Description = "An optional client name.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Client { get; set; }
     }
 }

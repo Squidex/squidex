@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -25,8 +25,6 @@ namespace Squidex.Domain.Apps.Entities
 
         public Instant LastModified { get; set; }
 
-        public bool IsDeleted { get; set; }
-
         public long Version { get; set; }
 
         protected DomainObjectState()
@@ -42,6 +40,11 @@ namespace Squidex.Domain.Apps.Entities
         public virtual bool ApplyEvent(IEvent @event)
         {
             return false;
+        }
+
+        public T Copy()
+        {
+            return (T)MemberwiseClone();
         }
 
         public T Apply(Envelope<IEvent> @event)

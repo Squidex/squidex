@@ -1,0 +1,32 @@
+<form class="inner-form" [formGroup]="synchronizeForm.form" (submit)="synchronize()">
+    <div class="inner-header" *ngIf="isEditable">
+        <div class="row gx-3 align-items-center">
+            <div class="col"></div>
+            <div class="col-auto">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="fieldsDelete" formControlName="fieldsDelete">
+                    <label class="form-check-label" for="fieldsDelete">
+                        {{ 'schemas.export.deleteFields' | sqxTranslate }}
+                    </label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="fieldsRecreate" formControlName="fieldsRecreate">
+                    <label class="form-check-label" for="fieldsRecreate">
+                        {{ 'schemas.export.recreateFields' | sqxTranslate }}
+                    </label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    {{ 'schemas.export.synchronize' | sqxTranslate }}
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="inner-main">
+        <sqx-code-editor [borderless]="true" formControlName="json" valueMode="Json"></sqx-code-editor>
+    </div>
+</form>

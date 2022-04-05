@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson.IO;
 using NewtonsoftJSonWriter = Newtonsoft.Json.JsonWriter;
 
@@ -17,7 +16,7 @@ namespace Squidex.Infrastructure.MongoDb
 
         public BsonJsonWriter(IBsonWriter bsonWriter)
         {
-            Guard.NotNull(bsonWriter, nameof(bsonWriter));
+            Guard.NotNull(bsonWriter);
 
             this.bsonWriter = bsonWriter;
         }

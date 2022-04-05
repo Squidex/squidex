@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.DefaultValues;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -27,13 +28,13 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             schema =
                 new Schema("my-schema")
-                    .AddString(1, "my-string", Partitioning.Language,
+                    .AddString(1, "myString", Partitioning.Language,
                         new StringFieldProperties { DefaultValue = "en-string" })
-                    .AddNumber(2, "my-number", Partitioning.Invariant,
+                    .AddNumber(2, "myNumber", Partitioning.Invariant,
                         new NumberFieldProperties())
-                    .AddDateTime(3, "my-datetime", Partitioning.Invariant,
+                    .AddDateTime(3, "myDatetime", Partitioning.Invariant,
                         new DateTimeFieldProperties { DefaultValue = now })
-                    .AddBoolean(4, "my-boolean", Partitioning.Invariant,
+                    .AddBoolean(4, "myBoolean", Partitioning.Invariant,
                         new BooleanFieldProperties { DefaultValue = true });
         }
 
@@ -42,41 +43,41 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var data =
                 new ContentData()
-                    .AddField("my-string",
+                    .AddField("myString",
                         new ContentFieldData()
                             .AddLocalized("de", "de-string"))
-                    .AddField("my-number",
+                    .AddField("myNumber",
                         new ContentFieldData()
                             .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(456, ((JsonNumber)data["my-number"]!["iv"]).Value);
+            Assert.Equal(456, ((JsonNumber)data["myNumber"]!["iv"]).Value);
 
-            Assert.Equal("de-string", data["my-string"]!["de"].ToString());
-            Assert.Equal("en-string", data["my-string"]!["en"].ToString());
+            Assert.Equal("de-string", data["myString"]!["de"].ToString());
+            Assert.Equal("en-string", data["myString"]!["en"].ToString());
 
-            Assert.Equal(now.ToString(), data["my-datetime"]!["iv"].ToString());
+            Assert.Equal(now.ToString(), data["myDatetime"]!["iv"].ToString());
 
-            Assert.True(((JsonBoolean)data["my-boolean"]!["iv"]).Value);
+            Assert.True(((JsonBoolean)data["myBoolean"]!["iv"]).Value);
         }
 
         [Fact]
-        public void Should_not_enrich_with_default_values_when_string_is_empty()
+        public void Should_not_enrich_with_default_values_if_string_is_empty()
         {
             var data =
                 new ContentData()
-                    .AddField("my-string",
+                    .AddField("myString",
                         new ContentFieldData()
                             .AddLocalized("de", string.Empty))
-                    .AddField("my-number",
+                    .AddField("myNumber",
                         new ContentFieldData()
                             .AddInvariant(456));
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(string.Empty, data["my-string"]!["de"].ToString());
-            Assert.Equal("en-string", data["my-string"]!["en"].ToString());
+            Assert.Equal(string.Empty, data["myString"]!["de"].ToString());
+            Assert.Equal("en-string", data["myString"]!["en"].ToString());
         }
 
         [Fact]
@@ -90,27 +91,27 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_assets_field_when_set()
+        public void Should_get_default_value_from_assets_field_if_set()
         {
             var field =
                 Fields.Assets(1, "1", Partitioning.Invariant,
-                    new AssetsFieldProperties { DefaultValue = new[] { "1", "2" } });
+                    new AssetsFieldProperties { DefaultValue = ReadonlyList.Create("1", "2") });
 
             Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         [Fact]
-        public void Should_get_default_value_from_assets_field_when_localized()
+        public void Should_get_default_value_from_assets_field_if_localized()
         {
             var field =
                 Fields.Assets(1, "1", Partitioning.Invariant,
                     new AssetsFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string[]?>
+                        DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                         {
                             [language.Iso2Code] = null
-                        },
-                        DefaultValue = new[] { "1", "2" }
+                        }),
+                        DefaultValue = ReadonlyList.Create("1", "2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -127,16 +128,16 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_boolean_field_when_localized()
+        public void Should_get_default_value_from_boolean_field_if_localized()
         {
             var field =
                 Fields.Boolean(1, "1", Partitioning.Invariant,
                     new BooleanFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<bool?>
+                        DefaultValues = new LocalizedValue<bool?>(new Dictionary<string, bool?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = true
                     });
 
@@ -154,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_datetime_field_when_set_to_today()
+        public void Should_get_default_value_from_datetime_field_if_set_to_today()
         {
             var field =
                 Fields.DateTime(1, "1", Partitioning.Invariant,
@@ -164,7 +165,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_datetime_field_when_set_to_now()
+        public void Should_get_default_value_from_datetime_field_if_set_to_now()
         {
             var field =
                 Fields.DateTime(1, "1", Partitioning.Invariant,
@@ -174,16 +175,16 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_datetime_field_when_localized()
+        public void Should_get_default_value_from_datetime_field_if_localized()
         {
             var field =
                 Fields.DateTime(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<Instant?>
+                        DefaultValues = new LocalizedValue<Instant?>(new Dictionary<string, Instant?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = FutureDays(15)
                     });
 
@@ -221,16 +222,16 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_number_field_when_localized()
+        public void Should_get_default_value_from_number_field_if_localized()
         {
             var field =
                 Fields.Number(1, "1", Partitioning.Invariant,
                     new NumberFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<double?>
+                        DefaultValues = new LocalizedValue<double?>(new Dictionary<string, double?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = 12
                     });
 
@@ -248,27 +249,27 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_references_field_when_set()
+        public void Should_get_default_value_from_references_field_if_set()
         {
             var field =
                 Fields.References(1, "1", Partitioning.Invariant,
-                    new ReferencesFieldProperties { DefaultValue = new[] { "1", "2" } });
+                    new ReferencesFieldProperties { DefaultValue = ReadonlyList.Create("1", "2") });
 
             Assert.Equal(JsonValue.Array("1", "2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         [Fact]
-        public void Should_get_default_value_from_references_field_when_localized()
+        public void Should_get_default_value_from_references_field_if_localized()
         {
             var field =
                 Fields.References(1, "1", Partitioning.Invariant,
                     new ReferencesFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string[]?>
+                        DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                         {
                             [language.Iso2Code] = null
-                        },
-                        DefaultValue = new[] { "1", "2" }
+                        }),
+                        DefaultValue = ReadonlyList.Create("1", "2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -285,16 +286,16 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         }
 
         [Fact]
-        public void Should_get_default_value_from_string_field_when_localized()
+        public void Should_get_default_value_from_string_field_if_localized()
         {
             var field =
                 Fields.String(1, "1", Partitioning.Invariant,
                     new StringFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string?>
+                        DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
                         {
                             [language.Iso2Code] = null
-                        },
+                        }),
                         DefaultValue = "default"
                     });
 
@@ -306,23 +307,23 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
         {
             var field =
                 Fields.Tags(1, "1", Partitioning.Invariant,
-                    new TagsFieldProperties { DefaultValue = new[] { "tag1", "tag2" } });
+                    new TagsFieldProperties { DefaultValue = ReadonlyList.Create("tag1", "tag2") });
 
             Assert.Equal(JsonValue.Array("tag1", "tag2"), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         [Fact]
-        public void Should_get_default_value_from_tags_field_when_localized()
+        public void Should_get_default_value_from_tags_field_if_localized()
         {
             var field =
                 Fields.Tags(1, "1", Partitioning.Invariant,
                     new TagsFieldProperties
                     {
-                        DefaultValues = new LocalizedValue<string[]?>
+                        DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                         {
                             [language.Iso2Code] = null
-                        },
-                        DefaultValue = new[] { "tag1", "tag2" }
+                        }),
+                        DefaultValue = ReadonlyList.Create("tag1", "tag2")
                     });
 
             Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));

@@ -1,12 +1,9 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
-
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {

@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class Workflows : ImmutableDictionary<DomainId, Workflow>
+    public sealed class Workflows : ReadonlyDictionary<DomainId, Workflow>
     {
         public static readonly Workflows Empty = new Workflows();
 
@@ -21,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public Workflows(Dictionary<DomainId, Workflow> inner)
+        public Workflows(IDictionary<DomainId, Workflow> inner)
             : base(inner)
         {
         }
@@ -29,49 +27,69 @@ namespace Squidex.Domain.Apps.Core.Contents
         [Pure]
         public Workflows Remove(DomainId id)
         {
-            return Without<Workflows>(id);
+            if (!this.TryRemove(id, out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
         public Workflows Add(DomainId workflowId, string name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(name);
 
-            return With<Workflows>(workflowId, Workflow.CreateDefault(name));
+            if (!this.TryAdd(workflowId, Workflow.CreateDefault(name), out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
         public Workflows Set(Workflow workflow)
         {
-            Guard.NotNull(workflow, nameof(workflow));
+            Guard.NotNull(workflow);
 
-            return With<Workflows>(default, workflow);
+            if (!this.TrySet(default, workflow, out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
         public Workflows Set(DomainId id, Workflow workflow)
         {
-            Guard.NotNull(workflow, nameof(workflow));
+            Guard.NotNull(workflow);
 
-            return With<Workflows>(id, workflow);
+            if (!this.TrySet(id, workflow, out var updated))
+            {
+                return this;
+            }
+
+            return new Workflows(updated);
         }
 
         [Pure]
         public Workflows Update(DomainId id, Workflow workflow)
         {
-            Guard.NotNull(workflow, nameof(workflow));
+            Guard.NotNull(workflow);
 
             if (id == DomainId.Empty)
             {
                 return Set(workflow);
             }
 
-            if (!ContainsKey(id))
+            if (!this.TryUpdate(id, workflow, out var updated))
             {
                 return this;
             }
 
-            return With<Workflows>(id, workflow);
+            return new Workflows(updated);
         }
 
         public Workflow GetFirst()

@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -20,17 +19,17 @@ namespace Squidex.Extensions.Actions.Slack
         Display = "Send to Slack",
         Description = "Create a status update to a slack channel.",
         ReadMore = "https://slack.com")]
-    public sealed class SlackAction : RuleAction
+    public sealed record SlackAction : RuleAction
     {
         [AbsoluteUrl]
         [LocalizedRequired]
         [Display(Name = "Webhook Url", Description = "The slack webhook url.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public Uri WebhookUrl { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Text", Description = "The text that is sent as message to slack.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Text { get; set; }
     }

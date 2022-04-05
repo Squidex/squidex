@@ -1,22 +1,24 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
-
-using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Migrations
 {
     public interface IMigrationStatus
     {
-        Task<int> GetVersionAsync();
+        Task<int> GetVersionAsync(
+            CancellationToken ct = default);
 
-        Task<bool> TryLockAsync();
+        Task<bool> TryLockAsync(
+            CancellationToken ct = default);
 
-        Task CompleteAsync(int newVersion);
+        Task CompleteAsync(int newVersion,
+            CancellationToken ct = default);
 
-        Task UnlockAsync();
+        Task UnlockAsync(
+            CancellationToken ct = default);
     }
 }

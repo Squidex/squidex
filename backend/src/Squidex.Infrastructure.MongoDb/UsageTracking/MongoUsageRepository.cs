@@ -1,15 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
@@ -17,8 +12,6 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class MongoUsageRepository : MongoRepositoryBase<MongoUsage>, IUsageRepository
     {
-        private static readonly BulkWriteOptions Unordered = new BulkWriteOptions { IsOrdered = false };
-
         public MongoUsageRepository(IMongoDatabase database)
             : base(database)
         {
@@ -29,7 +22,8 @@ namespace Squidex.Infrastructure.UsageTracking
             return "UsagesV2";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection, CancellationToken ct = default)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection,
+            CancellationToken ct)
         {
             return collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<MongoUsage>(
@@ -37,26 +31,38 @@ namespace Squidex.Infrastructure.UsageTracking
                         .Ascending(x => x.Key)
                         .Ascending(x => x.Category)
                         .Ascending(x => x.Date)),
-                cancellationToken: ct);
+                cancellationToken: ct = default);
         }
 
-        public async Task TrackUsagesAsync(UsageUpdate update)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
         {
-            Guard.NotNull(update, nameof(update));
+            Guard.NotNull(key);
+
+            return Collection.DeleteManyAsync(x => x.Key == key, ct);
+        }
+
+        public async Task TrackUsagesAsync(UsageUpdate update,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(update);
 
             if (update.Counters.Count > 0)
             {
                 var (filter, updateStatement) = CreateOperation(update);
 
-                await Collection.UpdateOneAsync(filter, updateStatement, Upsert);
+                await Collection.UpdateOneAsync(filter, updateStatement, Upsert, ct);
             }
         }
 
-        public async Task TrackUsagesAsync(params UsageUpdate[] updates)
+        public async Task TrackUsagesAsync(UsageUpdate[] updates,
+            CancellationToken ct = default)
         {
+            Guard.NotNull(updates);
+
             if (updates.Length == 1)
             {
-                await TrackUsagesAsync(updates[0]);
+                await TrackUsagesAsync(updates[0], ct);
             }
             else if (updates.Length > 0)
             {
@@ -72,7 +78,7 @@ namespace Squidex.Infrastructure.UsageTracking
                     }
                 }
 
-                await Collection.BulkWriteAsync(writes, Unordered);
+                await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
             }
         }
 
@@ -95,9 +101,10 @@ namespace Squidex.Infrastructure.UsageTracking
             return (filter, update);
         }
 
-        public async Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
         {
-            var entities = await Collection.Find(x => x.Key == key && x.Date >= fromDate && x.Date <= toDate).ToListAsync();
+            var entities = await Collection.Find(x => x.Key == key && x.Date >= fromDate && x.Date <= toDate).ToListAsync(ct);
 
             return entities.Select(x => new StoredUsage(x.Category, x.Date, x.Counters)).ToList();
         }

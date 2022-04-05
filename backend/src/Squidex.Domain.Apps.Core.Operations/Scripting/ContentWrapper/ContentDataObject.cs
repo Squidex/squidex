@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
@@ -145,6 +142,16 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                     fieldProperties.Add(key, new ContentDataProperty(this, new ContentFieldObject(this, value, false)));
                 }
             }
+        }
+
+        public override object ToObject()
+        {
+            if (TryUpdate(out var result))
+            {
+                return result;
+            }
+
+            return contentData;
         }
     }
 }

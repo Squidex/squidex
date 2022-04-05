@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Infrastructure.Queries
 {
     public sealed class Optimizer<TValue> : TransformVisitor<TValue, None>

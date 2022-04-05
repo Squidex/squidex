@@ -1,11 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -15,19 +14,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class FieldValidator : IValidator
     {
-        private readonly IValidator fieldValueValidator;
+        private readonly IValidator validator;
         private readonly IField field;
 
-        public FieldValidator(IValidator fieldValueValidator, IField field)
+        public FieldValidator(IValidator validator, IField field)
         {
-            Guard.NotNull(field, nameof(field));
-            Guard.NotNull(fieldValueValidator, nameof(fieldValueValidator));
+            Guard.NotNull(field);
+            Guard.NotNull(validator);
 
             this.field = field;
-            this.fieldValueValidator = fieldValueValidator;
+            this.validator = validator;
         }
 
-        public async Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public async ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             var typedValue = value;
 
@@ -41,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                     else
                     {
-                        var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue, context.JsonSerializer);
+                        var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue, context.JsonSerializer, context.Components);
 
                         if (error != null)
                         {
@@ -60,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 return;
             }
 
-            await fieldValueValidator.ValidateAsync(typedValue, context, addError);
+            await validator.ValidateAsync(typedValue, context, addError);
         }
     }
 }

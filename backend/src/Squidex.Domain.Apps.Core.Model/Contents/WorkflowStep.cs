@@ -1,48 +1,32 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Infrastructure;
-
-#pragma warning disable IDE0051 // Remove unused private members
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class WorkflowStep
+    public sealed record WorkflowStep
     {
-        private static readonly IReadOnlyDictionary<Status, WorkflowTransition> EmptyTransitions = new Dictionary<Status, WorkflowTransition>();
-
-        [IgnoreDuringEquals]
-        public IReadOnlyDictionary<Status, WorkflowTransition> Transitions { get; }
+        public ReadonlyDictionary<Status, WorkflowTransition> Transitions { get; } = ReadonlyDictionary.Empty<Status, WorkflowTransition>();
 
         public string? Color { get; }
 
         public NoUpdate? NoUpdate { get; }
 
-        public WorkflowStep(IReadOnlyDictionary<Status, WorkflowTransition>? transitions = null, string? color = null, NoUpdate? noUpdate = null)
+        public WorkflowStep(ReadonlyDictionary<Status, WorkflowTransition>? transitions = null, string? color = null, NoUpdate? noUpdate = null)
         {
-            Transitions = transitions ?? EmptyTransitions;
-
             Color = color;
 
+            if (transitions != null)
+            {
+                Transitions = transitions;
+            }
+
             NoUpdate = noUpdate;
-        }
-
-        [CustomEqualsInternal]
-        private bool CustomEquals(WorkflowStep other)
-        {
-            return Transitions.EqualsDictionary(other.Transitions);
-        }
-
-        [CustomGetHashCode]
-        private int CustomHashCode()
-        {
-            return Transitions.DictionaryHashCode();
         }
     }
 }

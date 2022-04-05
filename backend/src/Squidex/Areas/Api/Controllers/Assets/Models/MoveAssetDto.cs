@@ -18,11 +18,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public DomainId ParentId { get; set; }
 
-        /// <summary>
-        /// The optional path to the folder.
-        /// </summary>
-        public string? ParentPath { get; set; }
-
         public MoveAsset ToCommand(DomainId id)
         {
             return SimpleMapper.Map(this, new MoveAsset { AssetId = id });

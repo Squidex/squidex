@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -84,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Null(enrichedEvent.User);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustNotHaveHappened();
         }
 
@@ -95,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var user = A.Dummy<IUser>();
 
-            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier))
+            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
                 .Returns(user);
 
             var @event =
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal(user, enrichedEvent.User);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -121,7 +120,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var user = A.Dummy<IUser>();
 
-            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier))
+            A.CallTo(() => userResolver.FindByIdAsync(actor.Identifier, default))
                 .Returns(user);
 
             var event1 =
@@ -145,7 +144,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(user, enrichedEvent1.User);
             Assert.Equal(user, enrichedEvent2.User);
 
-            A.CallTo(() => userResolver.FindByIdAsync(A<string>._))
+            A.CallTo(() => userResolver.FindByIdAsync(A<string>._, default))
                 .MustHaveHappenedOnceExactly();
         }
     }

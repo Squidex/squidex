@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Clusters;
@@ -38,8 +35,6 @@ namespace Squidex.Infrastructure.EventSourcing
         public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
             : base(database)
         {
-            Guard.NotNull(notifier, nameof(notifier));
-
             this.notifier = notifier;
         }
 
@@ -53,7 +48,8 @@ namespace Squidex.Infrastructure.EventSourcing
             return new MongoCollectionSettings { WriteConcern = WriteConcern.WMajority };
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection,
+            CancellationToken ct)
         {
             await collection.Indexes.CreateManyAsync(new[]
             {
@@ -62,12 +58,12 @@ namespace Squidex.Infrastructure.EventSourcing
                         .Ascending(x => x.Timestamp)),
                 new CreateIndexModel<MongoEventCommit>(
                     Index
-                        .Ascending(x => x.EventStream)
-                        .Ascending(x => x.Timestamp)),
+                        .Ascending(x => x.Timestamp)
+                        .Ascending(x => x.EventStream)),
                 new CreateIndexModel<MongoEventCommit>(
                     Index
-                        .Ascending(x => x.EventStream)
-                        .Descending(x => x.Timestamp)),
+                        .Descending(x => x.Timestamp)
+                        .Ascending(x => x.EventStream)),
                 new CreateIndexModel<MongoEventCommit>(
                     Index
                         .Ascending(x => x.EventStream)
@@ -78,10 +74,10 @@ namespace Squidex.Infrastructure.EventSourcing
                     })
             }, ct);
 
-            var clusterVersion = await Database.GetVersionAsync();
-            var clustered = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
+            var clusterVersion = await Database.GetMajorVersionAsync(ct);
+            var clusteredAsReplica = Database.Client.Cluster.Description.Type == ClusterType.ReplicaSet;
 
-            CanUseChangeStreams = clustered && clusterVersion >= new Version("4.0");
+            CanUseChangeStreams = clusteredAsReplica && clusterVersion >= 4;
         }
     }
 }

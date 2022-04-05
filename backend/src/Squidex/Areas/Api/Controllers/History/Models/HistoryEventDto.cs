@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -48,9 +48,11 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static HistoryEventDto FromHistoryEvent(ParsedHistoryEvent historyEvent)
+        public static HistoryEventDto FromDomain(ParsedHistoryEvent historyEvent)
         {
-            return SimpleMapper.Map(historyEvent, new HistoryEventDto { EventId = historyEvent.Id });
+            var result = SimpleMapper.Map(historyEvent, new HistoryEventDto { EventId = historyEvent.Id });
+
+            return result;
         }
     }
 }

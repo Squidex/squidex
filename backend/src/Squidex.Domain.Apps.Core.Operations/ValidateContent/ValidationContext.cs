@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -19,6 +18,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public IJsonSerializer JsonSerializer { get; }
 
+        public ResolvedComponents Components { get; }
+
         public DomainId ContentId { get; }
 
         public bool IsOptional { get; private set; }
@@ -28,11 +29,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             NamedId<DomainId> appId,
             NamedId<DomainId> schemaId,
             Schema schema,
+            ResolvedComponents components,
             DomainId contentId)
             : base(appId, schemaId, schema)
         {
             JsonSerializer = jsonSerializer;
 
+            Components = components;
             ContentId = contentId;
         }
 

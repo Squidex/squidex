@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -38,6 +38,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
         public FieldPropertiesDto Visit(BooleanFieldProperties properties, None args)
         {
             return SimpleMapper.Map(properties, new BooleanFieldPropertiesDto());
+        }
+
+        public FieldPropertiesDto Visit(ComponentFieldProperties properties, None args)
+        {
+            return SimpleMapper.Map(properties, new ComponentFieldPropertiesDto());
+        }
+
+        public FieldPropertiesDto Visit(ComponentsFieldProperties properties, None args)
+        {
+            return SimpleMapper.Map(properties, new ComponentsFieldPropertiesDto());
         }
 
         public FieldPropertiesDto Visit(DateTimeFieldProperties properties, None args)

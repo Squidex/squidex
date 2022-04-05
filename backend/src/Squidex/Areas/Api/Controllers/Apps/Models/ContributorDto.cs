@@ -1,11 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
@@ -39,14 +38,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string? Role { get; set; }
 
-        public static ContributorDto FromIdAndRole(string id, string role)
+        public static ContributorDto FromDomain(string id, string role)
         {
             var result = new ContributorDto { ContributorId = id, Role = role };
 
             return result;
         }
 
-        public ContributorDto WithUser(IDictionary<string, IUser> users)
+        public ContributorDto CreateUser(IDictionary<string, IUser> users)
         {
             if (users.TryGetValue(ContributorId, out var user))
             {
@@ -61,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return this;
         }
 
-        public ContributorDto WithLinks(Resources resources)
+        public ContributorDto CreateLinks(Resources resources)
         {
             if (!resources.IsUser(ContributorId))
             {

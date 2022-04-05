@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_skip_total_when_set_in_context()
+        public async Task Should_skip_total_if_set_in_context()
         {
             var q = await sut.ParseAsync(requestContext.Clone(b => b.WithoutTotal()), Q.Empty);
 
@@ -98,10 +97,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             Assert.Equal("FullText: 'Hello'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
         }
 
-        [Fact]
-        public async Task Should_apply_default_page_size()
+        [Theory]
+        [InlineData(0L)]
+        [InlineData(-1L)]
+        [InlineData(long.MaxValue)]
+        [InlineData(long.MinValue)]
+        public async Task Should_apply_default_take_size_if_not_defined(long take)
         {
-            var query = Q.Empty;
+            var query = Q.Empty.WithQuery(new ClrQuery { Take = take });
 
             var q = await sut.ParseAsync(requestContext, query);
 
@@ -109,7 +112,27 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_apply_default_limit()
+        public async Task Should_set_take_to_ids_count_if_take_not_defined()
+        {
+            var query = Q.Empty.WithIds("1, 2, 3");
+
+            var q = await sut.ParseAsync(requestContext, query);
+
+            Assert.Equal("Take: 3; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_not_set_take_to_ids_count_if_take_defined()
+        {
+            var query = Q.Empty.WithIds("1, 2, 3").WithQuery(new ClrQuery { Take = 20 });
+
+            var q = await sut.ParseAsync(requestContext, query);
+
+            Assert.Equal("Take: 20; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        }
+
+        [Fact]
+        public async Task Should_apply_default_take_limit()
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
@@ -142,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         }
 
         [Fact]
-        public async Task Should_not_fail_when_tags_not_found()
+        public async Task Should_not_fail_if_tags_not_found()
         {
             A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string>());

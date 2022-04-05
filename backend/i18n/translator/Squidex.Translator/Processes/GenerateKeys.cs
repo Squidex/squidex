@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes

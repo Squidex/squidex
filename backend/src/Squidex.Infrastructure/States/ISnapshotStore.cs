@@ -1,26 +1,30 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.States
 {
-    public interface ISnapshotStore<T, in TKey>
+    public interface ISnapshotStore<T>
     {
-        Task WriteAsync(TKey key, T value, long oldVersion, long newVersion);
+        Task WriteAsync(DomainId key, T value, long oldVersion, long newVersion,
+            CancellationToken ct = default);
 
-        Task<(T Value, long Version)> ReadAsync(TKey key);
+        Task WriteManyAsync(IEnumerable<(DomainId Key, T Value, long Version)> snapshots,
+            CancellationToken ct = default);
 
-        Task ClearAsync();
+        Task<(T Value, bool Valid, long Version)> ReadAsync(DomainId key,
+            CancellationToken ct = default);
 
-        Task RemoveAsync(TKey key);
+        Task ClearAsync(
+            CancellationToken ct = default);
 
-        Task ReadAllAsync(Func<T, long, Task> callback, CancellationToken ct = default);
+        Task RemoveAsync(DomainId key,
+            CancellationToken ct = default);
+
+        IAsyncEnumerable<(T State, long Version)> ReadAllAsync(
+            CancellationToken ct = default);
     }
 }

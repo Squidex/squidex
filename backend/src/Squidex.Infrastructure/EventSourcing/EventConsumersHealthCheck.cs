@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans;
 using Squidex.Infrastructure.EventSourcing.Grains;
@@ -21,12 +18,11 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public EventConsumersHealthCheck(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
             var eventConsumers = await GetGrain().GetConsumersAsync();
 

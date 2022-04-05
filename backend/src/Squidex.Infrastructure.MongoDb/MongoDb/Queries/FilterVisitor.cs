@@ -1,13 +1,12 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections;
-using System.Linq;
+using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
@@ -99,7 +98,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
                 return new BsonRegularExpression("null", "i");
             }
 
-            if (value.Length > 3 && (value[0] == '/' && value[^1] == '/' || value[^2] == '/'))
+            if (value.Length > 3 && ((value[0] == '/' && value[^1] == '/') || value[^2] == '/'))
             {
                 if (value[^1] == 'i')
                 {
@@ -116,7 +115,9 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
         private static BsonRegularExpression BuildRegex(CompareFilter<ClrValue> node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(node.Value.Value?.ToString() ?? "null"), "i");
+            var value = formatter(Regex.Escape(node.Value.Value?.ToString() ?? "null"));
+
+            return new BsonRegularExpression(value, "i");
         }
     }
 }

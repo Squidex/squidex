@@ -1,0 +1,126 @@
+$color-theme-brand:         #3389ff;
+$color-theme-brand-dark:    #3284f4;
+$color-theme-brand-darker:  #2f7deb;
+$color-border:              #dedfe3;
+
+@mixin position($t: null, $r: null, $b: null, $l: null) {
+    bottom: $b; left: $l; right: $r; top: $t;
+}
+
+@mixin absolute($t: null, $r: null, $b: null, $l: null) {
+    @include position($t, $r, $b, $l);
+    position: absolute;
+}
+
+@mixin fixed($t: null, $r: null, $b: null, $l: null) {
+    @include position($t, $r, $b, $l);
+    position: fixed;
+}
+
+.squidex {
+	* {
+		box-sizing: border-box;
+	}
+
+	&-overlay {
+		box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+		font-weight: normal;
+		position: fixed;
+
+		&-border {
+			border: 2px solid $color-theme-brand-dark;
+			border-radius: 0;
+			position: fixed;
+			pointer-events: none;
+			z-index: 100000;
+		}
+
+		&-toolbar {
+			color: #fff;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: normal;
+			position: fixed;
+			white-space: nowrap;
+			z-index: 100000;
+		}
+
+		&-schema,
+		&-links {
+			display: inline-block;
+			height: 30px;
+			padding: 3px 8px;
+			padding-top: 5px;
+		}
+
+		&-schema {
+			background-color: lighten($color-theme-brand-dark, 5%);
+			border: 0;
+			border-radius: 0;
+		}
+	
+		&-links {
+			background-color: $color-theme-brand-dark;
+			border: 0;
+			border-radius: 0;
+	
+			a {
+				margin-left: 7px;
+				text-overflow: inherit;
+				text-decoration: none;
+	
+				& {
+					color: #fff !important;
+				}
+	
+				&:hover {
+					text-decoration: underline !important;
+				}
+			}
+		}
+	}
+
+	&-iframe {
+		@include fixed(50px, 50px, 50px, 50px);
+		background-color: white;
+		border: 1px solid $color-border;
+		border-radius: 2px;
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+		z-index: 100000;
+
+		iframe {
+			@include absolute(0, 0, 0, 0);
+			min-width: 100%;
+			min-height: 100%;
+		}
+
+		&-close {
+			@include absolute(-15px, -15px);
+			align-items: center;
+			background-color: black;
+			border-radius: 20px;
+			border: 0;
+			box-shadow: 0 0 4px rgba(0, 0, 0, 0.9);
+			cursor: pointer;
+			display: flex;
+			max-height: 30px;
+			max-width: 30px;
+			min-height: 30px;
+			min-width: 30px;
+			justify-content: center;
+			transition: opacity .3s ease-in;
+			opacity: .7;
+			z-index: 1000;
+
+			&:hover {
+				box-shadow: 0 0 4px rgba(0, 0, 0, 1);
+				opacity: 1;
+			}
+
+			svg {
+				fill: white;
+			}
+		}
+	}
+}

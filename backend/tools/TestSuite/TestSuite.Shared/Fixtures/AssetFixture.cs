@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 
 namespace TestSuite.Fixtures
@@ -34,7 +30,7 @@ namespace TestSuite.Fixtures
 
                 response.EnsureSuccessStatusCode();
 
-                using (var stream = await response.Content.ReadAsStreamAsync())
+                await using (var stream = await response.Content.ReadAsStreamAsync())
                 {
                     await stream.CopyToAsync(temp);
                 }
@@ -47,7 +43,7 @@ namespace TestSuite.Fixtures
         {
             var fileInfo = new FileInfo(path);
 
-            using (var stream = fileInfo.OpenRead())
+            await using (var stream = fileInfo.OpenRead())
             {
                 var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo.Extension), asset.MimeType);
 
@@ -59,7 +55,7 @@ namespace TestSuite.Fixtures
         {
             var fileInfo = new FileInfo(path);
 
-            using (var stream = fileInfo.OpenRead())
+            await using (var stream = fileInfo.OpenRead())
             {
                 var upload = new FileParameter(stream, fileName ?? RandomName(fileInfo.Extension), mimeType);
 

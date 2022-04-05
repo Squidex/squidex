@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
@@ -15,10 +14,10 @@ namespace Squidex.Infrastructure
     {
         public string Id { get; }
 
-        public DomainObjectException(string message, string id, Exception? inner = null)
-            : base(message, inner)
+        public DomainObjectException(string message, string id, string errorCode, Exception? inner = null)
+            : base(message, errorCode, inner)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
             Id = id;
         }

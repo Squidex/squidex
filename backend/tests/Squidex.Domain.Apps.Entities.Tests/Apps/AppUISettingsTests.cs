@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_retrieving_settings()
+        public async Task Should_call_grain_if_retrieving_settings()
         {
             var settings = JsonValue.Object();
 
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_setting_value()
+        public async Task Should_call_grain_if_setting_value()
         {
             var value = JsonValue.Object();
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_replacing_settings()
+        public async Task Should_call_grain_if_replacing_settings()
         {
             var value = JsonValue.Object();
 
@@ -65,11 +65,33 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task Should_call_grain_when_removing_value()
+        public async Task Should_call_grain_if_removing_value()
         {
             await sut.RemoveAsync(DomainId.NewGuid(), "user", "the.path");
 
             A.CallTo(() => grain.RemoveAsync("the.path"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_clear_grain_when_app_deleted()
+        {
+            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+
+            await ((IDeleter)sut).DeleteAppAsync(app, default);
+
+            A.CallTo(() => grain.ClearAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_clear_grain_when_contributor_removed()
+        {
+            var app = Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app"));
+
+            await ((IDeleter)sut).DeleteContributorAsync(app.Id, "user1", default);
+
+            A.CallTo(() => grain.ClearAsync())
                 .MustHaveHappened();
         }
     }

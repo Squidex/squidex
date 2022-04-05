@@ -1,28 +1,27 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public abstract class FieldProperties : NamedElementPropertiesBase
+    public abstract record FieldProperties : NamedElementPropertiesBase
     {
-        public bool IsRequired { get; set; }
+        public bool IsRequired { get; init; }
 
-        public bool IsRequiredOnPublish { get; set; }
+        public bool IsRequiredOnPublish { get; init; }
 
-        public bool IsHalfWidth { get; set; }
+        public bool IsHalfWidth { get; init; }
 
-        public string? Placeholder { get; set; }
+        public string? Placeholder { get; init; }
 
-        public string? EditorUrl { get; set; }
+        public string? EditorUrl { get; init; }
 
-        public ReadOnlyCollection<string>? Tags { get; set; }
+        public ReadonlyList<string>? Tags { get; init; }
 
         public abstract T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args);
 

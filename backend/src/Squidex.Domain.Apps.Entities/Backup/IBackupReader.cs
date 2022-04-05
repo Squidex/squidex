@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
@@ -19,10 +16,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         int ReadEvents { get; }
 
-        Task ReadBlobAsync(string name, Func<Stream, Task> handler);
+        Task<Stream> OpenBlobAsync(string name,
+            CancellationToken ct = default);
 
-        Task ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter, Func<(string Stream, Envelope<IEvent> Event), Task> handler);
+        Task<T> ReadJsonAsync<T>(string name,
+            CancellationToken ct = default);
 
-        Task<T> ReadJsonAsync<T>(string name);
+        Task<bool> HasFileAsync(string name,
+            CancellationToken ct = default);
+
+        IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(IStreamNameResolver streamNameResolver, IEventDataFormatter formatter,
+            CancellationToken ct = default);
     }
 }

@@ -1,0 +1,50 @@
+<div [formGroup]="fieldForm">
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.dateTime.rangeMin' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-date-time-editor [enforceTime]="true" mode="DateTime" formControlName="minValue"></sqx-date-time-editor>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.dateTime.rangeMax' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-date-time-editor [enforceTime]="true" mode="DateTime" formControlName="maxValue"></sqx-date-time-editor>
+        </div>
+    </div>
+
+    <ng-container *ngIf="showDefaultValues | async">
+        <div class="form-group row">
+            <label class="col-3 col-form-label">{{ 'schemas.fieldTypes.dateTime.defaultMode' | sqxTranslate }}</label>
+
+            <div class="col-3">
+                <select class="form-select" formControlName="calculatedDefaultValue">
+                    <option></option>
+                    <option *ngFor="let value of calculatedDefaultValues" [ngValue]="value">{{value}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row" *ngIf="showDefaultValue | async">
+            <label class="col-3 col-form-label">{{ 'schemas.field.defaultValue' | sqxTranslate }}</label>
+
+            <div class="col-9">
+                <sqx-date-time-editor [enforceTime]="true" mode="DateTime" formControlName="defaultValue"></sqx-date-time-editor>
+            </div>
+        </div>
+
+        <div class="form-group row" *ngIf="isLocalizable">
+            <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValues">{{ 'schemas.field.defaultValues' | sqxTranslate }}</label>
+    
+            <div class="col-9">
+                <sqx-localized-input type="datetime" [languages]="languages" formControlName="defaultValues" id="{{field.fieldId}}_fieldDefaultValues"></sqx-localized-input>
+
+                <sqx-form-hint>
+                    {{ 'schemas.field.defaultValuesHint' | sqxTranslate }}
+                </sqx-form-hint>
+            </div>
+        </div>
+    </ng-container>
+</div>

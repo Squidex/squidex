@@ -5,21 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
+    [BsonIgnoreExtraElements]
     public sealed class MongoSchemasHashEntity
     {
         [BsonId]
         [BsonElement]
-        public string AppId { get; set; }
-
-        [BsonRequired]
-        [BsonElement("v")]
-        public long AppVersion { get; set; }
+        public DomainId AppId { get; set; }
 
         [BsonRequired]
         [BsonElement("s")]

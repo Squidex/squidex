@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
-using System.Threading;
 using Squidex.Caching;
 
 namespace Squidex.Infrastructure.Orleans
@@ -57,7 +55,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public void Register(Type grainType, IDeactivater deactivater, int maxActivations)
         {
-            var byType = instances.GetOrAdd(grainType, t => new LastUsedInstances(maxActivations));
+            var byType = instances.GetOrAdd(grainType, maxActivations, (t, a) => new LastUsedInstances(a));
 
             byType.Register(deactivater);
         }

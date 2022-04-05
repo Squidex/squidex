@@ -1,14 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -33,39 +29,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public ResolveReferences(Lazy<IContentQueryService> contentQuery, IRequestCache requestCache)
         {
-            Guard.NotNull(contentQuery, nameof(contentQuery));
-            Guard.NotNull(requestCache, nameof(requestCache));
-
             this.contentQuery = contentQuery;
 
             this.requestCache = requestCache;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
-            if (ShouldEnrich(context))
+            if (!ShouldEnrich(context))
             {
-                var ids = new HashSet<DomainId>();
+                return;
+            }
 
-                foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
-                {
-                    var schema = await schemas(group.Key);
+            var ids = new HashSet<DomainId>();
 
-                    AddReferenceIds(ids, schema, group);
-                }
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var (schema, components) = await schemas(group.Key);
 
-                var references = await GetReferencesAsync(context, ids);
+                AddReferenceIds(ids, schema, components, group);
+            }
 
-                foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
-                {
-                    var schema = await schemas(group.Key);
+            var references = await GetReferencesAsync(context, ids, ct);
 
-                    await ResolveReferencesAsync(context, schema, group, references, schemas);
-                }
+            foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
+            {
+                var (schema, components) = await schemas(group.Key);
+
+                await ResolveReferencesAsync(context, schema, components, group, references, schemas);
             }
         }
 
-        private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references, ProvideSchema schemas)
+        private async Task ResolveReferencesAsync(Context context, ISchemaEntity schema, ResolvedComponents components,
+            IEnumerable<ContentEntity> contents, ILookup<DomainId, IEnrichedContentEntity> references, ProvideSchema schemas)
         {
             var formatted = new Dictionary<IContentEntity, JsonObject>();
 
@@ -84,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                             foreach (var (partition, partitionValue) in fieldData)
                             {
                                 var referencedContents =
-                                    field.GetReferencedIds(partitionValue)
+                                    field.GetReferencedIds(partitionValue, components)
                                         .Select(x => references[x])
                                         .SelectMany(x => x)
                                         .ToList();
@@ -93,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                                 {
                                     var reference = referencedContents[0];
 
-                                    var referencedSchema = await schemas(reference.SchemaId.Id);
+                                    var (referencedSchema, _) = await schemas(reference.SchemaId.Id);
 
                                     requestCache.AddDependency(referencedSchema.UniqueId, referencedSchema.Version);
                                     requestCache.AddDependency(reference.UniqueId, reference.Version);
@@ -138,15 +135,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
             return value;
         }
 
-        private static void AddReferenceIds(HashSet<DomainId> ids, ISchemaEntity schema, IEnumerable<ContentEntity> contents)
+        private static void AddReferenceIds(HashSet<DomainId> ids, ISchemaEntity schema, ResolvedComponents components, IEnumerable<ContentEntity> contents)
         {
             foreach (var content in contents)
             {
-                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids);
+                content.Data.AddReferencedIds(schema.SchemaDef.ResolvingReferences(), ids, components);
             }
         }
 
-        private async Task<ILookup<DomainId, IEnrichedContentEntity>> GetReferencesAsync(Context context, HashSet<DomainId> ids)
+        private async Task<ILookup<DomainId, IEnrichedContentEntity>> GetReferencesAsync(Context context, HashSet<DomainId> ids,
+            CancellationToken ct)
         {
             if (ids.Count == 0)
             {
@@ -157,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
                 .WithoutContentEnrichment(true)
                 .WithoutTotal());
 
-            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids));
+            var references = await ContentQuery.QueryAsync(queryContext, Q.Empty.WithIds(ids), ct);
 
             return references.ToLookup(x => x.Id);
         }

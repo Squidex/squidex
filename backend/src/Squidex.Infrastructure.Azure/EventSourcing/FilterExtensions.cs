@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
@@ -22,7 +24,8 @@ namespace Squidex.Infrastructure.EventSourcing
             EnableCrossPartitionQuery = true
         };
 
-        public static async Task<T?> FirstOrDefaultAsync<T>(this IQueryable<T> queryable, CancellationToken ct = default)
+        public static async Task<T?> FirstOrDefaultAsync<T>(this IQueryable<T> queryable,
+            CancellationToken ct = default)
         {
             var documentQuery = queryable.AsDocumentQuery();
 
@@ -39,28 +42,70 @@ namespace Squidex.Infrastructure.EventSourcing
             return default!;
         }
 
-        public static Task QueryAsync(this DocumentClient documentClient, Uri collectionUri, SqlQuerySpec querySpec, Func<CosmosDbEventCommit, Task> handler, CancellationToken ct = default)
+        public static async IAsyncEnumerable<CosmosDbEventCommit> QueryAsync(this DocumentClient documentClient, Uri collectionUri, SqlQuerySpec querySpec,
+            [EnumeratorCancellation] CancellationToken ct = default)
         {
             var query = documentClient.CreateDocumentQuery<CosmosDbEventCommit>(collectionUri, querySpec, CrossPartition);
 
-            return query.QueryAsync(handler, ct);
-        }
-
-        public static async Task QueryAsync<T>(this IQueryable<T> queryable, Func<T, Task> handler, CancellationToken ct = default)
-        {
-            var documentQuery = queryable.AsDocumentQuery();
+            var documentQuery = query.AsDocumentQuery();
 
             using (documentQuery)
             {
                 while (documentQuery.HasMoreResults && !ct.IsCancellationRequested)
                 {
-                    var items = await documentQuery.ExecuteNextAsync<T>(ct);
+                    var items = await documentQuery.ExecuteNextAsync<CosmosDbEventCommit>(ct);
 
                     foreach (var item in items)
                     {
-                        await handler(item);
+                        yield return item;
                     }
                 }
+            }
+        }
+
+        public static IEnumerable<StoredEvent> Filtered(this CosmosDbEventCommit commit, StreamPosition lastPosition)
+        {
+            var eventStreamOffset = commit.EventStreamOffset;
+
+            var commitTimestamp = commit.Timestamp;
+            var commitOffset = 0;
+
+            foreach (var @event in commit.Events)
+            {
+                eventStreamOffset++;
+
+                if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
+                {
+                    var eventData = @event.ToEventData();
+                    var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
+
+                    yield return new StoredEvent(commit.EventStream, eventPosition, eventStreamOffset, eventData);
+                }
+
+                commitOffset++;
+            }
+        }
+
+        public static IEnumerable<StoredEvent> Filtered(this CosmosDbEventCommit commit, long streamPosition = EtagVersion.Empty)
+        {
+            var eventStreamOffset = commit.EventStreamOffset;
+
+            var commitTimestamp = commit.Timestamp;
+            var commitOffset = 0;
+
+            foreach (var @event in commit.Events)
+            {
+                eventStreamOffset++;
+
+                if (eventStreamOffset >= streamPosition)
+                {
+                    var eventData = @event.ToEventData();
+                    var eventPosition = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
+
+                    yield return new StoredEvent(commit.EventStream, eventPosition, eventStreamOffset, eventData);
+                }
+
+                commitOffset++;
             }
         }
     }

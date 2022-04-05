@@ -1,12 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Namotion.Reflection;
 using NSwag;
@@ -17,7 +15,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {
-        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) =&gt; (?<Description>.*)", RegexOptions.Compiled);
+        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3})[\\s]*=((&gt;)|>)[\\s]*(?<Description>.*)", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         public bool Process(OperationProcessorContext context)
         {
@@ -40,7 +38,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                     var description = match.Groups["Description"].Value;
 
-                    if (description.Contains("=&gt;"))
+                    if (description.Contains("=&gt;", StringComparison.Ordinal))
                     {
                         throw new InvalidOperationException("Description not formatted correcly.");
                     }

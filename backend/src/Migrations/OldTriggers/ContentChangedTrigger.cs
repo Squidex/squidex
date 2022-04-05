@@ -1,24 +1,22 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
 namespace Migrations.OldTriggers
 {
     [TypeName(nameof(ContentChangedTrigger))]
-    public sealed class ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
+    public sealed record ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
     {
-        public ReadOnlyCollection<ContentChangedTriggerSchema> Schemas { get; set; }
+        public ReadonlyList<ContentChangedTriggerSchema> Schemas { get; set; }
 
         public bool HandleAll { get; set; }
 
@@ -27,22 +25,9 @@ namespace Migrations.OldTriggers
             throw new NotSupportedException();
         }
 
-        public override void Freeze()
-        {
-            base.Freeze();
-
-            if (Schemas != null)
-            {
-                foreach (var schema in Schemas)
-                {
-                    schema.Freeze();
-                }
-            }
-        }
-
         public RuleTrigger Migrate()
         {
-            var schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(Schemas.Select(x => x.Migrate()).ToList());
+            var schemas = Schemas.Select(x => x.Migrate()).ToReadonlyList();
 
             return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
         }

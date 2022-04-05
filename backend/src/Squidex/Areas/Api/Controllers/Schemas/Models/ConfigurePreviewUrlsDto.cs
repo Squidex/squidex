@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         {
             return new ConfigurePreviewUrls
             {
-                PreviewUrls = new Dictionary<string, string>(this)
+                PreviewUrls = new Dictionary<string, string>(this).ToReadonlyDictionary()
             };
         }
     }

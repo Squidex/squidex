@@ -9,7 +9,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public sealed class RuleActionProperty
     {
-        public RuleActionPropertyEditor Editor { get; set; }
+        public RuleFieldEditor Editor { get; set; }
 
         public string Name { get; set; }
 

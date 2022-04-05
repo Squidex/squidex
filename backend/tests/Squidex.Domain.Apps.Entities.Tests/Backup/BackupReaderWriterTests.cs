@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+using System.Globalization;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Xunit;
@@ -49,10 +47,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 try
                 {
-                    await writer.WriteBlobAsync(file, _ =>
+                    await using (var stream = await writer.OpenBlobAsync(file))
                     {
                         throw new InvalidOperationException();
-                    });
+                    }
                 }
                 catch
                 {
@@ -61,6 +59,42 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }, async reader =>
             {
                 await Assert.ThrowsAsync<FileNotFoundException>(() => ReadGuidAsync(reader, file));
+            });
+        }
+
+        [Fact]
+        public async Task Should_return_true_if_file_exists()
+        {
+            var file = "File.json";
+
+            var value = Guid.NewGuid();
+
+            await TestReaderWriterAsync(BackupVersion.V1, async writer =>
+            {
+                await WriteJsonGuidAsync(writer, file, value);
+            }, async reader =>
+            {
+                var hasFile = await reader.HasFileAsync(file);
+
+                Assert.True(hasFile);
+            });
+        }
+
+        [Fact]
+        public async Task Should_return_file_if_file_does_not_exist()
+        {
+            var file = "File.json";
+
+            var value = Guid.NewGuid();
+
+            await TestReaderWriterAsync(BackupVersion.V1, async writer =>
+            {
+                await Task.Yield();
+            }, async reader =>
+            {
+                var hasFile = await reader.HasFileAsync(file);
+
+                Assert.False(hasFile);
             });
         }
 
@@ -120,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 return Task.CompletedTask;
             }, async reader =>
             {
-                await Assert.ThrowsAsync<FileNotFoundException>(() => reader.ReadBlobAsync("404", s => Task.CompletedTask));
+                await Assert.ThrowsAsync<FileNotFoundException>(() => reader.OpenBlobAsync("404"));
             });
         }
 
@@ -150,8 +184,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 var envelope = Envelope.Create(@event);
 
-                envelope.Headers.Add("Id", @event.Id.ToString());
-                envelope.Headers.Add("Index", i);
+                envelope.Headers.Add("Id", JsonValue.Create(@event.Id));
+                envelope.Headers.Add("Index", JsonValue.Create(i));
 
                 sourceEvents.Add(($"My-{RandomDomainId()}", envelope));
             }
@@ -163,15 +197,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     var eventData = formatter.ToEventData(envelope, Guid.NewGuid(), true);
                     var eventStored = new StoredEvent(stream, "1", 2, eventData);
 
-                    var index = int.Parse(envelope.Headers["Index"].ToString());
+                    var index = int.Parse(envelope.Headers["Index"].ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture);
 
                     if (index % 17 == 0)
                     {
-                        await WriteGuidAsync(writer, index.ToString(), envelope.Payload.Id);
+                        await WriteGuidAsync(writer, index.ToString(CultureInfo.InvariantCulture), envelope.Payload.Id);
                     }
                     else if (index % 37 == 0)
                     {
-                        await WriteJsonGuidAsync(writer, index.ToString(), envelope.Payload.Id);
+                        await WriteJsonGuidAsync(writer, index.ToString(CultureInfo.InvariantCulture), envelope.Payload.Id);
                     }
 
                     writer.WriteEvent(eventStored);
@@ -180,27 +214,27 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var targetEvents = new List<(string Stream, Envelope<IEvent> Event)>();
 
-                await reader.ReadEventsAsync(streamNameResolver, formatter, async @event =>
+                await foreach (var @event in reader.ReadEventsAsync(streamNameResolver, formatter))
                 {
-                    var index = int.Parse(@event.Event.Headers["Index"].ToString());
+                    var index = int.Parse(@event.Event.Headers["Index"].ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture);
 
                     var id = Guid.Parse(@event.Event.Headers["Id"].ToString());
 
                     if (index % 17 == 0)
                     {
-                        var guid = await ReadGuidAsync(reader, index.ToString());
+                        var guid = await ReadGuidAsync(reader, index.ToString(CultureInfo.InvariantCulture));
 
                         Assert.Equal(id, guid);
                     }
                     else if (index % 37 == 0)
                     {
-                        var guid = await ReadJsonGuidAsync(reader, index.ToString());
+                        var guid = await ReadJsonGuidAsync(reader, index.ToString(CultureInfo.InvariantCulture));
 
                         Assert.Equal(id, guid);
                     }
 
                     targetEvents.Add(@event);
-                });
+                }
 
                 for (var i = 0; i < targetEvents.Count; i++)
                 {
@@ -226,26 +260,26 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return writer.WriteJsonAsync(file, value);
         }
 
-        private static Task WriteGuidAsync(IBackupWriter writer, string file, Guid value)
+        private static async Task WriteGuidAsync(IBackupWriter writer, string file, Guid value)
         {
-            return writer.WriteBlobAsync(file, async stream =>
+            await using (var stream = await writer.OpenBlobAsync(file))
             {
                 await stream.WriteAsync(value.ToByteArray());
-            });
+            }
         }
 
         private static async Task<Guid> ReadGuidAsync(IBackupReader reader, string file)
         {
             var read = Guid.Empty;
 
-            await reader.ReadBlobAsync(file, async stream =>
+            await using (var stream = await reader.OpenBlobAsync(file))
             {
                 var buffer = new byte[16];
 
-                await stream.ReadAsync(buffer);
+                _ = await stream.ReadAsync(buffer);
 
                 read = new Guid(buffer);
-            });
+            }
 
             return read;
         }

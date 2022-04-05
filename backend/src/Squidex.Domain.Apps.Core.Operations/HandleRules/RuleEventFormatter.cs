@@ -3,20 +3,16 @@
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
-// =========================================-=================================
+// ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Templates;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Text;
 using ValueTaskSupplement;
@@ -26,8 +22,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public class RuleEventFormatter
     {
         private const string GlobalFallback = "null";
-        private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled);
-        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled);
+        private static readonly Regex RegexPatternOld = new Regex(@"^(?<FullPath>(?<Type>[^_]*)_(?<Path>[^\s]*))", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private static readonly Regex RegexPatternNew = new Regex(@"^\{(?<FullPath>(?<Type>[\w]+)_(?<Path>[\w\.\-]+))[\s]*(\|[\s]*(?<Transform>[^\?}]+))?(\?[\s]*(?<Fallback>[^\}\s]+))?[\s]*\}", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
         private readonly IJsonSerializer jsonSerializer;
         private readonly IEnumerable<IRuleEventFormatter> formatters;
         private readonly ITemplateEngine templateEngine;
@@ -72,11 +68,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public RuleEventFormatter(IJsonSerializer jsonSerializer, IEnumerable<IRuleEventFormatter> formatters, ITemplateEngine templateEngine, IScriptEngine scriptEngine)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
-            Guard.NotNull(templateEngine, nameof(templateEngine));
-            Guard.NotNull(formatters, nameof(formatters));
-
             this.jsonSerializer = jsonSerializer;
             this.formatters = formatters;
             this.templateEngine = templateEngine;
@@ -112,12 +103,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             if (TryGetScript(text.Trim(), out var script))
             {
-                var vars = new ScriptVars
+                // Script vars are just wrappers over dictionaries for better performance.
+                var vars = new EventScriptVars
                 {
-                    ["event"] = @event
+                    Event = @event
                 };
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
                 var result = scriptEngine.Execute(vars, script).ToString();
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
 
                 if (result == "undefined")
                 {
@@ -291,7 +285,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                                 if (instant.Success)
                                 {
-                                    text = instant.Value.ToUnixTimeMilliseconds().ToString();
+                                    text = instant.Value.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture);
                                 }
 
                                 break;
@@ -303,7 +297,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                                 if (instant.Success)
                                 {
-                                    text = instant.Value.ToUnixTimeSeconds().ToString();
+                                    text = instant.Value.ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
                                 }
 
                                 break;

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 using TestSuite.Model;
@@ -38,7 +36,7 @@ namespace TestSuite.ApiTests
             // STEP 2: Create a content with a reference.
             var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
-            var contentB_1 = await _.Contents.CreateAsync(dataB, true);
+            var contentB_1 = await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Query new item
@@ -48,7 +46,10 @@ namespace TestSuite.ApiTests
 
 
             // STEP 4: Publish reference
-            await _.Contents.ChangeStatusAsync(contentA_1.Id, "Published");
+            await _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
+            {
+                Status = "Published"
+            });
 
 
             // STEP 5: Query new item again
@@ -63,21 +64,24 @@ namespace TestSuite.ApiTests
             // STEP 1: Create a referenced content.
             var dataA = new TestEntityWithReferencesData();
 
-            var contentA_1 = await _.Contents.CreateAsync(dataA, true);
+            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a content with a reference.
             var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
-            await _.Contents.CreateAsync(dataB, true);
+            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Try to delete with referrer check.
-            await Assert.ThrowsAsync<SquidexException>(() => _.Contents.DeleteAsync(contentA_1.Id, checkReferrers: true));
+            await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.DeleteAsync(contentA_1.Id, new ContentDeleteOptions
+            {
+                CheckReferrers = true
+            }));
 
 
             // STEP 4: Delete without referrer check
-            await _.Contents.DeleteAsync(contentA_1.Id, checkReferrers: false);
+            await _.Contents.DeleteAsync(contentA_1.Id);
         }
 
         [Fact]
@@ -86,17 +90,17 @@ namespace TestSuite.ApiTests
             // STEP 1: Create a published referenced content.
             var dataA = new TestEntityWithReferencesData();
 
-            var contentA_1 = await _.Contents.CreateAsync(dataA, true);
+            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a content with a reference.
             var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
-            await _.Contents.CreateAsync(dataB, true);
+            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
 
 
-            // STEP 3: Try to delete with referrer check.
-            await Assert.ThrowsAsync<SquidexException>(() => _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
+            // STEP 3: Try to ThrowsAnyAsync with referrer check.
+            await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
             {
                 Status = "Draft",
                 CheckReferrers = true
@@ -117,13 +121,13 @@ namespace TestSuite.ApiTests
             // STEP 1: Create a referenced content.
             var dataA = new TestEntityWithReferencesData();
 
-            var contentA_1 = await _.Contents.CreateAsync(dataA, true);
+            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a content with a reference.
             var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
-            await _.Contents.CreateAsync(dataB, true);
+            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Try to delete with referrer check.
@@ -168,13 +172,13 @@ namespace TestSuite.ApiTests
             // STEP 1: Create a published referenced content.
             var dataA = new TestEntityWithReferencesData();
 
-            var contentA_1 = await _.Contents.CreateAsync(dataA, true);
+            var contentA_1 = await _.Contents.CreateAsync(dataA, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create a published content with a reference.
             var dataB = new TestEntityWithReferencesData { References = new[] { contentA_1.Id } };
 
-            await _.Contents.CreateAsync(dataB, true);
+            await _.Contents.CreateAsync(dataB, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Try to delete with referrer check.

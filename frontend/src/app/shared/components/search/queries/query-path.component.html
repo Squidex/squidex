@@ -1,0 +1,23 @@
+<sqx-dropdown
+    searchProperty="path"
+    [disabled]="model.schema.fields.length === 0"
+    [items]="model.schema.fields"
+    [itemSeparator]="true"
+    [ngModel]="field"
+    (ngModelChange)="pathChange.emit($event?.path)"
+    [dropdownStyles]="{ maxWidth: '40rem' }">
+    <ng-template let-field="$implicit">
+        <div class="row">
+            <div class="col-auto">
+                <div class="badge rounded-pill badge-primary">{{field.path}}</div>
+            </div>
+            <div class="col text-end">
+                <sqx-form-hint>{{field.description}}</sqx-form-hint>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template let-field="$implicit">
+        {{field.path}}
+    </ng-template>
+</sqx-dropdown>

@@ -5,26 +5,26 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class FieldNames : ReadOnlyCollection<string>
+    public sealed class FieldNames : ReadonlyList<string>
     {
-        private static readonly List<string> EmptyNames = new List<string>();
+        public static readonly FieldNames Empty = new FieldNames(new List<string>());
 
-        public static readonly FieldNames Empty = new FieldNames(EmptyNames);
-
-        public FieldNames(params string[] fields)
-            : base(fields?.ToList() ?? EmptyNames)
+        public FieldNames()
         {
         }
 
         public FieldNames(IList<string> list)
-            : base(list ?? EmptyNames)
+            : base(list)
         {
+        }
+
+        public static FieldNames Create(params string[] names)
+        {
+            return new FieldNames(names.ToList());
         }
 
         public FieldNames Add(string field)

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using NodaTime;
@@ -24,10 +23,6 @@ namespace Squidex.Web.Pipeline
 
         public UsageMiddleware(IAppLogStore usageLog, IApiUsageTracker usageTracker, IClock clock)
         {
-            Guard.NotNull(usageLog, nameof(usageLog));
-            Guard.NotNull(usageTracker, nameof(usageTracker));
-            Guard.NotNull(clock, nameof(clock));
-
             this.usageLog = usageLog;
             this.usageTracker = usageTracker;
 
@@ -39,7 +34,6 @@ namespace Squidex.Web.Pipeline
             var usageBody = SetUsageBody(context);
 
             var watch = ValueStopwatch.StartNew();
-
             try
             {
                 await next(context);
@@ -48,7 +42,7 @@ namespace Squidex.Web.Pipeline
             {
                 if (context.Response.StatusCode != StatusCodes.Status429TooManyRequests)
                 {
-                    var appId = context.Features.Get<IAppFeature>()?.AppId;
+                    var appId = context.Features.Get<IAppFeature>()?.App.Id;
 
                     if (appId != null)
                     {
@@ -64,25 +58,30 @@ namespace Squidex.Web.Pipeline
                         var request = default(RequestLog);
 
                         request.Bytes = bytes;
+                        request.CacheStatus = "MISS";
+                        request.CacheHits = 0;
                         request.Costs = context.Features.Get<IApiCostsFeature>()?.Costs ?? 0;
                         request.ElapsedMs = watch.Stop();
                         request.RequestMethod = context.Request.Method;
                         request.RequestPath = context.Request.Path;
                         request.Timestamp = clock.GetCurrentInstant();
-                        request.UserClientId = clientId;
+                        request.StatusCode = context.Response.StatusCode;
                         request.UserId = context.User.OpenIdSubject();
+                        request.UserClientId = clientId;
 
-                        await usageLog.LogAsync(appId.Id, request);
+                        // Do not flow cancellation token because it is too important.
+                        await usageLog.LogAsync(appId.Value, request, default);
 
                         if (request.Costs > 0)
                         {
                             var date = request.Timestamp.ToDateTimeUtc().Date;
 
-                            await usageTracker.TrackAsync(date, appId.Id.ToString(),
+                            await usageTracker.TrackAsync(date, appId.Value.ToString(),
                                 request.UserClientId,
                                 request.Costs,
                                 request.ElapsedMs,
-                                request.Bytes);
+                                request.Bytes,
+                                default);
                         }
                     }
                 }
@@ -91,7 +90,7 @@ namespace Squidex.Web.Pipeline
 
         private static UsageResponseBodyFeature SetUsageBody(HttpContext context)
         {
-            var originalBodyFeature = context.Features.Get<IHttpResponseBodyFeature>();
+            var originalBodyFeature = context.Features.Get<IHttpResponseBodyFeature>()!;
 
             var usageBody = new UsageResponseBodyFeature(originalBodyFeature);
 

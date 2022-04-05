@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -22,6 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
             public NamedId<DomainId> AppId { get; set; }
 
             public Rule RuleDef { get; set; }
+
+            public bool IsDeleted { get; set; }
 
             [IgnoreDataMember]
             public DomainId UniqueId
@@ -62,6 +64,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject
                             if (e.Name != null)
                             {
                                 RuleDef = RuleDef.Rename(e.Name);
+                            }
+
+                            if (e.IsEnabled == true)
+                            {
+                                RuleDef = RuleDef.Enable();
+                            }
+                            else if (e.IsEnabled == false)
+                            {
+                                RuleDef = RuleDef.Disable();
                             }
 
                             break;

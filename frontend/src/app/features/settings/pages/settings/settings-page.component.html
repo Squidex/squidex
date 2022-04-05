@@ -1,0 +1,149 @@
+<sqx-title message="i18n:appSettings.title"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:appSettings.title" titleIcon="patterns" [innerWidth]="55">
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary me-2" (click)="reload()" title="i18n:appSettings.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        </button>
+
+        <button type="submit" class="float-end btn btn-primary" [disabled]="!isEditable" (click)="save()">
+            {{ 'common.save' | sqxTranslate }}
+        </button>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view innerWidth="55rem">
+            <h5>{{ 'appSettings.patterns.title' | sqxTranslate }}</h5>
+
+            <sqx-form-hint>
+                {{ 'appSettings.patterns.description' | sqxTranslate }}
+            </sqx-form-hint>
+    
+            <div class="card card-body mb-4">
+                <div class="content">
+                    <div class="mt-4" *ngIf="!isEditable && editForm.patternsControls.length === 0">
+                        {{ 'appSettings.patterns.empty' | sqxTranslate }}
+                    </div>
+    
+                    <div class="form-group row gx-2" *ngFor="let form of editForm.patternsControls; let i = index" [formGroup]="form">
+                        <div class="col-3">
+                            <sqx-control-errors for="name"></sqx-control-errors>
+    
+                            <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'common.name' | sqxTranslate }}">
+                        </div>
+    
+                        <div class="col">
+                            <sqx-control-errors for="regex"></sqx-control-errors>
+    
+                            <input type="text" class="form-control" maxlength="1000" formControlName="regex" placeholder="{{ 'common.pattern' | sqxTranslate }}">
+                        </div>
+    
+                        <div class="col-4">
+                            <sqx-control-errors for="message"></sqx-control-errors>
+    
+                            <input type="text" class="form-control" maxlength="1000" formControlName="message" placeholder="{{ 'common.message' | sqxTranslate }}">
+                        </div>
+    
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
+                                (sqxConfirmClick)="editForm.patterns.removeAt(i)"
+                                confirmTitle="i18n:appSettings.patterns.deleteConfirmTitle"
+                                confirmText="i18n:appSettings.patterns.deleteConfirmText"
+                                confirmRememberKey="deletePattern">
+                                <i class="icon-bin2"></i>
+                            </button>
+                        </div>
+                    </div>
+    
+                    <div class="form-group row gx-2" *ngIf="isEditable">
+                        <div class="col-3 col-action">
+                            <div class="form-control preview">{{ 'common.name' | sqxTranslate }}</div>
+                        </div>
+    
+                        <div class="col">
+                            <div class="form-control preview">{{ 'common.pattern' | sqxTranslate }}</div>
+                        </div>
+    
+                        <div class="col-4">
+                            <div class="form-control preview">{{ 'common.message' | sqxTranslate }}</div>
+                        </div>
+    
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success" (click)="editForm.patterns.add()">
+                                <i class="icon-add"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h5 class="mt-2">{{ 'appSettings.editors.title' | sqxTranslate }}</h5>
+    
+            <sqx-form-hint>
+                {{ 'appSettings.editors.description' | sqxTranslate }}
+            </sqx-form-hint>
+    
+            <div class="card card-body mb-4">
+                <div class="content">
+                    <div class="mt-4" *ngIf="!isEditable && editForm.editorsControls.length === 0">
+                        {{ 'appSettings.editors.empty' | sqxTranslate }}
+                    </div>
+    
+                    <div class="form-group row gx-2" *ngFor="let form of editForm.editorsControls; let i = index" [formGroup]="form">
+                        <div class="col-3 ">
+                            <sqx-control-errors for="name"></sqx-control-errors>
+    
+                            <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'common.name' | sqxTranslate }}">
+                        </div>
+    
+                        <div class="col ">
+                            <sqx-control-errors for="url"></sqx-control-errors>
+    
+                            <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="{{ 'common.url' | sqxTranslate }}">
+                        </div>
+    
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
+                                (sqxConfirmClick)="editForm.editors.removeAt(i)"
+                                confirmTitle="i18n:appSettings.editors.deleteConfirmTitle"
+                                confirmText="i18n:appSettings.editors.deleteConfirmText"
+                                confirmRememberKey="deleteEditor">
+                                <i class="icon-bin2"></i>
+                            </button>
+                        </div>
+                    </div>
+    
+                    <div class="form-group row gx-2" *ngIf="isEditable">
+                        <div class="col-3 ">
+                            <div class="form-control preview">{{ 'common.name' | sqxTranslate }}</div>
+                        </div>
+    
+                        <div class="col ">
+                            <div class="form-control preview">{{ 'common.url' | sqxTranslate }}</div>
+                        </div>
+    
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success" (click)="editForm.editors.add()">
+                                <i class="icon-add"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <h5 class="mt-2">{{ 'common.contents' | sqxTranslate }}</h5>
+    
+            <div class="card mb-2">
+                <div class="card-body" [formGroup]="editForm.form">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="hideScheduler" formControlName="hideScheduler">
+        
+                        <label class="form-check-label" for="hideScheduler">
+                            {{ 'appSettings.hideScheduler' | sqxTranslate }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </sqx-list-view>
+    </ng-container>
+</sqx-layout>

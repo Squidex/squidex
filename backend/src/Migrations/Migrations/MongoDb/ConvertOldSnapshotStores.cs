@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
@@ -22,7 +20,8 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             var collections = new[]
             {
@@ -38,7 +37,7 @@ namespace Migrations.Migrations.MongoDb
             return Task.WhenAll(
                 collections
                     .Select(x => database.GetCollection<BsonDocument>(x))
-                    .Select(x => x.UpdateManyAsync(filter, update)));
+                    .Select(x => x.UpdateManyAsync(filter, update, cancellationToken: ct)));
         }
     }
 }

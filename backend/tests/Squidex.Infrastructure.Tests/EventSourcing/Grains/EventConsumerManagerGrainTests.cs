@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Orleans;
@@ -90,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
-        public async Task Should_activate_matching_grains_when_stream_name_defined()
+        public async Task Should_activate_matching_grains_if_stream_name_defined()
         {
             await sut.ActivateAsync("a-123");
 
@@ -168,7 +166,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 .Returns(new EventConsumerInfo { Name = "A", Error = "A-Error", IsStopped = false, Position = "123" });
 
             A.CallTo(() => grainB.GetStateAsync())
-                .Returns( new EventConsumerInfo { Name = "B", Error = "B-Error", IsStopped = false, Position = "456" });
+                .Returns(new EventConsumerInfo { Name = "B", Error = "B-Error", IsStopped = false, Position = "456" });
 
             var infos = await sut.GetConsumersAsync();
 

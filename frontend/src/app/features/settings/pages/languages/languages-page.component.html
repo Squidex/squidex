@@ -1,0 +1,41 @@
+<sqx-title message="i18n:common.languages"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.languages" titleIcon="languages" [innerWidth]="55">
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:languages.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        </button>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view innerWidth="55rem" [isLoading]="languagesState.isLoading | async">
+            <div>
+                <ng-container *ngIf="(languagesState.isLoaded | async) && (languagesState.languages | async); let languages">
+                    <sqx-language-add-form *ngIf="languagesState.canCreate | async" 
+                        [newLanguages]="(languagesState.newLanguages | async)!">
+                    </sqx-language-add-form>
+
+                    <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage"
+                        [language]="languageInfo.language" 
+                        [fallbackLanguages]="languageInfo.fallbackLanguages"
+                        [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
+                    </sqx-language>
+                </ng-container>
+            </div>
+        </sqx-list-view>
+    </ng-container>
+
+    <ng-container sidebarMenu>
+        <div class="panel-nav">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.history" titlePosition="left-center">
+                <i class="icon-time"></i>
+            </a>
+
+            <a class="panel-link" routerLink="help" routerLinkActive="active" queryParamsHandling="preserve" title="i18n:common.help" titlePosition="left-center">
+                <i class="icon-help2"></i>
+            </a>
+        </div>
+    </ng-container>
+</sqx-layout>
+
+<router-outlet></router-outlet>

@@ -16,14 +16,14 @@ namespace Squidex.Extensions.Actions.Kafka
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            var kafkaOptions = config.GetSection("kafka").Get<KafkaProducerOptions>();
+            var options = config.GetSection("kafka").Get<KafkaProducerOptions>() ?? new ();
 
-            if (kafkaOptions.IsProducerConfigured())
+            if (options.IsProducerConfigured())
             {
                 services.AddRuleAction<KafkaAction, KafkaActionHandler>();
 
                 services.AddSingleton<KafkaProducer>();
-                services.AddSingleton(Options.Create(kafkaOptions));
+                services.AddSingleton(Options.Create(options));
             }
         }
     }

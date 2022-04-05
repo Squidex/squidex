@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -20,8 +19,6 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithActorCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-
             this.httpContextAccessor = httpContextAccessor;
         }
 

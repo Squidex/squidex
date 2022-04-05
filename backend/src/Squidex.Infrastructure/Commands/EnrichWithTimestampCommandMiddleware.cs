@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using NodaTime;
 
 namespace Squidex.Infrastructure.Commands
@@ -16,8 +15,6 @@ namespace Squidex.Infrastructure.Commands
 
         public EnrichWithTimestampCommandMiddleware(IClock clock)
         {
-            Guard.NotNull(clock, nameof(clock));
-
             this.clock = clock;
         }
 

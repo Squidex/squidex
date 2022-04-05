@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create(123);
 
-            var result = ValueConverters.ExcludeHidden(source, stringField.Hide());
+            var result = ValueConverters.ExcludeHidden(source, stringField.Hide(), null);
 
             Assert.Null(result);
         }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create("invalid");
 
-            var result = ValueConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, numberField);
+            var result = ValueConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, numberField, null);
 
             Assert.Null(result);
         }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = JsonValue.Array($"url/to/{id1}", $"url/to/{id2}");
 
-            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field, null);
 
             Assert.Equal(expected, result);
         }
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Theory]
         [InlineData("other")]
         [InlineData("**")]
-        public void Should_not_convert_asset_ids_when_field_name_does_not_match(string path)
+        public void Should_not_convert_asset_ids_if_field_name_does_not_match(string path)
         {
             var field = Fields.Assets(1, "assets", Partitioning.Invariant);
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = source;
 
-            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field);
+            var result = ValueConverters.ResolveAssetUrls(appId, HashSet.Of(path), urlGenerator)(source, field, null);
 
             Assert.Equal(expected, result);
         }
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [InlineData("*")]
         public void Should_convert_nested_asset_ids_to_urls(string path)
         {
-            var field = Fields.Array(1, "parent", Partitioning.Invariant, Fields.Assets(11, "assets"));
+            var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
 
             var source = JsonValue.Array(id1, id2);
 
@@ -107,9 +107,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [InlineData("parent")]
         [InlineData("parent.other")]
         [InlineData("other.assets")]
-        public void Should_not_convert_nested_asset_ids_when_field_name_does_not_match(string path)
+        public void Should_not_convert_nested_asset_ids_if_field_name_does_not_match(string path)
         {
-            var field = Fields.Array(1, "parent", Partitioning.Invariant, Fields.Assets(11, "assets"));
+            var field = Fields.Array(1, "parent", Partitioning.Invariant, null, null, Fields.Assets(11, "assets"));
 
             var source = JsonValue.Array(id1, id2);
 

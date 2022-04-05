@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -14,7 +14,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [LocalizedRequired]
         public string Email { get; set; }
 
-        [LocalizedRequiredAttribute]
+        [LocalizedRequired]
         public string Password { get; set; }
     }
 }

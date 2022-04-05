@@ -1,13 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
@@ -15,6 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public DataInputGraphType(Builder builder, SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.DataInputType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
@@ -25,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 {
                     var fieldGraphType = new InputObjectGraphType
                     {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
                         Name = fieldInfo.LocalizedInputType
                     };
 
@@ -53,6 +58,53 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             }
 
             Description = $"The structure of the {schemaInfo.DisplayName} data input type.";
+        }
+
+        public override object ParseDictionary(IDictionary<string, object?> value)
+        {
+            var result = new ContentData();
+
+            static ContentFieldData ToFieldData(IDictionary<string, object> source, IComplexGraphType type)
+            {
+                var result = new ContentFieldData();
+
+                foreach (var field in type.Fields)
+                {
+                    if (source.TryGetValue(field.Name, out var value))
+                    {
+                        if (value is IEnumerable<object> list && field.ResolvedType?.Flatten() is IComplexGraphType nestedType)
+                        {
+                            var array = new JsonArray(list.Count());
+
+                            foreach (var item in list)
+                            {
+                                if (item is JsonObject nested)
+                                {
+                                    array.Add(nested);
+                                }
+                            }
+
+                            result[field.SourceName()] = array;
+                        }
+                        else
+                        {
+                            result[field.SourceName()] = JsonGraphType.ParseJson(value);
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            foreach (var field in Fields)
+            {
+                if (field.ResolvedType is IComplexGraphType complexType && value.TryGetValue(field.Name, out var fieldValue) && fieldValue is IDictionary<string, object> nested)
+                {
+                    result[field.SourceName()] = ToFieldData(nested, complexType);
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -5,16 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class ArrayFieldProperties : FieldProperties
+    public sealed record ArrayFieldProperties : FieldProperties
     {
-        public int? MinItems { get; set; }
+        public int? MinItems { get; init; }
 
-        public int? MaxItems { get; set; }
+        public int? MaxItems { get; init; }
+
+        public ReadonlyList<string>? UniqueFields { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

@@ -21,6 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IGraphType? Visit(IArrayField field, FieldInfo args)
         {
+            if (args.Fields.Count == 0)
+            {
+                return null;
+            }
+
             var schemaFieldType =
                 new ListGraphType(
                     new NonNullGraphType(
@@ -39,9 +44,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return AllTypes.Boolean;
         }
 
+        public IGraphType? Visit(IField<ComponentFieldProperties> field, FieldInfo args)
+        {
+            return AllTypes.Json;
+        }
+
+        public IGraphType? Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
+        {
+            return AllTypes.Json;
+        }
+
         public IGraphType? Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Date;
+            return AllTypes.DateTime;
         }
 
         public IGraphType? Visit(IField<GeolocationFieldProperties> field, FieldInfo args)
@@ -54,24 +69,48 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return AllTypes.Json;
         }
 
-        public IGraphType? Visit(IField<NumberFieldProperties> field, FieldInfo args)
-        {
-            return AllTypes.Float;
-        }
-
         public IGraphType? Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
             return AllTypes.Strings;
         }
 
+        public IGraphType? Visit(IField<NumberFieldProperties> field, FieldInfo args)
+        {
+            return AllTypes.Float;
+        }
+
         public IGraphType? Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.String;
+            var type = AllTypes.String;
+
+            if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
+            {
+                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+
+                if (@enum != null)
+                {
+                    type = @enum;
+                }
+            }
+
+            return type;
         }
 
         public IGraphType? Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Strings;
+            var type = AllTypes.Strings;
+
+            if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
+            {
+                var @enum = builder.GetEnumeration(args.EnumName, field.Properties.AllowedValues);
+
+                if (@enum != null)
+                {
+                    type = new ListGraphType(new NonNullGraphType(@enum));
+                }
+            }
+
+            return type;
         }
 
         public IGraphType? Visit(IField<UIFieldProperties> field, FieldInfo args)

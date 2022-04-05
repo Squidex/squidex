@@ -5,11 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -34,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
             schema = Mocks.Schema(appId, schemaId);
-            schemaProvider = x => Task.FromResult(schema);
+            schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
             sut = new EnrichForCaching(requestCache);
         }
@@ -47,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => requestCache.AddHeader(A<string>._))
                 .Invokes(new Action<string>(header => headers.Add(header)));
 
-            await sut.EnrichAsync(requestContext);
+            await sut.EnrichAsync(requestContext, default);
 
             Assert.Equal(new List<string>
             {
@@ -67,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = CreateContent();
 
-            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider);
+            await sut.EnrichAsync(requestContext, Enumerable.Repeat(content, 1), schemaProvider, default);
 
             A.CallTo(() => requestCache.AddDependency(content.UniqueId, content.Version))
                 .MustHaveHappened();

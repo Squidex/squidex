@@ -58,6 +58,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public ResizeMode? Mode { get; set; }
 
         /// <summary>
+        /// Optional background color.
+        /// </summary>
+        [FromQuery(Name = "bg")]
+        public string? Background { get; set; }
+
+        /// <summary>
         /// Override the y focus point.
         /// </summary>
         [FromQuery(Name = "focusX")]
@@ -76,12 +82,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public bool IgnoreFocus { get; set; }
 
         /// <summary>
-        /// True to not use JPEG encoding when quality is set and the image is not a JPEG. Default: false.
-        /// </summary>
-        [FromQuery(Name = "keepformat")]
-        public bool KeepFormat { get; set; }
-
-        /// <summary>
         /// True to force a new resize even if it already stored.
         /// </summary>
         [FromQuery(Name = "force")]
@@ -91,11 +91,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// True to force a new resize even if it already stored.
         /// </summary>
         [FromQuery(Name = "format")]
-        public ImageFormat Format { get; set; }
+        public ImageFormat? Format { get; set; }
 
         public ResizeOptions ToResizeOptions(IAssetEntity asset)
         {
-            Guard.NotNull(asset, nameof(asset));
+            Guard.NotNull(asset);
 
             var result = SimpleMapper.Map(this, new ResizeOptions());
 
@@ -103,6 +103,8 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             result.FocusX = x;
             result.FocusY = y;
+            result.TargetWidth = Width;
+            result.TargetHeight = Height;
 
             return result;
         }

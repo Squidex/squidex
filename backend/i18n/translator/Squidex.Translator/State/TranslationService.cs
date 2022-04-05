@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -175,7 +172,7 @@ namespace Squidex.Translator.State
 
         public void Translate(string fileName, string text, string originText, Action<string> handler, bool silent = false)
         {
-            if (onlySingleWords && text.Contains(' '))
+            if (onlySingleWords && text.Contains(' ', StringComparison.Ordinal))
             {
                 return;
             }
@@ -205,7 +202,7 @@ namespace Squidex.Translator.State
 
                             if (string.IsNullOrWhiteSpace(key))
                             {
-                                key = $"common.{text.ToLower()}";
+                                key = $"common.{text.ToLower(CultureInfo.InvariantCulture)}";
 
                                 if (translations.TryGetValue(key, out var existing))
                                 {
@@ -221,21 +218,22 @@ namespace Squidex.Translator.State
 
                                 break;
                             }
-                            else if (key.Equals("s", StringComparison.OrdinalIgnoreCase) == true)
+
+                            if (key.Equals("s", StringComparison.OrdinalIgnoreCase))
                             {
                                 Console.WriteLine("Skipped");
                             }
-                            else if (key.Equals("i", StringComparison.OrdinalIgnoreCase) == true)
+                            else if (key.Equals("i", StringComparison.OrdinalIgnoreCase))
                             {
                                 Console.WriteLine("Ignored");
                                 AddIgnore(fileName, text);
                             }
-                            else if (key.Equals("f", StringComparison.OrdinalIgnoreCase) == true)
+                            else if (key.Equals("f", StringComparison.OrdinalIgnoreCase))
                             {
                                 Console.WriteLine("Ignored File");
                                 AddIgnore(fileName, "*");
                             }
-                            else if (key.Equals("t", StringComparison.OrdinalIgnoreCase) == true)
+                            else if (key.Equals("t", StringComparison.OrdinalIgnoreCase))
                             {
                                 Console.WriteLine("ToDo");
                                 AddTodo(fileName, text);
@@ -244,7 +242,7 @@ namespace Squidex.Translator.State
                             }
                             else
                             {
-                                if (!key.Contains("."))
+                                if (!key.Contains('.', StringComparison.Ordinal))
                                 {
                                     if (previousPrefix != null)
                                     {

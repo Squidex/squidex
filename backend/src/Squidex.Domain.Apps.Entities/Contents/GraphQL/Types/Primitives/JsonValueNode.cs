@@ -13,13 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
     internal sealed class JsonValueNode : ValueNode<IJsonValue>
     {
         public JsonValueNode(IJsonValue value)
+            : base(value)
         {
-            Value = value;
-        }
-
-        protected override bool Equals(ValueNode<IJsonValue> node)
-        {
-            return Equals(Value, node.Value);
         }
     }
 }

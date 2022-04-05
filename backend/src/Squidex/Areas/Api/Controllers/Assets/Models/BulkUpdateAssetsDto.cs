@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
@@ -24,6 +23,16 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// True to check referrers of deleted assets.
         /// </summary>
         public bool CheckReferrers { get; set; }
+
+        /// <summary>
+        /// True to turn off costly validation: Folder checks. Default: true.
+        /// </summary>
+        public bool OptimizeValidation { get; set; } = true;
+
+        /// <summary>
+        /// True to turn off scripting for faster inserts. Default: true.
+        /// </summary>
+        public bool DoNotScript { get; set; } = true;
 
         public BulkUpdateAssets ToCommand()
         {

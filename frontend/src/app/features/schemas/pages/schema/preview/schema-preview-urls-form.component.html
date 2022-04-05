@@ -1,0 +1,62 @@
+<form (ngSubmit)="saveSchema()">
+    <h5>{{ 'schemas.previewUrls.title' | sqxTranslate }}</h5>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <sqx-form-alert>
+                {{ 'schemas.previewUrls.help' | sqxTranslate }}
+            </sqx-form-alert>
+
+            <div class="content">
+                <div class="mt-4" *ngIf="!isEditable && editForm.previewControls.length === 0">
+                    {{ 'schemas.previewUrls.empty' | sqxTranslate }}
+                </div>
+
+                <div class="form-group row gx-2" *ngFor="let form of editForm.previewControls; let i = index" [formGroup]="form">
+                    <div class="col col-name">
+                        <sqx-control-errors for="name"></sqx-control-errors>
+
+                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="{{ 'schemas.previewUrls.namePlaceholder' | sqxTranslate }}">
+                    </div>
+
+                    <div class="col">
+                        <sqx-control-errors for="url"></sqx-control-errors>
+
+                        <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="{{ 'schemas.previewUrls.urlPlaceholder' | sqxTranslate }}">
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-text-danger" [disabled]="!isEditable"
+                            (sqxConfirmClick)="editForm.form.removeAt(i)"
+                            confirmTitle="i18n:schemas.deleteUrlConfirmTitle"
+                            confirmText="i18n:schemas.deleteUrlConfirmText"
+                            confirmRememberKey="removePreviewUrl">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group row gx-2" *ngIf="isEditable">
+                    <div class="col col-name">
+                        <div class="form-control preview">{{ 'schemas.previewUrls.namePlaceholder' | sqxTranslate }}</div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-control preview">{{ 'schemas.previewUrls.urlPlaceholder' | sqxTranslate }}</div>
+                    </div>
+
+                    <div class="col-auto col-options">
+                        <button type="button" class="btn btn-success" (click)="editForm.form.add()">
+                            <i class="icon-add"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer" *ngIf="isEditable">
+            <button type="submit" class="float-end btn btn-primary">
+                {{ 'common.save' | sqxTranslate }}
+            </button>
+        </div>
+    </div>
+</form>

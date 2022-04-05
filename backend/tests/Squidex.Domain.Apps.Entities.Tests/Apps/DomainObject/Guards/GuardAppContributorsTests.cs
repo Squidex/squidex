@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -23,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 {
     public class GuardAppContributorsTests : IClassFixture<TranslationsFixture>
     {
-        private readonly IUser user1 = A.Fake<IUser>();
-        private readonly IUser user2 = A.Fake<IUser>();
-        private readonly IUser user3 = A.Fake<IUser>();
+        private readonly IUser user1 = UserMocks.User("1");
+        private readonly IUser user2 = UserMocks.User("2");
+        private readonly IUser user3 = UserMocks.User("3");
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
         private readonly AppContributors contributors_0 = AppContributors.Empty;
@@ -33,15 +32,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public GuardAppContributorsTests()
         {
-            A.CallTo(() => user1.Id).Returns("1");
-            A.CallTo(() => user2.Id).Returns("2");
-            A.CallTo(() => user3.Id).Returns("3");
+            A.CallTo(() => user1.Id)
+                .Returns("1");
 
-            A.CallTo(() => users.FindByIdAsync("1")).Returns(user1);
-            A.CallTo(() => users.FindByIdAsync("2")).Returns(user2);
-            A.CallTo(() => users.FindByIdAsync("3")).Returns(user3);
+            A.CallTo(() => user2.Id)
+                .Returns("2");
 
-            A.CallTo(() => users.FindByIdAsync("notfound"))
+            A.CallTo(() => user3.Id)
+                .Returns("3");
+
+            A.CallTo(() => users.FindByIdAsync("1", default))
+                .Returns(user1);
+
+            A.CallTo(() => users.FindByIdAsync("2", default))
+                .Returns(user2);
+
+            A.CallTo(() => users.FindByIdAsync("3", default))
+                .Returns(user3);
+
+            A.CallTo(() => users.FindByIdAsync("notfound", default))
                 .Returns(Task.FromResult<IUser?>(null));
 
             A.CallTo(() => appPlan.MaxContributors)

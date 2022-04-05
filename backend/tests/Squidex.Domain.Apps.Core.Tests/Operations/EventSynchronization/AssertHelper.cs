@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -36,8 +34,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             ((object)lhs).Should().BeEquivalentTo(rhs, o => o
                 .WithStrictOrdering()
                 .IncludingNestedObjects()
-                .IncludingAllRuntimeProperties()
-                .Excluding(x => x.SelectedMemberPath == "Properties.IsFrozen"));
+                .IncludingAllRuntimeProperties());
         }
     }
 }

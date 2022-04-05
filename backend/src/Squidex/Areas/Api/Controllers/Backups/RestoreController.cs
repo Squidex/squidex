@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -44,14 +42,14 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiPermission(Permissions.AdminRestore)]
         public async Task<IActionResult> GetRestoreJob()
         {
-            var job = await backupService.GetRestoreAsync();
+            var job = await backupService.GetRestoreAsync(HttpContext.RequestAborted);
 
             if (job == null)
             {
                 return NotFound();
             }
 
-            var response = RestoreJobDto.FromJob(job);
+            var response = RestoreJobDto.FromDomain(job);
 
             return Ok(response);
         }

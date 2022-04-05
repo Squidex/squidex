@@ -133,17 +133,14 @@
   <data name="apps.languages.masterLanguageNotRemovable" xml:space="preserve">
     <value>Master language cannot be removed.</value>
   </data>
+  <data name="apps.maximumTotalReached" xml:space="preserve">
+    <value>You cannot create more apps. Please contact the support to remove this restriction from your account.</value>
+  </data>
   <data name="apps.nameAlreadyExists" xml:space="preserve">
     <value>An app with the same name already exists.</value>
   </data>
   <data name="apps.notImage" xml:space="preserve">
     <value>File is not an image</value>
-  </data>
-  <data name="apps.patterns.nameAlreadyExists" xml:space="preserve">
-    <value>A pattern with the same name already exists.</value>
-  </data>
-  <data name="apps.patterns.patternAlreadyExists" xml:space="preserve">
-    <value>This pattern already exists but with another name.</value>
   </data>
   <data name="apps.plans.notFound" xml:space="preserve">
     <value>A plan with this id does not exist.</value>
@@ -231,6 +228,9 @@
   </data>
   <data name="common.displayName" xml:space="preserve">
     <value>Display name</value>
+  </data>
+  <data name="common.documentation" xml:space="preserve">
+    <value>Documentation</value>
   </data>
   <data name="common.editor" xml:space="preserve">
     <value>Editor</value>
@@ -359,13 +359,13 @@
     <value>Num days</value>
   </data>
   <data name="common.odataFailure" xml:space="preserve">
-    <value>Failed to parse query: {message}</value>
+    <value>Failed to parse query: {message}, for query: {odata}</value>
   </data>
   <data name="common.odataFilterNotValid" xml:space="preserve">
     <value>OData $filter clause not valid: {message}</value>
   </data>
   <data name="common.odataNotSupported" xml:space="preserve">
-    <value>OData operation is not supported.</value>
+    <value>OData operation is not supported for query: {odata}</value>
   </data>
   <data name="common.odataSearchNotValid" xml:space="preserve">
     <value>OData $search clause not valid: {message}</value>
@@ -457,6 +457,9 @@
   <data name="contents.draftToDeleteNotFound" xml:space="preserve">
     <value>There is nothing to delete.</value>
   </data>
+  <data name="contents.invalidAllQuery" xml:space="preserve">
+    <value>Either Ids or Schedule range must be defined.</value>
+  </data>
   <data name="contents.invalidArrayOfObjects" xml:space="preserve">
     <value>Invalid json type, expected array of objects.</value>
   </data>
@@ -465,6 +468,15 @@
   </data>
   <data name="contents.invalidBoolean" xml:space="preserve">
     <value>Invalid json type, expected boolean.</value>
+  </data>
+  <data name="contents.invalidComponentNoObject" xml:space="preserve">
+    <value>Invalid json object, expected object with 'schemaId' field.</value>
+  </data>
+  <data name="contents.invalidComponentNoType" xml:space="preserve">
+    <value>Invalid component. No 'schemaId' field found.</value>
+  </data>
+  <data name="contents.invalidComponentUnknownSchema" xml:space="preserve">
+    <value>Invalid component. Cannot find schema.</value>
   </data>
   <data name="contents.invalidGeolocation" xml:space="preserve">
     <value>Invalid json type, expected latitude/longitude object.</value>
@@ -485,7 +497,10 @@
     <value>{count} Reference(s)</value>
   </data>
   <data name="contents.referenced" xml:space="preserve">
-    <value>Content is referenced by another content and cannot be deleted.</value>
+    <value>Content is referenced by another content and cannot be deleted or unpublished.</value>
+  </data>
+  <data name="contents.schemaNotPublished" xml:space="preserve">
+    <value>Schema not published.</value>
   </data>
   <data name="contents.singletonNotChangeable" xml:space="preserve">
     <value>Singleton content cannot be updated.</value>
@@ -508,6 +523,9 @@
   <data name="contents.validation.assetNotFound" xml:space="preserve">
     <value>Id {id} not found.</value>
   </data>
+  <data name="contents.validation.assetType" xml:space="preserve">
+    <value>Not of expected type: {type}.</value>
+  </data>
   <data name="contents.validation.between" xml:space="preserve">
     <value>Must be between {min} and {max}.</value>
   </data>
@@ -528,9 +546,6 @@
   </data>
   <data name="contents.validation.extension" xml:space="preserve">
     <value>Must be an allowed extension.</value>
-  </data>
-  <data name="contents.validation.image" xml:space="preserve">
-    <value>Not an image.</value>
   </data>
   <data name="contents.validation.invalid" xml:space="preserve">
     <value>Not a valid value.</value>
@@ -619,6 +634,9 @@
   <data name="contents.validation.unique" xml:space="preserve">
     <value>Another content with the same value exists.</value>
   </data>
+  <data name="contents.validation.uniqueObjectValues" xml:space="preserve">
+    <value>Must not contain items with duplicate '{field}' fields.</value>
+  </data>
   <data name="contents.validation.unknownField" xml:space="preserve">
     <value>Not a known {fieldType}.</value>
   </data>
@@ -638,7 +656,7 @@
     <value>Email is already taken.</value>
   </data>
   <data name="dotnet_identity_DuplicateUserName" xml:space="preserve">
-    <value>User name is already taken.</value>
+    <value>Email is already taken by another user. You can add this external login to your account if you go to the profile page.</value>
   </data>
   <data name="dotnet_identity_InvalidEmail" xml:space="preserve">
     <value>Email is invalid.</value>
@@ -675,12 +693,6 @@
   </data>
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
     <value>User is locked out.</value>
-  </data>
-  <data name="exception.invalidJsonQuery" xml:space="preserve">
-    <value>Json query not valid: {message}</value>
-  </data>
-  <data name="exception.invalidJsonQueryJson" xml:space="preserve">
-    <value>Json query not valid json: {message}</value>
   </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
     <value>Entity ({id}) already exists.</value>
@@ -721,15 +733,6 @@
   <data name="history.apps.languagedUpdated" xml:space="preserve">
     <value>updated language {[Language]}</value>
   </data>
-  <data name="history.apps.patternAdded" xml:space="preserve">
-    <value>added pattern {[Name]}</value>
-  </data>
-  <data name="history.apps.patternDeleted" xml:space="preserve">
-    <value>deleted pattern {[PatternId]}</value>
-  </data>
-  <data name="history.apps.patternUpdated" xml:space="preserve">
-    <value>updated pattern {[Name]}</value>
-  </data>
   <data name="history.apps.planChanged" xml:space="preserve">
     <value>changed plan to {[Plan]}</value>
   </data>
@@ -744,6 +747,9 @@
   </data>
   <data name="history.apps.roleUpdated" xml:space="preserve">
     <value>updated role {[Name]}</value>
+  </data>
+  <data name="history.apps.settingsUpdated" xml:space="preserve">
+    <value>updated UI settings</value>
   </data>
   <data name="history.assets.replaced" xml:space="preserve">
     <value>replaced asset.</value>
@@ -898,9 +904,6 @@
   <data name="search.schemaResult" xml:space="preserve">
     <value>{name} Schema</value>
   </data>
-  <data name="security.passwordStolen" xml:space="preserve">
-    <value>This password has previously appeared in a data breach and should never be used. If you have ever used it anywhere before, change it!</value>
-  </data>
   <data name="setup.createUser.button" xml:space="preserve">
     <value>Create User</value>
   </data>
@@ -929,7 +932,7 @@
     <value>Installation</value>
   </data>
   <data name="setup.hint" xml:space="preserve">
-    <value>You are seeing this screen because no user exists yet. After a user is created, you are not able to use this screen again.</value>
+    <value>You see this screen because no user exists yet. After a user is created, you are not able to use this setup page again.</value>
   </data>
   <data name="setup.madeBy" xml:space="preserve">
     <value>Proudly made by</value>
@@ -944,7 +947,7 @@
     <value>With your setup, every user can create new apps. If you want to change this set &lt;code&gt;UI__ONLYADMINSCANCREATEAPPS=true&lt;/code&gt; as environment variable.</value>
   </data>
   <data name="setup.ruleFolder.warning" xml:space="preserve">
-    <value>You are using the &lt;strong&gt;folder asset store&lt;/strong&gt; where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using Docker.</value>
+    <value>You are using the &lt;strong&gt;folder asset store&lt;/strong&gt; where all assets are stored in the file system. Please remember to include the asset folder into your backup strategy and map it to a volume, if you are using docker.</value>
   </data>
   <data name="setup.ruleFtp.warning" xml:space="preserve">
     <value>You are using the &lt;strong&gt;FTP asset store&lt;/strong&gt;. It is not recommended to use this storage type because of bad performance.</value>
@@ -959,10 +962,10 @@
     <value>System Checklist</value>
   </data>
   <data name="setup.ruleUrl.failure" xml:space="preserve">
-    <value>You should access Squidex only over one one canonical URL and configure this URL over the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;.</value>
+    <value>You should access Squidex only over one canonical URL and configure this URL with the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable. The current base URL &lt;code&gt;{actual}&lt;/code&gt; does not match to the base url &lt;code&gt;{configured}&lt;/code&gt;. This variable must point to the public URL under which your Squidex instance is available.</value>
   </data>
   <data name="setup.ruleUrl.success" xml:space="preserve">
-    <value>Congratulations the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly.</value>
+    <value>Congratulations, the &lt;code&gt;URLS__BASEURL&lt;/code&gt; environment variable is configured properly. This variable  must point to the public URL under which your Squidex instance is available.</value>
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
@@ -1066,6 +1069,9 @@
   <data name="users.logout.title" xml:space="preserve">
     <value>Logout</value>
   </data>
+  <data name="users.noEmailAddress" xml:space="preserve">
+    <value>We cannot get the email address from authentication provider.</value>
+  </data>
   <data name="users.profile.addLoginDone" xml:space="preserve">
     <value>Login added successfully.</value>
   </data>
@@ -1167,6 +1173,9 @@
   </data>
   <data name="validation.notAnImage" xml:space="preserve">
     <value>Picture is not a valid image.</value>
+  </data>
+  <data name="validation.notAnValidSvg" xml:space="preserve">
+    <value>The SVG is malicious and contains script tags.</value>
   </data>
   <data name="validation.onlyOneFile" xml:space="preserve">
     <value>Can only upload one file.</value>

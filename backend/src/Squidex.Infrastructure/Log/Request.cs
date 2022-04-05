@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using NodaTime;
 
 #pragma warning disable SA1401 // Fields should be private
@@ -18,6 +17,6 @@ namespace Squidex.Infrastructure.Log
 
         public string Key;
 
-        public Dictionary<string, string> Properties;
+        public Dictionary<string, string> Properties = new Dictionary<string, string>();
     }
 }

@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
@@ -78,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 return permissionsProvider.GetPermissionsAsync(App);
             });
 
-            Response.Headers[HeaderNames.ETag] = string.Concat(response).Sha256Base64();
+            Response.Headers[HeaderNames.ETag] = string.Concat(response).ToSha256Base64();
 
             return Ok(response);
         }
@@ -123,6 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesUpdate)]
         [ApiCosts(1)]
+        [UrlDecodeRouteParams]
         public async Task<IActionResult> PutRole(string app, string roleName, [FromBody] UpdateRoleDto request)
         {
             var command = request.ToCommand(roleName);
@@ -147,6 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(RolesDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppRolesDelete)]
         [ApiCosts(1)]
+        [UrlDecodeRouteParams]
         public async Task<IActionResult> DeleteRole(string app, string roleName)
         {
             var command = new DeleteRole { Name = roleName };
@@ -168,7 +168,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private RolesDto GetResponse(IAppEntity result)
         {
-            return RolesDto.FromApp(result, Resources);
+            return RolesDto.FromDomain(result, Resources);
         }
     }
 }

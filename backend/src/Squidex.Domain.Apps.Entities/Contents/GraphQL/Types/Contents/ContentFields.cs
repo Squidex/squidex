@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
@@ -19,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "id",
             ResolvedType = AllTypes.NonNullString,
             Resolver = EntityResolvers.Id,
-            Description = "The id of the content."
+            Description = FieldDescriptions.EntityId
         };
 
         public static readonly FieldType Version = new FieldType
@@ -27,15 +29,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "version",
             ResolvedType = AllTypes.NonNullInt,
             Resolver = EntityResolvers.Version,
-            Description = "The version of the content."
+            Description = FieldDescriptions.EntityVersion
         };
 
         public static readonly FieldType Created = new FieldType
         {
             Name = "created",
-            ResolvedType = AllTypes.NonNullDate,
+            ResolvedType = AllTypes.NonNullDateTime,
             Resolver = EntityResolvers.Created,
-            Description = "The date and time when the content has been created."
+            Description = FieldDescriptions.EntityCreated
         };
 
         public static readonly FieldType CreatedBy = new FieldType
@@ -43,15 +45,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "createdBy",
             ResolvedType = AllTypes.NonNullString,
             Resolver = EntityResolvers.CreatedBy,
-            Description = "The user that has created the content."
+            Description = FieldDescriptions.EntityCreatedBy
+        };
+
+        public static readonly FieldType CreatedByUser = new FieldType
+        {
+            Name = "createdByUser",
+            ResolvedType = UserGraphType.NonNull,
+            Resolver = EntityResolvers.CreatedByUser,
+            Description = FieldDescriptions.EntityCreatedBy
         };
 
         public static readonly FieldType LastModified = new FieldType
         {
             Name = "lastModified",
-            ResolvedType = AllTypes.NonNullDate,
+            ResolvedType = AllTypes.NonNullDateTime,
             Resolver = EntityResolvers.LastModified,
-            Description = "The date and time when the content has been modified last."
+            Description = FieldDescriptions.EntityLastModified
         };
 
         public static readonly FieldType LastModifiedBy = new FieldType
@@ -59,7 +69,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "lastModifiedBy",
             ResolvedType = AllTypes.NonNullString,
             Resolver = EntityResolvers.LastModifiedBy,
-            Description = "The user that has updated the content last."
+            Description = FieldDescriptions.EntityLastModifiedBy
+        };
+
+        public static readonly FieldType LastModifiedByUser = new FieldType
+        {
+            Name = "lastModifiedByUser",
+            ResolvedType = UserGraphType.NonNull,
+            Resolver = EntityResolvers.LastModifiedByUser,
+            Description = FieldDescriptions.EntityLastModifiedBy
         };
 
         public static readonly FieldType Status = new FieldType
@@ -67,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "status",
             ResolvedType = AllTypes.NonNullString,
             Resolver = Resolve(x => x.Status.ToString().ToUpperInvariant()),
-            Description = "The the status of the content."
+            Description = FieldDescriptions.ContentStatus
         };
 
         public static readonly FieldType StatusColor = new FieldType
@@ -75,8 +93,53 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             Name = "statusColor",
             ResolvedType = AllTypes.NonNullString,
             Resolver = Resolve(x => x.StatusColor),
-            Description = "The color status of the content."
+            Description = FieldDescriptions.ContentStatusColor
         };
+
+        public static readonly FieldType NewStatus = new FieldType
+        {
+            Name = "newStatus",
+            ResolvedType = AllTypes.String,
+            Resolver = Resolve(x => x.NewStatus?.ToString().ToUpperInvariant()),
+            Description = FieldDescriptions.ContentNewStatus
+        };
+
+        public static readonly FieldType NewStatusColor = new FieldType
+        {
+            Name = "newStatusColor",
+            ResolvedType = AllTypes.String,
+            Resolver = Resolve(x => x.NewStatusColor),
+            Description = FieldDescriptions.ContentStatusColor
+        };
+
+        public static readonly FieldType SchemaId = new FieldType
+        {
+            Name = "schemaId",
+            ResolvedType = AllTypes.NonNullString,
+            Resolver = Resolve(x => x[Component.Discriminator].ToString()),
+            Description = FieldDescriptions.ContentSchemaId
+        };
+
+        public static readonly FieldType Url = new FieldType
+        {
+            Name = "url",
+            ResolvedType = AllTypes.NonNullString,
+            Resolver = ContentResolvers.Url,
+            Description = FieldDescriptions.ContentUrl
+        };
+
+        public static readonly FieldType EditToken = new FieldType
+        {
+            Name = "editToken",
+            ResolvedType = AllTypes.String,
+            Resolver = Resolve(x => x.EditToken),
+            Description = FieldDescriptions.EditToken
+        };
+
+        private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)
+        {
+            return Resolvers.Sync(resolver);
+        }
 
         private static IFieldResolver Resolve<T>(Func<IEnrichedContentEntity, T> resolver)
         {

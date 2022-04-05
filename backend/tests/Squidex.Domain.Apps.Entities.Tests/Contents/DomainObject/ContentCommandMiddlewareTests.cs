@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -51,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         {
             await HandleAsync(new CreateContent(), 12);
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -66,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             Assert.Same(result, context.Result<IEnrichedContentEntity>());
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>._, A<bool>._, requestContext, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -77,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
             var enriched = new ContentEntity();
 
-            A.CallTo(() => contentEnricher.EnrichAsync(result, true, requestContext))
+            A.CallTo(() => contentEnricher.EnrichAsync(result, true, requestContext, A<CancellationToken>._))
                 .Returns(enriched);
 
             var context =

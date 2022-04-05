@@ -1,22 +1,15 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Squidex.Web;
@@ -33,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IUserPictureStore userPictureStore;
         private readonly IUserResolver userResolver;
-        private readonly ISemanticLog log;
+        private readonly ILogger<UsersController> log;
 
         static UsersController()
         {
@@ -43,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             {
                 AvatarBytes = new byte[resourceStream!.Length];
 
-                resourceStream.Read(AvatarBytes, 0, AvatarBytes.Length);
+                _ = resourceStream.Read(AvatarBytes, 0, AvatarBytes.Length);
             }
         }
 
@@ -52,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             IHttpClientFactory httpClientFactory,
             IUserPictureStore userPictureStore,
             IUserResolver userResolver,
-            ISemanticLog log)
+            ILogger<UsersController> log)
             : base(commandBus)
         {
             this.httpClientFactory = httpClientFactory;
@@ -69,12 +62,12 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// 200 => User resources returned.
         /// </returns>
         [HttpGet]
-        [Route("/")]
+        [Route("")]
         [ProducesResponseType(typeof(ResourcesDto), StatusCodes.Status200OK)]
         [ApiPermission]
         public IActionResult GetUserResources()
         {
-            var response = ResourcesDto.FromResources(Resources);
+            var response = ResourcesDto.FromDomain(Resources);
 
             return Ok(response);
         }
@@ -97,17 +90,15 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var users = await userResolver.QueryByEmailAsync(query);
+                var users = await userResolver.QueryByEmailAsync(query, HttpContext.RequestAborted);
 
-                var response = users.Where(x => !x.Claims.IsHidden()).Select(x => UserDto.FromUser(x, Resources)).ToArray();
+                var response = users.Select(x => UserDto.FromDomain(x, Resources)).ToArray();
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", nameof(GetUsers))
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to return users, returning empty results.");
             }
 
             return Ok(Array.Empty<UserDto>());
@@ -129,20 +120,18 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdAsync(id);
+                var entity = await userResolver.FindByIdAsync(id, HttpContext.RequestAborted);
 
                 if (entity != null)
                 {
-                    var response = UserDto.FromUser(entity, Resources);
+                    var response = UserDto.FromDomain(entity, Resources);
 
                     return Ok(response);
                 }
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", nameof(GetUser))
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to return user, returning empty results.");
             }
 
             return NotFound();
@@ -164,7 +153,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entity = await userResolver.FindByIdAsync(id);
+                var entity = await userResolver.FindByIdAsync(id, HttpContext.RequestAborted);
 
                 if (entity != null)
                 {
@@ -191,15 +180,16 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                         if (!string.IsNullOrWhiteSpace(url))
                         {
-                            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, HttpContext.RequestAborted);
 
                             if (response.IsSuccessStatusCode)
                             {
-                                var contentType = response.Content.Headers.ContentType?.ToString();
+                                var contentType = response.Content.Headers.ContentType?.ToString()!;
+                                var contentStream = await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted);
 
                                 var etag = response.Headers.ETag;
 
-                                var result = new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
+                                var result = new FileStreamResult(contentStream, contentType);
 
                                 if (!string.IsNullOrWhiteSpace(etag?.Tag))
                                 {
@@ -214,9 +204,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", nameof(GetUser))
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to return user picture, returning fallback image.");
             }
 
             return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Squidex.Areas.IdentityServer.Views
@@ -31,7 +30,7 @@ namespace Squidex.Areas.IdentityServer.Views
 
                     if (indexOfLastPart >= 0)
                     {
-                        applicationPath = applicationPath.Value.Substring(0, indexOfLastPart);
+                        applicationPath = applicationPath.Value[..indexOfLastPart];
                     }
                 }
 

@@ -1,0 +1,28 @@
+<div class="field-list field-list-assigned" #assignedList="cdkDropList"
+    cdkDropList
+    [cdkDropListData]="fieldsAdded"
+    [cdkDropListConnectedTo]="[availableList]"
+    (cdkDropListDropped)="drop($event)">
+    <label>{{ 'schemas.ui' | sqxTranslate }}</label>
+
+    <div class="empty-hint" *ngIf="fieldsAdded.length === 0">
+        <sqx-form-alert>{{emptyText}}</sqx-form-alert>
+    </div>
+
+    <div *ngFor="let field of fieldsAdded" class="table-items-row table-items-row-summary" cdkDrag>
+        <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
+    </div>
+</div>
+
+<div class="field-list field-list-available" #availableList="cdkDropList"
+    cdkDropList
+    cdkDropListSortingDisabled
+    [cdkDropListData]="fieldsNotAdded"
+    [cdkDropListConnectedTo]="[assignedList]"
+    (cdkDropListDropped)="drop($event)">
+    <label>{{ 'schemas.ui.unassignedFields' | sqxTranslate }}</label>
+    
+    <div *ngFor="let field of fieldsNotAdded" class="table-items-row table-items-row-summary" cdkDrag>
+        <i class="icon-drag2 drag-handle"></i> <span>{{field}}</span>
+    </div>
+</div>

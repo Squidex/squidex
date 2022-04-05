@@ -22,7 +22,8 @@ namespace Squidex.Infrastructure.Diagnostics
             documentClient = new DocumentClient(uri, masterKey);
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
             await documentClient.ReadDatabaseFeedAsync();
 

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Net.Http;
-using System.Threading.Tasks;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
@@ -32,7 +30,7 @@ namespace TestSuite.ApiTests
 
             var url = _.CDNClientManager.GenerateImageUrl(id);
 
-            Assert.StartsWith("https://assets.squidex.io/", url);
+            Assert.StartsWith("https://assets.squidex.io/", url, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -52,7 +50,7 @@ namespace TestSuite.ApiTests
 
             var url = _.ClientManager.GenerateImageUrl(id);
 
-            Assert.StartsWith("https://cloud.squidex.io/", url);
+            Assert.StartsWith("https://cloud.squidex.io/", url, StringComparison.Ordinal);
         }
 
         [Fact]

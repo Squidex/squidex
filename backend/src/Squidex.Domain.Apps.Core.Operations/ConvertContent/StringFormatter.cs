@@ -9,21 +9,15 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public sealed class StringFormatter : IFieldPropertiesVisitor<string, StringFormatter.Args>
     {
         private static readonly StringFormatter Instance = new StringFormatter();
 
-        public readonly struct Args
-        {
-            public readonly IJsonValue Value;
-
-            public Args(IJsonValue value)
-            {
-                Value = value;
-            }
-        }
+        public record struct Args(IJsonValue Value);
 
         private StringFormatter()
         {
@@ -31,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static string Format(IField field, IJsonValue? value)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             if (value == null || value is JsonNull)
             {
@@ -63,6 +57,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 return "No";
             }
+        }
+
+        public string Visit(ComponentFieldProperties properties, Args args)
+        {
+            return "{ Component }";
+        }
+
+        public string Visit(ComponentsFieldProperties properties, Args args)
+        {
+            return FormatArray(args.Value, "Component", "Components");
         }
 
         public string Visit(DateTimeFieldProperties properties, Args args)

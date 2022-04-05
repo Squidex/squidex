@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.ClientLibrary.Management;
 
 namespace TestSuite.Fixtures
 {
     public class CreatedAppFixture : ClientFixture
     {
+        private static readonly string[] Contributors =
+        {
+            "hello@squidex.io"
+        };
+
         private static bool isCreated;
 
         public CreatedAppFixture()
@@ -32,9 +36,29 @@ namespace TestSuite.Fixtures
                         }
                     }
 
-                    var invite = new AssignContributorDto { ContributorId = "sebastian@squidex.io", Invite = true, Role = "Owner" };
+                    var invite = new AssignContributorDto { Invite = true, Role = "Owner" };
 
-                    await Apps.PostContributorAsync(AppName, invite);
+                    foreach (var contributor in Contributors)
+                    {
+                        invite.ContributorId = contributor;
+
+                        await Apps.PostContributorAsync(AppName, invite);
+                    }
+
+                    try
+                    {
+                        await Apps.PostLanguageAsync(AppName, new AddLanguageDto
+                        {
+                            Language = "de"
+                        });
+                    }
+                    catch (SquidexManagementException ex)
+                    {
+                        if (ex.StatusCode != 400)
+                        {
+                            throw;
+                        }
+                    }
                 }).Wait();
 
                 isCreated = true;

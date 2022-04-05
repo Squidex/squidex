@@ -1,15 +1,13 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -29,10 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             IContextProvider contextProvider)
             : base(grainFactory)
         {
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-            Guard.NotNull(appImageStore, nameof(appImageStore));
-            Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
-
             this.appImageStore = appImageStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.contextProvider = contextProvider;
@@ -62,9 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         {
             var file = uploadImage.File;
 
-            using (var uploadStream = file.OpenRead())
+            await using (var uploadStream = file.OpenRead())
             {
-                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream);
+                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadStream, file.MimeType);
 
                 if (image == null)
                 {
@@ -72,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 }
             }
 
-            using (var uploadStream = file.OpenRead())
+            await using (var uploadStream = file.OpenRead())
             {
                 await appImageStore.UploadAsync(uploadImage.AppId.Id, uploadStream);
             }

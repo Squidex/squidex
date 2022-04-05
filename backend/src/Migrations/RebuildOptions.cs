@@ -22,5 +22,12 @@ namespace Migrations
         public bool Rules { get; set; }
 
         public bool Schemas { get; set; }
+
+        public int BatchSize { get; set; } = 100;
+
+        public int CalculateBatchSize()
+        {
+            return Math.Max(10, Math.Min(1000, BatchSize));
+        }
     }
 }

@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NeutralLanguage>en</NeutralLanguage>
     <Nullable>enable</Nullable>
 	<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
@@ -23,7 +25,6 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
-    <ProjectReference Include="..\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
@@ -33,63 +34,73 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.1" />
-    <PackageReference Include="GraphQL.Server.Core" Version="4.4.1" />
-    <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="4.4.1" />
-    <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="4.4.1" />
-    <PackageReference Include="IdentityServer4" Version="4.1.1" />
-    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.3" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.8.3" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="3.4.1" />
-    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.4.1" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.4.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.12.0" />
-    <PackageReference Include="Namotion.Reflection" Version="1.0.18" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NJsonSchema" Version="10.3.11" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.3" />
+    <PackageReference Include="GraphQL.DataLoader" Version="4.7.1" />
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="4.7.1" />
+    <PackageReference Include="GraphQL.Server.Core" Version="5.2.0" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="5.2.0" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.2.0" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.694">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.RulesetToEditorconfigConverter" Version="3.3.3" />
+    <PackageReference Include="Microsoft.Data.Edm" Version="5.8.5" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.14.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.14.1" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.10.0" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.6.0" />
+    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.0" />
+    <PackageReference Include="Microsoft.Orleans.Hosting.Kubernetes" Version="3.6.0" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.6.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
+    <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NJsonSchema" Version="10.6.10" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.10.7" />
-    <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="3.2.0" />
-    <PackageReference Include="OrleansDashboard" Version="3.1.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.15.7" />
+    <PackageReference Include="OpenCover" Version="4.7.1221" PrivateAssets="all" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc7" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="3.4.1" />
+    <PackageReference Include="OrleansDashboard" Version="3.6.1" />
+    <PackageReference Include="OrleansDashboard.EmbeddedAssets" Version="3.6.1" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="ReportGenerator" Version="4.8.7" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="1.3.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="1.3.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="1.3.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="1.3.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="1.3.0" />
-    <PackageReference Include="Squidex.Caching.Orleans" Version="1.8.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="6.16.0" />
-    <PackageReference Include="Squidex.Hosting" Version="1.9.0" />
+    <PackageReference Include="ReportGenerator" Version="5.0.3" PrivateAssets="all" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="2.18.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="2.18.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="2.18.0" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="2.18.0" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="2.18.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="2.18.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="2.18.0" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="2.18.0" />
+    <PackageReference Include="Squidex.Caching.Orleans" Version="1.9.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="8.11.0" />
+    <PackageReference Include="Squidex.Hosting" Version="2.13.0" />
+    <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="4.0.1-dev" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="6.0.0" GeneratePathProperty="true" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
-
-  <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
-    <ItemGroup Condition=" '$(DocumentationFile)' != '' ">
-      <_DocumentationFile Include="$(DocumentationFile)" />
-      <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
-    </ItemGroup>
-  </Target>
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-
+	
+  <Target Name="CopySystemSecurityCryptographyPkcs" AfterTargets="Build">
+	<Copy SourceFiles="$(PkgSystem_Security_Cryptography_Pkcs)\lib\net6.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutDir)" />
+  </Target>
+	
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
@@ -125,12 +136,18 @@
 
   <ItemGroup>
     <Folder Include="Areas\Frontend\Resources\" />
+    <Folder Include="wwwroot\build\" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="..\..\i18n\frontend_en.json" Link="Areas\Frontend\Resources\frontend_en.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_it.json" Link="Areas\Frontend\Resources\frontend_it.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_nl.json" Link="Areas\Frontend\Resources\frontend_nl.json" />
+    <EmbeddedResource Include="..\..\i18n\frontend_zh.json" Link="Areas\Frontend\Resources\frontend_zh.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\scripts\outdatedbrowser\outdatedbrowser.min.js" />
   </ItemGroup>
 
   <ItemGroup>

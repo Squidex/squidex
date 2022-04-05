@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -49,9 +46,9 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> GetBackups(string app)
         {
-            var jobs = await backupService.GetBackupsAsync(AppId);
+            var jobs = await backupService.GetBackupsAsync(AppId, HttpContext.RequestAborted);
 
-            var response = BackupJobsDto.FromBackups(jobs, Resources);
+            var response = BackupJobsDto.FromDomain(jobs, Resources);
 
             return Ok(response);
         }
@@ -93,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteBackup(string app, DomainId id)
         {
-            await backupService.DeleteBackupAsync(AppId, id);
+            await backupService.DeleteBackupAsync(AppId, id, HttpContext.RequestAborted);
 
             return NoContent();
         }

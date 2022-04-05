@@ -5,18 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate IJsonValue? ValueConverter(IJsonValue value, IField field, IArrayField? parent = null);
+    public delegate IJsonValue? ValueConverter(IJsonValue value, IField field, IArrayField? parent);
 
     public static class ValueConverters
     {
@@ -104,56 +103,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         var id = array[i].ToString();
 
                         array[i] = JsonValue.Create(urlGenerator.AssetContent(appId, id));
-                    }
-                }
-
-                return value;
-            };
-        }
-
-        public static ValueConverter ForNested(params ValueConverter[] converters)
-        {
-            if (converters?.Any() != true)
-            {
-                return Noop;
-            }
-
-            return (value, field, parent) =>
-            {
-                if (value is JsonArray array && field is IArrayField arrayField)
-                {
-                    foreach (var nested in array.OfType<JsonObject>())
-                    {
-                        foreach (var (fieldName, nestedValue) in nested.ToList())
-                        {
-                            var newValue = nestedValue;
-
-                            if (arrayField.FieldsByName.TryGetValue(fieldName, out var nestedField))
-                            {
-                                for (var i = 0; i < converters.Length; i++)
-                                {
-                                    newValue = converters[i](newValue!, nestedField, arrayField);
-
-                                    if (newValue == null)
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                newValue = null;
-                            }
-
-                            if (newValue == null)
-                            {
-                                nested.Remove(fieldName);
-                            }
-                            else if (!ReferenceEquals(nestedValue, newValue))
-                            {
-                                nested[fieldName] = newValue;
-                            }
-                        }
                     }
                 }
 

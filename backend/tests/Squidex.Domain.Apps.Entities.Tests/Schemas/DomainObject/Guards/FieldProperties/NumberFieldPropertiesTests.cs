@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -79,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards.FieldProperti
         [InlineData(NumberFieldEditor.Radio)]
         public void Should_add_error_if_inline_editing_is_not_allowed_for_editor(NumberFieldEditor editor)
         {
-            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadOnlyCollection.Create(1.0) };
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadonlyList.Create(1.0) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
@@ -96,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject.Guards.FieldProperti
         [InlineData(NumberFieldEditor.Stars)]
         public void Should_not_add_error_if_inline_editing_is_allowed_for_editor(NumberFieldEditor editor)
         {
-            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadOnlyCollection.Create(1.0) };
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadonlyList.Create(1.0) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 

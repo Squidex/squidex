@@ -1,13 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -30,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxItems = maxItems;
         }
 
-        public Task ValidateAsync(object? value, ValidationContext context, AddError addError)
+        public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
             if (value is not ICollection items || items.Count == 0)
             {
@@ -39,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     addError(context.Path, T.Get("contents.validation.required"));
                 }
 
-                return Task.CompletedTask;
+                return default;
             }
 
             if (minItems != null && maxItems != null)
@@ -66,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 }
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

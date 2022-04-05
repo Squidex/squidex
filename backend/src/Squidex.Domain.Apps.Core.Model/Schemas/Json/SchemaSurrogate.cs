@@ -1,14 +1,12 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
@@ -19,9 +17,9 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public string Category { get; set; }
 
-        public bool IsSingleton { get; set; }
-
         public bool IsPublished { get; set; }
+
+        public SchemaType Type { get; set; }
 
         public SchemaProperties Properties { get; set; }
 
@@ -35,7 +33,18 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public FieldSurrogate[] Fields { get; set; }
 
-        public Dictionary<string, string>? PreviewUrls { get; set; }
+        public ReadonlyDictionary<string, string>? PreviewUrls { get; set; }
+
+        public bool IsSingleton
+        {
+            set
+            {
+                if (value)
+                {
+                    Type = SchemaType.Singleton;
+                }
+            }
+        }
 
         public void FromSource(Schema source)
         {
@@ -54,8 +63,6 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         Partitioning = x.Partitioning.Key,
                         Properties = x.RawProperties
                     }).ToArray();
-
-            PreviewUrls = source.PreviewUrls.ToDictionary(x => x.Key, x => x.Value);
         }
 
         private static FieldSurrogate[]? CreateChildren(IField field)
@@ -81,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             var fields = Fields?.Select(f => f.ToField()).ToArray() ?? Array.Empty<RootField>();
 
-            var schema = new Schema(Name, fields, Properties, IsPublished, IsSingleton);
+            var schema = new Schema(Name, fields, Properties, IsPublished, Type);
 
             if (!string.IsNullOrWhiteSpace(Category))
             {

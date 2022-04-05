@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -34,31 +32,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
             ITextIndex contentTextIndexer,
             IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(contentQuery, nameof(contentQuery));
-            Guard.NotNull(contentTextIndexer, nameof(contentTextIndexer));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.appProvider = appProvider;
             this.contentQuery = contentQuery;
             this.contentTextIndexer = contentTextIndexer;
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<SearchResults> SearchAsync(string query, Context context)
+        public async Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 
-            var searchFilter = await CreateSearchFilterAsync(context);
+            var schemaIds = await GetSchemaIdsAsync(context, ct);
 
-            if (searchFilter == null)
+            if (schemaIds.Count == 0)
             {
                 return result;
             }
 
-            var textQuery = new TextQuery($"{query}~", searchFilter);
+            var textQuery = new TextQuery($"{query}~", 10)
+            {
+                RequiredSchemaIds = schemaIds
+            };
 
-            var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope());
+            var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope(), ct);
 
             if (ids == null || ids.Count == 0)
             {
@@ -67,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var appId = context.App.NamedId();
 
-            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids));
+            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids), ct);
 
             foreach (var content in contents)
             {
@@ -81,26 +78,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result;
         }
 
-        private async Task<TextFilter?> CreateSearchFilterAsync(Context context)
+        private async Task<List<DomainId>> GetSchemaIdsAsync(Context context,
+            CancellationToken ct)
         {
-            var allowedSchemas = new List<DomainId>();
+            var schemas = await appProvider.GetSchemasAsync(context.App.Id, ct);
 
-            var schemas = await appProvider.GetSchemasAsync(context.App.Id);
-
-            foreach (var schema in schemas)
-            {
-                if (HasPermission(context, schema.SchemaDef.Name))
-                {
-                    allowedSchemas.Add(schema.Id);
-                }
-            }
-
-            if (allowedSchemas.Count == 0)
-            {
-                return null;
-            }
-
-            return TextFilter.MustHaveSchemas(allowedSchemas.ToArray());
+            return schemas.Where(x => HasPermission(context, x.SchemaDef.Name)).Select(x => x.Id).ToList();
         }
 
         private static bool HasPermission(Context context, string schemaName)

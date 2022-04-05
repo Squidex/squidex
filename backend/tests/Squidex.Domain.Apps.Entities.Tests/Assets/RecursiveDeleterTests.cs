@@ -5,10 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Events.Assets;
@@ -16,14 +14,13 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class RecursiveDeleterTests
     {
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<RecursiveDeleter> log = A.Fake<ILogger<RecursiveDeleter>>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAssetFolderRepository assetFolderRepository = A.Fake<IAssetFolderRepository>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
@@ -62,6 +59,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Should_Not_invoke_delete_commands_if_event_restored()
+        {
+            var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
+
+            await sut.On(Envelope.Create(@event).SetRestored());
+
+            A.CallTo(() => commandBus.PublishAsync(A<ICommand>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_invoke_delete_commands_for_all_subfolders()
         {
             var @event = new AssetFolderDeleted { AppId = appId, AssetFolderId = DomainId.NewGuid() };
@@ -69,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var childFolderId1 = DomainId.NewGuid();
             var childFolderId2 = DomainId.NewGuid();
 
-            A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
+            A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
                 .Returns(new List<DomainId> { childFolderId1, childFolderId2 });
 
             await sut.On(Envelope.Create(@event));
@@ -89,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var childId1 = DomainId.NewGuid();
             var childId2 = DomainId.NewGuid();
 
-            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
+            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
                 .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));
@@ -112,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId1)))
                 .Throws(new InvalidOperationException());
 
-            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId))
+            A.CallTo(() => assetRepository.QueryChildIdsAsync(appId.Id, @event.AssetFolderId, A<CancellationToken>._))
                 .Returns(new List<DomainId> { childId1, childId2 });
 
             await sut.On(Envelope.Create(@event));
@@ -120,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => commandBus.PublishAsync(A<DeleteAsset>.That.Matches(x => x.AssetId == childId2)))
                 .MustHaveHappened();
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<Exception?>._, A<LogFormatter>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();
         }
     }

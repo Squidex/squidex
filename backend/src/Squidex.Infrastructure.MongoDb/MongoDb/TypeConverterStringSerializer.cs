@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class TypeConverterStringSerializer<T> : SerializerBase<T>
     {
-        private readonly TypeConverter typeConverter;
+        private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(T));
 
         public static void Register()
         {
@@ -26,11 +26,6 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 return;
             }
-        }
-
-        public TypeConverterStringSerializer()
-        {
-            typeConverter = TypeDescriptor.GetConverter(typeof(T));
         }
 
         public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
@@ -45,7 +40,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 var value = context.Reader.ReadString();
 
-                return (T)typeConverter.ConvertFromInvariantString(value);
+                return (T)typeConverter.ConvertFromInvariantString(value)!;
             }
         }
 

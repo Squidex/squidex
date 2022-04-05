@@ -1,14 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure.Security;
@@ -20,23 +16,23 @@ namespace Squidex.Areas.IdentityServer.Controllers
     {
         public static async Task<ExternalLoginInfo> GetExternalLoginInfoWithDisplayNameAsync(this SignInManager<IdentityUser> signInManager, string? expectedXsrf = null)
         {
-            var externalLogin = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);
+            var login = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);
 
-            if (externalLogin == null)
+            if (login == null)
             {
                 throw new InvalidOperationException("Request from external provider cannot be handled.");
             }
 
-            var email = externalLogin.Principal.GetEmail();
+            var email = login.Principal.GetEmail();
 
             if (string.IsNullOrWhiteSpace(email))
             {
                 throw new InvalidOperationException("External provider does not provide email claim.");
             }
 
-            externalLogin.ProviderDisplayName = email;
+            login.ProviderDisplayName = email;
 
-            return externalLogin;
+            return login;
         }
 
         public static async Task<List<ExternalProvider>> GetExternalProvidersAsync(this SignInManager<IdentityUser> signInManager)

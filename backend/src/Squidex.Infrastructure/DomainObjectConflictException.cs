@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Runtime.Serialization;
 using Squidex.Infrastructure.Translations;
 
@@ -14,8 +13,10 @@ namespace Squidex.Infrastructure
     [Serializable]
     public class DomainObjectConflictException : DomainObjectException
     {
+        private const string ValidationError = "OBJECT_CONFLICT";
+
         public DomainObjectConflictException(string id, Exception? inner = null)
-            : base(FormatMessage(id), id, inner)
+            : base(FormatMessage(id), id, ValidationError, inner)
         {
         }
 

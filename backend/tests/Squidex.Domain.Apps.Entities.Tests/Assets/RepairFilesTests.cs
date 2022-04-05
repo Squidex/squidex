@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
@@ -23,11 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-        private readonly RepairFiles sut;
+        private readonly RebuildFiles sut;
 
         public RepairFilesTests()
         {
-            sut = new RepairFiles(assetFileStore, eventStore, eventDataFormatter);
+            sut = new RebuildFiles(assetFileStore, eventStore, eventDataFormatter);
         }
 
         [Fact]
@@ -37,12 +34,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupEvent(@event);
 
-            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 0, default))
+            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 0, null, default))
                 .Throws(new AssetNotFoundException("file"));
 
             await sut.RepairAsync();
 
-            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 0, A<Stream>._, default))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 0, null, A<Stream>._, true, default))
                 .MustHaveHappened();
         }
 
@@ -53,12 +50,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupEvent(@event);
 
-            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 0, default))
+            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 0, null, default))
                 .Returns(100);
 
             await sut.RepairAsync();
 
-            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 0, A<Stream>._, default))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 0, null, A<Stream>._, true, default))
                 .MustNotHaveHappened();
         }
 
@@ -69,12 +66,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupEvent(@event);
 
-            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 3, default))
+            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 3, null, default))
                 .Throws(new AssetNotFoundException("file"));
 
             await sut.RepairAsync();
 
-            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 3, A<Stream>._, default))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 3, null, A<Stream>._, true, default))
                 .MustHaveHappened();
         }
 
@@ -85,12 +82,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             SetupEvent(@event);
 
-            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 3, default))
+            A.CallTo(() => assetFileStore.GetFileSizeAsync(appId.Id, @event.AssetId, 3, null, default))
                 .Returns(100);
 
             await sut.RepairAsync();
 
-            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 3, A<Stream>._, default))
+            A.CallTo(() => assetFileStore.UploadAsync(appId.Id, @event.AssetId, 3, null, A<Stream>._, true, default))
                 .MustNotHaveHappened();
         }
 
@@ -101,13 +98,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.RepairAsync();
 
-            A.CallTo(() => assetFileStore.GetFileSizeAsync(A<DomainId>._, A<DomainId>._, A<long>._, default))
+            A.CallTo(() => assetFileStore.GetFileSizeAsync(A<DomainId>._, A<DomainId>._, A<long>._, null, default))
                 .MustNotHaveHappened();
         }
 
         private void SetupEvent(IEvent? @event)
         {
-            var storedEvent = new StoredEvent("stream", "0", -1, new EventData("type", new EnvelopeHeaders(), "payload"));
+            var storedEvent =
+                new StoredEvent("stream", "0", -1,
+                    new EventData("type", new EnvelopeHeaders(), "payload"));
+
+            var storedEvents = new List<StoredEvent>
+            {
+                storedEvent
+            };
 
             if (@event != null)
             {
@@ -120,13 +124,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     .Returns(null);
             }
 
-            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>._, "^asset\\-", null, default))
-                .Invokes(x =>
-                {
-                    var callback = x.GetArgument<Func<StoredEvent, Task>>(0)!;
-
-                    callback(storedEvent).Wait();
-                });
+            A.CallTo(() => eventStore.QueryAllAsync("^asset\\-", null, int.MaxValue, default))
+                .Returns(storedEvents.ToAsyncEnumerable());
         }
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
@@ -32,7 +31,7 @@ namespace Squidex.Infrastructure.States
             {
                 Value = initial;
 
-                Write = state =>
+                Write = (state, _) =>
                 {
                     Value = state;
                 };

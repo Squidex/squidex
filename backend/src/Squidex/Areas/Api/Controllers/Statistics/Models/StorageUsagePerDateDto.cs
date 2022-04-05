@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
 
@@ -28,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// </summary>
         public long TotalSize { get; set; }
 
-        public static StorageUsagePerDateDto FromStats(AssetStats stats)
+        public static StorageUsagePerDateDto FromDomain(AssetStats stats)
         {
             var result = new StorageUsagePerDateDto
             {

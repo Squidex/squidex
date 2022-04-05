@@ -1,0 +1,109 @@
+<div class="panel2" #panel>
+    <ng-container *ngIf="layout === 'simple'">
+        <div class="panel2-slice simple">
+            <div class="panel2-header simple" *ngIf="!hideHeader">
+                <div class="panel2-header-inner simple">
+                    <h3 *ngIf="titleText">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
+                    </h3>
+                    <div>
+                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                    </div>
+                    <div class="flex-grow-1 text-end align-items-center">
+                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="panel2-main simple">
+                <div class="panel2-main-inner simple" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
+                    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+                </div> 
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="layout === 'left'">
+        <div class="panel2-slice left" [class.collapsed]="isCollapsed">
+            <div class="panel2-header left" *ngIf="!hideHeader">
+                <div class="panel2-header-inner left">
+                    <h3 *ngIf="titleText">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
+                    </h3>
+                    <div>
+                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                    </div>
+                    <div class="flex-grow-1 d-flex justify-content-end align-items-center">
+                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                    </div>
+                </div>
+
+                <button class="btn panel2-collapse" (click)="toggle()">
+                    <i class="icon-angle-left"></i>
+                </button>
+
+                <div class="panel2-sidebar-title">{{ (titleCollapsed || titleText) | sqxTranslate }}</div>
+            </div>
+
+            <div class="panel2-main left">
+                <div class="panel2-main-inner left" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
+                    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    
+    <ng-container *ngIf="layout === 'main'">
+        <div class="panel2-slice main">
+            <div class="panel2-header main" *ngIf="!hideHeader">
+                <div class="panel2-header-inner main" [style.width]="desiredInnerWidth"> 
+                    <h3 *ngIf="titleText">
+                        <i class="icon-{{titleIcon}}" *ngIf="titleIcon"></i> {{ titleText | sqxTranslate }}
+                    </h3>
+                    <div>
+                        <ng-container *ngTemplateOutlet="titleTemplate"></ng-container>
+                    </div>
+                    <div class="flex-grow-1 d-flex justify-content-end align-items-center">
+                        <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="panel2-main main">
+                <div class="panel2-main-inner main" [class.white]="white" [class.padded]="padding" [class.overflow]="overflow">
+                    <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+                </div> 
+            </div>
+        </div>
+
+        <div class="panel2-slice menu" *ngIf="!hideSidebar">
+            <div class="panel2-header menu">            
+                <a class="btn panel2-collapse" [routerLink]="['./']" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" *ngIf="firstChild | async">
+                    <i class="icon-angle-right"></i>
+                </a>
+            </div>
+    
+            <div class="panel2-main menu">
+                <ng-container *ngTemplateOutlet="sidebarMenuTemplate"></ng-container>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-template #contentTemplate>
+        <ng-content></ng-content>
+    </ng-template>
+
+    <ng-template #titleTemplate>
+        <ng-content select="[title]"></ng-content>
+    </ng-template>
+
+    <ng-template #menuTemplate>
+        <ng-content select="[menu]"></ng-content>
+    </ng-template>
+
+    <ng-template #headerTemplate>
+        <ng-content select="[header]"></ng-content>
+    </ng-template>
+
+    <ng-template #sidebarMenuTemplate>
+        <ng-content select="[sidebarMenu]"></ng-content>
+    </ng-template>
+</div>

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
 using Newtonsoft.Json;
 using NewtonsoftException = Newtonsoft.Json.JsonException;
 
@@ -19,16 +17,18 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public NewtonsoftJsonSerializer(JsonSerializerSettings settings)
         {
-            Guard.NotNull(settings, nameof(settings));
+            Guard.NotNull(settings);
 
             this.settings = settings;
 
             serializer = JsonSerializer.Create(settings);
         }
 
-        public string Serialize<T>(T value, bool intented)
+        public string Serialize<T>(T value, bool intented = false)
         {
-            return JsonConvert.SerializeObject(value, intented ? Formatting.Indented : Formatting.None, settings);
+            var formatting = intented ? Formatting.Indented : Formatting.None;
+
+            return JsonConvert.SerializeObject(value, formatting, settings);
         }
 
         public void Serialize<T>(T value, Stream stream, bool leaveOpen = false)

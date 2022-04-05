@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -23,8 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(OpenIdClaims.ClientId, "1"));
 
-            Assert.Equal("1", GetValue(identity, "user.id"));
-            Assert.Equal(true, GetValue(identity, "user.isClient"));
+            AssetUser(identity, "1", true, false);
         }
 
         [Fact]
@@ -33,9 +32,9 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var identity = new ClaimsIdentity();
 
             identity.AddClaim(new Claim(OpenIdClaims.Subject, "2"));
+            identity.AddClaim(new Claim(OpenIdClaims.Name, "user"));
 
-            Assert.Equal("2", GetValue(identity, "user.id"));
-            Assert.Equal(false, GetValue(identity, "user.isClient"));
+            AssetUser(identity, "2", false, true);
         }
 
         [Fact]
@@ -45,7 +44,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(OpenIdClaims.Email, "hello@squidex.io"));
 
-            Assert.Equal("hello@squidex.io", GetValue(identity, "user.email"));
+            const string script = @"
+                return user.email;
+            ";
+
+            Assert.Equal("hello@squidex.io", GetValue(identity, script));
         }
 
         [Fact]
@@ -55,7 +58,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, "my-picture"));
 
-            Assert.Equal(new[] { "my-picture" }, GetValue(identity, "user.claims.picture"));
+            const string script = @"
+                return user.claims.picture;
+            ";
+
+            Assert.Equal(new[] { "my-picture" }, GetValue(identity, script));
         }
 
         [Fact]
@@ -65,7 +72,11 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             identity.AddClaim(new Claim(ClaimTypes.Role, "my-role"));
 
-            Assert.Equal(new[] { "my-role" }, GetValue(identity, "user.claims.role"));
+            const string script = @"
+                return user.claims.role;
+            ";
+
+            Assert.Equal(new[] { "my-role" }, GetValue(identity, script));
         }
 
         [Fact]
@@ -78,8 +89,23 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             identity.AddClaim(new Claim("claim2", "2a"));
             identity.AddClaim(new Claim("claim2", "2b"));
 
-            Assert.Equal(new[] { "1a", "1b" }, GetValue(identity, "user.claims.claim1"));
-            Assert.Equal(new[] { "2a", "2b" }, GetValue(identity, "user.claims.claim2"));
+            const string script1 = @"
+                return user.claims.claim1;
+            ";
+
+            const string script2 = @"
+                return user.claims.claim2;
+            ";
+
+            Assert.Equal(new[] { "1a", "1b" }, GetValue(identity, script1));
+            Assert.Equal(new[] { "2a", "2b" }, GetValue(identity, script2));
+        }
+
+        private static void AssetUser(ClaimsIdentity identity, string id, bool isClient, bool isUser)
+        {
+            Assert.Equal(id, GetValue(identity, "user.id"));
+            Assert.Equal(isUser, GetValue(identity, "user.isUser"));
+            Assert.Equal(isClient, GetValue(identity, "user.isClient"));
         }
 
         private static object GetValue(ClaimsIdentity identity, string script)
@@ -88,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             engine.SetValue("user", JintUser.Create(engine, new ClaimsPrincipal(new[] { identity })));
 
-            return engine.Execute(script).GetCompletionValue().ToObject();
+            return engine.Evaluate(script).ToObject();
         }
     }
 }

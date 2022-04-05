@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -12,34 +12,32 @@ namespace Squidex.Web
 {
     public static class Constants
     {
-        public static readonly string SecurityDefinition = "squidex-oauth-auth";
+        public const string SecurityDefinition = "squidex-oauth-auth";
 
-        public static readonly string ApiPrefix = "/api";
+        public const string OrleansClusterId = "squidex-v2";
 
-        public static readonly string ApiScope = "squidex-api";
+        public const string ApiSecurityScheme = "API";
 
-        public static readonly string ApiSecurityScheme = "custom";
+        public const string PrefixApi = "/api";
 
-        public static readonly string OrleansClusterId = "squidex-v2";
+        public const string PrefixOrleans = "/orleans";
 
-        public static readonly string OrleansPrefix = "/orleans";
+        public const string PrefixPortal = "/portal";
 
-        public static readonly string PortalPrefix = "/portal";
+        public const string PrefixIdentityServer = "/identity-server";
 
-        public static readonly string EmailScope = "email";
+        public const string ScopePermissions = "permissions";
 
-        public static readonly string RoleScope = "role";
+        public const string ScopeProfile = "squidex-profile";
 
-        public static readonly string PermissionsScope = "permissions";
+        public const string ScopeRole = "role";
 
-        public static readonly string ProfileScope = "squidex-profile";
+        public const string ScopeApi = "squidex-api";
 
-        public static readonly string FrontendClient = DefaultClients.Frontend;
+        public static readonly string ClientFrontendId = DefaultClients.Frontend;
 
-        public static readonly string InternalClientId = "squidex-internal";
+        public static readonly string ClientInternalId = "squidex-internal";
 
-        public static readonly string InternalClientSecret = "squidex-internal".Sha256Base64();
-
-        public static readonly string IdentityServerPrefix = "/identity-server";
+        public static readonly string ClientInternalSecret = "squidex-internal".ToSha256Base64();
     }
 }

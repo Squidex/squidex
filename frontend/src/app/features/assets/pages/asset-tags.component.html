@@ -1,0 +1,28 @@
+<div class="nav nav-light flex-column">
+    <div class="nav-item">
+        <a class="nav-link" (click)="reset.emit()" [class.active]="isEmpty()">
+            {{ 'common.tagsAll' | sqxTranslate }}
+        </a>
+    </div>
+
+    <div class="nav-item" *ngFor="let tag of tags; trackBy: trackByTag">
+        <a class="nav-link" (click)="toggle.emit(tag.name)" [class.active]="isSelected(tag)">
+            <div class="row g-0">
+                <div class="col">
+                    <span class="truncate">{{tag.name}}</span>
+                </div>
+                <div class="col-auto">
+                    <div class="badge badge-secondary rounded-pill">{{tag.count}}</div>
+
+                    <a class="btn-sm btn-text-secondary btn-rename" (click)="renameTag(tag)" *ngIf="canRename" sqxStopClick>
+                        <i class="icon-pencil"></i>
+                    </a>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<ng-container *sqxModal="tagRenameDialog">
+    <sqx-asset-tag-dialog [tagName]="tagRenaming!.name" (complete)="tagRenameDialog.hide()"></sqx-asset-tag-dialog>
+</ng-container>

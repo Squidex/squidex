@@ -1,20 +1,17 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure;
 
 namespace Migrations.OldTriggers
 {
-    public sealed class ContentChangedTriggerSchema : Freezable
+    public sealed class ContentChangedTriggerSchema
     {
         public Guid SchemaId { get; set; }
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 
@@ -20,12 +19,13 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
-            await database.DropCollectionAsync("States_Contents");
-            await database.DropCollectionAsync("States_Contents_Archive");
-            await database.DropCollectionAsync("State_Content_Draft");
-            await database.DropCollectionAsync("State_Content_Published");
+            await database.DropCollectionAsync("States_Contents", ct);
+            await database.DropCollectionAsync("States_Contents_Archive", ct);
+            await database.DropCollectionAsync("State_Content_Draft", ct);
+            await database.DropCollectionAsync("State_Content_Published", ct);
         }
     }
 }

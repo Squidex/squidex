@@ -1,42 +1,40 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Log;
+using Microsoft.Extensions.Logging;
 
 namespace Squidex.Web
 {
     public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExceptionFilter, IAsyncActionFilter
     {
-        public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+        public override Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
-            var resultContext = await next();
-
-            if (resultContext.Result is ObjectResult { Value: ProblemDetails problem })
+            if (context.Result is ObjectResult objectResult && objectResult.Value is ProblemDetails problem)
             {
                 var (error, _) = problem.ToErrorDto(context.HttpContext);
 
                 context.Result = GetResult(error);
             }
+
+            return next();
         }
 
         public void OnException(ExceptionContext context)
         {
-            var (error, wellKnown) = context.Exception.ToErrorDto(context.HttpContext);
+            var (error, unhandled) = context.Exception.ToErrorDto(context.HttpContext);
 
-            if (!wellKnown)
+            if (unhandled != null)
             {
-                var log = context.HttpContext.RequestServices.GetRequiredService<ISemanticLog>();
+                var log = context.HttpContext.RequestServices.GetRequiredService<ILogger<ApiExceptionFilterAttribute>>();
 
-                log.LogError(context.Exception, w => w
-                    .WriteProperty("message", "An unexpected exception has occurred."));
+                log.LogError(unhandled, "An unexpected exception has occurred.");
             }
 
             context.Result = GetResult(error);

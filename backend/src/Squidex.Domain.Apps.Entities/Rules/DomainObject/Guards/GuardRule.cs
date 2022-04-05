@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
@@ -16,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
     {
         public static Task CanCreate(CreateRule command, IAppProvider appProvider)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             return Validate.It(async e =>
             {
@@ -46,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
 
         public static Task CanUpdate(UpdateRule command, IRuleEntity rule, IAppProvider appProvider)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             return Validate.It(async e =>
             {
@@ -64,21 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
                     errors.Foreach((x, _) => x.AddTo(e));
                 }
             });
-        }
-
-        public static void CanEnable(EnableRule command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanDisable(DisableRule command)
-        {
-            Guard.NotNull(command, nameof(command));
-        }
-
-        public static void CanDelete(DeleteRule command)
-        {
-            Guard.NotNull(command, nameof(command));
         }
     }
 }

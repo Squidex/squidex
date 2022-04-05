@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Namotion.Reflection;
 using NJsonSchema;
 using NSwag.Generation.Processors;
@@ -14,18 +12,15 @@ using NSwag.Generation.Processors.Contexts;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     public sealed class RuleActionProcessor : IDocumentProcessor
     {
-        private readonly RuleRegistry ruleRegistry;
+        private readonly RuleTypeProvider ruleRegistry;
 
-        public RuleActionProcessor(RuleRegistry ruleRegistry)
+        public RuleActionProcessor(RuleTypeProvider ruleRegistry)
         {
-            Guard.NotNull(ruleRegistry, nameof(ruleRegistry));
-
             this.ruleRegistry = ruleRegistry;
         }
 
@@ -39,7 +34,8 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 {
                     schema.DiscriminatorObject = new OpenApiDiscriminator
                     {
-                        JsonInheritanceConverter = new RuleActionConverter(), PropertyName = "actionType"
+                        JsonInheritanceConverter = new RuleActionConverter(),
+                        PropertyName = "actionType"
                     };
 
                     schema.Properties["actionType"] = new JsonSchemaProperty

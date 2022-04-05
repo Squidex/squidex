@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -14,17 +14,23 @@ namespace Squidex.Domain.Apps.Events.Rules
     [EventType(nameof(RuleUpdated))]
     public sealed class RuleUpdated : RuleEvent, IMigrated<IEvent>
     {
-        public RuleTrigger Trigger { get; set; }
+        public string? Name { get; set; }
 
-        public RuleAction Action { get; set; }
+        public RuleTrigger? Trigger { get; set; }
 
-        public string Name { get; set; }
+        public RuleAction? Action { get; set; }
+
+        public bool? IsEnabled { get; set; }
 
         public IEvent Migrate()
         {
             if (Trigger is IMigrated<RuleTrigger> migrated)
             {
-                Trigger = migrated.Migrate();
+                var clone = (RuleUpdated)MemberwiseClone();
+
+                clone.Trigger = migrated.Migrate();
+
+                return clone;
             }
 
             return this;

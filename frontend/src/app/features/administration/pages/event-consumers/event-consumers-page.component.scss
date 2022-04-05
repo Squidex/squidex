@@ -1,0 +1,14 @@
+@import 'mixins';
+@import 'vars';
+
+.faulted {
+    color: $color-theme-error;
+
+    &-icon {
+        @include build-icon($color-theme-error);
+    }
+}
+
+.error-message {
+    height: 18rem;
+}

@@ -1,146 +1,126 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public sealed class Rule : Cloneable<Rule>
+    public sealed class Rule
     {
-        private RuleTrigger trigger;
-        private RuleAction action;
-        private string name;
-        private bool isEnabled = true;
+        public string? Name { get; private set; }
 
-        public string Name
-        {
-            get => name;
-        }
+        public RuleTrigger Trigger { get; private set; }
 
-        public RuleTrigger Trigger
-        {
-            get => trigger;
-        }
+        public RuleAction Action { get; private set; }
 
-        public RuleAction Action
-        {
-            get => action;
-        }
-
-        public bool IsEnabled
-        {
-            get => isEnabled;
-        }
+        public bool IsEnabled { get; private set; } = true;
 
         public Rule(RuleTrigger trigger, RuleAction action)
         {
-            Guard.NotNull(trigger, nameof(trigger));
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(trigger);
+            Guard.NotNull(action);
 
-            SetTrigger(trigger);
-            SetAction(action);
+            Action = action;
+
+            Trigger = trigger;
         }
 
         [Pure]
         public Rule Rename(string newName)
         {
-            if (string.Equals(name, newName))
+            if (string.Equals(Name, newName, StringComparison.Ordinal))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.name = newName;
+                clone.Name = newName;
             });
         }
 
         [Pure]
         public Rule Enable()
         {
-            if (isEnabled)
+            if (IsEnabled)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isEnabled = true;
+                clone.IsEnabled = true;
             });
         }
 
         [Pure]
         public Rule Disable()
         {
-            if (!isEnabled)
+            if (!IsEnabled)
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.isEnabled = false;
+                clone.IsEnabled = false;
             });
         }
 
         [Pure]
         public Rule Update(RuleTrigger newTrigger)
         {
-            Guard.NotNull(newTrigger, nameof(newTrigger));
+            Guard.NotNull(newTrigger);
 
-            if (newTrigger.GetType() != trigger.GetType())
+            if (newTrigger.GetType() != Trigger.GetType())
             {
                 throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
             }
 
-            if (trigger.DeepEquals(newTrigger))
+            if (Trigger.Equals(newTrigger))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.SetTrigger(newTrigger);
+                clone.Trigger = newTrigger;
             });
         }
 
         [Pure]
         public Rule Update(RuleAction newAction)
         {
-            Guard.NotNull(newAction, nameof(newAction));
+            Guard.NotNull(newAction);
 
-            if (newAction.GetType() != action.GetType())
+            if (newAction.GetType() != Action.GetType())
             {
                 throw new ArgumentException("New action has another type.", nameof(newAction));
             }
 
-            if (action.DeepEquals(newAction))
+            if (Action.Equals(newAction))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.SetAction(newAction);
+                clone.Action = newAction;
             });
         }
 
-        private void SetAction(RuleAction newAction)
+        private Rule Clone(Action<Rule> updater)
         {
-            action = newAction;
-            action.Freeze();
-        }
+            var clone = (Rule)MemberwiseClone();
 
-        private void SetTrigger(RuleTrigger newTrigger)
-        {
-            trigger = newTrigger;
-            trigger.Freeze();
+            updater(clone);
+
+            return clone;
         }
     }
 }

@@ -1,0 +1,31 @@
+@import 'mixins';
+@import 'vars';
+
+:host,
+.inner-form,
+.inner-main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.inner-header,
+.inner-main {
+    position: relative;
+}
+
+.inner-header {
+    border-bottom: 1px solid $color-border;
+    border-radius: 0;
+    padding: 1rem $panel-padding;
+}
+
+.nav {
+    @include absolute(null, null, 0, 2rem);
+}
+
+:host ::ng-deep {
+    .editor {
+        @include absolute(0, 0, 0, 0);
+    }
+}

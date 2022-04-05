@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Fastly
 {
@@ -24,14 +22,17 @@ namespace Squidex.Extensions.Actions.Fastly
         public FastlyActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
             : base(formatter)
         {
-            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
-
             this.httpClientFactory = httpClientFactory;
         }
 
         protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
         {
-            var id = @event is IEnrichedEntityEvent entityEvent ? entityEvent.Id.ToString() : string.Empty;
+            var id = string.Empty;
+
+            if (@event is IEnrichedEntityEvent entityEvent)
+            {
+                id = DomainId.Combine(@event.AppId.Id, entityEvent.Id).ToString();
+            }
 
             var ruleJob = new FastlyJob
             {
@@ -43,7 +44,8 @@ namespace Squidex.Extensions.Actions.Fastly
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(FastlyJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(FastlyJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {

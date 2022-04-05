@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] = new WorkflowStep()
-                    }),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] = new WorkflowStep()
-                    }),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Draft] = new WorkflowStep()
-                    }),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                     {
                         [Status.Published] = null!,
                         [Status.Draft] = new WorkflowStep()
-                    }),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -152,9 +152,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                                 new Dictionary<Status, WorkflowTransition>
                                 {
                                     [Status.Archived] = WorkflowTransition.Always
-                                }),
+                                }.ToReadonlyDictionary()),
                         [Status.Draft] = new WorkflowStep()
-                    }),
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 
@@ -178,8 +178,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
                                 new Dictionary<Status, WorkflowTransition>
                                 {
                                     [Status.Draft] = null!
-                                })
-                    }),
+                                }.ToReadonlyDictionary())
+                    }.ToReadonlyDictionary()),
                 WorkflowId = workflowId
             };
 

@@ -1,14 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using NodaTime;
@@ -41,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsGrainTests()
         {
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>._, A<string>._, A<long>._, A<ICollection<EventData>>._, default))
                 .Invokes(x => LastEvents = sut!.GetUncommittedEvents().Select(x => x.To<IEvent>()).ToList());
 
             sut = new CommentsGrain(eventStore, eventDataFormatter);
@@ -57,12 +53,12 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             result.Value.ShouldBeEquivalent(CommandResult.Empty(commentsId, 0, EtagVersion.Empty));
 
-            sut.GetCommentsAsync(0).Result.Should().BeEquivalentTo(new CommentsResult
+            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
             {
                 Version = 0
             });
 
-            sut.GetCommentsAsync(-1).Result.Should().BeEquivalentTo(new CommentsResult
+            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
             {
                 CreatedComments = new List<Comment>
                 {
@@ -88,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             result.Value.ShouldBeEquivalent(CommandResult.Empty(commentsId, 1, 0));
 
-            sut.GetCommentsAsync(-1).Result.Should().BeEquivalentTo(new CommentsResult
+            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
             {
                 CreatedComments = new List<Comment>
                 {
@@ -97,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 Version = 1
             });
 
-            sut.GetCommentsAsync(0).Result.Should().BeEquivalentTo(new CommentsResult
+            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
             {
                 UpdatedComments = new List<Comment>
                 {
@@ -124,12 +120,12 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
             result.Value.ShouldBeEquivalent(CommandResult.Empty(commentsId, 2, 1));
 
-            sut.GetCommentsAsync(-1).Result.Should().BeEquivalentTo(new CommentsResult
+            (await sut.GetCommentsAsync(-1)).Should().BeEquivalentTo(new CommentsResult
             {
                 Version = 2
             });
 
-            sut.GetCommentsAsync(0).Result.Should().BeEquivalentTo(new CommentsResult
+            (await sut.GetCommentsAsync(0)).Should().BeEquivalentTo(new CommentsResult
             {
                 DeletedComments = new List<DomainId>
                 {
@@ -138,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
                 Version = 2
             });
 
-            sut.GetCommentsAsync(1).Result.Should().BeEquivalentTo(new CommentsResult
+            (await sut.GetCommentsAsync(1)).Should().BeEquivalentTo(new CommentsResult
             {
                 DeletedComments = new List<DomainId>
                 {

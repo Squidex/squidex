@@ -1,22 +1,21 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
     {
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
-        private readonly IUser user = A.Fake<IUser>();
+        private readonly IUser user;
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly string contributorId = DomainId.NewGuid().ToString();
         private readonly string clientId = "client";
@@ -36,10 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private readonly string planIdFree = "free";
         private readonly AppDomainObject sut;
         private readonly DomainId workflowId = DomainId.NewGuid();
-        private readonly DomainId patternId1 = DomainId.NewGuid();
-        private readonly DomainId patternId2 = DomainId.NewGuid();
-        private readonly DomainId patternId3 = DomainId.NewGuid();
-        private readonly InitialPatterns initialPatterns;
+        private readonly InitialSettings initialSettings;
 
         protected override DomainId Id
         {
@@ -48,10 +44,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         public AppDomainObjectTests()
         {
-            A.CallTo(() => user.Id)
-                .Returns(contributorId);
+            user = UserMocks.User(contributorId);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, default))
                 .Returns(user);
 
             A.CallTo(() => appPlansProvider.GetFreePlan())
@@ -63,18 +58,29 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             A.CallTo(() => appPlansProvider.GetPlan(planIdPaid))
                 .Returns(new ConfigAppLimitsPlan { Id = planIdPaid, MaxContributors = 30 });
 
-            initialPatterns = new InitialPatterns
+            // Create a non-empty setting, otherwise the event is not raised as it does not change the domain object.
+            initialSettings = new InitialSettings
             {
-                { patternId1, new AppPattern("Number", "[0-9]") },
-                { patternId2, new AppPattern("Numbers", "[0-9]*") }
+                Settings = new AppSettings
+                {
+                    HideScheduler = true
+                }
             };
 
-            sut = new AppDomainObject(Store, A.Dummy<ISemanticLog>(), initialPatterns, appPlansProvider, appPlansBillingManager, userResolver);
+            var log = A.Fake<ILogger<AppDomainObject>>();
+
+            sut = new AppDomainObject(PersistenceFactory, log,
+                initialSettings,
+                appPlansProvider,
+                appPlansBillingManager,
+                userResolver);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]
-        public async Task Command_should_throw_exception_if_app_is_archived()
+        public async Task Command_should_throw_exception_if_app_is_deleted()
         {
             await ExecuteCreateAsync();
             await ExecuteArchiveAsync();
@@ -97,8 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
                     CreateEvent(new AppContributorAssigned { ContributorId = Actor.Identifier, Role = Role.Owner }),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" })
+                    CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings })
                 );
         }
 
@@ -115,9 +120,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppCreated { Name = AppName }, true),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }, true),
-                    CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" }, true)
+                    CreateEvent(new AppCreated { Name = AppName }, true), // Must be with client actor.
+                    CreateEvent(new AppSettingsUpdated { Settings = initialSettings.Settings }, true)
                 );
         }
 
@@ -137,7 +141,31 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppUpdated { Label = "my-label", Description = "my-description" })
+                    CreateEvent(new AppUpdated { Label = command.Label, Description = command.Description })
+                );
+        }
+
+        [Fact]
+        public async Task UpdateSettings_should_create_event_and_update_settings()
+        {
+            var settings = new AppSettings
+            {
+                HideDateTimeModeButton = true
+            };
+
+            var command = new UpdateAppSettings { Settings = settings };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishIdempotentAsync(command);
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(settings, sut.Snapshot.Settings);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppSettingsUpdated { Settings = settings })
                 );
         }
 
@@ -602,66 +630,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         }
 
         [Fact]
-        public async Task AddPattern_should_create_events_and_add_pattern()
+        public async Task ArchiveApp_should_create_events_and_update_deleted_flag()
         {
-            var command = new AddPattern { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" };
-
-            await ExecuteCreateAsync();
-
-            var result = await PublishAsync(command);
-
-            result.ShouldBeEquivalent(sut.Snapshot);
-
-            Assert.Equal(initialPatterns.Count + 1, sut.Snapshot.Patterns.Count);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternAdded { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" })
-                );
-        }
-
-        [Fact]
-        public async Task DeletePattern_should_create_events_and_update_pattern()
-        {
-            var command = new DeletePattern { PatternId = patternId3 };
-
-            await ExecuteCreateAsync();
-            await ExecuteAddPatternAsync();
-
-            var result = await PublishAsync(command);
-
-            result.ShouldBeEquivalent(sut.Snapshot);
-
-            Assert.Equal(initialPatterns.Count, sut.Snapshot.Patterns.Count);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternDeleted { PatternId = patternId3 })
-                );
-        }
-
-        [Fact]
-        public async Task UpdatePattern_should_create_events_and_remove_pattern()
-        {
-            var command = new UpdatePattern { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" };
-
-            await ExecuteCreateAsync();
-            await ExecuteAddPatternAsync();
-
-            var result = await PublishIdempotentAsync(command);
-
-            result.ShouldBeEquivalent(sut.Snapshot);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternUpdated { PatternId = patternId3, Name = "Any", Pattern = ".*", Message = "Msg" })
-                );
-        }
-
-        [Fact]
-        public async Task ArchiveApp_should_create_events_and_update_archived_flag()
-        {
-            var command = new ArchiveApp();
+            var command = new DeleteApp();
 
             await ExecuteCreateAsync();
 
@@ -669,11 +640,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             result.ShouldBeEquivalent(None.Value);
 
-            Assert.True(sut.Snapshot.IsArchived);
+            Assert.True(sut.Snapshot.IsDeleted);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppArchived())
+                    CreateEvent(new AppDeleted())
                 );
 
             A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppNamedId, null, A<string?>._))
@@ -688,11 +659,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private Task ExecuteUploadImage()
         {
             return PublishAsync(new UploadAppImage { File = new NoopAssetFile() });
-        }
-
-        private Task ExecuteAddPatternAsync()
-        {
-            return PublishAsync(new AddPattern { PatternId = patternId3, Name = "Name", Pattern = ".*" });
         }
 
         private Task ExecuteAssignContributorAsync()
@@ -727,7 +693,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private Task ExecuteArchiveAsync()
         {
-            return PublishAsync(new ArchiveApp());
+            return PublishAsync(new DeleteApp());
         }
 
         private Task<object> PublishIdempotentAsync(AppCommand command)

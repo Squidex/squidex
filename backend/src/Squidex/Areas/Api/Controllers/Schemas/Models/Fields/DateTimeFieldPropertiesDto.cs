@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -32,6 +32,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// The minimum allowed value for the field value.
         /// </summary>
         public Instant? MinValue { get; set; }
+
+        /// <summary>
+        /// The format pattern when displayed in the UI.
+        /// </summary>
+        public string? Format { get; set; }
 
         /// <summary>
         /// The editor that is used to manage this field.

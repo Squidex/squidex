@@ -1,13 +1,9 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -20,7 +16,7 @@ namespace Squidex.Infrastructure.Commands
             Task InvokeAsync(CommandContext context);
         }
 
-        private class NoopStep : IStep
+        private sealed class NoopStep : IStep
         {
             public Task InvokeAsync(CommandContext context)
             {
@@ -28,7 +24,7 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        private class DefaultStep : IStep
+        private sealed class DefaultStep : IStep
         {
             private readonly IStep next;
             private readonly ICommandMiddleware middleware;
@@ -48,8 +44,6 @@ namespace Squidex.Infrastructure.Commands
 
         public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
         {
-            Guard.NotNull(middlewares, nameof(middlewares));
-
             var reverseMiddlewares = middlewares.Reverse().ToList();
 
             IStep next = new NoopStep();
@@ -64,7 +58,7 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task<CommandContext> PublishAsync(ICommand command)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var context = new CommandContext(command, this);
 

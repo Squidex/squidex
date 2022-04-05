@@ -1,0 +1,69 @@
+<sqx-title message="i18n:apps.listPageTitle"></sqx-title>
+
+<div class="panel-container page" *ngIf="authState.userChanges | async; let user">  
+    <div class="apps-section">
+        <h1 class="apps-title">{{ 'apps.welcomeTitle' | sqxTranslate: { user: user.displayName } }}</h1>
+
+        <div class="subtext">
+            {{ 'apps.welcomeSubtitle' | sqxTranslate }}
+        </div>
+    </div>
+
+    <ng-container *ngIf="appsState.apps | async; let apps">
+        <div class="apps-section">
+            <div class="empty" *ngIf="apps.length === 0">
+                <h3 class="empty-headline">{{ 'apps.empty' | sqxTranslate }}</h3>
+            </div>
+
+            <sqx-app *ngFor="let app of apps; trackBy: trackByApp"
+                [app]="app" (leave)="leave($event)">
+            </sqx-app>
+        </div>
+    </ng-container>
+
+    <div class="apps-section" *ngIf="(uiState.settings | async)?.canCreateApps">
+        <div class="card card-template card-href" (click)="createNewApp()">
+            <div class="card-body">
+                <div class="card-image">
+                    <img src="./images/add-app.svg">
+                </div>
+
+                <h3 class="card-title">{{ 'apps.createBlankApp' | sqxTranslate }}</h3>
+
+                <sqx-form-hint>
+                    {{ 'apps.createBlankAppDescription' | sqxTranslate }}
+                </sqx-form-hint>
+            </div>
+        </div>
+
+        <div class="card card-template card-href" *ngFor="let template of templates | async" (click)="createNewApp(template)">
+            <div class="card-body">
+                <div class="card-image">
+                    <img src="./images/add-template.svg">
+                </div>
+
+                <h3 class="card-title">{{template.title}}</h3>
+
+                <sqx-form-hint>
+                    {{template.description}}
+                </sqx-form-hint>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="info" class="apps-section">
+        <small class="info">{{info}}</small>
+    </div>
+</div>
+
+<ng-container *sqxModal="addAppDialog">
+    <sqx-app-form [template]="addAppTemplate" (complete)="addAppDialog.hide()"></sqx-app-form>
+</ng-container>
+
+<ng-container *sqxModal="onboardingDialog">
+    <sqx-onboarding-dialog (close)="onboardingDialog.hide()"></sqx-onboarding-dialog>
+</ng-container>
+
+<ng-container *sqxModal="newsDialog">
+    <sqx-news-dialog [features]="newsFeatures!" (close)="newsDialog.hide()"></sqx-news-dialog>
+</ng-container>

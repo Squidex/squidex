@@ -3,7 +3,7 @@ services:
   mongo:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - "27018:27017"
     networks:
       - internal
 
@@ -18,7 +18,19 @@ services:
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__TYPE=MongoDB
+      - SCRIPTING__TIMEOUTSCRIPT=00:00:10
+      - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - GRAPHQL__CACHEDURATION=0
+      - ASSETS_RESIZERURL=http://resizer:8081
+    networks:
+      - internal
+    depends_on:
+      - mongo
+
+  resizer:
+    image: squidex/resizer:dev-2
+    ports:
+      - "8081:80"
     networks:
       - internal
     depends_on:

@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using NJsonSchema;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.TestHelpers;
@@ -35,80 +31,43 @@ namespace Squidex.Infrastructure.Queries
             ("StartsWith", "startswith", "startsWith($FIELD, $VALUE)")
         };
 
-        private static readonly JsonSchema Schema = new JsonSchema();
+        private static readonly QueryModel Model = new QueryModel();
 
         static QueryFromJsonTests()
         {
-            var nested = new JsonSchemaProperty { Title = "nested", Type = JsonObjectType.Object };
-
-            nested.Properties["property"] = new JsonSchemaProperty
+            var nestedSchema = new FilterSchema(FilterSchemaType.Object)
             {
-                Type = JsonObjectType.String
+                Fields = ReadonlyList.Create(new FilterField(FilterSchema.String, "property"))
             };
 
-            Schema.Properties["boolean"] = new JsonSchemaProperty
+            var fields = new List<FilterField>
             {
-                Type = JsonObjectType.Boolean
+                new FilterField(nestedSchema, "object"),
+                new FilterField(FilterSchema.Any, "json"),
+                new FilterField(FilterSchema.Boolean, "boolean"),
+                new FilterField(FilterSchema.Boolean, "booleanNullable", IsNullable: true),
+                new FilterField(FilterSchema.DateTime, "datetime"),
+                new FilterField(FilterSchema.DateTime, "datetimeNullable", IsNullable: true),
+                new FilterField(FilterSchema.GeoObject, "geo"),
+                new FilterField(FilterSchema.Guid, "guid"),
+                new FilterField(FilterSchema.Guid, "guidNullable", IsNullable: true),
+                new FilterField(FilterSchema.Number, "number"),
+                new FilterField(FilterSchema.Number, "numberNullable", IsNullable: true),
+                new FilterField(FilterSchema.Number, "union"),
+                new FilterField(FilterSchema.String, "string"),
+                new FilterField(FilterSchema.String, "stringNullable", IsNullable: true),
+                new FilterField(FilterSchema.String, "union"),
+                new FilterField(FilterSchema.StringArray, "stringArray"),
+                new FilterField(FilterSchema.StringArray, "stringArrayNullable", IsNullable: true),
+                new FilterField(FilterSchema.String, "nested2.value")
             };
 
-            Schema.Properties["datetime"] = new JsonSchemaProperty
+            var schema = new FilterSchema(FilterSchemaType.Object)
             {
-                Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime
+                Fields = fields.ToReadonlyList()
             };
 
-            Schema.Properties["guid"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.String, Format = JsonFormatStrings.Guid
-            };
-
-            Schema.Properties["integer"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Integer
-            };
-
-            Schema.Properties["number"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Number
-            };
-
-            Schema.Properties["json"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.None
-            };
-
-            Schema.Properties["geo"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.Object, Format = GeoJson.Format
-            };
-
-            Schema.Properties["reference"] = new JsonSchemaProperty
-            {
-                Reference = nested
-            };
-
-            Schema.Properties["string"] = new JsonSchemaProperty
-            {
-                Type = JsonObjectType.String
-            };
-
-            Schema.Properties["geoRef"] = new JsonSchemaProperty
-            {
-                Reference = new JsonSchema
-                {
-                    Format = GeoJson.Format
-                }
-            };
-
-            Schema.Properties["stringArray"] = new JsonSchemaProperty
-            {
-                Item = new JsonSchema
-                {
-                    Type = JsonObjectType.String
-                },
-                Type = JsonObjectType.Array
-            };
-
-            Schema.Properties["object"] = nested;
+            Model = new QueryModel { Schema = schema };
         }
 
         public class DateTime
@@ -130,11 +89,27 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
+            public void Should_parse_filter_with_null()
+            {
+                var json = new { path = "datetimeNullable", op = "eq", value = (object?)null };
+
+                AssertFilter(json, "datetimeNullable == null");
+            }
+
+            [Fact]
+            public void Should_add_error_if_field_is_not_nullable()
+            {
+                var json = new { path = "datetime", op = "eq", value = (object?)null };
+
+                AssertFilterError(json, "Expected String (ISO8601 DateTime) for path 'datetime', but got Null.");
+            }
+
+            [Fact]
             public void Should_add_error_if_value_is_invalid()
             {
                 var json = new { path = "datetime", op = "eq", value = "invalid" };
 
-                AssertErrors(json, "Expected ISO8601 DateTime String for path 'datetime', but got invalid String.");
+                AssertFilterError(json, "Expected String (ISO8601 DateTime) for path 'datetime', but got invalid String.");
             }
 
             [Fact]
@@ -142,7 +117,7 @@ namespace Squidex.Infrastructure.Queries
             {
                 var json = new { path = "datetime", op = "eq", value = 1 };
 
-                AssertErrors(json, "Expected ISO8601 DateTime String for path 'datetime', but got Number.");
+                AssertFilterError(json, "Expected String (ISO8601 DateTime) for path 'datetime', but got Number.");
             }
         }
 
@@ -165,11 +140,27 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
+            public void Should_parse_filter_with_null()
+            {
+                var json = new { path = "guidNullable", op = "eq", value = (object?)null };
+
+                AssertFilter(json, "guidNullable == null");
+            }
+
+            [Fact]
+            public void Should_add_error_if_field_is_not_nullable()
+            {
+                var json = new { path = "guid", op = "eq", value = (object?)null };
+
+                AssertFilterError(json, "Expected String (Guid) for path 'guid', but got Null.");
+            }
+
+            [Fact]
             public void Should_add_error_if_value_is_invalid()
             {
                 var json = new { path = "guid", op = "eq", value = "invalid" };
 
-                AssertErrors(json, "Expected Guid String for path 'guid', but got invalid String.");
+                AssertFilterError(json, "Expected String (Guid) for path 'guid', but got invalid String.");
             }
 
             [Fact]
@@ -177,7 +168,7 @@ namespace Squidex.Infrastructure.Queries
             {
                 var json = new { path = "guid", op = "eq", value = 1 };
 
-                AssertErrors(json, "Expected Guid String for path 'guid', but got Number.");
+                AssertFilterError(json, "Expected String (Guid) for path 'guid', but got Number.");
             }
         }
 
@@ -216,11 +207,35 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
+            public void Should_parse_filter_with_null()
+            {
+                var json = new { path = "stringNullable", op = "eq", value = (object?)null };
+
+                AssertFilter(json, "stringNullable == null");
+            }
+
+            [Fact]
+            public void Should_add_error_if_field_is_not_nullable()
+            {
+                var json = new { path = "string", op = "eq", value = (object?)null };
+
+                AssertFilterError(json, "Expected String for path 'string', but got Null.");
+            }
+
+            [Fact]
             public void Should_add_error_if_value_type_is_invalid()
             {
                 var json = new { path = "string", op = "eq", value = 1 };
 
-                AssertErrors(json, "Expected String for path 'string', but got Number.");
+                AssertFilterError(json, "Expected String for path 'string', but got Number.");
+            }
+
+            [Fact]
+            public void Should_add_error_if_valid_is_not_a_valid_regex()
+            {
+                var json = new { path = "string", op = "matchs", value = "((" };
+
+                AssertFilterError(json, "'((' is not a valid regular expression at path 'string'.");
             }
 
             [Fact]
@@ -229,14 +244,6 @@ namespace Squidex.Infrastructure.Queries
                 var json = new { path = "object.property", op = "in", value = new[] { "Hello" } };
 
                 AssertFilter(json, "object.property in ['Hello']");
-            }
-
-            [Fact]
-            public void Should_parse_referenced_string_filter()
-            {
-                var json = new { path = "reference.property", op = "in", value = new[] { "Hello" } };
-
-                AssertFilter(json, "reference.property in ['Hello']");
             }
         }
 
@@ -252,13 +259,6 @@ namespace Squidex.Infrastructure.Queries
                 var value = new { longitude = 10, latitude = 20, distance = 30 };
 
                 return BuildFlatTests("geo", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
-            }
-
-            public static IEnumerable<object[]> ValidRefTests()
-            {
-                var value = new { longitude = 10, latitude = 20, distance = 30 };
-
-                return BuildFlatTests("geoRef", ValidOperator, value, $"Radius({value.longitude}, {value.latitude}, {value.distance})");
             }
 
             public static IEnumerable<object[]> InvalidTests()
@@ -278,21 +278,12 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Theory]
-            [MemberData(nameof(ValidRefTests))]
-            public void Should_parse_filter_with_reference(string field, string op, object value, string expected)
-            {
-                var json = new { path = field, op, value };
-
-                AssertFilter(json, expected);
-            }
-
-            [Theory]
             [MemberData(nameof(InvalidTests))]
             public void Should_add_error_if_operator_is_invalid(string field, string op, object value, string expected)
             {
                 var json = new { path = field, op, value };
 
-                AssertErrors(json, $"'{expected}' is not a valid operator for type Object(geo-json) at '{field}'.");
+                AssertFilterError(json, $"'{expected}' is not a valid operator for type GeoObject at '{field}'.");
             }
 
             [Fact]
@@ -300,7 +291,7 @@ namespace Squidex.Infrastructure.Queries
             {
                 var json = new { path = "geo", op = "lt", value = new { latitude = 10, longitude = 20 } };
 
-                AssertErrors(json, "Expected Object(geo-json) for path 'geo', but got Object.");
+                AssertFilterError(json, "Expected Object(geo-json) for path 'geo', but got Object.");
             }
 
             [Fact]
@@ -308,7 +299,7 @@ namespace Squidex.Infrastructure.Queries
             {
                 var json = new { path = "geo", op = "lt", value = 1 };
 
-                AssertErrors(json, "Expected Object(geo-json) for path 'geo', but got Number.");
+                AssertFilterError(json, "Expected Object(geo-json) for path 'geo', but got Number.");
             }
         }
 
@@ -355,7 +346,7 @@ namespace Squidex.Infrastructure.Queries
             {
                 var json = new { path = field, op, value };
 
-                AssertErrors(json, $"'{expected}' is not a valid operator for type Number at '{field}'.");
+                AssertFilterError(json, $"'{expected}' is not a valid operator for type Number at '{field}'.");
             }
 
             [Theory]
@@ -368,11 +359,27 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
+            public void Should_parse_filter_with_null()
+            {
+                var json = new { path = "numberNullable", op = "eq", value = (object?)null };
+
+                AssertFilter(json, "numberNullable == null");
+            }
+
+            [Fact]
+            public void Should_add_error_if_field_is_not_nullable()
+            {
+                var json = new { path = "number", op = "eq", value = (object?)null };
+
+                AssertFilterError(json, "Expected Number for path 'number', but got Null.");
+            }
+
+            [Fact]
             public void Should_add_error_if_value_type_is_invalid()
             {
                 var json = new { path = "number", op = "eq", value = true };
 
-                AssertErrors(json, "Expected Number for path 'number', but got Boolean.");
+                AssertFilterError(json, "Expected Number for path 'number', but got Boolean.");
             }
         }
 
@@ -419,7 +426,7 @@ namespace Squidex.Infrastructure.Queries
             {
                 var json = new { path = field, op, value };
 
-                AssertErrors(json, $"'{expected}' is not a valid operator for type Boolean at '{field}'.");
+                AssertFilterError(json, $"'{expected}' is not a valid operator for type Boolean at '{field}'.");
             }
 
             [Theory]
@@ -432,11 +439,27 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
+            public void Should_parse_filter_with_null()
+            {
+                var json = new { path = "booleanNullable", op = "eq", value = (object?)null };
+
+                AssertFilter(json, "booleanNullable == null");
+            }
+
+            [Fact]
+            public void Should_add_error_if_field_is_not_nullable()
+            {
+                var json = new { path = "boolean", op = "eq", value = (object?)null };
+
+                AssertFilterError(json, "Expected Boolean for path 'boolean', but got Null.");
+            }
+
+            [Fact]
             public void Should_add_error_if_boolean_property_got_invalid_value()
             {
                 var json = new { path = "boolean", op = "eq", value = 1 };
 
-                AssertErrors(json, "Expected Boolean for path 'boolean', but got Number.");
+                AssertFilterError(json, "Expected Boolean for path 'boolean', but got Number.");
             }
         }
 
@@ -480,12 +503,60 @@ namespace Squidex.Infrastructure.Queries
             }
 
             [Fact]
-            public void Should_add_error_when_using_array_value_for_non_allowed_operator()
+            public void Should_parse_filter_with_null()
+            {
+                var json = new { path = "stringArrayNullable", op = "eq", value = (object?)null };
+
+                AssertFilter(json, "stringArrayNullable == null");
+            }
+
+            [Fact]
+            public void Should_add_error_if_field_is_not_nullable()
+            {
+                var json = new { path = "stringArray", op = "eq", value = (object?)null };
+
+                AssertFilterError(json, "Expected String for path 'stringArray', but got Null.");
+            }
+
+            [Fact]
+            public void Should_add_error_if_using_array_value_for_non_allowed_operator()
             {
                 var json = new { path = "string", op = "eq", value = new[] { "Hello" } };
 
-                AssertErrors(json, "Array value is not allowed for 'Equals' operator and path 'string'.");
+                AssertFilterError(json, "Array value is not allowed for 'Equals' operator and path 'string'.");
             }
+
+            [Fact]
+            public void Should_convert_single_value_to_list_for_in_operator()
+            {
+                var json = new { path = "string", op = "in", value = "Hello" };
+
+                AssertFilter(json, "string in ['Hello']");
+            }
+        }
+
+        [Fact]
+        public void Should_filter_union_by_string()
+        {
+            var json = new { path = "union", op = "eq", value = "Hello" };
+
+            AssertFilter(json, "union == 'Hello'");
+        }
+
+        [Fact]
+        public void Should_filter_union_by_number()
+        {
+            var json = new { path = "union", op = "eq", value = 42 };
+
+            AssertFilter(json, "union == 42");
+        }
+
+        [Fact]
+        public void Should_not_filter_union_by_boolean()
+        {
+            var json = new { path = "union", op = "eq", value = true };
+
+            AssertFilterError(json, "Expected String for path 'union', but got Boolean.");
         }
 
         [Fact]
@@ -493,7 +564,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "notfound", op = "eq", value = 1 };
 
-            AssertErrors(json, "Path 'notfound' does not point to a valid property in the model.");
+            AssertFilterError(json, "Path 'notfound' does not point to a valid property in the model.");
         }
 
         [Fact]
@@ -501,15 +572,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "object.notfound", op = "eq", value = 1 };
 
-            AssertErrors(json, "'notfound' is not a property of 'nested'.");
-        }
-
-        [Fact]
-        public void Should_add_error_if_nested_reference_property_does_not_exist()
-        {
-            var json = new { path = "reference.notfound", op = "eq", value = 1 };
-
-            AssertErrors(json, "'notfound' is not a property of 'nested'.");
+            AssertFilterError(json, "Path 'object.notfound' does not point to a valid property in the model.");
         }
 
         [Fact]
@@ -545,7 +608,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_throw_exception_when_parsing_invalid_json()
+        public void Should_throw_exception_if_parsing_invalid_json()
         {
             var json = "invalid";
 
@@ -572,7 +635,7 @@ namespace Squidex.Infrastructure.Queries
             Assert.Equal(expectedFilter, filter);
         }
 
-        private static void AssertErrors(object json, string expectedError)
+        private static void AssertFilterError(object json, string expectedError)
         {
             var errors = new List<string>();
 
@@ -588,14 +651,14 @@ namespace Squidex.Infrastructure.Queries
 
             var jsonFilter = TestUtils.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
 
-            return JsonFilterVisitor.Parse(jsonFilter, Schema, errors)?.ToString();
+            return JsonFilterVisitor.Parse(jsonFilter, Model, errors)?.ToString();
         }
 
         private static string? ConvertQuery<T>(T value)
         {
             var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            var jsonFilter = Schema.Parse(json, TestUtils.DefaultSerializer);
+            var jsonFilter = Model.Parse(json, TestUtils.DefaultSerializer);
 
             return jsonFilter.ToString();
         }
@@ -607,16 +670,16 @@ namespace Squidex.Infrastructure.Queries
                 $"{field}"
             };
 
-            foreach (var f in fields)
+            foreach (var fieldName in fields)
             {
                 foreach (var (_, op, output) in AllOps.Where(x => opFilter(x.Operator)))
                 {
                     var expected =
                         output
-                            .Replace("$FIELD", f)
-                            .Replace("$VALUE", valueString);
+                            .Replace("$FIELD", fieldName, StringComparison.Ordinal)
+                            .Replace("$VALUE", valueString, StringComparison.Ordinal);
 
-                    yield return new[] { f, op, value, expected };
+                    yield return new[] { fieldName, op, value, expected };
                 }
             }
         }
@@ -630,16 +693,16 @@ namespace Squidex.Infrastructure.Queries
                 $"json.nested.{field}"
             };
 
-            foreach (var f in fields)
+            foreach (var fieldName in fields)
             {
                 foreach (var (_, op, output) in AllOps.Where(x => opFilter(x.Operator)))
                 {
                     var expected =
                         output
-                            .Replace("$FIELD", f)
-                            .Replace("$VALUE", valueString);
+                            .Replace("$FIELD", fieldName, StringComparison.Ordinal)
+                            .Replace("$VALUE", valueString, StringComparison.Ordinal);
 
-                    yield return new[] { f, op, value, expected };
+                    yield return new[] { fieldName, op, value, expected };
                 }
             }
         }

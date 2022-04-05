@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -11,20 +11,24 @@ namespace Squidex.Domain.Users
 {
     public interface IUserEvents
     {
-        void OnUserRegistered(IUser user)
+        Task OnUserRegisteredAsync(IUser user)
         {
+            return Task.CompletedTask;
         }
 
-        void OnUserUpdated(IUser user)
+        Task OnUserUpdatedAsync(IUser user, IUser previous)
         {
+            return Task.CompletedTask;
         }
 
-        void OnUserDeleted(IUser user)
+        Task OnUserDeletedAsync(IUser user)
         {
+            return Task.CompletedTask;
         }
 
-        void OnConsentGiven(IUser user)
+        Task OnConsentGivenAsync(IUser user)
         {
+            return Task.CompletedTask;
         }
     }
 }

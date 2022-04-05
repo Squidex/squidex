@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
@@ -20,9 +19,6 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public DefaultEventDataFormatter(TypeNameRegistry typeNameRegistry, IJsonSerializer serializer)
         {
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
-            Guard.NotNull(serializer, nameof(serializer));
-
             this.typeNameRegistry = typeNameRegistry;
 
             this.serializer = serializer;
@@ -42,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope<IEvent> Parse(StoredEvent storedEvent)
         {
-            Guard.NotNull(storedEvent, nameof(storedEvent));
+            Guard.NotNull(storedEvent);
 
             var eventData = storedEvent.Data;
 

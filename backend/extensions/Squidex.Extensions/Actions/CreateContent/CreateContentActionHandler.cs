@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -30,10 +27,6 @@ namespace Squidex.Extensions.Actions.CreateContent
         public CreateContentActionHandler(RuleEventFormatter formatter, IAppProvider appProvider, ICommandBus commandBus, IJsonSerializer jsonSerializer)
             : base(formatter)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(commandBus, nameof(commandBus));
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-
             this.appProvider = appProvider;
             this.commandBus = commandBus;
             this.jsonSerializer = jsonSerializer;
@@ -76,7 +69,8 @@ namespace Squidex.Extensions.Actions.CreateContent
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(Command job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(Command job,
+            CancellationToken ct = default)
         {
             var command = job;
 

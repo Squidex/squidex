@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_be_handled_when_succeeded()
+        public void Should_be_handled_if_succeeded()
         {
             sut.Complete();
 
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_provide_result_when_succeeded_with_value()
+        public void Should_provide_result_if_succeeded_with_value()
         {
             sut.Complete("RESULT");
 
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_provide_plain_result_when_succeeded_with_value()
+        public void Should_provide_plain_result_if_succeeded_with_value()
         {
             sut.Complete("RESULT");
 

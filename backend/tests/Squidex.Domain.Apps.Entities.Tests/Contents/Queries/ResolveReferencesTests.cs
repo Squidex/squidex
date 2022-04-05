@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -68,15 +65,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (x == schemaId.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, schemaId, schemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, schemaId, schemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == refSchemaId1.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, refSchemaId1, refSchemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, refSchemaId1, refSchemaDef), ResolvedComponents.Empty));
                 }
                 else if (x == refSchemaId2.Id)
                 {
-                    return Task.FromResult(Mocks.Schema(appId, refSchemaId2, refSchemaDef));
+                    return Task.FromResult((Mocks.Schema(appId, refSchemaId2, refSchemaDef), ResolvedComponents.Empty));
                 }
                 else
                 {
@@ -102,10 +99,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
 
             A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
+                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-            await sut.EnrichAsync(requestContext, contents, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
 
             A.CallTo(() => requestCache.AddDependency(DomainId.Combine(appId, refSchemaId1.Id), 0))
                 .MustHaveHappened();
@@ -141,10 +138,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
 
             A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
+                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-            await sut.EnrichAsync(requestContext, contents, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
 
             Assert.Equal(
                 new ContentData()
@@ -180,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         }
 
         [Fact]
-        public async Task Should_not_enrich_when_content_has_more_items()
+        public async Task Should_not_enrich_if_content_has_more_items()
         {
             var ref1_1 = CreateRefContent(DomainId.NewGuid(), 1, "ref1_1", 13, refSchemaId1);
             var ref1_2 = CreateRefContent(DomainId.NewGuid(), 2, "ref1_2", 17, refSchemaId1);
@@ -194,10 +191,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
 
             A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id)))
+                    A<Context>.That.Matches(x => x.ShouldSkipContentEnrichment() && x.ShouldSkipTotal()), A<Q>.That.HasIds(ref1_1.Id, ref1_2.Id, ref2_1.Id, ref2_2.Id), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
 
-            await sut.EnrichAsync(requestContext, contents, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
 
             Assert.Equal(
                 new ContentData()
@@ -242,11 +239,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId));
 
-            await sut.EnrichAsync(ctx, contents, schemaProvider);
+            await sut.EnrichAsync(ctx, contents, schemaProvider, default);
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -260,11 +257,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId)).Clone(b => b.WithoutContentEnrichment(true));
 
-            await sut.EnrichAsync(ctx, contents, schemaProvider);
+            await sut.EnrichAsync(ctx, contents, schemaProvider, default);
 
             Assert.Null(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -276,11 +273,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 CreateContent(Array.Empty<DomainId>(), Array.Empty<DomainId>())
             };
 
-            await sut.EnrichAsync(requestContext, contents, schemaProvider);
+            await sut.EnrichAsync(requestContext, contents, schemaProvider, default);
 
             Assert.NotNull(contents[0].ReferenceData);
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -297,7 +294,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("ref2",
                             new ContentFieldData()
                                 .AddInvariant(JsonValue.Array(ref2.Select(x => x.ToString())))),
-                SchemaId = schemaId, AppId = appId,
+                SchemaId = schemaId,
+                AppId = appId,
                 Version = 0
             };
         }
@@ -315,7 +313,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddField("number",
                             new ContentFieldData()
                                 .AddInvariant(number)),
-                SchemaId = refSchemaId, AppId = appId,
+                SchemaId = refSchemaId,
+                AppId = appId,
                 Version = version
             };
         }

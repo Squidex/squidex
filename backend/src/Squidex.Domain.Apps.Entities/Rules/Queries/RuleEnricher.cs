@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Queries
 {
@@ -23,29 +19,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
         public RuleEnricher(IRuleEventRepository ruleEventRepository, IRequestCache requestCache)
         {
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(requestCache, nameof(requestCache));
-
             this.ruleEventRepository = ruleEventRepository;
 
             this.requestCache = requestCache;
         }
 
-        public async Task<IEnrichedRuleEntity> EnrichAsync(IRuleEntity rule, Context context)
+        public async Task<IEnrichedRuleEntity> EnrichAsync(IRuleEntity rule, Context context,
+            CancellationToken ct)
         {
-            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(rule);
 
-            var enriched = await EnrichAsync(Enumerable.Repeat(rule, 1), context);
+            var enriched = await EnrichAsync(Enumerable.Repeat(rule, 1), context, ct);
 
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IEnrichedRuleEntity>> EnrichAsync(IEnumerable<IRuleEntity> rules, Context context)
+        public async Task<IReadOnlyList<IEnrichedRuleEntity>> EnrichAsync(IEnumerable<IRuleEntity> rules, Context context,
+            CancellationToken ct)
         {
-            Guard.NotNull(rules, nameof(rules));
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(rules);
+            Guard.NotNull(context);
 
-            using (Profiler.TraceMethod<RuleEnricher>())
+            using (Telemetry.Activities.StartActivity("RuleEnricher/EnrichAsync"))
             {
                 var results = new List<RuleEntity>();
 
@@ -58,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Queries
 
                 foreach (var group in results.GroupBy(x => x.AppId.Id))
                 {
-                    var statistics = await ruleEventRepository.QueryStatisticsByAppAsync(group.Key);
+                    var statistics = await ruleEventRepository.QueryStatisticsByAppAsync(group.Key, ct);
 
                     foreach (var rule in group)
                     {

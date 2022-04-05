@@ -1,13 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards;
@@ -19,39 +17,33 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 {
     public sealed partial class AppDomainObject : DomainObject<AppDomainObject.State>
     {
-        private readonly InitialPatterns initialPatterns;
+        private readonly InitialSettings initialSettings;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
 
-        public AppDomainObject(IStore<DomainId> store, ISemanticLog log,
-            InitialPatterns initialPatterns,
+        public AppDomainObject(IPersistenceFactory<State> persistence, ILogger<AppDomainObject> log,
+            InitialSettings initialSettings,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
-            : base(store, log)
+            : base(persistence, log)
         {
-            Guard.NotNull(initialPatterns, nameof(initialPatterns));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
-            Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
-
             this.userResolver = userResolver;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
-            this.initialPatterns = initialPatterns;
+            this.initialSettings = initialSettings;
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsArchived;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -88,6 +80,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return Snapshot;
                     });
 
+                case UpdateAppSettings updateSettings:
+                    return UpdateReturn(updateSettings, c =>
+                    {
+                        GuardApp.CanUpdateSettings(c);
+
+                        UpdateSettings(c);
+
+                        return Snapshot;
+                    });
+
                 case UploadAppImage uploadImage:
                     return UpdateReturn(uploadImage, c =>
                     {
@@ -104,6 +106,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         GuardApp.CanRemoveImage(c);
 
                         RemoveImage(c);
+
+                        return Snapshot;
+                    });
+
+                case ConfigureAssetScripts configureAssetScripts:
+                    return UpdateReturn(configureAssetScripts, c =>
+                    {
+                        GuardApp.CanUpdateAssetScripts(c);
+
+                        ConfigureAssetScripts(c);
 
                         return Snapshot;
                     });
@@ -248,36 +260,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return Snapshot;
                     });
 
-                case AddPattern addPattern:
-                    return UpdateReturn(addPattern, c =>
-                    {
-                        GuardAppPatterns.CanAdd(c, Snapshot);
-
-                        AddPattern(c);
-
-                        return Snapshot;
-                    });
-
-                case DeletePattern deletePattern:
-                    return UpdateReturn(deletePattern, c =>
-                    {
-                        GuardAppPatterns.CanDelete(c, Snapshot);
-
-                        DeletePattern(c);
-
-                        return Snapshot;
-                    });
-
-                case UpdatePattern updatePattern:
-                    return UpdateReturn(updatePattern, c =>
-                    {
-                        GuardAppPatterns.CanUpdate(c, Snapshot);
-
-                        UpdatePattern(c);
-
-                        return Snapshot;
-                    });
-
                 case ChangePlan changePlan:
                     return UpdateReturnAsync(changePlan, async c =>
                     {
@@ -306,12 +288,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         }
                     });
 
-                case ArchiveApp archive:
-                    return UpdateAsync(archive, async c =>
+                case DeleteApp delete:
+                    return UpdateAsync(delete, async c =>
                     {
                         await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null, null);
 
-                        ArchiveApp(c);
+                        DeleteApp(c);
                     });
 
                 default:
@@ -330,8 +312,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             var events = new List<AppEvent>
             {
-                CreateInitalEvent(command.Name),
-                CreateInitialLanguage()
+                CreateInitalEvent(command.Name)
             };
 
             if (command.Actor.IsUser)
@@ -339,10 +320,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                 events.Add(CreateInitialOwner(command.Actor));
             }
 
-            foreach (var (key, value) in initialPatterns)
-            {
-                events.Add(CreateInitialPattern(key, value));
-            }
+            events.Add(CreateInitialSettings());
 
             foreach (var @event in events)
             {
@@ -354,7 +332,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
         private void ChangePlan(ChangePlan command)
         {
-            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId))
+            if (string.Equals(appPlansProvider.GetFreePlan()?.Id, command.PlanId, StringComparison.Ordinal))
             {
                 Raise(command, new AppPlanReset());
             }
@@ -367,6 +345,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
         private void Update(UpdateApp command)
         {
             Raise(command, new AppUpdated());
+        }
+
+        private void UpdateSettings(UpdateAppSettings command)
+        {
+            Raise(command, new AppSettingsUpdated());
+        }
+
+        private void ConfigureAssetScripts(ConfigureAssetScripts command)
+        {
+            Raise(command, new AppAssetsScriptsConfigured());
         }
 
         private void UpdateClient(UpdateClient command)
@@ -434,21 +422,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppLanguageRemoved());
         }
 
-        private void AddPattern(AddPattern command)
-        {
-            Raise(command, new AppPatternAdded());
-        }
-
-        private void DeletePattern(DeletePattern command)
-        {
-            Raise(command, new AppPatternDeleted());
-        }
-
-        private void UpdatePattern(UpdatePattern command)
-        {
-            Raise(command, new AppPatternUpdated());
-        }
-
         private void AddRole(AddRole command)
         {
             Raise(command, new AppRoleAdded());
@@ -464,9 +437,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             Raise(command, new AppRoleUpdated());
         }
 
-        private void ArchiveApp(ArchiveApp command)
+        private void DeleteApp(DeleteApp command)
         {
-            Raise(command, new AppArchived());
+            Raise(command, new AppDeleted());
         }
 
         private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
@@ -483,25 +456,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
             return new AppCreated { Name = name };
         }
 
-        private static AppLanguageAdded CreateInitialLanguage()
-        {
-            return new AppLanguageAdded { Language = Language.EN };
-        }
-
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
         }
 
-        private static AppPatternAdded CreateInitialPattern(DomainId id, AppPattern pattern)
+        private AppSettingsUpdated CreateInitialSettings()
         {
-            return new AppPatternAdded
-            {
-                Name = pattern.Name,
-                PatternId = id,
-                Pattern = pattern.Pattern,
-                Message = pattern.Message
-            };
+            return new AppSettingsUpdated { Settings = initialSettings.Settings };
         }
     }
 }

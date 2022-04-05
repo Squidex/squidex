@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -36,30 +36,30 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetFolderDto FromAssetFolder(IAssetFolderEntity asset, Resources resources)
+        public static AssetFolderDto FromDomain(IAssetFolderEntity asset, Resources resources)
         {
-            var response = SimpleMapper.Map(asset, new AssetFolderDto());
+            var result = SimpleMapper.Map(asset, new AssetFolderDto());
 
-            return CreateLinks(response, resources);
+            return result.CreateLinks(resources);
         }
 
-        private static AssetFolderDto CreateLinks(AssetFolderDto response, Resources resources)
+        private AssetFolderDto CreateLinks(Resources resources)
         {
-            var values = new { app = resources.App, id = response.Id };
+            var values = new { app = resources.App, id = Id };
 
             if (resources.CanUpdateAsset)
             {
-                response.AddPutLink("update", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
+                AddPutLink("update", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolder), values));
 
-                response.AddPutLink("move", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
+                AddPutLink("move", resources.Url<AssetFoldersController>(x => nameof(x.PutAssetFolderParent), values));
             }
 
             if (resources.CanUpdateAsset)
             {
-                response.AddDeleteLink("delete", resources.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
+                AddDeleteLink("delete", resources.Url<AssetFoldersController>(x => nameof(x.DeleteAssetFolder), values));
             }
 
-            return response;
+            return this;
         }
     }
 }

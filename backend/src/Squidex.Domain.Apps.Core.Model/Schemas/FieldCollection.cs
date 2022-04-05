@@ -1,26 +1,23 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class FieldCollection<T> : Cloneable<FieldCollection<T>> where T : IField
+    public sealed class FieldCollection<T> where T : IField
     {
         public static readonly FieldCollection<T> Empty = new FieldCollection<T>();
 
         private static readonly Dictionary<long, T> EmptyById = new Dictionary<long, T>();
         private static readonly Dictionary<string, T> EmptyByString = new Dictionary<string, T>();
 
-        private T[] fieldsOrdered;
+        private readonly T[] fieldsOrdered;
         private Dictionary<long, T>? fieldsById;
         private Dictionary<string, T>? fieldsByName;
 
@@ -76,15 +73,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public FieldCollection(T[] fields)
         {
-            Guard.NotNull(fields, nameof(fields));
+            Guard.NotNull(fields);
 
             fieldsOrdered = fields;
         }
 
-        protected override void OnCloned()
+        private FieldCollection(IEnumerable<T> fields)
         {
-            fieldsById = null;
-            fieldsByName = null;
+            fieldsOrdered = fields.ToArray();
         }
 
         [Pure]
@@ -95,16 +91,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            return Clone(clone =>
-            {
-                clone.fieldsOrdered = fieldsOrdered.Where(x => x.Id != fieldId).ToArray();
-            });
+            return new FieldCollection<T>(fieldsOrdered.Where(x => x.Id != fieldId));
         }
 
         [Pure]
         public FieldCollection<T> Reorder(List<long> ids)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
             if (ids.Count != fieldsOrdered.Length || ids.Any(x => !ById.ContainsKey(x)))
             {
@@ -116,16 +109,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            return Clone(clone =>
-            {
-                clone.fieldsOrdered = fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToArray();
-            });
+            return new FieldCollection<T>(fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)));
         }
 
         [Pure]
         public FieldCollection<T> Add(T field)
         {
-            Guard.NotNull(field, nameof(field));
+            Guard.NotNull(field);
 
             if (ByName.ContainsKey(field.Name))
             {
@@ -134,19 +124,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (ById.ContainsKey(field.Id))
             {
-                throw new ArgumentException($"A field with id {field.Id} already exists.", nameof(field));
+                throw new ArgumentException($"A field with ID {field.Id} already exists.", nameof(field));
             }
 
-            return Clone(clone =>
-            {
-                clone.fieldsOrdered = clone.fieldsOrdered.Union(Enumerable.Repeat(field, 1)).ToArray();
-            });
+            return new FieldCollection<T>(fieldsOrdered.Union(Enumerable.Repeat(field, 1)));
         }
 
         [Pure]
         public FieldCollection<T> Update(long fieldId, Func<T, T> updater)
         {
-            Guard.NotNull(updater, nameof(updater));
+            Guard.NotNull(updater);
 
             if (!ById.TryGetValue(fieldId, out var field))
             {
@@ -160,15 +147,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            if (newField is not T)
+            if (newField is null)
             {
                 throw new InvalidOperationException($"Field must be of type {typeof(T)}");
             }
 
-            return Clone(clone =>
-            {
-                clone.fieldsOrdered = clone.fieldsOrdered.Select(x => ReferenceEquals(x, field) ? newField : x).ToArray();
-            });
+            return new FieldCollection<T>(fieldsOrdered.Select(x => ReferenceEquals(x, field) ? newField : x));
         }
     }
 }

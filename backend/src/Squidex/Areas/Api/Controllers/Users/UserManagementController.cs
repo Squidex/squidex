@@ -1,12 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
@@ -35,9 +33,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUsers([FromQuery] string? query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
-            var users = await userService.QueryAsync(query, take, skip);
+            var users = await userService.QueryAsync(query, take, skip, HttpContext.RequestAborted);
 
-            var response = UsersDto.FromResults(users, users.Total, Resources);
+            var response = UsersDto.FromDomain(users, users.Total, Resources);
 
             return Ok(response);
         }
@@ -48,14 +46,14 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUser(string id)
         {
-            var user = await userService.FindByIdAsync(id);
+            var user = await userService.FindByIdAsync(id, HttpContext.RequestAborted);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -66,9 +64,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var user = await userService.CreateAsync(request.Email, request.ToValues());
+            var user = await userService.CreateAsync(request.Email, request.ToValues(), ct: HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -79,9 +77,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
-            var user = await userService.UpdateAsync(id, request.ToValues());
+            var user = await userService.UpdateAsync(id, request.ToValues(), ct: HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -97,9 +95,9 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new DomainForbiddenException(T.Get("users.lockYourselfError"));
             }
 
-            var user = await userService.LockAsync(id);
+            var user = await userService.LockAsync(id, HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -115,9 +113,9 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new DomainForbiddenException(T.Get("users.unlockYourselfError"));
             }
 
-            var user = await userService.UnlockAsync(id);
+            var user = await userService.UnlockAsync(id, HttpContext.RequestAborted);
 
-            var response = UserDto.FromUser(user, Resources);
+            var response = UserDto.FromDomain(user, Resources);
 
             return Ok(response);
         }
@@ -133,7 +131,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new DomainForbiddenException(T.Get("users.deleteYourselfError"));
             }
 
-            await userService.DeleteAsync(id);
+            await userService.DeleteAsync(id, HttpContext.RequestAborted);
 
             return NoContent();
         }

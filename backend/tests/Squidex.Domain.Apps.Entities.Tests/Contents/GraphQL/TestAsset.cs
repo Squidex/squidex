@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -20,8 +19,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             version
             created
             createdBy
+            createdByUser {
+              id
+              email
+              displayName
+            }
+            editToken
             lastModified
             lastModifiedBy
+            lastModifiedByUser {
+              id
+              email
+              displayName
+            }
             url
             thumbnailUrl
             sourceUrl
@@ -42,19 +52,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             metadata
             slug";
 
-        public static IEnrichedAssetEntity Create(NamedId<DomainId> appId, DomainId id)
+        public static IEnrichedAssetEntity Create(DomainId id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
             var asset = new AssetEntity
             {
                 Id = id,
-                AppId = appId,
+                AppId = TestApp.DefaultId,
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
-                LastModifiedBy = RefToken.User("user2"),
+                LastModifiedBy = RefToken.Client("client1"),
                 FileName = "MyFile.png",
                 Slug = "myfile.png",
                 FileSize = 1024,
@@ -85,8 +96,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 version = asset.Version,
                 created = asset.Created,
                 createdBy = asset.CreatedBy.ToString(),
+                createdByUser = new
+                {
+                    id = asset.CreatedBy.Identifier,
+                    email = $"{asset.CreatedBy.Identifier}@email.com",
+                    displayName = $"name_{asset.CreatedBy.Identifier}"
+                },
+                editToken = $"token_{asset.Id}",
                 lastModified = asset.LastModified,
                 lastModifiedBy = asset.LastModifiedBy.ToString(),
+                lastModifiedByUser = new
+                {
+                    id = asset.LastModifiedBy.Identifier,
+                    email = $"{asset.LastModifiedBy}",
+                    displayName = asset.LastModifiedBy.Identifier
+                },
                 url = $"assets/{asset.AppId.Name}/{asset.Id}",
                 thumbnailUrl = $"assets/{asset.AppId.Name}/{asset.Id}?width=100",
                 sourceUrl = $"assets/source/{asset.Id}",

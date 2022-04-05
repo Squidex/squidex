@@ -5,8 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
+using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
@@ -25,9 +24,13 @@ namespace Squidex.Domain.Apps.Entities
 
         public DomainId Reference { get; init; }
 
-        public string? ODataQuery { get; init; }
+        public string? QueryAsOdata { get; init; }
 
-        public string? JsonQueryString { get; init; }
+        public string? QueryAsJson { get; init; }
+
+        public Instant? ScheduledFrom { get; init; }
+
+        public Instant? ScheduledTo { get; init; }
 
         public Query<IJsonValue>? JsonQuery { get; init; }
 
@@ -41,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Q WithQuery(ClrQuery query)
         {
-            Guard.NotNull(query, nameof(query));
+            Guard.NotNull(query);
 
             return this with { Query = query };
         }
@@ -53,12 +56,12 @@ namespace Squidex.Domain.Apps.Entities
 
         public Q WithODataQuery(string? query)
         {
-            return this with { ODataQuery = query };
+            return this with { QueryAsOdata = query };
         }
 
         public Q WithJsonQuery(string? query)
         {
-            return this with { JsonQueryString = query };
+            return this with { QueryAsJson = query };
         }
 
         public Q WithJsonQuery(Query<IJsonValue>? query)
@@ -84,6 +87,11 @@ namespace Squidex.Domain.Apps.Entities
         public Q WithIds(IEnumerable<DomainId> ids)
         {
             return this with { Ids = ids?.ToList() };
+        }
+
+        public Q WithSchedule(Instant from, Instant to)
+        {
+            return this with { ScheduledFrom = from, ScheduledTo = to };
         }
 
         public Q WithIds(string? ids)

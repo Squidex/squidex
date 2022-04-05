@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Algolia.Search.Clients;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -16,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Algolia
 {
@@ -43,16 +41,9 @@ namespace Squidex.Extensions.Actions.Algolia
             {
                 var delete = @event.ShouldDelete(scriptEngine, action.Delete);
 
-                var contentId = entityEvent.Id.ToString();
-
                 var ruleDescription = string.Empty;
-                var ruleJob = new AlgoliaJob
-                {
-                    AppId = action.AppId,
-                    ApiKey = action.ApiKey,
-                    ContentId = contentId,
-                    IndexName = await FormatAsync(action.IndexName, @event)
-                };
+                var contentId = entityEvent.Id.ToString();
+                var content = (JObject)null;
 
                 if (delete)
                 {
@@ -62,7 +53,6 @@ namespace Squidex.Extensions.Actions.Algolia
                 {
                     ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
 
-                    JObject json;
                     try
                     {
                         string jsonString;
@@ -77,17 +67,24 @@ namespace Squidex.Extensions.Actions.Algolia
                             jsonString = ToJson(@event);
                         }
 
-                        json = JObject.Parse(jsonString);
+                        content = JObject.Parse(jsonString);
                     }
                     catch (Exception ex)
                     {
-                        json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
+                        content = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
                     }
 
-                    json["objectID"] = contentId;
-
-                    ruleJob.Content = json.ToString();
+                    content["objectID"] = contentId;
                 }
+
+                var ruleJob = new AlgoliaJob
+                {
+                    AppId = action.AppId,
+                    ApiKey = action.ApiKey,
+                    Content = content,
+                    ContentId = contentId,
+                    IndexName = await FormatAsync(action.IndexName, @event)
+                };
 
                 return (ruleDescription, ruleJob);
             }
@@ -95,7 +92,8 @@ namespace Squidex.Extensions.Actions.Algolia
             return ("Ignore", new AlgoliaJob());
         }
 
-        protected override async Task<Result> ExecuteJobAsync(AlgoliaJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(AlgoliaJob job,
+            CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(job.AppId))
             {
@@ -136,6 +134,6 @@ namespace Squidex.Extensions.Actions.Algolia
 
         public string IndexName { get; set; }
 
-        public string Content { get; set; }
+        public JObject Content { get; set; }
     }
 }

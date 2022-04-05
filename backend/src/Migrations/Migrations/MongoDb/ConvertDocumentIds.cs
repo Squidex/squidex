@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
@@ -55,40 +53,42 @@ namespace Migrations.Migrations.MongoDb
             return this;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             switch (scope)
             {
                 case Scope.Assets:
-                    await RebuildAsync(database, ConvertParentId, "States_Assets");
-                    await RebuildAsync(database, ConvertParentId, "States_AssetFolders");
+                    await RebuildAsync(database, ConvertParentId, "States_Assets", ct);
+                    await RebuildAsync(database, ConvertParentId, "States_AssetFolders", ct);
                     break;
                 case Scope.Contents:
-                    await RebuildAsync(databaseContent, null, "State_Contents_All");
-                    await RebuildAsync(databaseContent, null, "State_Contents_Published");
+                    await RebuildAsync(databaseContent, null, "State_Contents_All", ct);
+                    await RebuildAsync(databaseContent, null, "State_Contents_Published", ct);
                     break;
             }
         }
 
-        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameOld)
+        private static async Task RebuildAsync(IMongoDatabase database, Action<BsonDocument>? extraAction, string collectionNameV1,
+            CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 10;
 
-            string collectionNameNew;
+            string collectionNameV2;
 
-            collectionNameNew = $"{collectionNameOld}2";
-            collectionNameNew = collectionNameNew.Replace("State_", "States_");
+            collectionNameV2 = $"{collectionNameV1}2";
+            collectionNameV2 = collectionNameV2.Replace("State_", "States_", StringComparison.Ordinal);
 
-            var collectionOld = database.GetCollection<BsonDocument>(collectionNameOld);
-            var collectionNew = database.GetCollection<BsonDocument>(collectionNameNew);
+            var collectionV1 = database.GetCollection<BsonDocument>(collectionNameV1);
+            var collectionV2 = database.GetCollection<BsonDocument>(collectionNameV2);
 
-            if (!await collectionOld.AnyAsync())
+            if (!await collectionV1.AnyAsync(ct: ct))
             {
                 return;
             }
 
-            await collectionNew.DeleteManyAsync(new BsonDocument());
+            await collectionV2.DeleteManyAsync(new BsonDocument(), ct);
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
@@ -102,39 +102,47 @@ namespace Migrations.Migrations.MongoDb
 
             var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
             {
-                var writes = new List<WriteModel<BsonDocument>>();
-
-                foreach (var document in batch)
+                try
                 {
-                    var appId = document["_ai"].AsString;
+                    var writes = new List<WriteModel<BsonDocument>>();
 
-                    var documentIdOld = document["_id"].AsString;
-
-                    if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
+                    foreach (var document in batch)
                     {
-                        var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+                        var appId = document["_ai"].AsString;
 
-                        documentIdOld = documentIdOld[(index + 2)..];
+                        var documentIdOld = document["_id"].AsString;
+
+                        if (documentIdOld.Contains("--", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var index = documentIdOld.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+
+                            documentIdOld = documentIdOld[(index + 2)..];
+                        }
+
+                        var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
+
+                        document["id"] = documentIdOld;
+                        document["_id"] = documentIdNew;
+
+                        extraAction?.Invoke(document);
+
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", documentIdNew);
+
+                        writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                        {
+                            IsUpsert = true
+                        });
                     }
 
-                    var documentIdNew = DomainId.Combine(DomainId.Create(appId), DomainId.Create(documentIdOld)).ToString();
-
-                    document["id"] = documentIdOld;
-                    document["_id"] = documentIdNew;
-
-                    extraAction?.Invoke(document);
-
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", documentIdNew);
-
-                    writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                    if (writes.Count > 0)
                     {
-                        IsUpsert = true
-                    });
+                        await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
+                    }
                 }
-
-                if (writes.Count > 0)
+                catch (OperationCanceledException ex)
                 {
-                    await collectionNew.BulkWriteAsync(writes, writeOptions);
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
                 }
             }, new ExecutionDataflowBlockOptions
             {
@@ -143,12 +151,15 @@ namespace Migrations.Migrations.MongoDb
                 BoundedCapacity = SizeOfQueue
             });
 
-            batchBlock.LinkTo(actionBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync);
+            await foreach (var document in collectionV1.Find(new BsonDocument()).ToAsyncEnumerable(ct: ct))
+            {
+                if (!await batchBlock.SendAsync(document, ct))
+                {
+                    break;
+                }
+            }
 
             batchBlock.Complete();
 

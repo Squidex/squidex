@@ -1,10 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Squidex.Domain.Apps.Core.Contents;

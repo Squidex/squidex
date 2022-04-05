@@ -1,13 +1,9 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
-
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Timers
 {
@@ -23,8 +19,8 @@ namespace Squidex.Infrastructure.Timers
 
         public CompletionTimer(int delayInMs, Func<CancellationToken, Task> callback, int initialDelay = 0)
         {
-            Guard.NotNull(callback, nameof(callback));
-            Guard.GreaterThan(delayInMs, 0, nameof(delayInMs));
+            Guard.NotNull(callback);
+            Guard.GreaterThan(delayInMs, 0);
 
             runTask = RunInternalAsync(delayInMs, initialDelay, callback);
         }

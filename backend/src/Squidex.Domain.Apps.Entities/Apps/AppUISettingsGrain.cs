@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
@@ -27,14 +24,19 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppUISettingsGrain(IGrainState<State> state)
         {
-            Guard.NotNull(state, nameof(state));
-
             this.state = state;
         }
 
         public Task<J<JsonObject>> GetAsync()
         {
             return Task.FromResult(state.Value.Settings.AsJ());
+        }
+
+        public Task ClearAsync()
+        {
+            TryDeactivateOnIdle();
+
+            return state.ClearAsync();
         }
 
         public Task SetAsync(J<JsonObject> settings)
@@ -72,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private JsonObject? GetContainer(string path, bool add, out string key)
         {
-            Guard.NotNullOrEmpty(path, nameof(path));
+            Guard.NotNullOrEmpty(path);
 
             var segments = path.Split('.');
 

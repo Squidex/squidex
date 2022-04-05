@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
@@ -35,6 +32,27 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             public int? NumDays { get; set; }
 
             public DateTime? Triggered { get; set; }
+
+            public Target SetApp(NamedId<DomainId> appId)
+            {
+                AppId = appId;
+
+                return this;
+            }
+
+            public Target SetLimit(int value)
+            {
+                Limits = value;
+
+                return this;
+            }
+
+            public Target SetNumDays(int? value)
+            {
+                NumDays = value;
+
+                return this;
+            }
         }
 
         [CollectionName("UsageTracker")]
@@ -45,9 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public UsageTrackerGrain(IGrainState<State> state, IApiUsageTracker usageTracker)
         {
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(usageTracker, nameof(usageTracker));
-
             this.state = state;
 
             this.usageTracker = usageTracker;
@@ -121,21 +136,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public Task AddTargetAsync(DomainId ruleId, NamedId<DomainId> appId, int limits, int? numDays)
         {
-            UpdateTarget(ruleId, t => { t.Limits = limits; t.AppId = appId; t.NumDays = numDays; });
+            UpdateTarget(ruleId, t => t.SetApp(appId).SetLimit(limits).SetNumDays(numDays));
 
             return state.WriteAsync();
         }
 
         public Task UpdateTargetAsync(DomainId ruleId, int limits, int? numDays)
         {
-            UpdateTarget(ruleId, t => { t.Limits = limits; t.NumDays = numDays; });
+            UpdateTarget(ruleId, t => t.SetLimit(limits).SetNumDays(numDays));
 
             return state.WriteAsync();
         }
 
         public Task AddTargetAsync(DomainId ruleId, int limits)
         {
-            UpdateTarget(ruleId, t => t.Limits = limits);
+            UpdateTarget(ruleId, t => t.SetLimit(limits));
 
             return state.WriteAsync();
         }

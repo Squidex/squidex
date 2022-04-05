@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 
@@ -18,8 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
         public DomainId Id { get; set; }
 
         public DomainId ParentId { get; set; }
-
-        public string? ParentPath { get; set; }
 
         public string? FileName { get; set; }
 

@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.History.Models;
 using Squidex.Domain.Apps.Entities.History;
@@ -47,9 +44,9 @@ namespace Squidex.Areas.Api.Controllers.History
         [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)
         {
-            var events = await historyService.QueryByChannelAsync(AppId, channel, 100);
+            var events = await historyService.QueryByChannelAsync(AppId, channel, 100, HttpContext.RequestAborted);
 
-            var response = events.Select(HistoryEventDto.FromHistoryEvent).Where(x => x.Message != null).ToArray();
+            var response = events.Select(HistoryEventDto.FromDomain).Where(x => x.Message != null).ToArray();
 
             return Ok(response);
         }

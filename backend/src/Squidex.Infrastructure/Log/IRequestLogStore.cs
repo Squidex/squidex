@@ -5,16 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.Log
 {
     public interface IRequestLogStore
     {
-        Task LogAsync(Request request);
+        bool IsEnabled { get; }
 
-        Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default);
+        Task LogAsync(Request request,
+            CancellationToken ct = default);
+
+        Task DeleteAsync(string key,
+            CancellationToken ct = default);
+
+        IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default);
     }
 }

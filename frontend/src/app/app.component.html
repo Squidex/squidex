@@ -1,0 +1,13 @@
+<main>
+    <sqx-root-view>
+        <sqx-dialog-renderer>
+            <router-outlet (activate)="isLoaded = true">
+                <div class="loading" *ngIf="!isLoaded">
+                    <img alt="Loading" src="./images/loader.svg">
+
+                    <div>{{ 'common.loading' | sqxTranslate }}</div>
+                </div>
+            </router-outlet>
+        </sqx-dialog-renderer>
+    </sqx-root-view>
+</main>

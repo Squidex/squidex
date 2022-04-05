@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
@@ -18,25 +15,53 @@ namespace Squidex.Infrastructure.Commands
 {
     public class DomainObjectTests
     {
-        private readonly IStore<DomainId> store = A.Fake<IStore<DomainId>>();
+        private readonly IPersistenceFactory<MyDomainState> persistenceFactory = A.Fake<IPersistenceFactory<MyDomainState>>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
         private readonly DomainId id = DomainId.NewGuid();
         private readonly MyDomainObject sut;
 
         public DomainObjectTests()
         {
-            sut = new MyDomainObject(store);
+            sut = new MyDomainObject(persistenceFactory);
         }
 
         [Fact]
         public void Should_instantiate()
         {
             Assert.Equal(EtagVersion.Empty, sut.Version);
-            AssertSnapshot(sut.Snapshot, 0, -1);
+            AssertSnapshot(sut.Snapshot, 0, EtagVersion.Empty);
         }
 
         [Fact]
-        public async Task Should_write_state_and_events_when_created()
+        public async Task Should_repair_if_stale()
+        {
+            A.CallTo(() => persistence.IsSnapshotStale)
+                .Returns(true);
+
+            SetupCreated(1);
+
+            await sut.EnsureLoadedAsync();
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_repair_if_not_stale()
+        {
+            A.CallTo(() => persistence.IsSnapshotStale)
+                .Returns(false);
+
+            SetupCreated(1);
+
+            await sut.EnsureLoadedAsync();
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_write_state_and_events_if_created()
         {
             SetupEmpty();
 
@@ -50,15 +75,66 @@ namespace Squidex.Infrastructure.Commands
                 .MustNotHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 0, EtagVersion.Empty), result);
+            Assert.Equal(0, sut.Version);
+            Assert.Equal(0, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 0);
         }
 
         [Fact]
-        public async Task Should_recreate_with_create_command_when_deleted_before()
+        public async Task Should_create_old_event()
+        {
+            SetupCreated(new ValueChanged { Value = 10 }, new MultipleByTwiceEvent());
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(1, sut.Version);
+            Assert.Equal(1, sut.Snapshot.Version);
+            Assert.Equal(20, sut.Snapshot.Value);
+        }
+
+        [Fact]
+        public async Task Should_recreate_when_loading()
+        {
+            sut.RecreateEvent = true;
+
+            SetupCreated(
+                new ValueChanged { Value = 2 },
+                new ValueChanged { Value = 3 },
+                new Deleted(),
+                new ValueChanged { Value = 4 });
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(3, sut.Version);
+            Assert.Equal(3, sut.Snapshot.Version);
+
+            AssertSnapshot(sut.Snapshot, 4, 3);
+        }
+
+        [Fact]
+        public async Task Should_ignore_events_after_deleting_when_loading()
+        {
+            SetupCreated(
+                new ValueChanged { Value = 2 },
+                new ValueChanged { Value = 3 },
+                new Deleted(),
+                new ValueChanged { Value = 4 });
+
+            await sut.EnsureLoadedAsync();
+
+            Assert.Equal(2, sut.Version);
+            Assert.Equal(2, sut.Snapshot.Version);
+
+            AssertSnapshot(sut.Snapshot, 3, 2, true);
+        }
+
+        [Fact]
+        public async Task Should_recreate_with_create_command_if_deleted_before()
         {
             sut.Recreate = true;
+            sut.RecreateEvent = true;
 
             SetupCreated(2);
             SetupDeleted();
@@ -74,13 +150,15 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
+            Assert.Equal(2, sut.Version);
+            Assert.Equal(2, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 2);
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_recreation_with_create_command_not_allowed()
+        public async Task Should_throw_exception_if_recreation_with_create_command_not_allowed()
         {
             sut.Recreate = false;
 
@@ -94,9 +172,10 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_recreate_with_upsert_command_when_deleted_before()
+        public async Task Should_recreate_with_upsert_command_if_deleted_before()
         {
             sut.Recreate = true;
+            sut.RecreateEvent = true;
 
             SetupCreated(2);
             SetupDeleted();
@@ -112,13 +191,15 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 2, 1), result);
+            Assert.Equal(2, sut.Version);
+            Assert.Equal(2, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 2);
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_recreation_with_upsert_command_not_allowed()
+        public async Task Should_throw_exception_if_recreation_with_upsert_command_not_allowed()
         {
             sut.Recreate = false;
 
@@ -132,7 +213,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_write_state_and_events_when_updated_after_creation()
+        public async Task Should_write_state_and_events_if_updated_after_creation()
         {
             SetupEmpty();
 
@@ -148,13 +229,15 @@ namespace Squidex.Infrastructure.Commands
                 .MustNotHaveHappened();
 
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
+            Assert.Equal(1, sut.Version);
+            Assert.Equal(1, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 8, 1);
         }
 
         [Fact]
-        public async Task Should_write_state_and_events_when_updated()
+        public async Task Should_write_state_and_events_if_updated()
         {
             SetupCreated(4);
 
@@ -168,6 +251,8 @@ namespace Squidex.Infrastructure.Commands
                 .MustHaveHappenedOnceExactly();
 
             Assert.Equal(CommandResult.Empty(id, 1, 0), result);
+            Assert.Equal(1, sut.Version);
+            Assert.Equal(1, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 8, 1);
@@ -213,7 +298,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_on_rebuild_when_no_event_found()
+        public async Task Should_throw_on_rebuild_if_no_event_found()
         {
             SetupEmpty();
 
@@ -232,7 +317,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_create_command_is_invoked_for_loaded_and_created_object()
+        public async Task Should_throw_exception_if_create_command_is_invoked_for_loaded_and_created_object()
         {
             await sut.ExecuteAsync(new CreateAuto());
 
@@ -240,7 +325,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_create_command_not_accepted()
+        public async Task Should_throw_exception_if_create_command_not_accepted()
         {
             SetupEmpty();
 
@@ -258,7 +343,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_update_command_invoked_for_empty_object()
+        public async Task Should_throw_exception_if_update_command_invoked_for_empty_object()
         {
             SetupEmpty();
 
@@ -266,7 +351,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_update_command_not_accepted()
+        public async Task Should_throw_exception_if_update_command_not_accepted()
         {
             SetupCreated(4);
 
@@ -284,7 +369,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_other_verison_expected()
+        public async Task Should_throw_exception_if_other_verison_expected()
         {
             SetupCreated(4);
 
@@ -292,20 +377,22 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_not_update_when_snapshot_is_not_changed()
+        public async Task Should_not_update_if_snapshot_is_not_changed()
         {
             SetupCreated(4);
 
             var result = await sut.ExecuteAsync(new UpdateAuto { Value = MyDomainState.Unchanged });
 
             Assert.Equal(CommandResult.Empty(id, 0, 0), result);
+            Assert.Equal(0, sut.Version);
+            Assert.Equal(0, sut.Snapshot.Version);
 
             Assert.Empty(sut.GetUncomittedEvents());
             AssertSnapshot(sut.Snapshot, 4, 0);
         }
 
         [Fact]
-        public async Task Should_reset_state_when_writing_snapshot_for_create_failed()
+        public async Task Should_reset_state_if_writing_snapshot_for_create_failed()
         {
             SetupEmpty();
 
@@ -315,11 +402,11 @@ namespace Squidex.Infrastructure.Commands
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(new CreateAuto()));
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(sut.Snapshot, 0, -1);
+            AssertSnapshot(sut.Snapshot, 0, EtagVersion.Empty);
         }
 
         [Fact]
-        public async Task Should_reset_state_when_writing_snapshot_for_update_failed()
+        public async Task Should_reset_state_if_writing_snapshot_for_update_failed()
         {
             SetupCreated(4);
 
@@ -338,9 +425,9 @@ namespace Squidex.Infrastructure.Commands
             SetupCreated(4);
             SetupDeleted();
 
-            var deleteStream = A.Fake<IPersistence>();
+            var deleteStream = A.Fake<IPersistence<MyDomainState>>();
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), DomainId.Combine(id, DomainId.Create("deleted")), null))
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), DomainId.Combine(id, DomainId.Create("deleted")), null))
                 .Returns(deleteStream);
 
             await sut.ExecuteAsync(new DeletePermanent());
@@ -358,7 +445,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_get_old_versions_when_cached()
+        public async Task Should_get_old_versions_if_cached()
         {
             sut.VersionsToKeep = int.MaxValue;
 
@@ -366,22 +453,25 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new CreateAuto { Value = 3 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 4 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = 5 });
 
             var version_Empty = await sut.GetSnapshotAsync(EtagVersion.Empty);
             var version_0 = await sut.GetSnapshotAsync(0);
             var version_1 = await sut.GetSnapshotAsync(1);
+            var version_2 = await sut.GetSnapshotAsync(2);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(version_Empty, 0, -1);
+            AssertSnapshot(version_Empty, 0, EtagVersion.Empty);
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_2, 5, 2);
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_get_old_versions_from_query_when_not_cached()
+        public async Task Should_get_old_versions_from_query_if_not_cached()
         {
             sut.VersionsToKeep = 1;
 
@@ -390,18 +480,21 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.ExecuteAsync(new CreateAuto { Value = 3 });
             await sut.ExecuteAsync(new UpdateAuto { Value = 4 });
+            await sut.ExecuteAsync(new UpdateAuto { Value = 5 });
 
             var version_Empty = await sut.GetSnapshotAsync(EtagVersion.Empty);
             var version_0 = await sut.GetSnapshotAsync(0);
             var version_1 = await sut.GetSnapshotAsync(1);
+            var version_2 = await sut.GetSnapshotAsync(2);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            AssertSnapshot(version_Empty, 0, -1);
+            AssertSnapshot(version_Empty, 0, EtagVersion.Empty);
             AssertSnapshot(version_0, 3, 0);
             AssertSnapshot(version_1, 4, 1);
+            AssertSnapshot(version_2, 5, 2);
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
-                .MustHaveHappened();
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
+                .MustHaveHappenedOnceExactly();
         }
 
         private static void AssertSnapshot(MyDomainState state, int value, long version, bool isDeleted = false)
@@ -416,6 +509,11 @@ namespace Squidex.Infrastructure.Commands
 
         private void SetupCreated(int value)
         {
+            SetupCreated(new ValueChanged { Value = value });
+        }
+
+        private void SetupCreated(params IEvent[] @events)
+        {
             var handleEvent = new HandleEvent(_ => true);
 
             var version = -1;
@@ -423,12 +521,15 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.ReadAsync(-2))
                 .Invokes(() =>
                 {
-                    version = 0;
+                    version++;
 
-                    handleEvent(Envelope.Create(new ValueChanged { Value = value }));
+                    foreach (var @event in events)
+                    {
+                        handleEvent(Envelope.Create(@event));
+                    }
                 });
 
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
                 .Invokes(args =>
                 {
                     handleEvent = args.GetArgument<HandleEvent>(3)!;
@@ -448,11 +549,14 @@ namespace Squidex.Infrastructure.Commands
             var @events = new List<Envelope<IEvent>>();
 
             A.CallTo(() => persistence.WriteEventsAsync(A<IReadOnlyList<Envelope<IEvent>>>._))
-                .Invokes(c => @events.AddRange(c.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!));
+                .Invokes(args =>
+                {
+                    @events.AddRange(args.GetArgument<IReadOnlyList<Envelope<IEvent>>>(0)!);
+                });
 
-            var eventsPersistence = A.Fake<IPersistence>();
+            var eventsPersistence = A.Fake<IPersistence<MyDomainState>>();
 
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>._))
                 .Invokes(args =>
                 {
                     handleEvent = args.GetArgument<HandleEvent>(2)!;
@@ -471,7 +575,7 @@ namespace Squidex.Infrastructure.Commands
 
         private void SetupEmpty()
         {
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
+            A.CallTo(() => persistenceFactory.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>._, A<HandleEvent>._))
                 .Returns(persistence);
 
             A.CallTo(() => persistence.Version)

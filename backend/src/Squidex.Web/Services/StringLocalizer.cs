@@ -5,12 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Extensions.Localization;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
@@ -79,8 +75,6 @@ namespace Squidex.Web.Services
 
         private StringLocalizer(ILocalizer translationService, CultureInfo? culture)
         {
-            Guard.NotNull(translationService, nameof(translationService));
-
             this.translationService = translationService;
 
             this.culture = culture;

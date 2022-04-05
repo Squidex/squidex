@@ -1,0 +1,25 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .modal-body {
+        background: $color-background;
+    }
+}
+
+.col-selector {
+    position: relative;
+
+    .form-control {
+        @include absolute(-.125rem, auto, auto, 0);
+        @include force-width(300px);
+        color: $color-white;
+    }
+}
+
+.table-container {
+    display: inline-block;
+    min-width: 100%;
+    padding: 0;
+    padding-right: 1.5rem;
+}

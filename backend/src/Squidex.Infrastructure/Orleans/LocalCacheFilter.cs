@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Caching;
 
@@ -18,8 +16,6 @@ namespace Squidex.Infrastructure.Orleans
 
         public LocalCacheFilter(ILocalCache localCache)
         {
-            Guard.NotNull(localCache, nameof(localCache));
-
             this.localCache = localCache;
         }
 

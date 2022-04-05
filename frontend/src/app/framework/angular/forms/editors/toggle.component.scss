@@ -1,0 +1,58 @@
+@import 'mixins';
+@import 'vars';
+
+$toggle-width: 2.2rem;
+$toggle-height: 1.25rem;
+$toggle-button-size: $toggle-height - .25rem;
+
+:host {
+    display: inline-block;
+}
+
+.toggle {
+    &-button {
+        @include circle($toggle-button-size);
+        @include box-shadow-outer(0, 2px, 2px, .2);
+        @include absolute($toggle-height * .5, auto, auto, $toggle-width * .5);
+        background: $color-white;
+        border: 0;
+        margin-left: -$toggle-button-size * .5;
+        margin-top: -$toggle-button-size * .5;
+        transition: left .3s ease;
+    }
+
+    &-container {
+        @include box-shadow-outer;
+        background: lighten($color-border, 6%);
+        border: 0;
+        border-radius: $toggle-height * .5;
+        height: $toggle-height;
+        margin: 0;
+        margin-bottom: -3px;
+        position: relative;
+        transition: background-color .3s ease;
+        width: $toggle-width;
+
+        &.checked {
+            background: $color-theme-success-dark;
+
+            .toggle-button {
+                left: $toggle-height * .5;
+            }
+        }
+
+        &.unchecked {
+            background: $color-theme-error;
+
+            .toggle-button {
+                left: $toggle-width - $toggle-height * .5;
+            }
+        }
+
+        &.disabled {
+            background: $color-input-disabled;
+            border: 0;
+            cursor: not-allowed;
+        }
+    }
+}

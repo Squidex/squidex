@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -16,20 +16,52 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public DataGraphType(Builder builder, SchemaInfo schemaInfo)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = schemaInfo.DataType;
 
             foreach (var fieldInfo in schemaInfo.Fields)
             {
+                var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
+
+                if (fieldInfo.Field.IsComponentLike())
+                {
+                    var fieldGraphType = new ObjectGraphType
+                    {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
+                        Name = fieldInfo.LocalizedTypeDynamic
+                    };
+
+                    foreach (var partitionKey in partitioning.AllKeys)
+                    {
+                        fieldGraphType.AddField(new FieldType
+                        {
+                            Name = partitionKey.EscapePartition(),
+                            Arguments = ContentActions.Json.Arguments,
+                            ResolvedType = AllTypes.Json,
+                            Resolver = FieldVisitor.JsonPath,
+                            Description = fieldInfo.Field.RawProperties.Hints
+                        }).WithSourceName(partitionKey);
+                    }
+
+                    fieldGraphType.Description = $"The dynamic structure of the {fieldInfo.DisplayName} field of the {schemaInfo.DisplayName} content type.";
+
+                    AddField(new FieldType
+                    {
+                        Name = fieldInfo.FieldNameDynamic,
+                        ResolvedType = fieldGraphType,
+                        Resolver = ContentResolvers.Field
+                    }).WithSourceName(fieldInfo);
+                }
+
                 var (resolvedType, resolver, args) = builder.GetGraphType(fieldInfo);
 
                 if (resolver != null)
                 {
                     var fieldGraphType = new ObjectGraphType
                     {
+                        // The name is used for equal comparison. Therefore it is important to treat it as readonly.
                         Name = fieldInfo.LocalizedType
                     };
-
-                    var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
 
                     foreach (var partitionKey in partitioning.AllKeys)
                     {

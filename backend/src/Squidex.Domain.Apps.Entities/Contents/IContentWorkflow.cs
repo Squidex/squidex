@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 
@@ -21,6 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user);
 
         Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user);
+
+        Task<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user);
 
         Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status);
 

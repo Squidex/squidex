@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-
 namespace Squidex.Domain.Apps.Core.Templates
 {
     public interface ITemplateEngine

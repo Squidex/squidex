@@ -5,10 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using NodaTime;
 using Xunit;
 
@@ -19,62 +16,63 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_make_correct_object_equal_comparisons()
         {
-            var obj_count1_key1_val1_a = JsonValue.Object().Add("key1", 1);
-            var obj_count1_key1_val1_b = JsonValue.Object().Add("key1", 1);
+            var obj1a = JsonValue.Object().Add("key1", 1);
+            var obj1b = JsonValue.Object().Add("key1", 1);
 
-            var obj_count1_key1_val2 = JsonValue.Object().Add("key1", 2);
-            var obj_count1_key2_val1 = JsonValue.Object().Add("key2", 1);
-            var obj_count2_key1_val1 = JsonValue.Object().Add("key1", 1).Add("key2", 2);
+            var objOtherValue = JsonValue.Object().Add("key1", 2);
+            var objOtherKey = JsonValue.Object().Add("key2", 1);
+
+            var objOtherCount = JsonValue.Object().Add("key1", 1).Add("key2", 2);
 
             var number = JsonValue.Create(1);
 
-            Assert.Equal(obj_count1_key1_val1_a, obj_count1_key1_val1_b);
-            Assert.Equal(obj_count1_key1_val1_a.GetHashCode(), obj_count1_key1_val1_b.GetHashCode());
-            Assert.True(obj_count1_key1_val1_a.Equals((object)obj_count1_key1_val1_b));
+            Assert.Equal(obj1a, obj1b);
+            Assert.Equal(obj1a.GetHashCode(), obj1b.GetHashCode());
+            Assert.True(obj1a.Equals((object)obj1b));
 
-            Assert.NotEqual(obj_count1_key1_val1_a, obj_count1_key1_val2);
-            Assert.NotEqual(obj_count1_key1_val1_a.GetHashCode(), obj_count1_key1_val2.GetHashCode());
-            Assert.False(obj_count1_key1_val1_a.Equals((object)obj_count1_key1_val2));
+            Assert.NotEqual(obj1a, objOtherValue);
+            Assert.NotEqual(obj1a.GetHashCode(), objOtherValue.GetHashCode());
+            Assert.False(obj1a.Equals((object)objOtherValue));
 
-            Assert.NotEqual(obj_count1_key1_val1_a, obj_count1_key2_val1);
-            Assert.NotEqual(obj_count1_key1_val1_a.GetHashCode(), obj_count1_key2_val1.GetHashCode());
-            Assert.False(obj_count1_key1_val1_a.Equals((object)obj_count1_key2_val1));
+            Assert.NotEqual(obj1a, objOtherKey);
+            Assert.NotEqual(obj1a.GetHashCode(), objOtherKey.GetHashCode());
+            Assert.False(obj1a.Equals((object)objOtherKey));
 
-            Assert.NotEqual(obj_count1_key1_val1_a, obj_count2_key1_val1);
-            Assert.NotEqual(obj_count1_key1_val1_a.GetHashCode(), obj_count2_key1_val1.GetHashCode());
-            Assert.False(obj_count1_key1_val1_a.Equals((object)obj_count2_key1_val1));
+            Assert.NotEqual(obj1a, objOtherCount);
+            Assert.NotEqual(obj1a.GetHashCode(), objOtherCount.GetHashCode());
+            Assert.False(obj1a.Equals((object)objOtherCount));
 
-            Assert.NotEqual(obj_count1_key1_val1_a, number);
-            Assert.NotEqual(obj_count1_key1_val1_a.GetHashCode(), number.GetHashCode());
-            Assert.False(obj_count1_key1_val1_a.Equals((object)number));
+            Assert.NotEqual(obj1a, number);
+            Assert.NotEqual(obj1a.GetHashCode(), number.GetHashCode());
+            Assert.False(obj1a.Equals((object)number));
         }
 
         [Fact]
         public void Should_make_correct_array_equal_comparisons()
         {
-            var array_count1_val1_a = JsonValue.Array(1);
-            var array_count1_val1_b = JsonValue.Array(1);
+            var array1a = JsonValue.Array(1);
+            var array1b = JsonValue.Array(1);
 
-            var array_count1_val2 = JsonValue.Array(2);
-            var array_count2_val1 = JsonValue.Array(1, 2);
+            var arrayOtherValue = JsonValue.Array(2);
+            var arrayOtherSize = JsonValue.Array(1, 2);
 
             var number = JsonValue.Create(1);
 
-            Assert.Equal(array_count1_val1_a, array_count1_val1_b);
-            Assert.Equal(array_count1_val1_a.GetHashCode(), array_count1_val1_b.GetHashCode());
-            Assert.True(array_count1_val1_a.Equals((object)array_count1_val1_b));
+            Assert.Equal(array1a, array1b);
+            Assert.Equal(array1a.GetHashCode(), array1b.GetHashCode());
+            Assert.True(array1a.Equals((object)array1b));
 
-            Assert.NotEqual(array_count1_val1_a, array_count1_val2);
-            Assert.NotEqual(array_count1_val1_a.GetHashCode(), array_count1_val2.GetHashCode());
-            Assert.False(array_count1_val1_a.Equals((object)array_count1_val2));
+            Assert.NotEqual(array1a, arrayOtherValue);
+            Assert.NotEqual(array1a.GetHashCode(), arrayOtherValue.GetHashCode());
+            Assert.False(array1a.Equals((object)arrayOtherValue));
 
-            Assert.NotEqual(array_count1_val1_a, array_count2_val1);
-            Assert.NotEqual(array_count1_val1_a.GetHashCode(), array_count2_val1.GetHashCode());
-            Assert.False(array_count1_val1_a.Equals((object)array_count2_val1));
+            Assert.NotEqual(array1a, arrayOtherSize);
+            Assert.NotEqual(array1a.GetHashCode(), arrayOtherSize.GetHashCode());
+            Assert.False(array1a.Equals((object)arrayOtherSize));
 
-            Assert.NotEqual(array_count1_val1_a, number);
-            Assert.NotEqual(array_count1_val1_a.GetHashCode(), number.GetHashCode());
-            Assert.False(array_count1_val1_a.Equals((object)number));
+            Assert.NotEqual(array1a, number);
+            Assert.NotEqual(array1a.GetHashCode(), number.GetHashCode());
+            Assert.False(array1a.Equals((object)number));
         }
 
         [Fact]
@@ -183,6 +181,15 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
+        public void Should_create_array_from_object_source()
+        {
+            var json = JsonValue.Create(new object[] { 1, "2" });
+
+            Assert.Equal("[1, \"2\"]", json.ToJsonString());
+            Assert.Equal("[1, \"2\"]", json.ToString());
+        }
+
+        [Fact]
         public void Should_create_array_from_source()
         {
             var json = JsonValue.Array<object>(1, "2");
@@ -202,6 +209,15 @@ namespace Squidex.Infrastructure.Json.Objects
         public void Should_create_object()
         {
             var json = JsonValue.Object().Add("key1", 1).Add("key2", "2");
+
+            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToJsonString());
+            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToString());
+        }
+
+        [Fact]
+        public void Should_create_object_from_clr_source()
+        {
+            var json = JsonValue.Create(new Dictionary<string, object> { ["key1"] = 1, ["key2"] = "2" });
 
             Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToJsonString());
             Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToString());
@@ -353,7 +369,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_adding_null_to_array()
+        public void Should_create_null_if_adding_null_to_array()
         {
             var array = JsonValue.Array();
 
@@ -363,7 +379,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_replacing_to_null_in_array()
+        public void Should_create_null_if_replacing_to_null_in_array()
         {
             var array = JsonValue.Array(1);
 
@@ -373,7 +389,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_adding_null_to_object()
+        public void Should_create_null_if_adding_null_to_object()
         {
             var obj = JsonValue.Object();
 
@@ -383,7 +399,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_create_null_when_replacing_to_null_object()
+        public void Should_create_null_if_replacing_to_null_object()
         {
             var obj = JsonValue.Object();
 
@@ -435,13 +451,13 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_throw_exception_when_creation_value_from_invalid_type()
+        public void Should_throw_exception_if_creation_value_from_invalid_type()
         {
             Assert.Throws<ArgumentException>(() => JsonValue.Create(default(TimeSpan)));
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_null()
+        public void Should_return_null_if_getting_value_by_path_segment_from_null()
         {
             var json = JsonValue.Null;
 
@@ -452,7 +468,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_string()
+        public void Should_return_null_if_getting_value_by_path_segment_from_string()
         {
             var json = JsonValue.Create("string");
 
@@ -463,7 +479,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_boolean()
+        public void Should_return_null_if_getting_value_by_path_segment_from_boolean()
         {
             var json = JsonValue.True;
 
@@ -474,7 +490,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_getting_value_by_path_segment_from_number()
+        public void Should_return_null_if_getting_value_by_path_segment_from_number()
         {
             var json = JsonValue.Create(12);
 
@@ -485,7 +501,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_same_object_when_path_is_null()
+        public void Should_return_same_object_if_path_is_null()
         {
             var json = JsonValue.Object().Add("property", 12);
 
@@ -496,7 +512,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_same_object_when_path_is_empty()
+        public void Should_return_same_object_if_path_is_empty()
         {
             var json = JsonValue.Object().Add("property", 12);
 
@@ -524,7 +540,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_property_not_found()
+        public void Should_return_null_if_property_not_found()
         {
             var json =
                 JsonValue.Object()
@@ -537,7 +553,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_out_of_index1()
+        public void Should_return_null_if_out_of_index1()
         {
             var json = JsonValue.Array(12, 14);
 
@@ -548,7 +564,7 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_return_null_when_out_of_index2()
+        public void Should_return_null_if_out_of_index2()
         {
             var json = JsonValue.Array(12, 14);
 

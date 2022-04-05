@@ -1,33 +1,36 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public class AssetDomainObjectTests : HandlerTestBase<AssetDomainObject.State>
     {
-        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-        private readonly ITagService tagService = A.Fake<ITagService>();
+        private readonly IAppEntity app;
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
+        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly DomainId parentId = DomainId.NewGuid();
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly AssetFile file = new NoopAssetFile();
@@ -40,14 +43,45 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
         public AssetDomainObjectTests()
         {
-            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId))
+            app = Mocks.App(AppNamedId, Language.DE);
+
+            var scripts = new AssetScripts
+            {
+                Annotate = "<annotate-script>",
+                Create = "<create-script>",
+                Delete = "<delete-script>",
+                Move = "<move-script>",
+                Update = "<update-script>"
+            };
+
+            A.CallTo(() => app.AssetScripts)
+                .Returns(scripts);
+
+            A.CallTo(() => appProvider.GetAppAsync(AppId, false, default))
+                .Returns(app);
+
+            A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId, parentId, A<CancellationToken>._))
                 .Returns(new List<IAssetFolderEntity> { A.Fake<IAssetFolderEntity>() });
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>._, A<HashSet<string>>._))
                 .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? new Dictionary<string, string>()));
 
-            sut = new AssetDomainObject(Store, A.Dummy<ISemanticLog>(), tagService, assetQuery, contentRepository);
+            var log = A.Fake<ILogger<AssetDomainObject>>();
+
+            var serviceProvider =
+                new ServiceCollection()
+                    .AddSingleton(appProvider)
+                    .AddSingleton(assetQuery)
+                    .AddSingleton(contentRepository)
+                    .AddSingleton(log)
+                    .AddSingleton(scriptEngine)
+                    .AddSingleton(tagService)
+                    .BuildServiceProvider();
+
+            sut = new AssetDomainObject(PersistenceFactory, log, serviceProvider);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]
@@ -85,6 +119,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         Slug = file.FileName.ToAssetSlug()
                     })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -110,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         }
 
         [Fact]
-        public async Task Upsert_should_create_events_and_set_intitial_state_when_not_found()
+        public async Task Upsert_should_create_events_and_set_intitial_state_if_not_found()
         {
             var command = new UpsertAsset { File = file, FileHash = "NewHash" };
 
@@ -135,10 +172,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         Slug = file.FileName.ToAssetSlug()
                     })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<create-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Upsert_should_create_events_and_update_file_state_when_found()
+        public async Task Upsert_should_create_events_and_update_file_state_if_found()
         {
             var command = new UpsertAsset { File = file, FileHash = "NewHash" };
 
@@ -162,6 +202,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         MimeType = file.MimeType
                     })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -189,6 +232,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         MimeType = file.MimeType
                     })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -208,6 +254,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetAnnotated { FileName = command.FileName })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -227,6 +276,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetAnnotated { Slug = command.Slug })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -246,6 +298,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetAnnotated { IsProtected = command.IsProtected })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -265,6 +320,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetAnnotated { Metadata = command.Metadata })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<anootate-script>", ScriptOptions(), default))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -282,6 +340,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string> { "tag1" } })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<annotate-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -301,6 +362,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetMoved { ParentId = parentId })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<move-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -321,6 +385,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetDeleted { DeletedSize = 2048 })
                 );
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -330,8 +397,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
-                .Returns(true);
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
+                .Returns(false);
 
             var result = await PublishAsync(command);
 
@@ -339,6 +406,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             Assert.Equal(EtagVersion.Empty, sut.Snapshot.Version);
             Assert.Empty(LastEvents);
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -348,10 +418,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
                 .Returns(true);
 
             await Assert.ThrowsAsync<DomainException>(() => PublishAsync(command));
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -361,10 +434,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
             await ExecuteCreateAsync();
 
-            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All))
+            A.CallTo(() => contentRepository.HasReferrersAsync(AppId, Id, SearchScope.All, A<CancellationToken>._))
                 .Returns(true);
 
             await PublishAsync(command);
+
+            A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), default))
+                .MustHaveHappened();
         }
 
         private Task ExecuteCreateAsync()
@@ -380,6 +456,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         private Task ExecuteDeleteAsync(bool permanent = false)
         {
             return PublishAsync(new DeleteAsset { Permanent = permanent });
+        }
+
+        private static ScriptOptions ScriptOptions()
+        {
+            return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
         }
 
         private T CreateAssetEvent<T>(T @event) where T : AssetEvent

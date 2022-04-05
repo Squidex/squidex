@@ -1,0 +1,31 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .notifo {
+        .notifo-notifications-button {
+            margin-left: .75rem;
+            margin-right: .75rem;
+            margin-top: .125rem;
+
+            svg {
+                fill: $color-text;
+            }
+        }
+
+        .notifo-topics-button {
+            margin-left: .75rem;
+            margin-right: .75rem;
+
+            svg {
+                fill: $color-text-decent;
+            }
+        }
+
+        .notifo-container {
+            display: inline-block;
+            max-width: 5rem;
+            min-width: 3rem;
+        }
+    }
+}

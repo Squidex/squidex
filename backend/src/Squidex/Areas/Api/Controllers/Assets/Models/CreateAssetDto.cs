@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -26,12 +25,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         [FromQuery]
         public DomainId ParentId { get; set; }
-
-        /// <summary>
-        /// The optional path to the parent folder.
-        /// </summary>
-        [FromQuery]
-        public string? ParentPath { get; set; }
 
         /// <summary>
         /// The optional custom asset id.

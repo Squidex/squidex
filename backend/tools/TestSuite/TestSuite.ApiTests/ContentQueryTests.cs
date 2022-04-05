@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
@@ -210,6 +206,44 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_return_items_by_json_filter_with_json()
+        {
+            var items = await _.Contents.GetAsync(new ContentQuery
+            {
+                JsonQuery = new
+                {
+                    sort = new[]
+                    {
+                        new
+                        {
+                            path = "data.json.iv.nested1.nested2", order = "ascending"
+                        }
+                    },
+                    filter = new
+                    {
+                        and = new[]
+                        {
+                            new
+                            {
+                                path = "data.json.iv.nested1.nested2",
+                                op = "gt",
+                                value = 3
+                            },
+                            new
+                            {
+                                path = "data.json.iv.nested1.nested2",
+                                op = "lt",
+                                value = 7
+                            }
+                        }
+                    }
+                }
+            });
+
+            AssertItems(items, 3, new[] { 4, 5, 6 });
+        }
+
+        [Fact]
         public async Task Should_return_items_by_full_text_with_odata()
         {
             // Query multiple times to wait for async text indexer.
@@ -385,7 +419,7 @@ namespace TestSuite.ApiTests
                     mutation {
                         createMyReadsContent(data: {
                             number: {
-                                iv: 999
+                                iv: 555
                             }
                         }) {
                             id,
@@ -402,7 +436,7 @@ namespace TestSuite.ApiTests
 
             var value = result["createMyReadsContent"]["data"]["number"]["iv"].Value<int>();
 
-            Assert.Equal(999, value);
+            Assert.Equal(555, value);
         }
 
         [Fact]

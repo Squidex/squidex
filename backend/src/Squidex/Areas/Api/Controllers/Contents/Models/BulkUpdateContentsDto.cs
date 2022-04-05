@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
-
-#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -27,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// True to automatically publish the content.
         /// </summary>
-        [Obsolete("Use Jobs.Status")]
+        [Obsolete("Use 'jobs.status' fields now.")]
         public bool Publish { get; set; }
 
         /// <summary>
@@ -61,6 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             result.Jobs = Jobs?.Select(x => x.ToJob())?.ToArray();
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (result.Jobs != null && Publish)
             {
                 foreach (var job in result.Jobs)
@@ -71,6 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                     }
                 }
             }
+#pragma warning restore CS0618 // Type or member is obsolete
 
             return result;
         }

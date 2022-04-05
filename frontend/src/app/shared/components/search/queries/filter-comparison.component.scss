@@ -1,0 +1,18 @@
+@import 'mixins';
+@import 'vars';
+
+.path {
+    width: 10rem;
+}
+
+.operator {
+    width: 10rem;
+}
+
+.dropdown-user {
+    @include truncate;
+
+    .user-name {
+        margin-left: .25rem;
+    }
+}

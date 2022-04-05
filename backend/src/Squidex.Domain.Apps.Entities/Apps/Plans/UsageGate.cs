@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Orleans;
@@ -28,10 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public UsageGate(IAppPlansProvider appPlansProvider, IApiUsageTracker apiUsageTracker, IGrainFactory grainFactory)
         {
-            Guard.NotNull(apiUsageTracker, nameof(apiUsageTracker));
-            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.appPlansProvider = appPlansProvider;
             this.apiUsageTracker = apiUsageTracker;
             this.grainFactory = grainFactory;
@@ -39,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public virtual async Task<bool> IsBlockedAsync(IAppEntity app, string? clientId, DateTime today)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             var appId = app.Id;
 
@@ -76,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                     TrackNotified(appId);
                 }
 
-                isBlocked = isBlocked || plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls;
+                isBlocked = isBlocked || (plan.BlockingApiCalls > 0 && usage > plan.BlockingApiCalls);
             }
 
             return isBlocked;

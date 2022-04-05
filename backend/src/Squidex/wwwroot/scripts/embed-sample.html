@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <style>
+        .element {
+            border: 2px dashed red;
+            border-radius: 0;
+            box-sizing: border-box;
+            padding: 20px;
+            position: fixed;
+            text-align: center;
+            text-decoration: none;
+            width: 200px;
+        }
+
+        .element-left {
+            left: -100px;
+        }
+
+        .element-right {
+            right: -100px;
+        }
+
+        .element-top {
+            top: -30px;
+        }
+
+        .element-bottom {
+            bottom: -30px;
+        }
+
+        .element-left,
+        .element-center,
+        .element-right {
+            top: 50%;
+            margin-top: -30px;
+        }
+
+        .element-top,
+        .element-center,
+        .element-bottom {
+            left: 50%;
+            margin-left: -100px;
+        }
+    </style>
+
+    <script src="embed-sdk.js"></script>
+</head>
+<body>
+    <div class="element element-top" squidex-token="ewogICJ1IjogImh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLAogICJhIjogInRlc3QiLAogICJzIjogInRlc3QiLAogICJpIjogIjI0ZWQxMWJhLWJjNzItNDMzZS04ODRjLWE0NGE3ODIwYjU1MSIgIAp9">
+        Top Aligned
+    </div>
+
+    <div class="element element-right" squidex-token="ewogICJ1IjogImh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLAogICJhIjogInRlc3QiLAogICJzIjogInRlc3QiLAogICJpIjogIjI0ZWQxMWJhLWJjNzItNDMzZS04ODRjLWE0NGE3ODIwYjU1MSIgIAp9">
+        Right Aligned
+    </div>
+
+    <div class="element element-bottom" squidex-token="ewogICJ1IjogImh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLAogICJhIjogInRlc3QiLAogICJzIjogInRlc3QiLAogICJpIjogIjI0ZWQxMWJhLWJjNzItNDMzZS04ODRjLWE0NGE3ODIwYjU1MSIgIAp9">
+        Bottom Aligned
+    </div>
+
+    <div class="element element-left" squidex-token="ewogICJ1IjogImh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLAogICJhIjogInRlc3QiLAogICJzIjogInRlc3QiLAogICJpIjogIjI0ZWQxMWJhLWJjNzItNDMzZS04ODRjLWE0NGE3ODIwYjU1MSIgIAp9">
+        Left Aligned
+    </div>
+
+    <div class="element element-center" squidex-token="ewogICJ1IjogImh0dHBzOi8vbG9jYWxob3N0OjUwMDEiLAogICJhIjogInRlc3QiLAogICJzIjogInRlc3QiLAogICJpIjogIjI0ZWQxMWJhLWJjNzItNDMzZS04ODRjLWE0NGE3ODIwYjU1MSIgIAp9">
+        Center
+    </div>
+</body>
+</html>

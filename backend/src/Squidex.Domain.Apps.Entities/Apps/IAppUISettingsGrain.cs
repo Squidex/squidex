@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
@@ -21,5 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         Task SetAsync(J<JsonObject> settings);
 
         Task RemoveAsync(string path);
+
+        Task ClearAsync();
     }
 }

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Events;
@@ -24,9 +22,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public EventEnricher(IMemoryCache userCache, IUserResolver userResolver)
         {
-            Guard.NotNull(userCache, nameof(userCache));
-            Guard.NotNull(userResolver, nameof(userResolver));
-
             this.userCache = userCache;
             this.userResolver = userResolver;
         }
@@ -65,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 IUser? user;
                 try
                 {
-                     user = await userResolver.FindByIdAsync(actor.Identifier);
+                    user = await userResolver.FindByIdAsync(actor.Identifier);
                 }
                 catch
                 {

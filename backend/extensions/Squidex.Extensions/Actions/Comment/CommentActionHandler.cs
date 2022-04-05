@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
@@ -23,8 +21,6 @@ namespace Squidex.Extensions.Actions.Comment
         public CommentActionHandler(RuleEventFormatter formatter, ICommandBus commandBus)
             : base(formatter)
         {
-            Guard.NotNull(commandBus, nameof(commandBus));
-
             this.commandBus = commandBus;
         }
 
@@ -56,7 +52,8 @@ namespace Squidex.Extensions.Actions.Comment
             return ("Ignore", new CreateComment());
         }
 
-        protected override async Task<Result> ExecuteJobAsync(CreateComment job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(CreateComment job,
+            CancellationToken ct = default)
         {
             if (job.CommentsId == default)
             {

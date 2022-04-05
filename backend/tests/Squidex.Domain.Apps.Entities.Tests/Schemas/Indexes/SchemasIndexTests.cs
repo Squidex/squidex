@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -28,21 +26,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly ISchemasByAppIndexGrain index = A.Fake<ISchemasByAppIndexGrain>();
+        private readonly ISchemasCacheGrain cache = A.Fake<ISchemasCacheGrain>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly SchemasIndex sut;
 
         public SchemasIndexTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<ISchemasByAppIndexGrain>(appId.Id.ToString(), null))
-                .Returns(index);
+            A.CallTo(() => grainFactory.GetGrain<ISchemasCacheGrain>(appId.Id.ToString(), null))
+                .Returns(this.cache);
 
-            var cache =
+            var localCache =
                 new ReplicatedCache(new MemoryCache(Options.Create(new MemoryCacheOptions())), new SimplePubSub(A.Fake<ILogger<SimplePubSub>>()),
                     Options.Create(new ReplicatedCacheOptions { Enable = true }));
 
-            sut = new SchemasIndex(grainFactory, cache);
+            sut = new SchemasIndex(grainFactory, localCache);
         }
 
         [Fact]
@@ -50,11 +48,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var (expected, _) = SetupSchema();
 
-            A.CallTo(() => index.GetIdAsync(schemaId.Name))
+            A.CallTo(() => cache.GetSchemaIdAsync(schemaId.Name))
                 .Returns(schemaId.Id);
 
-            var actual1 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, false);
-            var actual2 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, false);
+            var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, false);
+            var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, false);
 
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);
@@ -62,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedTwiceExactly();
 
-            A.CallTo(() => index.GetIdAsync(A<string>._))
+            A.CallTo(() => cache.GetSchemaIdAsync(A<string>._))
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -71,11 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var (expected, _) = SetupSchema();
 
-            A.CallTo(() => index.GetIdAsync(schemaId.Name))
+            A.CallTo(() => cache.GetSchemaIdAsync(schemaId.Name))
                 .Returns(schemaId.Id);
 
-            var actual1 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
-            var actual2 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
+            var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true);
+            var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true);
             var actual3 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
 
             Assert.Same(expected, actual1);
@@ -85,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => index.GetIdAsync(A<string>._))
+            A.CallTo(() => cache.GetSchemaIdAsync(A<string>._))
                 .MustHaveHappenedOnceExactly();
         }
 
@@ -103,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedTwiceExactly();
 
-            A.CallTo(() => index.GetIdAsync(A<string>._))
+            A.CallTo(() => cache.GetSchemaIdAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -114,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             var actual1 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
             var actual2 = await sut.GetSchemaAsync(appId.Id, schemaId.Id, true);
-            var actual3 = await sut.GetSchemaByNameAsync(appId.Id, schemaId.Name, true);
+            var actual3 = await sut.GetSchemaAsync(appId.Id, schemaId.Name, true);
 
             Assert.Same(expected, actual1);
             Assert.Same(expected, actual2);
@@ -123,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             A.CallTo(() => grainFactory.GetGrain<ISchemaGrain>(A<string>._, null))
                 .MustHaveHappenedOnceExactly();
 
-            A.CallTo(() => index.GetIdAsync(A<string>._))
+            A.CallTo(() => cache.GetSchemaIdAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 
@@ -132,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var (schema, _) = SetupSchema();
 
-            A.CallTo(() => index.GetIdsAsync())
+            A.CallTo(() => cache.GetSchemaIdsAsync())
                 .Returns(new List<DomainId> { schema.Id });
 
             var actual = await sut.GetSchemasAsync(appId.Id);
@@ -145,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var (schema, _) = SetupSchema(EtagVersion.Empty);
 
-            A.CallTo(() => index.GetIdsAsync())
+            A.CallTo(() => cache.GetSchemaIdsAsync())
                 .Returns(new List<DomainId> { schema.Id });
 
             var actual = await sut.GetSchemasAsync(appId.Id);
@@ -158,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var (schema, _) = SetupSchema(0, true);
 
-            A.CallTo(() => index.GetIdsAsync())
+            A.CallTo(() => cache.GetSchemaIdsAsync())
                 .Returns(new List<DomainId> { schema.Id });
 
             var actual = await sut.GetSchemasAsync(appId.Id);
@@ -167,11 +165,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_add_schema_to_index_when_creating()
+        public async Task Should_add_schema_to_index_if_creating()
         {
             var token = RandomHash.Simple();
 
-            A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
+            A.CallTo(() => cache.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns(token);
 
             var command = Create(schemaId.Name);
@@ -182,19 +180,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.AddAsync(token))
+            A.CallTo(() => cache.AddAsync(schemaId.Id, schemaId.Name))
                 .MustHaveHappened();
 
-            A.CallTo(() => index.RemoveReservationAsync(A<string>._))
-                .MustNotHaveHappened();
+            A.CallTo(() => cache.RemoveReservationAsync(A<string>._))
+                .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_clear_reservation_when_schema_creation_failed()
+        public async Task Should_clear_reservation_if_schema_creation_failed()
         {
             var token = RandomHash.Simple();
 
-            A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
+            A.CallTo(() => cache.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns(token);
 
             var command = Create(schemaId.Name);
@@ -204,17 +202,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.AddAsync(token))
+            A.CallTo(() => cache.AddAsync(A<DomainId>._, A<string>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => index.RemoveReservationAsync(token))
+            A.CallTo(() => cache.RemoveReservationAsync(token))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_add_to_indexes_when_name_is_taken()
+        public async Task Should_not_add_to_indexes_if_name_is_reserved()
         {
-            A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
+            A.CallTo(() => cache.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns(Task.FromResult<string?>(null));
 
             var command = Create(schemaId.Name);
@@ -225,50 +223,41 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
 
-            A.CallTo(() => index.AddAsync(A<string>._))
+            A.CallTo(() => cache.AddAsync(A<DomainId>._, A<string>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => index.RemoveReservationAsync(A<string>._))
+            A.CallTo(() => cache.RemoveReservationAsync(A<string>._))
                 .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_add_to_indexes_when_name_is_invalid()
+        public async Task Should_not_add_to_indexes_if_name_is_taken()
         {
-            var command = Create("INVALID");
+            var token = RandomHash.Simple();
+
+            A.CallTo(() => cache.ReserveAsync(schemaId.Id, schemaId.Name))
+                .Returns(Task.FromResult<string?>(token));
+
+            A.CallTo(() => cache.GetSchemaIdAsync(schemaId.Name))
+                .Returns(schemaId.Id);
+
+            var command = Create(schemaId.Name);
 
             var context =
                 new CommandContext(command, commandBus)
                     .Complete();
 
-            await sut.HandleAsync(context);
+            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
 
-            A.CallTo(() => index.ReserveAsync(schemaId.Id, A<string>._))
+            A.CallTo(() => cache.AddAsync(A<DomainId>._, A<string>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => index.RemoveReservationAsync(A<string>._))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_update_index_when_schema_is_updated()
-        {
-            var (_, schemaGrain) = SetupSchema();
-
-            var command = new UpdateSchema { SchemaId = schemaId, AppId = appId };
-
-            var context =
-                new CommandContext(command, commandBus)
-                    .Complete();
-
-            await sut.HandleAsync(context);
-
-            A.CallTo(() => schemaGrain.GetStateAsync())
+            A.CallTo(() => cache.RemoveReservationAsync(token))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_update_index_with_result_when_schema_is_updated()
+        public async Task Should_update_index_with_result_if_schema_is_updated()
         {
             var (schema, schemaGrain) = SetupSchema();
 
@@ -285,7 +274,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_remove_schema_from_index_when_deleted_and_exists()
+        public async Task Should_remove_schema_from_index_if_deleted_and_exists()
         {
             var (schema, _) = SetupSchema(isDeleted: true);
 
@@ -297,18 +286,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.RemoveAsync(schema.Id))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_forward_call_when_rebuilding()
-        {
-            var schemas = new Dictionary<string, DomainId>();
-
-            await sut.RebuildAsync(appId.Id, schemas);
-
-            A.CallTo(() => index.RebuildAsync(schemas))
+            A.CallTo(() => cache.RemoveAsync(schema.Id))
                 .MustHaveHappened();
         }
 

@@ -1,22 +1,22 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using GraphQL;
+using GraphQL.DataLoader;
+using GraphQL.DI;
 using GraphQL.Server;
 using GraphQL.Server.Transports.AspNetCore;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Caching;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web;
@@ -30,9 +30,6 @@ namespace Squidex.Config.Web
     {
         public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDefaultWebServices(config);
-            services.AddDefaultForwardRules();
-
             services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
                 .AsSelf();
 
@@ -90,24 +87,26 @@ namespace Squidex.Config.Web
 
         public static void AddSquidexGraphQL(this IServiceCollection services)
         {
-            services.AddGraphQL(options =>
-            {
-                options.EnableMetrics = false;
-            })
-            .AddDataLoader()
-            .AddSystemTextJson()
-            .AddSquidexWriter();
+            GraphQL.MicrosoftDI.GraphQLBuilderExtensions.AddGraphQL(services)
+                .AddServer(false, options =>
+                {
+                    options.EnableMetrics = false;
+                })
+                .AddSchema<DummySchema>()
+                .AddSystemTextJson()
+                .AddSquidexJson() // Use Newtonsoft.JSON for custom converters.
+                .AddDataLoader();
 
             services.AddSingletonAs<DummySchema>()
                 .AsSelf();
 
-            services.AddSingletonAs<DynamicExecutor>()
-                .As<IDocumentExecuter>();
-
             services.AddSingletonAs<DynamicUserContextBuilder>()
                 .As<IUserContextBuilder>();
 
-            services.AddSingletonAs<GraphQLMiddleware>()
+            services.AddSingletonAs<CachingGraphQLResolver>()
+                .As<IConfigureExecution>();
+
+            services.AddSingletonAs<GraphQLRunner>()
                 .AsSelf();
         }
     }

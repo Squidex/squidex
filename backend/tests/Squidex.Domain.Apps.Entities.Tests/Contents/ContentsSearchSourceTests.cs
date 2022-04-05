@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core;
@@ -26,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentsSearchSourceTests
     {
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly ITextIndex contentIndex = A.Fake<ITextIndex>();
@@ -38,7 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentsSearchSourceTests()
         {
-            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
+            ct = cts.Token;
+
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id, ct))
                 .Returns(new List<ISchemaEntity>
                 {
                     Mocks.Schema(appId, schemaId1),
@@ -54,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = new ContentEntity { Id = DomainId.NewGuid(), SchemaId = schemaId1 };
 
-            await TestContentAsyc(content, "Content");
+            await TestContentAsync(content, "Content");
         }
 
         [Fact]
@@ -79,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 SchemaId = schemaId1
             };
 
-            await TestContentAsyc(content, "hello, world");
+            await TestContentAsync(content, "hello, world");
         }
 
         [Fact]
@@ -100,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 SchemaId = schemaId1
             };
 
-            await TestContentAsyc(content, "hello");
+            await TestContentAsync(content, "hello");
         }
 
         [Fact]
@@ -121,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 SchemaId = schemaId1
             };
 
-            await TestContentAsyc(content, "hello");
+            await TestContentAsync(content, "hello");
         }
 
         [Fact]
@@ -147,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 SchemaId = schemaId1
             };
 
-            await TestContentAsyc(content, "resolved");
+            await TestContentAsync(content, "resolved");
         }
 
         [Fact]
@@ -155,11 +157,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ctx = ContextWithPermissions();
 
-            var result = await sut.SearchAsync("query", ctx);
+            var result = await sut.SearchAsync("query", ctx, ct);
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>._, A<SearchScope>._))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>._, A<SearchScope>._, ct))
                 .MustNotHaveHappened();
         }
 
@@ -168,18 +170,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ctx = ContextWithPermissions(schemaId1, schemaId2);
 
-            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope()))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope(), ct))
                 .Returns(new List<DomainId>());
 
-            var result = await sut.SearchAsync("query", ctx);
+            var result = await sut.SearchAsync("query", ctx, ct);
 
             Assert.Empty(result);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>._, ct))
                 .MustNotHaveHappened();
         }
 
-        private async Task TestContentAsyc(ContentEntity content, string expectedName)
+        private async Task TestContentAsync(ContentEntity content, string expectedName)
         {
             content.AppId = appId;
 
@@ -187,16 +189,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ids = new List<DomainId> { content.Id };
 
-            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~" && x.Filter != null), ctx.Scope()))
+            A.CallTo(() => contentIndex.SearchAsync(ctx.App, A<TextQuery>.That.Matches(x => x.Text == "query~"), ctx.Scope(), ct))
                 .Returns(ids);
 
-            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids)))
+            A.CallTo(() => contentQuery.QueryAsync(ctx, A<Q>.That.HasIds(ids), ct))
                 .Returns(ResultList.CreateFrom<IEnrichedContentEntity>(1, content));
 
             A.CallTo(() => urlGenerator.ContentUI(appId, schemaId1, content.Id))
                 .Returns("content-url");
 
-            var result = await sut.SearchAsync("query", ctx);
+            var result = await sut.SearchAsync("query", ctx, ct);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()

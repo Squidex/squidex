@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -32,7 +31,7 @@ namespace Squidex.Infrastructure
 
         public RefToken(RefTokenType type, string identifier)
         {
-            Guard.NotNullOrEmpty(identifier, nameof(identifier));
+            Guard.NotNullOrEmpty(identifier);
 
             Type = type;
 
@@ -66,11 +65,11 @@ namespace Squidex.Infrastructure
 
             value = value.Trim();
 
-            var idx = value.IndexOf(':');
+            var idx = value.IndexOf(':', StringComparison.Ordinal);
 
             if (idx > 0 && idx < value.Length - 1)
             {
-                if (!Enum.TryParse<RefTokenType>(value.Substring(0, idx), true, out var type))
+                if (!Enum.TryParse<RefTokenType>(value[..idx], true, out var type))
                 {
                     type = RefTokenType.Subject;
                 }

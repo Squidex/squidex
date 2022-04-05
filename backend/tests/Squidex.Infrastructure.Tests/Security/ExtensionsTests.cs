@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
 using Xunit;
 
@@ -35,12 +34,6 @@ namespace Squidex.Infrastructure.Security
         public void Should_retrieve_name()
         {
             TestClaimExtension(OpenIdClaims.Name, x => x.OpenIdName());
-        }
-
-        [Fact]
-        public void Should_retrieve_nickname()
-        {
-            TestClaimExtension(OpenIdClaims.NickName, x => x.OpenIdNickName());
         }
 
         [Fact]

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -43,14 +41,14 @@ namespace Squidex.Web
                 {
                     foreach (var id in permissionIds)
                     {
-                        var app = context.HttpContext.Features.Get<IAppFeature>()?.AppId.Name;
+                        var app = context.HttpContext.Features.Get<IAppFeature>()?.App.Name;
 
                         if (string.IsNullOrWhiteSpace(app))
                         {
                             app = Permission.Any;
                         }
 
-                        var schema = context.HttpContext.Features.Get<ISchemaFeature>()?.SchemaId.Name;
+                        var schema = context.HttpContext.Features.Get<ISchemaFeature>()?.Schema.SchemaDef.Name;
 
                         if (string.IsNullOrWhiteSpace(schema))
                         {

@@ -19,40 +19,40 @@ namespace Squidex.Extensions.Actions.Kafka
         Display = "Push to kafka",
         Description = "Connect to Kafka stream and push data to that stream.",
         ReadMore = "https://kafka.apache.org/quickstart")]
-    public sealed class KafkaAction : RuleAction
+    public sealed record KafkaAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Topic Name", Description = "The name of the topic.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string TopicName { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Payload { get; set; }
 
         [Display(Name = "Key", Description = "The message key, commonly used for partitioning.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string Key { get; set; }
 
         [Display(Name = "Partition Key", Description = "The partition key, only used when we don't want to define partiontionig with key.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string PartitionKey { get; set; }
 
         [Display(Name = "Partition Count", Description = "Define the number of partitions for specific topic.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public int PartitionCount { get; set; }
 
         [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Headers { get; set; }
 
         [Display(Name = "Schema (Optional)", Description = "Define a specific AVRO schema in JSON format.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         public string Schema { get; set; }
     }
 }

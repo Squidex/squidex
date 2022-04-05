@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -64,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public RuleJobResult JobResult { get; set; }
 
-        public static RuleEventDto FromRuleEvent(IRuleEventEntity ruleEvent, Resources resources)
+        public static RuleEventDto FromDomain(IRuleEventEntity ruleEvent, Resources resources)
         {
             var result = new RuleEventDto();
 
@@ -82,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
             if (NextAttempt != null)
             {
-                AddDeleteLink("delete", resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
+                AddDeleteLink("cancel", resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));
             }
 
             return this;

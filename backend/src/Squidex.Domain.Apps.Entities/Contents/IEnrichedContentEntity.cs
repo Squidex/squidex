@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         string? ScheduledStatusColor { get; }
 
-        string SchemaName { get; }
-
         string SchemaDisplayName { get; }
+
+        string? EditToken { get; }
 
         RootField[]? ReferenceFields { get; }
 

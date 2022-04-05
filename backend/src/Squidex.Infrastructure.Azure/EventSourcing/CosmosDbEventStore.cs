@@ -36,11 +36,6 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public CosmosDbEventStore(DocumentClient documentClient, string masterKey, string database, IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(documentClient, nameof(documentClient));
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-            Guard.NotNullOrEmpty(masterKey, nameof(masterKey));
-            Guard.NotNullOrEmpty(database, nameof(database));
-
             this.documentClient = documentClient;
 
             databaseUri = UriFactory.CreateDatabaseUri(database);
@@ -61,7 +56,8 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default)
+        public async Task InitializeAsync(
+            CancellationToken ct = default)
         {
             await documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = DatabaseId });
 

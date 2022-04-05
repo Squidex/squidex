@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Search
@@ -20,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Search
     {
         private readonly ISearchSource source1 = A.Fake<ISearchSource>();
         private readonly ISearchSource source2 = A.Fake<ISearchSource>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ILogger<SearchManager> log = A.Fake<ILogger<SearchManager>>();
         private readonly Context requestContext = Context.Anonymous(Mocks.App(NamedId.Of(DomainId.NewGuid(), "my-app")));
         private readonly SearchManager sut;
 
@@ -36,10 +34,10 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             Assert.Empty(result);
 
-            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -50,10 +48,10 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             Assert.Empty(result);
 
-            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source1.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._))
+            A.CallTo(() => source2.SearchAsync(A<string>._, A<Context>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -65,10 +63,10 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             var query = "a query";
 
-            A.CallTo(() => source1.SearchAsync(query, requestContext))
+            A.CallTo(() => source1.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Returns(result1);
 
-            A.CallTo(() => source2.SearchAsync(query, requestContext))
+            A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Returns(result2);
 
             var result = await sut.SearchAsync(query, requestContext);
@@ -86,17 +84,17 @@ namespace Squidex.Domain.Apps.Entities.Search
 
             var query = "a query";
 
-            A.CallTo(() => source1.SearchAsync(query, requestContext))
+            A.CallTo(() => source1.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Throws(new InvalidOperationException());
 
-            A.CallTo(() => source2.SearchAsync(query, requestContext))
+            A.CallTo(() => source2.SearchAsync(query, requestContext, A<CancellationToken>._))
                 .Returns(result2);
 
             var result = await sut.SearchAsync(query, requestContext);
 
             result.Should().BeEquivalentTo(result2);
 
-            A.CallTo(() => log.Log(A<SemanticLogLevel>._, A<string>._, A<Exception?>._, A<LogFormatter<string>>._!))
+            A.CallTo(log).Where(x => x.Method.Name == "Log")
                 .MustHaveHappened();
         }
     }

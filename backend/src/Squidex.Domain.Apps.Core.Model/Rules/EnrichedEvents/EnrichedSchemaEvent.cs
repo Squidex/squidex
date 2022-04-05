@@ -11,6 +11,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
     public sealed class EnrichedSchemaEvent : EnrichedSchemaEventBase, IEnrichedEntityEvent
     {
+        [FieldDescription(nameof(FieldDescriptions.EventType))]
         public EnrichedSchemaEventType Type { get; set; }
 
         public DomainId Id
@@ -20,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 
         public override long Partition
         {
-            get => SchemaId.GetHashCode();
+            get => SchemaId?.GetHashCode() ?? 0;
         }
     }
 }

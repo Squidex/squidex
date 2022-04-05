@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 
 namespace Squidex.Infrastructure.Commands
@@ -16,8 +15,6 @@ namespace Squidex.Infrastructure.Commands
 
         public GrainCommandMiddleware(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 

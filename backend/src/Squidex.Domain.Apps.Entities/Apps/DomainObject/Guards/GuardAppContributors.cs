@@ -1,13 +1,10 @@
 // ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Plans;
@@ -22,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
     {
         public static Task CanAssign(AssignContributor command, IAppEntity app, IUserResolver users, IAppLimitsPlan plan)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var contributors = app.Contributors;
 
@@ -67,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanRemove(RemoveContributor command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             var contributors = app.Contributors;
 

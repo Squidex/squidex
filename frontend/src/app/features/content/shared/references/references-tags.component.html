@@ -1,0 +1,8 @@
+<sqx-tag-editor placeholder="{{ 'common.tagAddReference' | sqxTranslate }}"
+    (open)="onOpened()"
+    [formControl]="control" 
+    [allowDuplicates]="false"
+    [allowOpen]="true"
+    [converter]="snapshot.converter"
+    [suggestions]="snapshot.converter.suggestions">
+</sqx-tag-editor>

@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -25,9 +25,17 @@ namespace Squidex.Areas.Api.Controllers
         [LocalizedRequired]
         public string EnglishName { get; set; }
 
-        public static LanguageDto FromLanguage(Language language)
+        /// <summary>
+        /// The native name of the language.
+        /// </summary>
+        [LocalizedRequired]
+        public string NativeName { get; set; }
+
+        public static LanguageDto FromDomain(Language language)
         {
-            return SimpleMapper.Map(language, new LanguageDto());
+            var result = SimpleMapper.Map(language, new LanguageDto());
+
+            return result;
         }
     }
 }

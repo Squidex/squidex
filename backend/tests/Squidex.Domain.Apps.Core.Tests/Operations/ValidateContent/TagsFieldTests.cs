@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -26,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties());
 
-            Assert.Equal("my-tags", sut.Name);
+            Assert.Equal("myTags", sut.Name);
         }
 
         [Fact]
@@ -139,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_value_contains_an_not_allowed_values()
         {
-            var sut = Field(new TagsFieldProperties { AllowedValues = ReadOnlyCollection.Create("tag-2", "tag-3") });
+            var sut = Field(new TagsFieldProperties { AllowedValues = ReadonlyList.Create("tag-2", "tag-3") });
 
             await sut.ValidateAsync(CreateValue("tag-1", "tag-2", null), errors);
 
@@ -154,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)
         {
-            return Fields.Tags(1, "my-tags", Partitioning.Invariant, properties);
+            return Fields.Tags(1, "myTags", Partitioning.Invariant, properties);
         }
     }
 }

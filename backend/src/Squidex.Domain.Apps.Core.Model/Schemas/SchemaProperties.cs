@@ -1,25 +1,26 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class SchemaProperties : NamedElementPropertiesBase
+    public sealed record SchemaProperties : NamedElementPropertiesBase
     {
-        public ReadOnlyCollection<string>? Tags { get; set; }
+        public static readonly SchemaProperties Empty = new SchemaProperties();
 
-        public string? ContentsSidebarUrl { get; set; }
+        public ReadonlyList<string>? Tags { get; init; }
 
-        public string? ContentSidebarUrl { get; set; }
+        public string? ContentsSidebarUrl { get; init; }
 
-        public string? ContentEditorUrl { get; set; }
+        public string? ContentSidebarUrl { get; init; }
 
-        public bool ValidateOnPublish { get; set; }
+        public string? ContentEditorUrl { get; init; }
+
+        public bool ValidateOnPublish { get; init; }
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Contents;
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ReferencesFluidExtension(services)
             };
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
                 .Returns(Mocks.App(appId));
 
             sut = new FluidTemplateEngine(extensions);
@@ -62,10 +61,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 AppId = appId
             };
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, reference1));
 
-            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId2)))
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId2), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(1, reference2));
 
             var vars = new TemplateVars
@@ -78,7 +77,53 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {% reference 'ref', id %}
                     Text: {{ ref.data.field1.iv }} {{ ref.data.field2.iv }} {{ ref.id }}
                 {% endfor %}
-                ";
+            ";
+
+            var expected = $@"
+                Text: Hello 1 World 1 {referenceId1}
+                Text: Hello 2 World 2 {referenceId2}
+            ";
+
+            var result = await sut.RenderAsync(template, vars);
+
+            Assert.Equal(Cleanup(expected), Cleanup(result));
+        }
+
+        [Fact]
+        public async Task Should_resolve_references_in_loop_with_filter()
+        {
+            var referenceId1 = DomainId.NewGuid();
+            var reference1 = CreateReference(referenceId1, 1);
+            var referenceId2 = DomainId.NewGuid();
+            var reference2 = CreateReference(referenceId2, 2);
+
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new ContentData()
+                        .AddField("references",
+                            new ContentFieldData()
+                                .AddInvariant(JsonValue.Array(referenceId1, referenceId2))),
+                AppId = appId
+            };
+
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, reference1));
+
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId2), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, reference2));
+
+            var vars = new TemplateVars
+            {
+                ["event"] = @event
+            };
+
+            var template = @"
+                {% for id in event.data.references.iv %}
+                    {% assign ref = id | reference %}
+                    Text: {{ ref.data.field1.iv }} {{ ref.data.field2.iv }} {{ ref.id }}
+                {% endfor %}
+            ";
 
             var expected = $@"
                 Text: Hello 1 World 1 {referenceId1}
@@ -109,9 +154,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private static string Cleanup(string text)
         {
             return text
-                .Replace("\r", string.Empty)
-                .Replace("\n", string.Empty)
-                .Replace(" ", string.Empty);
+                .Replace("\r", string.Empty, StringComparison.Ordinal)
+                .Replace("\n", string.Empty, StringComparison.Ordinal)
+                .Replace(" ", string.Empty, StringComparison.Ordinal);
         }
     }
 }

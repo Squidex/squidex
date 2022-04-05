@@ -1,9 +1,6 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Profile.ProfileVM
 
 @{
-    ViewBag.ThemeColor = "white";
-    ViewBag.ThemeSize = "profile-lg";
-
     ViewBag.Title = T.Get("users.profile.title");
 
     void RenderValidation(string field)
@@ -11,7 +8,7 @@
         @if (ViewContext.ViewData.ModelState[field]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
         {
             <div class="errors-container">
-                <span class="errors">Html.ValidationMessage(field)</span>
+                <span class="errors">@Html.ValidationMessage(field)</span>
             </div>
         }
     }
@@ -21,23 +18,23 @@
 
 <h2>@T.Get("users.profile.pii")</h2>
 
-@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+@if (!string.IsNullOrWhiteSpace(Model!.SuccessMessage))
 {
     <div class="form-alert form-alert-success" id="success">
-        @Model.SuccessMessage
+        @Model!.SuccessMessage
     </div>
 }
 
-@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+@if (!string.IsNullOrWhiteSpace(Model!.ErrorMessage))
 {
     <div class="form-alert form-alert-error">
-        @Model.ErrorMessage
+        @Model!.ErrorMessage
     </div>
 }
 
 <div class="row profile-section-sm">
     <div class="col profile-picture-col">
-        <img class="profile-picture" src="@Url.RootContentUrl($"~/api/users/{Model.Id}/picture/?q={Guid.NewGuid()}")" />
+        <img class="profile-picture" src="@Url.RootContentUrl($"~/api/users/{Model!.Id}/picture/?q={Guid.NewGuid()}")" />
     </div>
     <div class="col">
         <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">
@@ -78,8 +75,10 @@
     <button type="submit" class="btn btn-primary">@T.Get("common.save")</button>
 </form>
 
-@if (Model.ExternalProviders.Any())
+@if (Model!.ExternalProviders.Any())
 {
+    <hr />
+
     <div class="profile-section">
         <h2>@T.Get("users.profile.loginsTitle")</h2>
 
@@ -89,7 +88,7 @@
                 <col style="width: 100%;" />
                 <col style="width: 100px;" />
             </colgroup>
-            @foreach (var login in Model.ExternalLogins)
+            @foreach (var login in Model!.ExternalLogins)
             {
                 <tr>
                     <td>
@@ -99,7 +98,7 @@
                         <span class="truncate">@login.ProviderDisplayName</span>
                     </td>
                     <td class="text-right">
-                        @if (Model.ExternalLogins.Count > 1 || Model.HasPassword)
+                        @if (Model!.ExternalLogins.Count > 1 || Model!.HasPassword)
                         {
                             <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
                                 <input type="hidden" value="@login.LoginProvider" name="LoginProvider" />
@@ -116,7 +115,7 @@
         </table>
 
         <form asp-controller="Profile" asp-action="AddLogin" method="post">
-            @foreach (var provider in Model.ExternalProviders.Where(x => Model.ExternalLogins.All(y => x.AuthenticationScheme != y.LoginProvider)))
+            @foreach (var provider in Model!.ExternalProviders.Where(x => Model!.ExternalLogins.All(y => x.AuthenticationScheme != y.LoginProvider)))
             {
                 var schema = provider.AuthenticationScheme.ToLowerInvariant();
 
@@ -128,12 +127,14 @@
     </div>
 }
 
-@if (Model.HasPasswordAuth)
+@if (Model!.HasPasswordAuth)
 {
+    <hr />
+
     <div class="profile-section">
         <h2>@T.Get("users.profile.passwordTitle")</h2>
 
-        @if (Model.HasPassword)
+        @if (Model!.HasPassword)
         {
             <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
                 <div class="form-group">
@@ -192,23 +193,25 @@
     </div>
 }
 
+<hr />
+
 <div class="profile-section">
     <h2>@T.Get("users.profile.clientTitle")</h2>
 
     <small class="form-text text-muted mt-2 mb-2">@T.Get("users.profile.clientHint")</small>
 
-    <div class="row no-gutters form-group">
+    <div class="row g-2 form-group">
         <div class="col-8">
             <label for="clientId">@T.Get("common.clientId")</label>
 
-            <input class="form-control" name="clientId" id="clientId" readonly value="@Model.Id" />
+            <input class="form-control" name="clientId" id="clientId" readonly value="@Model!.Id" />
         </div>
     </div>
-    <div class="row no-gutters form-group">
+    <div class="row g-2 form-group">
         <div class="col-8">
             <label for="clientSecret">@T.Get("common.clientSecret")</label>
 
-            <input class="form-control" name="clientSecret" id="clientSecret" readonly value="@Model.ClientSecret" />
+            <input class="form-control" name="clientSecret" id="clientSecret" readonly value="@Model!.ClientSecret" />
         </div>
         <div class="col-4 pl-2">
             <label for="generate">&nbsp;</label>
@@ -220,6 +223,8 @@
     </div>
 </div>
 
+<hr />
+
 <div class="profile-section">
     <h2>@T.Get("users.profile.propertiesTitle")</h2>
 
@@ -227,9 +232,9 @@
 
     <form class="profile-form" asp-controller="Profile" asp-action="UpdateProperties" method="post">
         <div class="mb-2" id="properties">
-            @for (var i = 0; i < Model.Properties.Count; i++)
+            @for (var i = 0; i < Model!.Properties.Count; i++)
             {
-                <div class="row no-gutters form-group">
+                <div class="row g-2 form-group">
                     <div class="col-5 pr-2">
 
                         @{ RenderValidation($"Properties[{i}].Name"); }
@@ -279,7 +284,7 @@
     }
 
     document.addEventListener('click',
-        function(event) {
+        function (event) {
             if (event.target.className.indexOf('remove-item') >= 0) {
                 event.target.parentNode.parentNode.remove();
 
@@ -302,7 +307,7 @@
             var template = document.createElement('template');
 
             template.innerHTML =
-                `<div class="row no-gutters form-group">
+                `<div class="row g-2 form-group">
                     <div class="col-5 pr-2">
                         <input class="form-control" />
                     </div>

@@ -1,18 +1,16 @@
 ﻿// ==========================================================================
-//  JsonExternalSerializerTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using FakeItEasy;
 using Orleans.Serialization;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
+
+#pragma warning disable MA0060 // The value returned by Stream.Read/Stream.ReadAsync is not used
 
 namespace Squidex.Infrastructure.Orleans
 {
@@ -26,28 +24,31 @@ namespace Squidex.Infrastructure.Orleans
         [Fact]
         public void Should_not_copy_null()
         {
-            var v = (string?)null;
-            var c = J<int>.Copy(v, null);
+            var source = (string?)null;
 
-            Assert.Null(c);
+            var clone = J<int>.Copy(source, null);
+
+            Assert.Null(clone);
         }
 
         [Fact]
         public void Should_copy_null_json()
         {
-            var v = new J<List<int>?>(null);
-            var c = (J<List<int>>)J<object>.Copy(v, null)!;
+            var source = new J<List<int>?>(null);
 
-            Assert.Null(c.Value);
+            var clone = (J<List<int>>)J<object>.Copy(source, null)!;
+
+            Assert.Null(clone.Value);
         }
 
         [Fact]
         public void Should_not_copy_immutable_values()
         {
-            var v = new List<int> { 1, 2, 3 }.AsJ();
-            var c = (J<List<int>>)J<object>.Copy(v, null)!;
+            var source = new List<int> { 1, 2, 3 }.AsJ();
 
-            Assert.Same(v.Value, c.Value);
+            var copy = (J<List<int>>)J<object>.Copy(source, null)!;
+
+            Assert.Same(source.Value, copy.Value);
         }
 
         [Fact]
@@ -83,7 +84,7 @@ namespace Squidex.Infrastructure.Orleans
             var reader = A.Fake<IBinaryTokenStreamReader>();
 
             A.CallTo(() => reader.ReadByteArray(A<byte[]>._, A<int>._, A<int>._))
-                .Invokes(new Action<byte[], int, int>((b, o, l) => buffer.Read(b, o, l)));
+                .Invokes(new Action<byte[], int, int>((array, offset, length) => buffer.Read(array, offset, length)));
             A.CallTo(() => reader.CurrentPosition)
                 .ReturnsLazily(x => (int)buffer.Position);
             A.CallTo(() => reader.Length)

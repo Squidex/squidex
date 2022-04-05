@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public sealed class RuleActionDefinition

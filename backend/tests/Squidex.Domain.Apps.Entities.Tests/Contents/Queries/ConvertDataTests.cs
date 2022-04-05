@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -46,19 +43,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                         .AddAssets(31, "nested"));
 
             schema = Mocks.Schema(appId, schemaId, schemaDef);
-            schemaProvider = x => Task.FromResult(schema);
+            schemaProvider = x => Task.FromResult((schema, ResolvedComponents.Empty));
 
             sut = new ConvertData(urlGenerator, TestUtils.DefaultSerializer, assetRepository, contentRepository);
         }
 
         [Fact]
-        public async Task Should_convert_data_and_data_draft_when_frontend_user()
+        public async Task Should_convert_data_and_data_draft_if_frontend_user()
         {
             var content = CreateContent(new ContentData());
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
 
             Assert.NotNull(content.Data);
         }
@@ -88,21 +85,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array(id2)))));
 
-            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2)))
+            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
                 .Returns(new List<DomainId> { id2 });
 
-            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All))
+            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, A<CancellationToken>._))
                 .Returns(new List<(DomainId, DomainId, Status)> { (id2, id2, Status.Published) });
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
 
             Assert.Equal(expected, content.Data);
         }
 
         [Fact]
-        public async Task Should_cleanup_references_when_everything_deleted()
+        public async Task Should_cleanup_references_if_everything_deleted()
         {
             var id1 = DomainId.NewGuid();
             var id2 = DomainId.NewGuid();
@@ -126,15 +123,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                                     JsonValue.Object()
                                         .Add("nested", JsonValue.Array()))));
 
-            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2)))
+            A.CallTo(() => assetRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), A<CancellationToken>._))
                 .Returns(new List<DomainId>());
 
-            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All))
+            A.CallTo(() => contentRepository.QueryIdsAsync(appId.Id, A<HashSet<DomainId>>.That.Is(id1, id2), SearchScope.All, A<CancellationToken>._))
                 .Returns(new List<(DomainId, DomainId, Status)>());
 
             var ctx = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider);
+            await sut.EnrichAsync(ctx, Enumerable.Repeat(content, 1), schemaProvider, default);
 
             Assert.Equal(expected, content.Data);
         }

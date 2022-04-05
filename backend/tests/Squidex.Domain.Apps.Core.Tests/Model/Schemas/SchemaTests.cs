@@ -1,16 +1,14 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -79,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(2, "my-field-1", Partitioning.Invariant));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(2, "myField1", Partitioning.Invariant));
         }
 
         [Fact]
@@ -87,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(1, "my-field-2", Partitioning.Invariant));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(1, "myField2", Partitioning.Invariant));
         }
 
         [Fact]
@@ -366,7 +364,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
-        public void Should_also_set_list_fields_when_reordered()
+        public void Should_also_set_list_fields_if_reordered()
         {
             var schema_1 = schema_0.SetFieldsInLists("2", "1");
             var schema_2 = schema_1.SetFieldsInLists("1", "2");
@@ -388,7 +386,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
-        public void Should_also_set_reference_fields_when_reordered()
+        public void Should_also_set_reference_fields_if_reordered()
         {
             var schema_1 = schema_0.SetFieldsInReferences("2", "1");
             var schema_2 = schema_1.SetFieldsInReferences("1", "2");
@@ -437,11 +435,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var urls1 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            };
+            }.ToReadonlyDictionary();
             var urls2 = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            };
+            }.ToReadonlyDictionary();
 
             var schema_1 = schema_0.SetPreviewUrls(urls1);
             var schema_2 = schema_1.SetPreviewUrls(urls2);
@@ -457,28 +455,47 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         public void Should_serialize_and_deserialize_schema()
         {
             var schemaSource =
-                TestUtils.MixedSchema(true)
+                TestUtils.MixedSchema(SchemaType.Singleton).Schema
                     .ChangeCategory("Category")
                     .SetFieldRules(FieldRule.Hide("2"))
                     .SetFieldsInLists("field2")
                     .SetFieldsInReferences("field1")
-                    .SetPreviewUrls(new Dictionary<string, string>
-                    {
-                        ["web"] = "Url"
-                    })
                     .SetScripts(new SchemaScripts
                     {
                         Create = "<create-script>"
-                    });
+                    })
+                    .SetPreviewUrls(new Dictionary<string, string>
+                    {
+                        ["web"] = "Url"
+                    }.ToReadonlyDictionary());
 
             var schemaTarget = schemaSource.SerializeAndDeserialize();
 
             schemaTarget.Should().BeEquivalentTo(schemaSource);
         }
 
+        [Fact]
+        public void Should_deserialize_obsolete_isSingleton_property()
+        {
+            var schemaSource = new
+            {
+                name = "my-schema",
+                isPublished = true,
+                isSingleton = true
+            };
+
+            var expected =
+                new Schema("my-schema", type: SchemaType.Singleton)
+                    .Publish();
+
+            var schemaTarget = schemaSource.SerializeAndDeserialize<Schema>();
+
+            schemaTarget.Should().BeEquivalentTo(expected);
+        }
+
         private static RootField<NumberFieldProperties> CreateField(int id)
         {
-            return Fields.Number(id, $"my-field-{id}", Partitioning.Invariant);
+            return Fields.Number(id, $"myField{id}", Partitioning.Invariant);
         }
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 using Orleans.Runtime;
 using Squidex.Infrastructure.EventSourcing;
@@ -19,8 +18,6 @@ namespace Squidex.Infrastructure.Orleans
 
         public StateFilter(IGrainRuntime runtime)
         {
-            Guard.NotNull(runtime, nameof(runtime));
-
             this.runtime = runtime;
         }
 

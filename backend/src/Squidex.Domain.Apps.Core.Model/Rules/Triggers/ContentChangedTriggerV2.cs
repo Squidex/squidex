@@ -1,38 +1,25 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
     [TypeName(nameof(ContentChangedTriggerV2))]
-    public sealed class ContentChangedTriggerV2 : RuleTrigger
+    public sealed record ContentChangedTriggerV2 : RuleTrigger
     {
-        public ReadOnlyCollection<ContentChangedTriggerSchemaV2> Schemas { get; set; }
+        public ReadonlyList<ContentChangedTriggerSchemaV2>? Schemas { get; init; }
 
-        public bool HandleAll { get; set; }
+        public bool HandleAll { get; init; }
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {
             return visitor.Visit(this);
-        }
-
-        public override void Freeze()
-        {
-            base.Freeze();
-
-            if (Schemas != null)
-            {
-                foreach (var schema in Schemas)
-                {
-                    schema.Freeze();
-                }
-            }
         }
     }
 }

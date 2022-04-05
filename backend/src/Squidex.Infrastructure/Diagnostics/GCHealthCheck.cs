@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
@@ -20,12 +16,11 @@ namespace Squidex.Infrastructure.Diagnostics
 
         public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
         {
-            Guard.NotNull(options, nameof(options));
-
             threshold = 1024 * 1024 * options.Value.Threshold;
         }
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
             var allocated = GC.GetTotalMemory(false);
 

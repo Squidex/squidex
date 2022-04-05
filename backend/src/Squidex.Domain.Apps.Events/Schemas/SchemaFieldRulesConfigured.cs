@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaFieldRulesConfigured))]
     public sealed class SchemaFieldRulesConfigured : SchemaEvent
     {
-        public FieldRules FieldRules { get; set; }
+        public FieldRules? FieldRules { get; set; }
     }
 }

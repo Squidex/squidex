@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +23,7 @@ namespace Squidex.Extensions.Samples.AssetStore
             {
                 builder.Use(async (context, next) =>
                 {
-                    if (context.Request.Path.StartsWithSegments("/api/assets/memory"))
+                    if (context.Request.Path.StartsWithSegments("/api/assets/memory", StringComparison.Ordinal))
                     {
                         context.Response.StatusCode = 200;
 

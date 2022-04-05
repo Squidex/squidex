@@ -1,12 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Squidex.Config.Authentication
 {
@@ -21,6 +20,7 @@ namespace Squidex.Config.Authentication
                     options.ClientId = identityOptions.GithubClient;
                     options.ClientSecret = identityOptions.GithubSecret;
                     options.Events = new GithubHandler();
+                    options.Scope.Add("user:email");
                 });
             }
 

@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Translations
 
         public static string Get(string key, string fallback, object? args = null)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             if (localizer == null)
             {

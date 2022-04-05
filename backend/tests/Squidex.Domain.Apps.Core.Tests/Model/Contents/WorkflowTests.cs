@@ -5,9 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Contents
@@ -15,7 +14,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
     public class WorkflowTests
     {
         private readonly Workflow workflow = new Workflow(
-            Status.Draft, new Dictionary<Status, WorkflowStep>
+            Status.Draft,
+            new Dictionary<Status, WorkflowStep>
             {
                 [Status.Draft] =
                     new WorkflowStep(
@@ -23,13 +23,13 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                         {
                             [Status.Archived] = WorkflowTransition.When("ToArchivedExpr", "ToArchivedRole"),
                             [Status.Published] = WorkflowTransition.When("ToPublishedExpr", "ToPublishedRole")
-                        },
+                        }.ToReadonlyDictionary(),
                         StatusColors.Draft),
                 [Status.Archived] =
                     new WorkflowStep(),
                 [Status.Published] =
                     new WorkflowStep()
-            });
+            }.ToReadonlyDictionary());
 
         [Fact]
         public void Should_provide_default_workflow_if_none_found()

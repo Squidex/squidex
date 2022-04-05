@@ -1,0 +1,28 @@
+@import 'mixins';
+@import 'vars';
+
+.section {
+    margin-bottom: 2rem;
+
+    &:last-child {
+        margin: 0;
+    }
+}
+
+.btn-status {
+    padding: 1rem;
+    padding-top: .75rem;
+    text-align: left;
+}
+
+h3 {
+    border-bottom: 1px solid $color-border;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    padding-bottom: .5rem;
+}
+
+hr {
+    margin-left: 0;
+    margin-right: 0;
+}

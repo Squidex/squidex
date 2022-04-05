@@ -1,0 +1,38 @@
+@import 'mixins';
+@import 'vars';
+
+.inline-edit {
+    position: relative;
+
+    .edit-menu {
+        @include absolute(.5rem, auto, auto, .5rem);
+        background: $color-white;
+        border-right: 1px solid $color-border;
+        padding-right: 1rem;
+        white-space: nowrap;
+        z-index: 100;
+    }
+}
+
+tr {
+    background-color: $color-white;
+}
+
+td {
+    border-bottom: 1px solid $color-border;
+    border-left: 1px solid $color-white;
+    border-top: 0 !important;
+    position: relative;
+    vertical-align: middle;
+
+    &.cell-select {
+        @include force-width(60px);
+        border-left: 0;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    &.cell-actions {
+        @include force-width(90px);
+    }
+}

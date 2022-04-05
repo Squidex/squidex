@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Text;
 using GeoJSON.Net;
 using Squidex.Domain.Apps.Core.Contents;
@@ -27,7 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     foreach (var (key, jsonValue) in value)
                     {
-                        if (GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson) == GeoJsonParseResult.Success)
+                        GeoJsonValue.TryParse(jsonValue, jsonSerializer, out var geoJson);
+
+                        if (geoJson != null)
                         {
                             result ??= new Dictionary<string, GeoJSONObject>();
                             result[$"{field}.{key}"] = geoJson;

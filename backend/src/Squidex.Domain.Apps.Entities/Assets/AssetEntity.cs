@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
@@ -43,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public string Slug { get; set; }
 
         public string MetadataText { get; set; }
+
+        public string? EditToken { get; set; }
 
         public long FileSize { get; set; }
 

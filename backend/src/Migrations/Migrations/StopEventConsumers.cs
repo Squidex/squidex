@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Migrations;
@@ -22,7 +21,8 @@ namespace Migrations.Migrations
             eventConsumerManager = grainFactory.GetGrain<IEventConsumerManagerGrain>(SingleGrain.Id);
         }
 
-        public Task UpdateAsync()
+        public Task UpdateAsync(
+            CancellationToken ct)
         {
             return eventConsumerManager.StopAllAsync();
         }

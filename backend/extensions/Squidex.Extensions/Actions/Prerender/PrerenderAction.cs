@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -19,17 +19,17 @@ namespace Squidex.Extensions.Actions.Prerender
         Display = "Recache URL",
         Description = "Prerender a javascript website for bots.",
         ReadMore = "https://prerender.io")]
-    public sealed class PrerenderAction : RuleAction
+    public sealed record PrerenderAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Token", Description = "The prerender token from your account.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string Token { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Url", Description = "The url to recache.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Url { get; set; }
     }
 }

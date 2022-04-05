@@ -1,0 +1,63 @@
+@import 'mixins';
+@import 'vars';
+
+$color-apps-border: #65a6ff;
+$color-nav-shadow: rgba(26, 93, 184, 25%);
+
+.dropdown {
+    &-button {
+        padding: 1rem 1.5rem;
+    }
+
+    &-item {
+        border-radius: 0;
+    }
+}
+
+h3 {
+    margin: 0;
+}
+
+.btn-block {
+    white-space: nowrap;
+}
+
+.icon-plus {
+    font-size: $font-smallest;
+}
+
+.apps-list {
+    max-height: 600px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.breadcrumb {
+    margin: 0;
+
+    &-item {
+        @include truncate;
+        max-width: 10rem;
+        min-width: 0;
+        white-space: nowrap;
+
+        &.active {
+            color: $color-text-decent;
+        }
+
+        a {
+            color: inherit !important;
+            text-align: left;
+            text-decoration: none;
+        }
+    }
+}
+
+.form-select {
+    white-space: nowrap;
+}
+
+.breadcrumb,
+.breadcrumb-item {
+    flex-wrap: nowrap !important;
+}

@@ -1,0 +1,18 @@
+@import 'mixins';
+@import 'vars';
+
+.search ::ng-deep {
+    .form-control {
+        border-radius: 0 $border-radius $border-radius 0;
+    }
+
+    .tags {
+        border-radius: $border-radius 0 0 $border-radius;
+        border-right: 0;
+
+        &:focus,
+        &.focus {
+            z-index: 1000;
+        }
+    }
+}

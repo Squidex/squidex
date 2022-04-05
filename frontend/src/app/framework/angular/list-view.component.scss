@@ -1,0 +1,120 @@
+@import 'mixins';
+@import 'vars';
+
+%transition-opacity {
+    transition: opacity .2s ease;
+}
+
+%disabled {
+    pointer-events: none;
+}
+
+:host {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.inner {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 $panel-padding;
+
+    &.tabled {
+        padding-bottom: .25rem !important;
+        padding-top: .5rem !important;
+    }
+
+    &.tabled2 {
+        padding: 0 !important;
+    }
+}
+
+.list {
+    &-content {
+        @extend %transition-opacity;
+        flex-direction: column;
+        flex-grow: 1;
+
+        &.normal {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .inner {
+            &.normal {
+                padding: $panel-padding;
+            }
+        }
+
+        &.synced {
+            overflow-x: auto;
+            overflow-y: auto;
+
+            .inner {
+                padding-right: 0;
+            }
+        }
+    }
+
+    &-header {
+        @extend %transition-opacity;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        flex-shrink: 0;
+        overflow-x: hidden;
+        overflow-y: hidden;
+
+        &.tabled2 {
+            background-color: $color-white;
+        }
+
+        .sync-inner {
+            display: table-cell;
+        }
+
+        ::ng-deep {
+            th {
+                padding: .75rem;
+            }
+
+            table {
+                margin: 0;
+            }
+
+            .table-items {
+                margin: 0;
+            }
+        }
+    }
+
+    &-footer {
+        @extend %transition-opacity;
+        border: 0;
+        border-top: 1px solid $color-border;
+        flex-shrink: 0;
+
+        ::ng-deep {
+            .pagination {
+                margin: .25rem 0;
+            }
+        }
+    }
+}
+
+:host(.overflow) {
+    overflow: visible;
+}
+
+.loading-indicator {
+    @extend %disabled;
+    opacity: .5;
+}
+
+.loader {
+    @include absolute(50%, 0, auto, 0);
+    @extend %disabled;
+    margin-top: -.5rem;
+}

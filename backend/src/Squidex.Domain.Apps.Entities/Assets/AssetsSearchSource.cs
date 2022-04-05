@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Search;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Squidex.Shared;
 
@@ -22,15 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetsSearchSource(IAssetQueryService assetQuery, IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(assetQuery, nameof(assetQuery));
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.assetQuery = assetQuery;
 
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<SearchResults> SearchAsync(string query, Context context)
+        public async Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 
@@ -40,14 +36,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 var clrQuery = new ClrQuery { Filter = filter, Take = 5 };
 
-                var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithQuery(clrQuery));
+                var assets = await assetQuery.QueryAsync(context, null, Q.Empty.WithQuery(clrQuery), ct);
 
                 if (assets.Count > 0)
                 {
-                    var url = urlGenerator.AssetsUI(context.App.NamedId(), query);
-
                     foreach (var asset in assets)
                     {
+                        var url = urlGenerator.AssetsUI(context.App.NamedId(), asset.Id.ToString());
+
                         result.Add(asset.FileName, SearchResultType.Asset, url);
                     }
                 }

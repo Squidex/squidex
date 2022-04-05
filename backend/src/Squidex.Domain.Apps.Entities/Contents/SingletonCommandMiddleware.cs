@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             await next(context);
 
-            if (context.IsCompleted && context.Command is CreateSchema { IsSingleton: true } createSchema)
+            if (context.IsCompleted && context.Command is CreateSchema { Type: SchemaType.Singleton } createSchema)
             {
                 var schemaId = NamedId.Of(createSchema.SchemaId, createSchema.Name);
 

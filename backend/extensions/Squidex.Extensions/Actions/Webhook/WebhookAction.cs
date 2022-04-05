@@ -1,15 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure.Validation;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Webhook
 {
@@ -20,11 +21,11 @@ namespace Squidex.Extensions.Actions.Webhook
         Display = "Send webhook",
         Description = "Invoke HTTP endpoints on a target system.",
         ReadMore = "https://en.wikipedia.org/wiki/Webhook")]
-    public sealed class WebhookAction : RuleAction
+    public sealed record WebhookAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Url", Description = "The url to the webhook.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public Uri Url { get; set; }
 
@@ -33,21 +34,20 @@ namespace Squidex.Extensions.Actions.Webhook
         public WebhookMethod Method { get; set; }
 
         [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Payload { get; set; }
 
         [Display(Name = "Payload Type", Description = "The mime type of the payload.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string PayloadType { get; set; }
 
         [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
-        [DataType(DataType.MultilineText)]
-        [Formattable]
+        [Editor(RuleFieldEditor.TextArea)]
         public string Headers { get; set; }
 
         [Display(Name = "Shared Secret", Description = "The shared secret that is used to calculate the payload signature.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string SharedSecret { get; set; }
     }
 
@@ -55,6 +55,8 @@ namespace Squidex.Extensions.Actions.Webhook
     {
         POST,
         PUT,
-        GET
+        GET,
+        DELETE,
+        PATCH
     }
 }

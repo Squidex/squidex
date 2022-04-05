@@ -1,0 +1,92 @@
+/* stylelint-disable */
+
+$color-background:          #f5f6f9;
+
+$color-border:              #dedfe3;
+$color-border-light:        #f5f6f9;
+$color-border-lighter:      lighten($color-border-light, 1%);
+$color-border-dark:         #e7e8ea;
+$color-border-darker:       darken($color-border, 15%);
+
+$color-title:               #000;
+$color-text:                #373a3c;
+$color-text-decent:         #6c707f;
+$color-tooltip:             #1a2129;
+
+$color-code-background:     #f5f7f9;
+$color-code-text:           #708090;
+
+$color-extern-github:       #353535;
+$color-extern-google:       #d34836;
+$color-extern-microsoft:    #004185;
+$color-extern-twitter:      #1da1f2;
+
+$color-theme-brand:         #3389ff;
+$color-theme-brand-dark:    #3284f4;
+$color-theme-brand-darker:  #2f7deb;
+$color-theme-brand-light:   #d9e8fc;
+$color-theme-secondary:     #e0e1e5;
+
+$color-theme-error:         #eb3142;
+$color-theme-error-dark:    #c00;
+$color-theme-info:          #0eafcc;
+$color-theme-success-dark:  #38a678;
+$color-theme-success:       #3ab480;
+$color-theme-warning-dark:  #a65b00;
+$color-theme-warning:       #ffb136;
+
+$color-black:   #000;
+$color-white:   #fff;
+
+$color-input:               #e0e1e5;
+$color-input-background:    #fff;
+$color-input-disabled:      #eff1f4;
+$color-input-placeholder:   lighten($color-text-decent, 20%);
+$color-input-shortcut:      rgba(255, 255, 255, .2);
+
+$color-badge-success-background:    #e4f6e6;
+$color-badge-success-foreground:    #42a54c;
+
+$color-badge-warning-background:    #ffe8cc;
+$color-badge-warning-foreground:    #d18c3e;
+
+$color-badge-danger-background:     #fce0e3;
+$color-badge-danger-foreground:     #e56471;
+
+$color-badge-info-background:       #d0f2fb;
+$color-badge-info-foreground:       #3bb1cc;
+
+$color-badge-primary-background:    #cce1ff;
+$color-badge-primary-foreground:    #4186e0;
+
+$color-badge-secondary-background:  #e6e6e6;
+$color-badge-secondary-foreground:  #555;
+
+$border-radius:             .25rem;
+
+$input-shadow:              inset 0 1px 2px rgb(0 0 0 / 8%);
+
+$size-navbar-height:        3.75rem;
+$size-sidebar-width:        5rem;
+
+$color-dark-onboarding:   #273039;
+
+$panel-padding:             1.5rem;
+$panel-header:              5.4rem;
+$panel-sidebar:             3.75rem;
+
+$font-small:                85%;
+$font-smallest:             80%;
+
+$history-dot-size: 10px;
+$history-dot-offset-x: -($history-dot-size * .5 + 1px);
+$history-dot-sm-size: 6px;
+$history-dot-sm-offset-x: -($history-dot-sm-size * .5 + 1px);
+
+$asset-width:               14.5rem;
+$asset-folder-height:       4rem;
+$asset-height:              19rem;
+$asset-header:              12rem;
+$asset-image:               12rem;
+$asset-footer:              7rem;
+$asset-background:          url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAIAAAC1nk4lAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWMqnEsAAACbSURBVGhD7c6hDQAxAMPA33+m7vYlJh7AoFKOBMbfyfyZRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4E3o9kA7YFFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgQejz7nPYYKl8IqSfgAAAABJRU5ErkJggg==');

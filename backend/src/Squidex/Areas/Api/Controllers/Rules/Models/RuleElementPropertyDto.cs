@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The html editor.
         /// </summary>
         [LocalizedRequired]
-        public RuleActionPropertyEditor Editor { get; set; }
+        public RuleFieldEditor Editor { get; set; }
 
         /// <summary>
         /// The name of the editor.

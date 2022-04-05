@@ -1,32 +1,22 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Assets;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Plans;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Web;
-
-#pragma warning disable CA2016 // Forward the 'CancellationToken' parameter to methods that take one
 
 namespace Squidex.Areas.Api.Controllers.Apps
 {
@@ -36,26 +26,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
-        private static readonly ResizeOptions ResizeOptions = new ResizeOptions { Width = 50, Height = 50, Mode = ResizeMode.Crop };
-        private readonly IAppImageStore appImageStore;
-        private readonly IAssetStore assetStore;
-        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IAppProvider appProvider;
-        private readonly IAppPlansProvider appPlansProvider;
 
-        public AppsController(ICommandBus commandBus,
-            IAppImageStore appImageStore,
-            IAssetStore assetStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator,
-            IAppProvider appProvider,
-            IAppPlansProvider appPlansProvider)
+        public AppsController(ICommandBus commandBus, IAppProvider appProvider)
             : base(commandBus)
         {
-            this.appImageStore = appImageStore;
-            this.assetStore = assetStore;
-            this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.appProvider = appProvider;
-            this.appPlansProvider = appPlansProvider;
         }
 
         /// <summary>
@@ -78,13 +54,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var userOrClientId = HttpContext.User.UserOrClientId()!;
             var userPermissions = Resources.Context.UserPermissions;
 
-            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
+            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions, HttpContext.RequestAborted);
 
             var response = Deferred.Response(() =>
             {
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, isFrontend, appPlansProvider, Resources)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, isFrontend, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -113,7 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromApp(App, userOrClientId, isFrontend, appPlansProvider, Resources);
+                return AppDto.FromDomain(App, userOrClientId, isFrontend, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -161,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
         [ApiPermissionOrAnonymous(Permissions.AppUpdate)]
         [ApiCosts(0)]
-        public async Task<IActionResult> UpdateApp(string app, [FromBody] UpdateAppDto request)
+        public async Task<IActionResult> PutApp(string app, [FromBody] UpdateAppDto request)
         {
             var response = await InvokeCommandAsync(request.ToCommand());
 
@@ -181,84 +157,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/image")]
         [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppUpdateImage)]
+        [ApiPermissionOrAnonymous(Permissions.AppImageUpload)]
         [ApiCosts(0)]
         public async Task<IActionResult> UploadImage(string app, IFormFile file)
         {
             var response = await InvokeCommandAsync(CreateCommand(file));
 
             return Ok(response);
-        }
-
-        /// <summary>
-        /// Get the app image.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <returns>
-        /// 200 => App image found and content or (resized) image returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/image")]
-        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
-        [AllowAnonymous]
-        [ApiCosts(0)]
-        public IActionResult GetImage(string app)
-        {
-            if (App.Image == null)
-            {
-                return NotFound();
-            }
-
-            var etag = App.Image.Etag;
-
-            Response.Headers[HeaderNames.ETag] = etag;
-
-            var callback = new FileCallback(async (body, range, ct) =>
-            {
-                var resizedAsset = $"{App.Id}_{etag}_Resized";
-
-                try
-                {
-                    await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
-                }
-                catch (AssetNotFoundException)
-                {
-                    using (Profiler.Trace("Resize"))
-                    {
-                        using (var sourceStream = GetTempStream())
-                        {
-                            using (var destinationStream = GetTempStream())
-                            {
-                                using (Profiler.Trace("ResizeDownload"))
-                                {
-                                    await appImageStore.DownloadAsync(App.Id, sourceStream);
-                                    sourceStream.Position = 0;
-                                }
-
-                                using (Profiler.Trace("ResizeImage"))
-                                {
-                                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, ResizeOptions);
-                                    destinationStream.Position = 0;
-                                }
-
-                                using (Profiler.Trace("ResizeUpload"))
-                                {
-                                    await assetStore.UploadAsync(resizedAsset, destinationStream);
-                                    destinationStream.Position = 0;
-                                }
-
-                                await destinationStream.CopyToAsync(body, ct);
-                            }
-                        }
-                    }
-                }
-            });
-
-            return new FileCallbackResult(App.Image.MimeType, callback)
-            {
-                ErrorAs404 = true
-            };
         }
 
         /// <summary>
@@ -272,7 +177,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/image")]
         [ProducesResponseType(typeof(AppDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppUpdateImage)]
+        [ApiPermissionOrAnonymous(Permissions.AppImageDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteImage(string app)
         {
@@ -282,11 +187,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Archive the app.
+        /// Delete the app.
         /// </summary>
-        /// <param name="app">The name of the app to archive.</param>
+        /// <param name="app">The name of the app to delete.</param>
         /// <returns>
-        /// 204 => App archived.
+        /// 204 => App deleted.
         /// 404 => App not found.
         /// </returns>
         [HttpDelete]
@@ -295,21 +200,29 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {
-            await CommandBus.PublishAsync(new ArchiveApp());
+            await CommandBus.PublishAsync(new DeleteApp());
 
             return NoContent();
         }
 
-        private async Task<AppDto> InvokeCommandAsync(ICommand command)
+        private Task<AppDto> InvokeCommandAsync(ICommand command)
+        {
+            return InvokeCommandAsync(command, x =>
+            {
+                var userOrClientId = HttpContext.User.UserOrClientId()!;
+
+                var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
+
+                return AppDto.FromDomain(x, userOrClientId, isFrontend, Resources);
+            });
+        }
+
+        private async Task<T> InvokeCommandAsync<T>(ICommand command, Func<IAppEntity, T> converter)
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var userOrClientId = HttpContext.User.UserOrClientId()!;
-
-            var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
-
             var result = context.Result<IAppEntity>();
-            var response = AppDto.FromApp(result, userOrClientId, isFrontend, appPlansProvider, Resources);
+            var response = converter(result);
 
             return response;
         }
@@ -324,19 +237,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
             }
 
             return new UploadAppImage { File = file.ToAssetFile() };
-        }
-
-        private static FileStream GetTempStream()
-        {
-            var tempFileName = Path.GetTempFileName();
-
-            return new FileStream(tempFileName,
-                FileMode.Create,
-                FileAccess.ReadWrite,
-                FileShare.Delete, 1024 * 16,
-                FileOptions.Asynchronous |
-                FileOptions.DeleteOnClose |
-                FileOptions.SequentialScan);
         }
     }
 }

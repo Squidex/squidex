@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.Commands
 {
     public partial class DomainObject<T>
@@ -121,7 +118,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : ICommand
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handler);
 
             return await UpsertAsync(command, x =>
             {
@@ -133,7 +130,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected async Task<CommandResult> DeletePermanentAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : ICommand
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handler);
 
             await EnsureCanDeleteAsync(command);
 
@@ -147,7 +144,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected async Task<CommandResult> DeletePermanent<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : ICommand
         {
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(handler);
 
             return await DeletePermanentAsync(command, x =>
             {
@@ -159,35 +156,40 @@ namespace Squidex.Infrastructure.Commands
 
         private void EnsureCanCreate<TCommand>(TCommand command) where TCommand : ICommand
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
-            MatchingVersion(command);
-            MatchingCreateCommand(command);
-
-            if (Version != EtagVersion.Empty && !(IsDeleted() && CanRecreate()))
+            if (Version != EtagVersion.Empty && !(IsDeleted(Snapshot) && CanRecreate()))
             {
                 throw new DomainObjectConflictException(uniqueId.ToString());
             }
+
+            MatchingVersion(command);
+            MatchingCreateCommand(command);
         }
 
         private async Task EnsureCanUpdateAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             await EnsureLoadedAsync();
 
-            MatchingVersion(command);
-            MatchingCommand(command);
-
             NotDeleted();
             NotEmpty();
+
+            MatchingVersion(command);
+            MatchingCommand(command);
         }
 
         private async Task EnsureCanUpsertAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             await EnsureLoadedAsync();
+
+            if (IsDeleted(Snapshot) && !CanRecreate())
+            {
+                throw new DomainObjectDeletedException(uniqueId.ToString());
+            }
 
             MatchingVersion(command);
 
@@ -199,28 +201,23 @@ namespace Squidex.Infrastructure.Commands
             {
                 MatchingCommand(command);
             }
-
-            if (IsDeleted() && !CanRecreate())
-            {
-                throw new DomainObjectDeletedException(uniqueId.ToString());
-            }
         }
 
         private async Task EnsureCanDeleteAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             await EnsureLoadedAsync();
 
+            NotEmpty();
+
             MatchingVersion(command);
             MatchingCommand(command);
-
-            NotEmpty();
         }
 
         private void NotDeleted()
         {
-            if (IsDeleted())
+            if (IsDeleted(Snapshot))
             {
                 throw new DomainObjectDeletedException(uniqueId.ToString());
             }

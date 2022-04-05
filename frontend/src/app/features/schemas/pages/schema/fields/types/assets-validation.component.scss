@@ -1,0 +1,13 @@
+@import 'mixins';
+@import 'vars';
+
+.minmax {
+    text-align: center;
+    text-decoration: none;
+    width: 2rem;
+}
+
+.col-label {
+    @include force-width(5rem);
+    padding-left: .5rem;
+}

@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Plans.Models;
@@ -54,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
             var response = Deferred.Response(() =>
             {
-                return AppPlansDto.FromApp(App, appPlansProvider, hasPortal);
+                return AppPlansDto.FromDomain(App, appPlansProvider, hasPortal);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();

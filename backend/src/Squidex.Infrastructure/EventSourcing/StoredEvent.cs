@@ -1,34 +1,15 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class StoredEvent
+    public sealed record StoredEvent(string StreamName, string EventPosition, long EventStreamNumber, EventData Data)
     {
-        public string StreamName { get; }
-
-        public string EventPosition { get; }
-
-        public long EventStreamNumber { get; }
-
-        public EventData Data { get; }
-
-        public StoredEvent(string streamName, string eventPosition, long eventStreamNumber, EventData data)
-        {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNullOrEmpty(eventPosition, nameof(eventPosition));
-            Guard.NotNull(data, nameof(data));
-
-            Data = data;
-
-            EventPosition = eventPosition;
-            EventStreamNumber = eventStreamNumber;
-
-            StreamName = streamName;
-        }
     }
 }

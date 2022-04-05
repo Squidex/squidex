@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure;
@@ -21,12 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppSettingsSearchSource(IUrlGenerator urlGenerator)
         {
-            Guard.NotNull(urlGenerator, nameof(urlGenerator));
-
             this.urlGenerator = urlGenerator;
         }
 
-        public Task<SearchResults> SearchAsync(string query, Context context)
+        public Task<SearchResults> SearchAsync(string query, Context context,
+            CancellationToken ct)
         {
             var result = new SearchResults();
 
@@ -62,9 +59,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Search("Languages", Permissions.AppLanguagesRead,
                 urlGenerator.LanguagesUI, SearchResultType.Setting);
-
-            Search("Patterns", Permissions.AppPatternsRead,
-                urlGenerator.PatternsUI, SearchResultType.Setting);
 
             Search("Roles", Permissions.AppRolesRead,
                 urlGenerator.RolesUI, SearchResultType.Setting);

@@ -1,18 +1,10 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityModel;
-using IdentityServer4;
-using IdentityServer4.Extensions;
-using IdentityServer4.Models;
-using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -31,15 +23,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
     {
         private readonly IUserService userService;
         private readonly MyIdentityOptions identityOptions;
-        private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
             IUserService userService,
-            IOptions<MyIdentityOptions> identityOptions,
-            IIdentityServerInteractionService interactions)
+            IOptions<MyIdentityOptions> identityOptions)
         {
             this.identityOptions = identityOptions.Value;
-            this.interactions = interactions;
             this.userService = userService;
         }
 
@@ -106,7 +95,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 return View(vm);
             }
 
-            var user = await userService.GetAsync(User);
+            var user = await userService.GetAsync(User, HttpContext.RequestAborted);
 
             if (user == null)
             {
@@ -119,7 +108,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 ConsentForEmails = model.ConsentToAutomatedEmails
             };
 
-            await userService.UpdateAsync(user.Id, update);
+            await userService.UpdateAsync(user.Id, update, ct: HttpContext.RequestAborted);
 
             return RedirectToReturnUrl(returnUrl);
         }
@@ -130,24 +119,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             await SignInManager.SignOutAsync();
 
-            if (User.Identity?.IsAuthenticated == true)
-            {
-                var provider = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
-
-                if (provider != null && provider != IdentityServerConstants.LocalIdentityProvider)
-                {
-                    var providerSupportsSignout = await HttpContext.GetSchemeSupportsSignOutAsync(provider);
-
-                    if (providerSupportsSignout)
-                    {
-                        return SignOut(provider);
-                    }
-                }
-            }
-
-            var context = await interactions.GetLogoutContextAsync(logoutId);
-
-            return RedirectToLogoutUrl(context);
+            return Redirect("~/../");
         }
 
         [HttpGet]
@@ -209,11 +181,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             {
                 var provider = externalProviders[0].AuthenticationScheme;
 
-                var properties =
-                    SignInManager.ConfigureExternalAuthenticationProperties(provider,
-                        Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
+                var challengeRedirectUrl = Url.Action(nameof(ExternalCallback));
+                var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl);
 
-                return Challenge(properties, provider);
+                return Challenge(challengeProperties, provider);
             }
 
             var vm = new LoginVM
@@ -232,25 +203,24 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/external/")]
         public IActionResult External(string provider, string? returnUrl = null)
         {
-            var properties =
-                SignInManager.ConfigureExternalAuthenticationProperties(provider,
-                    Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
+            var challengeRedirectUrl = Url.Action(nameof(ExternalCallback), new { returnUrl });
+            var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl);
 
-            return Challenge(properties, provider);
+            return Challenge(challengeProperties, provider);
         }
 
         [HttpGet]
         [Route("account/external-callback/")]
         public async Task<IActionResult> ExternalCallback(string? returnUrl = null)
         {
-            var externalLogin = await SignInManager.GetExternalLoginInfoWithDisplayNameAsync();
+            var login = await SignInManager.GetExternalLoginInfoWithDisplayNameAsync();
 
-            if (externalLogin == null)
+            if (login == null)
             {
                 return RedirectToAction(nameof(Login));
             }
 
-            var result = await SignInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
+            var result = await SignInManager.ExternalLoginSignInAsync(login.LoginProvider, login.ProviderKey, true);
 
             if (!result.Succeeded && result.IsLockedOut)
             {
@@ -258,55 +228,65 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
 
             var isLoggedIn = result.Succeeded;
+            var isLocked = false;
 
-            IUser? user;
+            IUser? user = null;
 
             if (isLoggedIn)
             {
-                user = await userService.FindByLoginAsync(externalLogin.LoginProvider, externalLogin.ProviderKey);
+                user = await userService.FindByLoginAsync(login.LoginProvider, login.ProviderKey, HttpContext.RequestAborted);
             }
             else
             {
-                var email = externalLogin.Principal.GetEmail();
+                var email = login.Principal.GetEmail();
 
                 if (string.IsNullOrWhiteSpace(email))
                 {
-                    throw new DomainException("User has no exposed email address.");
+                    throw new DomainException(T.Get("users.noEmailAddress"));
                 }
 
-                user = await userService.FindByEmailAsync(email);
+                user = await userService.FindByEmailAsync(email!, HttpContext.RequestAborted);
+
+                // User might not have a login or password if the user got invited.
+                if (user != null && await HasLoginAsync(user))
+                {
+                    // If we have a login, we reject this user, otherwise you can login to an account you do not own.
+                    user = null;
+                }
+
+                if (user == null)
+                {
+                    var values = new UserValues
+                    {
+                        CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList()
+                    };
+
+                    var locked = identityOptions.LockAutomatically;
+
+                    // Try to create a user. If the user exists an exception message is shown to the user.
+                    user = await userService.CreateAsync(email!, values, locked, HttpContext.RequestAborted);
+                }
 
                 if (user != null)
                 {
-                    var update = CreateUserValues(externalLogin, email, user: user);
+                    await userService.AddLoginAsync(user.Id, login, HttpContext.RequestAborted);
 
-                    await userService.UpdateAsync(user.Id, update);
+                    // Login might fail if the user is locked out.
+                    (isLoggedIn, isLocked) = await LoginAsync(login);
                 }
-                else
-                {
-                    var update = CreateUserValues(externalLogin, email);
-
-                    user = await userService.CreateAsync(email, update, identityOptions.LockAutomatically);
-                }
-
-                await userService.AddLoginAsync(user.Id, externalLogin);
-
-                var (success, locked) = await LoginAsync(externalLogin);
-
-                if (locked)
-                {
-                    return View(nameof(LockedOut));
-                }
-
-                isLoggedIn = success;
             }
 
-            if (!isLoggedIn)
+            if (isLocked)
+            {
+                return View(nameof(LockedOut));
+            }
+            else if (!isLoggedIn)
             {
                 return RedirectToAction(nameof(Login));
             }
             else if (user != null && !user.Claims.HasConsent() && !identityOptions.NoConsent)
             {
+                // This should actually never happen, because user should not be null, when logged in.
                 return RedirectToAction(nameof(Consent), new { returnUrl });
             }
             else
@@ -315,24 +295,16 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
         }
 
-        private static UserValues CreateUserValues(ExternalLoginInfo externalLogin, string email, IUser? user = null)
+        private async Task<bool> HasLoginAsync(IUser user)
         {
-            var values = new UserValues
+            if (await userService.HasPasswordAsync(user, HttpContext.RequestAborted))
             {
-                CustomClaims = externalLogin.Principal.Claims.GetSquidexClaims().ToList()
-            };
-
-            if (user != null && !user.Claims.HasPictureUrl())
-            {
-                values.PictureUrl = GravatarHelper.CreatePictureUrl(email);
+                return true;
             }
 
-            if (user != null && !user.Claims.HasDisplayName())
-            {
-                values.DisplayName = email;
-            }
+            var logins = await userService.GetLoginsAsync(user, HttpContext.RequestAborted);
 
-            return values;
+            return logins.Count > 0;
         }
 
         private async Task<(bool Success, bool Locked)> LoginAsync(UserLoginInfo externalLogin)
@@ -340,18 +312,6 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             var result = await SignInManager.ExternalLoginSignInAsync(externalLogin.LoginProvider, externalLogin.ProviderKey, true);
 
             return (result.Succeeded, result.IsLockedOut);
-        }
-
-        private IActionResult RedirectToLogoutUrl(LogoutRequest context)
-        {
-            if (!string.IsNullOrWhiteSpace(context.PostLogoutRedirectUri))
-            {
-                return Redirect(context.PostLogoutRedirectUri);
-            }
-            else
-            {
-                return Redirect("~/../");
-            }
         }
     }
 }

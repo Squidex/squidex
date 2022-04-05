@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using Microsoft.Azure.Documents;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -70,10 +69,10 @@ namespace Squidex.Infrastructure.EventSourcing
             return new SqlQuerySpec(query, parameters);
         }
 
-        public static SqlQuerySpec ByStreamNameDesc(string streamName, long count)
+        public static SqlQuerySpec ByStreamNameDesc(string streamName, long take)
         {
             var query =
-                $"SELECT TOP {count}* " +
+                $"SELECT TOP {take}* " +
                 $"FROM {Constants.Collection} e " +
                 $"WHERE " +
                 $"    e.eventStream = @name " +
@@ -87,19 +86,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return new SqlQuerySpec(query, parameters);
         }
 
-        public static SqlQuerySpec CreateByProperty(string property, object value, StreamPosition streamPosition)
-        {
-            var filters = new List<string>();
-
-            var parameters = new SqlParameterCollection();
-
-            filters.ForPosition(parameters, streamPosition);
-            filters.ForProperty(parameters, property, value);
-
-            return BuildQuery(filters, parameters);
-        }
-
-        public static SqlQuerySpec CreateByFilter(string? streamFilter, StreamPosition streamPosition)
+        public static SqlQuerySpec CreateByFilter(string? streamFilter, StreamPosition streamPosition, string sortOrder, long take)
         {
             var filters = new List<string>();
 
@@ -108,21 +95,14 @@ namespace Squidex.Infrastructure.EventSourcing
             filters.ForPosition(parameters, streamPosition);
             filters.ForRegex(parameters, streamFilter);
 
-            return BuildQuery(filters, parameters);
+            return BuildQuery(filters, parameters, sortOrder, take);
         }
 
-        private static SqlQuerySpec BuildQuery(IEnumerable<string> filters, SqlParameterCollection parameters)
+        private static SqlQuerySpec BuildQuery(IEnumerable<string> filters, SqlParameterCollection parameters, string sortOrder, long take)
         {
-            var query = $"SELECT * FROM {Constants.Collection} e WHERE {string.Join(" AND ", filters)} ORDER BY e.timestamp";
+            var query = $"SELECT TOP {take} * FROM {Constants.Collection} e WHERE {string.Join(" AND ", filters)} ORDER BY e.timestamp {sortOrder}";
 
             return new SqlQuerySpec(query, parameters);
-        }
-
-        private static void ForProperty(this ICollection<string> filters, SqlParameterCollection parameters, string property, object value)
-        {
-            filters.Add($"ARRAY_CONTAINS(e.events, {{ \"header\": {{ \"{property}\": @value }} }}, true)");
-
-            parameters.Add(new SqlParameter("@value", value));
         }
 
         private static void ForRegex(this ICollection<string> filters, SqlParameterCollection parameters, string? streamFilter)
@@ -154,20 +134,6 @@ namespace Squidex.Infrastructure.EventSourcing
             }
 
             parameters.Add(new SqlParameter("@time", streamPosition.Timestamp));
-        }
-
-        public static EventPredicate CreateExpression(string? property, object? value)
-        {
-            if (!string.IsNullOrWhiteSpace(property))
-            {
-                var jsonValue = JsonValue.Create(value);
-
-                return x => x.Headers.TryGetValue(property, out var p) && p.Equals(jsonValue);
-            }
-            else
-            {
-                return x => true;
-            }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -13,6 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public ContentInterfaceGraphType()
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = "Content";
 
             AddField(ContentFields.Id);
@@ -23,6 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(ContentFields.LastModifiedBy);
             AddField(ContentFields.Status);
             AddField(ContentFields.StatusColor);
+            AddField(ContentFields.NewStatus);
+            AddField(ContentFields.NewStatusColor);
+            AddField(ContentFields.Url);
 
             Description = "The structure of all content types.";
         }

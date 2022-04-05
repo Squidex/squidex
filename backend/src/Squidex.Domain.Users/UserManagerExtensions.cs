@@ -1,27 +1,23 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
-using Squidex.Log;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users
 {
     internal static class UserManagerExtensions
     {
-        public static async Task Throw(this Task<IdentityResult> task, ISemanticLog log)
+        public static async Task Throw(this Task<IdentityResult> task, ILogger log)
         {
             var result = await task;
 
@@ -50,10 +46,7 @@ namespace Squidex.Domain.Users
 
                 var errorMessage = errorMessageBuilder.ToString();
 
-                log.LogError(errorMessage, (ctx, w) => w
-                    .WriteProperty("action", "IdentityOperation")
-                    .WriteProperty("status", "Failed")
-                    .WriteProperty("message", ctx));
+                log.LogError("Identity operation failed: {errorMessage}.", errorMessage);
 
                 throw new ValidationException(result.Errors.Select(x => new ValidationError(Localize(x))).ToList());
             }

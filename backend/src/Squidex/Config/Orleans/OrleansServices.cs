@@ -5,10 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -16,7 +15,9 @@ using Orleans.Providers.MongoDB.Configuration;
 using Orleans.Providers.MongoDB.Utils;
 using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Web;
 
@@ -28,24 +29,34 @@ namespace Squidex.Config.Orleans
         {
             builder.AddOrleansPubSub();
 
-            builder.ConfigureServices(siloServices =>
+            builder.ConfigureServices(services =>
             {
-                siloServices.AddSingletonAs<DefaultMongoClientFactory>()
+                services.AddScoped(typeof(IGrainState<>), typeof(Infrastructure.Orleans.GrainState<>));
+
+                services.AddSingletonAs<DefaultMongoClientFactory>()
                     .As<IMongoClientFactory>();
 
-                siloServices.AddSingletonAs<ActivationLimiter>()
+                services.AddSingletonAs<ActivationLimiter>()
                     .As<IActivationLimiter>();
 
-                siloServices.AddScopedAs<ActivationLimit>()
+                services.AddScopedAs<ActivationLimit>()
                     .As<IActivationLimit>();
 
-                siloServices.AddScoped(typeof(IGrainState<>), typeof(Infrastructure.Orleans.GrainState<>));
+                services.AddInitializer<IJsonSerializer>("Serializer (Orleans)", serializer =>
+                {
+                    J.DefaultSerializer = serializer;
+                }, -1);
             });
 
             builder.ConfigureApplicationParts(parts =>
             {
                 parts.AddApplicationPart(SquidexEntities.Assembly);
                 parts.AddApplicationPart(SquidexInfrastructure.Assembly);
+            });
+
+            builder.Configure<SchedulingOptions>(options =>
+            {
+                options.TurnWarningLengthThreshold = TimeSpan.FromSeconds(5);
             });
 
             builder.Configure<ClusterOptions>(options =>
@@ -58,6 +69,7 @@ namespace Squidex.Config.Orleans
                 options.HideTrace = true;
             });
 
+            builder.UseDashboardEmbeddedFiles();
             builder.UseDashboard(options =>
             {
                 options.HostSelf = false;
@@ -69,30 +81,18 @@ namespace Squidex.Config.Orleans
             builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
             builder.AddIncomingGrainCallFilter<StateFilter>();
 
-            var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
-            var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
+            var (siloPort, gatewayPort) = GetPorts(config);
 
             config.ConfigureByOption("orleans:clustering", new Alternatives
             {
                 ["MongoDB"] = () =>
                 {
-                    IPAddress address;
-
-                    var configuredAddress = config.GetOptionalValue("orleans:ipAddress", string.Empty);
-
-                    if (!string.IsNullOrWhiteSpace(configuredAddress))
-                    {
-                        address = IPAddress.Parse(configuredAddress);
-                    }
-                    else
-                    {
-                        address = Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
-                    }
+                    var address = GetIPAddress(config);
 
                     builder.ConfigureEndpoints(
                         address,
-                        orleansPortSilo,
-                        orleansPortGateway,
+                        siloPort,
+                        gatewayPort,
                         true);
 
                     builder.UseMongoDBClustering(options =>
@@ -101,10 +101,15 @@ namespace Squidex.Config.Orleans
 
                         options.Configure(config);
                     });
+
+                    if (config.GetValue<bool>("orleans:kubernetes"))
+                    {
+                        builder.UseKubernetesHosting();
+                    }
                 },
                 ["Development"] = () =>
                 {
-                    builder.UseLocalhostClustering(orleansPortSilo, orleansPortGateway);
+                    builder.UseLocalhostClustering(siloPort, gatewayPort);
                 }
             });
 
@@ -118,6 +123,54 @@ namespace Squidex.Config.Orleans
                     });
                 }
             });
+        }
+
+        private static (int, int) GetPorts(IConfiguration config)
+        {
+            var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
+            var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
+
+            var privatePorts = config.GetOptionalValue("WEBSITE_PRIVATE_PORTS", string.Empty);
+
+            if (!string.IsNullOrWhiteSpace(privatePorts) && config.GetValue<bool>("orleans:useAzureNetwork"))
+            {
+                var ports = privatePorts.Split(',');
+
+                if (ports.Length < 1 || !int.TryParse(ports[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out orleansPortSilo))
+                {
+                    var error = new ConfigurationError("Insufficient private ports configured.", "WEBSITE_PRIVATE_PORTS");
+
+                    throw new ConfigurationException(error);
+                }
+            }
+
+            return (orleansPortSilo, orleansPortGateway);
+        }
+
+        private static IPAddress GetIPAddress(IConfiguration config)
+        {
+            IPAddress? address = null;
+
+            var configuredAddress = config.GetOptionalValue("orleans:ipAddress", string.Empty);
+
+            if (!string.IsNullOrWhiteSpace(configuredAddress))
+            {
+                address = IPAddress.Parse(configuredAddress);
+            }
+
+            if (address == null && config.GetValue<bool>("orleans:useAzureNetwork"))
+            {
+                var privateIP = config.GetOptionalValue("WEBSITE_PRIVATE_IP", string.Empty);
+
+                if (!string.IsNullOrWhiteSpace(privateIP))
+                {
+                    address = IPAddress.Parse(privateIP);
+                }
+            }
+
+            address ??= Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
+
+            return address;
         }
 
         private static void Configure(this MongoDBOptions options, IConfiguration config)

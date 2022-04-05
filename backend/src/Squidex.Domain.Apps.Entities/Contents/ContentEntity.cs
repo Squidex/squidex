@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public bool IsSingleton { get; set; }
 
-        public string SchemaName { get; set; }
+        public bool IsDeleted { get; set; }
 
         public string SchemaDisplayName { get; set; }
 
@@ -55,6 +55,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public string? NewStatusColor { get; set; }
 
         public string? ScheduledStatusColor { get; set; }
+
+        public string? EditToken { get; set; }
 
         public RootField[]? ReferenceFields { get; set; }
 

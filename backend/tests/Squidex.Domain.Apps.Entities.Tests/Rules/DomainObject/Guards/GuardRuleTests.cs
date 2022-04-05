@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -27,14 +25,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
-        public sealed class TestAction : RuleAction
+        public sealed record TestAction : RuleAction
         {
             public Uri Url { get; set; }
         }
 
         public GuardRuleTests()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, default))
                 .Returns(Mocks.Schema(appId, schemaId));
         }
 
@@ -61,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = null!,
             });
@@ -77,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {
@@ -111,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             {
                 Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
+                    Schemas = ReadonlyList.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {
@@ -121,30 +119,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards
             };
 
             await GuardRule.CanUpdate(command, Rule(), appProvider);
-        }
-
-        [Fact]
-        public void CanEnable_should_not_throw_exception()
-        {
-            var command = new EnableRule();
-
-            GuardRule.CanEnable(command);
-        }
-
-        [Fact]
-        public void CanDisable_should_not_throw_exception()
-        {
-            var command = new DisableRule();
-
-            GuardRule.CanDisable(command);
-        }
-
-        [Fact]
-        public void CanDelete_should_not_throw_exception()
-        {
-            var command = new DeleteRule();
-
-            GuardRule.CanDelete(command);
         }
 
         private CreateRule CreateCommand(CreateRule command)

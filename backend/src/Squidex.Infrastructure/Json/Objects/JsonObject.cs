@@ -5,11 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
@@ -25,7 +22,7 @@ namespace Squidex.Infrastructure.Json.Objects
             }
             set
             {
-                Guard.NotNull(key, nameof(key));
+                Guard.NotNull(key);
 
                 inner[key] = value ?? JsonValue.Null;
             }
@@ -56,13 +53,22 @@ namespace Squidex.Infrastructure.Json.Objects
             inner = new Dictionary<string, IJsonValue>();
         }
 
+        public JsonObject(int capacity)
+        {
+            inner = new Dictionary<string, IJsonValue>(capacity);
+        }
+
         public JsonObject(JsonObject obj)
         {
+            Guard.NotNull(obj);
+
             inner = new Dictionary<string, IJsonValue>(obj.inner);
         }
 
-        private JsonObject(Dictionary<string, IJsonValue> source)
+        public JsonObject(Dictionary<string, IJsonValue> source)
         {
+            Guard.NotNull(source);
+
             inner = source;
         }
 
@@ -159,7 +165,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool TryGet(string pathSegment, [MaybeNullWhen(false)] out IJsonValue result)
         {
-            Guard.NotNull(pathSegment, nameof(pathSegment));
+            Guard.NotNull(pathSegment);
 
             return TryGetValue(pathSegment, out result!);
         }

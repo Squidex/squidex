@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Assets;
@@ -71,6 +69,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string MetadataText { get; set; }
 
         /// <summary>
+        /// The UI token.
+        /// </summary>
+        public string? EditToken { get; set; }
+
+        /// <summary>
         /// The asset metadata.
         /// </summary>
         [LocalizedRequired]
@@ -133,7 +136,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// Determines of the created file is an image.
         /// </summary>
-        [Obsolete("Use Type instead")]
+        [Obsolete("Use 'type' field now.")]
         public bool IsImage
         {
             get => Type == AssetType.Image;
@@ -142,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The width of the image in pixels if the asset is an image.
         /// </summary>
-        [Obsolete("Use Metdata instead")]
+        [Obsolete("Use 'metdata' field now.")]
         public int? PixelWidth
         {
             get => Metadata.GetPixelWidth();
@@ -151,74 +154,74 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The height of the image in pixels if the asset is an image.
         /// </summary>
-        [Obsolete("Use Metdata instead")]
+        [Obsolete("Use 'metdata' field now.")]
         public int? PixelHeight
         {
             get => Metadata.GetPixelHeight();
         }
 
-        public static AssetDto FromAsset(IEnrichedAssetEntity asset, Resources resources, bool isDuplicate = false)
+        public static AssetDto FromDomain(IEnrichedAssetEntity asset, Resources resources, bool isDuplicate = false)
         {
-            var response = SimpleMapper.Map(asset, new AssetDto());
+            var result = SimpleMapper.Map(asset, new AssetDto());
 
-            response.Tags = asset.TagNames;
-
-            response.FileType = asset.FileName.FileType();
+            result.Tags = asset.TagNames;
 
             if (isDuplicate)
             {
-                response.Meta = new AssetMeta
+                result.Meta = new AssetMeta
                 {
                     IsDuplicate = "true"
                 };
             }
 
-            return CreateLinks(response, resources);
+            result.FileType = asset.FileName.FileType();
+
+            return result.CreateLinks(resources);
         }
 
-        private static AssetDto CreateLinks(AssetDto response, Resources resources)
+        private AssetDto CreateLinks(Resources resources)
         {
             var app = resources.App;
 
-            var values = new { app, id = response.Id };
+            var values = new { app, id = Id };
 
-            response.AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAsset), values));
+            AddSelfLink(resources.Url<AssetsController>(x => nameof(x.GetAsset), values));
 
             if (resources.CanUpdateAsset)
             {
-                response.AddPutLink("update", resources.Url<AssetsController>(x => nameof(x.PutAsset), values));
+                AddPutLink("update", resources.Url<AssetsController>(x => nameof(x.PutAsset), values));
 
-                response.AddPutLink("move", resources.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
+                AddPutLink("move", resources.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
             }
 
             if (resources.CanUploadAsset)
             {
-                response.AddPutLink("upload", resources.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
+                AddPutLink("upload", resources.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
             }
 
             if (resources.CanDeleteAsset)
             {
-                response.AddDeleteLink("delete", resources.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
+                AddDeleteLink("delete", resources.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
             }
 
-            if (!string.IsNullOrWhiteSpace(response.Slug))
+            if (!string.IsNullOrWhiteSpace(Slug))
             {
-                var idValues = new { app, idOrSlug = response.Id, more = response.Slug };
+                var idValues = new { app, idOrSlug = Id, more = Slug };
 
-                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
+                AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
 
-                var slugValues = new { app, idOrSlug = response.Slug };
+                var slugValues = new { app, idOrSlug = Slug };
 
-                response.AddGetLink("content/slug", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), slugValues));
+                AddGetLink("content/slug", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), slugValues));
             }
             else
             {
-                var idValues = new { app, idOrSlug = response.Id };
+                var idValues = new { app, idOrSlug = Id };
 
-                response.AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
+                AddGetLink("content", resources.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), idValues));
             }
 
-            return response;
+            return this;
         }
     }
 }

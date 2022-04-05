@@ -1,0 +1,22 @@
+@import 'mixins';
+@import 'vars';
+
+$color-video: #000;
+
+:host {
+    background: $color-video;
+}
+
+:host ::ng-deep {
+    .video-js {
+        &.vjs-fluid {
+            height: 100%;
+            padding: 0;
+            position: static;
+        }
+    }
+}
+
+.hidden {
+    display: none !important;
+}

@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// </summary>
         public JobStatus Status { get; set; }
 
-        public static BackupJobDto FromBackup(IBackupJob backup, Resources resources)
+        public static BackupJobDto FromDomain(IBackupJob backup, Resources resources)
         {
             var result = SimpleMapper.Map(backup, new BackupJobDto());
 

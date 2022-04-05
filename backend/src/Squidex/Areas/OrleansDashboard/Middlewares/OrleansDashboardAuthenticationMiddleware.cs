@@ -1,15 +1,13 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Http;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
@@ -30,7 +28,9 @@ namespace Squidex.Areas.OrleansDashboard.Middlewares
 
             if (authentication.Succeeded)
             {
-                if (authentication.Principal?.Allows(Permissions.AdminOrleans) == true)
+                var permissions = authentication.Principal?.Claims.Permissions();
+
+                if (permissions?.Allows(Permissions.AdminOrleans) == true)
                 {
                     await next(context);
                 }

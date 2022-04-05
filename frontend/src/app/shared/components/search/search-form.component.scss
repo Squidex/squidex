@@ -1,0 +1,32 @@
+@import 'mixins';
+@import 'vars';
+
+.search-form {
+    display: inline-block;
+}
+
+.form-inline {
+    position: relative;
+}
+
+.form-horizontal {
+    min-width: 35rem;
+}
+
+.buttons {
+    @include absolute(8px, 8px);
+}
+
+.buttons2 {
+    @include absolute(.75rem, 1.75rem);
+}
+
+.link {
+    font-size: $font-small;
+    font-weight: normal;
+    margin-top: 1.5rem;
+}
+
+.col-form-label {
+    text-align: left;
+}

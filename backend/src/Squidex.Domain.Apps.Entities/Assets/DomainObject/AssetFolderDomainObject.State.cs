@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             public string FolderName { get; set; }
 
             public DomainId ParentId { get; set; }
+
+            public bool IsDeleted { get; set; }
 
             [IgnoreDataMember]
             public DomainId UniqueId

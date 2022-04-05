@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -20,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
         public static IEnumerable<SchemaEvent> Synchronize(this Schema source, Schema? target, Func<long> idGenerator,
             SchemaSynchronizationOptions? options = null)
         {
-            Guard.NotNull(source, nameof(source));
-            Guard.NotNull(idGenerator, nameof(idGenerator));
+            Guard.NotNull(source);
+            Guard.NotNull(idGenerator);
 
             if (target == null)
             {
@@ -48,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (!source.PreviewUrls.EqualsDictionary(target.PreviewUrls))
                 {
-                    yield return new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary() };
+                    yield return new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls };
                 }
 
                 if (source.IsPublished != target.IsPublished)
@@ -65,17 +62,17 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     yield return @event;
                 }
 
-                if (!source.FieldsInLists.SequenceEqual(target.FieldsInLists))
+                if (!source.FieldsInLists.Equals(target.FieldsInLists))
                 {
                     yield return new SchemaUIFieldsConfigured { FieldsInLists = target.FieldsInLists };
                 }
 
-                if (!source.FieldsInReferences.SequenceEqual(target.FieldsInReferences))
+                if (!source.FieldsInReferences.Equals(target.FieldsInReferences))
                 {
                     yield return new SchemaUIFieldsConfigured { FieldsInReferences = target.FieldsInReferences };
                 }
 
-                if (!source.FieldRules.SetEquals(target.FieldRules))
+                if (!source.FieldRules.Equals(target.FieldRules))
                 {
                     yield return new SchemaFieldRulesConfigured { FieldRules = target.FieldRules };
                 }
@@ -196,8 +193,8 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
             if (sourceIds.Count > 1)
             {
-                var sourceNames = sourceIds.Select(x => x.Name).ToList();
-                var targetNames = target.Ordered.Select(x => x.Name).ToList();
+                var sourceNames = sourceIds.Select(x => x.Name).ToHashSet();
+                var targetNames = target.Ordered.Select(x => x.Name).ToHashSet();
 
                 if (sourceNames.SetEquals(targetNames) && !sourceNames.SequenceEqual(targetNames))
                 {

@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime;
@@ -30,37 +27,40 @@ namespace Squidex.Infrastructure.Orleans
 
         public GrainState(IGrainActivationContext context)
         {
-            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(context);
 
             this.context = context;
 
             context.ObservableLifecycle.Subscribe("Persistence", GrainLifecycleStage.SetupState, SetupAsync);
         }
 
-        public Task SetupAsync(CancellationToken ct = default)
+        public Task SetupAsync(
+            CancellationToken ct = default)
         {
             if (ct.IsCancellationRequested)
             {
                 return Task.CompletedTask;
             }
 
+            DomainId key;
+
             if (context.GrainIdentity.PrimaryKeyString != null)
             {
-                var store = context.ActivationServices.GetRequiredService<IStore<string>>();
-
-                persistence = store.WithSnapshots<T>(GetType(), context.GrainIdentity.PrimaryKeyString, ApplyState);
+                key = DomainId.Create(context.GrainIdentity.PrimaryKeyString);
             }
             else
             {
-                var store = context.ActivationServices.GetRequiredService<IStore<Guid>>();
-
-                persistence = store.WithSnapshots<T>(GetType(), context.GrainIdentity.PrimaryKey, ApplyState);
+                key = DomainId.Create(context.GrainIdentity.PrimaryKey);
             }
+
+            var factory = context.ActivationServices.GetRequiredService<IPersistenceFactory<T>>();
+
+            persistence = factory.WithSnapshots(GetType(), key, ApplyState);
 
             return persistence.ReadAsync();
         }
 
-        private void ApplyState(T value)
+        private void ApplyState(T value, long version)
         {
             Value = value;
         }

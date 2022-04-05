@@ -5,17 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace TestSuite.Model
 {
     public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesData>
     {
-        public static async Task<SchemaDetailsDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
+        public static async Task<SchemaDto> CreateSchemaAsync(ISchemasClient schemas, string appName, string name)
         {
             var schema = await schemas.PostSchemaAsync(appName, new CreateSchemaDto
             {

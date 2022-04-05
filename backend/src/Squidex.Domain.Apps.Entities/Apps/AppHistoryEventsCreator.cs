@@ -1,11 +1,10 @@
 // ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -52,14 +51,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             AddEventMessage<AppMasterLanguageSet>(
                 "history.apps.languagedSetToMaster");
 
-            AddEventMessage<AppPatternAdded>(
-                "history.apps.patternAdded");
-
-            AddEventMessage<AppPatternDeleted>(
-                "history.apps.patternDeleted");
-
-            AddEventMessage<AppPatternUpdated>(
-                "history.apps.patternUpdated");
+            AddEventMessage<AppSettingsUpdated>(
+                "history.apps.settingsUpdated");
 
             AddEventMessage<AppRoleAdded>(
                 "history.apps.roleAdded");
@@ -93,12 +86,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     return CreateLanguagesEvent(e, e.Language);
                 case AppLanguageRemoved e:
                     return CreateLanguagesEvent(e, e.Language);
-                case AppPatternAdded e:
-                    return CreatePatternsEvent(e, e.PatternId, e.Name);
-                case AppPatternUpdated e:
-                    return CreatePatternsEvent(e, e.PatternId, e.Name);
-                case AppPatternDeleted e:
-                    return CreatePatternsEvent(e, e.PatternId);
                 case AppRoleAdded e:
                     return CreateRolesEvent(e, e.Name);
                 case AppRoleUpdated e:
@@ -109,9 +96,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     return CreatePlansEvent(e, e.PlanId);
                 case AppPlanReset e:
                     return CreatePlansEvent(e);
+                case AppSettingsUpdated e:
+                    return CreateAppSettingsEvent(e);
             }
 
             return null;
+        }
+
+        private HistoryEvent CreateAppSettingsEvent(AppSettingsUpdated e)
+        {
+            return ForEvent(e, "settings.appSettings");
         }
 
         private HistoryEvent CreateContributorsEvent(IEvent e, string contributor, string? role = null)
@@ -127,11 +121,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private HistoryEvent CreateRolesEvent(IEvent e, string name)
         {
             return ForEvent(e, "settings.roles").Param("Name", name);
-        }
-
-        private HistoryEvent CreatePatternsEvent(IEvent e, DomainId id, string? name = null)
-        {
-            return ForEvent(e, "settings.patterns").Param("PatternId", id).Param("Name", name);
         }
 
         private HistoryEvent CreateClientsEvent(IEvent e, string id)

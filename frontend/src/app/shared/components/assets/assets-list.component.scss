@@ -1,0 +1,77 @@
+@import 'mixins';
+@import 'vars';
+
+.unrow {
+    display: block;
+}
+
+h5 {
+    font-size: $font-small;
+    font-weight: normal;
+    margin-bottom: .5rem;
+    margin-top: 0;
+}
+
+.folders {
+    .cdk-drag-placeholder {
+        @include absolute(0, auto, auto, auto);
+    }
+}
+
+.folder-container {
+    height: $asset-folder-height;
+    margin-bottom: 1rem;
+    margin-right: .5rem;
+    position: relative;
+    width: $asset-width;
+
+    &-over {
+        @include absolute(-6px, -6px, -6px, -6px);
+        border: 2px solid $color-theme-brand;
+        opacity: 0;
+    }
+
+    &.cdk-drop-list-dragging {
+        &:hover {
+            .folder-container-over {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+.file-drop {
+    background: transparent;
+    border: 2px dashed $color-border;
+    margin-bottom: 1rem;
+    margin-right: 0;
+    padding: 1rem;
+    text-align: center;
+    transition: border-color .4s ease;
+
+    &.drag {
+        border-color: darken($color-border, 10%);
+        border-style: dashed;
+        cursor: copy;
+    }
+
+    &-button-input {
+        @include hidden;
+    }
+
+    &-button {
+        margin: .5rem 0;
+    }
+
+    &-or {
+        font-size: $font-smallest;
+    }
+
+    &-info {
+        color: darken($color-border, 30%);
+    }
+}
+
+.btn {
+    cursor: default;
+}

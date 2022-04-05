@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
@@ -78,7 +76,6 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             serializerSettings.Converters.Add(new TodayConverter());
 
             var serializer = new NewtonsoftJsonSerializer(serializerSettings);
-
             var serialized = serializer.Deserialize<Instant>(serializer.Serialize(value, true))!;
 
             Assert.Equal(value, serialized);

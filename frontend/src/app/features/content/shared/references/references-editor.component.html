@@ -1,0 +1,59 @@
+<div class="references-container"
+    (sqxResizeCondition)="setCompact($event)"
+    [sqxResizeMinWidth]="600"
+    [sqxResizeMaxWidth]="0">
+    <ng-container>
+        <div class="drop-area-container" [class.disabled]="snapshot.isDisabled">
+            <div class="drop-area">
+                <a (click)="createContent()">{{ 'contents.referencesCreateNew' | sqxTranslate }}</a>
+
+                &middot;
+
+                <a (click)="contentSelectorDialog.show()">{{ 'contents.referencesSelectExisting' | sqxTranslate }}</a>
+            </div>
+        </div>
+        
+        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.contentItems && snapshot.contentItems.length > 0" 
+            cdkDropList
+            [cdkDropListData]="snapshot.contentItems"
+            [cdkDropListDisabled]="snapshot.isDisabled"
+            (cdkDropListDropped)="sort($event)">
+            <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent"
+                [sqxReferenceItem]="content"
+                class="table-drag"
+                cdkDrag
+                cdkDragLockAxis="y" 
+                (clone)="createContent(content)"
+                [columns]="snapshot.contentItems | sqxContentsColumns"
+                [isCompact]="snapshot.isCompact"
+                [isDisabled]="snapshot.isDisabled"
+                [language]="language"
+                (delete)="remove(content)">
+                <i cdkDragHandle class="icon-drag2 drag-handle"></i>
+            </tbody>
+        </table>
+    </ng-container>
+</div>
+
+<ng-container *sqxModal="contentCreatorDialog">
+    <sqx-content-creator
+        (select)="select($event)"
+        [formContext]="formContext"
+        [initialData]="clonedContent?.data"
+        [language]="language"
+        [languages]="languages"
+        [schemaName]="clonedContent?.schemaName"
+        [schemaIds]="schemaIds">
+    </sqx-content-creator>
+</ng-container>
+
+<ng-container *sqxModal="contentSelectorDialog">
+    <sqx-content-selector
+        (select)="select($event)"
+        [allowDuplicates]="allowDuplicates"
+        [alreadySelected]="snapshot.contentItems"
+        [language]="language"
+        [languages]="languages"
+        [schemaIds]="schemaIds">
+    </sqx-content-selector>
+</ng-container>

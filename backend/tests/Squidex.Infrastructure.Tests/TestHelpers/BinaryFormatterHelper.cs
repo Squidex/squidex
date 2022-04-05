@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 #pragma warning disable SYSLIB0011 // Type or member is obsolete

@@ -1,17 +1,14 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Log;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
@@ -21,10 +18,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IGrainState<EventConsumerState> state;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
-        private readonly ISemanticLog log;
+        private readonly ILogger<EventConsumerGrain> log;
         private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
-        private TaskScheduler? scheduler;
-        private BatchSubscriber? currentSubscriber;
+        private IEventSubscription? currentSubscription;
         private IEventConsumer? eventConsumer;
 
         private EventConsumerState State
@@ -38,14 +34,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IGrainState<EventConsumerState> state,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            ISemanticLog log)
+            ILogger<EventConsumerGrain> log)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(eventConsumerFactory, nameof(eventConsumerFactory));
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(log, nameof(log));
-
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.eventConsumerFactory = eventConsumerFactory;
@@ -56,18 +46,30 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         protected override Task OnActivateAsync(string key)
         {
-            scheduler = TaskScheduler.Current;
-
             eventConsumer = eventConsumerFactory(key);
+
+            return Task.CompletedTask;
+        }
+
+        public override Task OnDeactivateAsync()
+        {
+            CompleteAsync().Forget();
 
             return Task.CompletedTask;
         }
 
         public async Task CompleteAsync()
         {
-            if (currentSubscriber != null)
+            if (currentSubscription is BatchSubscriber batchSubscriber)
             {
-                await currentSubscriber.CompleteAsync();
+                try
+                {
+                    await batchSubscriber.CompleteAsync();
+                }
+                catch (Exception ex)
+                {
+                    log.LogCritical(ex, "Failed to complete consumer.");
+                }
             }
         }
 
@@ -83,7 +85,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task OnEventsAsync(object sender, IReadOnlyList<Envelope<IEvent>> events, string position)
         {
-            if (!ReferenceEquals(sender, currentSubscriber?.Sender))
+            if (!ReferenceEquals(sender, currentSubscription?.Sender))
             {
                 return Task.CompletedTask;
             }
@@ -93,12 +95,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 await DispatchAsync(events);
 
                 State = State.Handled(position, events.Count);
-            });
+            }, State.Position);
         }
 
         public Task OnErrorAsync(object sender, Exception exception)
         {
-            if (!ReferenceEquals(sender, currentSubscriber?.Sender))
+            if (!ReferenceEquals(sender, currentSubscription?.Sender))
             {
                 return Task.CompletedTask;
             }
@@ -108,7 +110,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 Unsubscribe();
 
                 State = State.Stopped(exception);
-            });
+            }, State.Position);
         }
 
         public async Task ActivateAsync()
@@ -120,7 +122,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     Subscribe();
 
                     State = State.Started();
-                });
+                }, State.Position);
             }
             else if (!State.IsStopped)
             {
@@ -140,7 +142,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 Subscribe();
 
                 State = State.Started();
-            });
+            }, State.Position);
 
             return CreateInfo();
         }
@@ -157,7 +159,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 Unsubscribe();
 
                 State = State.Stopped();
-            });
+            }, State.Position);
 
             return CreateInfo();
         }
@@ -170,10 +172,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 await ClearAsync();
 
-                State = EventConsumerState.Reset();
+                State = EventConsumerState.Initial;
 
                 Subscribe();
-            });
+            }, State.Position);
 
             return CreateInfo();
         }
@@ -186,17 +188,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string? caller = null)
+        private Task DoAndUpdateStateAsync(Action action, string? position, [CallerMemberName] string? caller = null)
         {
             return DoAndUpdateStateAsync(() =>
             {
                 action();
 
                 return Task.CompletedTask;
-            }, caller);
+            }, position, caller);
         }
 
-        private async Task DoAndUpdateStateAsync(Func<Task> action, [CallerMemberName] string? caller = null)
+        private async Task DoAndUpdateStateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
         {
             await semaphore.WaitAsync();
             try
@@ -218,10 +220,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                         ex = new AggregateException(ex, unsubscribeException);
                     }
 
-                    log.LogFatal(ex, w => w
-                        .WriteProperty("action", caller)
-                        .WriteProperty("status", "Failed")
-                        .WriteProperty("eventConsumer", eventConsumer!.Name));
+                    log.LogCritical(ex, "Failed to update consumer {consumer} at position {position} from {caller}.",
+                        eventConsumer!.Name, position, caller);
 
                     State = previousState.Stopped(ex);
                 }
@@ -239,51 +239,44 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private async Task ClearAsync()
         {
-            var logContext = (actionId: Guid.NewGuid().ToString(), consumer: eventConsumer!.Name);
-
-            log.LogDebug(logContext, (ctx, w) => w
-                .WriteProperty("action", "EventConsumerReset")
-                .WriteProperty("actionId", ctx.actionId)
-                .WriteProperty("status", "Started")
-                .WriteProperty("eventConsumer", ctx.consumer));
-
-            using (log.MeasureInformation(logContext, (ctx, w) => w
-                .WriteProperty("action", "EventConsumerReset")
-                .WriteProperty("actionId", ctx.actionId)
-                .WriteProperty("status", "Completed")
-                .WriteProperty("eventConsumer", ctx.consumer)))
+            if (log.IsEnabled(LogLevel.Debug))
             {
-                await eventConsumer.ClearAsync();
+                log.LogDebug("Event consumer {consumer} reset started", eventConsumer!.Name);
+            }
+
+            var watch = ValueStopwatch.StartNew();
+            try
+            {
+                await eventConsumer!.ClearAsync();
+            }
+            finally
+            {
+                log.LogDebug("Event consumer {consumer} reset completed after {time}ms.", eventConsumer!.Name, watch.Stop());
             }
         }
 
         private void Unsubscribe()
         {
-            var subscription = Interlocked.Exchange(ref currentSubscriber, null);
+            var subscription = Interlocked.Exchange(ref currentSubscription, null);
 
             subscription?.Unsubscribe();
         }
 
         private void Subscribe()
         {
-            if (currentSubscriber == null)
+            if (currentSubscription == null)
             {
-                currentSubscriber = CreateSubscription();
+                currentSubscription = CreateSubscription();
             }
             else
             {
-                currentSubscriber.WakeUp();
+                currentSubscription.WakeUp();
             }
-        }
-
-        protected virtual TaskScheduler GetScheduler()
-        {
-            return scheduler!;
         }
 
         private BatchSubscriber CreateSubscription()
         {
-            return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription, GetScheduler());
+            return new BatchSubscriber(this, eventDataFormatter, eventConsumer!, CreateRetrySubscription);
         }
 
         protected virtual IEventSubscription CreateRetrySubscription(IEventSubscriber subscriber)

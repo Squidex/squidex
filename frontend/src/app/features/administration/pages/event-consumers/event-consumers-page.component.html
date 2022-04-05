@@ -1,0 +1,54 @@
+<sqx-title message="i18n:eventConsumers.pageTitle"></sqx-title>
+
+<sqx-layout layout="main" titleText="i18n:common.consumers" titleIcon="time" [innerWidth]="50" [hideSidebar]="true">
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="i18n:eventConsumers.refreshTooltip" shortcut="CTRL + B">
+            <i class="icon-reset"></i> {{ 'common.refresh' | sqxTranslate }}
+        </button>
+    </ng-container>
+
+    <ng-container>
+        <sqx-list-view innerWidth="50rem" [isLoading]="eventConsumersState.isLoading | async" [table]="true">
+            <ng-container header>
+                <table class="table table-items table-fixed" #header>
+                    <thead>
+                        <tr>
+                            <th class="cell-auto">
+                                {{ 'common.name' | sqxTranslate }}
+                            </th>
+                            <th class="cell-auto-right">
+                                {{ 'eventConsumers.count' | sqxTranslate }}
+                            </th>
+                            <th class="cell-auto-right">
+                                {{ 'eventConsumers.position' | sqxTranslate }}
+                            </th>
+                            <th class="cell-actions-lg">
+                                {{ 'common.actions' | sqxTranslate }}
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </ng-container>
+
+            <ng-container>
+                <table class="table table-items table-fixed" [sqxSyncWidth]="header">        
+                    <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer"
+                        [sqxEventConsumer]="eventConsumer" (error)="showError(eventConsumer)">
+                    </tbody>
+                </table>
+            </ng-container>
+        </sqx-list-view>
+    </ng-container>
+</sqx-layout>
+
+<ng-container *sqxModal="eventConsumerErrorDialog">
+    <sqx-modal-dialog (close)="eventConsumerErrorDialog.hide()">
+        <ng-container title>
+            {{ 'common.error' | sqxTranslate }}
+        </ng-container>
+    
+        <ng-container content>
+            <textarea readonly class="form-control error-message small">{{eventConsumerError}}</textarea>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

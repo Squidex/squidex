@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -34,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleEventFormatterCompareTests
     {
-        private readonly IUser user = A.Fake<IUser>();
+        private readonly IUser user = UserMocks.User("user123", "me@email.com", "me");
         private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
         private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
         private readonly NamedId<DomainId> schemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
@@ -43,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly DomainId assetId = DomainId.NewGuid();
         private readonly RuleEventFormatter sut;
 
-        private class FakeContentResolver : IRuleEventFormatter
+        private sealed class FakeContentResolver : IRuleEventFormatter
         {
             public (bool Match, ValueTask<string?>) Format(EnrichedEvent @event, object value, string[] path)
             {
@@ -73,15 +71,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             A.CallTo(() => urlGenerator.AssetContent(appId, "file-name"))
                 .Returns("asset-content-slug-url");
-
-            A.CallTo(() => user.Id)
-                .Returns("user123");
-
-            A.CallTo(() => user.Email)
-                .Returns("me@email.com");
-
-            A.CallTo(() => user.Claims)
-                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
 
             var formatters = new IRuleEventFormatter[]
             {
@@ -117,9 +106,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 new StringWordsJintExtension()
             };
 
-            var cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-
-            return new JintScriptEngine(cache, extensions);
+            return new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }),
+                extensions);
         }
 
         [Theory]
@@ -247,7 +240,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("From client:android (client:android, android)", result);
+            Assert.Equal("From android (client:android, android)", result);
         }
 
         [Theory]
@@ -323,7 +316,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "Download at {{event.id | assetContentUrl | default: 'null'}}"
         )]
         [InlineData("Liquid(Download at {{event | assetContentUrl | default: 'null'}})")]
-        public async Task Should_return_null_when_asset_content_url_not_found(string script)
+        public async Task Should_return_null_if_asset_content_url_not_found(string script)
         {
             var @event = new EnrichedContentEvent();
 
@@ -357,7 +350,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "Download at {{event.id | assetContentAppUrl | default: 'null'}}"
         )]
         [InlineData("Liquid(Download at {{event | assetContentAppUrl | default: 'null'}})")]
-        public async Task Should_return_null_when_asset_content_app_url_not_found(string script)
+        public async Task Should_return_null_if_asset_content_app_url_not_found(string script)
         {
             var @event = new EnrichedContentEvent();
 
@@ -391,7 +384,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "Download at {{event.id | assetContentSlugUrl | default: 'null'}}"
         )]
         [InlineData("Liquid(Download at {{event | assetContentSlugUrl | default: 'null'}})")]
-        public async Task Should_return_null_when_asset_content_slug_url_not_found(string script)
+        public async Task Should_return_null_if_asset_content_slug_url_not_found(string script)
         {
             var @event = new EnrichedContentEvent();
 
@@ -423,7 +416,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "Go to ${contentUrl()}",
             "Go to {{event.id | contentUrl | default: 'null'}}"
         )]
-        public async Task Should_return_null_when_content_url_when_not_found(string script)
+        public async Task Should_return_null_if_content_url_if_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 
@@ -439,7 +432,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${contentAction()}",
             "{{event.status}}"
         )]
-        public async Task Should_format_content_status_when_found(string script)
+        public async Task Should_format_content_status_if_found(string script)
         {
             var @event = new EnrichedContentEvent { Status = Status.Published };
 
@@ -455,7 +448,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${contentAction()}",
             "{{event.status | default: 'null'}}"
         )]
-        public async Task Should_return_null_when_content_status_not_found(string script)
+        public async Task Should_return_null_if_content_status_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 
@@ -471,7 +464,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.type}",
             "{{event.type}}"
         )]
-        public async Task Should_format_content_actions_when_found(string script)
+        public async Task Should_format_content_actions_if_found(string script)
         {
             var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
 
@@ -487,7 +480,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${contentAction()}",
             null
         )]
-        public async Task Should_return_null_when_content_action_not_found(string script)
+        public async Task Should_return_null_if_content_action_not_found(string script)
         {
             var @event = new EnrichedAssetEvent();
 
@@ -526,7 +519,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.data.country.iv}",
             "{{event.data.country.iv | default: 'null'}}"
         )]
-        public async Task Should_return_null_when_field_not_found(string script)
+        public async Task Should_return_null_if_field_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -549,7 +542,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.data.country.iv}",
             "{{event.data.country.iv | default: 'null'}}"
         )]
-        public async Task Should_return_null_when_partition_not_found(string script)
+        public async Task Should_return_null_if_partition_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -572,7 +565,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.data.country.iv[10]}",
             "{{event.data.country.iv[10] | default: 'null'}}"
         )]
-        public async Task Should_return_null_when_array_item_not_found(string script)
+        public async Task Should_return_null_if_array_item_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -595,7 +588,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.data.country.iv.Location}",
             "{{event.data.country.iv.Location | default: 'null'}}"
         )]
-        public async Task Should_return_null_when_property_not_found(string script)
+        public async Task Should_return_null_if_property_not_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -618,7 +611,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.data.city.iv}",
             "{{event.data.city.iv}}"
         )]
-        public async Task Should_return_plain_value_when_found(string script)
+        public async Task Should_return_plain_value_if_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -641,7 +634,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.data.city.iv[0]}",
             "{{event.data.city.iv[0]}}"
         )]
-        public async Task Should_return_plain_value_from_array_when_found(string script)
+        public async Task Should_return_plain_value_from_array_if_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -664,7 +657,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${event.data.city.iv.name}",
             "{{event.data.city.iv.name}}"
         )]
-        public async Task Should_return_plain_value_from_object_when_found(string script)
+        public async Task Should_return_plain_value_from_object_if_found(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -687,7 +680,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${JSON.stringify(event.data.city.iv)}",
             "{{event.data.city.iv}}"
         )]
-        public async Task Should_return_json_string_when_object(string script)
+        public async Task Should_return_json_string_if_object(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -710,7 +703,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${JSON.stringify(event.data.city.iv)}",
             "{{event.data.city.iv}}"
         )]
-        public async Task Should_return_json_string_when_array(string script)
+        public async Task Should_return_json_string_if_array(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -723,7 +716,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = await sut.FormatAsync(script, @event);
 
-            Assert.Equal("[1,2,3]", result?.Replace(" ", string.Empty));
+            Assert.Equal("[1,2,3]", result?.Replace(" ", string.Empty, StringComparison.Ordinal));
         }
 
         [Theory]
@@ -733,7 +726,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${JSON.stringify(event.data)}",
             null
         )]
-        public async Task Should_return_json_string_when_data(string script)
+        public async Task Should_return_json_string_if_data(string script)
         {
             var @event = new EnrichedContentEvent
             {
@@ -787,7 +780,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             "${CONTENT_DATA.time.iv | timestamp}",
             null,
             "{{event.data.time.iv | timestamp}}")]
-        public async Task Should_return_timestamp_when_string(string script)
+        public async Task Should_return_timestamp_if_string(string script)
         {
             var @event = new EnrichedContentEvent
             {

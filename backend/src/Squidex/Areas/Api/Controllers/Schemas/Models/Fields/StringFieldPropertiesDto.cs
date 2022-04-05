@@ -1,12 +1,12 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -32,6 +32,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// The validation message for the pattern.
         /// </summary>
         public string? PatternMessage { get; set; }
+
+        /// <summary>
+        /// The initial id to the folder when the control supports file uploads.
+        /// </summary>
+        public string? FolderId { get; set; }
 
         /// <summary>
         /// The minimum allowed length for the field value.
@@ -66,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public ReadOnlyCollection<string>? AllowedValues { get; set; }
+        public ReadonlyList<string>? AllowedValues { get; set; }
 
         /// <summary>
         /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.
@@ -77,6 +82,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// Indicates that the inline editor is enabled for this field.
         /// </summary>
         public bool InlineEditable { get; set; }
+
+        /// <summary>
+        /// Indicates whether GraphQL Enum should be created.
+        /// </summary>
+        public bool CreateEnum { get; init; }
 
         /// <summary>
         /// How the string content should be interpreted.

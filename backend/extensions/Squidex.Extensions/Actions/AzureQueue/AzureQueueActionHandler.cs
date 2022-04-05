@@ -1,16 +1,16 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.AzureQueue
 {
@@ -58,7 +58,8 @@ namespace Squidex.Extensions.Actions.AzureQueue
             return (ruleDescription, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job,
+            CancellationToken ct = default)
         {
             var queue = await clients.GetClientAsync((job.QueueConnectionString, job.QueueName));
 

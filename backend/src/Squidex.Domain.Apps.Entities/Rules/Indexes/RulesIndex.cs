@@ -5,15 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
@@ -23,19 +19,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         public RulesIndex(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 
-        public Task RebuildAsync(DomainId appId, HashSet<DomainId> rules)
+        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId,
+            CancellationToken ct = default)
         {
-            return Index(appId).RebuildAsync(rules);
-        }
-
-        public async Task<List<IRuleEntity>> GetRulesAsync(DomainId appId)
-        {
-            using (Profiler.TraceMethod<RulesIndex>())
+            using (Telemetry.Activities.StartActivity("RulesIndex/GetRulesAsync"))
             {
                 var ids = await GetRuleIdsAsync(appId);
 
@@ -47,11 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             }
         }
 
-        private async Task<List<DomainId>> GetRuleIdsAsync(DomainId appId)
+        private async Task<IReadOnlyCollection<DomainId>> GetRuleIdsAsync(DomainId appId)
         {
-            using (Profiler.TraceMethod<RulesIndex>())
+            using (Telemetry.Activities.StartActivity("RulesIndex/GetRuleIdsAsync"))
             {
-                return await Index(appId).GetIdsAsync();
+                return await Cache(appId).GetRuleIdsAsync();
             }
         }
 
@@ -63,34 +53,29 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             {
                 switch (context.Command)
                 {
-                    case CreateRule createRule:
-                        await CreateRuleAsync(createRule);
+                    case CreateRule create:
+                        await OnCreateAsync(create);
                         break;
-                    case DeleteRule deleteRule:
-                        await DeleteRuleAsync(deleteRule);
+                    case DeleteRule delete:
+                        await OnDeleteAsync(delete);
                         break;
                 }
             }
         }
 
-        private async Task CreateRuleAsync(CreateRule command)
+        private async Task OnCreateAsync(CreateRule create)
         {
-            await Index(command.AppId.Id).AddAsync(command.RuleId);
+            await Cache(create.AppId.Id).AddAsync(create.RuleId);
         }
 
-        private async Task DeleteRuleAsync(DeleteRule command)
+        private async Task OnDeleteAsync(DeleteRule delete)
         {
-            var rule = await GetRuleCoreAsync(command.AggregateId);
-
-            if (rule != null)
-            {
-                await Index(rule.AppId.Id).RemoveAsync(rule.Id);
-            }
+            await Cache(delete.AppId.Id).RemoveAsync(delete.RuleId);
         }
 
-        private IRulesByAppIndexGrain Index(DomainId appId)
+        private IRulesCacheGrain Cache(DomainId appId)
         {
-            return grainFactory.GetGrain<IRulesByAppIndexGrain>(appId.ToString());
+            return grainFactory.GetGrain<IRulesCacheGrain>(appId.ToString());
         }
 
         private async Task<IRuleEntity?> GetRuleCoreAsync(DomainId id)

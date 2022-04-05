@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core;
@@ -36,11 +35,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var ctx = ContextWithPermission();
 
-            var result = await sut.SearchAsync("logo", ctx);
+            var result = await sut.SearchAsync("logo", ctx, default);
 
             Assert.Empty(result);
 
-            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._))
+            A.CallTo(() => assetQuery.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -51,26 +50,29 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var ctx = ContextWithPermission(permission.Id);
 
-            var asset1 = CreateAsset("logo-light.png");
-            var asset2 = CreateAsset("logo-dark.png");
+            var asset1 = CreateAsset("logo1.png");
+            var asset2 = CreateAsset("logo2.png");
 
-            A.CallTo(() => urlGenerator.AssetsUI(appId, "logo"))
-                .Returns("assets-url");
+            A.CallTo(() => urlGenerator.AssetsUI(appId, asset1.Id.ToString()))
+                .Returns("assets-url1");
 
-            A.CallTo(() => assetQuery.QueryAsync(ctx, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5")))
+            A.CallTo(() => urlGenerator.AssetsUI(appId, asset2.Id.ToString()))
+                .Returns("assets-url2");
+
+            A.CallTo(() => assetQuery.QueryAsync(ctx, null, A<Q>.That.HasQuery("Filter: contains(fileName, 'logo'); Take: 5"), A<CancellationToken>._))
                 .Returns(ResultList.CreateFrom(2, asset1, asset2));
 
-            var result = await sut.SearchAsync("logo", ctx);
+            var result = await sut.SearchAsync("logo", ctx, default);
 
             result.Should().BeEquivalentTo(
                 new SearchResults()
-                    .Add("logo-light.png", SearchResultType.Asset, "assets-url")
-                    .Add("logo-dark.png", SearchResultType.Asset, "assets-url"));
+                    .Add("logo1.png", SearchResultType.Asset, "assets-url1")
+                    .Add("logo2.png", SearchResultType.Asset, "assets-url2"));
         }
 
         private static IEnrichedAssetEntity CreateAsset(string fileName)
         {
-            return new AssetEntity { FileName = fileName };
+            return new AssetEntity { FileName = fileName, Id = DomainId.NewGuid() };
         }
 
         private Context ContextWithPermission(string? permission = null)

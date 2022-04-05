@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
 namespace Squidex.Web
@@ -27,14 +25,14 @@ namespace Squidex.Web
 
         public static Deferred Response(Func<object> factory)
         {
-            Guard.NotNull(factory, nameof(factory));
+            Guard.NotNull(factory);
 
             return new Deferred(() => Task.FromResult(factory()));
         }
 
         public static Deferred AsyncResponse<T>(Func<Task<T>> factory)
         {
-            Guard.NotNull(factory, nameof(factory));
+            Guard.NotNull(factory);
 
             return new Deferred(async () => (await factory())!);
         }

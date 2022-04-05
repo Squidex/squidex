@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
 
         public string? Position { get; set; }
 
-        public static EventConsumerDto FromEventConsumerInfo(EventConsumerInfo eventConsumerInfo, Resources resources)
+        public static EventConsumerDto FromDomain(EventConsumerInfo eventConsumerInfo, Resources resources)
         {
             var result = SimpleMapper.Map(eventConsumerInfo, new EventConsumerDto());
 

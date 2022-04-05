@@ -1,12 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
@@ -33,13 +32,13 @@ namespace Squidex.Web.CommandMiddlewares
         }
 
         [Fact]
-        public async Task Should_throw_security_exception_when_no_subject_or_client_is_found()
+        public async Task Should_throw_security_exception_if_no_subject_or_client_is_found()
         {
             await Assert.ThrowsAsync<DomainForbiddenException>(() => HandleAsync(new CreateContent()));
         }
 
         [Fact]
-        public async Task Should_do_nothing_when_context_is_null()
+        public async Task Should_do_nothing_if_context_is_null()
         {
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(null!);
@@ -54,7 +53,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_assign_actor_from_subject()
         {
-            httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "my-user");
+            httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "my-user", "My User");
 
             var context = await HandleAsync(new CreateContent());
 
@@ -64,7 +63,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_assign_actor_from_client()
         {
-            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
+            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client", null);
 
             var context = await HandleAsync(new CreateContent());
 
@@ -74,7 +73,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_not_override_actor()
         {
-            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
+            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client", null);
 
             var customActor = RefToken.User("me");
 
@@ -92,15 +91,18 @@ namespace Squidex.Web.CommandMiddlewares
             return commandContext;
         }
 
-        private static ClaimsPrincipal CreatePrincipal(string claimType, string claimValue)
+        private static ClaimsPrincipal CreatePrincipal(string claimType, string claimValue, string? name)
         {
-            var claimsPrincipal = new ClaimsPrincipal();
-            var claimsIdentity = new ClaimsIdentity();
+            var identity = new ClaimsIdentity();
 
-            claimsIdentity.AddClaim(new Claim(claimType, claimValue));
-            claimsPrincipal.AddIdentity(claimsIdentity);
+            identity.AddClaim(new Claim(claimType, claimValue));
 
-            return claimsPrincipal;
+            if (name != null)
+            {
+                identity.AddClaim(new Claim(OpenIdClaims.Name, name));
+            }
+
+            return new ClaimsPrincipal(identity);
         }
     }
 }

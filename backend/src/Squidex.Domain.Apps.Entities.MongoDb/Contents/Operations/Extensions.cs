@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
@@ -35,7 +33,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public Status Status { get; set; }
         }
 
-        public static Task<List<StatusModel>> FindStatusAsync(this IMongoCollection<MongoContentEntity> collection, FilterDefinition<MongoContentEntity> filter)
+        public static Task<List<StatusModel>> FindStatusAsync(this IMongoCollection<MongoContentEntity> collection, FilterDefinition<MongoContentEntity> filter,
+            CancellationToken ct)
         {
             var projections = Builders<MongoContentEntity>.Projection;
 
@@ -44,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                     .Include(x => x.Id)
                     .Include(x => x.IndexedSchemaId)
                     .Include(x => x.Status))
-                .ToListAsync();
+                .ToListAsync(ct);
         }
     }
 }

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -16,7 +14,7 @@ using Squidex.Infrastructure.Reflection;
 namespace Migrations.OldTriggers
 {
     [TypeName(nameof(AssetChangedTrigger))]
-    public sealed class AssetChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
+    public sealed record AssetChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
     {
         public bool SendCreate { get; set; }
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Translations;
 
@@ -17,8 +16,6 @@ namespace Squidex.Infrastructure.Commands
 
         public ReadonlyCommandMiddleware(IOptions<ReadonlyOptions> options)
         {
-            Guard.NotNull(options, nameof(options));
-
             this.options = options.Value;
         }
 

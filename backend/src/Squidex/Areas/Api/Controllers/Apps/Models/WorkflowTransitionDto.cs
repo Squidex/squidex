@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -22,12 +21,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string[]? Roles { get; set; }
 
-        public static WorkflowTransitionDto FromWorkflowTransition(WorkflowTransition transition)
+        public static WorkflowTransitionDto FromDomain(WorkflowTransition transition)
         {
-            return new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
+            var result = new WorkflowTransitionDto { Expression = transition.Expression, Roles = transition.Roles?.ToArray() };
+
+            return result;
         }
 
-        public WorkflowTransition ToTransition()
+        public WorkflowTransition ToWorkflowTransition()
         {
             return WorkflowTransition.When(Expression, Roles);
         }

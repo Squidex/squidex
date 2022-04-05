@@ -19,33 +19,33 @@ namespace Squidex.Extensions.Actions.Algolia
         Display = "Populate Algolia index",
         Description = "Populate a full text search index in Algolia.",
         ReadMore = "https://www.algolia.com/")]
-    public sealed class AlgoliaAction : RuleAction
+    public sealed record AlgoliaAction : RuleAction
     {
         [LocalizedRequired]
         [Display(Name = "Application Id", Description = "The application ID.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string AppId { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Api Key", Description = "The API key to grant access to Squidex.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string ApiKey { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Index Name", Description = "The name of the index.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string IndexName { get; set; }
 
         [Display(Name = "Document", Description = "The optional custom document.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Document { get; set; }
 
         [Display(Name = "Deletion", Description = "The condition when to delete the entry.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Delete { get; set; }
     }
 }

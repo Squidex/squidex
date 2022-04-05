@@ -1,14 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
 using Squidex.Hosting;
 using Squidex.Hosting.Configuration;
@@ -39,11 +36,6 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public RabbitMqEventConsumer(IJsonSerializer jsonSerializer, string eventPublisherName, string uri, string exchange, string eventsFilter)
         {
-            Guard.NotNullOrEmpty(uri, nameof(uri));
-            Guard.NotNullOrEmpty(eventPublisherName, nameof(eventPublisherName));
-            Guard.NotNullOrEmpty(exchange, nameof(exchange));
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-
             connectionFactory = new ConnectionFactory { Uri = new Uri(uri, UriKind.Absolute) };
             connection = new Lazy<IConnection>(connectionFactory.CreateConnection);
             channel = new Lazy<IModel>(connection.Value.CreateModel);
@@ -63,7 +55,8 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public Task InitializeAsync(CancellationToken ct = default)
+        public Task InitializeAsync(
+            CancellationToken ct)
         {
             try
             {
@@ -88,6 +81,11 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public Task On(Envelope<IEvent> @event)
         {
+            if (@event.Headers.Restored())
+            {
+                return Task.CompletedTask;
+            }
+
             var jsonString = jsonSerializer.Serialize(@event);
             var jsonBytes = Encoding.UTF8.GetBytes(jsonString);
 

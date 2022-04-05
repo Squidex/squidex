@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Notifications

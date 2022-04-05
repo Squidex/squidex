@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_join_non_empty_when_all_are_valid()
+        public void Should_join_non_empty_if_all_are_valid()
         {
             var result = StringExtensions.JoinNonEmpty("_", "1", "2", "3");
 
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_join_non_empty_when_first_invalid()
+        public void Should_join_non_empty_if_first_invalid()
         {
             var result = StringExtensions.JoinNonEmpty("_", null, "2", "3");
 
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_join_non_empty_when_middle_invalid()
+        public void Should_join_non_empty_if_middle_invalid()
         {
             var result = StringExtensions.JoinNonEmpty("_", "1", null, "3");
 
@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_join_non_empty_when_last_invalid()
+        public void Should_join_non_empty_if_last_invalid()
         {
             var result = StringExtensions.JoinNonEmpty("_", "1", "2", null);
 

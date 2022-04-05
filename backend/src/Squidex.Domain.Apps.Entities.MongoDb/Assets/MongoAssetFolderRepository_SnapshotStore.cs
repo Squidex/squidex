@@ -1,69 +1,113 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderDomainObject.State, DomainId>
+    public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFolderDomainObject.State>, IDeleter
     {
-        async Task<(AssetFolderDomainObject.State Value, long Version)> ISnapshotStore<AssetFolderDomainObject.State, DomainId>.ReadAsync(DomainId key)
+        Task IDeleter.DeleteAppAsync(IAppEntity app,
+            CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
+        }
+
+        IAsyncEnumerable<(AssetFolderDomainObject.State State, long Version)> ISnapshotStore<AssetFolderDomainObject.State>.ReadAllAsync(
+            CancellationToken ct)
+        {
+            return Collection.Find(new BsonDocument(), Batching.Options).ToAsyncEnumerable(ct).Select(x => (Map(x), x.Version));
+        }
+
+        async Task<(AssetFolderDomainObject.State Value, bool Valid, long Version)> ISnapshotStore<AssetFolderDomainObject.State>.ReadAsync(DomainId key,
+            CancellationToken ct)
+        {
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/ReadAsync"))
             {
                 var existing =
                     await Collection.Find(x => x.DocumentId == key)
-                        .FirstOrDefaultAsync();
+                        .FirstOrDefaultAsync(ct);
 
                 if (existing != null)
                 {
-                    return (Map(existing), existing.Version);
+                    return (Map(existing), true, existing.Version);
                 }
 
-                return (null!, EtagVersion.Empty);
+                return (null!, true, EtagVersion.Empty);
             }
         }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State, DomainId>.WriteAsync(DomainId key, AssetFolderDomainObject.State value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteAsync(DomainId key, AssetFolderDomainObject.State value, long oldVersion, long newVersion,
+            CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteAsync"))
             {
-                var entity = SimpleMapper.Map(value, new MongoAssetFolderEntity());
+                var entity = Map(value);
 
-                entity.IndexedAppId = value.AppId.Id;
-
-                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity);
+                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct);
             }
         }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State, DomainId>.ReadAllAsync(Func<AssetFolderDomainObject.State, long, Task> callback, CancellationToken ct)
+        async Task ISnapshotStore<AssetFolderDomainObject.State>.WriteManyAsync(IEnumerable<(DomainId Key, AssetFolderDomainObject.State Value, long Version)> snapshots,
+            CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/WriteManyAsync"))
             {
-                await Collection.Find(new BsonDocument(), options: Batching.Options).ForEachPipedAsync(x => callback(Map(x), x.Version), ct);
+                var updates = snapshots.Select(Map).Select(x =>
+                    new ReplaceOneModel<MongoAssetFolderEntity>(
+                        Filter.Eq(y => y.DocumentId, x.DocumentId),
+                        x)
+                    {
+                        IsUpsert = true
+                    }).ToList();
+
+                if (updates.Count == 0)
+                {
+                    return;
+                }
+
+                await Collection.BulkWriteAsync(updates, BulkUnordered, ct);
             }
         }
 
-        async Task ISnapshotStore<AssetFolderDomainObject.State, DomainId>.RemoveAsync(DomainId key)
+        async Task ISnapshotStore<AssetFolderDomainObject.State>.RemoveAsync(DomainId key,
+            CancellationToken ct)
         {
-            using (Profiler.TraceMethod<MongoAssetFolderRepository>())
+            using (Telemetry.Activities.StartActivity("MongoAssetFolderRepository/RemoveAsync"))
             {
-                await Collection.DeleteOneAsync(x => x.DocumentId == key);
+                await Collection.DeleteOneAsync(x => x.DocumentId == key, ct);
             }
+        }
+
+        private static MongoAssetFolderEntity Map(AssetFolderDomainObject.State value)
+        {
+            var entity = SimpleMapper.Map(value, new MongoAssetFolderEntity());
+
+            entity.IndexedAppId = value.AppId.Id;
+
+            return entity;
+        }
+
+        private static MongoAssetFolderEntity Map((DomainId Key, AssetFolderDomainObject.State Value, long Version) snapshot)
+        {
+            var entity = Map(snapshot.Value);
+
+            entity.DocumentId = snapshot.Key;
+
+            return entity;
         }
 
         private static AssetFolderDomainObject.State Map(MongoAssetFolderEntity existing)

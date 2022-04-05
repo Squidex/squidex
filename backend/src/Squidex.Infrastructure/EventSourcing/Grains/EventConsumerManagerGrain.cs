@@ -1,15 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
 using Orleans.Core;
@@ -32,8 +28,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IGrainRuntime? runtime)
             : base(identity, runtime)
         {
-            Guard.NotNull(eventConsumers, nameof(eventConsumers));
-
             this.eventConsumers = eventConsumers;
         }
 

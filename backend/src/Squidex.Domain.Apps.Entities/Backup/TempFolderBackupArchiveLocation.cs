@@ -5,11 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
@@ -22,31 +18,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public TempFolderBackupArchiveLocation(IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
-
             this.jsonSerializer = jsonSerializer;
         }
 
         public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id)
         {
-            var stream = OpenStream(id);
+            Stream stream;
 
-            if (string.Equals(url.Scheme, "file"))
+            if (string.Equals(url.Scheme, "file", StringComparison.OrdinalIgnoreCase))
             {
-                try
-                {
-                    using (var sourceStream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read))
-                    {
-                        await sourceStream.CopyToAsync(stream);
-                    }
-                }
-                catch (IOException ex)
-                {
-                    throw new BackupRestoreException($"Cannot download the archive: {ex.Message}.", ex);
-                }
+                stream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read);
             }
             else
             {
+                stream = OpenStream(id);
+
                 HttpResponseMessage? response = null;
                 try
                 {
@@ -57,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                         response.EnsureSuccessStatusCode();
 
-                        using (var sourceStream = await response.Content.ReadAsStreamAsync())
+                        await using (var sourceStream = await response.Content.ReadAsStreamAsync())
                         {
                             await sourceStream.CopyToAsync(stream);
                         }

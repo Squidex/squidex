@@ -1,13 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Globalization;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities;
@@ -22,8 +20,6 @@ namespace Squidex.Web.CommandMiddlewares
 
         public ETagCommandMiddleware(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.NotNull(httpContextAccessor, nameof(httpContextAccessor));
-
             this.httpContextAccessor = httpContextAccessor;
         }
 
@@ -42,7 +38,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (command.ExpectedVersion == EtagVersion.Auto)
             {
-                if (TryParseEtag(httpContext, out var expectedVersion))
+                if (httpContext.TryParseEtagVersion(HeaderNames.IfMatch, out var expectedVersion))
                 {
                     command.ExpectedVersion = expectedVersion;
                 }
@@ -66,27 +62,7 @@ namespace Squidex.Web.CommandMiddlewares
 
         private static void SetResponsEtag(HttpContext httpContext, long version)
         {
-            httpContext.Response.Headers[HeaderNames.ETag] = version.ToString();
-        }
-
-        private static bool TryParseEtag(HttpContext httpContext, out long version)
-        {
-            version = default;
-
-            if (httpContext.Request.Headers.TryGetString(HeaderNames.IfMatch, out var etag))
-            {
-                if (etag.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
-                {
-                    etag = etag[2..];
-                }
-
-                if (long.TryParse(etag, NumberStyles.Any, CultureInfo.InvariantCulture, out version))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            httpContext.Response.Headers[HeaderNames.ETag] = version.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

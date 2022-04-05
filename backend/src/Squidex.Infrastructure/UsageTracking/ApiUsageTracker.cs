@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class ApiUsageTracker : IApiUsageTracker
@@ -23,25 +19,36 @@ namespace Squidex.Infrastructure.UsageTracking
             this.usageTracker = usageTracker;
         }
 
-        public async Task<long> GetMonthCallsAsync(string key, DateTime date, string? category)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
         {
             var apiKey = GetKey(key);
 
-            var counters = await usageTracker.GetForMonthAsync(apiKey, date, category);
+            return usageTracker.DeleteAsync(apiKey, ct);
+        }
+
+        public async Task<long> GetMonthCallsAsync(string key, DateTime date, string? category,
+            CancellationToken ct = default)
+        {
+            var apiKey = GetKey(key);
+
+            var counters = await usageTracker.GetForMonthAsync(apiKey, date, category, ct);
 
             return counters.GetInt64(CounterTotalCalls);
         }
 
-        public async Task<long> GetMonthBytesAsync(string key, DateTime date, string? category)
+        public async Task<long> GetMonthBytesAsync(string key, DateTime date, string? category,
+            CancellationToken ct = default)
         {
             var apiKey = GetKey(key);
 
-            var counters = await usageTracker.GetForMonthAsync(apiKey, date, category);
+            var counters = await usageTracker.GetForMonthAsync(apiKey, date, category, ct);
 
             return counters.GetInt64(CounterTotalBytes);
         }
 
-        public Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes)
+        public Task TrackAsync(DateTime date, string key, string? category, double weight, long elapsedMs, long bytes,
+            CancellationToken ct = default)
         {
             var apiKey = GetKey(key);
 
@@ -52,14 +59,15 @@ namespace Squidex.Infrastructure.UsageTracking
                 [CounterTotalBytes] = bytes
             };
 
-            return usageTracker.TrackAsync(date, apiKey, category, counters);
+            return usageTracker.TrackAsync(date, apiKey, category, counters, ct);
         }
 
-        public async Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<(ApiStatsSummary, Dictionary<string, List<ApiStats>> Details)> QueryAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
         {
             var apiKey = GetKey(key);
 
-            var queries = await usageTracker.QueryAsync(apiKey, fromDate, toDate);
+            var queries = await usageTracker.QueryAsync(apiKey, fromDate, toDate, ct);
 
             var details = new Dictionary<string, List<ApiStats>>();
 
@@ -90,7 +98,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var summaryElapsedAvg = CalculateAverage(summaryCalls, summaryElapsed);
 
-            var monthStats = await usageTracker.GetForMonthAsync(apiKey, DateTime.Today, null);
+            var monthStats = await usageTracker.GetForMonthAsync(apiKey, DateTime.Today, null, ct);
 
             var summary = new ApiStatsSummary(
                 summaryElapsedAvg,
@@ -109,7 +117,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
         private static string GetKey(string key)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
+            Guard.NotNullOrEmpty(key);
 
             return $"{key}_API";
         }

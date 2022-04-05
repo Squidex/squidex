@@ -1,37 +1,31 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
-using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class Role : Named
+    public sealed record Role : Named
     {
         private static readonly HashSet<string> ExtraPermissions = new HashSet<string>
         {
-            P.AppComments,
-            P.AppContributorsRead,
-            P.AppHistory,
-            P.AppLanguagesRead,
-            P.AppPatternsRead,
-            P.AppPing,
-            P.AppRolesRead,
-            P.AppSchemasRead,
-            P.AppSearch,
-            P.AppTranslate,
-            P.AppUsage
+            Shared.Permissions.AppComments,
+            Shared.Permissions.AppContributorsRead,
+            Shared.Permissions.AppHistory,
+            Shared.Permissions.AppLanguagesRead,
+            Shared.Permissions.AppPing,
+            Shared.Permissions.AppRolesRead,
+            Shared.Permissions.AppSchemasRead,
+            Shared.Permissions.AppSearch,
+            Shared.Permissions.AppTranslate,
+            Shared.Permissions.AppUsage
         };
 
         public const string Editor = "Editor";
@@ -43,7 +37,6 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public JsonObject Properties { get; }
 
-        [IgnoreDuringEquals]
         public bool IsDefault
         {
             get => Roles.IsDefault(this);
@@ -52,8 +45,8 @@ namespace Squidex.Domain.Apps.Core.Apps
         public Role(string name, PermissionSet permissions, JsonObject properties)
             : base(name)
         {
-            Guard.NotNull(permissions, nameof(permissions));
-            Guard.NotNull(properties, nameof(properties));
+            Guard.NotNull(permissions);
+            Guard.NotNull(properties);
 
             Permissions = permissions;
             Properties = properties;
@@ -87,13 +80,13 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public Role ForApp(string app, bool isFrontend = false)
         {
-            Guard.NotNullOrEmpty(app, nameof(app));
+            Guard.NotNullOrEmpty(app);
 
             var result = new HashSet<Permission>();
 
             if (Permissions.Any())
             {
-                var prefix = P.ForApp(P.App, app).Id;
+                var prefix = Shared.Permissions.ForApp(Shared.Permissions.App, app).Id;
 
                 foreach (var permission in Permissions)
                 {
@@ -105,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             {
                 foreach (var extraPermissionId in ExtraPermissions)
                 {
-                    var extraPermission = P.ForApp(extraPermissionId, app);
+                    var extraPermission = Shared.Permissions.ForApp(extraPermissionId, app);
 
                     result.Add(extraPermission);
                 }

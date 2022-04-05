@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
@@ -71,9 +69,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         }
 
         [Fact]
-        public async Task Should_add_timeout_error_when_regex_is_too_slow()
+        public async Task Should_add_timeout_error_if_regex_is_too_slow()
         {
-            var sut = new PatternValidator(@"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$");
+            var sut = new PatternValidator(@"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$", capture: true);
 
             await sut.ValidateAsync("https://archiverbx.blob.core.windows.net/static/C:/Users/USR/Documents/Projects/PROJ/static/images/full/1234567890.jpg", errors);
 

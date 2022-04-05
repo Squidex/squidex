@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Backup.State;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
@@ -31,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         }
 
         [Fact]
-        public async Task Should_call_grain_when_restoring_backup()
+        public async Task Should_call_grain_if_restoring_backup()
         {
             var grain = A.Fake<IRestoreGrain>();
 
@@ -136,6 +134,20 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await sut.DeleteBackupAsync(appId, backupId);
 
             A.CallTo(() => grain.DeleteAsync(backupId))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_to_clear_backups()
+        {
+            var grain = A.Fake<IBackupGrain>();
+
+            A.CallTo(() => grainFactory.GetGrain<IBackupGrain>(appId.ToString(), null))
+                .Returns(grain);
+
+            await ((IDeleter)sut).DeleteAppAsync(Mocks.App(NamedId.Of(appId, "my-app")), default);
+
+            A.CallTo(() => grain.ClearAsync())
                 .MustHaveHappened();
         }
     }

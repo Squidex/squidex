@@ -1,12 +1,12 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -16,12 +16,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The language specific default value for the field value.
         /// </summary>
-        public LocalizedValue<string[]?> DefaultValues { get; set; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; set; }
 
         /// <summary>
         /// The default value.
         /// </summary>
-        public string[]? DefaultValue { get; set; }
+        public ReadonlyList<string>? DefaultValue { get; set; }
 
         /// <summary>
         /// The minimum allowed items for the field value.
@@ -36,7 +36,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The allowed values for the field value.
         /// </summary>
-        public ReadOnlyCollection<string>? AllowedValues { get; set; }
+        public ReadonlyList<string>? AllowedValues { get; set; }
+
+        /// <summary>
+        /// Indicates whether GraphQL Enum should be created.
+        /// </summary>
+        public bool CreateEnum { get; init; }
 
         /// <summary>
         /// The editor that is used to manage this field.

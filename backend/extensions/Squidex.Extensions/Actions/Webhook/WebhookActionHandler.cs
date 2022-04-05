@@ -1,18 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
+
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Extensions.Actions.Webhook
 {
@@ -23,8 +21,6 @@ namespace Squidex.Extensions.Actions.Webhook
         public WebhookActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
             : base(formatter)
         {
-            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
-
             this.httpClientFactory = httpClientFactory;
         }
 
@@ -45,7 +41,7 @@ namespace Squidex.Extensions.Actions.Webhook
                     requestBody = ToEnvelopeJson(@event);
                 }
 
-                requestSignature = $"{requestBody}{action.SharedSecret}".Sha256Base64();
+                requestSignature = $"{requestBody}{action.SharedSecret}".ToSha256Base64();
             }
 
             var ruleDescription = $"Send event to webhook '{requestUrl}'";
@@ -75,23 +71,24 @@ namespace Squidex.Extensions.Actions.Webhook
 
             foreach (var line in lines)
             {
-                var indexEqual = line.IndexOf('=');
+                var indexEqual = line.IndexOf('=', StringComparison.Ordinal);
 
                 if (indexEqual > 0 && indexEqual < line.Length - 1)
                 {
-                    var key = line.Substring(0, indexEqual);
-                    var val = line[(indexEqual + 1)..];
+                    var headerKey = line[..indexEqual];
+                    var headerValue = line[(indexEqual + 1)..];
 
-                    val = await FormatAsync(val, @event);
+                    headerValue = await FormatAsync(headerValue, @event);
 
-                    headersDictionary[key] = val;
+                    headersDictionary[headerKey] = headerValue;
                 }
             }
 
             return headersDictionary;
         }
 
-        protected override async Task<Result> ExecuteJobAsync(WebhookJob job, CancellationToken ct = default)
+        protected override async Task<Result> ExecuteJobAsync(WebhookJob job,
+            CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
@@ -104,6 +101,12 @@ namespace Squidex.Extensions.Actions.Webhook
                         break;
                     case WebhookMethod.GET:
                         method = HttpMethod.Get;
+                        break;
+                    case WebhookMethod.DELETE:
+                        method = HttpMethod.Delete;
+                        break;
+                    case WebhookMethod.PATCH:
+                        method = HttpMethod.Patch;
                         break;
                 }
 

@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Xunit;
 
@@ -16,15 +12,16 @@ namespace Squidex.Infrastructure.Tasks
 {
     public class PartitionedActionBlockTests
     {
+        private const int Partitions = 10;
+
         [Fact]
         public async Task Should_propagate_in_order()
         {
             var random = new Random();
-            var partitions = 10;
 
-            var lists = new List<int>[partitions];
+            var lists = new List<int>[Partitions];
 
-            for (var i = 0; i < partitions; i++)
+            for (var i = 0; i < Partitions; i++)
             {
                 lists[i] = new List<int>();
             }
@@ -43,7 +40,7 @@ namespace Squidex.Infrastructure.Tasks
                 BoundedCapacity = 100
             });
 
-            for (var i = 0; i < partitions; i++)
+            for (var i = 0; i < Partitions; i++)
             {
                 for (var j = 0; j < 10; j++)
                 {

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading;
-using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -15,18 +13,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 {
     internal sealed class QueryReferrers : OperationBase
     {
-        protected override Task PrepareAsync(CancellationToken ct = default)
+        public override IEnumerable<CreateIndexModel<MongoContentEntity>> CreateIndexes()
         {
-            var index =
-                new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.ReferencedIds)
-                    .Ascending(x => x.IndexedAppId)
-                    .Ascending(x => x.IsDeleted));
-
-            return Collection.Indexes.CreateOneAsync(index, cancellationToken: ct);
+            yield return new CreateIndexModel<MongoContentEntity>(Index
+                .Ascending(x => x.ReferencedIds)
+                .Ascending(x => x.IndexedAppId)
+                .Ascending(x => x.IsDeleted));
         }
 
-        public async Task<bool> CheckExistsAsync(DomainId appId, DomainId contentId)
+        public async Task<bool> CheckExistsAsync(DomainId appId, DomainId contentId,
+            CancellationToken ct)
         {
             var filter =
                 Filter.And(
@@ -37,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
 
             var hasReferrerAsync =
                 await Collection.Find(filter).Only(x => x.Id)
-                    .AnyAsync();
+                    .AnyAsync(ct);
 
             return hasReferrerAsync;
         }

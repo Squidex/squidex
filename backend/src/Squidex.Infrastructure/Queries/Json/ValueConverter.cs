@@ -5,13 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using NJsonSchema;
 using NodaTime;
 using NodaTime.Text;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.Queries.Json
@@ -27,13 +22,20 @@ namespace Squidex.Infrastructure.Queries.Json
             InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
         };
 
-        public static ClrValue? Convert(JsonSchema schema, IJsonValue value, PropertyPath path, List<string> errors)
+        public static ClrValue? Convert(FilterField field, IJsonValue value, PropertyPath path, List<string> errors)
         {
             ClrValue? result = null;
 
-            switch (GetType(schema))
+            var type = field.Schema.Type;
+
+            if (value is JsonNull && type != FilterSchemaType.GeoObject && field.IsNullable)
             {
-                case JsonObjectType.None when schema.Reference?.Format == GeoJson.Format:
+                return ClrValue.Null;
+            }
+
+            switch (type)
+            {
+                case FilterSchemaType.GeoObject:
                     {
                         if (TryParseGeoJson(errors, path, value, out var temp))
                         {
@@ -43,7 +45,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case JsonObjectType.None:
+                case FilterSchemaType.Any:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -59,7 +61,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case JsonObjectType.Boolean:
+                case FilterSchemaType.Boolean:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -73,8 +75,7 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case JsonObjectType.Integer:
-                case JsonObjectType.Number:
+                case FilterSchemaType.Number:
                     {
                         if (value is JsonArray jsonArray)
                         {
@@ -88,48 +89,42 @@ namespace Squidex.Infrastructure.Queries.Json
                         break;
                     }
 
-                case JsonObjectType.String:
+                case FilterSchemaType.Guid:
                     {
-                        if (schema.Format == JsonFormatStrings.Guid)
+                        if (value is JsonArray jsonArray)
                         {
-                            if (value is JsonArray jsonArray)
-                            {
-                                result = ParseArray<Guid>(errors, path, jsonArray, TryParseGuid);
-                            }
-                            else if (TryParseGuid(errors, path, value, out var temp))
-                            {
-                                result = temp;
-                            }
+                            result = ParseArray<Guid>(errors, path, jsonArray, TryParseGuid);
                         }
-                        else if (schema.Format == JsonFormatStrings.DateTime)
+                        else if (TryParseGuid(errors, path, value, out var temp))
                         {
-                            if (value is JsonArray jsonArray)
-                            {
-                                result = ParseArray<Instant>(errors, path, jsonArray, TryParseDateTime);
-                            }
-                            else if (TryParseDateTime(errors, path, value, out var temp))
-                            {
-                                result = temp;
-                            }
-                        }
-                        else
-                        {
-                            if (value is JsonArray jsonArray)
-                            {
-                                result = ParseArray<string>(errors, path, jsonArray, TryParseString!);
-                            }
-                            else if (TryParseString(errors, path, value, out var temp))
-                            {
-                                result = temp;
-                            }
+                            result = temp;
                         }
 
                         break;
                     }
 
-                case JsonObjectType.Object when schema.Format == GeoJson.Format || schema.Reference?.Format == GeoJson.Format:
+                case FilterSchemaType.DateTime:
                     {
-                        if (TryParseGeoJson(errors, path, value, out var temp))
+                        if (value is JsonArray jsonArray)
+                        {
+                            result = ParseArray<Instant>(errors, path, jsonArray, TryParseDateTime);
+                        }
+                        else if (TryParseDateTime(errors, path, value, out var temp))
+                        {
+                            result = temp;
+                        }
+
+                        break;
+                    }
+
+                case FilterSchemaType.StringArray:
+                case FilterSchemaType.String:
+                    {
+                        if (value is JsonArray jsonArray)
+                        {
+                            result = ParseArray<string>(errors, path, jsonArray, TryParseString!);
+                        }
+                        else if (TryParseString(errors, path, value, out var temp))
                         {
                             result = temp;
                         }
@@ -139,7 +134,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 default:
                     {
-                        errors.Add($"Unsupported type {schema.Type} for {path}.");
+                        errors.Add(Errors.WrongType(type.ToString(), path));
                         break;
                     }
             }
@@ -164,6 +159,8 @@ namespace Squidex.Infrastructure.Queries.Json
 
         private static bool TryParseGeoJson(List<string> errors, PropertyPath path, IJsonValue value, out FilterSphere result)
         {
+            const string expected = "Object(geo-json)";
+
             result = default!;
 
             if (value is JsonObject geoObject &&
@@ -176,13 +173,15 @@ namespace Squidex.Infrastructure.Queries.Json
                 return true;
             }
 
-            errors.Add($"Expected Object(geo-json) for path '{path}', but got {value.Type}.");
+            errors.Add(Errors.WrongExpectedType(expected, value.Type.ToString(), path));
 
             return false;
         }
 
         private static bool TryParseBoolean(List<string> errors, PropertyPath path, IJsonValue value, out bool result)
         {
+            const string expected = "Boolean";
+
             result = default;
 
             if (value is JsonBoolean jsonBoolean)
@@ -192,13 +191,15 @@ namespace Squidex.Infrastructure.Queries.Json
                 return true;
             }
 
-            errors.Add($"Expected Boolean for path '{path}', but got {value.Type}.");
+            errors.Add(Errors.WrongExpectedType(expected, value.Type.ToString(), path));
 
             return false;
         }
 
         private static bool TryParseNumber(List<string> errors, PropertyPath path, IJsonValue value, out double result)
         {
+            const string expected = "Number";
+
             result = default;
 
             if (value is JsonNumber jsonNumber)
@@ -208,13 +209,15 @@ namespace Squidex.Infrastructure.Queries.Json
                 return true;
             }
 
-            errors.Add($"Expected Number for path '{path}', but got {value.Type}.");
+            errors.Add(Errors.WrongExpectedType(expected, value.Type.ToString(), path));
 
             return false;
         }
 
         private static bool TryParseString(List<string> errors, PropertyPath path, IJsonValue value, out string? result)
         {
+            const string expected = "String";
+
             result = default;
 
             if (value is JsonString jsonString)
@@ -223,18 +226,16 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 return true;
             }
-            else if (value is JsonNull)
-            {
-                return true;
-            }
 
-            errors.Add($"Expected String for path '{path}', but got {value.Type}.");
+            errors.Add(Errors.WrongExpectedType(expected, value.Type.ToString(), path));
 
             return false;
         }
 
         private static bool TryParseGuid(List<string> errors, PropertyPath path, IJsonValue value, out Guid result)
         {
+            const string expected = "String (Guid)";
+
             result = default;
 
             if (value is JsonString jsonString)
@@ -244,11 +245,11 @@ namespace Squidex.Infrastructure.Queries.Json
                     return true;
                 }
 
-                errors.Add($"Expected Guid String for path '{path}', but got invalid String.");
+                errors.Add(Errors.WrongFormat(expected, path));
             }
             else
             {
-                errors.Add($"Expected Guid String for path '{path}', but got {value.Type}.");
+                errors.Add(Errors.WrongExpectedType(expected, value.Type.ToString(), path));
             }
 
             return false;
@@ -256,6 +257,8 @@ namespace Squidex.Infrastructure.Queries.Json
 
         private static bool TryParseDateTime(List<string> errors, PropertyPath path, IJsonValue value, out Instant result)
         {
+            const string expected = "String (ISO8601 DateTime)";
+
             result = default;
 
             if (value is JsonString jsonString)
@@ -272,11 +275,11 @@ namespace Squidex.Infrastructure.Queries.Json
                     }
                 }
 
-                errors.Add($"Expected ISO8601 DateTime String for path '{path}', but got invalid String.");
+                errors.Add(Errors.WrongFormat(expected, path));
             }
             else
             {
-                errors.Add($"Expected ISO8601 DateTime String for path '{path}', but got {value.Type}.");
+                errors.Add(Errors.WrongExpectedType(expected, value.Type.ToString(), path));
             }
 
             return false;
@@ -323,19 +326,9 @@ namespace Squidex.Infrastructure.Queries.Json
                     }
             }
 
-            errors.Add($"Expected primitive for path '{path}', but got {value.Type}.");
+            errors.Add(Errors.WrongPrimitive(value.Type.ToString(), path));
 
             return false;
-        }
-
-        private static JsonObjectType GetType(JsonSchema schema)
-        {
-            if (schema.Item != null)
-            {
-                return schema.Item.Type;
-            }
-
-            return schema.Type;
         }
     }
 }

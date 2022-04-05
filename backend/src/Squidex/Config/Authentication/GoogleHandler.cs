@@ -1,13 +1,12 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Security.Claims;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Shared.Identity;
@@ -25,11 +24,11 @@ namespace Squidex.Config.Authentication
 
         public override Task CreatingTicket(OAuthCreatingTicketContext context)
         {
-            var nameClaim = context.Identity.FindFirst(ClaimTypes.Name)?.Value;
+            var nameClaim = context.Identity?.FindFirst(ClaimTypes.Name)?.Value;
 
             if (!string.IsNullOrWhiteSpace(nameClaim))
             {
-                context.Identity.AddClaim(new Claim(SquidexClaimTypes.DisplayName, nameClaim));
+                context.Identity?.AddClaim(new Claim(SquidexClaimTypes.DisplayName, nameClaim));
             }
 
             string? pictureUrl = null;
@@ -54,7 +53,7 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrWhiteSpace(pictureUrl))
             {
-                context.Identity.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, pictureUrl));
+                context.Identity?.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, pictureUrl));
             }
 
             return base.CreatingTicket(context);

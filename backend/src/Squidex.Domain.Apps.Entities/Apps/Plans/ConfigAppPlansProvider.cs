@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans
@@ -30,8 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public ConfigAppPlansProvider(IEnumerable<ConfigAppLimitsPlan> config)
         {
-            Guard.NotNull(config, nameof(config));
-
             foreach (var plan in config.OrderBy(x => x.MaxApiCalls).Select(x => x.Clone()))
             {
                 plansList.Add(plan);
@@ -43,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
                 }
             }
 
-            freePlan = plansList.FirstOrDefault(x => x.IsFree) ?? Infinite;
+            freePlan = plansList.Find(x => x.IsFree) ?? Infinite;
         }
 
         public IEnumerable<IAppLimitsPlan> GetAvailablePlans()
@@ -68,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public IAppLimitsPlan? GetPlanUpgradeForApp(IAppEntity app)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             return GetPlanUpgrade(app.Plan?.PlanId);
         }
@@ -89,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Plans
 
         public (IAppLimitsPlan Plan, string PlanId) GetPlanForApp(IAppEntity app)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(app);
 
             var planId = app.Plan?.PlanId;
             var plan = GetPlanCore(planId);

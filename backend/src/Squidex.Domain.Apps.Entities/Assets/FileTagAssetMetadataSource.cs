@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -81,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     var pw = file.Properties.PhotoWidth;
                     var ph = file.Properties.PhotoHeight;
 
-                    if (pw > 0 && pw > 0)
+                    if (pw > 0 && ph > 0)
                     {
                         command.Metadata.SetPixelWidth(pw);
                         command.Metadata.SetPixelHeight(ph);
@@ -129,13 +125,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     TryAddTimeSpan("duration", file.Properties.Duration);
 
+                    TryAddInt("bitsPerSample", file.Properties.BitsPerSample);
                     TryAddInt("audioBitrate", file.Properties.AudioBitrate);
                     TryAddInt("audioChannels", file.Properties.AudioChannels);
                     TryAddInt("audioSampleRate", file.Properties.AudioSampleRate);
-                    TryAddInt("bitsPerSample", file.Properties.BitsPerSample);
                     TryAddInt("imageQuality", file.Properties.PhotoQuality);
-                    TryAddInt("videoWidth", file.Properties.VideoWidth);
-                    TryAddInt("videoHeight", file.Properties.VideoHeight);
+
+                    TryAddInt(AssetMetadata.VideoWidth, file.Properties.VideoWidth);
+                    TryAddInt(AssetMetadata.VideoHeight, file.Properties.VideoHeight);
 
                     TryAddString("description", file.Properties.Description);
                 }
@@ -150,24 +147,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public IEnumerable<string> Format(IAssetEntity asset)
         {
-            var metadata = asset.Metadata;
-
             if (asset.Type == AssetType.Video)
             {
-                if (metadata.TryGetNumber("videoWidth", out var w) &&
-                    metadata.TryGetNumber("videoHeight", out var h))
+                var w = asset.Metadata.GetVideoWidth();
+                var h = asset.Metadata.GetVideoHeight();
+
+                if (w != null && h != null)
                 {
                     yield return $"{w}x{h}pt";
                 }
 
-                if (metadata.TryGetString("duration", out var duration))
+                if (asset.Metadata.TryGetString("duration", out var duration))
                 {
                     yield return duration;
                 }
             }
             else if (asset.Type == AssetType.Audio)
             {
-                if (metadata.TryGetString("duration", out var duration))
+                if (asset.Metadata.TryGetString("duration", out var duration))
                 {
                     yield return duration;
                 }

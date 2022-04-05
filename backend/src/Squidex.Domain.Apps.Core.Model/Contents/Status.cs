@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -36,12 +35,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public bool Equals(Status other)
         {
-            return string.Equals(Name, other.Name);
+            return string.Equals(Name, other.Name, StringComparison.Ordinal);
         }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode();
+            return Name.GetHashCode(StringComparison.Ordinal);
         }
 
         public override string ToString()

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Schemas
@@ -17,18 +18,18 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var lhs = new StringFieldProperties
             {
-                DefaultValues = new LocalizedValue<string?>
+                DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
                 {
                     ["iv"] = "ABC"
-                }
+                })
             };
 
             var rhs = new StringFieldProperties
             {
-                DefaultValues = new LocalizedValue<string?>
+                DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
                 {
                     ["iv"] = "ABC"
-                }
+                })
             };
 
             Assert.Equal(lhs, rhs);
@@ -39,18 +40,18 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var lhs = new TagsFieldProperties
             {
-                DefaultValues = new LocalizedValue<string[]?>
+                DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                 {
-                    ["iv"] = new[] { "A", "B", "C" }
-                }
+                    ["iv"] = ReadonlyList.Create("A", "B", "C")
+                })
             };
 
             var rhs = new TagsFieldProperties
             {
-                DefaultValues = new LocalizedValue<string[]?>
+                DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                 {
-                    ["iv"] = new[] { "A", "B", "C" }
-                }
+                    ["iv"] = ReadonlyList.Create("A", "B", "C")
+                })
             };
 
             Assert.Equal(lhs, rhs);

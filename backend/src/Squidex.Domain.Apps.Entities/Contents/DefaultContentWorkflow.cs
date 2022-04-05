@@ -1,15 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 
@@ -50,6 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public Task<Status> GetInitialStatusAsync(ISchemaEntity schema)
         {
             return Task.FromResult(Status.Draft);
+        }
+
+        public Task<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user)
+        {
+            return Task.FromResult(true);
         }
 
         public Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user)

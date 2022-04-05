@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime;
@@ -21,9 +19,6 @@ namespace Squidex.Infrastructure.Orleans
 
         public ActivationLimit(IGrainActivationContext context, IActivationLimiter limiter)
         {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(limiter, nameof(limiter));
-
             this.context = context;
             this.limiter = limiter;
         }

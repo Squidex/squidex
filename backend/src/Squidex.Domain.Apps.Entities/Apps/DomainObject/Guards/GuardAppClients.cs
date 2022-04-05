@@ -1,7 +1,7 @@
 // ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
     {
         public static void CanAttach(AttachClient command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             Validate.It(e =>
             {
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanRevoke(RevokeClient command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             GetClientOrThrow(app.Clients, command.Id);
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject.Guards
 
         public static void CanUpdate(UpdateClient command, IAppEntity app)
         {
-            Guard.NotNull(command, nameof(command));
+            Guard.NotNull(command);
 
             GetClientOrThrow(app.Clients, command.Id);
 

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Globalization;
 using Fluid;
 using Fluid.Values;
 using NodaTime;
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         private static FluidValue Format(FilterArguments arguments, DateTimeOffset value)
         {
-            var formatted = value.ToString(arguments.At(0).ToStringValue());
+            var formatted = value.ToString(arguments.At(0).ToStringValue(), CultureInfo.InvariantCulture);
 
             return new StringValue(formatted);
         }

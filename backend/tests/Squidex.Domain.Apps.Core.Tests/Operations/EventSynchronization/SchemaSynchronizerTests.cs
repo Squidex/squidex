@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
@@ -18,9 +17,9 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
     public class SchemaSynchronizerTests
     {
         private readonly Func<long> idGenerator;
-        private readonly NamedId<long> stringId = NamedId.Of(13L, "my-value");
-        private readonly NamedId<long> nestedId = NamedId.Of(141L, "my-value");
-        private readonly NamedId<long> arrayId = NamedId.Of(14L, "11-array");
+        private readonly NamedId<long> stringId = NamedId.Of(13L, "myValue");
+        private readonly NamedId<long> nestedId = NamedId.Of(141L, "myValue");
+        private readonly NamedId<long> arrayId = NamedId.Of(14L, "11Array");
         private int fields = 50;
 
         public SchemaSynchronizerTests()
@@ -88,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var previewUrls = new Dictionary<string, string>
             {
                 ["web"] = "Url"
-            };
+            }.ToReadonlyDictionary();
 
             var sourceSchema =
                 new Schema("source");
@@ -152,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaUIFieldsConfigured { FieldsInLists = new FieldNames("2", "1") }
+                new SchemaUIFieldsConfigured { FieldsInLists = FieldNames.Create("2", "1") }
             );
         }
 
@@ -170,7 +169,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaUIFieldsConfigured { FieldsInReferences = new FieldNames("2", "1") }
+                new SchemaUIFieldsConfigured { FieldsInReferences = FieldNames.Create("2", "1") }
             );
         }
 
@@ -188,7 +187,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             var events = sourceSchema.Synchronize(targetSchema, idGenerator);
 
             events.ShouldHaveSameEvents(
-                new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Hide("1")) }
+                new SchemaFieldRulesConfigured { FieldRules = FieldRules.Create(FieldRule.Hide("1")) }
             );
         }
 

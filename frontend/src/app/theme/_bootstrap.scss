@@ -1,0 +1,673 @@
+@import 'mixins';
+@import 'vars';
+
+@import './../../../node_modules/bootstrap/scss/mixins/buttons';
+
+/* stylelint-disable */
+
+//
+// Bade colors
+//
+.badge {
+    & {
+        font-size: .9rem;
+        font-weight: normal;
+        padding: .25rem .6rem;
+    }
+
+    &-primary {
+        background: $color-badge-primary-background;
+        color: $color-badge-primary-foreground;
+    }
+
+    &-secondary {
+        background: $color-badge-secondary-background;
+        color: $color-badge-secondary-foreground;
+    }
+
+    &-success {
+        background: $color-badge-success-background;
+        color: $color-badge-success-foreground;
+    }
+
+    &-info {
+        background: $color-badge-info-background;
+        color: $color-badge-info-foreground;
+    }
+
+    &-warning {
+        background: $color-badge-warning-background;
+        color: $color-badge-warning-foreground;
+    }
+
+    &-danger {
+        background: $color-badge-danger-background;
+        color: $color-badge-danger-foreground;
+    }
+}
+
+.input-group {
+    & {
+        // Fix drop shadow with custom border radius.
+        border: 0;
+        border-radius: $border-radius;
+        box-shadow: $input-shadow;
+        flex-wrap: nowrap;
+    }
+}
+
+.alert {
+    word-break: break-word;
+
+    .alert-link {
+        color: inherit;
+    }
+
+    a {
+        color: inherit;
+    }
+}
+
+.alert-hint {
+    background: lighten($color-theme-brand, 35%);
+    border: 0;
+    border-radius: $border-radius;
+    color: $color-text;
+    font-size: 90%;
+    font-weight: normal;
+    padding-left: 3rem;
+    position: relative;
+
+    &.light {
+        background: $color-white;
+        border: 1px solid $color-border;
+        border-radius: $border-radius;
+    }
+
+    i {
+        @include absolute(1rem, null, null, 1rem);
+        color: $color-theme-brand;
+        font-size: 1.3rem;
+        font-weight: normal;
+        vertical-align: text-bottom;
+    }
+
+    .icon-external-link {
+        color: inherit;
+        font-size: inherit;
+        font-weight: normal;
+        position: static;
+        vertical-align: baseline;
+    }
+}
+
+a {
+    &:disabled,
+    &.disabled {
+        opacity: .8;
+        pointer-events: none;
+    }
+
+    &.btn {
+        &:focus {
+            color: inherit;
+        }
+    }
+
+    &.pointer {
+        cursor: pointer;
+    }
+
+    &.force {
+        & {
+            color: $color-theme-brand !important;
+        }
+
+        &:hover {
+            color: inherit;
+            cursor: pointer;
+            text-decoration: underline !important;
+        }
+    }
+}
+
+.navbar {
+    @include box-shadow-outer(0, 2px, 4px, .2);
+}
+
+.navbar-nav {
+    .nav-link {
+        cursor: pointer;
+    }
+
+    .nav-icon {
+        & {
+            margin-left: .5rem;
+        }
+
+        .nav-link {
+            i {
+                font-size: 1.5rem;
+                font-weight: lighter;
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
+//
+// Restyle dropdown menu.
+//
+.dropdown-menu {
+    // White dropdown menu without border and shadow.
+    & {
+        z-index: 1200;
+    }
+
+    .dropdown-header {
+        font-size: 80%;
+        text-transform: uppercase;
+    }
+
+    .dropdown-divider {
+        margin-left: 1rem;
+        margin-right: 1rem;
+
+        &:first-child {
+            display: none;
+        }
+        
+        &:last-child {
+            display: none;
+        }
+
+        & + .dropdown-divider {
+            display: none;
+        }
+    }
+
+    a {
+        // Special style for menu item to delete something.
+        &.dropdown-item-delete {
+            & {
+                color: $color-theme-error;
+            }
+
+            &:hover {
+                background: $color-theme-error-dark;
+                // Make the color white on active.
+                color: $color-white;
+            }
+
+            &:active {
+                background: $color-theme-error-dark;
+                // Make the color white on active.
+                color: $color-white;
+            }
+
+            &:disabled,
+            &.disabled {
+                color: lighten($color-theme-error, 20%);
+            }
+        }
+    }
+}
+
+//
+// Breadcrump
+//
+.breadcrumb {
+    &.steps {
+        & {
+            border: 1px solid $color-border;
+            border-radius: $border-radius;
+            padding: 0;
+        }
+
+        .breadcrumb-item {
+            & {
+                background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
+                background-position-x: right;
+                background-repeat: no-repeat;
+                background-size: contain;
+                color: $color-text-decent;
+                padding: .75rem 2rem .75rem 1rem;
+
+                a {
+                    color: $color-text-decent !important;
+                    text-align: left;
+                    text-decoration: none;
+                }
+            }
+
+            &.active {
+                color: $color-text;
+
+                a {
+                    color: $color-text !important;
+                }
+            }
+
+            &.done {
+                color: $color-theme-success !important;
+
+                a {
+                    color: $color-theme-success !important;
+                }
+            }
+
+            &:last-child {
+                background: none;
+            }
+
+            &::before {
+                content: none;
+            }
+        }
+    }
+
+    &-item {
+        i {
+            display: none;
+        }
+
+        &::before {
+            color: darken($color-border, 10%);
+        }
+
+        &.done {
+            color: $color-theme-success;
+
+            a {
+                color: $color-theme-success !important;
+            }
+
+            i {
+                display: inline-block;
+            }
+        }
+    }
+}
+
+//
+// Tab control navigation.
+//
+.nav-tabs2 {
+    & .nav-link {
+        & {
+            border-bottom: 2px solid transparent;
+            color: $color-text;
+            cursor: pointer;
+            margin-left: 1rem;
+            margin-right: 1rem;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        &.active {
+            font-weight: bold;
+        }
+
+        &.active,
+        &:hover {
+            border-color: $color-theme-brand;
+        }
+    }
+}
+
+.icon-sm {
+    font-size: 70%;
+}
+
+.icon-decent {
+    opacity: .5;
+}
+
+//
+// Button improvements
+//
+.btn {
+    &.active {
+        box-shadow: none;
+    }
+
+    &-outline-secondary {
+        color: $color-text-decent;
+
+        &:hover {
+            color: $color-text;
+        }
+    }
+
+    // Buttons for external logins.
+    &-github {
+        @include button-variant($color-extern-github, $color-extern-github);
+    }
+
+    &-google {
+        @include button-variant($color-extern-google, $color-extern-google);
+    }
+
+    &-microsoft {
+        @include button-variant($color-extern-microsoft, $color-extern-microsoft);
+    }
+
+    &-twitter {
+        @include button-variant($color-extern-twitter, $color-extern-twitter);
+    }
+
+    // Special radio button.
+    &-radio {
+        & {
+            background: transparent;
+            border: 1px solid $color-border;
+            border-radius: $border-radius;
+            color: $color-text-decent;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: normal;
+            margin-right: .5rem;
+            margin-bottom: .5rem;
+            text-align: center;
+            width: 4.5rem;
+        }
+
+        i {
+            color: $color-border-darker;
+        }
+
+        .radio-label {
+            display: block;
+            font-size: .7rem;
+            font-weight: bold;
+            line-height: 1.5rem;
+            margin-left: -.5rem;
+            margin-right: -.5rem;
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        &.active {
+            & {
+                background: none;
+                border-color: $color-theme-brand;
+                color: $color-theme-brand;
+            }
+
+            i {
+                color: $color-theme-brand;
+            }
+
+            &:hover {
+                color: $color-theme-brand-dark;
+
+                i {
+                    color: $color-theme-brand-dark;
+                }
+            }
+        }
+
+        &:hover {
+            color: $color-theme-brand;
+
+            i {
+                color: $color-theme-brand;
+            }
+        }
+    }
+
+    // Special button groups
+    &-group {
+        .btn-toggle {
+            & {
+                background: $color-white;
+                border: 1px solid $color-theme-secondary;
+            }
+
+            &.btn-primary {
+                @include build-toggle-button($color-theme-brand, $color-badge-primary-background);
+            }
+
+            &.btn-info {
+                @include build-toggle-button($color-theme-info, $color-badge-info-background);
+            }
+
+            &.btn-danger {
+                @include build-toggle-button($color-theme-error, $color-badge-danger-background);
+            }
+
+            &.btn-success {
+                @include build-toggle-button($color-theme-success, $color-badge-success-background);
+            }
+
+            &.btn-warning {
+                @include build-toggle-button($color-theme-warning, $color-badge-warning-background);
+            }
+        }
+
+        .btn + .btn-toggle {
+            margin-left: -2px;
+        }
+    }
+
+    // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
+    &-text {
+        &-primary {
+            @include build-text-button($color-theme-brand);
+        }
+
+        &-secondary {
+            @include build-text-button($color-text-decent);
+        }
+
+        &-danger {
+            @include build-text-button($color-theme-error);
+        }
+
+        &-success {
+            @include build-text-button($color-theme-success);
+        }
+
+        &-info {
+            @include build-text-button($color-theme-info);
+        }
+
+        &-warning {
+            @include build-text-button($color-theme-warning);
+        }
+
+        &-secondary2 {
+            @include build-text-button($color-text);
+        }
+    }
+
+    &-outline-secondary {
+        color: $color-text-decent;
+    }
+
+    &-decent {
+        &:focus {
+            outline: none !important;
+        }
+
+        &:active,
+        &:focus {
+            box-shadow: none !important;
+        }
+    }
+}
+
+$icon-size: 4.5rem;
+
+//
+// Type icons, for example for apps or schemas
+//
+.type {
+    & {
+        margin-bottom: .5rem;
+    }
+
+    &-title {
+        font-weight: bold;
+        margin-bottom: 0;
+        margin-top: -.25rem;
+    }
+
+    &-text {
+        font-size: .9rem;
+    }
+
+    .btn-radio {
+        & {
+            font-size: 1.75rem;
+            font-weight: normal;
+            height: $icon-size;
+            line-height: $icon-size;
+        }
+
+        i {
+            color: $color-theme-brand;
+        }
+
+        .radio-input {
+            display: none;
+        }
+    }
+
+    .radio-input {
+        display: none;
+    }
+}
+
+//
+// Restyle modal dialogs.
+//
+.modal {
+    &-header,
+    &-tabs,
+    &-footer {
+        flex-shrink: 0;
+    }
+
+    &-body {
+        overflow-y: auto;
+    }
+
+    &-header {
+        &.with-tabs {
+            border: 0;
+            padding-bottom: 0;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 2.25rem;
+        }
+    }
+
+    &-tabs {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    &-content {
+        @include box-shadow-outer(0, 8px, 16px, .3);
+        border: 0;
+        border-radius: $border-radius;
+        max-height: 100%;
+    }
+
+    &-fh {
+        .modal-content {
+            min-height: 100%;
+        }
+    }
+
+    &-lg {
+        @media (max-width: 992px) {
+            max-width: 90%;
+        }
+    }
+
+    &-dialog {
+        & {
+            @include absolute(0, 0, 0, 0);
+            z-index: 1100;
+        }
+    }
+
+    &-tabs {
+        background-color: $color-white;
+        border: 0;
+        border-bottom: 1px solid $color-border;
+        padding-bottom: 0;
+        padding-left: .75rem;
+        padding-top: 0;
+    }
+
+    &-footer {
+        padding-bottom: 1.25rem;
+        padding-top: 1.25rem;
+
+        .clearfix {
+            width: 100%;
+        }
+    }
+}
+
+// 
+// Cards
+// 
+.card {
+    &-title {
+        margin-bottom: 1rem;
+    }
+}
+
+// 
+// Table Helpers
+// 
+.table {
+    // Use fixed width for columns.
+    &-fixed {
+        table-layout: fixed;
+    }
+
+    // Vertical align cells.
+    &-middle {
+        td {
+            vertical-align: middle;
+        }
+    }
+
+    // Remove all borders.
+    &-borderless {
+        td,
+        th {
+            border: 0;
+        }
+    }
+
+    &-lesspadding {
+        td {
+            &:first-child {
+                padding-left: 0;
+            }
+
+            &:last-child {
+                padding-right: 0;
+            }
+        }
+    }
+
+    tbody + tbody {
+        border: 0;
+    }
+
+    .form-control {
+        border-bottom-width: 1px;
+    }
+}

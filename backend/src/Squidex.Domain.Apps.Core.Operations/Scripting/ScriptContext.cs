@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 
@@ -21,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public bool TryGetValue<T>(string key, [MaybeNullWhen(false)] out T value)
         {
-            Guard.NotNull(key, nameof(key));
+            Guard.NotNull(key);
 
             value = default!;
 

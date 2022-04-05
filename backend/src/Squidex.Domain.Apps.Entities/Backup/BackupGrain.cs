@@ -1,17 +1,13 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Backup.State;
@@ -21,7 +17,6 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Translations;
-using Squidex.Log;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -31,14 +26,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
+        private readonly IGrainState<BackupState> state;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IBackupArchiveStore backupArchiveStore;
         private readonly IClock clock;
         private readonly IServiceProvider serviceProvider;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
-        private readonly ISemanticLog log;
-        private readonly IGrainState<BackupState> state;
+        private readonly ILogger<BackupGrain> log;
         private readonly IUserResolver userResolver;
         private CancellationTokenSource? currentJobToken;
         private BackupJob? currentJob;
@@ -52,18 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IGrainState<BackupState> state,
             IServiceProvider serviceProvider,
             IUserResolver userResolver,
-            ISemanticLog log)
+            ILogger<BackupGrain> log)
         {
-            Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
-            Guard.NotNull(backupArchiveStore, nameof(backupArchiveStore));
-            Guard.NotNull(clock, nameof(clock));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(state, nameof(state));
-            Guard.NotNull(userResolver, nameof(userResolver));
-            Guard.NotNull(log, nameof(log));
-
             this.backupArchiveLocation = backupArchiveLocation;
             this.backupArchiveStore = backupArchiveStore;
             this.clock = clock;
@@ -88,6 +73,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
             state.Value.Jobs.RemoveAll(x => x.Stopped == null);
 
             await state.WriteAsync();
+        }
+
+        public async Task ClearAsync()
+        {
+            foreach (var backup in state.Value.Jobs)
+            {
+                await backupArchiveStore.DeleteAsync(backup.Id, default);
+            }
+
+            TryDeactivateOnIdle();
+
+            await state.ClearAsync();
         }
 
         public async Task BackupAsync(RefToken actor)
@@ -116,15 +113,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             await state.WriteAsync();
 
+#pragma warning disable MA0042 // Do not use blocking calls in an async method
             Process(job, actor, currentJobToken.Token);
+#pragma warning restore MA0042 // Do not use blocking calls in an async method
         }
 
-        private void Process(BackupJob job, RefToken actor, CancellationToken ct)
+        private void Process(BackupJob job, RefToken actor,
+            CancellationToken ct)
         {
             ProcessAsync(job, actor, ct).Forget();
         }
 
-        private async Task ProcessAsync(BackupJob job, RefToken actor, CancellationToken ct)
+        private async Task ProcessAsync(BackupJob job, RefToken actor,
+            CancellationToken ct)
         {
             var handlers = CreateHandlers();
 
@@ -134,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var appId = DomainId.Create(Key);
 
-                using (var stream = backupArchiveLocation.OpenStream(job.Id))
+                await using (var stream = backupArchiveLocation.OpenStream(job.Id))
                 {
                     using (var writer = await backupArchiveLocation.OpenWriterAsync(stream))
                     {
@@ -144,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                         var context = new BackupContext(appId, userMapping, writer);
 
-                        await eventStore.QueryAsync(async storedEvent =>
+                        await foreach (var storedEvent in eventStore.QueryAllAsync(GetFilter(), ct: ct))
                         {
                             var @event = eventDataFormatter.Parse(storedEvent);
 
@@ -155,22 +156,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                             foreach (var handler in handlers)
                             {
-                                await handler.BackupEventAsync(@event, context);
+                                await handler.BackupEventAsync(@event, context, ct);
                             }
 
-                            writer.WriteEvent(storedEvent);
+                            writer.WriteEvent(storedEvent, ct);
 
                             job.HandledEvents = writer.WrittenEvents;
                             job.HandledAssets = writer.WrittenAttachments;
 
                             lastTimestamp = await WritePeriodically(lastTimestamp);
-                        }, GetFilter(), null, ct);
+                        }
 
                         foreach (var handler in handlers)
                         {
                             ct.ThrowIfCancellationRequested();
 
-                            await handler.BackupAsync(context);
+                            await handler.BackupAsync(context, ct);
                         }
 
                         foreach (var handler in handlers)
@@ -180,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             await handler.CompleteBackupAsync(context);
                         }
 
-                        await userMapping.StoreAsync(writer, userResolver);
+                        await userMapping.StoreAsync(writer, userResolver, ct);
                     }
 
                     stream.Position = 0;
@@ -198,10 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             catch (Exception ex)
             {
-                log.LogError(ex, job.Id.ToString(), (ctx, w) => w
-                    .WriteProperty("action", "makeBackup")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("backupId", ctx));
+                log.LogError(ex, "Faield to make backup with backup id '{backupId}'.", job.Id);
 
                 job.Status = JobStatus.Failed;
             }
@@ -238,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async Task DeleteAsync(DomainId id)
         {
-            var job = state.Value.Jobs.FirstOrDefault(x => x.Id == id);
+            var job = state.Value.Jobs.Find(x => x.Id == id);
 
             if (job == null)
             {
@@ -266,14 +264,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             try
             {
+#pragma warning disable MA0040 // Flow the cancellation token
                 await backupArchiveStore.DeleteAsync(job.Id);
+#pragma warning restore MA0040 // Flow the cancellation token
             }
             catch (Exception ex)
             {
-                log.LogError(ex, job.Id.ToString(), (logOperationId, w) => w
-                    .WriteProperty("action", "deleteBackup")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("operationId", logOperationId));
+                log.LogError(ex, "Failed to make remove with backup id '{backupId}'.", job.Id);
             }
 
             state.Value.Jobs.Remove(job);

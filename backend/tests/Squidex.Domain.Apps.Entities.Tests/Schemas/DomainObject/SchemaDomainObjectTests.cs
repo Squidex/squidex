@@ -1,22 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
-using Squidex.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
@@ -37,8 +35,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
         public SchemaDomainObjectTests()
         {
-            sut = new SchemaDomainObject(Store, A.Dummy<ISemanticLog>());
+            var log = A.Fake<ILogger<SchemaDomainObject>>();
+
+            sut = new SchemaDomainObject(PersistenceFactory, log);
+#pragma warning disable MA0056 // Do not call overridable members in constructor
             sut.Setup(Id);
+#pragma warning restore MA0056 // Do not call overridable members in constructor
         }
 
         [Fact]
@@ -55,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var properties = new SchemaProperties();
 
-            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, IsSingleton = true };
+            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Type = SchemaType.Singleton };
 
             var result = await PublishAsync(command);
 
@@ -64,12 +66,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
             Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-            Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-            Assert.True(sut.Snapshot.SchemaDef.IsSingleton);
+            Assert.Equal(SchemaType.Singleton, sut.Snapshot.SchemaDef.Type);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, command.IsSingleton) })
+                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, SchemaType.Singleton) })
                 );
         }
 
@@ -175,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaFieldRulesConfigured { FieldRules = new FieldRules(FieldRule.Disable("field1")) })
+                    CreateEvent(new SchemaFieldRulesConfigured { FieldRules = FieldRules.Create(FieldRule.Disable("field1")) })
                 );
         }
 
@@ -184,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var command = new ConfigureUIFields
             {
-                FieldsInLists = new FieldNames(fieldName)
+                FieldsInLists = FieldNames.Create(fieldName)
             };
 
             await ExecuteCreateAsync();
@@ -207,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
         {
             var command = new ConfigureUIFields
             {
-                FieldsInReferences = new FieldNames(fieldName)
+                FieldsInReferences = FieldNames.Create(fieldName)
             };
 
             await ExecuteCreateAsync();
@@ -291,7 +292,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                 PreviewUrls = new Dictionary<string, string>
                 {
                     ["Web"] = "web-url"
-                }
+                }.ToReadonlyDictionary()
             };
 
             await ExecuteCreateAsync();

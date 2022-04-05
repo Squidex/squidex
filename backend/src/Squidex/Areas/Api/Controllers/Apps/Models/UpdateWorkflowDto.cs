@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -30,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The schema ids.
         /// </summary>
-        public List<DomainId>? SchemaIds { get; set; }
+        public ReadonlyList<DomainId>? SchemaIds { get; set; }
 
         /// <summary>
         /// The initial step.
@@ -42,9 +41,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var workflow = new Workflow(
                 Initial,
-                Steps?.ToDictionary(
+                Steps?.ToReadonlyDictionary(
                     x => x.Key,
-                    x => x.Value?.ToStep()!),
+                    x => x.Value?.ToWorkflowStep()!),
                 SchemaIds,
                 Name);
 

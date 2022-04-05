@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Kafka
 {
     public class KafkaProducerOptions : ProducerConfig
     {
-        public SchemaRegistryConfig SchemaRegistry { get;  set; }
+        public SchemaRegistryConfig SchemaRegistry { get; set; }
 
         public AvroSerializerConfig AvroSerializer { get; set; }
 

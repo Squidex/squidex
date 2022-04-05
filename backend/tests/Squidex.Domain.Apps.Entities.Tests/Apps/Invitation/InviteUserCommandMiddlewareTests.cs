@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -37,9 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 new CommandContext(command, commandBus)
                     .Complete(app);
 
-            var user = CreateUser("123");
+            var user = UserMocks.User("123", command.ContributorId);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, default))
                 .Returns((user, true));
 
             await sut.HandleAsync(context);
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             Assert.Same(context.Result<InvitedResult>().App, app);
             Assert.Equal(user.Id, command.ContributorId);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, default))
                 .MustHaveHappened();
         }
 
@@ -60,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 new CommandContext(command, commandBus)
                     .Complete(app);
 
-            var user = CreateUser("123");
+            var user = UserMocks.User("123", command.ContributorId);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, default))
                 .Returns((user, false));
 
             await sut.HandleAsync(context);
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             Assert.Same(context.Result<IAppEntity>(), app);
             Assert.Equal(user.Id, command.ContributorId);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync("me@email.com", true))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(user.Email, true, default))
                 .MustHaveHappened();
         }
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -100,17 +100,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._))
+            A.CallTo(() => userResolver.CreateUserIfNotExistsAsync(A<string>._, A<bool>._, A<CancellationToken>._))
                 .MustNotHaveHappened();
-        }
-
-        private static IUser CreateUser(string id)
-        {
-            var user = A.Fake<IUser>();
-
-            A.CallTo(() => user.Id).Returns(id);
-
-            return user;
         }
     }
 }

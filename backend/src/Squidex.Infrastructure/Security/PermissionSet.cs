@@ -5,61 +5,54 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Security
 {
-    public sealed class PermissionSet : IReadOnlyCollection<Permission>
+    public sealed class PermissionSet : ReadonlyList<Permission>
     {
         public static readonly PermissionSet Empty = new PermissionSet(Array.Empty<string>());
 
-        private readonly List<Permission> permissions;
         private readonly Lazy<string> display;
 
-        public int Count
-        {
-            get => permissions.Count;
-        }
-
         public PermissionSet(params Permission[] permissions)
-            : this((IEnumerable<Permission>)permissions)
+            : this(permissions?.ToList()!)
         {
         }
 
         public PermissionSet(params string[] permissions)
-            : this(permissions?.Select(x => new Permission(x))!)
+            : this(permissions?.Select(x => new Permission(x)).ToList()!)
         {
         }
 
         public PermissionSet(IEnumerable<string> permissions)
-            : this(permissions?.Select(x => new Permission(x))!)
+            : this(permissions?.Select(x => new Permission(x)).ToList()!)
         {
         }
 
         public PermissionSet(IEnumerable<Permission> permissions)
+            : this(permissions?.ToList()!)
         {
-            Guard.NotNull(permissions, nameof(permissions));
+        }
 
-            this.permissions = permissions.ToList();
-
-            display = new Lazy<string>(() => string.Join(";", this.permissions));
+        public PermissionSet(IList<Permission> permissions)
+            : base(permissions)
+        {
+            display = new Lazy<string>(() => string.Join(";", this));
         }
 
         public PermissionSet Add(string permission)
         {
-            Guard.NotNullOrEmpty(permission, nameof(permission));
+            Guard.NotNullOrEmpty(permission);
 
             return Add(new Permission(permission));
         }
 
         public PermissionSet Add(Permission permission)
         {
-            Guard.NotNull(permission, nameof(permission));
+            Guard.NotNull(permission);
 
-            return new PermissionSet(permissions.Union(Enumerable.Repeat(permission, 1)).Distinct());
+            return new PermissionSet(this.Union(Enumerable.Repeat(permission, 1)).Distinct());
         }
 
         public bool Allows(Permission? other)
@@ -69,7 +62,7 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            return permissions.Any(x => x.Allows(other));
+            return this.Any(x => x.Allows(other));
         }
 
         public bool Includes(Permission? other)
@@ -79,7 +72,7 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            return permissions.Any(x => x.Includes(other));
+            return this.Any(x => x.Includes(other));
         }
 
         public override string ToString()
@@ -89,17 +82,7 @@ namespace Squidex.Infrastructure.Security
 
         public IEnumerable<string> ToIds()
         {
-            return permissions.Select(x => x.Id);
-        }
-
-        public IEnumerator<Permission> GetEnumerator()
-        {
-            return permissions.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return permissions.GetEnumerator();
+            return this.Select(x => x.Id);
         }
     }
 }

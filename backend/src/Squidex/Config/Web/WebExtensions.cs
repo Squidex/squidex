@@ -1,18 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure.Json;
@@ -39,7 +32,7 @@ namespace Squidex.Config.Web
 
         public static IApplicationBuilder UseSquidexLocalization(this IApplicationBuilder app)
         {
-            var supportedCultures = new[] { "en", "nl", "it" };
+            var supportedCultures = new[] { "en", "nl", "it", "zh" };
 
             var localizationOptions = new RequestLocalizationOptions()
                 .SetDefaultCulture(supportedCultures[0])
@@ -51,11 +44,23 @@ namespace Squidex.Config.Web
             return app;
         }
 
-        public static IApplicationBuilder UseSquidexTracking(this IApplicationBuilder app)
+        public static IApplicationBuilder UseSquidexLogging(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<RequestLogPerformanceMiddleware>();
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseSquidexUsage(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<UsageMiddleware>();
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseSquidexExceptionHandling(this IApplicationBuilder app)
         {
             app.UseMiddleware<RequestExceptionMiddleware>();
-            app.UseMiddleware<RequestLogPerformanceMiddleware>();
-            app.UseMiddleware<UsageMiddleware>();
 
             return app;
         }
@@ -128,7 +133,8 @@ namespace Squidex.Config.Web
         public static void UseSquidexCors(this IApplicationBuilder app)
         {
             app.UseCors(builder => builder
-                .AllowAnyOrigin()
+                .SetIsOriginAllowed(x => true)
+                .AllowCredentials()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
         }

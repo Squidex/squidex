@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
@@ -25,29 +22,35 @@ namespace Migrations.Migrations
             this.eventStore = eventStore;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             if (eventStore is MongoEventStore mongoEventStore)
             {
                 var collection = mongoEventStore.RawCollection;
 
-                var filterer = Builders<BsonDocument>.Filter;
-                var updater = Builders<BsonDocument>.Update;
+                var filter = Builders<BsonDocument>.Filter;
 
-                var writesBatches = new List<WriteModel<BsonDocument>>();
+                var updates = Builders<BsonDocument>.Update;
+
+                var writes = new List<WriteModel<BsonDocument>>();
+                var writeOptions = new BulkWriteOptions
+                {
+                    IsOrdered = false
+                };
 
                 async Task WriteAsync(WriteModel<BsonDocument>? model, bool force)
                 {
                     if (model != null)
                     {
-                        writesBatches.Add(model);
+                        writes.Add(model);
                     }
 
-                    if (writesBatches.Count == 1000 || (force && writesBatches.Count > 0))
+                    if (writes.Count == 1000 || (force && writes.Count > 0))
                     {
-                        await collection.BulkWriteAsync(writesBatches);
+                        await collection.BulkWriteAsync(writes, writeOptions, ct);
 
-                        writesBatches.Clear();
+                        writes.Clear();
                     }
                 }
 
@@ -65,11 +68,11 @@ namespace Migrations.Migrations
                         {
                             var appId = NamedId<Guid>.Parse(appIdValue.AsString, Guid.TryParse).Id.ToString();
 
-                            var eventUpdate = updater.Set($"Events.{index}.Metadata.AppId", appId);
+                            var eventUpdate = updates.Set($"Events.{index}.Metadata.AppId", appId);
 
                             if (update != null)
                             {
-                                update = updater.Combine(update, eventUpdate);
+                                update = updates.Combine(update, eventUpdate);
                             }
                             else
                             {
@@ -82,11 +85,11 @@ namespace Migrations.Migrations
 
                     if (update != null)
                     {
-                        var write = new UpdateOneModel<BsonDocument>(filterer.Eq("_id", commit["_id"].AsString), update);
+                        var write = new UpdateOneModel<BsonDocument>(filter.Eq("_id", commit["_id"].AsString), update);
 
                         await WriteAsync(write, false);
                     }
-                });
+                }, ct);
 
                 await WriteAsync(null, true);
             }

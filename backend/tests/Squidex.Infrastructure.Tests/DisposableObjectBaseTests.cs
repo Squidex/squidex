@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Xunit;
 
 namespace Squidex.Infrastructure
@@ -28,7 +27,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_not_throw_exception_when_not_disposed()
+        public void Should_not_throw_exception_if_not_disposed()
         {
             var sut = new MyDisposableObject();
 
@@ -49,7 +48,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public void Should_throw_exception_when_disposed()
+        public void Should_throw_exception_if_disposed()
         {
             var sut = new MyDisposableObject();
 

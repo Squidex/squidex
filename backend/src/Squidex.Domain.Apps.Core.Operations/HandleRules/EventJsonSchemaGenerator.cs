@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
@@ -26,8 +24,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public EventJsonSchemaGenerator(JsonSchemaGenerator schemaGenerator)
         {
-            Guard.NotNull(schemaGenerator, nameof(schemaGenerator));
-
             this.schemaGenerator = schemaGenerator;
 
             schemas = new Lazy<Dictionary<string, JsonSchema>>(GenerateSchemas);
@@ -35,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public JsonSchema? GetSchema(string typeName)
         {
-            Guard.NotNull(typeName, nameof(typeName));
+            Guard.NotNull(typeName);
 
             return schemas.Value.GetOrDefault(typeName);
         }

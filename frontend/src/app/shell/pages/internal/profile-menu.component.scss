@@ -1,0 +1,38 @@
+@import 'mixins';
+@import 'vars';
+
+.user-picture {
+    margin-right: .5rem;
+}
+
+.dropdown {
+    &-item {
+        cursor: pointer;
+    }
+
+    &-info {
+        font-size: $font-small;
+        font-weight: normal;
+        line-height: 1.4rem;
+    }
+
+    &-menu {
+        &.open {
+            display: block;
+        }
+    }
+
+    &-submenu {
+        position: relative;
+
+        .dropdown-menu {
+            @include absolute(0, null, null, -10rem);
+        }
+    }
+}
+
+@media (max-width: 1000px) {
+    .nav-item-help {
+        display: none;
+    }
+}

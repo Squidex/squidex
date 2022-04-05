@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -18,12 +15,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         Task StartRestoreAsync(RefToken actor, Uri url, string? newAppName);
 
-        Task<IRestoreJob?> GetRestoreAsync();
+        Task<IRestoreJob?> GetRestoreAsync(
+            CancellationToken ct = default);
 
-        Task<List<IBackupJob>> GetBackupsAsync(DomainId appId);
+        Task<List<IBackupJob>> GetBackupsAsync(DomainId appId,
+            CancellationToken ct = default);
 
-        Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId);
+        Task<IBackupJob?> GetBackupAsync(DomainId appId, DomainId backupId,
+            CancellationToken ct = default);
 
-        Task DeleteBackupAsync(DomainId appId, DomainId backupId);
+        Task DeleteBackupAsync(DomainId appId, DomainId backupId,
+            CancellationToken ct = default);
     }
 }

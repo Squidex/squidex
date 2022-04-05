@@ -1,11 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Globalization;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 target[i] = Map(arr[i], engine);
             }
 
-            return engine.Array.Construct(target);
+            return engine.Realm.Intrinsics.Array.Construct(target);
         }
 
         private static JsValue FromObject(JsonObject obj, Engine engine)
@@ -59,10 +59,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
             foreach (var (key, value) in obj)
             {
-                target.FastAddProperty(key, Map(value, engine), false, true, true);
+                target.FastAddProperty(key, Map(value, engine), true, true, true);
             }
-
-            target.PreventExtensions();
 
             return target;
         }
@@ -107,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                 for (var i = 0; i < arr.Length; i++)
                 {
-                    result.Add(Map(arr.Get(i.ToString())));
+                    result.Add(Map(arr.Get(i.ToString(CultureInfo.InvariantCulture))));
                 }
 
                 return result;

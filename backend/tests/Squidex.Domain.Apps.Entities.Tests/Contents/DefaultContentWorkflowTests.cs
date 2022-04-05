@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Xunit;
@@ -38,6 +37,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await sut.GetInitialStatusAsync(null!);
 
             Assert.Equal(Status.Draft, result);
+        }
+
+        [Fact]
+        public async Task Should_allow_publish_on_create()
+        {
+            var result = await sut.CanPublishInitialAsync(null!, null);
+
+            Assert.True(result);
         }
 
         [Fact]

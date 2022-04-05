@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -11,25 +11,15 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.DefaultValues
 {
     public sealed class DefaultValueFactory : IFieldPropertiesVisitor<IJsonValue, DefaultValueFactory.Args>
     {
         private static readonly DefaultValueFactory Instance = new DefaultValueFactory();
 
-        public readonly struct Args
-        {
-            public readonly Instant Now;
-
-            public readonly string Partition;
-
-            public Args(Instant now, string partition)
-            {
-                Now = now;
-
-                Partition = partition;
-            }
-        }
+        public record struct Args(Instant Now, string Partition);
 
         private DefaultValueFactory()
         {
@@ -37,8 +27,8 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public static IJsonValue CreateDefaultValue(IField field, Instant now, string partition)
         {
-            Guard.NotNull(field, nameof(field));
-            Guard.NotNull(partition, nameof(partition));
+            Guard.NotNull(field);
+            Guard.NotNull(partition);
 
             return field.RawProperties.Accept(Instance, new Args(now, partition));
         }
@@ -60,6 +50,16 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             var value = GetDefaultValue(properties.DefaultValue, properties.DefaultValues, args.Partition);
 
             return JsonValue.Create(value);
+        }
+
+        public IJsonValue Visit(ComponentFieldProperties properties, Args args)
+        {
+            return JsonValue.Null;
+        }
+
+        public IJsonValue Visit(ComponentsFieldProperties properties, Args args)
+        {
+            return JsonValue.Array();
         }
 
         public IJsonValue Visit(GeolocationFieldProperties properties, Args args)
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
             return value;
         }
 
-        private static IJsonValue Array(string[]? values)
+        private static IJsonValue Array(IEnumerable<string>? values)
         {
             if (values != null)
             {

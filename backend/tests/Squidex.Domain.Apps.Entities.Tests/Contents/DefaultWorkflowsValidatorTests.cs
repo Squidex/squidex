@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -15,6 +12,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -30,10 +28,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var schema = Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, false, default))
                 .Returns(Task.FromResult<ISchemaEntity?>(null));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false, default))
                 .Returns(schema);
 
             sut = new DefaultWorkflowsValidator(appProvider);
@@ -60,8 +58,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, Workflow.EmptySteps, new List<DomainId> { schemaId.Id }))
-                .Update(id2, new Workflow(default, Workflow.EmptySteps, new List<DomainId> { schemaId.Id }));
+                .Update(id1, new Workflow(default, null, ReadonlyList.Create(schemaId.Id)))
+                .Update(id2, new Workflow(default, null, ReadonlyList.Create(schemaId.Id)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
@@ -79,8 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, Workflow.EmptySteps, new List<DomainId> { oldSchemaId }))
-                .Update(id2, new Workflow(default, Workflow.EmptySteps, new List<DomainId> { oldSchemaId }));
+                .Update(id1, new Workflow(default, null, ReadonlyList.Create(oldSchemaId)))
+                .Update(id2, new Workflow(default, null, ReadonlyList.Create(oldSchemaId)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
@@ -96,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty
                 .Add(id1, "workflow1")
                 .Add(id2, "workflow2")
-                .Update(id1, new Workflow(default, Workflow.EmptySteps, new List<DomainId> { schemaId.Id }));
+                .Update(id1, new Workflow(default, null, ReadonlyList.Create(schemaId.Id)));
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 

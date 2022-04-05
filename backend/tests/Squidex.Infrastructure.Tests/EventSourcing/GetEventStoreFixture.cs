@@ -5,58 +5,43 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading.Tasks;
-using EventStore.ClientAPI;
-using EventStore.ClientAPI.Projections;
+using EventStore.Client;
 using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class GetEventStoreFixture : IDisposable
     {
-        private readonly IEventStoreConnection connection;
+        private readonly EventStoreClientSettings settings;
 
         public GetEventStore EventStore { get; }
 
         public GetEventStoreFixture()
         {
-            connection = EventStoreConnection.Create("ConnectTo=tcp://admin:changeit@localhost:1113; HeartBeatTimeout=500; MaxReconnections=-1");
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
-            EventStore = new GetEventStore(connection, TestUtils.DefaultSerializer, "test", "localhost");
-            EventStore.InitializeAsync().Wait();
+            settings = EventStoreClientSettings.Create(TestConfig.Configuration["eventStore:configuration"]);
+
+            EventStore = new GetEventStore(settings, TestUtils.DefaultSerializer);
+            EventStore.InitializeAsync(default).Wait();
         }
 
         public void Dispose()
         {
             CleanupAsync().Wait();
-
-            connection.Dispose();
         }
 
         private async Task CleanupAsync()
         {
-            var endpoints = await Dns.GetHostAddressesAsync("localhost");
-            var endpoint = new IPEndPoint(endpoints.First(x => x.AddressFamily == AddressFamily.InterNetwork), 2113);
+            var projectionsManager = new EventStoreProjectionManagementClient(settings);
 
-            var credentials = connection.Settings.DefaultUserCredentials;
-
-            var projectionsManager =
-                new ProjectionsManager(
-                    connection.Settings.Log, endpoint,
-                    connection.Settings.OperationTimeout);
-
-            foreach (var projection in await projectionsManager.ListAllAsync(credentials))
+            await foreach (var projection in projectionsManager.ListAllAsync())
             {
                 var name = projection.Name;
 
-                if (name.StartsWith("by-test", StringComparison.OrdinalIgnoreCase))
+                if (name.StartsWith("by-squidex-test", StringComparison.OrdinalIgnoreCase))
                 {
-                    await projectionsManager.DisableAsync(name, credentials);
-                    await projectionsManager.DeleteAsync(name, true, credentials);
+                    await projectionsManager.DisableAsync(name);
                 }
             }
         }

@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -15,5 +15,7 @@ namespace Squidex.Domain.Apps.Events.Apps
         public string Id { get; set; }
 
         public string Secret { get; set; }
+
+        public string? Role { get; set; }
     }
 }

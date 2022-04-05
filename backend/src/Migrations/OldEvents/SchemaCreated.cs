@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
@@ -33,7 +32,7 @@ namespace Migrations.OldEvents
 
         public IEvent Migrate()
         {
-            var schema = new Schema(Name, Properties, Singleton);
+            var schema = new Schema(Name, Properties, Singleton ? SchemaType.Singleton : SchemaType.Default);
 
             if (Publish)
             {
@@ -50,7 +49,11 @@ namespace Migrations.OldEvents
 
                     var partitioning = Partitioning.FromString(eventField.Partitioning);
 
-                    var field = eventField.Properties.CreateRootField(totalFields, eventField.Name, partitioning);
+                    var field =
+                        eventField.Properties.CreateRootField(
+                            totalFields,
+                            eventField.Name, partitioning,
+                            eventField);
 
                     if (field is ArrayField arrayField && eventField.Nested?.Length > 0)
                     {
@@ -58,42 +61,16 @@ namespace Migrations.OldEvents
                         {
                             totalFields++;
 
-                            var nestedField = nestedEventField.Properties.CreateNestedField(totalFields, nestedEventField.Name);
-
-                            if (nestedEventField.IsHidden)
-                            {
-                                nestedField = nestedField.Hide();
-                            }
-
-                            if (nestedEventField.IsDisabled)
-                            {
-                                nestedField = nestedField.Disable();
-                            }
-
-                            if (nestedEventField.IsLocked)
-                            {
-                                nestedField = nestedField.Lock();
-                            }
+                            var nestedField =
+                                nestedEventField.Properties.CreateNestedField(
+                                    totalFields,
+                                    nestedEventField.Name,
+                                    nestedEventField);
 
                             arrayField = arrayField.AddField(nestedField);
                         }
 
                         field = arrayField;
-                    }
-
-                    if (eventField.IsHidden)
-                    {
-                        field = field.Hide();
-                    }
-
-                    if (eventField.IsDisabled)
-                    {
-                        field = field.Disable();
-                    }
-
-                    if (eventField.IsLocked)
-                    {
-                        field = field.Lock();
                     }
 
                     schema = schema.AddField(field);

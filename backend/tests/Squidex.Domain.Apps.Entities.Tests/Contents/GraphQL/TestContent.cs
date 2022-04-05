@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -20,90 +19,168 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             version
             created
             createdBy
+            createdByUser {
+              id
+              email
+              displayName
+            }
+            editToken
             lastModified
             lastModifiedBy
+            lastModifiedByUser {
+              id
+              email
+              displayName
+            }
             status
             statusColor
+            newStatus
+            newStatusColor
             url
             data {
-                gql_2Numbers {
-                    iv
+              myJson {
+                iv
+                ivValue: iv(path: ""value"")
+              }
+              myString {
+                iv
+              }
+              myStringEnum {
+                iv
+              }
+              myLocalizedString {
+                de_DE
+              }
+              myNumber {
+                iv
+              }
+              myBoolean {
+                iv
+              }
+              myDatetime {
+                iv
+              }
+              myGeolocation {
+                iv
+              }
+              myComponent__Dynamic {
+                iv
+              }
+              myComponent {
+                iv {
+                  schemaId
+                  schemaRef1Field
                 }
-                gql_2Numbers2 {
-                    iv
+              }
+              myComponents__Dynamic {
+                iv
+              }
+              myComponents {
+                iv {
+                  __typename
+                  ... on MyRefSchema1Component {
+                    schemaId
+                    schemaRef1Field
+                  }
+                  ... on MyRefSchema2Component {
+                    schemaId
+                    schemaRef2Field
+                  }
                 }
-                content {
-                    iv
+              }
+              myTags {
+                iv
+              }
+              myTagsEnum {
+                iv
+              }
+              myArray {
+                iv {
+                  nestedNumber
+                  nestedBoolean
                 }
-                myString {
-                    de
-                }
-                myString2 {
-                    iv
-                }
-                myNumber {
-                    iv
-                }
-                myNumber2 {
-                    iv
-                }
-                myBoolean {
-                    iv
-                }
-                myDatetime {
-                    iv
-                }
-                myJson {
-                    iv
-                }
-                myGeolocation {
-                    iv
-                }
-                myTags {
-                    iv
-                }
-                myLocalized {
-                    de_DE
-                }
-                myArray {
-                    iv {
-                        nestedNumber
-                        nestedNumber2
-                        nestedBoolean
-                    }
-                }
+              }
             }";
 
-        public static IEnrichedContentEntity Create(NamedId<DomainId> appId, NamedId<DomainId> schemaId, DomainId id, DomainId refId, DomainId assetId, ContentData? data = null)
+        public const string AllFlatFields = @"
+            id
+            version
+            created
+            createdBy
+            createdByUser {
+              id
+              email
+              displayName
+            }
+            editToken
+            lastModified
+            lastModifiedBy
+            lastModifiedByUser {
+              id
+              email
+              displayName
+            }
+            status
+            statusColor
+            newStatus
+            newStatusColor
+            url
+            flatData {
+              myJson
+              myJsonValue: myJson(path: ""value"")
+              myString
+              myStringEnum
+              myLocalizedString
+              myNumber
+              myBoolean
+              myDatetime
+              myGeolocation
+              myComponent__Dynamic
+              myComponent {
+                schemaId
+                schemaRef1Field
+              }
+              myComponents__Dynamic
+              myComponents {
+                __typename
+                ... on MyRefSchema1Component {
+                  schemaId
+                  schemaRef1Field
+                }
+                ... on MyRefSchema2Component {
+                  schemaId
+                  schemaRef2Field
+                }
+              }
+              myTags
+              myTagsEnum
+              myArray {
+                nestedNumber
+                nestedBoolean
+              }
+            }";
+
+        public static IEnrichedContentEntity Create(DomainId id, DomainId refId = default, DomainId assetId = default, ContentData? data = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
             data ??=
                 new ContentData()
+                    .AddField("my-localized-string",
+                        new ContentFieldData()
+                            .AddLocalized("de-DE", "de-DE"))
                     .AddField("my-string",
                         new ContentFieldData()
-                            .AddLocalized("de", "value"))
-                    .AddField("my-string2",
-                        new ContentFieldData()
                             .AddInvariant(null))
+                    .AddField("my-string-enum",
+                        new ContentFieldData()
+                            .AddInvariant("EnumA"))
                     .AddField("my-assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId.ToString())))
-                    .AddField("2_numbers",
-                        new ContentFieldData()
-                            .AddInvariant(22))
-                    .AddField("2-numbers",
-                        new ContentFieldData()
-                            .AddInvariant(23))
-                    .AddField("content",
-                        new ContentFieldData()
-                            .AddInvariant(24))
                     .AddField("my-number",
                         new ContentFieldData()
                             .AddInvariant(1.0))
-                    .AddField("my_number",
-                        new ContentFieldData()
-                            .AddInvariant(null))
                     .AddField("my-boolean",
                         new ContentFieldData()
                             .AddInvariant(true))
@@ -113,6 +190,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-tags",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array("tag1", "tag2")))
+                    .AddField("my-tags-enum",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array("EnumA", "EnumB")))
                     .AddField("my-references",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(refId.ToString())))
@@ -121,38 +201,57 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddInvariant(JsonValue.Array(refId.ToString())))
                     .AddField("my-geolocation",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("latitude", 10)
+                                    .Add("longitude", 20)))
+                    .AddField("my-component",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add(Component.Discriminator, TestSchemas.Ref1.Id)
+                                    .Add("schemaRef1Field", "Component1")))
+                    .AddField("my-components",
+                        new ContentFieldData()
+                            .AddInvariant(
+                                JsonValue.Array(
+                                    JsonValue.Object()
+                                        .Add(Component.Discriminator, TestSchemas.Ref1.Id)
+                                        .Add("schemaRef1Field", "Component1"),
+                                    JsonValue.Object()
+                                        .Add(Component.Discriminator, TestSchemas.Ref2.Id)
+                                        .Add("schemaRef2Field", "Component2"))))
                     .AddField("my-json",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("value", 1)))
-                    .AddField("my-localized",
-                        new ContentFieldData()
-                            .AddLocalized("de-DE", "de-DE"))
+                            .AddInvariant(
+                                JsonValue.Object()
+                                    .Add("value", 1)))
                     .AddField("my-array",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(
                                 JsonValue.Object()
                                     .Add("nested-number", 10)
-                                    .Add("nested_number", null)
                                     .Add("nested-boolean", true),
                                 JsonValue.Object()
                                     .Add("nested-number", 20)
-                                    .Add("nested_number", null)
                                     .Add("nested-boolean", false))));
 
             var content = new ContentEntity
             {
                 Id = id,
-                AppId = appId,
+                AppId = TestApp.DefaultId,
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
-                LastModifiedBy = RefToken.User("user2"),
+                LastModifiedBy = RefToken.Client("client1"),
                 Data = data,
-                SchemaId = schemaId,
+                SchemaId = TestSchemas.DefaultId,
                 Status = Status.Draft,
-                StatusColor = "red"
+                StatusColor = "red",
+                NewStatus = Status.Published,
+                NewStatusColor = "blue"
             };
 
             return content;
@@ -171,15 +270,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var content = new ContentEntity
             {
                 Id = id,
+                AppId = TestApp.DefaultId,
                 Version = 1,
                 Created = now,
                 CreatedBy = RefToken.User("user1"),
+                EditToken = $"token_{id}",
                 LastModified = now,
                 LastModifiedBy = RefToken.User("user2"),
                 Data = data,
                 SchemaId = schemaId,
                 Status = Status.Draft,
-                StatusColor = "red"
+                StatusColor = "red",
+                NewStatus = Status.Published,
+                NewStatusColor = "blue"
             };
 
             return content;
@@ -192,47 +295,89 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 id = content.Id,
                 version = 1,
                 created = content.Created,
-                createdBy = "subject:user1",
+                createdBy = content.CreatedBy.ToString(),
+                createdByUser = new
+                {
+                    id = content.CreatedBy.Identifier,
+                    email = $"{content.CreatedBy.Identifier}@email.com",
+                    displayName = $"name_{content.CreatedBy.Identifier}"
+                },
+                editToken = $"token_{content.Id}",
                 lastModified = content.LastModified,
-                lastModifiedBy = "subject:user2",
+                lastModifiedBy = content.LastModifiedBy.ToString(),
+                lastModifiedByUser = new
+                {
+                    id = content.LastModifiedBy.Identifier,
+                    email = $"{content.LastModifiedBy}",
+                    displayName = content.LastModifiedBy.Identifier
+                },
                 status = "DRAFT",
                 statusColor = "red",
+                newStatus = "PUBLISHED",
+                newStatusColor = "blue",
                 url = $"contents/my-schema/{content.Id}",
                 data = Data(content)
             };
         }
 
-        public static object Data(IContentEntity content, DomainId refId = default, DomainId assetId = default)
+        public static object FlatResponse(IEnrichedContentEntity content)
+        {
+            return new
+            {
+                id = content.Id,
+                version = 1,
+                created = content.Created,
+                createdBy = content.CreatedBy.ToString(),
+                createdByUser = new
+                {
+                    id = content.CreatedBy.Identifier,
+                    email = $"{content.CreatedBy.Identifier}@email.com",
+                    displayName = $"name_{content.CreatedBy.Identifier}"
+                },
+                editToken = $"token_{content.Id}",
+                lastModified = content.LastModified,
+                lastModifiedBy = content.LastModifiedBy.ToString(),
+                lastModifiedByUser = new
+                {
+                    id = content.LastModifiedBy.Identifier,
+                    email = $"{content.LastModifiedBy}",
+                    displayName = content.LastModifiedBy.Identifier
+                },
+                status = "DRAFT",
+                statusColor = "red",
+                newStatus = "PUBLISHED",
+                newStatusColor = "blue",
+                url = $"contents/my-schema/{content.Id}",
+                flatData = FlatData(content)
+            };
+        }
+
+        public static object Input(IContentEntity content, DomainId refId = default, DomainId assetId = default)
         {
             var result = new Dictionary<string, object>
             {
-                ["gql_2Numbers"] = new
+                ["myJson"] = new
                 {
-                    iv = 22.0
-                },
-                ["gql_2Numbers2"] = new
-                {
-                    iv = 23.0
-                },
-                ["content"] = new
-                {
-                    iv = 24.0
+                    iv = new
+                    {
+                        value = 1
+                    },
                 },
                 ["myString"] = new
                 {
-                    de = "value"
+                    iv = (string?)null,
                 },
-                ["myString2"] = new
+                ["myStringEnum"] = new
                 {
-                    iv = (object?)null
+                    iv = "EnumA",
+                },
+                ["myLocalizedString"] = new
+                {
+                    de_DE = "de-DE"
                 },
                 ["myNumber"] = new
                 {
                     iv = 1.0
-                },
-                ["myNumber2"] = new
-                {
-                    iv = (object?)null
                 },
                 ["myBoolean"] = new
                 {
@@ -242,19 +387,36 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 {
                     iv = content.LastModified.ToString()
                 },
-                ["myJson"] = new
-                {
-                    iv = new
-                    {
-                        value = 1
-                    }
-                },
                 ["myGeolocation"] = new
                 {
                     iv = new
                     {
                         latitude = 10,
                         longitude = 20
+                    }
+                },
+                ["myComponent"] = new
+                {
+                    iv = new Dictionary<string, object>
+                    {
+                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                        ["schemaRef1Field"] = "Component1"
+                    }
+                },
+                ["myComponents"] = new
+                {
+                    iv = new[]
+                    {
+                        new Dictionary<string, object>
+                        {
+                            ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                            ["schemaRef1Field"] = "Component1"
+                        },
+                        new Dictionary<string, object>
+                        {
+                            ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
+                            ["schemaRef2Field"] = "Component2"
+                        },
                     }
                 },
                 ["myTags"] = new
@@ -265,9 +427,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         "tag2"
                     }
                 },
-                ["myLocalized"] = new
+                ["myTagsEnum"] = new
                 {
-                    de_DE = "de-DE"
+                    iv = new[]
+                    {
+                        "EnumA",
+                        "EnumB"
+                    }
                 },
                 ["myArray"] = new
                 {
@@ -276,13 +442,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new
                         {
                             nestedNumber = 10.0,
-                            nestedNumber2 = (object?)null,
                             nestedBoolean = true
                         },
                         new
                         {
                             nestedNumber = 20.0,
-                            nestedNumber2 = (object?)null,
                             nestedBoolean = false
                         }
                     }
@@ -318,6 +482,223 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     }
                 };
             }
+
+            return result;
+        }
+
+        private static object Data(IContentEntity content)
+        {
+            var result = new Dictionary<string, object>
+            {
+                ["myJson"] = new
+                {
+                    iv = new
+                    {
+                        value = 1
+                    },
+                    ivValue = 1
+                },
+                ["myString"] = new
+                {
+                    iv = (string?)null,
+                },
+                ["myStringEnum"] = new
+                {
+                    iv = "EnumA",
+                },
+                ["myLocalizedString"] = new
+                {
+                    de_DE = "de-DE"
+                },
+                ["myNumber"] = new
+                {
+                    iv = 1.0
+                },
+                ["myBoolean"] = new
+                {
+                    iv = true
+                },
+                ["myDatetime"] = new
+                {
+                    iv = content.LastModified.ToString()
+                },
+                ["myGeolocation"] = new
+                {
+                    iv = new
+                    {
+                        latitude = 10,
+                        longitude = 20
+                    }
+                },
+                ["myComponent__Dynamic"] = new
+                {
+                    iv = new Dictionary<string, object>
+                    {
+                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                        ["schemaRef1Field"] = "Component1"
+                    }
+                },
+                ["myComponent"] = new
+                {
+                    iv = new Dictionary<string, object>
+                    {
+                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                        ["schemaRef1Field"] = "Component1"
+                    }
+                },
+                ["myComponents__Dynamic"] = new
+                {
+                    iv = new[]
+                    {
+                        new Dictionary<string, object>
+                        {
+                            ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                            ["schemaRef1Field"] = "Component1"
+                        },
+                        new Dictionary<string, object>
+                        {
+                            ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
+                            ["schemaRef2Field"] = "Component2"
+                        },
+                    }
+                },
+                ["myComponents"] = new
+                {
+                    iv = new object[]
+                    {
+                        new Dictionary<string, object>
+                        {
+                            ["__typename"] = "MyRefSchema1Component",
+                            ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                            ["schemaRef1Field"] = "Component1"
+                        },
+                        new Dictionary<string, object>
+                        {
+                            ["__typename"] = "MyRefSchema2Component",
+                            ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
+                            ["schemaRef2Field"] = "Component2"
+                        },
+                    }
+                },
+                ["myTags"] = new
+                {
+                    iv = new[]
+                    {
+                        "tag1",
+                        "tag2"
+                    }
+                },
+                ["myTagsEnum"] = new
+                {
+                    iv = new[]
+                    {
+                        "EnumA",
+                        "EnumB"
+                    }
+                },
+                ["myArray"] = new
+                {
+                    iv = new[]
+                    {
+                        new
+                        {
+                            nestedNumber = 10.0,
+                            nestedBoolean = true
+                        },
+                        new
+                        {
+                            nestedNumber = 20.0,
+                            nestedBoolean = false
+                        }
+                    }
+                }
+            };
+
+            return result;
+        }
+
+        private static object FlatData(IContentEntity content)
+        {
+            var result = new Dictionary<string, object?>
+            {
+                ["myJson"] = new
+                {
+                    value = 1
+                },
+                ["myJsonValue"] = 1,
+                ["myString"] = null,
+                ["myStringEnum"] = "EnumA",
+                ["myLocalizedString"] = "de-DE",
+                ["myNumber"] = 1.0,
+                ["myBoolean"] = true,
+                ["myDatetime"] = content.LastModified.ToString(),
+                ["myGeolocation"] = new
+                {
+                    latitude = 10,
+                    longitude = 20
+                },
+                ["myComponent__Dynamic"] = new Dictionary<string, object>
+                {
+                    ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                    ["schemaRef1Field"] = "Component1"
+                },
+                ["myComponent"] = new Dictionary<string, object>
+                {
+                    ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                    ["schemaRef1Field"] = "Component1"
+                },
+                ["myComponents__Dynamic"] = new[]
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                        ["schemaRef1Field"] = "Component1"
+                    },
+                    new Dictionary<string, object>
+                    {
+                        ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
+                        ["schemaRef2Field"] = "Component2"
+                    },
+                },
+                ["myComponents"] = new object[]
+                {
+                    new Dictionary<string, object>
+                    {
+                        ["__typename"] = "MyRefSchema1Component",
+                        ["schemaId"] = TestSchemas.Ref1.Id.ToString(),
+                        ["schemaRef1Field"] = "Component1"
+                    },
+                    new Dictionary<string, object>
+                    {
+                        ["__typename"] = "MyRefSchema2Component",
+                        ["schemaId"] = TestSchemas.Ref2.Id.ToString(),
+                        ["schemaRef2Field"] = "Component2"
+                    },
+                },
+                ["myTags"] = new[]
+                {
+                    "tag1",
+                    "tag2"
+                },
+                ["myTagsEnum"] = new[]
+                {
+                    "EnumA",
+                    "EnumB"
+                },
+                ["myArray"] = new[]
+                {
+                    new
+                    {
+                        nestedNumber = 10.0,
+                        nestedBoolean = true
+                    },
+                    new
+                    {
+                        nestedNumber = 20.0,
+                        nestedBoolean = false
+                    }
+                }
+            };
 
             return result;
         }

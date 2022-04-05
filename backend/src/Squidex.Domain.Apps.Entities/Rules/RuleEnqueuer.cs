@@ -1,13 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -37,12 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             IRuleEventRepository ruleEventRepository,
             IRuleService ruleService)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(cache, nameof(cache));
-            Guard.NotNull(localCache, nameof(localCache));
-            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(ruleService, nameof(ruleService));
-
             this.appProvider = appProvider;
 
             this.cache = cache;
@@ -53,22 +44,36 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public async Task EnqueueAsync(Rule rule, DomainId ruleId, Envelope<IEvent> @event)
         {
-            Guard.NotNull(rule, nameof(rule));
+            Guard.NotNull(rule);
             Guard.NotNull(@event, nameof(@event));
 
-            var jobs = await ruleService.CreateJobsAsync(rule, ruleId, @event);
-
-            foreach (var (job, ex) in jobs)
+            var ruleContext = new RuleContext
             {
-                await ruleEventRepository.EnqueueAsync(job, ex);
+                Rule = rule,
+                RuleId = ruleId
+            };
+
+            var jobs = ruleService.CreateJobsAsync(@event, ruleContext);
+
+            await foreach (var job in jobs)
+            {
+                if (job.Job != null && job.SkipReason == SkipReason.None)
+                {
+                    await ruleEventRepository.EnqueueAsync(job.Job, job.EnrichmentError);
+                }
             }
         }
 
         public async Task On(Envelope<IEvent> @event)
         {
-            using (localCache.StartContext())
+            if (@event.Headers.Restored())
             {
-                if (@event.Payload is AppEvent appEvent)
+                return;
+            }
+
+            if (@event.Payload is AppEvent appEvent)
+            {
+                using (localCache.StartContext())
                 {
                     var rules = await GetRulesAsync(appEvent.AppId.Id);
 

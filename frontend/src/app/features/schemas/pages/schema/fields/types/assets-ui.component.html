@@ -1,0 +1,45 @@
+
+<div [formGroup]="fieldForm">
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_previewMode">{{ 'schemas.fieldTypes.assets.previewMode' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <select class="form-select" id="{{field.fieldId}}_previewMode" formControlName="previewMode">
+                <option value="ImageAndFileName">{{ 'schemas.fieldTypes.assets.previewImageAndFileName' | sqxTranslate }}</option>
+                <option value="Image">{{ 'schemas.fieldTypes.assets.previewImage' | sqxTranslate }}</option>
+                <option value="FileName">{{ 'schemas.fieldTypes.assets.previewFileName' | sqxTranslate }}</option>
+            </select>
+
+            <sqx-form-hint>
+                {{ 'schemas.fieldTypes.assets.previewModeHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldResolveFirst" formControlName="resolveFirst">
+                <label class="form-check-label" for="{{field.fieldId}}_fieldResolveFirst">
+                    {{ 'schemas.fieldTypes.assets.resolve' | sqxTranslate }}
+                </label>
+            </div>
+
+            <sqx-form-hint>
+                {{ 'schemas.fieldTypes.assets.resolveHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_folderId">{{ 'schemas.fieldTypes.assets.folderId' | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-asset-folder-dropdown formControlName="folderId"></sqx-asset-folder-dropdown>
+
+            <sqx-form-hint>
+                {{ 'schemas.fieldTypes.assets.folderIdHint' | sqxTranslate }}
+            </sqx-form-hint>
+        </div>
+    </div>
+</div>

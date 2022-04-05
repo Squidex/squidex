@@ -167,6 +167,54 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
+        public void Should_format_component_field()
+        {
+            var value = JsonValue.Object();
+
+            var field = Fields.Component(1, "field", Partitioning.Invariant);
+
+            var formatted = StringFormatter.Format(field, value);
+
+            Assert.Equal("{ Component }", formatted);
+        }
+
+        [Fact]
+        public void Should_format_components_field_without_items()
+        {
+            var value = JsonValue.Array();
+
+            var field = Fields.Components(1, "field", Partitioning.Invariant);
+
+            var formatted = StringFormatter.Format(field, value);
+
+            Assert.Equal("0 Components", formatted);
+        }
+
+        [Fact]
+        public void Should_format_components_field_with_single_item()
+        {
+            var value = JsonValue.Array(JsonValue.Object());
+
+            var field = Fields.Components(1, "field", Partitioning.Invariant);
+
+            var formatted = StringFormatter.Format(field, value);
+
+            Assert.Equal("1 Component", formatted);
+        }
+
+        [Fact]
+        public void Should_format_components_field_with_multiple_items()
+        {
+            var value = JsonValue.Array(JsonValue.Object(), JsonValue.Object());
+
+            var field = Fields.Components(1, "field", Partitioning.Invariant);
+
+            var formatted = StringFormatter.Format(field, value);
+
+            Assert.Equal("2 Components", formatted);
+        }
+
+        [Fact]
         public void Should_format_datetime_field()
         {
             var value = JsonValue.Create("2019-01-19T12:00:00Z");

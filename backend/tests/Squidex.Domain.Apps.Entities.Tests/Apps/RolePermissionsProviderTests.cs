@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -34,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_provide_all_permissions()
         {
-            A.CallTo(() => appProvider.GetSchemasAsync(A<DomainId>._))
+            A.CallTo(() => appProvider.GetSchemasAsync(A<DomainId>._, default))
                 .Returns(new List<ISchemaEntity>
                 {
                     Mocks.Schema(appId, NamedId.Of(DomainId.NewGuid(), "schema1")),

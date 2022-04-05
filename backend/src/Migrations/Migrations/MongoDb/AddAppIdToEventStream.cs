@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Tasks;
 
 namespace Migrations.Migrations.MongoDb
 {
@@ -26,13 +25,14 @@ namespace Migrations.Migrations.MongoDb
             this.database = database;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(
+            CancellationToken ct)
         {
             const int SizeOfBatch = 1000;
             const int SizeOfQueue = 20;
 
-            var collectionOld = database.GetCollection<BsonDocument>("Events");
-            var collectionNew = database.GetCollection<BsonDocument>("Events2");
+            var collectionV1 = database.GetCollection<BsonDocument>("Events");
+            var collectionV2 = database.GetCollection<BsonDocument>("Events2");
 
             var batchBlock = new BatchBlock<BsonDocument>(SizeOfBatch, new GroupingDataflowBlockOptions
             {
@@ -46,75 +46,86 @@ namespace Migrations.Migrations.MongoDb
 
             var actionBlock = new ActionBlock<BsonDocument[]>(async batch =>
             {
-                var writes = new List<WriteModel<BsonDocument>>();
-
-                foreach (var document in batch)
+                try
                 {
-                    var eventStream = document["EventStream"].AsString;
+                    var writes = new List<WriteModel<BsonDocument>>();
 
-                    if (TryGetAppId(document, out var appId))
+                    foreach (var document in batch)
                     {
-                        if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
+                        var eventStream = document["EventStream"].AsString;
+
+                        if (TryGetAppId(document, out var appId))
                         {
-                            var indexOfType = eventStream.IndexOf('-');
-                            var indexOfId = indexOfType + 1;
-
-                            var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
-
-                            if (indexOfOldId > 0)
+                            if (!eventStream.StartsWith("app-", StringComparison.OrdinalIgnoreCase))
                             {
-                                indexOfId = indexOfOldId + 2;
+                                var indexOfType = eventStream.IndexOf('-', StringComparison.Ordinal);
+                                var indexOfId = indexOfType + 1;
+
+                                var indexOfOldId = eventStream.LastIndexOf("--", StringComparison.OrdinalIgnoreCase);
+
+                                if (indexOfOldId > 0)
+                                {
+                                    indexOfId = indexOfOldId + 2;
+                                }
+
+                                var domainType = eventStream[..indexOfType];
+                                var domainId = eventStream[indexOfId..];
+
+                                var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
+                                var newStreamName = $"{domainType}-{newDomainId}";
+
+                                document["EventStream"] = newStreamName;
+
+                                foreach (var @event in document["Events"].AsBsonArray)
+                                {
+                                    var metadata = @event["Metadata"].AsBsonDocument;
+
+                                    metadata["AggregateId"] = newDomainId;
+                                }
                             }
-
-                            var domainType = eventStream.Substring(0, indexOfType);
-                            var domainId = eventStream[indexOfId..];
-
-                            var newDomainId = DomainId.Combine(DomainId.Create(appId), DomainId.Create(domainId)).ToString();
-                            var newStreamName = $"{domainType}-{newDomainId}";
-
-                            document["EventStream"] = newStreamName;
 
                             foreach (var @event in document["Events"].AsBsonArray)
                             {
                                 var metadata = @event["Metadata"].AsBsonDocument;
 
-                                metadata["AggregateId"] = newDomainId;
+                                metadata.Remove("AppId");
                             }
                         }
 
-                        foreach (var @event in document["Events"].AsBsonArray)
-                        {
-                            var metadata = @event["Metadata"].AsBsonDocument;
+                        var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].AsString);
 
-                            metadata.Remove("AppId");
-                        }
+                        writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                        {
+                            IsUpsert = true
+                        });
                     }
 
-                    var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].AsString);
-
-                    writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
+                    if (writes.Count > 0)
                     {
-                        IsUpsert = true
-                    });
+                        await collectionV2.BulkWriteAsync(writes, writeOptions, ct);
+                    }
                 }
-
-                if (writes.Count > 0)
+                catch (OperationCanceledException ex)
                 {
-                    await collectionNew.BulkWriteAsync(writes, writeOptions);
+                    // Dataflow swallows operation cancelled exception.
+                    throw new AggregateException(ex);
                 }
             }, new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
-                MaxMessagesPerTask = 1,
+                MaxMessagesPerTask = 10,
                 BoundedCapacity = SizeOfQueue
             });
 
-            batchBlock.LinkTo(actionBlock, new DataflowLinkOptions
-            {
-                PropagateCompletion = true
-            });
+            batchBlock.BidirectionalLinkTo(actionBlock);
 
-            await collectionOld.Find(new BsonDocument()).ForEachAsync(batchBlock.SendAsync);
+            await foreach (var commit in collectionV1.Find(new BsonDocument()).ToAsyncEnumerable(ct: ct))
+            {
+                if (!await batchBlock.SendAsync(commit, ct))
+                {
+                    break;
+                }
+            }
 
             batchBlock.Complete();
 

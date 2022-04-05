@@ -5,13 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
 #pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
@@ -24,25 +21,26 @@ namespace Squidex.Domain.Users
 
         public DefaultUserResolver(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited)
+        public async Task<(IUser? User, bool Created)> CreateUserIfNotExistsAsync(string email, bool invited = false,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(email, nameof(email));
+            Guard.NotNullOrEmpty(email);
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
                 try
                 {
-                    var user = await userService.CreateAsync(email, new UserValues
+                    var values = new UserValues
                     {
                         Invited = invited
-                    });
+                    };
+
+                    var user = await userService.CreateAsync(email, values, ct: ct);
 
                     return (user, true);
                 }
@@ -50,19 +48,20 @@ namespace Squidex.Domain.Users
                 {
                 }
 
-                var found = await FindByIdOrEmailAsync(email);
+                var found = await FindByIdOrEmailAsync(email, ct);
 
                 return (found, false);
             }
         }
 
-        public async Task SetClaimAsync(string id, string type, string value)
+        public async Task SetClaimAsync(string id, string type, string value, bool silent = false,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
-            Guard.NotNullOrEmpty(type, nameof(type));
-            Guard.NotNullOrEmpty(value, nameof(value));
+            Guard.NotNullOrEmpty(id);
+            Guard.NotNullOrEmpty(type);
+            Guard.NotNullOrEmpty(value);
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
@@ -74,76 +73,79 @@ namespace Squidex.Domain.Users
                     }
                 };
 
-                await userService.UpdateAsync(id, values);
+                await userService.UpdateAsync(id, values, silent, ct);
             }
         }
 
-        public async Task<IUser?> FindByIdAsync(string id)
+        public async Task<IUser?> FindByIdAsync(string id,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(id);
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                return await userService.FindByIdAsync(id);
+                return await userService.FindByIdAsync(id, ct);
             }
         }
 
-        public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail)
+        public async Task<IUser?> FindByIdOrEmailAsync(string idOrEmail,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(idOrEmail, nameof(idOrEmail));
+            Guard.NotNullOrEmpty(idOrEmail);
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                if (idOrEmail.Contains("@"))
+                if (idOrEmail.Contains('@', StringComparison.Ordinal))
                 {
-                    return await userService.FindByEmailAsync(idOrEmail);
+                    return await userService.FindByEmailAsync(idOrEmail, ct);
                 }
                 else
                 {
-                    return await userService.FindByIdAsync(idOrEmail);
+                    return await userService.FindByIdAsync(idOrEmail, ct);
                 }
             }
         }
 
-        public async Task<List<IUser>> QueryAllAsync()
+        public async Task<List<IUser>> QueryAllAsync(
+            CancellationToken ct = default)
         {
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userService.QueryAsync(take: int.MaxValue);
+                var result = await userService.QueryAsync(take: int.MaxValue, ct: ct);
 
                 return result.ToList();
             }
         }
 
-        public async Task<List<IUser>> QueryByEmailAsync(string email)
+        public async Task<List<IUser>> QueryByEmailAsync(string email,
+            CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(email, nameof(email));
-
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userService.QueryAsync(email);
+                var result = await userService.QueryAsync(email, ct: ct);
 
-                return result.ToList();
+                return result.Where(x => !x.Claims.IsHidden()).ToList();
             }
         }
 
-        public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids)
+        public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids,
+            CancellationToken ct = default)
         {
-            Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(ids);
 
-            using (var scope = serviceProvider.CreateScope())
+            await using (var scope = serviceProvider.CreateAsyncScope())
             {
                 var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-                var result = await userService.QueryAsync(ids);
+                var result = await userService.QueryAsync(ids, ct);
 
                 return result.OfType<IUser>().ToDictionary(x => x.Id);
             }

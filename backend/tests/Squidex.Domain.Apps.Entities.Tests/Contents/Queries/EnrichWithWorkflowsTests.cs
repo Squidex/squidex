@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
@@ -45,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => workflow.GetNextAsync(content, content.Status, requestContext.User))
                 .Returns(nexts);
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
             Assert.Equal(nexts, content.NextStatuses);
         }
@@ -55,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Draft };
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
             Assert.Equal(Status.Published, content.NextStatuses?.Single().Status);
 
@@ -68,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var content = new ContentEntity { SchemaId = schemaId, IsSingleton = true, Status = Status.Published };
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
             Assert.Empty(content.NextStatuses);
 
@@ -84,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
             Assert.Equal(StatusColors.Published, content.StatusColor);
         }
@@ -97,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => workflow.GetInfoAsync(content, content.NewStatus.Value))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
             Assert.Equal(StatusColors.Archived, content.NewStatusColor);
         }
@@ -110,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => workflow.GetInfoAsync(content, content.ScheduleJob.Status))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
-            await sut.EnrichAsync(requestContext, new[] { content }, null!);
+            await sut.EnrichAsync(requestContext, new[] { content }, null!, default);
 
             Assert.Equal(StatusColors.Archived, content.ScheduledStatusColor);
         }
@@ -125,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 
-            await sut.EnrichAsync(ctx, new[] { content }, null!);
+            await sut.EnrichAsync(ctx, new[] { content }, null!, default);
 
             Assert.Equal(StatusColors.Draft, content.StatusColor);
         }
@@ -140,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 
-            await sut.EnrichAsync(ctx, new[] { content }, null!);
+            await sut.EnrichAsync(ctx, new[] { content }, null!, default);
 
             Assert.True(content.CanUpdate);
         }
@@ -152,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var ctx = new Context(Mocks.ApiUser(), Mocks.App(appId)).Clone(b => b.WithResolveFlow(false));
 
-            await sut.EnrichAsync(ctx, new[] { content }, null!);
+            await sut.EnrichAsync(ctx, new[] { content }, null!, default);
 
             Assert.False(content.CanUpdate);
 

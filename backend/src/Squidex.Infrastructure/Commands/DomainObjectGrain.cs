@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Orleans;
 
@@ -28,7 +26,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected DomainObjectGrain(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+            Guard.NotNull(serviceProvider);
 
             domainObject = serviceProvider.GetRequiredService<T>();
         }

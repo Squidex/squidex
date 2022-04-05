@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
@@ -19,25 +15,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
 
         public EnrichForCaching(IRequestCache requestCache)
         {
-            Guard.NotNull(requestCache, nameof(requestCache));
-
             this.requestCache = requestCache;
         }
 
-        public Task EnrichAsync(Context context)
+        public Task EnrichAsync(Context context,
+            CancellationToken ct)
         {
             context.AddCacheHeaders(requestCache);
 
             return Task.CompletedTask;
         }
 
-        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas)
+        public async Task EnrichAsync(Context context, IEnumerable<ContentEntity> contents, ProvideSchema schemas,
+            CancellationToken ct)
         {
             var app = context.App;
 
             foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
             {
-                var schema = await schemas(group.Key);
+                ct.ThrowIfCancellationRequested();
+
+                var (schema, _) = await schemas(group.Key);
 
                 foreach (var content in group)
                 {

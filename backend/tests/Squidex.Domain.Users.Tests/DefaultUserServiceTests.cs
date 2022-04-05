@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Squidex.Infrastructure;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -36,7 +33,9 @@ namespace Squidex.Domain.Users
             A.CallTo(userManager).WithReturnType<Task<IdentityResult>>()
                 .Returns(IdentityResult.Success);
 
-            sut = new DefaultUserService(userManager, userFactory, Enumerable.Repeat(userEvents, 1), A.Fake<ISemanticLog>());
+            var log = A.Fake<ILogger<DefaultUserService>>();
+
+            sut = new DefaultUserService(userManager, userFactory, Enumerable.Repeat(userEvents, 1), log);
         }
 
         [Fact]
@@ -179,10 +178,10 @@ namespace Squidex.Domain.Users
 
             await sut.CreateAsync(values.Email, values);
 
-            A.CallTo(() => userEvents.OnUserRegistered(A<IUser>.That.Matches(x => x.Identity == identity)))
+            A.CallTo(() => userEvents.OnUserRegisteredAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
                 .MustHaveHappened();
 
-            A.CallTo(() => userEvents.OnConsentGiven(A<IUser>.That.Matches(x => x.Identity == identity)))
+            A.CallTo(() => userEvents.OnConsentGivenAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
                 .MustNotHaveHappened();
 
             A.CallTo(() => userManager.AddClaimsAsync(identity, HasClaim(SquidexClaimTypes.Permissions)))
@@ -209,7 +208,7 @@ namespace Squidex.Domain.Users
 
             await sut.CreateAsync(identity.Email, values);
 
-            A.CallTo(() => userEvents.OnConsentGiven(A<IUser>.That.Matches(x => x.Identity == identity)))
+            A.CallTo(() => userEvents.OnConsentGivenAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
                 .MustHaveHappened();
         }
 
@@ -299,6 +298,19 @@ namespace Squidex.Domain.Users
         }
 
         [Fact]
+        public async Task Update_should_not_invoke_events_if_silent()
+        {
+            var update = new UserValues();
+
+            var identity = CreateIdentity(found: true);
+
+            await sut.UpdateAsync(identity.Id, update, true);
+
+            A.CallTo(() => userEvents.OnUserUpdatedAsync(A<IUser>.That.Matches(x => x.Identity == identity), A<IUser>._))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Update_should_do_nothing_for_new_update()
         {
             var update = new UserValues();
@@ -307,7 +319,7 @@ namespace Squidex.Domain.Users
 
             await sut.UpdateAsync(identity.Id, update);
 
-            A.CallTo(() => userEvents.OnUserUpdated(A<IUser>.That.Matches(x => x.Identity == identity)))
+            A.CallTo(() => userEvents.OnUserUpdatedAsync(A<IUser>.That.Matches(x => x.Identity == identity), A<IUser>._))
                 .MustHaveHappened();
         }
 
@@ -367,7 +379,7 @@ namespace Squidex.Domain.Users
             A.CallTo<Task<IdentityResult>>(() => userManager.AddClaimsAsync(identity, HasClaim(SquidexClaimTypes.Consent)))
                 .MustHaveHappened();
 
-            A.CallTo(() => userEvents.OnConsentGiven(A<IUser>.That.Matches(x => x.Identity == identity)))
+            A.CallTo(() => userEvents.OnConsentGivenAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
                 .MustHaveHappened();
         }
 
@@ -386,7 +398,7 @@ namespace Squidex.Domain.Users
             A.CallTo<Task<IdentityResult>>(() => userManager.AddClaimsAsync(identity, HasClaim(SquidexClaimTypes.ConsentForEmails)))
                 .MustHaveHappened();
 
-            A.CallTo(() => userEvents.OnConsentGiven(A<IUser>.That.Matches(x => x.Identity == identity)))
+            A.CallTo(() => userEvents.OnConsentGivenAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
                 .MustHaveHappened();
         }
 
@@ -522,7 +534,7 @@ namespace Squidex.Domain.Users
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.DeleteAsync(identity.Id));
 
-            A.CallTo(() => userEvents.OnUserDeleted(A<IUser>._))
+            A.CallTo(() => userEvents.OnUserDeletedAsync(A<IUser>._))
                 .MustNotHaveHappened();
         }
 
@@ -536,7 +548,7 @@ namespace Squidex.Domain.Users
             A.CallTo(() => userManager.DeleteAsync(identity))
                 .MustHaveHappened();
 
-            A.CallTo(() => userEvents.OnUserDeleted(A<IUser>.That.Matches(x => x.Identity == identity)))
+            A.CallTo(() => userEvents.OnUserDeletedAsync(A<IUser>.That.Matches(x => x.Identity == identity)))
                 .MustHaveHappened();
         }
 
@@ -570,7 +582,7 @@ namespace Squidex.Domain.Users
 
             for (var i = 0; i < numCurrentUsers; i++)
             {
-                users.Add(CreatePendingUser(i.ToString()));
+                users.Add(CreatePendingUser(i.ToString(CultureInfo.InvariantCulture)));
             }
 
             A.CallTo(() => userManager.Users)

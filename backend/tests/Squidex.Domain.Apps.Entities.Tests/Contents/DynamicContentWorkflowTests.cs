@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
@@ -16,6 +14,7 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Draft] = WorkflowTransition.Always
-                        },
+                        }.ToReadonlyDictionary(),
                         StatusColors.Archived, NoUpdate.Always),
                 [Status.Draft] =
                     new WorkflowStep(
@@ -46,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Published] = WorkflowTransition.When("data.field.iv === 2", "Editor")
-                        },
+                        }.ToReadonlyDictionary(),
                         StatusColors.Draft),
                 [Status.Published] =
                     new WorkflowStep(
@@ -54,9 +53,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Archived] = WorkflowTransition.Always,
                             [Status.Draft] = WorkflowTransition.Always
-                        },
+                        }.ToReadonlyDictionary(),
                         StatusColors.Published, NoUpdate.When("data.field.iv === 2", "Owner", "Editor"))
-            });
+            }.ToReadonlyDictionary());
 
         public DynamicContentWorkflowTests()
         {
@@ -71,29 +70,34 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Published] = WorkflowTransition.Always
-                            },
+                            }.ToReadonlyDictionary(),
                             StatusColors.Draft),
                     [Status.Published] =
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
                                 [Status.Draft] = WorkflowTransition.Always
-                            },
+                            }.ToReadonlyDictionary(),
                             StatusColors.Published)
-                },
-                new List<DomainId> { simpleSchemaId.Id });
+                }.ToReadonlyDictionary(),
+                ReadonlyList.Create(simpleSchemaId.Id));
 
             var workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow);
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
                 .Returns(app);
 
             A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
-            var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+            var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }));
 
-            sut = new DynamicContentWorkflow(new JintScriptEngine(memoryCache), appProvider);
+            sut = new DynamicContentWorkflow(scriptEngine, appProvider);
         }
 
         [Fact]
@@ -127,29 +131,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_allow_publish_on_create()
         {
-            var content = CreateContent(Status.Draft, 2);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
+            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
 
         [Fact]
-        public async Task Should_not_allow_publish_on_create_if_data_is_invalid()
-        {
-            var content = CreateContent(Status.Draft, 4);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Editor"));
-
-            Assert.False(result);
-        }
-
-        [Fact]
         public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
         {
-            var content = CreateContent(Status.Draft, 2);
-
-            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.Data, Mocks.FrontendUser("Developer"));
+            var result = await sut.CanPublishInitialAsync(Mocks.Schema(appId, schemaId), Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }
@@ -381,7 +371,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_return_all_statuses_for_default_workflow_when_no_workflow_configured()
+        public async Task Should_return_all_statuses_for_default_workflow_if_no_workflow_configured()
         {
             A.CallTo(() => app.Workflows).Returns(Workflows.Empty);
 

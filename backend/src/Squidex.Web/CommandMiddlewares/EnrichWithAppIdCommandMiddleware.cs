@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
@@ -20,8 +18,6 @@ namespace Squidex.Web.CommandMiddlewares
 
         public EnrichWithAppIdCommandMiddleware(IContextProvider contextProvider)
         {
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
             this.contextProvider = contextProvider;
         }
 

@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
@@ -43,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         {
             var response = Deferred.Response(() =>
             {
-                return Language.AllLanguages.Select(LanguageDto.FromLanguage).ToArray();
+                return Language.AllLanguages.Select(LanguageDto.FromDomain).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = "1";

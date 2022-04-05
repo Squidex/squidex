@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Squidex.Config;
@@ -16,7 +12,6 @@ using Squidex.Domain.Users;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
-using Squidex.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
@@ -36,13 +31,14 @@ namespace Squidex.Areas.IdentityServer.Config
             this.identityOptions = identityOptions.Value;
         }
 
-        public async Task InitializeAsync(CancellationToken ct)
+        public async Task InitializeAsync(
+            CancellationToken ct)
         {
             IdentityModelEventSource.ShowPII = identityOptions.ShowPII;
 
             if (identityOptions.IsAdminConfigured())
             {
-                using (var scope = serviceProvider.CreateScope())
+                await using (var scope = serviceProvider.CreateAsyncScope())
                 {
                     var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
@@ -55,7 +51,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     {
                         try
                         {
-                            var user = await userService.FindByEmailAsync(adminEmail);
+                            var user = await userService.FindByEmailAsync(adminEmail, ct);
 
                             if (user != null)
                             {
@@ -69,7 +65,7 @@ namespace Squidex.Areas.IdentityServer.Config
                                         Permissions = permissions
                                     };
 
-                                    await userService.UpdateAsync(user.Id, values);
+                                    await userService.UpdateAsync(user.Id, values, ct: ct);
                                 }
                             }
                             else
@@ -83,16 +79,14 @@ namespace Squidex.Areas.IdentityServer.Config
                                     DisplayName = adminEmail
                                 };
 
-                                await userService.CreateAsync(adminEmail, values);
+                                await userService.CreateAsync(adminEmail, values, ct: ct);
                             }
                         }
                         catch (Exception ex)
                         {
-                            var log = serviceProvider.GetRequiredService<ISemanticLog>();
+                            var log = serviceProvider.GetRequiredService<ILogger<CreateAdminInitializer>>();
 
-                            log.LogError(ex, w => w
-                                .WriteProperty("action", "createAdmin")
-                                .WriteProperty("status", "failed"));
+                            log.LogError(ex, "Failed to create administrator.");
                         }
                     }
                 }

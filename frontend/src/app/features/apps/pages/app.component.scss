@@ -1,0 +1,14 @@
+@import 'mixins';
+@import 'vars';
+
+.btn {
+    @include absolute(1rem, 1rem);
+}
+
+.card-body {
+    position: relative;
+}
+
+.card-title {
+    padding-right: 2rem;
+}

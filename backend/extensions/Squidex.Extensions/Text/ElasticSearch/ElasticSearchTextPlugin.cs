@@ -1,0 +1,52 @@
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Hosting;
+using Squidex.Hosting.Configuration;
+using Squidex.Infrastructure.Plugins;
+
+namespace Squidex.Extensions.Text.ElasticSearch
+{
+    public sealed class ElasticSearchTextPlugin : IPlugin
+    {
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
+        {
+            var fullTextType = config.GetValue<string>("fullText:type");
+
+            if (string.Equals(fullTextType, "elastic", StringComparison.OrdinalIgnoreCase))
+            {
+                var elasticConfiguration = config.GetValue<string>("fullText:elastic:configuration");
+
+                if (string.IsNullOrWhiteSpace(elasticConfiguration))
+                {
+                    var error = new ConfigurationError("Value is required.", "fullText:elastic:configuration");
+
+                    throw new ConfigurationException(error);
+                }
+
+                var indexName = config.GetValue<string>("fullText:elastic:indexName");
+
+                if (string.IsNullOrWhiteSpace(indexName))
+                {
+                    indexName = "squidex-index";
+                }
+
+                services.AddSingleton(
+                    c => new ElasticSearchTextIndex(elasticConfiguration, indexName));
+
+                services.AddSingleton<ITextIndex>(
+                    c => c.GetRequiredService<ElasticSearchTextIndex>());
+
+                services.AddSingleton<IInitializable>(
+                    c => c.GetRequiredService<ElasticSearchTextIndex>());
+            }
+        }
+    }
+}

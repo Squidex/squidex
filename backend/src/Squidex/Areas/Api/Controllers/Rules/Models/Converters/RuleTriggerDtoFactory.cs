@@ -1,11 +1,10 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -53,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
 
         public RuleTriggerDto Visit(ContentChangedTriggerV2 trigger)
         {
-            var schemas = trigger.Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedRuleTriggerSchemaDto())).ToArray();
+            var schemas = trigger.Schemas?.Select(ContentChangedRuleTriggerSchemaDto.FromDomain).ToArray();
 
             return new ContentChangedRuleTriggerDto { Schemas = schemas, HandleAll = trigger.HandleAll };
         }

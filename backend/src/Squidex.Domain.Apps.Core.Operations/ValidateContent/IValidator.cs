@@ -1,12 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -14,6 +13,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
     public interface IValidator
     {
-        Task ValidateAsync(object? value, ValidationContext context, AddError addError);
+        ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError);
     }
 }

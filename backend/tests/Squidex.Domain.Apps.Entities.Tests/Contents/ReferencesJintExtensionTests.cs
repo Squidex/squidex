@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,31 +40,26 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new ReferencesJintExtension(services)
             };
 
-            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false))
+            A.CallTo(() => appProvider.GetAppAsync(appId.Id, false, default))
                 .Returns(Mocks.App(appId));
 
-            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())), extensions);
+            sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+                Options.Create(new JintScriptOptions
+                {
+                    TimeoutScript = TimeSpan.FromSeconds(2),
+                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                }),
+                extensions);
         }
 
         [Fact]
         public async Task Should_resolve_reference()
         {
-            var referenceId1 = DomainId.NewGuid();
-            var reference1 = CreateReference(referenceId1, 1);
+            var (vars, _) = SetupReferenceVars(1);
 
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("references",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(referenceId1)));
-
-            A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceId1)))
-                .Returns(ResultList.CreateFrom(1, reference1));
-
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            var expected = @"
+                Text: Hello 1 World 1
+            ";
 
             var script = @"
                 getReference(data.references.iv[0], function (references) {
@@ -73,10 +67,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     complete(`${result1}`);
                 })";
-
-            var expected = @"
-                Text: Hello 1 World 1
-            ";
 
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
@@ -86,24 +76,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_resolve_references()
         {
-            var referenceId1 = DomainId.NewGuid();
-            var reference1 = CreateReference(referenceId1, 1);
-            var referenceId2 = DomainId.NewGuid();
-            var reference2 = CreateReference(referenceId1, 2);
+            var (vars, _) = SetupReferenceVars(2);
 
-            var user = new ClaimsPrincipal();
-
-            var data =
-                new ContentData()
-                    .AddField("references",
-                        new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(referenceId1, referenceId2)));
-
-            A.CallTo(() => contentQuery.QueryAsync(
-                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceId1, referenceId2)))
-                .Returns(ResultList.CreateFrom(2, reference1, reference2));
-
-            var vars = new ScriptVars { Data = data, AppId = appId.Id, User = user };
+            var expected = @"
+                Text: Hello 1 World 1
+                Text: Hello 2 World 2
+            ";
 
             var script = @"
                 getReferences(data.references.iv, function (references) {
@@ -113,17 +91,40 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     complete(`${result1}\n${result2}`);
                 })";
 
-            var expected = @"
-                Text: Hello 1 World 1
-                Text: Hello 2 World 2
-            ";
-
             var result = (await sut.ExecuteAsync(vars, script)).ToString();
 
             Assert.Equal(Cleanup(expected), Cleanup(result));
         }
 
-        private static IEnrichedContentEntity CreateReference(DomainId referenceId, int index)
+        private (ScriptVars, IContentEntity[]) SetupReferenceVars(int count)
+        {
+            var references = Enumerable.Range(0, count).Select((x, i) => CreateReference(i + 1)).ToArray();
+            var referenceIds = references.Select(x => x.Id);
+
+            var user = new ClaimsPrincipal();
+
+            var data =
+                new ContentData()
+                    .AddField("references",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(referenceIds)));
+
+            A.CallTo(() => contentQuery.QueryAsync(
+                    A<Context>.That.Matches(x => x.App.Id == appId.Id && x.User == user), A<Q>.That.HasIds(referenceIds), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(2, references));
+
+            var vars = new ScriptVars
+            {
+                ["appId"] = appId.Id,
+                ["data"] = data,
+                ["dataOld"] = null,
+                ["user"] = user
+            };
+
+            return (vars, references);
+        }
+
+        private static IEnrichedContentEntity CreateReference(int index)
         {
             return new ContentEntity
             {
@@ -135,16 +136,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         .AddField("field2",
                             new ContentFieldData()
                                 .AddInvariant(JsonValue.Create($"World {index}"))),
-                Id = referenceId
+                Id = DomainId.NewGuid()
             };
         }
 
         private static string Cleanup(string text)
         {
             return text
-                .Replace("\r", string.Empty)
-                .Replace("\n", string.Empty)
-                .Replace(" ", string.Empty);
+                .Replace("\r", string.Empty, StringComparison.Ordinal)
+                .Replace("\n", string.Empty, StringComparison.Ordinal)
+                .Replace(" ", string.Empty, StringComparison.Ordinal);
         }
     }
 }

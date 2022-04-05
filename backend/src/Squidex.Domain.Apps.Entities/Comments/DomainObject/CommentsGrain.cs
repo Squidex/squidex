@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Comments.DomainObject.Guards;
 using Squidex.Domain.Apps.Events.Comments;
@@ -36,9 +32,6 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         public CommentsGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter)
         {
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
         }
@@ -47,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
         {
             streamName = $"comments-{key}";
 
-            var storedEvents = await eventStore.QueryLatestAsync(streamName, 100);
+            var storedEvents = await eventStore.QueryReverseAsync(streamName, 100);
 
             foreach (var @event in storedEvents)
             {
@@ -101,8 +94,8 @@ namespace Squidex.Domain.Apps.Entities.Comments.DomainObject
 
         private async Task<CommandResult> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : CommentsCommand
         {
-            Guard.NotNull(command, nameof(command));
-            Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(command);
+            Guard.NotNull(handler);
 
             if (command.ExpectedVersion > EtagVersion.Any && command.ExpectedVersion != Version)
             {

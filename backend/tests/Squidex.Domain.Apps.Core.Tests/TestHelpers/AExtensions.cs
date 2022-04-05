@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using FakeItEasy;
 
 namespace Squidex.Domain.Apps.Core.TestHelpers
@@ -14,6 +12,11 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
     public static class AExtensions
     {
         public static T[] Is<T>(this INegatableArgumentConstraintManager<T[]> that, params T[]? values)
+        {
+            return values == null ? that.IsNull() : that.IsSameSequenceAs(values);
+        }
+
+        public static IEnumerable<T> Is<T>(this INegatableArgumentConstraintManager<IEnumerable<T>> that, params T[]? values)
         {
             return values == null ? that.IsNull() : that.IsSameSequenceAs(values);
         }

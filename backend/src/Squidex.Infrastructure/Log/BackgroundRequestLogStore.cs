@@ -5,35 +5,35 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Timers;
-using Squidex.Log;
 
 namespace Squidex.Infrastructure.Log
 {
     public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
     {
-        private const int Intervall = 10 * 1000;
-        private const int BatchSize = 1000;
         private readonly IRequestLogRepository logRepository;
-        private readonly ISemanticLog log;
+        private readonly ILogger<BackgroundRequestLogStore> log;
         private readonly CompletionTimer timer;
+        private readonly RequestLogStoreOptions options;
         private ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
 
-        public BackgroundRequestLogStore(IRequestLogRepository logRepository, ISemanticLog log)
+        public bool ForceWrite { get; set; }
+
+        public bool IsEnabled => options.StoreEnabled;
+
+        public BackgroundRequestLogStore(IOptions<RequestLogStoreOptions> options,
+            IRequestLogRepository logRepository, ILogger<BackgroundRequestLogStore> log)
         {
-            Guard.NotNull(logRepository, nameof(logRepository));
-            Guard.NotNull(log, nameof(log));
+            this.options = options.Value;
 
             this.logRepository = logRepository;
 
-            this.log = log;
+            timer = new CompletionTimer(options.Value.WriteIntervall, TrackAsync, options.Value.WriteIntervall);
 
-            timer = new CompletionTimer(Intervall, ct => TrackAsync(), Intervall);
+            this.log = log;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -51,38 +51,69 @@ namespace Squidex.Infrastructure.Log
             timer.SkipCurrentDelay();
         }
 
-        private async Task TrackAsync()
+        private async Task TrackAsync(
+            CancellationToken ct)
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
+
             try
             {
+                var batchSize = options.BatchSize;
+
                 var localJobs = Interlocked.Exchange(ref jobs, new ConcurrentQueue<Request>());
 
                 if (!localJobs.IsEmpty)
                 {
-                    var pages = (int)Math.Ceiling((double)localJobs.Count / BatchSize);
+                    var pages = (int)Math.Ceiling((double)localJobs.Count / batchSize);
 
                     for (var i = 0; i < pages; i++)
                     {
-                        await logRepository.InsertManyAsync(localJobs.Skip(i * BatchSize).Take(BatchSize));
+                        var batch = localJobs.Skip(i * batchSize).Take(batchSize);
+
+                        if (ForceWrite)
+                        {
+                            ct = default;
+                        }
+
+                        await logRepository.InsertManyAsync(batch, ct);
                     }
                 }
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "TrackUsage")
-                    .WriteProperty("status", "Failed"));
+                log.LogError(ex, "Failed to track usage in background.");
             }
         }
 
-        public Task QueryAllAsync(Func<Request, Task> callback, string key, DateTime fromDate, DateTime toDate, CancellationToken ct = default)
+        public Task DeleteAsync(string key,
+            CancellationToken ct = default)
         {
-            return logRepository.QueryAllAsync(callback, key, fromDate, toDate, ct);
+            return logRepository.DeleteAsync(key, ct);
         }
 
-        public Task LogAsync(Request request)
+        public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+            CancellationToken ct = default)
         {
-            Guard.NotNull(request, nameof(request));
+            if (!IsEnabled)
+            {
+                return AsyncEnumerable.Empty<Request>();
+            }
+
+            return logRepository.QueryAllAsync(key, fromDate, toDate, ct);
+        }
+
+        public Task LogAsync(Request request,
+            CancellationToken ct = default)
+        {
+            Guard.NotNull(request);
+
+            if (!IsEnabled)
+            {
+                return Task.CompletedTask;
+            }
 
             jobs.Enqueue(request);
 

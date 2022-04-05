@@ -5,17 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
 using TestSuite.Fixtures;
+using TestSuite.Model;
 using Xunit;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
-#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
 
 namespace TestSuite.ApiTests
 {
@@ -64,6 +62,42 @@ namespace TestSuite.ApiTests
         public sealed class CityData
         {
             public string Name { get; set; }
+        }
+
+        [Fact]
+        public async Task Should_query_json()
+        {
+            // STEP 1: Create a content with JSON.
+            var content_0 = await _.Contents.CreateAsync(new TestEntityData
+            {
+                Json = JToken.FromObject(new
+                {
+                    value = 1,
+                    obj = new
+                    {
+                        value = 2
+                    }
+                })
+            }, ContentCreateOptions.AsPublish);
+
+
+            // STEP 2: Query this content.
+            var query = new
+            {
+                query = @"
+                {
+                    findMyWritesContent(id: ""<ID>"") {
+                        flatData {
+                            json
+                        }   
+                    }
+                }".Replace("<ID>", content_0.Id, StringComparison.Ordinal)
+            };
+
+            var result1 = await _.Contents.GraphQlAsync<JToken>(query);
+
+            Assert.Equal(1, result1["findMyWritesContent"]["flatData"]["json"]["value"].Value<int>());
+            Assert.Equal(2, result1["findMyWritesContent"]["flatData"]["json"]["obj"]["value"].Value<int>());
         }
 
         [Fact]
@@ -195,7 +229,7 @@ namespace TestSuite.ApiTests
 
             var citiesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("cities");
 
-            var city = await citiesClient.CreateAsync(cityData, true);
+            var city = await citiesClient.CreateAsync(cityData, ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Create city
@@ -213,7 +247,7 @@ namespace TestSuite.ApiTests
 
             var statesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("states");
 
-            var state = await statesClient.CreateAsync(stateData, true);
+            var state = await statesClient.CreateAsync(stateData, ContentCreateOptions.AsPublish);
 
 
             // STEP 3: Create country
@@ -231,7 +265,7 @@ namespace TestSuite.ApiTests
 
             var countriesClient = _.ClientManager.CreateContentsClient<DynamicEntity, object>("countries");
 
-            await countriesClient.CreateAsync(countryData, true);
+            await countriesClient.CreateAsync(countryData, ContentCreateOptions.AsPublish);
         }
     }
 }

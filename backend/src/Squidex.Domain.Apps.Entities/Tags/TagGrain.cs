@@ -5,10 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -21,15 +17,16 @@ namespace Squidex.Domain.Apps.Entities.Tags
         private readonly IGrainState<State> state;
 
         [CollectionName("Index_Tags")]
-        public sealed class State
+        public sealed class State : TagsExport
         {
-            public TagsExport Tags { get; set; } = new TagsExport();
         }
+
+        private Dictionary<string, Tag> Tags => state.Value.Tags ??= new Dictionary<string, Tag>();
+
+        private Dictionary<string, string> Alias => state.Value.Alias ??= new Dictionary<string, string>();
 
         public TagGrain(IGrainState<State> state)
         {
-            Guard.NotNull(state, nameof(state));
-
             this.state = state;
         }
 
@@ -38,9 +35,43 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return state.ClearAsync();
         }
 
-        public Task RebuildAsync(TagsExport tags)
+        public Task RebuildAsync(TagsExport export)
         {
-            state.Value.Tags = tags;
+            state.Value.Tags = export.Tags;
+            state.Value.Alias = export.Alias;
+
+            return state.WriteAsync();
+        }
+
+        public Task RenameTagAsync(string name, string newName)
+        {
+            Guard.NotNull(name);
+            Guard.NotNull(newName);
+
+            name = NormalizeName(name);
+
+            var (_, tag) = FindTag(name);
+
+            if (tag == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            newName = NormalizeName(newName);
+
+            tag.Name = newName;
+
+            foreach (var alias in Alias.Where(x => x.Value == name).ToList())
+            {
+                Alias.Remove(alias.Key);
+
+                if (alias.Key != newName)
+                {
+                    Alias[alias.Key] = newName;
+                }
+            }
+
+            Alias[name] = newName;
 
             return state.WriteAsync();
         }
@@ -53,30 +84,11 @@ namespace Squidex.Domain.Apps.Entities.Tags
             {
                 foreach (var tag in names)
                 {
-                    if (!string.IsNullOrWhiteSpace(tag))
+                    var name = NormalizeName(tag);
+
+                    if (!string.IsNullOrWhiteSpace(name))
                     {
-                        var tagName = tag.ToLowerInvariant();
-                        var tagId = string.Empty;
-
-                        var (key, value) = state.Value.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, tagName, StringComparison.OrdinalIgnoreCase));
-
-                        if (value != null)
-                        {
-                            tagId = key;
-
-                            if (ids == null || !ids.Contains(tagId))
-                            {
-                                value.Count++;
-                            }
-                        }
-                        else
-                        {
-                            tagId = DomainId.NewGuid().ToString();
-
-                            state.Value.Tags.Add(tagId, new Tag { Name = tagName });
-                        }
-
-                        result.Add(tagName, tagId);
+                        result.Add(name, GetId(name, ids));
                     }
                 }
             }
@@ -87,13 +99,13 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 {
                     if (!result.ContainsValue(id))
                     {
-                        if (state.Value.Tags.TryGetValue(id, out var tagInfo))
+                        if (Tags.TryGetValue(id, out var tagInfo))
                         {
                             tagInfo.Count--;
 
                             if (tagInfo.Count <= 0)
                             {
-                                state.Value.Tags.Remove(id);
+                                Tags.Remove(id);
                             }
                         }
                     }
@@ -107,11 +119,15 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public Task<Dictionary<string, string>> GetTagIdsAsync(HashSet<string> names)
         {
+            Guard.NotNull(names);
+
             var result = new Dictionary<string, string>();
 
-            foreach (var name in names)
+            foreach (var tag in names)
             {
-                var id = state.Value.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, name, StringComparison.OrdinalIgnoreCase)).Key;
+                var name = NormalizeName(tag);
+
+                var (id, _) = FindTag(name);
 
                 if (!string.IsNullOrWhiteSpace(id))
                 {
@@ -128,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             foreach (var id in ids)
             {
-                if (state.Value.Tags.TryGetValue(id, out var tagInfo))
+                if (Tags.TryGetValue(id, out var tagInfo))
                 {
                     result[id] = tagInfo.Name;
                 }
@@ -139,14 +155,50 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public Task<TagsSet> GetTagsAsync()
         {
-            var tags = state.Value.Tags.Values.ToDictionary(x => x.Name, x => x.Count);
+            var tags = Tags.Values.ToDictionary(x => x.Name, x => x.Count);
 
             return Task.FromResult(new TagsSet(tags, state.Version));
         }
 
         public Task<TagsExport> GetExportableTagsAsync()
         {
-            return Task.FromResult(state.Value.Tags);
+            return Task.FromResult(state.Value.Clone());
+        }
+
+        private string GetId(string name, HashSet<string>? ids)
+        {
+            var (id, tag) = FindTag(name);
+
+            if (tag != null)
+            {
+                if (ids == null || !ids.Contains(id))
+                {
+                    tag.Count++;
+                }
+            }
+            else
+            {
+                id = DomainId.NewGuid().ToString();
+
+                Tags.Add(id, new Tag { Name = name });
+            }
+
+            return id;
+        }
+
+        private static string NormalizeName(string name)
+        {
+            return name.Trim().ToLowerInvariant();
+        }
+
+        private KeyValuePair<string, Tag> FindTag(string name)
+        {
+            if (Alias.TryGetValue(name, out var newName))
+            {
+                name = newName;
+            }
+
+            return Tags.FirstOrDefault(x => x.Value.Name == name);
         }
     }
 }

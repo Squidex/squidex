@@ -1,12 +1,11 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -19,20 +18,19 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
 {
     public sealed partial class SchemaDomainObject : DomainObject<SchemaDomainObject.State>
     {
-        public SchemaDomainObject(IStore<DomainId> store, ISemanticLog log)
-            : base(store, log)
+        public SchemaDomainObject(IPersistenceFactory<State> persistence, ILogger<SchemaDomainObject> log)
+            : base(persistence, log)
         {
         }
 
-        protected override bool IsDeleted()
+        protected override bool IsDeleted(State snapshot)
         {
-            return Snapshot.IsDeleted;
+            return snapshot.IsDeleted;
         }
 
         protected override bool CanAcceptCreation(ICommand command)
@@ -161,62 +159,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
-                case UpdateSchema update:
-                    return UpdateReturn(update, c =>
-                    {
-                        GuardSchema.CanUpdate(c);
-
-                        Update(c);
-
-                        return Snapshot;
-                    });
-
-                case PublishSchema publish:
-                    return UpdateReturn(publish, c =>
-                    {
-                        GuardSchema.CanPublish(c);
-
-                        Publish(c);
-
-                        return Snapshot;
-                    });
-
-                case UnpublishSchema unpublish:
-                    return UpdateReturn(unpublish, c =>
-                    {
-                        GuardSchema.CanUnpublish(c);
-
-                        Unpublish(c);
-
-                        return Snapshot;
-                    });
-
                 case ConfigureFieldRules configureFieldRules:
                     return UpdateReturn(configureFieldRules, c =>
                     {
                         GuardSchema.CanConfigureFieldRules(c);
 
                         ConfigureFieldRules(c);
-
-                        return Snapshot;
-                    });
-
-                case ConfigureScripts configureScripts:
-                    return UpdateReturn(configureScripts, c =>
-                    {
-                        GuardSchema.CanConfigureScripts(c);
-
-                        ConfigureScripts(c);
-
-                        return Snapshot;
-                    });
-
-                case ChangeCategory changeCategory:
-                    return UpdateReturn(changeCategory, c =>
-                    {
-                        GuardSchema.CanChangeCategory(c);
-
-                        ChangeCategory(c);
 
                         return Snapshot;
                     });
@@ -241,11 +189,49 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
                         return Snapshot;
                     });
 
+                case ChangeCategory changeCategory:
+                    return UpdateReturn(changeCategory, c =>
+                    {
+                        ChangeCategory(c);
+
+                        return Snapshot;
+                    });
+
+                case UpdateSchema update:
+                    return UpdateReturn(update, c =>
+                    {
+                        Update(c);
+
+                        return Snapshot;
+                    });
+
+                case PublishSchema publish:
+                    return UpdateReturn(publish, c =>
+                    {
+                        Publish(c);
+
+                        return Snapshot;
+                    });
+
+                case UnpublishSchema unpublish:
+                    return UpdateReturn(unpublish, c =>
+                    {
+                        Unpublish(c);
+
+                        return Snapshot;
+                    });
+
+                case ConfigureScripts configureScripts:
+                    return UpdateReturn(configureScripts, c =>
+                    {
+                        ConfigureScripts(c);
+
+                        return Snapshot;
+                    });
+
                 case DeleteSchema deleteSchema:
                     return Update(deleteSchema, c =>
                     {
-                        GuardSchema.CanDelete(c);
-
                         Delete(c);
                     });
 
@@ -263,7 +249,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject
             };
 
             var schemaSource = Snapshot.SchemaDef;
-            var schemaTarget = command.BuildSchema(schemaSource.Name, schemaSource.IsSingleton);
+            var schemaTarget = command.BuildSchema(schemaSource.Name, schemaSource.Type);
 
             var events = schemaSource.Synchronize(schemaTarget, () => Snapshot.SchemaFieldsTotal + 1, options);
 

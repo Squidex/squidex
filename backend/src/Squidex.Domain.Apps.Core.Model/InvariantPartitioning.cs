@@ -1,11 +1,9 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
-
-using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Core
 {
@@ -13,6 +11,8 @@ namespace Squidex.Domain.Apps.Core
     {
         public static readonly InvariantPartitioning Instance = new InvariantPartitioning();
         public static readonly string Key = "iv";
+        public static readonly string Name = "Invariant";
+        public static readonly string Description = "invariant value";
 
         public string Master
         {
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core
         {
             if (Contains(key))
             {
-                return "Invariant";
+                return Name;
             }
 
             return null;
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core
 
         public override string ToString()
         {
-            return "invariant value";
+            return Description;
         }
     }
 }

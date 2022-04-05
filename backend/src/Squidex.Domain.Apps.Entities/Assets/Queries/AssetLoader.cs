@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Infrastructure;
-using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
@@ -19,14 +17,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public AssetLoader(IGrainFactory grainFactory)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
-
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version)
+        public async Task<IAssetEntity?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any)
         {
-            using (Profiler.TraceMethod<AssetLoader>())
+            using (Telemetry.Activities.StartActivity("AssetLoader/GetAsync"))
             {
                 var key = DomainId.Combine(appId, id);
 

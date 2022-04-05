@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -20,35 +19,35 @@ namespace Squidex.Extensions.Actions.ElasticSearch
         Display = "Populate Elasticsearch index",
         Description = "Populate a full text search index in ElasticSearch.",
         ReadMore = "https://www.elastic.co/")]
-    public sealed class ElasticSearchAction : RuleAction
+    public sealed record ElasticSearchAction : RuleAction
     {
         [AbsoluteUrl]
         [LocalizedRequired]
         [Display(Name = "Server Url", Description = "The url to the elastic search instance or cluster.")]
-        [DataType(DataType.Url)]
+        [Editor(RuleFieldEditor.Url)]
         public Uri Host { get; set; }
 
         [LocalizedRequired]
         [Display(Name = "Index Name", Description = "The name of the index.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         [Formattable]
         public string IndexName { get; set; }
 
         [Display(Name = "Username", Description = "The optional username.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Username { get; set; }
 
         [Display(Name = "Password", Description = "The optional password.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Password { get; set; }
 
         [Display(Name = "Document", Description = "The optional custom document.")]
-        [DataType(DataType.MultilineText)]
+        [Editor(RuleFieldEditor.TextArea)]
         [Formattable]
         public string Document { get; set; }
 
         [Display(Name = "Deletion", Description = "The condition when to delete the document.")]
-        [DataType(DataType.Text)]
+        [Editor(RuleFieldEditor.Text)]
         public string Delete { get; set; }
     }
 }

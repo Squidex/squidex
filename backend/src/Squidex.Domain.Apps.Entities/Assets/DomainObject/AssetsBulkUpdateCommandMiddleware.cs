@@ -1,19 +1,19 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -24,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
     public sealed class AssetsBulkUpdateCommandMiddleware : ICommandMiddleware
     {
         private readonly IContextProvider contextProvider;
+        private readonly ILogger<AssetsBulkUpdateCommandMiddleware> log;
 
         private sealed record BulkTaskCommand(BulkTask Task, DomainId Id, ICommand Command)
         {
@@ -39,11 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
         {
         }
 
-        public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider)
+        public AssetsBulkUpdateCommandMiddleware(IContextProvider contextProvider, ILogger<AssetsBulkUpdateCommandMiddleware> log)
         {
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
             this.contextProvider = contextProvider;
+            this.log = log;
         }
 
         public async Task HandleAsync(CommandContext context, NextDelegate next)
@@ -59,21 +59,34 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 
                     var createCommandsBlock = new TransformBlock<BulkTask, BulkTaskCommand?>(task =>
                     {
-                        return CreateCommand(task);
+                        try
+                        {
+                            return CreateCommand(task);
+                        }
+                        catch (OperationCanceledException ex)
+                        {
+                            // Dataflow swallows operation cancelled exception.
+                            throw new AggregateException(ex);
+                        }
                     }, executionOptions);
 
                     var executeCommandBlock = new ActionBlock<BulkTaskCommand?>(async command =>
                     {
-                        if (command != null)
+                        try
                         {
-                            await ExecuteCommandAsync(command);
+                            if (command != null)
+                            {
+                                await ExecuteCommandAsync(command);
+                            }
+                        }
+                        catch (OperationCanceledException ex)
+                        {
+                            // Dataflow swallows operation cancelled exception.
+                            throw new AggregateException(ex);
                         }
                     }, executionOptions);
 
-                    createCommandsBlock.LinkTo(executeCommandBlock, new DataflowLinkOptions
-                    {
-                        PropagateCompletion = true
-                    });
+                    createCommandsBlock.BidirectionalLinkTo(executeCommandBlock);
 
                     contextProvider.Context.Change(b => b
                         .WithoutAssetEnrichment()
@@ -92,7 +105,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                             bulkUpdates,
                             results);
 
-                        await createCommandsBlock.SendAsync(task);
+                        if (!await createCommandsBlock.SendAsync(task))
+                        {
+                            break;
+                        }
                     }
 
                     createCommandsBlock.Complete();
@@ -112,26 +128,23 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
         }
 
-        private static async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
+        private async Task ExecuteCommandAsync(BulkTaskCommand bulkCommand)
         {
             var (task, id, command) = bulkCommand;
-
-            Exception? exception = null;
             try
             {
                 await task.Bus.PublishAsync(command);
+
+                task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex));
             }
             catch (Exception ex)
             {
-                exception = ex;
-            }
+                log.LogError(ex, "Faield to execute asset bulk job with index {index} of type {type}.",
+                    task.JobIndex,
+                    task.CommandJob.Type);
 
-            task.Results.Add(new BulkUpdateResultItem
-            {
-                Id = id,
-                JobIndex = task.JobIndex,
-                Exception = exception
-            });
+                task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
+            }
         }
 
         private BulkTaskCommand? CreateCommand(BulkTask task)
@@ -148,13 +161,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
             }
             catch (Exception ex)
             {
-                task.Results.Add(new BulkUpdateResultItem
-                {
-                    Id = id,
-                    JobIndex = task.JobIndex,
-                    Exception = ex
-                });
+                log.LogError(ex, "Faield to execute asset bulk job with index {index} of type {type}.",
+                    task.JobIndex,
+                    task.CommandJob.Type);
 
+                task.Results.Add(new BulkUpdateResultItem(id, task.JobIndex, ex));
                 return null;
             }
         }

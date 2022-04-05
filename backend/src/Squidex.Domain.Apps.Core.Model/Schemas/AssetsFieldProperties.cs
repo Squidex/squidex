@@ -1,56 +1,64 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.ObjectModel;
+using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [Equals(DoNotAddEqualityOperators = true)]
-    public sealed class AssetsFieldProperties : FieldProperties
+    public sealed record AssetsFieldProperties : FieldProperties
     {
-        public AssetPreviewMode PreviewMode { get; set; }
+        public AssetPreviewMode PreviewMode { get; init; }
 
-        public LocalizedValue<string[]?> DefaultValues { get; set; }
+        public LocalizedValue<ReadonlyList<string>?> DefaultValues { get; init; }
 
-        public string[]? DefaultValue { get; set; }
+        public ReadonlyList<string>? DefaultValue { get; init; }
 
-        public int? MinItems { get; set; }
+        public string? FolderId { get; init; }
 
-        public int? MaxItems { get; set; }
+        public int? MinItems { get; init; }
 
-        public int? MinWidth { get; set; }
+        public int? MaxItems { get; init; }
 
-        public int? MaxWidth { get; set; }
+        public int? MinWidth { get; init; }
 
-        public int? MinHeight { get; set; }
+        public int? MaxWidth { get; init; }
 
-        public int? MaxHeight { get; set; }
+        public int? MinHeight { get; init; }
 
-        public int? MinSize { get; set; }
+        public int? MaxHeight { get; init; }
 
-        public int? MaxSize { get; set; }
+        public int? MinSize { get; init; }
 
-        public int? AspectWidth { get; set; }
+        public int? MaxSize { get; init; }
 
-        public int? AspectHeight { get; set; }
+        public int? AspectWidth { get; init; }
 
-        public bool MustBeImage { get; set; }
+        public int? AspectHeight { get; init; }
 
-        public bool AllowDuplicates { get; set; }
+        public AssetType? ExpectedType { get; set; }
 
-        public bool ResolveFirst { get; set; }
+        public bool AllowDuplicates { get; init; }
 
-        public bool ResolveImage
+        public bool ResolveFirst { get; init; }
+
+        [Obsolete("Use 'AllowDuplicates' field now")]
+        public bool MustBeImage
         {
-            get => ResolveFirst;
-            set => ResolveFirst = value;
+            init => ExpectedType = value ? AssetType.Image : ExpectedType;
         }
 
-        public ReadOnlyCollection<string>? AllowedExtensions { get; set; }
+        [Obsolete("Use 'ResolveFirst' field now")]
+        public bool ResolveImage
+        {
+            init => ResolveFirst = value;
+        }
+
+        public ReadonlyList<string>? AllowedExtensions { get; set; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Newtonsoft;
@@ -47,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
 
                         var value = serializer.Deserialize<IJsonValue>(reader)!;
 
-                        if (Language.IsValidLanguage(propertyName) || propertyName == InvariantPartitioning.Key)
+                        if (Language.IsDefault(propertyName) || propertyName == InvariantPartitioning.Key)
                         {
                             propertyName = string.Intern(propertyName);
                         }

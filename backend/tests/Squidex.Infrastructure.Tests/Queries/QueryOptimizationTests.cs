@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_return_null_when_filters_of_logical_filter_get_optimized_away()
+        public void Should_return_null_if_filters_of_logical_filter_get_optimized_away()
         {
             var source = ClrFilter.And(ClrFilter.And());
 
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_return_null_when_logical_filter_has_no_filter()
+        public void Should_return_null_if_logical_filter_has_no_filter()
         {
             var source = ClrFilter.And();
 
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
-        public void Should_return_null_when_filter_of_negation_get_optimized_away()
+        public void Should_return_null_if_filter_of_negation_get_optimized_away()
         {
             var source = ClrFilter.Not(ClrFilter.And());
 

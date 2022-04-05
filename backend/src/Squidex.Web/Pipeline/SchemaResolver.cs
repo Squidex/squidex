@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
@@ -24,18 +22,18 @@ namespace Squidex.Web.Pipeline
 
         public SchemaResolver(IAppProvider appProvider)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(appProvider);
 
             this.appProvider = appProvider;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var appId = context.HttpContext.Features.Get<IAppFeature>()?.AppId.Id ?? default;
+            var appId = context.HttpContext.Features.Get<IAppFeature>()?.App.Id ?? default;
 
             if (appId != default)
             {
-                var schemaIdOrName = context.RouteData.Values["name"]?.ToString();
+                var schemaIdOrName = context.RouteData.Values["schema"]?.ToString();
 
                 if (!string.IsNullOrWhiteSpace(schemaIdOrName))
                 {
@@ -47,7 +45,13 @@ namespace Squidex.Web.Pipeline
                         return;
                     }
 
-                    context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema.NamedId()));
+                    if (context.ActionDescriptor.EndpointMetadata.Any(x => x is SchemaMustBePublishedAttribute) && !schema.SchemaDef.IsPublished)
+                    {
+                        context.Result = new NotFoundResult();
+                        return;
+                    }
+
+                    context.HttpContext.Features.Set<ISchemaFeature>(new SchemaFeature(schema));
                 }
             }
 
