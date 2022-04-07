@@ -10,14 +10,15 @@ namespace Squidex.Domain.Apps.Core.Scripting
     [Flags]
     public enum ScriptScope
     {
-        Async,
-        AssetScript,
-        AssetTrigger,
-        ContentScript,
-        ContentTrigger,
-        Transform,
-        SchemaTrigger,
-        UsageTrigger,
-        CommentTrigger
+        None = 0,
+        AssetScript = 1,
+        AssetTrigger = 2,
+        Async = 4,
+        CommentTrigger = 8,
+        ContentScript = 16,
+        ContentTrigger = 32,
+        SchemaTrigger = 128,
+        Transform = 256,
+        UsageTrigger = 512,
     }
 }

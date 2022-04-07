@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnChanges } from '@angular/core';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { AppsState, EditSchemaScriptsForm, SchemaCompletions, SchemaDto, SchemasService, SchemasState } from '@app/shared';
 
 @Component({
@@ -38,7 +38,7 @@ export class SchemaScriptsFormComponent implements OnChanges {
         this.editForm.load(this.schema.scripts);
         this.editForm.setEnabled(this.isEditable);
 
-        this.schemaCompletions = this.schemasService.getCompletions(this.appsState.appName, this.schema.name);
+        this.schemaCompletions = this.schemasService.getCompletions(this.appsState.appName, this.schema.name).pipe(shareReplay(1));
     }
 
     public selectField(field: string) {
