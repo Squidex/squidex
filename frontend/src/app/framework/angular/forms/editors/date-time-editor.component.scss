@@ -5,12 +5,16 @@
     max-width: 400px;
 }
 
+.flex-grow {
+    flex-grow: 1;
+}
+
 .form-group {
     position: relative;
 }
 
-.flex-grow {
-    flex-grow: 1;
+.form-time {
+    width: 45%;
 }
 
 .form-date {
@@ -21,10 +25,6 @@
     }
 }
 
-.form-time {
-    width: 45%;
-}
-
 .form-control {
     &:last-child {
         padding-left: .75rem;
@@ -33,7 +33,22 @@
     }
 }
 
-.mini,
+.btn {
+    &-clear {
+        @include absolute(auto, 4px, 3px, auto);
+        z-index: 100;
+    }
+
+    &-time-mode {
+        @include absolute(1px, auto, -1px, auto);
+        z-index: 100;
+    }
+
+    &:focus {
+        box-shadow: none;
+    }
+}
+
 .compact {
     .btn-time-mode {
         display: none;
@@ -45,8 +60,16 @@
 }
 
 .mini {
+    .btn-time-mode {
+        display: none;
+    }
+
     .btn-quick {
         display: none;
+    }
+
+    .form-date {
+        padding-left: .75rem;
     }
 }
 
@@ -60,20 +83,5 @@
                 border-color: $color-theme-error-dark;
             }
         }
-    }
-}
-
-.btn {
-    &-clear {
-        @include absolute(auto, 4px, 3px, auto);
-    }
-
-    &-time-mode {
-        @include absolute(1px, auto, -1px, auto);
-        z-index: 1000;
-    }
-
-    &:focus {
-        box-shadow: none;
     }
 }
