@@ -59,7 +59,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     public hideDateTimeModeButton?: boolean | null;
 
     @Input()
-    public isCompact?: boolean | null;
+    public size: 'Normal' | 'Compact' | 'Mini' = 'Normal';
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
@@ -69,8 +69,8 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     @ViewChild('dateInput', { static: false })
     public dateInput!: ElementRef<HTMLInputElement>;
 
-    public timeControl = new FormControl();
-    public dateControl = new FormControl();
+    public readonly timeControl = new FormControl();
+    public readonly dateControl = new FormControl();
 
     public get shouldShowDateButtons() {
         return !this.hideDateButtonsSettings && !this.hideDateButtons;
@@ -252,8 +252,14 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
         this.updateControls();
     }
 
-    public setCompact(isCompact: boolean) {
-        this.isCompact = isCompact;
+    public setSize(size: DOMRect) {
+        if (size.width < 300) {
+            this.size = 'Mini';
+        } else if (size.width < 350) {
+            this.size = 'Compact';
+        } else {
+            this.size = 'Normal';
+        }
     }
 }
 

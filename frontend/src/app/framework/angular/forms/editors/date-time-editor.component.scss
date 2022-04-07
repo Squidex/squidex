@@ -1,35 +1,52 @@
 @import 'mixins';
 @import 'vars';
 
+.root {
+    max-width: 400px;
+}
+
 .form-group {
     position: relative;
 }
 
-.input-group {
-    .form-control {
-        &:last-child {
-            padding-left: .75rem;
-            padding-right: 2rem;
-            position: relative;
-        }
+.flex-grow {
+    flex-grow: 1;
+}
+
+.form-date {
+    width: 55%;
+
+    &.with-buttons {
+        padding-left: 3.3rem;
+    }
+}
+
+.form-time {
+    width: 45%;
+}
+
+.form-control {
+    &:last-child {
+        padding-left: .75rem;
+        padding-right: 2rem;
+        position: relative;
+    }
+}
+
+.mini,
+.compact {
+    .btn-time-mode {
+        display: none;
     }
 
     .form-date {
-        width: 8.5rem;
+        padding-left: .75rem;
     }
+}
 
-    .form-date-only {
-        width: 8.5rem;
-    }
-
-    .form-date-time-only {
-        padding-left: 3.3rem;
-        padding-right: .75rem;
-        width: 11rem;
-    }
-
-    .form-time {
-        width: 7rem;
+.mini {
+    .btn-quick {
+        display: none;
     }
 }
 
