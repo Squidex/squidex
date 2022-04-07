@@ -10,7 +10,9 @@
     "start": "ng serve",
     "test": "ng test",
     "test:coverage": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessNoSandbox",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "storybook": "start-storybook -p 6006",
+    "storybook-build": "build-storybook"
   },
   "private": true,
   "dependencies": {
@@ -78,6 +80,15 @@
     "@angular/compiler-cli": "~13.1.0",
     "@angular/elements": "^13.1.1",
     "@babel/core": "^7.16.7",
+    "@compodoc/compodoc": "^1.1.19",
+    "@storybook/addon-actions": "^6.4.20",
+    "@storybook/addon-essentials": "^6.4.20",
+    "@storybook/addon-interactions": "^6.4.20",
+    "@storybook/addon-links": "^6.4.20",
+    "@storybook/angular": "^6.4.20",
+    "@storybook/builder-webpack5": "^6.4.20",
+    "@storybook/manager-webpack5": "^6.4.20",
+    "@storybook/testing-library": "^0.0.9",
     "@types/codemirror": "0.0.108",
     "@types/core-js": "2.5.5",
     "@types/jasmine": "3.10.2",
