@@ -22,7 +22,7 @@ services:
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__TYPE=MongoDB
-      - TEMPLATES__LOCALURL=http://host.docker.internal:8080
+      - TEMPLATES__LOCALURL=http://localhost:80
     networks:
       - internal
     depends_on:
