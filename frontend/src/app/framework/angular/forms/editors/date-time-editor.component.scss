@@ -1,35 +1,75 @@
 @import 'mixins';
 @import 'vars';
 
+.root {
+    max-width: 400px;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
 .form-group {
     position: relative;
 }
 
-.input-group {
-    .form-control {
-        &:last-child {
-            padding-left: .75rem;
-            padding-right: 2rem;
-            position: relative;
-        }
+.form-time {
+    width: 45%;
+}
+
+.form-date {
+    width: 55%;
+
+    &.with-buttons {
+        padding-left: 3.3rem;
+    }
+}
+
+.form-control {
+    &:last-child {
+        padding-left: .75rem;
+        padding-right: 2rem;
+        position: relative;
+    }
+}
+
+.btn {
+    &-clear {
+        @include absolute(auto, 4px, 3px, auto);
+        z-index: 100;
+    }
+
+    &-time-mode {
+        @include absolute(1px, auto, -1px, auto);
+        z-index: 100;
+    }
+
+    &:focus {
+        box-shadow: none;
+    }
+}
+
+.compact {
+    .btn-time-mode {
+        display: none;
     }
 
     .form-date {
-        width: 8.5rem;
+        padding-left: .75rem;
+    }
+}
+
+.mini {
+    .btn-time-mode {
+        display: none;
     }
 
-    .form-date-only {
-        width: 8.5rem;
+    .btn-quick {
+        display: none;
     }
 
-    .form-date-time-only {
-        padding-left: 3.3rem;
-        padding-right: .75rem;
-        width: 11rem;
-    }
-
-    .form-time {
-        width: 7rem;
+    .form-date {
+        padding-left: .75rem;
     }
 }
 
@@ -43,20 +83,5 @@
                 border-color: $color-theme-error-dark;
             }
         }
-    }
-}
-
-.btn {
-    &-clear {
-        @include absolute(auto, 4px, 3px, auto);
-    }
-
-    &-time-mode {
-        @include absolute(1px, auto, -1px, auto);
-        z-index: 1000;
-    }
-
-    &:focus {
-        box-shadow: none;
     }
 }
