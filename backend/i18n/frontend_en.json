@@ -439,6 +439,7 @@
   "contents.draftNew": "New Draft",
   "contents.draftStatus": "New Version",
   "contents.editPageTitle": "Edit Content",
+  "contents.fieldFullscreen": "Focus on this field and toggle fullscreen mode.",
   "contents.idPlaceholder": "Define a custom ID or leave empty to let Squidex generate one.",
   "contents.inspectContent": "Content",
   "contents.inspectData": "Data",

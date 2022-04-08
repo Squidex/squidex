@@ -439,6 +439,7 @@
   "contents.draftNew": "新草稿",
   "contents.draftStatus": "新版本",
   "contents.editPageTitle": "编辑内容",
+  "contents.fieldFullscreen": "Focus on this field and toggle fullscreen mode.",
   "contents.idPlaceholder": "Define a custom ID or leave empty to let Squidex generate one.",
   "contents.inspectContent": "Content",
   "contents.inspectData": "Data",
