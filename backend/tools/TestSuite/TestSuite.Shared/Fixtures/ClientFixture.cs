@@ -22,5 +22,7 @@ namespace TestSuite.Fixtures
         public IRulesClient Rules => Squidex.Rules;
 
         public ISchemasClient Schemas => Squidex.Schemas;
+
+        public ITemplatesClient Templates => Squidex.Templates;
     }
 }

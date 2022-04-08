@@ -41,6 +41,9 @@ namespace TestSuite
         [Lazy]
         public ISchemasClient Schemas => ClientManager.CreateSchemasClient();
 
+        [Lazy]
+        public ITemplatesClient Templates => ClientManager.CreateTemplatesClient();
+
         public ClientManagerWrapper()
         {
             var appName = GetValue("config:app:name", "integration-tests");
