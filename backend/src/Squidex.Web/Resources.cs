@@ -185,7 +185,16 @@ namespace Squidex.Web
 
         public string Url<T>(Func<T?, string> action, object? values = null) where T : ApiController
         {
-            return Controller.Url(action, values);
+            var url = Controller.Url(action, values);
+
+            var basePath = Controller.HttpContext.Request.PathBase;
+
+            if (url.StartsWith(Controller.HttpContext.Request.PathBase, StringComparison.OrdinalIgnoreCase))
+            {
+                url = url[basePath.Value!.Length..];
+            }
+
+            return url;
         }
 
         public bool IsUser(string userId)

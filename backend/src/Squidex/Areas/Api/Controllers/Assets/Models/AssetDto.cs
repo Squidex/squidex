@@ -190,7 +190,10 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             if (resources.CanUpdateAsset)
             {
                 AddPutLink("update", resources.Url<AssetsController>(x => nameof(x.PutAsset), values));
+            }
 
+            if (resources.CanUpdateAsset)
+            {
                 AddPutLink("move", resources.Url<AssetsController>(x => nameof(x.PutAssetParent), values));
             }
 
