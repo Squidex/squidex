@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Squidex.CLI.Commands.Implementation;
 using Squidex.CLI.Commands.Implementation.FileSystem;
 using Squidex.CLI.Commands.Implementation.Sync;
@@ -28,13 +29,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     public sealed class TemplateCommandMiddleware : ICommandMiddleware
     {
         private readonly TemplatesClient templatesClient;
+        private readonly TemplatesOptions templateOptions;
         private readonly IUrlGenerator urlGenerator;
         private readonly ISemanticLog log;
 
-        public TemplateCommandMiddleware(TemplatesClient templatesClient, IUrlGenerator urlGenerator,
+        public TemplateCommandMiddleware(TemplatesClient templatesClient, IOptions<TemplatesOptions> templateOptions, IUrlGenerator urlGenerator,
             ISemanticLog log)
         {
             this.templatesClient = templatesClient;
+            this.templateOptions = templateOptions.Value;
             this.urlGenerator = urlGenerator;
 
             this.log = log;
@@ -102,6 +105,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             var client = app.Clients.First();
 
+            var url = templateOptions.LocalUrl;
+
+            if (string.IsNullOrEmpty(url))
+            {
+                url = urlGenerator.Root();
+            }
+
             return new Session(
                 app.Name,
                 new DirectoryInfo(Path.GetTempPath()),
@@ -111,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     AppName = app.Name,
                     ClientId = $"{app.Name}:{client.Key}",
                     ClientSecret = client.Value.Secret,
-                    Url = urlGenerator.Root()
+                    Url = url
                 }));
         }
     }

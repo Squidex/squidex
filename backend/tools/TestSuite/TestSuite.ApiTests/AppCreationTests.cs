@@ -113,5 +113,28 @@ namespace TestSuite.ApiTests
             // STEP 3: Create app again
             await _.Apps.PostAppAsync(createRequest);
         }
+
+        [Fact]
+        public async Task Should_create_app_from_templates()
+        {
+            var appName = Guid.NewGuid().ToString();
+
+            // STEP 1: Get template.
+            var templates = await _.Templates.GetTemplatesAsync();
+
+            var template = templates.Items.First(x => x.IsStarter);
+
+
+            // STEP 2: Create app.
+            var createRequest = new CreateAppDto { Name = appName, Template = template.Name };
+
+            await _.Apps.PostAppAsync(createRequest);
+
+
+            // STEP 3: Get schemas
+            var schemas = await _.Schemas.GetSchemasAsync(appName);
+
+            Assert.NotEmpty(schemas.Items);
+        }
     }
 }
