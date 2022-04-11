@@ -179,7 +179,6 @@ namespace Squidex.Web
         public Resources(ApiController controller)
         {
             Controller = controller;
-
             Context = controller.HttpContext.Context();
         }
 

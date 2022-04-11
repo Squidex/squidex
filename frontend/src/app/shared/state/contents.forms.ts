@@ -351,7 +351,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
     }
 
     public addComponent(schemaId: string) {
-        this.form.add().reset({ schemaId });
+        this.form.add().patchValue({ schemaId });
     }
 
     public addItem() {
