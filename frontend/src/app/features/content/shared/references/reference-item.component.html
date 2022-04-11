@@ -3,7 +3,7 @@
         <ng-content></ng-content>
     </td>
 
-    <td class="content-field" sqxContentListCell="meta.lastModifiedBy.avatar">
+    <td class="content-field" sqxContentListCell field="meta.lastModifiedBy.avatar">
         <sqx-content-list-field field="meta.lastModifiedBy.avatar" [content]="content" [language]="language"></sqx-content-list-field>
     </td>
 
@@ -16,7 +16,7 @@
         <span class="badge rounded-pill badge-danger" *ngIf="isValid === false">INVALID</span>
     </td>
 
-    <td sqxContentListCell="meta.status.color">
+    <td sqxContentListCell field="meta.status.color">
         <sqx-content-list-field [language]="language" field="meta.status.color" [content]="content"></sqx-content-list-field>
     </td>
 
