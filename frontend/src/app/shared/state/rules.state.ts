@@ -95,7 +95,9 @@ export class RulesState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedRule: this.snapshot.selectedRule }, 'Loading Initial');
+            const { selectedRule } = this.snapshot;
+
+            this.resetState({ selectedRule }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);

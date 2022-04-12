@@ -67,7 +67,9 @@ export class RuleEventsState extends State<Snapshot> {
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ ruleId: this.snapshot.ruleId, ...update }, 'Loading Initial');
+            const { ruleId } = this.snapshot;
+
+            this.resetState({ ruleId, ...update }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);

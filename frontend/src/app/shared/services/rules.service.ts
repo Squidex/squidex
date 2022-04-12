@@ -198,6 +198,7 @@ export class SimulatedRuleEventDto {
     public readonly _links: ResourceLinks;
 
     constructor(links: ResourceLinks,
+        public readonly eventId: string,
         public readonly eventName: string,
         public readonly event: any,
         public readonly enrichedEvent: any | undefined,
@@ -360,6 +361,16 @@ export class RulesService {
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
 
+    public postSimulatedEvents(appName: string, trigger: any, action: any): Observable<SimulatedRuleEventsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/simulate`);
+
+        return this.http.post<any>(url, { trigger, action }).pipe(
+            map(body => {
+                return parseSimulatedEvents(body);
+            }),
+            pretifyError('i18n:rules.ruleEvents.loadFailed'));
+    }
+
     public enqueueEvent(appName: string, resource: Resource): Observable<any> {
         const link = resource._links['update'];
 
@@ -471,6 +482,7 @@ function parseRuleEvent(response: any) {
 
 function parseSimulatedRuleEvent(response: any) {
     return new SimulatedRuleEventDto(response._links,
+        response.eventId,
         response.eventName,
         response.event,
         response.enrichedEvent,

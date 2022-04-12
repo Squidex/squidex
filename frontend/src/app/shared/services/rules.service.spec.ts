@@ -326,6 +326,33 @@ describe('RulesService', () => {
                 ]));
         }));
 
+    it('should make post request to get simulated rule events with action and trigger',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+            let rules: SimulatedRuleEventsDto;
+
+            rulesService.postSimulatedEvents('my-app', {}, {}).subscribe(result => {
+                rules = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/simulate');
+
+            expect(req.request.method).toEqual('POST');
+
+            req.flush({
+                total: 20,
+                items: [
+                    simulatedRuleEventResponse(1),
+                    simulatedRuleEventResponse(2),
+                ],
+            });
+
+            expect(rules!).toEqual(
+                new SimulatedRuleEventsDto(20, [
+                    createSimulatedRuleEvent(1),
+                    createSimulatedRuleEvent(2),
+                ]));
+        }));
+
     it('should make put request to enqueue rule event',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             const resource: Resource = {
@@ -417,12 +444,12 @@ describe('RulesService', () => {
         return {
             id: `id${id}`,
             created: `${id % 1000 + 2000}-12-12T10:10:00Z`,
+            description: `event-url${key}`,
             eventName: `event-name${key}`,
-            nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
             jobResult: `Failed${key}`,
             lastDump: `event-dump${key}`,
+            nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
             numCalls: id,
-            description: `event-url${key}`,
             result: `Failed${key}`,
             _links: {
                 update: { method: 'PUT', href: `/rules/events/${id}` },
@@ -434,6 +461,7 @@ describe('RulesService', () => {
         const key = `${id}${suffix}`;
 
         return {
+            eventId: `id${key}`,
             eventName: `name${key}`,
             event: { value: 'simple' },
             enrichedEvent: { value: 'enriched' },
@@ -499,6 +527,7 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
     return new SimulatedRuleEventDto({},
+        `id${key}`,
         `name${key}`,
         { value: 'simple' },
         { value: 'enriched' },

@@ -52,6 +52,21 @@ describe('RuleSimulatorState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
+    it('should load simulated rule events by action and trigger', () => {
+        rulesService.setup(x => x.postSimulatedEvents(app, It.isAny(), It.isAny()))
+            .returns(() => of(new SimulatedRuleEventsDto(200, oldSimulatedRuleEvents)));
+
+        ruleSimulatorState.setRule({}, {});
+        ruleSimulatorState.load().subscribe();
+
+        expect(ruleSimulatorState.snapshot.simulatedRuleEvents).toEqual(oldSimulatedRuleEvents);
+        expect(ruleSimulatorState.snapshot.isLoaded).toBeTruthy();
+        expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
+        expect(ruleSimulatorState.snapshot.total).toEqual(200);
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+    });
+
     it('should reset loading state if loading failed', () => {
         rulesService.setup(x => x.getSimulatedEvents(app, '12'))
             .returns(() => throwError(() => 'Service Error'));

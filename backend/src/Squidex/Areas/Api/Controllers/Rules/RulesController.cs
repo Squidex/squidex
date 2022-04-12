@@ -14,6 +14,7 @@ using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -280,6 +281,31 @@ namespace Squidex.Areas.Api.Controllers.Rules
             await ruleEventsRepository.CancelByRuleAsync(id, HttpContext.RequestAborted);
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Simulate a rule.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="request">The rule to simulate.</param>
+        /// <returns>
+        /// 200 => Rule simulated.
+        /// 404 => Rule or app not found.
+        /// </returns>
+        [HttpPost]
+        [Route("apps/{app}/rules/simulate/")]
+        [ProducesResponseType(typeof(SimulatedRuleEventsDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
+        [ApiCosts(5)]
+        public async Task<IActionResult> Simulate(string app, [FromBody] CreateRuleDto request)
+        {
+            var rule = request.ToRule();
+
+            var simulation = await ruleRunnerService.SimulateAsync(App.NamedId(), DomainId.Empty, rule, HttpContext.RequestAborted);
+
+            var response = SimulatedRuleEventsDto.FromDomain(simulation);
+
+            return Ok(response);
         }
 
         /// <summary>

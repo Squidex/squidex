@@ -25,9 +25,9 @@
                     </tr>
                 </thead>
 
-                <tbody *ngFor="let event of ruleSimulatorState.simulatedRuleEvents | async"
+                <tbody *ngFor="let event of ruleSimulatorState.simulatedRuleEvents | async; trackBy: trackByEvent"
                     [sqxSimulatedRuleEvent]="event"
-                    [expanded]="event === selectedRuleEvent"
+                    [expanded]="event.eventId === selectedRuleEvent"
                     (expandedChange)="selectEvent(event)">
                 </tbody>
             </table>

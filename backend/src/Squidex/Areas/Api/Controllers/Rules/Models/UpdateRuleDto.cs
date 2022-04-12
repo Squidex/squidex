@@ -40,10 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         {
             var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id });
 
-            if (Trigger != null)
-            {
-                command.Trigger = Trigger.ToTrigger();
-            }
+            command.Trigger = Trigger?.ToTrigger();
 
             return command;
         }

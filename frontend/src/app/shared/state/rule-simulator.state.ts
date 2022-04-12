@@ -18,6 +18,12 @@ interface Snapshot extends ListState {
 
     // The current rule id.
     ruleId?: string;
+
+    // The rule trigger.
+    trigger?: any;
+
+    // The rule action.
+    action?: any;
 }
 
 @Injectable()
@@ -57,22 +63,29 @@ export class RuleSimulatorState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState({ ruleId: this.snapshot.ruleId }, 'Loading Initial');
+            const { action, ruleId, trigger } = this.snapshot;
+
+            this.resetState({ action, ruleId, trigger }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        if (!this.snapshot.ruleId) {
+        const { action, ruleId, trigger } = this.snapshot;
+
+        if (!ruleId && !trigger && !action) {
             return EMPTY;
         }
 
         this.next({ isLoading: true }, 'Loading Started');
 
-        const { ruleId } = this.snapshot;
+        const request =
+            action && trigger ?
+            this.rulesService.postSimulatedEvents(this.appName, trigger, action) :
+            this.rulesService.getSimulatedEvents(this.appName, ruleId!);
 
-        return this.rulesService.getSimulatedEvents(this.appName, ruleId!).pipe(
+        return request.pipe(
             tap(({ total, items: simulatedRuleEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:rules.ruleEvents.reloaded');
@@ -93,5 +106,9 @@ export class RuleSimulatorState extends State<Snapshot> {
 
     public selectRule(ruleId?: string) {
         this.resetState({ ruleId }, 'Select Rule');
+    }
+
+    public setRule(trigger: any, action: any) {
+        this.next({ trigger, action }, 'Set Rule');
     }
 }

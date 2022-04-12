@@ -15,6 +15,12 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
     public sealed record SimulatedRuleEventDto
     {
         /// <summary>
+        /// The unique event id.
+        /// </summary>
+        [Required]
+        public Guid EventId { get; init; }
+
+        /// <summary>
         /// The name of the event.
         /// </summary>
         [Required]
