@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
@@ -14,6 +15,8 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Infrastructure.Json;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 using Squidex.Text;
 using ValueTaskSupplement;
 
@@ -76,12 +79,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public virtual string ToPayload<T>(T @event)
         {
-            return jsonSerializer.Serialize(@event);
+            var payload = @event;
+
+            return jsonSerializer.Serialize(payload);
         }
 
         public virtual string ToEnvelope(EnrichedEvent @event)
         {
-            return jsonSerializer.Serialize(new { type = @event.Name, payload = @event, timestamp = @event.Timestamp });
+            var payload = new { type = @event.Name, payload = @event, timestamp = @event.Timestamp };
+
+            return jsonSerializer.Serialize(payload);
         }
 
         public async ValueTask<string?> FormatAsync(string text, EnrichedEvent @event)
@@ -106,12 +113,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 // Script vars are just wrappers over dictionaries for better performance.
                 var vars = new EventScriptVars
                 {
-                    Event = @event
+                    Event = @event,
+                    AppId = @event.AppId.Id,
+                    AppName = @event.AppId.Name,
+                    User = Admin()
                 };
 
-#pragma warning disable MA0042 // Do not use blocking calls in an async method
-                var result = scriptEngine.Execute(vars, script).ToString();
-#pragma warning restore MA0042 // Do not use blocking calls in an async method
+                var result = (await scriptEngine.ExecuteAsync(vars, script)).ToString();
 
                 if (result == "undefined")
                 {
@@ -129,6 +137,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             return CombineParts(text, parts);
+        }
+
+        private static ClaimsPrincipal Admin()
+        {
+            var claimsIdentity = new ClaimsIdentity();
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+
+            return claimsPrincipal;
         }
 
         private static string CombineParts(string text, List<TextPart> parts)

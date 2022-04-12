@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> SchemaTrigger()
             {
-                AddHelpers(ScriptScope.SchemaTrigger);
+                AddHelpers(ScriptScope.SchemaTrigger | ScriptScope.Async);
 
                 AddObject("event", FieldDescriptions.Event, () =>
                 {
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> CommentTrigger()
             {
-                AddHelpers(ScriptScope.CommentTrigger);
+                AddHelpers(ScriptScope.CommentTrigger | ScriptScope.Async);
 
                 AddObject("event", FieldDescriptions.Event, () =>
                 {
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> UsageTrigger()
             {
-                AddHelpers(ScriptScope.UsageTrigger);
+                AddHelpers(ScriptScope.UsageTrigger | ScriptScope.Async);
 
                 AddObject("event", FieldDescriptions.Event, () =>
                 {
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> ContentTrigger()
             {
-                var scope = ScriptScope.ContentTrigger;
+                var scope = ScriptScope.ContentTrigger | ScriptScope.Async;
 
                 AddHelpers(scope);
 
@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             public IReadOnlyList<ScriptingValue> AssetTrigger()
             {
-                AddHelpers(ScriptScope.AssetTrigger);
+                AddHelpers(ScriptScope.AssetTrigger | ScriptScope.Async);
 
                 AddObject("event", FieldDescriptions.Event, () =>
                 {
