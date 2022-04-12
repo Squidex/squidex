@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("${EVENT_INVALID ? file}", "file")]
         public async Task Should_provide_fallback_if_path_is_invalid(string script, string expect)
         {
-            var @event = new EnrichedAssetEvent { FileName = null! };
+            var @event = new EnrichedAssetEvent { AppId = appId, FileName = null! };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -165,7 +165,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("${ASSET_FILENAME ? file}", "file")]
         public async Task Should_provide_fallback_if_value_is_null(string script, string expect)
         {
-            var @event = new EnrichedAssetEvent { FileName = null! };
+            var @event = new EnrichedAssetEvent { AppId = appId, FileName = null! };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Found in ${ASSET_FILENAME|Upper }.docx", "Found in DONALD DUCK.docx")]
         public async Task Should_transform_replacements_and_igore_whitepsaces(string script, string expect)
         {
-            var @event = new EnrichedAssetEvent { FileName = "Donald Duck" };
+            var @event = new EnrichedAssetEvent { AppId = appId, FileName = "Donald Duck" };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Found in ${ASSET_FILENAME | Trim}.docx", "Found in Donald Duck.docx", "Donald Duck ")]
         public async Task Should_transform_replacements(string script, string expect, string name)
         {
-            var @event = new EnrichedAssetEvent { FileName = name };
+            var @event = new EnrichedAssetEvent { AppId = appId, FileName = name };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -210,7 +210,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("From ${USER_NAME | Trim}", "From Donald Duck", "Donald Duck ")]
         public async Task Should_transform_replacements_with_simple_pattern(string script, string expect, string name)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, name) });
@@ -225,7 +225,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("{'Key':'${ASSET_FILENAME}'}", "{'Key':'Donald Duck'}")]
         public async Task Should_transform_json_examples(string script, string expect)
         {
-            var @event = new EnrichedAssetEvent { FileName = "Donald Duck" };
+            var @event = new EnrichedAssetEvent { AppId = appId, FileName = "Donald Duck" };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_format_json()
         {
-            var @event = new EnrichedContentEvent { Actor = RefToken.Client("android") };
+            var @event = new EnrichedContentEvent { AppId = appId, Actor = RefToken.Client("android") };
 
             var result = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
@@ -245,7 +245,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_format_json_with_special_characters()
         {
-            var @event = new EnrichedContentEvent { Actor = RefToken.Client("mobile\"android") };
+            var @event = new EnrichedContentEvent { AppId = appId, Actor = RefToken.Client("mobile\"android") };
 
             var result = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
@@ -255,7 +255,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_evaluate_script_if_starting_with_whitespace()
         {
-            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+            var @event = new EnrichedContentEvent { AppId = appId, Type = EnrichedContentEventType.Created };
 
             var result = await sut.FormatAsync(" Script(`${event.type}`)", @event);
 
@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_evaluate_script_if_ends_with_whitespace()
         {
-            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+            var @event = new EnrichedContentEvent { AppId = appId, Type = EnrichedContentEventType.Created };
 
             var result = await sut.FormatAsync("Script(`${event.type}`) ", @event);
 
@@ -277,6 +277,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("categories",
