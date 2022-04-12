@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_schema_information_from_event(string script)
         {
-            var @event = new EnrichedContentEvent { SchemaId = schemaId };
+            var @event = new EnrichedContentEvent { AppId = appId, SchemaId = schemaId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_timestamp_information_from_event(string script)
         {
-            var @event = new EnrichedContentEvent { Timestamp = now };
+            var @event = new EnrichedContentEvent { AppId = appId, Timestamp = now };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_timestamp_date_information_from_event(string script)
         {
-            var @event = new EnrichedContentEvent { Timestamp = now };
+            var @event = new EnrichedContentEvent { AppId = appId, Timestamp = now };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_email_and_display_name_from_mentioned_user(string script)
         {
-            var @event = new EnrichedCommentEvent { MentionedUser = user };
+            var @event = new EnrichedCommentEvent { AppId = appId, MentionedUser = user };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_email_and_display_name_from_user(string script)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_return_null_if_user_is_not_found(string script)
         {
-            var @event = new EnrichedContentEvent();
+            var @event = new EnrichedContentEvent { AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -236,7 +236,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_email_and_display_name_from_client(string script)
         {
-            var @event = new EnrichedContentEvent { User = new ClientUser(RefToken.Client("android")) };
+            var @event = new EnrichedContentEvent { AppId = appId, User = new ClientUser(RefToken.Client("android")) };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -252,7 +252,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_base_property(string script)
         {
-            var @event = new EnrichedAssetEvent { Version = 13 };
+            var @event = new EnrichedAssetEvent { AppId = appId, Version = 13 };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_asset_file_name_from_event(string script)
         {
-            var @event = new EnrichedAssetEvent { FileName = "my-file.png" };
+            var @event = new EnrichedAssetEvent { AppId = appId, FileName = "my-file.png" };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_asset_asset_type_from_event(string script)
         {
-            var @event = new EnrichedAssetEvent { AssetType = AssetType.Audio };
+            var @event = new EnrichedAssetEvent { AppId = appId, AssetType = AssetType.Audio };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Liquid(Download at {{event | assetContentUrl}})")]
         public async Task Should_format_asset_content_url_from_event(string script)
         {
-            var @event = new EnrichedAssetEvent { Id = assetId, AppId = appId };
+            var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -318,7 +318,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Liquid(Download at {{event | assetContentUrl | default: 'null'}})")]
         public async Task Should_return_null_if_asset_content_url_not_found(string script)
         {
-            var @event = new EnrichedContentEvent();
+            var @event = new EnrichedContentEvent { AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -352,7 +352,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Liquid(Download at {{event | assetContentAppUrl | default: 'null'}})")]
         public async Task Should_return_null_if_asset_content_app_url_not_found(string script)
         {
-            var @event = new EnrichedContentEvent();
+            var @event = new EnrichedContentEvent { AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -386,7 +386,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Liquid(Download at {{event | assetContentSlugUrl | default: 'null'}})")]
         public async Task Should_return_null_if_asset_content_slug_url_not_found(string script)
         {
-            var @event = new EnrichedContentEvent();
+            var @event = new EnrichedContentEvent { AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -418,7 +418,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_return_null_if_content_url_if_not_found(string script)
         {
-            var @event = new EnrichedAssetEvent();
+            var @event = new EnrichedAssetEvent { AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -434,7 +434,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_content_status_if_found(string script)
         {
-            var @event = new EnrichedContentEvent { Status = Status.Published };
+            var @event = new EnrichedContentEvent { AppId = appId, Status = Status.Published };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -450,7 +450,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_return_null_if_content_status_not_found(string script)
         {
-            var @event = new EnrichedAssetEvent();
+            var @event = new EnrichedAssetEvent { AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -466,7 +466,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_content_actions_if_found(string script)
         {
-            var @event = new EnrichedContentEvent { Type = EnrichedContentEventType.Created };
+            var @event = new EnrichedContentEvent { AppId = appId, Type = EnrichedContentEventType.Created };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -482,7 +482,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_return_null_if_content_action_not_found(string script)
         {
-            var @event = new EnrichedAssetEvent();
+            var @event = new EnrichedAssetEvent { AppId = appId };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -500,6 +500,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("country",
@@ -523,6 +524,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -546,6 +548,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -569,6 +572,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -592,6 +596,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -615,6 +620,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -638,6 +644,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -661,6 +668,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -684,6 +692,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -707,6 +716,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -730,6 +740,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("city",
@@ -751,7 +762,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_format_actor(string script)
         {
-            var @event = new EnrichedContentEvent { Actor = RefToken.Client("android") };
+            var @event = new EnrichedContentEvent { AppId = appId, Actor = RefToken.Client("android") };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -767,7 +778,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_timestamp(string script)
         {
-            var @event = new EnrichedAssetEvent { LastModified = Instant.FromUnixTimeSeconds(1590769584) };
+            var @event = new EnrichedAssetEvent { AppId = appId, LastModified = Instant.FromUnixTimeSeconds(1590769584) };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -784,6 +795,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new EnrichedContentEvent
             {
+                AppId = appId,
                 Data =
                     new ContentData()
                         .AddField("time",
@@ -805,7 +817,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_timestamp_seconds(string script)
         {
-            var @event = new EnrichedAssetEvent { LastModified = Instant.FromUnixTimeSeconds(1590769584) };
+            var @event = new EnrichedAssetEvent { AppId = appId, LastModified = Instant.FromUnixTimeSeconds(1590769584) };
 
             var result = await sut.FormatAsync(script, @event);
 
@@ -821,7 +833,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_upper(string script)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
@@ -840,7 +852,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_lower(string script)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
@@ -859,7 +871,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_trimmed(string script)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
@@ -878,7 +890,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_slugify(string script)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
@@ -897,7 +909,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_chained(string script)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
@@ -916,7 +928,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         )]
         public async Task Should_transform_json_escape(string script)
         {
-            var @event = new EnrichedContentEvent { User = user };
+            var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck") });
