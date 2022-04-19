@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { marked } from 'marked';
 import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
@@ -16,6 +16,11 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true,
 };
 
+interface State {
+    // True, when the editor is shown as fullscreen.
+    isFullscreen: boolean;
+}
+
 @Component({
     selector: 'sqx-markdown-editor',
     styleUrls: ['./markdown-editor.component.scss'],
@@ -25,29 +30,38 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MarkdownEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit {
+export class MarkdownEditorComponent extends StatefulControlComponent<State, string> implements AfterViewInit {
     private simplemde: any;
     private value?: string;
+
+    @Input()
+    public folderId?: string;
 
     @Input()
     public set disabled(value: boolean | undefined | null) {
         this.setDisabledState(value === true);
     }
 
-    @Input()
-    public folderId?: string;
-
     @ViewChild('editor', { static: false })
     public editor!: ElementRef;
+
+    @ViewChild('container', { static: false })
+    public container!: ElementRef;
+
+    @ViewChild('inner', { static: false })
+    public inner!: ElementRef;
 
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
+        private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService,
     ) {
-        super(changeDetector, {});
+        super(changeDetector, {
+            isFullscreen: false,
+        });
     }
 
     public writeValue(obj: any) {
@@ -136,6 +150,11 @@ export class MarkdownEditorComponent extends StatefulControlComponent<{}, string
                         className: 'fa fa-eye no-disable',
                         title: 'Toggle Preview',
                     }, {
+                        name: 'fullscreen',
+                        action: SimpleMDE.toggleFullScreen,
+                        className: 'fa fa-arrows-alt no-disable no-mobile',
+                        title: 'Toggle Fullscreen',
+                    }, {
                         name: 'side-by-side',
                         action: SimpleMDE.toggleSideBySide,
                         className: 'fa fa-columns no-disable no-mobile',
@@ -170,6 +189,12 @@ export class MarkdownEditorComponent extends StatefulControlComponent<{}, string
 
                     this.callChange(value);
                 }
+            });
+
+            this.simplemde.codemirror.on('refresh', () => {
+                const isFullscreen = this.simplemde.isFullscreenActive();
+
+                this.toggleFullscreen(isFullscreen);
             });
 
             this.simplemde.codemirror.on('blur', () => {
@@ -235,6 +260,18 @@ export class MarkdownEditorComponent extends StatefulControlComponent<{}, string
                     }
                 },
             });
+    }
+
+    private toggleFullscreen(isFullscreen: boolean) {
+        let target = this.container.nativeElement;
+
+        if (isFullscreen) {
+            target = document.body;
+        }
+
+        this.renderer.appendChild(target, this.inner.nativeElement);
+
+        this.next({ isFullscreen });
     }
 
     private buildMarkups(assets: readonly AssetDto[]) {

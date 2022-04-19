@@ -12,3 +12,8 @@ $background: #fff;
         padding-top: 10px;
     }
 }
+
+.fullscreen {
+    @include fixed(0, 0, 0, 0);
+    z-index: 1040;
+}
