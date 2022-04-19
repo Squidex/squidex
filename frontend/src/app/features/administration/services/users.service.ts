@@ -60,11 +60,9 @@ export class UsersService {
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
-        return this.http.get<{ total: number; items: any[] } & Resource>(url).pipe(
-            map(({ total, items, _links }) => {
-                const users = items.map(parseUser);
-
-                return new UsersDto(total, users, _links);
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return parseUsers(body);
             }),
             pretifyError('i18n:users.loadFailed'));
     }
@@ -133,6 +131,12 @@ export class UsersService {
         return this.http.request(link.method, url).pipe(
             pretifyError('i18n:users.deleteFailed'));
     }
+}
+
+function parseUsers(response: { items: any[]; total: number } & Resource) {
+    const items = response.items.map(parseUser);
+
+    return new UsersDto(response.total, items, response._links);
 }
 
 function parseUser(response: any) {

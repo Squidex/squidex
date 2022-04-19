@@ -59,7 +59,7 @@ export class ContentComponent implements OnChanges {
     public dropdown = new ModalModel();
 
     public get isDirty() {
-        return this.patchForm && this.patchForm.form.dirty;
+        return this.patchForm?.form.dirty === true;
     }
 
     constructor(

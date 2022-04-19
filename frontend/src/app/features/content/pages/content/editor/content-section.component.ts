@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 
 interface State {
@@ -59,16 +59,18 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
 
         this.changes.subscribe(state => {
             if (this.formSection?.separator && this.schema) {
-                this.localStore.setBoolean(this.expandedKey(), state.isCollapsed);
+                this.localStore.setBoolean(this.isCollapsedKey(), state.isCollapsed);
             }
         });
     }
 
-    public ngOnChanges() {
-        if (this.formSection?.separator && this.schema) {
-            const isCollapsed = this.localStore.getBoolean(this.expandedKey());
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['formSection' || changes['schema']]) {
+            if (this.formSection?.separator && this.schema) {
+                const isCollapsed = this.localStore.getBoolean(this.isCollapsedKey());
 
-            this.next({ isCollapsed });
+                this.next({ isCollapsed });
+            }
         }
     }
 
@@ -87,7 +89,7 @@ export class ContentSectionComponent extends StatefulComponent<State> implements
         return formState.field.fieldId;
     }
 
-    private expandedKey(): string {
+    private isCollapsedKey(): string {
         return Settings.Local.FIELD_COLLAPSED(this.schema?.id, this.formSection?.separator?.fieldId);
     }
 }

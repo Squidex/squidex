@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { FilterComparison, LanguageDto, FilterableField, QueryModel, FilterFieldUI, getFilterUI, StatusInfo } from '@app/shared/internal';
+import { FilterableField, FilterComparison, FilterFieldUI, getFilterUI, LanguageDto, QueryModel, StatusInfo } from '@app/shared/internal';
 import { ContributorsState } from '@app/shared/state/contributors.state';
 
 @Component({

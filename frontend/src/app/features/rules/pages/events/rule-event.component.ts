@@ -29,24 +29,4 @@ export class RuleEventComponent {
 
     @Output()
     public cancel = new EventEmitter<any>();
-
-    public get jobResultClass() {
-        return getClass(this.event.jobResult);
-    }
-
-    public get resultClass() {
-        return getClass(this.event.result);
-    }
-}
-
-function getClass(result: string) {
-    if (result === 'Retry') {
-        return 'warning';
-    } else if (result === 'Failed' || result === 'Cancelled') {
-        return 'danger';
-    } else if (result === 'Pending') {
-        return 'secondary';
-    } else {
-        return result.toLowerCase();
-    }
 }

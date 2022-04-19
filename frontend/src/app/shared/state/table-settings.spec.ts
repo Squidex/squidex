@@ -8,7 +8,7 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DateTime, Version } from '@app/framework';
-import { createProperties, MetaFields, RootFieldDto, SchemaDto, TableField, TableSettings, FieldSizes, UIState } from '@app/shared/internal';
+import { createProperties, FieldSizes, MetaFields, RootFieldDto, SchemaDto, TableField, TableSettings, UIState } from '@app/shared/internal';
 import { FieldWrappings } from '..';
 
 describe('TableSettings', () => {

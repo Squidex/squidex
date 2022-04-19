@@ -68,28 +68,7 @@ export class CommentsService {
 
         return this.http.get<any>(url, options).pipe(
             map(body => {
-                const comments = new CommentsDto(
-                    body.createdComments.map((item: any) => {
-                        return new CommentDto(
-                            item.id,
-                            DateTime.parseISO(item.time),
-                            item.text,
-                            item.url,
-                            item.user);
-                    }),
-                    body.updatedComments.map((item: any) => {
-                        return new CommentDto(
-                            item.id,
-                            DateTime.parseISO(item.time),
-                            item.text,
-                            item.url,
-                            item.user);
-                    }),
-                    body.deletedComments,
-                    new Version(body.version),
-                );
-
-                return comments;
+                return parseComments(body);
             }),
             pretifyError('i18n:comments.loadFailed'));
     }
@@ -99,14 +78,7 @@ export class CommentsService {
 
         return this.http.post<any>(url, dto).pipe(
             map(body => {
-                const comment = new CommentDto(
-                    body.id,
-                    DateTime.parseISO(body.time),
-                    body.text,
-                    body.url,
-                    body.user);
-
-                return comment;
+                return parseComment(body);
             }),
             pretifyError('i18n:comments.createFailed'));
     }
@@ -125,3 +97,20 @@ export class CommentsService {
             pretifyError('i18n:comments.deleteFailed'));
     }
 }
+function parseComments(response: any) {
+    return new CommentsDto(
+        response.createdComments.map(parseComment),
+        response.updatedComments.map(parseComment),
+        response.deletedComments,
+        new Version(response.version));
+}
+
+function parseComment(response: any) {
+    return new CommentDto(
+        response.id,
+        DateTime.parseISO(response.time),
+        response.text,
+        response.url,
+        response.user);
+}
+

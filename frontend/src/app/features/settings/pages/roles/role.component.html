@@ -6,12 +6,12 @@
         <div class="col text-decent">
             {{ 'common.clients' | sqxTranslate }}
             
-            <span class="badge bg-secondary rounded-pill" [class.text-muted]="role.numClients <= 0">{{role.numClients}}</span>
+            <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numClients <= 0">{{role.numClients}}</span>
         </div>
         <div class="col text-decent">
             {{ 'common.users' | sqxTranslate }}
             
-            <span class="badge bg-secondary rounded-pill" [class.text-muted]="role.numContributors <=  0">{{role.numContributors}}</span>
+            <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numContributors <=  0">{{role.numContributors}}</span>
         </div>
         <div class="col-auto">
             <div class="float-end">

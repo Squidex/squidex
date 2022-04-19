@@ -80,6 +80,10 @@ export class Form<T extends AbstractControl, TOut, TIn = TOut> {
         return value;
     }
 
+    public getValue() {
+        return this.transformSubmit(this.form.value);
+    }
+
     public load(value: Partial<TIn> | undefined) {
         this.state.resetState();
 

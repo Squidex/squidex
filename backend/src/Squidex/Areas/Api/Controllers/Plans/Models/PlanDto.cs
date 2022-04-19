@@ -71,9 +71,11 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// </summary>
         public int MaxContributors { get; set; }
 
-        public static PlanDto FromPlan(IAppLimitsPlan plan)
+        public static PlanDto FromDomain(IAppLimitsPlan plan)
         {
-            return SimpleMapper.Map(plan, new PlanDto());
+            var result = SimpleMapper.Map(plan, new PlanDto());
+
+            return result;
         }
     }
 }

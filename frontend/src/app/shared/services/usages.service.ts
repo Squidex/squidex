@@ -76,7 +76,7 @@ export class UsagesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return new CurrentStorageDto(body.size, body.maxAllowed);
+                return parseCurrentStorage(body);
             }),
             pretifyError('i18n:usages.loadTodayStorageFailed'));
     }
@@ -86,30 +86,7 @@ export class UsagesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const details: { [category: string]: CallsUsagePerDateDto[] } = {};
-
-                for (const [category, value] of Object.entries(body.details)) {
-                    details[category] = (value as any).map((item: any) =>
-                        new CallsUsagePerDateDto(
-                            DateTime.parseISO(item.date),
-                            item.totalBytes,
-                            item.totalCalls,
-                            item.averageElapsedMs));
-                }
-
-                const usages =
-                    new CallsUsageDto(
-                        body.allowedBytes,
-                        body.allowedCalls,
-                        body.blockingCalls,
-                        body.totalBytes,
-                        body.totalCalls,
-                        body.monthBytes,
-                        body.monthCalls,
-                        body.averageElapsedMs,
-                        details);
-
-                return usages;
+                return parseCallsUsage(body);
             }),
             pretifyError('i18n:usages.loadCallsFailed'));
     }
@@ -119,14 +96,46 @@ export class UsagesService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                const usages = body.map(item =>
-                    new StorageUsagePerDateDto(
-                        DateTime.parseISO(item.date),
-                        item.totalCount,
-                        item.totalSize));
-
-                return usages;
+                return parseStorageUser(body);
             }),
             pretifyError('i18n:usages.loadStorageFailed'));
     }
+}
+
+function parseCurrentStorage(response: any): CurrentStorageDto {
+    return new CurrentStorageDto(response.size, response.maxAllowed);
+}
+
+function parseCallsUsage(response: any) {
+    const details: { [category: string]: CallsUsagePerDateDto[] } = {};
+
+    for (const [category, value] of Object.entries(response.details)) {
+        details[category] = (value as any).map((item: any) => new CallsUsagePerDateDto(
+            DateTime.parseISO(item.date),
+            item.totalBytes,
+            item.totalCalls,
+            item.averageElapsedMs));
+    }
+
+    const usages = new CallsUsageDto(
+        response.allowedBytes,
+        response.allowedCalls,
+        response.blockingCalls,
+        response.totalBytes,
+        response.totalCalls,
+        response.monthBytes,
+        response.monthCalls,
+        response.averageElapsedMs,
+        details);
+
+    return usages;
+}
+
+function parseStorageUser(response: any[]) {
+    const usages = response.map(item => new StorageUsagePerDateDto(
+        DateTime.parseISO(item.date),
+        item.totalCount,
+        item.totalSize));
+
+    return usages;
 }

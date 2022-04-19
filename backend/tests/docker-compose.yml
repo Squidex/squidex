@@ -13,15 +13,17 @@ services:
       - "8080:80"
     environment:
       - URLS__BASEURL=http://localhost:8080
+      - ASSETS_RESIZERURL=http://resizer:8081
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - GRAPHQL__CACHEDURATION=0
       - IDENTITY__ADMINCLIENTID=root
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
+      - IDENTITY__MULTIPLEDOMAINS=true
+      - SCRIPTING__TIMEOUTEXECUTION=00:00:10
+      - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
       - STORE__TYPE=MongoDB
-      - SCRIPTING__TIMEOUTSCRIPT=00:00:10
-      - SCRIPTING__TIMEOUTEXECUTION=00:00:10
-      - GRAPHQL__CACHEDURATION=0
-      - ASSETS_RESIZERURL=http://resizer:8081
+      - TEMPLATES__LOCALURL=http://localhost:80
     networks:
       - internal
     depends_on:

@@ -37,6 +37,9 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
     @Input()
     public formattable = true;
 
+    @Input()
+    public completion: ReadonlyArray<{ path: string; description: string }> | undefined | null;
+
     @ViewChild(DefaultValueAccessor)
     public inputEditor!: DefaultValueAccessor;
 
@@ -45,14 +48,18 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
 
     public disabled = false;
 
-    public get valueAccessor(): ControlValueAccessor {
-        return this.codeEditor || this.inputEditor;
-    }
-
     public modes = MODES;
     public mode: TemplateMode = 'Text';
 
     public aceMode = 'ace/editor/text';
+
+    public get actualCompletion() {
+        return this.mode === 'Script' ? this.completion : null;
+    }
+
+    public get valueAccessor(): ControlValueAccessor {
+        return this.codeEditor || this.inputEditor;
+    }
 
     public ngAfterViewInit() {
         this.valueAccessor.registerOnChange((value: any) => {

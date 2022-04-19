@@ -64,11 +64,15 @@ export class PlansState extends State<Snapshot> {
     public hasPortal =
         this.project(x => x.hasPortal);
 
-    public window = window;
-
     public get appId() {
         return this.appsState.appId;
     }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
+    public window = window;
 
     constructor(
         private readonly appsState: AppsState,
@@ -128,10 +132,6 @@ export class PlansState extends State<Snapshot> {
                 }
             }),
             shareSubscribed(this.dialogs));
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 
     private get userId() {

@@ -74,10 +74,8 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
         return this.http.get<{ items: any[]; _links: {} } & Resource>(url).pipe(
-            map(({ items, _links }) => {
-                const backups = items.map(parseBackup);
-
-                return new BackupsDto(backups.length, backups, _links);
+            map(body => {
+                return parseBackups(body);
             }),
             pretifyError('i18n:backups.loadFailed'));
     }
@@ -134,6 +132,12 @@ export class BackupsService {
     }
 }
 
+function parseBackups(response: { items: any[] } & Resource) {
+    const items = response.items.map(parseBackup);
+
+    return new BackupsDto(items.length, items, response._links);
+}
+
 function parseRestore(response: any) {
     return new RestoreDto(
         response.url,
@@ -143,7 +147,7 @@ function parseRestore(response: any) {
         response.log);
 }
 
-function parseBackup(response: any) {
+function parseBackup(response: any & Resource) {
     return new BackupDto(response._links,
         response.id,
         DateTime.parseISO(response.started),

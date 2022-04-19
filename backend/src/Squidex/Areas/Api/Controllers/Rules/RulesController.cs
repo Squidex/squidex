@@ -9,9 +9,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NodaTime;
+using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -70,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             var response = Deferred.Response(() =>
             {
-                return ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
+                return ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDomain(x.Value));
             });
 
             Response.Headers[HeaderNames.ETag] = etag;
@@ -284,6 +287,31 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// Simulate a rule.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="request">The rule to simulate.</param>
+        /// <returns>
+        /// 200 => Rule simulated.
+        /// 404 => Rule or app not found.
+        /// </returns>
+        [HttpPost]
+        [Route("apps/{app}/rules/simulate/")]
+        [ProducesResponseType(typeof(SimulatedRuleEventsDto), StatusCodes.Status200OK)]
+        [ApiPermissionOrAnonymous(Permissions.AppRulesEvents)]
+        [ApiCosts(5)]
+        public async Task<IActionResult> Simulate(string app, [FromBody] CreateRuleDto request)
+        {
+            var rule = request.ToRule();
+
+            var simulation = await ruleRunnerService.SimulateAsync(App.NamedId(), DomainId.Empty, rule, HttpContext.RequestAborted);
+
+            var response = SimulatedRuleEventsDto.FromDomain(simulation);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Simulate a rule.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the rule to simulate.</param>
         /// <returns>
         /// 200 => Rule simulated.
@@ -305,7 +333,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             var simulation = await ruleRunnerService.SimulateAsync(rule, HttpContext.RequestAborted);
 
-            var response = SimulatedRuleEventsDto.FromSimulatedRuleEvents(simulation);
+            var response = SimulatedRuleEventsDto.FromDomain(simulation);
 
             return Ok(response);
         }
@@ -350,7 +378,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take, HttpContext.RequestAborted);
 
-            var response = RuleEventsDto.FromRuleEvents(ruleEvents, Resources, ruleId);
+            var response = RuleEventsDto.FromDomain(ruleEvents, Resources, ruleId);
 
             return Ok(response);
         }
@@ -469,6 +497,19 @@ namespace Squidex.Areas.Api.Controllers.Rules
             return Content(schema.ToJson(), "application/json");
         }
 
+        [HttpGet]
+        [Route("apps/{app}/rules/completion/{triggerType}")]
+        [ApiPermissionOrAnonymous]
+        [ApiCosts(1)]
+        [OpenApiIgnore]
+        public IActionResult GetScriptCompletion(string app, string triggerType,
+            [FromServices] ScriptingCompleter completer)
+        {
+            var completion = completer.Trigger(triggerType);
+
+            return Ok(completion);
+        }
+
         private async Task<RuleDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
@@ -476,7 +517,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
             var runningRuleId = await ruleRunnerService.GetRunningRuleIdAsync(Context.App.Id, HttpContext.RequestAborted);
 
             var result = context.Result<IEnrichedRuleEntity>();
-            var response = RuleDto.FromRule(result, runningRuleId == null, ruleRunnerService, Resources);
+            var response = RuleDto.FromDomain(result, runningRuleId == null, ruleRunnerService, Resources);
 
             return response;
         }

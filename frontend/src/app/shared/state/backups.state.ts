@@ -45,6 +45,14 @@ export class BackupsState extends State<Snapshot> {
     public canCreate =
         this.project(x => x.canCreate === true);
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly backupsService: BackupsService,
@@ -99,9 +107,5 @@ export class BackupsState extends State<Snapshot> {
                 this.dialogs.notifyInfo('i18n:backups.deleted');
             }),
             shareSubscribed(this.dialogs));
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }

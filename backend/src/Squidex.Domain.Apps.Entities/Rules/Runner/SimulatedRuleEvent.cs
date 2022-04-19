@@ -6,11 +6,14 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
     public sealed record SimulatedRuleEvent
     {
+        public Guid EventId { get; init; }
+
         public string EventName { get; init; }
 
         public object Event { get; init; }

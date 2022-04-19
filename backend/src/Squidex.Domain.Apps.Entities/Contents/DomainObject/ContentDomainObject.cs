@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task ChangeCore(ChangeContentStatus c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsChangeStatusOwn);
+            operation.MustHavePermission(Permissions.AppContentsChangeStatus);
             operation.MustNotChangeSingleton(c.Status);
 
             if (c.Status == Snapshot.EditingStatus())
@@ -383,7 +383,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task ValidateCore(ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsReadOwn);
+            operation.MustHavePermission(Permissions.AppContentsRead);
 
             await operation.ValidateContentAndInputAsync(Snapshot.Data, false, Snapshot.IsPublished());
         }
@@ -408,12 +408,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
 
         private async Task DeleteCore(DeleteContent c, ContentOperation operation)
         {
-            operation.MustHavePermission(Permissions.AppContentsDeleteOwn);
+            operation.MustHavePermission(Permissions.AppContentsDelete);
             operation.MustNotDeleteSingleton();
 
             if (!c.DoNotScript)
             {
-                await operation.ExecuteDeleteScriptAsync();
+                await operation.ExecuteDeleteScriptAsync(c.Permanent);
             }
 
             if (c.CheckReferrers)

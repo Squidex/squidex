@@ -46,12 +46,10 @@ namespace Squidex.Infrastructure.Queries
                 {
                     var path = string.Join('.', pathStack.Reverse());
 
-                    var schema = field.Schema;
-
-                    if (schema.Fields != null)
+                    var schema = field.Schema with
                     {
-                        schema = schema with { Fields = null };
-                    }
+                        Fields = null
+                    };
 
                     result?.Add(field with { Path = path, Schema = schema });
                 }
@@ -88,9 +86,13 @@ namespace Squidex.Infrastructure.Queries
             {
                 var firstType = group.First().Schema.Type;
 
-                if (group.All(x => x.Schema.Type == firstType))
+                if (group.Count() == 1)
                 {
                     return group.Take(1);
+                }
+                else if (group.All(x => x.Schema.Type == firstType))
+                {
+                    return group.Take(1).Select(x => x with { Description = null });
                 }
                 else
                 {

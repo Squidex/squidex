@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 {
     public sealed class ResourcesDto : Resource
     {
-        public static ResourcesDto FromResources(Resources resources)
+        public static ResourcesDto FromDomain(Resources resources)
         {
             var result = new ResourcesDto();
 

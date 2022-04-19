@@ -6,7 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAssetScriptsForm, ResourceOwner } from '@app/shared';
 
 @Component({
@@ -15,7 +15,7 @@ import { AppsState, AssetCompletions, AssetScriptsState, AssetsService, EditAsse
     templateUrl: './asset-scripts-page.component.html',
 })
 export class AssetScriptsPageComponent extends ResourceOwner implements OnInit {
-    public assetScript = 'create';
+    public assetScript = 'annotate';
     public assetCompletions: Observable<AssetCompletions> = EMPTY;
 
     public editForm = new EditAssetScriptsForm();
@@ -31,7 +31,7 @@ export class AssetScriptsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.assetCompletions = this.assetsService.getCompletions(this.appsState.appName);
+        this.assetCompletions = this.assetsService.getCompletions(this.appsState.appName).pipe(shareReplay(1));
 
         this.assetScriptsState.scripts
             .subscribe(scripts => {

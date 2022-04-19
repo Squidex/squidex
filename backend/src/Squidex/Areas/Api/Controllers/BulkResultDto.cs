@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers
         [Obsolete("Use 'id' field now.")]
         public DomainId? ContentId => Id;
 
-        public static BulkResultDto FromBulkResult(BulkUpdateResultItem result, HttpContext httpContext)
+        public static BulkResultDto FromDomain(BulkUpdateResultItem result, HttpContext httpContext)
         {
             var error = result.Exception?.ToErrorDto(httpContext).Error;
 

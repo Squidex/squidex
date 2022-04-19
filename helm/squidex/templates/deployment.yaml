@@ -67,6 +67,11 @@ spec:
               value: {{ $mongoDefaultConnectionString | quote }}
           {{- end }}
 
+          {{- if (not .Values.env.ASSETSTORE__MONGODB__CONFIGURATION) }}
+            - name: "ASSETSTORE__MONGODB__CONFIGURATION"
+              value: {{ $mongoDefaultConnectionString | quote }}
+          {{- end }}
+
             - name: ORLEANS_SERVICE_ID
               valueFrom:
                 fieldRef:

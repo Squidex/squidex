@@ -63,6 +63,7 @@ export class CopyDirective {
 
     private copy() {
         try {
+            // eslint-disable-next-line deprecation/deprecation
             document.execCommand('copy');
 
             this.dialogs.notifyInfo('i18n:common.clipboardAdded');

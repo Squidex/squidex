@@ -27,16 +27,14 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 
+        public Rule ToRule()
+        {
+            return new Rule(Trigger.ToTrigger(), Action);
+        }
+
         public CreateRule ToCommand()
         {
-            var command = new CreateRule { Action = Action };
-
-            if (Trigger != null)
-            {
-                command.Trigger = Trigger.ToTrigger();
-            }
-
-            return command;
+            return new CreateRule { Action = Action, Trigger = Trigger?.ToTrigger() };
         }
     }
 }

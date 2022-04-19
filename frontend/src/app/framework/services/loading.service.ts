@@ -7,8 +7,7 @@
 
 import { Injectable, OnDestroy } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, map, Observable, Subscription } from 'rxjs';
 import { Types } from './../utils/types';
 
 @Injectable()

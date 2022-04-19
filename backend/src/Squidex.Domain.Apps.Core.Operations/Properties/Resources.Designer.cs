@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tell Squidex to not allow the current operation and to return a 403 (Forbidden)..
+        ///   Looks up a localized string similar to Tell Squidex to not allow the current operation and to return a 400 (BadRequest)..
         /// </summary>
         internal static string ScriptingDisallow {
             get {

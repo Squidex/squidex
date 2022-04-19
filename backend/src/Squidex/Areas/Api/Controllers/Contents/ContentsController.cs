@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
@@ -209,7 +208,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = Deferred.Response(() =>
             {
-                return ContentDto.FromContent(content, Resources);
+                return ContentDto.FromDomain(content, Resources);
             });
 
             return Ok(response);
@@ -331,7 +330,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 return NotFound();
             }
 
-            var response = ContentDto.FromContent(content, Resources);
+            var response = ContentDto.FromDomain(content, Resources);
 
             return Ok(response.Data);
         }
@@ -391,7 +390,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -422,7 +421,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<BulkUpdateResult>();
-            var response = result.Select(x => BulkResultDto.FromBulkResult(x, HttpContext)).ToArray();
+            var response = result.Select(x => BulkResultDto.FromDomain(x, HttpContext)).ToArray();
 
             return Ok(response);
         }
@@ -614,7 +613,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpDelete]
         [Route("content/{app}/{schema}/{id}/draft/")]
         [ProducesResponseType(typeof(ContentsDto), StatusCodes.Status200OK)]
-        [ApiPermissionOrAnonymous(Permissions.AppContentsDeleteOwn)]
+        [ApiPermissionOrAnonymous(Permissions.AppContentsVersionDeleteOwn)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteVersion(string app, string schema, DomainId id)
         {
@@ -658,7 +657,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IEnrichedContentEntity>();
-            var response = ContentDto.FromContent(result, Resources);
+            var response = ContentDto.FromDomain(result, Resources);
 
             return response;
         }

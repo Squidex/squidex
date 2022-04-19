@@ -61,6 +61,33 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user or client that triggered the event or command..
+        /// </summary>
+        public static string Actor {
+            get {
+                return ResourceManager.GetString("Actor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ID of this actor..
+        /// </summary>
+        public static string ActorIdentifier {
+            get {
+                return ResourceManager.GetString("ActorIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type of this actor..
+        /// </summary>
+        public static string ActorType {
+            get {
+                return ResourceManager.GetString("ActorType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The ID of the current app..
         /// </summary>
         public static string AppId {
@@ -304,6 +331,33 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user when someone is mentioned with &apos;@&apos;..
+        /// </summary>
+        public static string CommentMentionedUser {
+            get {
+                return ResourceManager.GetString("CommentMentionedUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The text of the comment..
+        /// </summary>
+        public static string CommentText {
+            get {
+                return ResourceManager.GetString("CommentText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The URL pointing to the source of the comment..
+        /// </summary>
+        public static string CommentUrl {
+            get {
+                return ResourceManager.GetString("CommentUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} field ({1} component)..
         /// </summary>
         public static string ComponentField {
@@ -318,6 +372,15 @@ namespace Squidex.Domain.Apps.Core {
         public static string ComponentSchemaId {
             get {
                 return ResourceManager.GetString("ComponentSchemaId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The content..
+        /// </summary>
+        public static string Content {
+            get {
+                return ResourceManager.GetString("Content", resourceCulture);
             }
         }
         
@@ -628,11 +691,65 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The actual event..
+        /// </summary>
+        public static string Event {
+            get {
+                return ResourceManager.GetString("Event", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name of the event..
+        /// </summary>
+        public static string EventName {
+            get {
+                return ResourceManager.GetString("EventName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The event timestamp..
+        /// </summary>
+        public static string EventTimestamp {
+            get {
+                return ResourceManager.GetString("EventTimestamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type of the event, e.g. &apos;Created&apos; or &apos;Updated&apos;..
+        /// </summary>
+        public static string EventType {
+            get {
+                return ResourceManager.GetString("EventType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The path to the json value..
         /// </summary>
         public static string JsonPath {
             get {
                 return ResourceManager.GetString("JsonPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ID part of this ID..
+        /// </summary>
+        public static string NamedId {
+            get {
+                return ResourceManager.GetString("NamedId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name part of this ID..
+        /// </summary>
+        public static string NamedName {
+            get {
+                return ResourceManager.GetString("NamedName", resourceCulture);
             }
         }
         
@@ -718,6 +835,33 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The ID of the schema..
+        /// </summary>
+        public static string SchemaId {
+            get {
+                return ResourceManager.GetString("SchemaId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The current number of calls..
+        /// </summary>
+        public static string UsageCallsCurrent {
+            get {
+                return ResourceManager.GetString("UsageCallsCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The configured usage limit..
+        /// </summary>
+        public static string UsageCallsLimit {
+            get {
+                return ResourceManager.GetString("UsageCallsLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Information about the current user..
         /// </summary>
         public static string User {
@@ -727,7 +871,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The additional properties of the user..
+        ///   Looks up a localized string similar to The additional properties of this user..
         /// </summary>
         public static string UserClaims {
             get {
@@ -736,7 +880,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The display name of the user..
+        ///   Looks up a localized string similar to The display name of this user..
         /// </summary>
         public static string UserDisplayName {
             get {
@@ -745,7 +889,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The email address of the current user..
+        ///   Looks up a localized string similar to The email address ofthis  user..
         /// </summary>
         public static string UserEmail {
             get {
@@ -754,7 +898,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The ID of the user..
+        ///   Looks up a localized string similar to The ID of this user..
         /// </summary>
         public static string UserId {
             get {
@@ -763,7 +907,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to True when the current user is a client, which is typically the case when the request is made from the API..
+        ///   Looks up a localized string similar to True when this user is a client, which is typically the case when the request is made from the API..
         /// </summary>
         public static string UserIsClient {
             get {
@@ -772,7 +916,7 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to True when the current user is a user, which is typically the case when the request is made in the UI..
+        ///   Looks up a localized string similar to True when this user is a user, which is typically the case when the request is made in the UI..
         /// </summary>
         public static string UserIsUser {
             get {

@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Secret { get; set; }
 
+        public string? Role { get; set; }
+
         public AttachClient()
         {
             Secret = RandomHash.New();

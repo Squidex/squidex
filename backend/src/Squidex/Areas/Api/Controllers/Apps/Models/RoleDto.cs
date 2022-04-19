@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public JsonObject Properties { get; set; }
 
-        public static RoleDto FromRole(Role role, IAppEntity app)
+        public static RoleDto FromDomain(Role role, IAppEntity app)
         {
             var result = new RoleDto
             {

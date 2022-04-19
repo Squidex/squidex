@@ -7,7 +7,8 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ResourceOwner, RuleSimulatorState, SimulatedRuleEventDto } from '@app/shared';
+import { MessageBus, ResourceOwner, RuleSimulatorState, SimulatedRuleEventDto } from '@app/shared';
+import { RuleConfigured } from '../messages';
 
 @Component({
     selector: 'sqx-simulator-events-page',
@@ -15,16 +16,23 @@ import { ResourceOwner, RuleSimulatorState, SimulatedRuleEventDto } from '@app/s
     templateUrl: './rule-simulator-page.component.html',
 })
 export class RuleSimulatorPageComponent extends ResourceOwner implements OnInit {
-    public selectedRuleEvent?: SimulatedRuleEventDto | null;
+    public selectedRuleEvent?: string | null;
 
     constructor(
-        private route: ActivatedRoute,
         public readonly ruleSimulatorState: RuleSimulatorState,
+        private readonly route: ActivatedRoute,
+        private readonly messageBus: MessageBus,
     ) {
         super();
     }
 
     public ngOnInit() {
+        this.own(
+            this.messageBus.of(RuleConfigured)
+                .subscribe(message => {
+                    this.ruleSimulatorState.setRule(message.trigger, message.action);
+                }));
+
         this.own(
             this.route.queryParams
                 .subscribe(query => {
@@ -33,14 +41,18 @@ export class RuleSimulatorPageComponent extends ResourceOwner implements OnInit 
     }
 
     public simulate() {
-        this.ruleSimulatorState.load();
+        this.ruleSimulatorState.load(true);
     }
 
     public selectEvent(event: SimulatedRuleEventDto) {
-        if (this.selectedRuleEvent === event) {
+        if (this.selectedRuleEvent === event.eventId) {
             this.selectedRuleEvent = null;
         } else {
-            this.selectedRuleEvent = event;
+            this.selectedRuleEvent = event.eventId;
         }
+    }
+
+    public trackByEvent(_index: number, event: SimulatedRuleEventDto) {
+        return event.eventId;
     }
 }

@@ -6,8 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
+import { map, Observable, shareReplay, Subject, takeUntil } from 'rxjs';
 import { DialogService, MathHelper, State, Types } from '@app/framework';
 import { AssetDto, AssetsService } from './../services/assets.service';
 import { AppsState } from './apps.state';
@@ -44,6 +43,14 @@ type UploadResult = AssetDto | number;
 export class AssetUploaderState extends State<Snapshot> {
     public uploads =
         this.project(x => x.uploads);
+
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
 
     constructor(
         private readonly appsState: AppsState,
@@ -97,17 +104,20 @@ export class AssetUploaderState extends State<Snapshot> {
                 } else {
                     return event;
                 }
-            }),
-            publishReplay(), refCount());
+            }), shareReplay());        
 
-        stream.subscribe(event => {
-            if (Types.isNumber(event)) {
-                upload = this.update(upload, { progress: event });
-            }
-        }, () => {
-            upload = this.remove(upload, { status: 'Failed' });
-        }, () => {
-            upload = this.remove(upload, { status: 'Completed', progress: 100 });
+        stream.subscribe({
+            next: event => {
+                if (Types.isNumber(event)) {
+                    upload = this.update(upload, { progress: event });
+                }
+            },
+            error: () => {
+                upload = this.remove(upload, { status: 'Failed' });
+            },
+            complete: () => {
+                upload = this.remove(upload, { status: 'Completed', progress: 100 });
+            },
         });
 
         return stream;
@@ -145,9 +155,5 @@ export class AssetUploaderState extends State<Snapshot> {
 
             return { ...s, uploads };
         }, 'Upload Started');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }

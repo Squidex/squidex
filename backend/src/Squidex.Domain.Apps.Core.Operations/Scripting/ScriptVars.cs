@@ -6,27 +6,11 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
-using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class ScriptVars : ScriptContext
+    public class ScriptVars : ScriptContext
     {
-        public ScriptVars()
-        {
-        }
-
-        public ScriptVars(ScriptVars source)
-            : base(source)
-        {
-        }
-
-        public ContentData? Data
-        {
-            get => GetValue<ContentData?>();
-            set => SetValue(value);
-        }
-
         public void SetValue(object? value, [CallerMemberName] string? key = null)
         {
             if (key != null)

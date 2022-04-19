@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { map, shareReplay } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { TagConverter, TagValue } from '@app/framework';
 import { SchemaDto } from './../services/schemas.service';
 import { SchemasState } from './schemas.state';
@@ -45,7 +45,7 @@ class SchemaConverter implements TagConverter {
 export class SchemaTagSource {
     public converter =
         this.schemasState.schemas.pipe(
-            map(x => new SchemaConverter(x), shareReplay(1)));
+            map(x => new SchemaConverter(x)));
 
     constructor(
         readonly schemasState: SchemasState,

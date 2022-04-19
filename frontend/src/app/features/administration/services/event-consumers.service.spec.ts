@@ -48,7 +48,7 @@ describe('EventConsumersService', () => {
             });
 
             expect(eventConsumers!).toEqual(
-                new EventConsumersDto([
+                new EventConsumersDto(2, [
                     createEventConsumer(12),
                     createEventConsumer(13),
                 ]));

@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.News.Models
         /// The latest features.
         /// </summary>
         [LocalizedRequired]
-        public List<FeatureDto> Features { get; set; }
+        public List<FeatureDto> Features { get; } = new List<FeatureDto>();
 
         /// <summary>
         /// The recent version.

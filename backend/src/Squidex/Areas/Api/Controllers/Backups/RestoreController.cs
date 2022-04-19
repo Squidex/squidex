@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
                 return NotFound();
             }
 
-            var response = RestoreJobDto.FromJob(job);
+            var response = RestoreJobDto.FromDomain(job);
 
             return Ok(response);
         }

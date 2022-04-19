@@ -117,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromContent(IEnrichedContentEntity content, Resources resources)
+        public static ContentDto FromDomain(IEnrichedContentEntity content, Resources resources)
         {
             var response = SimpleMapper.Map(content, new ContentDto
             {
@@ -136,7 +136,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (content.ReferenceFields != null)
             {
-                response.ReferenceFields = content.ReferenceFields.Select(FieldDto.FromField).ToArray();
+                response.ReferenceFields = content.ReferenceFields.Select(FieldDto.FromDomain).ToArray();
             }
 
             if (content.ScheduleJob != null)

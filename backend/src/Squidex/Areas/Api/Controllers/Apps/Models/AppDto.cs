@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public JsonObject RoleProperties { get; set; } = EmptyObject;
 
-        public static AppDto FromApp(IAppEntity app, string userId, bool isFrontend, Resources resources)
+        public static AppDto FromDomain(IAppEntity app, string userId, bool isFrontend, Resources resources)
         {
             var result = SimpleMapper.Map(app, new AppDto());
 
@@ -225,7 +225,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.IsAllowed(Shared.Permissions.AppAssetsScriptsUpdate, Name, additional: permissions))
             {
-                AddDeleteLink("assets/scripts", resources.Url<AppAssetsController>(x => nameof(x.GetScripts), values));
+                AddDeleteLink("assets/scripts", resources.Url<AppAssetsController>(x => nameof(x.GetAssetScripts), values));
             }
 
             AddGetLink("settings", resources.Url<AppSettingsController>(x => nameof(x.GetSettings), values));

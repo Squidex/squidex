@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
-            public AssetScripts AssetScripts { get; set; } = AssetScripts.Empty;
+            public AssetScripts AssetScripts { get; set; } = new AssetScripts();
 
             public LanguagesConfig Languages { get; set; } = LanguagesConfig.English;
 
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
                         return UpdateContributors(e, (e, c) => c.Remove(e.ContributorId));
 
                     case AppClientAttached e:
-                        return UpdateClients(e, (e, c) => c.Add(e.Id, e.Secret));
+                        return UpdateClients(e, (e, c) => c.Add(e.Id, e.Secret, e.Role));
 
                     case AppClientUpdated e:
                         return UpdateClients(e, (e, c) => c.Update(e.Id, e.Name, e.Role, e.ApiCallsLimit, e.ApiTrafficLimit, e.AllowAnonymous));
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.DomainObject
 
             private bool UpdateAssetScripts(AssetScripts? scripts)
             {
-                AssetScripts = scripts ?? AssetScripts.Empty;
+                AssetScripts = scripts ?? new AssetScripts();
 
                 return true;
             }

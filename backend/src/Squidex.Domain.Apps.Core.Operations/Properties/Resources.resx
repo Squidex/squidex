@@ -142,7 +142,7 @@
     <value>Makes a DELETE request to the defined URL and parses the result as JSON. Headers are optional.</value>
   </data>
   <data name="ScriptingDisallow" xml:space="preserve">
-    <value>Tell Squidex to not allow the current operation and to return a 403 (Forbidden).</value>
+    <value>Tell Squidex to not allow the current operation and to return a 400 (BadRequest).</value>
   </data>
   <data name="ScriptingFormatDate" xml:space="preserve">
     <value>Formats a JavaScript date object using the specified pattern.</value>

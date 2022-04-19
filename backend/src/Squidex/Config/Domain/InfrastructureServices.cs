@@ -67,7 +67,7 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<JintScriptEngine>()
-                .As<IScriptEngine>();
+                .As<IScriptEngine>().As<IScriptDescriptor>();
 
             services.AddSingletonAs<GrainTagService>()
                 .As<ITagService>();

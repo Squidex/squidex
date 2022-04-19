@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public FieldNames FieldsInReferences { get; private set; } = FieldNames.Empty;
 
-        public SchemaScripts Scripts { get; private set; } = SchemaScripts.Empty;
+        public SchemaScripts Scripts { get; private set; } = new SchemaScripts();
 
         public SchemaProperties Properties { get; private set; } = new SchemaProperties();
 

@@ -90,8 +90,16 @@ describe('ComponentField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to constant', () => {
-        expect(FieldFormatter.format(field, {})).toBe('{ Component }');
+    it('should format to constant when empty', () => {
+        expect(FieldFormatter.format(field, { schemaId: '123' })).toBe('Component');
+    });
+
+    it('should format to constant when values give', () => {
+        expect(FieldFormatter.format(field, { schemaId: '123', field1: 'Hello', field2: 1 })).toBe('Component: Hello, 1');
+    });
+
+    it('should format to constant when result is empty', () => {
+        expect(FieldFormatter.format(field, { schemaId: '123', field1: [] })).toBe('Component');
     });
 
     it('should return default value as null', () => {
@@ -240,6 +248,10 @@ describe('GeolocationField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
+    it('should format to empty string if other type', () => {
+        expect(FieldFormatter.format(field, 'Text')).toBe('');
+    });
+
     it('should format to latitude and longitude', () => {
         expect(FieldFormatter.format(field, { latitude: 42, longitude: 3.14 })).toBe('3.14, 42');
     });
@@ -278,6 +290,10 @@ describe('NumberField', () => {
 
     it('should format to empty string if null', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
+    });
+
+    it('should format to empty string if other type', () => {
+        expect(FieldFormatter.format(field, 'Text')).toBe('');
     });
 
     it('should format to number', () => {
@@ -393,7 +409,7 @@ describe('StringField', () => {
     it('should not format to preview image if not unsplash image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.com/123?x', true)).toBe('https://images.com/123?x');
+        expect(FieldFormatter.format(field2, 'https://images.com/123?x', true)).toEqual(new HtmlValue('<img src="https://images.com/123?x" />'));
     });
 
     it('should return default value from properties', () => {
@@ -420,12 +436,12 @@ describe('TagsField', () => {
         expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should format to asset count', () => {
-        expect(FieldFormatter.format(field, ['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
+    it('should format to empty string if other type', () => {
+        expect(FieldFormatter.format(field, 'Text')).toBe('');
     });
 
-    it('should return zero formatting if other type', () => {
-        expect(FieldFormatter.format(field, 1)).toBe('');
+    it('should format to asset count', () => {
+        expect(FieldFormatter.format(field, ['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
     });
 
     it('should return default value from properties', () => {

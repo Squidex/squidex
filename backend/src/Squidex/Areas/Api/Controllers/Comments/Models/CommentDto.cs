@@ -44,12 +44,14 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// </summary>
         public Uri? Url { get; set; }
 
-        public static CommentDto FromComment(Comment comment)
+        public static CommentDto FromDomain(Comment comment)
         {
-            return SimpleMapper.Map(comment, new CommentDto());
+            var result = SimpleMapper.Map(comment, new CommentDto());
+
+            return result;
         }
 
-        public static CommentDto FromCommand(CreateComment command)
+        public static CommentDto FromDomain(CreateComment command)
         {
             var time = SystemClock.Instance.GetCurrentInstant();
 

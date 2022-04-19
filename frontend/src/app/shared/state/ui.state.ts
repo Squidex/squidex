@@ -84,6 +84,14 @@ export class UIState extends State<Snapshot> {
             distinctUntilChanged());
     }
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly uiService: UIService,
@@ -207,10 +215,6 @@ export class UIState extends State<Snapshot> {
         }
 
         return false;
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }
 

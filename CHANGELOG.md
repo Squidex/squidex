@@ -3,6 +3,53 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.6.0] - 2022-03-25
+
+There was actually a 6.5.0, but it was not documented and due to a problem with the Github CI never published as a Release to Github.
+
+This version contains a lot of small improvements, but also one breaking change. Therefore it was not easy to decide whether the major version should be increased or not. As part of a refactoring the redirect URIs for external authentication providers have been changed. You have to change the following paths when you use Google, Github, Microsoft or OIDC authentication.
+
+* `/identity-server/signin-github` -> `/signin-github`
+* `/identity-server/signin-google` -> `/signin-google`
+* `/identity-server/signin-microsoft` -> `/signin-microsoft`
+* `/identity-server/signin-oidc` -> `/signin-oidc`
+
+### Fixed
+
+* **Assets**: Fixed a bug when image metadata was resolved.
+* **Assets**: Several fixes to the calculation of etags.
+* **Contents**: Several fixes to the calculation of etags.
+* **OpenAPI**: Several fixes to OpenAPI.
+* **Rules**: Fixed the authentication for the Medium action.
+* **Translations**: Fixed the selection of the chinese localization.
+* **UI**: Fixed the default values for component fields.
+* **UI**: Fixes for the field rules forms.
+
+### Changed
+
+* **Filters**: Better model for filters to simplify the UI and autocompletion in scripts.
+* **Identity**: Migration to a new authentication structure.
+* **Logs**: Easier logs with reabable messages.
+* **UI**: Better unsplash field editor.
+* **UI**: Migration to Angular CLI.
+* **UI**: New library for virtualization to fix several bugs with the array editor and large lists.
+* **UI**: New profile page.
+* **UI**: New style for content table to support resizable columns.
+
+### Added
+
+* **Assets**: New function to calculate the blur hash of an image.
+* **Assets**: Resumable file uploads with tus.
+* **GraphQL**: Memory caching directive (only self hosting).
+* **GraphQL**: New resolver to query references.
+* **GraphQL**: Support to define the allowed values for string fields as GraphQL enum.
+* **Templates**: New template system based on Github repositories.
+* **UI**: Fullscreen button for all fields.
+* **UI**: New embed SDK to allow inline editing to your website.
+* **UI**: New gallery page to explain how to install templates.
+* **UI**: Option to word wrap table columns.
+* **UI**: Resizable table columns.
+
 ## [6.4.0] - 2021-12-20
 
 ### Fixed

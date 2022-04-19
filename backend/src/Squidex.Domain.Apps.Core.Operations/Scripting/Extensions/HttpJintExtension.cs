@@ -36,6 +36,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.Extensions
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
+            if (!scope.HasFlag(ScriptScope.Async))
+            {
+                return;
+            }
+
             describe(JsonType.Function, "getJSON(url, callback, headers?)",
                 Resources.ScriptingGetJSON);
 

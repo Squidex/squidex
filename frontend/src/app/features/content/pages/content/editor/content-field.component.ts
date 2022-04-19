@@ -48,6 +48,11 @@ export class ContentFieldComponent implements OnChanges {
     @Input()
     public languages!: ReadonlyArray<AppLanguageDto>;
 
+    public showAllControls = false;
+
+    public isDifferent?: Observable<boolean>;
+    public isInvalid?: Observable<boolean>;
+
     @HostBinding('class')
     public get class() {
         return this.isHalfWidth ? 'col-6 half-field' : 'col-12';
@@ -61,11 +66,6 @@ export class ContentFieldComponent implements OnChanges {
         return this.formModel.field.properties.fieldType === 'String' && this.formModel.field.isLocalizable && this.languages.length > 1;
     }
 
-    public showAllControls = false;
-
-    public isDifferent?: Observable<boolean>;
-    public isInvalid?: Observable<boolean>;
-
     constructor(
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
@@ -74,7 +74,7 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        this.showAllControls = this.localStore.getBoolean(this.configKey());
+        this.showAllControls = this.localStore.getBoolean(this.showAllControlsKey());
 
         if (changes['formModel'] && this.formModel) {
             this.isInvalid = invalid$(this.formModel.form);
@@ -88,7 +88,7 @@ export class ContentFieldComponent implements OnChanges {
     public changeShowAllControls(showAllControls: boolean) {
         this.showAllControls = showAllControls;
 
-        this.localStore.setBoolean(this.configKey(), this.showAllControls);
+        this.localStore.setBoolean(this.showAllControlsKey(), this.showAllControls);
     }
 
     public copy() {
@@ -164,7 +164,7 @@ export class ContentFieldComponent implements OnChanges {
         return language.iso2Code;
     }
 
-    private configKey() {
+    private showAllControlsKey() {
         return Settings.Local.FIELD_ALL(this.schema?.id, this.formModel.field.fieldId);
     }
 }

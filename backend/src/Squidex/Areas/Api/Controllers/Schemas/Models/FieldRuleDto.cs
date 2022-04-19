@@ -31,7 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public string? Condition { get; set; }
 
-        public static FieldRuleDto FromFieldRule(FieldRule fieldRule)
+        public static FieldRuleDto FromDomain(FieldRule fieldRule)
         {
             return SimpleMapper.Map(fieldRule, new FieldRuleDto());
         }

@@ -10,7 +10,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { distinctUntilChanged, map, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, switchSafe, TableSettings, TempService, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsState, ContributorsState, defined, LanguagesState, LocalStoreService, ModalModel, Queries, Query, QuerySynchronizer, ResourceOwner, Router2State, SchemaDto, SchemasService, SchemasState, Settings, switchSafe, TableSettings, TempService, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
@@ -59,6 +59,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         public readonly languagesState: LanguagesState,
         private readonly appsState: AppsState,
         private readonly contributorsState: ContributorsState,
+        private readonly localStore: LocalStoreService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly schemasState: SchemasState,
@@ -103,6 +104,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.contentsState.load(false, initial);
                     this.contentsRoute.listen();
+
+                    const languageKey = this.localStore.get(this.languageKey());
+                    const language = this.languages.find(x => x.iso2Code === languageKey);
+
+                    if (language) {
+                        this.language = language;
+                    }
                 }));
 
         this.own(
@@ -149,6 +157,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.tempService.put(content.data);
 
         this.router.navigate(['new'], { relativeTo: this.route });
+    }
+
+    public changeLanguage(language: AppLanguageDto) {
+        this.language = language;
+
+        this.localStore.set(this.languageKey(), language.iso2Code);
     }
 
     public search(query: Query) {
@@ -220,6 +234,10 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     private selectItems(predicate?: (content: ContentDto) => boolean) {
         return this.contentsState.snapshot.contents.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
+    }
+
+    private languageKey(): any {
+        return Settings.Local.CONTENT_LANGUAGE(this.schema.id);
     }
 }
 

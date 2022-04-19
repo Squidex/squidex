@@ -25,6 +25,32 @@ const options = window['options'] || {};
 
 DateHelper.setlocale(options.more?.culture);
 
+function basePath() {
+    const baseElements = document.getElementsByTagName('base');
+
+    let baseHref: string = null!;
+
+    if (baseElements.length > 0) {
+        baseHref = baseElements[0].href;
+    }
+
+    if (baseHref.indexOf('http') === 0) {
+        baseHref = new URL(baseHref).pathname;
+    }
+
+    if (!baseHref) {
+        baseHref = '';
+    }
+
+    let path = options.embedPath || '/';
+
+    while (baseHref.endsWith('/')) {
+        baseHref = baseHref.substring(0, baseHref.length - 1);
+    }
+
+    return `${baseHref}${path}`;
+}
+
 function configApiUrl() {
     const baseElements = document.getElementsByTagName('base');
 
@@ -38,7 +64,7 @@ function configApiUrl() {
         baseHref = '/';
     }
 
-    if (baseHref.indexOf(window.location.protocol) === 0) {
+    if (baseHref.indexOf('http') === 0) {
         return new ApiUrlConfig(baseHref);
     } else {
         return new ApiUrlConfig(`${window.location.protocol}//${window.location.host}${baseHref}`);
@@ -86,7 +112,7 @@ export class AppRouteReuseStrategy extends BaseRouteReuseStrategy {
         { provide: RouteReuseStrategy, useClass: AppRouteReuseStrategy },
         { provide: TitlesConfig, useFactory: configTitles },
         { provide: UIOptions, useFactory: configUIOptions },
-        { provide: APP_BASE_HREF, useValue: options.embedPath || '/' },
+        { provide: APP_BASE_HREF, useValue: basePath() },
     ],
     entryComponents: [AppComponent],
 })

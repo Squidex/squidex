@@ -20,6 +20,9 @@ affinity: { }
 
 clusterSuffix: cluster.local
 
+auth:
+  ## 
+
 ingress:  
   ## If true, Squidex Ingress will be created.
   ##

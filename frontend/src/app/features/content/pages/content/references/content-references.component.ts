@@ -43,13 +43,13 @@ export class ContentReferencesComponent implements OnChanges, OnInit, OnDestroy 
     }
 
     public ngOnInit() {
-        this.toolbar.addButton(this, 'contents.validate', () => {
+        this.toolbar.addButton(this, 'i18n:contents.validate', () => {
             this.validate();
 
             this.changeDetector.detectChanges();
         });
 
-        this.toolbar.addButton(this, 'contents.publishAll', () => {
+        this.toolbar.addButton(this, 'i18n:contents.publishAll', () => {
             this.publishAll();
 
             this.changeDetector.detectChanges();

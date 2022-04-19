@@ -19,13 +19,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [LocalizedRequired]
         public RoleDto[] Items { get; set; }
 
-        public static RolesDto FromApp(IAppEntity app, Resources resources)
+        public static RolesDto FromDomain(IAppEntity app, Resources resources)
         {
             var result = new RolesDto
             {
                 Items =
                     app.Roles.All
-                        .Select(x => RoleDto.FromRole(x, app))
+                        .Select(x => RoleDto.FromDomain(x, app))
                         .Select(x => x.CreateLinks(resources))
                         .OrderBy(x => x.Name)
                         .ToArray()

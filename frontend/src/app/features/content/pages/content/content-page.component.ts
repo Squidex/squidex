@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ResolveContents, ContentsState, defined, DialogService, EditContentForm, LanguagesState, ModalModel, ResourceOwner, SchemaDto, SchemasState, TempService, ToolbarService, Types, Version, ResolveAssets } from '@app/shared';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, ContentDto, ContentsState, defined, DialogService, EditContentForm, LanguagesState, LocalStoreService, ModalModel, ResolveAssets, ResolveContents, ResourceOwner, SchemaDto, SchemasState, Settings, TempService, ToolbarService, Types, Version } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-page',
@@ -49,6 +49,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly autoSaveService: AutoSaveService,
         private readonly dialogs: DialogService,
         private readonly languagesState: LanguagesState,
+        private readonly localStore: LocalStoreService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly schemasState: SchemasState,
@@ -85,6 +86,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.schemasState.selectedSchema.pipe(defined())
                 .subscribe(schema => {
                     this.schema = schema;
+
+                    const languageKey = this.localStore.get(this.languageKey());
+                    const language = this.languages.find(x => x.iso2Code === languageKey);
+
+                    if (language) {
+                        this.language = language;
+                    }
 
                     this.contentForm = new EditContentForm(this.languages, this.schema, this.schemasState.schemaMap, this.formContext);
                 }));
@@ -217,6 +225,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
+    public changeLanguage(language: AppLanguageDto) {
+        this.language = language;
+
+        this.localStore.set(this.languageKey(), language.iso2Code);
+    }
+
     public checkPendingChangesBeforePreview() {
         return this.checkPendingChanges('i18n:contents.pendingChangesTextToPreview');
     }
@@ -276,6 +290,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
         this.contentForm.load(data, isInitial);
         this.contentForm.setEnabled(!this.content || this.content.canUpdate);
+    }
+
+    private languageKey(): any {
+        return Settings.Local.CONTENT_LANGUAGE(this.schema.id);
     }
 }
 

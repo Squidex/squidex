@@ -32,15 +32,17 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static CommentsDto FromResult(CommentsResult result)
+        public static CommentsDto FromDomain(CommentsResult comments)
         {
-            return new CommentsDto
+            var result = new CommentsDto
             {
-                CreatedComments = result.CreatedComments.Select(CommentDto.FromComment).ToArray(),
-                UpdatedComments = result.UpdatedComments.Select(CommentDto.FromComment).ToArray(),
-                DeletedComments = result.DeletedComments,
-                Version = result.Version
+                CreatedComments = comments.CreatedComments.Select(CommentDto.FromDomain).ToArray(),
+                UpdatedComments = comments.UpdatedComments.Select(CommentDto.FromDomain).ToArray(),
+                DeletedComments = comments.DeletedComments,
+                Version = comments.Version
             };
+
+            return result;
         }
     }
 }

@@ -12,10 +12,10 @@
                     <sqx-formattable-input [formControlName]="property.name" type="Text" [formattable]="property.isFormattable"></sqx-formattable-input>
                 </ng-container>
                 <ng-container *ngSwitchCase="'TextArea'">
-                    <sqx-formattable-input [formControlName]="property.name" type="Code" [formattable]="property.isFormattable"></sqx-formattable-input>
+                    <sqx-formattable-input [completion]="ruleCompletions | async" [formControlName]="property.name" type="Code" [formattable]="property.isFormattable"></sqx-formattable-input>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Javascript'">
-                    <sqx-code-editor [formControlName]="property.name" [height]="350"></sqx-code-editor>
+                    <sqx-code-editor [completion]="ruleCompletions | async" [formControlName]="property.name" [height]="350"></sqx-code-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'Checkbox'">
                     <div class="form-check">
@@ -37,10 +37,10 @@
             </ng-container>
 
             <sqx-form-hint>
-                <span [sqxMarkdown]="property.description" [inline]="true"></span>
+                <span [sqxMarkdown]="property.description" [inline]="true" [html]="true"></span>
 
                 <div *ngIf="property.isFormattable">
-                    You can use advanced formatting: <a href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>Documentation</a>
+                    {{ 'i18n:rules.advancedFormattingHint' | sqxTranslate }}: <a href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink>{{ 'i18n:common.documentation' | sqxTranslate }}</a>
                 </div>
             </sqx-form-hint>
         </div>

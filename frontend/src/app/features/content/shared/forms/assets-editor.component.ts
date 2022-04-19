@@ -8,6 +8,7 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AssetDto, DialogModel, LocalStoreService, MessageBus, ResolveAssets, Settings, sorted, StatefulControlComponent, Types } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -56,15 +57,18 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
     public assetsDialog = new DialogModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef, localStore: LocalStoreService,
         private readonly assetsResolver: ResolveAssets,
-        private readonly localStore: LocalStoreService,
         private readonly messageBus: MessageBus,
     ) {
         super(changeDetector, {
             assets: [],
             assetFiles: [],
             isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
+        });
+
+        this.changes.pipe(map(x => x.isListView), distinctUntilChanged()).subscribe(value => {
+            localStore.setBoolean(Settings.Local.ASSETS_MODE, value);
         });
     }
 
@@ -170,8 +174,6 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, Reado
 
     public changeView(isListView: boolean) {
         this.next({ isListView });
-
-        this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }
 
     private updateValue() {

@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string? Label { get; set; }
 
         /// <summary>
-        /// Hints to describe the schema.
+        /// Hints to describe the field.
         /// </summary>
         [LocalizedStringLength(1000)]
         public string? Hints { get; set; }

@@ -113,6 +113,18 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     public canRenameTag =
         this.project(x => x.canRenameTag === true);
 
+    public get parentId() {
+        return this.snapshot.parentId;
+    }
+
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     protected constructor(name: string,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
@@ -413,14 +425,6 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         }
 
         return this.loadInternal(false);
-    }
-
-    public get parentId() {
-        return this.snapshot.parentId;
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }
 

@@ -559,6 +559,61 @@ describe('ContentForm', () => {
             });
         });
 
+        it('should add components with default values', () => {
+            const componentId = MathHelper.guid();
+            const component = createSchema({
+                id: 1,
+                fields: [
+                    createField({
+                        id: 11,
+                        properties: createProperties('String', {
+                            defaultValue: 'Initial',
+                        }),
+                        partitioning: 'invariant',
+                    }),
+                    createField({
+                        id: 12,
+                        properties: createProperties('Number', {
+                            defaultValue: 12,
+                        }),
+                        partitioning: 'invariant',
+                    }),
+                ],
+            });
+
+            const contentForm = createForm([
+                createField({
+                    id: 4,
+                    properties: createProperties('Components'),
+                    partitioning: 'invariant',
+                }),
+            ], [], {
+                [componentId]: component,
+            });
+
+            contentForm.load({});
+
+            // Should be undefined by default.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: undefined,
+                },
+            });
+
+            (contentForm.get('field4')?.get('iv') as FieldArrayForm).addComponent(componentId);
+
+            // Should add field from component.
+            expect(contentForm.value).toEqual({
+                field4: {
+                    iv: [{
+                        schemaId: componentId,
+                        field11: 'Initial',
+                        field12: 12,
+                    }],
+                },
+            });
+        });
+
         it('should replace component with new fields', () => {
             const component1Id = MathHelper.guid();
             const component1 = createSchema({
@@ -798,11 +853,11 @@ describe('ContentForm', () => {
                         const a = form[key];
                         const e = test[key];
 
-                        expect(a).toBe(e, `Expected ${key} of ${path} to be <${e}>, but found <${a}>.`);
+                        expect(a).withContext(`Expected ${key} of ${path} to be <${e}>, but found <${a}>.`).toEqual(e);
                     }
                 }
             } else {
-                expect(form).not.toBeNull(`Expected to find form ${path}, but form not found.`);
+                expect(form).withContext(`Expected to find form ${path}, but form not found.`).not.toBeNull();
             }
         }
     });

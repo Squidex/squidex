@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, provider, default);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             await sut.EnrichAsync(ctx, new[] { content }, provider, default);
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
                 .MustNotHaveHappened();
         }
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var content = new ContentEntity { Data = oldData, SchemaId = schemaId };
 
-            A.CallTo(() => scriptEngine.TransformAsync(A<ScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
+            A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, "my-query", ScriptOptions(), A<CancellationToken>._))
                 .Returns(new ContentData());
 
             await sut.EnrichAsync(ctx, new[] { content }, provider, default);
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             Assert.NotSame(oldData, content.Data);
 
             A.CallTo(() => scriptEngine.TransformAsync(
-                    A<ScriptVars>.That.Matches(x =>
+                    A<DataScriptVars>.That.Matches(x =>
                         Equals(x["user"], ctx.User) &&
                         Equals(x["data"], oldData) &&
                         Equals(x["contentId"], content.Id)),

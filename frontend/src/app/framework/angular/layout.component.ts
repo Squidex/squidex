@@ -9,7 +9,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
-import { filter, map, startWith } from 'rxjs/operators';
+import { filter, map, startWith } from 'rxjs';
 import { LayoutContainerDirective } from './layout-container.directive';
 
 @Component({
@@ -68,6 +68,8 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('panel', { static: false })
     public panel!: ElementRef<HTMLElement>;
 
+    public isCollapsed = false;
+
     public get desiredWidth() {
         return this.isCollapsed ? 3 : this.width;
     }
@@ -83,8 +85,6 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     public get renderWidth() {
         return this.widthToRender;
     }
-
-    public isCollapsed = false;
 
     public firstChild =
         this.router.events.pipe(

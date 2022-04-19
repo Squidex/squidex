@@ -87,6 +87,7 @@ $color-border:              #dedfe3;
 		border: 1px solid $color-border;
 		border-radius: 2px;
 		box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+		z-index: 100000;
 
 		iframe {
 			@include absolute(0, 0, 0, 0);

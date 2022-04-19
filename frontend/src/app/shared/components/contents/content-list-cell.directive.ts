@@ -7,8 +7,7 @@
 
 import { Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit, Pipe, PipeTransform, Renderer2 } from '@angular/core';
 import { ResourceOwner } from '@app/framework';
-import { RootFieldDto, TableSettings } from '@app/shared';
-import { ContentDto, MetaFields, TableField, FieldSizes, Types } from '@app/shared/internal';
+import { ContentDto, FieldSizes, MetaFields, RootFieldDto, TableField, TableSettings, Types } from '@app/shared/internal';
 
 export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | null) {
     if (Types.is(field, RootFieldDto)) {

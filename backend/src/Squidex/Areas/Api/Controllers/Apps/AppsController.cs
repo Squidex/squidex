@@ -60,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             {
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, isFrontend, Resources)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, isFrontend, Resources)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -89,7 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromApp(App, userOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(App, userOrClientId, isFrontend, Resources);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -213,7 +213,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
                 var isFrontend = HttpContext.User.IsInClient(DefaultClients.Frontend);
 
-                return AppDto.FromApp(x, userOrClientId, isFrontend, Resources);
+                return AppDto.FromDomain(x, userOrClientId, isFrontend, Resources);
             });
         }
 

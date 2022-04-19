@@ -49,6 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public void Describe(AddDescription describe, ScriptScope scope)
         {
+            if (!scope.HasFlag(ScriptScope.Async))
+            {
+                return;
+            }
+
             describe(JsonType.Function, "getReferences(ids, callback)",
                 Resources.ScriptingGetReferences);
 

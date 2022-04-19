@@ -21,7 +21,11 @@
                 <span class="truncate">{{triggerSchema.schema.displayName}}</span>
             </td>
             <td class="text-center">
-                <input type="text" class="form-control code" placeholder="i18n:rules.conditionHint" [disabled]="triggerForm.form.disabled" [ngModelOptions]="{ updateOn: 'blur' }" [ngModel]="triggerSchema.condition" (ngModelChange)="updateCondition(triggerSchema.schema, $event)">
+                <input type="text" class="form-control code" placeholder="{{ 'i18n:rules.conditionHint' | sqxTranslate }}" 
+                    [disabled]="triggerForm.form.disabled" 
+                    [ngModelOptions]="{ updateOn: 'blur' }" 
+                    [ngModel]="triggerSchema.condition" 
+                    (ngModelChange)="updateCondition(triggerSchema.schema, $event)">
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)" [disabled]="triggerForm.form.disabled">

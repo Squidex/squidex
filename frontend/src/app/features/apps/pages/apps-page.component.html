@@ -22,7 +22,7 @@
     </ng-container>
 
     <div class="apps-section" *ngIf="(uiState.settings | async)?.canCreateApps">
-        <div class="card card-template card-href" (click)="createNewApp('')">
+        <div class="card card-template card-href" (click)="createNewApp()">
             <div class="card-body">
                 <div class="card-image">
                     <img src="./images/add-app.svg">
@@ -36,34 +36,16 @@
             </div>
         </div>
 
-        <div class="card card-template card-href" (click)="createNewApp('Blog')">
+        <div class="card card-template card-href" *ngFor="let template of templates | async" (click)="createNewApp(template)">
             <div class="card-body">
                 <div class="card-image">
-                    <img src="./images/add-blog.svg">
+                    <img src="./images/add-template.svg">
                 </div>
 
-                <h3 class="card-title">{{ 'apps.createBlogApp' | sqxTranslate }}</h3>
+                <h3 class="card-title">{{template.title}}</h3>
 
                 <sqx-form-hint>
-                    {{ 'apps.createBlogAppDescription' | sqxTranslate }}
-                    <br />
-                    {{ 'common.sampleCodeLabel' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'common.github' | sqxTranslate }}</a>
-                </sqx-form-hint>
-            </div>
-        </div>
-
-        <div class="card card-template card-href" (click)="createNewApp('Profile')">
-            <div class="card-body">
-                <div class="card-image">
-                    <img src="./images/add-profile.svg">
-                </div>
-
-                <h3 class="card-title">{{ 'apps.createProfileApp' | sqxTranslate }}</h3>
-
-                <sqx-form-hint>
-                    {{ 'apps.createProfileAppDescription' | sqxTranslate }}
-                    <br />
-                    {{ 'common.sampleCodeLabel' | sqxTranslate }} <a href="https://github.com/Squidex/squidex-samples" sqxStopClick sqxExternalLink>{{ 'common.github' | sqxTranslate }}</a>
+                    {{template.description}}
                 </sqx-form-hint>
             </div>
         </div>
