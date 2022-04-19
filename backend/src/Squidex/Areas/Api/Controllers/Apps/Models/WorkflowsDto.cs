@@ -32,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 Items =
                     app.Workflows
-                        .Select(x => WorkflowDto.FromWorkflow(x.Key, x.Value))
+                        .Select(x => WorkflowDto.FromDomain(x.Key, x.Value))
                         .Select(x => x.CreateLinks(resources))
                         .ToArray()
             };

@@ -32,14 +32,17 @@ export class StockPhotoService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                return body.map(x =>
-                    new StockPhotoDto(
-                        x.url,
-                        x.thumbUrl,
-                        x.user,
-                        x.userProfileUrl,
-                    ));
+                return parseImages(body);
             }),
             catchError(() => of([])));
     }
 }
+function parseImages(body: any[]) {
+    return body.map(x => new StockPhotoDto(
+        x.url,
+        x.thumbUrl,
+        x.user,
+        x.userProfileUrl,
+    ));
+}
+

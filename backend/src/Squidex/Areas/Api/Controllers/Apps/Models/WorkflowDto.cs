@@ -42,13 +42,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public Status Initial { get; set; }
 
-        public static WorkflowDto FromWorkflow(DomainId id, Workflow workflow)
+        public static WorkflowDto FromDomain(DomainId id, Workflow workflow)
         {
             var result = SimpleMapper.Map(workflow, new WorkflowDto
             {
                 Steps = workflow.Steps.ToDictionary(
                     x => x.Key,
-                    x => WorkflowStepDto.FromWorkflowStep(x.Value)),
+                    x => WorkflowStepDto.FromDomain(x.Value)),
                 Id = id
             });
 

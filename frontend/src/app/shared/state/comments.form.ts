@@ -6,7 +6,7 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, ExtendedFormGroup } from '@app/framework';
+import { ExtendedFormGroup, Form } from '@app/framework';
 import { UpsertCommentDto } from './../services/comments.service';
 
 export class UpsertCommentForm extends Form<ExtendedFormGroup, UpsertCommentDto> {

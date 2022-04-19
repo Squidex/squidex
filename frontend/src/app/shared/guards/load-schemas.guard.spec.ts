@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-import { SchemasState } from '@app/shared';
+import { SchemasState } from '@app/shared/internal';
 import { LoadSchemasGuard } from './load-schemas.guard';
 
 describe('LoadSchemasGuard', () => {

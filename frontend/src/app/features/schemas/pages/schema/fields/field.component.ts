@@ -30,10 +30,6 @@ export class FieldComponent implements OnChanges {
     @Input()
     public settings!: AppSettingsDto;
 
-    public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
-    }
-
     public dropdown = new ModalModel();
 
     public trackByFieldFn: (_index: number, field: NestedFieldDto) => any;
@@ -44,6 +40,10 @@ export class FieldComponent implements OnChanges {
     public editForm!: EditFieldForm;
 
     public addFieldDialog = new DialogModel();
+
+    public get isLocalizable() {
+        return (this.parent && this.parent.isLocalizable) || this.field['isLocalizable'];
+    }
 
     constructor(
         private readonly schemasState: SchemasState,

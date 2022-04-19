@@ -9,8 +9,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed record SchemaScripts
     {
-        public static readonly SchemaScripts Empty = new SchemaScripts();
-
         public string? Change { get; init; }
 
         public string? Create { get; init; }

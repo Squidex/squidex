@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetScriptsDto FromApp(IAppEntity app, Resources resources)
+        public static AssetScriptsDto FromDomain(IAppEntity app, Resources resources)
         {
             var result = SimpleMapper.Map(app.AssetScripts, new AssetScriptsDto());
 
@@ -58,7 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (resources.CanUpdateAssetsScripts)
             {
-                AddPutLink("update", resources.Url<AppAssetsController>(x => nameof(x.PutScripts), values));
+                AddPutLink("update", resources.Url<AppAssetsController>(x => nameof(x.PutAssetScripts), values));
             }
 
             return this;

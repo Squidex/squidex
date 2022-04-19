@@ -62,6 +62,10 @@
     .alert-link {
         color: inherit;
     }
+
+    a {
+        color: inherit;
+    }
 }
 
 .alert-hint {
@@ -74,12 +78,26 @@
     padding-left: 3rem;
     position: relative;
 
+    &.light {
+        background: $color-white;
+        border: 1px solid $color-border;
+        border-radius: $border-radius;
+    }
+
     i {
         @include absolute(1rem, null, null, 1rem);
         color: $color-theme-brand;
         font-size: 1.3rem;
         font-weight: normal;
         vertical-align: text-bottom;
+    }
+
+    .icon-external-link {
+        color: inherit;
+        font-size: inherit;
+        font-weight: normal;
+        position: static;
+        vertical-align: baseline;
     }
 }
 

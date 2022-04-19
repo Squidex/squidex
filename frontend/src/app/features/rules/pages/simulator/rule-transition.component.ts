@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { SimulatedRuleEventDto } from '@app/shared';
 
 @Component({
@@ -14,7 +14,7 @@ import { SimulatedRuleEventDto } from '@app/shared';
     templateUrl: './rule-transition.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RuleTransitionComponent {
+export class RuleTransitionComponent implements OnChanges {
     @Input()
     public event: SimulatedRuleEventDto | undefined | null;
 
@@ -24,19 +24,25 @@ export class RuleTransitionComponent {
     @Input()
     public text: string | undefined | null;
 
-    public get filteredErrors() {
-        const errors = this.errors;
+    public filteredErrors?: string[] | null;
 
-        if (!errors) {
-            return null;
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['event'] || changes['errors']) {
+            const errors = this.errors;
+
+            if (!errors) {
+                this.filteredErrors = null;
+                return;
+            }
+
+            const result = this.event?.skipReasons.filter(x => errors.includes(x)).map(x => `rules.simulation.error${x}`);
+
+            if (result?.length === 0) {
+                this.filteredErrors = null;
+                return;
+            }
+
+            this.filteredErrors = result;
         }
-
-        const result = this.event?.skipReasons.filter(x => errors.includes(x)).map(x => `rules.simulation.error${x}`);
-
-        if (result?.length === 0) {
-            return null;
-        }
-
-        return result;
     }
 }

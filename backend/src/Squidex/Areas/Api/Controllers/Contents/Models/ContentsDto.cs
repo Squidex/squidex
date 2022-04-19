@@ -38,7 +38,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             var result = new ContentsDto
             {
                 Total = contents.Total,
-                Items = contents.Select(x => ContentDto.FromContent(x, resources)).ToArray()
+                Items = contents.Select(x => ContentDto.FromDomain(x, resources)).ToArray()
             };
 
             if (schema != null)
@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var allStatuses = await workflow.GetAllAsync(schema);
 
-            Statuses = allStatuses.Select(StatusInfoDto.FromStatusInfo).ToArray();
+            Statuses = allStatuses.Select(StatusInfoDto.FromDomain).ToArray();
         }
 
         private async Task CreateLinksAsync(Resources resources, IContentWorkflow workflow, ISchemaEntity schema)

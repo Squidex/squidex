@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-import { AppsState } from '@app/shared';
+import { AppsState } from '@app/shared/internal';
 import { LoadAppsGuard } from './load-apps.guard';
 
 describe('LoadAppsGuard', () => {

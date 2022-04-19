@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -26,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public UpdateRole ToCommand(string name)
         {
-            return new UpdateRole { Name = name, Permissions = Permissions, Properties = Properties };
+            return SimpleMapper.Map(this, new UpdateRole { Name = name });
         }
     }
 }

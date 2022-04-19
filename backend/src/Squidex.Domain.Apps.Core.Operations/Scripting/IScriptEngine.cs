@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         Task<IJsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default);
 
-        Task<ContentData> TransformAsync(ScriptVars vars, string script, ScriptOptions options = default,
+        Task<ContentData> TransformAsync(DataScriptVars vars, string script, ScriptOptions options = default,
             CancellationToken ct = default);
 
         IJsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default);

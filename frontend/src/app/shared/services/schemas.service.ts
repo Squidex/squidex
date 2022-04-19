@@ -673,10 +673,8 @@ export class SchemasService {
     }
 }
 
-function parseSchemas(response: any) {
-    const raw: any[] = response.items;
-
-    const items = raw.map(parseSchema);
+function parseSchemas(response: { items: any[] } & Resource) {
+    const items = response.items.map(parseSchema);
 
     const _links = response._links;
 

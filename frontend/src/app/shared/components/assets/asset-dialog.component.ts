@@ -44,13 +44,12 @@ export class AssetDialogComponent implements OnChanges {
 
     public path!: Observable<ReadonlyArray<AssetPathItem>>;
 
+    public selectedTab = 0;
     public isEditable = false;
     public isEditableAny = false;
     public isUploadable = false;
 
     public progress = 0;
-
-    public selectedTab = 0;
 
     public annotateForm = new AnnotateAssetForm();
 

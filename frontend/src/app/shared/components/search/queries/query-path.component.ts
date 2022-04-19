@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { QueryModel } from '@app/shared/internal';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { FilterableField, QueryModel } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-query-path[model]',
@@ -14,7 +14,7 @@ import { QueryModel } from '@app/shared/internal';
     templateUrl: './query-path.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QueryPathComponent {
+export class QueryPathComponent implements OnChanges {
     @Output()
     public pathChange = new EventEmitter<string>();
 
@@ -24,7 +24,9 @@ export class QueryPathComponent {
     @Input()
     public model!: QueryModel;
 
-    public get value() {
-        return this.model.schema.fields.find(x => x.path === this.path);
+    public field?: FilterableField;
+
+    public ngOnChanges() {
+        this.field = this.model.schema.fields.find(x => x.path === this.path);
     }
 }

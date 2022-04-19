@@ -69,6 +69,14 @@ export class RulesState extends State<Snapshot> {
     public runningRule =
         this.projectFrom2(this.rules, this.runningRuleId, (r, id) => r.find(x => x.id === id));
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService,
@@ -87,7 +95,9 @@ export class RulesState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedRule: this.snapshot.selectedRule }, 'Loading Initial');
+            const { selectedRule } = this.snapshot;
+
+            this.resetState({ selectedRule }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
@@ -215,9 +225,5 @@ export class RulesState extends State<Snapshot> {
 
             return { ...s, rules, selectedRule };
         }, 'Updated');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 }

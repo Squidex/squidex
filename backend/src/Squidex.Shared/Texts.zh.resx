@@ -694,12 +694,6 @@
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
     <value>User is locked out.</value>
   </data>
-  <data name="exception.invalidJsonQuery" xml:space="preserve">
-    <value>Json 查询无效：{message}</value>
-  </data>
-  <data name="exception.invalidJsonQueryJson" xml:space="preserve">
-    <value>Json 查询无效 json: {message}</value>
-  </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
     <value>实体 ({id}) 已经存在。</value>
   </data>
@@ -910,9 +904,6 @@
   <data name="search.schemaResult" xml:space="preserve">
     <value>{name} Schemas</value>
   </data>
-  <data name="security.passwordStolen" xml:space="preserve">
-    <value>此密码以前曾出现在数据泄露事件中，永远不应使用。如果您以前曾在任何地方使用过它，请更改它！</value>
-  </data>
   <data name="setup.createUser.button" xml:space="preserve">
     <value>创建用户</value>
   </data>
@@ -978,15 +969,6 @@
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>安装</value>
-  </data>
-  <data name="setup.webpack.headline" xml:space="preserve">
-    <value>webpack error</value>
-  </data>
-  <data name="setup.webpack.text" xml:space="preserve">
-    <value>You have to run webpack dev server to run the frontend in Development mode. More information in the documenation: </value>
-  </data>
-  <data name="setup.webpack.title" xml:space="preserve">
-    <value>webpack error</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>不允许此操作，您的帐户可能被锁定。</value>

@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-import { LanguagesState } from '@app/shared';
+import { LanguagesState } from '@app/shared/internal';
 import { LoadLanguagesGuard } from './load-languages.guard';
 
 describe('LoadLanguagesGuard', () => {

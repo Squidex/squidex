@@ -88,7 +88,9 @@ export class UsersState extends State<Snapshot> {
 
     public load(isReload = false, update: Partial<Snapshot> = {}): Observable<any> {
         if (!isReload) {
-            this.resetState({ selectedUser: this.snapshot.selectedUser, ...update }, 'Loading Initial');
+            const { selectedUser } = this.snapshot;
+
+            this.resetState({ selectedUser, ...update }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
@@ -148,7 +150,7 @@ export class UsersState extends State<Snapshot> {
             tap(updated => {
                 this.replaceUser(updated);
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     public lock(user: UserDto): Observable<UserDto> {

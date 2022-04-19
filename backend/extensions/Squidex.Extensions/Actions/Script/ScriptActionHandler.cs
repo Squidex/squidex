@@ -33,9 +33,10 @@ namespace Squidex.Extensions.Actions.Script
         protected override async Task<Result> ExecuteJobAsync(ScriptJob job,
             CancellationToken ct = default)
         {
-            var vars = new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = new EventScriptVars
             {
-                ["event"] = job.Event
+                Event = job.Event
             };
 
             var result = await scriptEngine.ExecuteAsync(vars, job.Script, ct: ct);

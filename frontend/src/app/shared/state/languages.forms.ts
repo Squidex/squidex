@@ -6,7 +6,7 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, ExtendedFormGroup, value$ } from '@app/framework';
+import { ExtendedFormGroup, Form, value$ } from '@app/framework';
 import { AppLanguageDto, UpdateAppLanguageDto } from './../services/app-languages.service';
 
 export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateAppLanguageDto, AppLanguageDto> {

@@ -6,7 +6,7 @@
  */
 
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Form, ExtendedFormGroup, ValidatorsEx } from '@app/framework';
+import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/framework';
 import { RuleElementDto } from '../services/rules.service';
 
 export class ActionForm extends Form<any, FormGroup> {

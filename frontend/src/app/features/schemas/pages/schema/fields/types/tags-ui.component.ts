@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { FieldDto, TagsFieldPropertiesDto, TAGS_FIELD_EDITORS } from '@app/shared';
+import { FieldDto, TAGS_FIELD_EDITORS, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-ui[field][fieldForm][properties]',

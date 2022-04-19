@@ -76,6 +76,14 @@ export class LanguagesState extends State<Snapshot> {
     public canCreate =
         this.project(x => x.canCreate === true);
 
+    public get appId() {
+        return this.appsState.appId;
+    }
+
+    public get appName() {
+        return this.appsState.appName;
+    }
+
     constructor(
         private readonly appLanguagesService: AppLanguagesService,
         private readonly appsState: AppsState,
@@ -163,10 +171,6 @@ export class LanguagesState extends State<Snapshot> {
                 version,
             };
         }, 'Loading Success / Updated');
-    }
-
-    private get appName() {
-        return this.appsState.appName;
     }
 
     private get version() {

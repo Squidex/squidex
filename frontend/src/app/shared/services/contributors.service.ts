@@ -82,9 +82,7 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-            mapVersioned(payload => {
-                const body = payload.body;
-
+            mapVersioned(({ body }) => {
                 return parseContributors(body);
             }),
             tap(() => {
@@ -94,10 +92,8 @@ export class ContributorsService {
     }
 }
 
-function parseContributors(response: any) {
-    const raw: any[] = response.items;
-
-    const items = raw.map(item =>
+function parseContributors(response: { items: any[]; maxContributors: number } & Resource) {
+    const items = response.items.map(item =>
         new ContributorDto(item._links,
             item.contributorId,
             item.contributorName,

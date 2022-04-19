@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             var result = new ContributorsDto
             {
                 Items = app.Contributors
-                    .Select(x => ContributorDto.FromIdAndRole(x.Key, x.Value))
+                    .Select(x => ContributorDto.FromDomain(x.Key, x.Value))
                     .Select(x => x.CreateUser(users))
                     .Select(x => x.CreateLinks(resources))
                     .OrderBy(x => x.ContributorName)

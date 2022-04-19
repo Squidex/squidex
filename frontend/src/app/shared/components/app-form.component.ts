@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ApiUrlConfig, AppsState, CreateAppForm } from '@app/shared/internal';
+import { ApiUrlConfig, AppsState, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-app-form',
@@ -19,7 +19,7 @@ export class AppFormComponent {
     public complete = new EventEmitter();
 
     @Input()
-    public template = '';
+    public template?: TemplateDto;
 
     public createForm = new CreateAppForm();
 
@@ -37,8 +37,8 @@ export class AppFormComponent {
         const value = this.createForm.submit();
 
         if (value) {
-            const request = { ...value, template: this.template };
-
+            const request = { ...value, template: this.template?.name };
+    
             this.appsStore.create(request)
                 .subscribe({
                     next: () => {

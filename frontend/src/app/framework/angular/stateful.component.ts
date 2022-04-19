@@ -7,8 +7,7 @@
 
 import { ChangeDetectorRef, Directive, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
-import { EMPTY, Observable, Subscription } from 'rxjs';
-import { catchError, skip } from 'rxjs/operators';
+import { catchError, EMPTY, Observable, skip, Subscription } from 'rxjs';
 import { State } from './../state';
 import { Types } from './../utils/types';
 

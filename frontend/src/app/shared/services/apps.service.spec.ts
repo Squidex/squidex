@@ -237,13 +237,12 @@ describe('AppsService', () => {
                 },
             };
 
-            let app: AppDto;
             let error: ErrorDto;
 
-            appsService.postAppImage('my-app', resource, null!, version).subscribe(result => {
-                app = <AppDto>result;
-            }, e => {
-                error = e;
+            appsService.postAppImage('my-app', resource, null!, version).subscribe({
+                error: e => {
+                    error = e;
+                },
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
@@ -253,7 +252,6 @@ describe('AppsService', () => {
 
             req.flush({}, { status: 413, statusText: 'Payload too large' });
 
-            expect(app!).toBeUndefined();
             expect(error!).toEqual(new ErrorDto(413, 'i18n:apps.uploadImageTooBig'));
         }));
 

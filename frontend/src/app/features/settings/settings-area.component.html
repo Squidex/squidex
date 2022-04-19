@@ -49,6 +49,11 @@
             <li class="nav-item nav-heading">
                 {{ 'common.more' | sqxTranslate }}
             </li>
+            <li class="nav-item" *ngIf="app.canReadClients">
+                <a class="nav-link" routerLink="templates" routerLinkActive="active">
+                    <i class="icon-download"></i> {{ 'common.templates' | sqxTranslate }}
+                </a>
+            </li>
             <li class="nav-item" *ngIf="app.canReadBackups">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
                     <i class="icon-backups"></i> {{ 'common.backups' | sqxTranslate }}

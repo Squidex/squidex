@@ -6,7 +6,7 @@
  */
 
 import { FormControl, Validators } from '@angular/forms';
-import { Form, ExtendedFormGroup, ValidatorsEx } from '@app/shared';
+import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/shared';
 import { UpdateUserDto, UserDto } from './../services/users.service';
 
 export class UserForm extends Form<ExtendedFormGroup, UpdateUserDto, UserDto> {

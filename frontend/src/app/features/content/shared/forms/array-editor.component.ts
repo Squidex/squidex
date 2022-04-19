@@ -6,8 +6,8 @@
  */
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
+import { VirtualScrollerComponent } from 'ngx-virtual-scroller';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentForm, FieldArrayForm, LocalStoreService, ModalModel, ObjectFormBase, SchemaDto, Settings, sorted, Types } from '@app/shared';
@@ -19,7 +19,7 @@ import { ArrayItemComponent } from './array-item.component';
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ArrayEditorComponent implements OnChanges, OnInit {
+export class ArrayEditorComponent implements OnChanges {
     @Input()
     public form!: EditContentForm;
 
@@ -43,9 +43,9 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
 
     @ViewChildren(ArrayItemComponent)
     public children!: QueryList<ArrayItemComponent>;
-
-    @ViewChildren(CdkVirtualScrollViewport)
-    public viewport?: QueryList<CdkVirtualScrollViewport>;
+    
+    @ViewChildren(VirtualScrollerComponent)
+    public scroller?: QueryList<VirtualScrollerComponent>;
 
     public isArray = false;
 
@@ -66,10 +66,6 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        this.isCollapsedInitial = this.formLevel > 0;
-    }
-
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['formModel']) {
             const maxItems = this.formModel.field.properties['maxItems'] || Number.MAX_VALUE;
@@ -88,10 +84,10 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
             ]).pipe(map(([disabled, items]) => {
                 return disabled || items.length >= maxItems;
             }));
+        }
 
-            if (this.formLevel === 0) {
-                this.isCollapsedInitial = this.localStore.getBoolean(this.expandedKey());
-            }
+        if (changes['formModel'] || changes['formLevel']) {
+            this.isCollapsedInitial = this.localStore.getBoolean(this.isCollapsedKey()) || this.formLevel > 0;
         }
     }
 
@@ -127,32 +123,28 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
         this.reset();
     }
 
-    public onExpanded() {
-        this.viewport?.first?.checkViewportSize();
-    }
-
     public collapseAll() {
-        this.children.forEach(child => {
-            child.collapse();
-        });
-
-        if (this.formLevel === 0) {
-            this.localStore.setBoolean(this.expandedKey(), true);
+        for (const item of this.formModel.items) {
+            item.collapse();
         }
 
-        this.onExpanded();
+        if (this.formLevel === 0) {
+            this.localStore.setBoolean(this.isCollapsedKey(), true);
+        }
+
+        this.scroller?.first?.invalidateAllCachedMeasurements();
     }
 
     public expandAll() {
-        this.children.forEach(child => {
-            child.expand();
-        });
-
-        if (this.formLevel === 0) {
-            this.localStore.setBoolean(this.expandedKey(), false);
+        for (const item of this.formModel.items) {
+            item.expand();
         }
 
-        this.onExpanded();
+        if (this.formLevel === 0) {
+            this.localStore.setBoolean(this.isCollapsedKey(), false);
+        }
+
+        this.scroller?.first?.invalidateAllCachedMeasurements();
     }
 
     private reset() {
@@ -161,7 +153,7 @@ export class ArrayEditorComponent implements OnChanges, OnInit {
         });
     }
 
-    private expandedKey(): string {
+    private isCollapsedKey(): string {
         return Settings.Local.FIELD_COLLAPSED(this.form.schema?.id, this.formModel.field?.fieldId);
     }
 }

@@ -19,25 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             CanReject = true
         };
 
-        private static class ScriptKeys
-        {
-            public const string AppId = "appId";
-            public const string AppName = "appName";
-            public const string Command = "command";
-            public const string Content = "content";
-            public const string ContentId = "contentId";
-            public const string Data = "data";
-            public const string DataOld = "dataOld";
-            public const string OldData = "oldData";
-            public const string OldStatus = "oldStatus";
-            public const string Operation = "operation";
-            public const string SchemaId = "achemaId";
-            public const string SchemaName = "achemaName";
-            public const string Status = "status";
-            public const string StatusOld = "statusOld";
-            public const string User = "user";
-        }
-
         public static Task<ContentData> ExecuteCreateScriptAsync(this ContentOperation operation, ContentData data, Status status)
         {
             var script = operation.SchemaDef.Scripts.Create;
@@ -47,15 +28,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 return Task.FromResult(data);
             }
 
-            var vars = Enrich(operation, new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = Enrich(operation, new ContentScriptVars
             {
-                [ScriptKeys.Data] = data,
-                [ScriptKeys.DataOld] = null,
-                [ScriptKeys.OldData] = null,
-                [ScriptKeys.OldStatus] = default(Status),
-                [ScriptKeys.Operation] = "Create",
-                [ScriptKeys.Status] = status,
-                [ScriptKeys.StatusOld] = default(Status)
+                Data = data,
+                DataOld = null,
+                OldData = null,
+                OldStatus = default,
+                Operation = "Create",
+                Status = status,
+                StatusOld = default
             });
 
             return TransformAsync(operation, script, vars);
@@ -70,15 +52,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 return Task.FromResult(data);
             }
 
-            var vars = Enrich(operation, new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = Enrich(operation, new ContentScriptVars
             {
-                [ScriptKeys.Data] = data,
-                [ScriptKeys.DataOld] = operation.Snapshot.Data,
-                [ScriptKeys.OldData] = operation.Snapshot.Data,
-                [ScriptKeys.OldStatus] = data,
-                [ScriptKeys.Operation] = "Update",
-                [ScriptKeys.Status] = operation.Snapshot.EditingStatus(),
-                [ScriptKeys.StatusOld] = default(Status)
+                Data = data,
+                DataOld = operation.Snapshot.Data,
+                OldData = operation.Snapshot.Data,
+                OldStatus = operation.Snapshot.Status,
+                Operation = "Update",
+                Status = operation.Snapshot.EditingStatus(),
+                StatusOld = default
             });
 
             return TransformAsync(operation, script, vars);
@@ -93,24 +76,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 return Task.FromResult(operation.Snapshot.Data);
             }
 
-            // Clone the data so we do not change it by accident.
-            var data = operation.Snapshot.Data.Clone();
-
-            var vars = Enrich(operation, new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = Enrich(operation, new ContentScriptVars
             {
-                [ScriptKeys.Data] = data,
-                [ScriptKeys.DataOld] = null,
-                [ScriptKeys.OldData] = null,
-                [ScriptKeys.OldStatus] = operation.Snapshot.EditingStatus(),
-                [ScriptKeys.Operation] = change.ToString(),
-                [ScriptKeys.Status] = status,
-                [ScriptKeys.StatusOld] = operation.Snapshot.EditingStatus()
+                Data = operation.Snapshot.Data.Clone(),
+                DataOld = null,
+                OldData = null,
+                OldStatus = operation.Snapshot.EditingStatus(),
+                Operation = change.ToString(),
+                Status = status,
+                StatusOld = operation.Snapshot.EditingStatus()
             });
 
             return TransformAsync(operation, script, vars);
         }
 
-        public static Task ExecuteDeleteScriptAsync(this ContentOperation operation)
+        public static Task ExecuteDeleteScriptAsync(this ContentOperation operation, bool permanent)
         {
             var script = operation.SchemaDef.Scripts.Delete;
 
@@ -119,40 +100,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 return Task.CompletedTask;
             }
 
-            var vars = Enrich(operation, new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = Enrich(operation, new ContentScriptVars
             {
-                [ScriptKeys.Data] = operation.Snapshot.Data,
-                [ScriptKeys.DataOld] = null,
-                [ScriptKeys.OldData] = null,
-                [ScriptKeys.OldStatus] = operation.Snapshot.EditingStatus(),
-                [ScriptKeys.Operation] = "Delete",
-                [ScriptKeys.Status] = operation.Snapshot.EditingStatus(),
-                [ScriptKeys.StatusOld] = default(Status)
+                Data = operation.Snapshot.Data,
+                DataOld = null,
+                OldData = null,
+                OldStatus = operation.Snapshot.EditingStatus(),
+                Operation = "Delete",
+                Permanent = permanent,
+                Status = operation.Snapshot.EditingStatus(),
+                StatusOld = default
             });
 
             return ExecuteAsync(operation, script, vars);
         }
 
-        private static async Task<ContentData> TransformAsync(ContentOperation operation, string script, ScriptVars vars)
+        private static async Task<ContentData> TransformAsync(ContentOperation operation, string script, ContentScriptVars vars)
         {
             return await operation.Resolve<IScriptEngine>().TransformAsync(vars, script, Options);
         }
 
-        private static async Task ExecuteAsync(ContentOperation operation, string script, ScriptVars vars)
+        private static async Task ExecuteAsync(ContentOperation operation, string script, ContentScriptVars vars)
         {
             await operation.Resolve<IScriptEngine>().ExecuteAsync(vars, script, Options);
         }
 
-        private static ScriptVars Enrich(ContentOperation operation, ScriptVars vars)
+        private static ContentScriptVars Enrich(ContentOperation operation, ContentScriptVars vars)
         {
-            vars[ScriptKeys.AppId] = operation.App.Id;
-            vars[ScriptKeys.AppName] = operation.App.Name;
-            vars[ScriptKeys.Command] = operation.Command;
-            vars[ScriptKeys.Content] = operation.Snapshot;
-            vars[ScriptKeys.ContentId] = operation.CommandId;
-            vars[ScriptKeys.SchemaId] = operation.Schema.Id;
-            vars[ScriptKeys.SchemaName] = operation.Schema.SchemaDef.Name;
-            vars[ScriptKeys.User] = operation.User;
+            vars.AppId = operation.App.Id;
+            vars.AppName = operation.App.Name;
+            vars.ContentId = operation.CommandId;
+            vars.SchemaId = operation.Schema.Id;
+            vars.SchemaName = operation.Schema.SchemaDef.Name;
+            vars.User = operation.User;
 
             return vars;
         }

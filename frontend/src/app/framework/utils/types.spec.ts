@@ -265,6 +265,31 @@ describe('Types', () => {
             array: [4, 8],
         });
     });
+
+    it('Should format true', () => {
+        const result = Types.booleanToString(true);
+
+        expect(result).toEqual('Yes');
+    });
+
+    it('Should format false', () => {
+        const result = Types.booleanToString(false);
+
+        expect(result).toEqual('No');
+    });
+
+    it('Should format object', () => {
+        const input = {
+            field1: 'Hello',
+            field2: 1,
+            field3: true,
+            field4: [],
+        };
+
+        const result = Types.objectToString(input);
+
+        expect(result).toEqual('Hello, 1, Yes');
+    });
 });
 
 class MyClass {

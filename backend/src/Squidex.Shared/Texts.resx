@@ -694,12 +694,6 @@
   <data name="dotnet_identity_UserLockedOut" xml:space="preserve">
     <value>User is locked out.</value>
   </data>
-  <data name="exception.invalidJsonQuery" xml:space="preserve">
-    <value>Json query not valid: {message}</value>
-  </data>
-  <data name="exception.invalidJsonQueryJson" xml:space="preserve">
-    <value>Json query not valid json: {message}</value>
-  </data>
   <data name="exceptions.domainObjectConflict" xml:space="preserve">
     <value>Entity ({id}) already exists.</value>
   </data>
@@ -910,9 +904,6 @@
   <data name="search.schemaResult" xml:space="preserve">
     <value>{name} Schema</value>
   </data>
-  <data name="security.passwordStolen" xml:space="preserve">
-    <value>This password has previously appeared in a data breach and should never be used. If you have ever used it anywhere before, change it!</value>
-  </data>
   <data name="setup.createUser.button" xml:space="preserve">
     <value>Create User</value>
   </data>
@@ -978,15 +969,6 @@
   </data>
   <data name="setup.title" xml:space="preserve">
     <value>Installation</value>
-  </data>
-  <data name="setup.webpack.headline" xml:space="preserve">
-    <value>webpack error</value>
-  </data>
-  <data name="setup.webpack.text" xml:space="preserve">
-    <value>You have to run webpack dev server to run the frontend in Development mode. More information in the documenation: </value>
-  </data>
-  <data name="setup.webpack.title" xml:space="preserve">
-    <value>webpack error</value>
   </data>
   <data name="users.accessDenied.text" xml:space="preserve">
     <value>This operation is not allowed, your account might be locked.</value>

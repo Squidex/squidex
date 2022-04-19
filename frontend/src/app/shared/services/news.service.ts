@@ -40,18 +40,18 @@ export class NewsService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const items: any[] = body.features;
-
-                const features = new FeaturesDto(
-                    items.map(item =>
-                        new FeatureDto(
-                            item.name,
-                            item.text),
-                    ),
-                    body.version);
-
-                return features;
+                return parseFeatures(body);
             }),
             pretifyError('i18n:features.loadFailed'));
     }
+}
+
+function parseFeatures(body: { features: any[]; version: number }) {
+    return new FeaturesDto(
+        body.features.map(item => 
+            new FeatureDto(
+                item.name,
+                item.text),
+        ),
+        body.version);
 }

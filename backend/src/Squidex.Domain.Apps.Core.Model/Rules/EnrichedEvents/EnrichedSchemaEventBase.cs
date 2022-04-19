@@ -11,6 +11,7 @@ namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents
 {
     public abstract class EnrichedSchemaEventBase : EnrichedUserEventBase
     {
+        [FieldDescription(nameof(FieldDescriptions.EntityVersion))]
         public NamedId<DomainId> SchemaId { get; set; }
     }
 }

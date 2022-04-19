@@ -6,6 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings, StatefulComponent } from '@app/shared/internal';
 
 interface State {
@@ -32,14 +33,17 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     @Output()
     public select = new EventEmitter<ReadonlyArray<AssetDto>>();
 
-    constructor(changeDector: ChangeDetectorRef,
+    constructor(changeDector: ChangeDetectorRef, localStore: LocalStoreService,
         public readonly assetsState: ComponentAssetsState,
-        public readonly localStore: LocalStoreService,
     ) {
         super(changeDector, {
             selectedAssets: {},
             selectionCount: 0,
             isListView: localStore.getBoolean(Settings.Local.ASSETS_MODE),
+        });
+
+        this.changes.pipe(map(x => x.isListView), distinctUntilChanged()).subscribe(value => {
+            localStore.setBoolean(Settings.Local.ASSETS_MODE, value);
         });
     }
 
@@ -85,7 +89,5 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
 
     public changeView(isListView: boolean) {
         this.next({ isListView });
-
-        this.localStore.setBoolean(Settings.Local.ASSETS_MODE, isListView);
     }
 }

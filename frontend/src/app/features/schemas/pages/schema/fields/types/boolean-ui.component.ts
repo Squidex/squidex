@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { BooleanFieldPropertiesDto, BOOLEAN_FIELD_EDITORS, FieldDto } from '@app/shared';
+import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-ui[field][fieldForm][properties]',

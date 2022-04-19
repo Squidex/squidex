@@ -6,7 +6,8 @@
  */
 
 import { EMPTY, Observable, ReplaySubject, throwError } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, filter, map, onErrorResumeNext, share, switchMap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, share, switchMap } from 'rxjs/operators';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { DialogService } from './../services/dialog.service';
 import { Version, versioned, Versioned } from './version';
 

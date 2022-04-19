@@ -7,15 +7,15 @@
         />
     </td>
 
-    <td sqxContentListCell="meta.lastModifiedBy.avatar">
+    <td sqxContentListCell field="meta.lastModifiedBy.avatar">
         <sqx-content-list-field [language]="language" field="meta.lastModifiedBy.avatar" [content]="content"></sqx-content-list-field>
     </td>
 
-    <td *ngFor="let field of schema.defaultReferenceFields" sqxContentListCell [field]="field">
+    <td *ngFor="let field of schema.defaultReferenceFields">
         <sqx-content-list-field [field]="field" [content]="content" [language]="language"></sqx-content-list-field>
     </td>
 
-    <td sqxContentListCell="meta.status.color">
+    <td sqxContentListCell field="meta.status.color">
         <sqx-content-list-field [language]="language" field="meta.status.color" [content]="content"></sqx-content-list-field>
     </td>
 </tr>

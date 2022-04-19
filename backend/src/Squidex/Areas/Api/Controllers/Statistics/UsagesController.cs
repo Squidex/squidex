@@ -104,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var (plan, _) = appPlansProvider.GetPlanForApp(App);
 
-            var response = CallsUsageDtoDto.FromStats(plan, summary, details);
+            var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
 
             return Ok(response);
         }
@@ -158,7 +158,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var usages = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
 
-            var models = usages.Select(StorageUsagePerDateDto.FromStats).ToArray();
+            var models = usages.Select(StorageUsagePerDateDto.FromDomain).ToArray();
 
             return Ok(models);
         }

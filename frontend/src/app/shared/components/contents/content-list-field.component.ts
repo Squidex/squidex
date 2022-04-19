@@ -39,6 +39,18 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
     @Input()
     public language!: LanguageDto;
 
+    public get metaFields() {
+        return MetaFields;
+    }
+
+    public get isInlineEditable() {
+        return Types.is(this.field, RootFieldDto) ? this.field.isInlineEditable : false;
+    }
+
+    public get fieldName() {
+        return Types.is(this.field, RootFieldDto) ? this.field.name : this.field;
+    }
+
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
             formatted: '',
@@ -63,17 +75,5 @@ export class ContentListFieldComponent extends StatefulComponent<State> implemen
 
             this.next({ formatted });
         }
-    }
-
-    public get metaFields() {
-        return MetaFields;
-    }
-
-    public get isInlineEditable() {
-        return Types.is(this.field, RootFieldDto) ? this.field.isInlineEditable : false;
-    }
-
-    public get fieldName() {
-        return Types.is(this.field, RootFieldDto) ? this.field.name : this.field;
     }
 }

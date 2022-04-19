@@ -99,12 +99,12 @@
             <div class="col-3">
                 {{ 'common.succeeded' | sqxTranslate }} 
                 
-                <span class="badge bg-success rounded-pill" *ngIf="rule.numSucceeded > 0">{{rule.numSucceeded}}</span>
+                <span class="badge badge-success rounded-pill" *ngIf="rule.numSucceeded > 0">{{rule.numSucceeded}}</span>
             </div>
             <div class="col-3">
                 {{ 'common.failed' | sqxTranslate }} 
                 
-                <span class="badge bg-danger rounded-pill" *ngIf="rule.numFailed > 0">{{rule.numFailed}}</span>
+                <span class="badge badge-danger rounded-pill" *ngIf="rule.numFailed > 0">{{rule.numFailed}}</span>
             </div>
             <div class="col">
                 {{ 'common.lastExecuted' | sqxTranslate }}: <span>{{rule.lastExecuted | sqxFromNow:'-'}}</span>

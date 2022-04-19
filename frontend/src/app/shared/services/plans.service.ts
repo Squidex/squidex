@@ -51,30 +51,7 @@ export class PlansService {
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                const items: any[] = body.plans;
-
-                const { hasPortal, currentPlanId, planOwner } = body;
-
-                const plans = {
-                    currentPlanId,
-                    planOwner,
-                    plans: items.map(item =>
-                        new PlanDto(
-                            item.id,
-                            item.name,
-                            item.costs,
-                            item.confirmText,
-                            item.yearlyId,
-                            item.yearlyCosts,
-                            item.yearlyConfirmText,
-                            item.maxApiBytes,
-                            item.maxApiCalls,
-                            item.maxAssetSize,
-                            item.maxContributors)),
-                    hasPortal,
-                };
-
-                return plans;
+                return parsePlans(body);
             }),
             pretifyError('i18n:plans.loadFailed'));
     }
@@ -83,8 +60,8 @@ export class PlansService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
-            mapVersioned(payload => {
-                return <PlanChangedDto>payload.body;
+            mapVersioned(({ body }) => {
+                return <PlanChangedDto>body;
             }),
             tap(() => {
                 this.analytics.trackEvent('Plan', 'Changed', appName);
@@ -92,3 +69,26 @@ export class PlansService {
             pretifyError('i18n:plans.changeFailed'));
     }
 }
+
+function parsePlans(body: { plans: any[]; hasPortal: boolean; currentPlanId: string; planOwner: string }) {
+    const { hasPortal, currentPlanId, planOwner } = body;
+
+    return {
+        currentPlanId,
+        planOwner,
+        plans: body.plans.map(item => new PlanDto(
+            item.id,
+            item.name,
+            item.costs,
+            item.confirmText,
+            item.yearlyId,
+            item.yearlyCosts,
+            item.yearlyConfirmText,
+            item.maxApiBytes,
+            item.maxApiCalls,
+            item.maxAssetSize,
+            item.maxContributors)),
+        hasPortal,
+    };
+}
+

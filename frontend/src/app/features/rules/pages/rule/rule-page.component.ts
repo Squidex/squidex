@@ -6,8 +6,11 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ActionForm, ALL_TRIGGERS, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm } from '@app/shared';
+import { debounceTime, Subscription } from 'rxjs';
+import { ActionForm, ALL_TRIGGERS, MessageBus, ResourceOwner, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, TriggerForm, value$ } from '@app/shared';
+import { RuleConfigured } from '../messages';
 
 type ComponentState<T> = { type: string; values: any; form: T };
 
@@ -17,13 +20,16 @@ type ComponentState<T> = { type: string; values: any; form: T };
     templateUrl: './rule-page.component.html',
 })
 export class RulePageComponent extends ResourceOwner implements OnInit {
-    public supportedActions: { [name: string]: RuleElementDto } = {};
+    private currentTriggerSubscription?: Subscription;
+    private currentActionSubscription?: Subscription;
+
     public supportedTriggers = ALL_TRIGGERS;
+    public supportedActions: { [name: string]: RuleElementDto } = {};
 
     public rule?: RuleDto | null;
 
-    public currentAction?: ComponentState<ActionForm>;
     public currentTrigger?: ComponentState<TriggerForm>;
+    public currentAction?: ComponentState<ActionForm>;
 
     public isEnabled = false;
     public isEditable = false;
@@ -44,6 +50,7 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
         public readonly rulesState: RulesState,
         public readonly rulesService: RulesService,
         public readonly schemasState: SchemasState,
+        private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
     ) {
@@ -91,6 +98,8 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
 
             this.currentAction = { form, type, values };
             this.currentAction.form.setEnabled(this.isEditable);
+            this.currentActionSubscription?.unsubscribe();
+            this.currentActionSubscription = this.subscribe(form.form);
         }
 
         this.currentAction!.form.load(values);
@@ -102,9 +111,15 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
 
             this.currentTrigger = { form, type, values };
             this.currentTrigger.form.setEnabled(this.isEditable);
+            this.currentTriggerSubscription?.unsubscribe();
+            this.currentTriggerSubscription = this.subscribe(form.form);
         }
 
         this.currentTrigger.form.load(values);
+    }
+
+    private subscribe(form: AbstractControl) {
+        return value$(form).pipe(debounceTime(100)).subscribe(() => this.publishState());
     }
 
     public resetAction() {
@@ -161,6 +176,20 @@ export class RulePageComponent extends ResourceOwner implements OnInit {
                     },
                 });
         }
+    }
+
+    private publishState() {
+        if (!this.currentAction || !this.currentTrigger) {
+            return;
+        }
+
+        if (!this.currentAction.form.form.valid || !this.currentTrigger.form.form.valid) {  
+            return;
+        }
+
+        this.messageBus.emit(new RuleConfigured(
+            this.currentTrigger.form.getValue(),
+            this.currentAction.form.getValue()));
     }
 
     private submitCompleted() {

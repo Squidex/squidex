@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
+using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Hosting;
@@ -84,7 +86,6 @@ namespace Squidex.Areas.IdentityServer.Config
                             .SetOrder(AttachTokenParameters.Descriptor.Order + 1);
                     });
 
-                    builder.SetConfigurationEndpointUris("/identity-server/.well-known/openid-configuration");
                     builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
 
                     builder.DisableAccessTokenEncryption();
@@ -118,28 +119,51 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 var urlGenerator = services.GetRequiredService<IUrlGenerator>();
 
-                var issuerUrl = Constants.PrefixIdentityServer;
+                var identityPrefix = Constants.PrefixIdentityServer;
+                var identityOptions = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
-                options.AuthorizationEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/authorize", false)));
+                Func<string, Uri> buildUrl;
 
-                options.IntrospectionEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/introspect", false)));
+                if (identityOptions.MultipleDomains)
+                {
+                    buildUrl = url => new Uri($"{identityPrefix}{url}", UriKind.Relative);
 
-                options.LogoutEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/logout", false)));
+                    options.Issuer = new Uri(urlGenerator.BuildUrl());
+                }
+                else
+                {
+                    buildUrl = url => new Uri(urlGenerator.BuildUrl($"{identityPrefix}{url}", false));
 
-                options.TokenEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/token", false)));
+                    options.Issuer = new Uri(urlGenerator.BuildUrl(identityPrefix, false));
+                }
 
-                options.UserinfoEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/connect/userinfo", false)));
+                options.AuthorizationEndpointUris.SetEndpoint(
+                    buildUrl("/connect/authorize"));
 
-                options.CryptographyEndpointUris.Add(
-                     new Uri(urlGenerator.BuildUrl($"{issuerUrl}/.well-known/jwks", false)));
+                options.IntrospectionEndpointUris.SetEndpoint(
+                    buildUrl("/connect/introspect"));
 
-                options.Issuer = new Uri(urlGenerator.BuildUrl(issuerUrl, false));
+                options.LogoutEndpointUris.SetEndpoint(
+                    buildUrl("/connect/logout"));
+
+                options.TokenEndpointUris.SetEndpoint(
+                    buildUrl("/connect/token"));
+
+                options.UserinfoEndpointUris.SetEndpoint(
+                    buildUrl("/connect/userinfo"));
+
+                options.CryptographyEndpointUris.SetEndpoint(
+                    buildUrl("/.well-known/jwks"));
+
+                options.ConfigurationEndpointUris.SetEndpoint(
+                    buildUrl("/.well-known/openid-configuration"));
             });
+        }
+
+        private static void SetEndpoint(this List<Uri> endpointUris, Uri uri)
+        {
+            endpointUris.Clear();
+            endpointUris.Add(uri);
         }
     }
 }

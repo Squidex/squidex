@@ -24,7 +24,7 @@ export class OnboardingService {
     }
 
     public disable(key: string) {
-        this.localStore.set(this.getConfigKey(key), '1');
+        this.localStore.set(this.disabledKey(key), '1');
     }
 
     public shouldShow(key: string) {
@@ -32,10 +32,10 @@ export class OnboardingService {
     }
 
     private shouldShowKey(key: string) {
-        return this.localStore.get(this.getConfigKey(key)) !== '1';
+        return this.localStore.get(this.disabledKey(key)) !== '1';
     }
 
-    private getConfigKey(key: string): string {
+    private disabledKey(key: string): string {
         return `squidex.onboarding.disable.${key}`;
     }
 }

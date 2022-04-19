@@ -13,10 +13,12 @@ module.exports = {
         "project": "tsconfig.json"
     },
     "plugins": [
+        "deprecation",
         "eslint-plugin-import",
         "@typescript-eslint",
     ],
     "rules": {
+        "deprecation/deprecation": "warn",
         "@typescript-eslint/dot-notation": "off",
         "@typescript-eslint/indent": "off",
         "@typescript-eslint/lines-between-class-members": "off",
@@ -107,12 +109,12 @@ module.exports = {
         "no-restricted-syntax": "off",
         "no-underscore-dangle": "off",
         "object-curly-newline": [
-            "error", 
+            "error",
             {
-                "ObjectExpression": { 
+                "ObjectExpression": {
                     "consistent": true
                 },
-                "ObjectPattern": { 
+                "ObjectPattern": {
                     "consistent": true
                 },
                 "ImportDeclaration": "never",
@@ -120,6 +122,13 @@ module.exports = {
             }
         ],
         "operator-linebreak": "off",
-        "prefer-destructuring": "off"
+        "prefer-destructuring": "off",
+        "sort-imports": [
+            "error",
+            {
+                "ignoreCase": true,
+                "ignoreDeclarationSort": true
+            }
+        ],
     }
 };

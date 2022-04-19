@@ -32,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// </summary>
         public double AverageElapsedMs { get; set; }
 
-        public static CallsUsagePerDateDto FromStats(ApiStats stats)
+        public static CallsUsagePerDateDto FromDomain(ApiStats stats)
         {
             var result = new CallsUsagePerDateDto
             {

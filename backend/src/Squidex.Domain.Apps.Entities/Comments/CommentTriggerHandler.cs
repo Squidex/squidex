@@ -74,9 +74,10 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 return true;
             }
 
-            var vars = new ScriptVars
+            // Script vars are just wrappers over dictionaries for better performance.
+            var vars = new EventScriptVars
             {
-                ["event"] = @event
+                Event = @event
             };
 
             return scriptEngine.Evaluate(vars, trigger.Condition);

@@ -8,9 +8,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HelpComponent, HistoryComponent, SqxFrameworkModule, SqxSharedModule } from '@app/shared';
-import { AssetScriptsPageComponent, BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
-import { SettingsPageComponent } from './pages/settings/settings-page.component';
-import { WorkflowDiagramComponent } from './pages/workflows/workflow-diagram.component';
+import { AssetScriptsPageComponent, BackupComponent, BackupsPageComponent, ClientAddFormComponent, ClientComponent, ClientConnectFormComponent, ClientsPageComponent, ContributorAddFormComponent, ContributorComponent, ContributorsPageComponent, ImportContributorsDialogComponent, LanguageAddFormComponent, LanguageComponent, LanguagesPageComponent, MorePageComponent, PlanComponent, PlansPageComponent, RoleAddFormComponent, RoleComponent, RolesPageComponent, SettingsAreaComponent, SettingsPageComponent, TemplateComponent, TemplatesPageComponent, WorkflowAddFormComponent, WorkflowComponent, WorkflowDiagramComponent, WorkflowsPageComponent, WorkflowStepComponent, WorkflowTransitionComponent } from './declarations';
 
 const routes: Routes = [
     {
@@ -97,6 +95,10 @@ const routes: Routes = [
             {
                 path: 'settings',
                 component: SettingsPageComponent,
+            },
+            {
+                path: 'templates',
+                component: TemplatesPageComponent,
             },
             {
                 path: 'plans',
@@ -188,8 +190,10 @@ const routes: Routes = [
         RoleAddFormComponent,
         RoleComponent,
         RolesPageComponent,
-        SettingsPageComponent,
         SettingsAreaComponent,
+        SettingsPageComponent,
+        TemplateComponent,
+        TemplatesPageComponent,
         WorkflowAddFormComponent,
         WorkflowComponent,
         WorkflowDiagramComponent,

@@ -8,9 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
-import { AuthService, CommentDto, CommentsService, CommentsState, DialogService, LocalStoreService, ModalModel, ResourceOwner, UIOptions } from '@app/shared';
-
-const CONFIG_KEY = 'notifications.version';
+import { AuthService, CommentDto, CommentsService, CommentsState, DialogService, LocalStoreService, ModalModel, ResourceOwner, Settings, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-notifications-menu',
@@ -25,12 +23,9 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
 
     public versionRead = -1;
     public versionReceived = -1;
+    public unread = 0;
 
     public userToken = '';
-
-    public get unread() {
-        return Math.max(0, this.versionReceived - this.versionRead);
-    }
 
     public isNotifoConfigured = false;
 
@@ -47,8 +42,10 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
 
         this.userToken = authService.user!.token;
 
-        this.versionRead = localStore.getInt(CONFIG_KEY, -1);
+        this.versionRead = localStore.getInt(Settings.Local.NOTIFICATION_VERSION, -1);
         this.versionReceived = this.versionRead;
+
+        this.updateVersion();
 
         const commentsUrl = `users/${authService.user!.id}/notifications`;
 
@@ -87,10 +84,12 @@ export class NotificationsMenuComponent extends ResourceOwner implements OnInit 
     }
 
     private updateVersion() {
+        this.unread = Math.max(0, this.versionReceived - this.versionRead);
+
         if (this.modalMenu.isOpen) {
             this.versionRead = this.versionReceived;
 
-            this.localStore.setInt(CONFIG_KEY, this.versionRead);
+            this.localStore.setInt(Settings.Local.NOTIFICATION_VERSION, this.versionRead);
         }
     }
 }

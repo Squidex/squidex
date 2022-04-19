@@ -48,6 +48,8 @@ export class FilterLogicalComponent {
         this.updateFilters(this.filterValue);
     }
 
+    public filters: FilterNode[] = [];
+
     public get filter() {
         return this.filterValue;
     }
@@ -59,12 +61,6 @@ export class FilterLogicalComponent {
     public get isOr() {
         return !!this.filterValue.or;
     }
-
-    public get nestedLevel() {
-        return this.level + 1;
-    }
-
-    public filters: FilterNode[] = [];
 
     public addComparison() {
         this.filters.push(<any>{ path: this.model.schema.fields[0].path });

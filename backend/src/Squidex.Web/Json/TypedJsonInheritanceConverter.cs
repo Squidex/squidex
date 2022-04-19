@@ -7,9 +7,9 @@
 
 using System.Reflection;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Converters;
-using Squidex.Infrastructure;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
@@ -81,7 +81,17 @@ namespace Squidex.Web.Json
 
         protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
         {
-            return mapping.GetOrDefault(discriminatorValue) ?? throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
+            if (discriminatorValue == null)
+            {
+                throw new JsonException("Cannot find discriminator.");
+            }
+
+            if (!mapping.TryGetValue(discriminatorValue, out var type))
+            {
+                throw new JsonException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
+            }
+
+            return type;
         }
 
         public override string GetDiscriminatorValue(Type type)

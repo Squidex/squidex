@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure;
 
 #pragma warning disable IDE0059 // Value assigned to symbol is never used
 #pragma warning disable MA0048 // File name must match type name
@@ -41,61 +42,65 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
         protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(EnrichedEvent @event, ElasticSearchAction action)
         {
-            if (@event is IEnrichedEntityEvent entityEvent)
+            var delete = @event.ShouldDelete(scriptEngine, action.Delete);
+
+            string contentId;
+
+            if (@event is IEnrichedEntityEvent enrichedEntityEvent)
             {
-                var delete = @event.ShouldDelete(scriptEngine, action.Delete);
-
-                var contentId = entityEvent.Id.ToString();
-
-                var ruleDescription = string.Empty;
-                var ruleJob = new ElasticSearchJob
-                {
-                    IndexName = await FormatAsync(action.IndexName, @event),
-                    ServerHost = action.Host.ToString(),
-                    ServerUser = action.Username,
-                    ServerPassword = action.Password,
-                    ContentId = contentId
-                };
-
-                if (delete)
-                {
-                    ruleDescription = $"Delete entry index: {action.IndexName}";
-                }
-                else
-                {
-                    ruleDescription = $"Upsert to index: {action.IndexName}";
-
-                    JObject json;
-                    try
-                    {
-                        string jsonString;
-
-                        if (!string.IsNullOrEmpty(action.Document))
-                        {
-                            jsonString = await FormatAsync(action.Document, @event);
-                            jsonString = jsonString?.Trim();
-                        }
-                        else
-                        {
-                            jsonString = ToJson(@event);
-                        }
-
-                        json = JObject.Parse(jsonString);
-                    }
-                    catch (Exception ex)
-                    {
-                        json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
-                    }
-
-                    json.AddFirst(new JProperty("contentId", contentId));
-
-                    ruleJob.Content = json.ToString();
-                }
-
-                return (ruleDescription, ruleJob);
+                contentId = enrichedEntityEvent.Id.ToString();
+            }
+            else
+            {
+                contentId = DomainId.NewGuid().ToString();
             }
 
-            return ("Ignore", new ElasticSearchJob());
+            var ruleDescription = string.Empty;
+            var ruleJob = new ElasticSearchJob
+            {
+                IndexName = await FormatAsync(action.IndexName, @event),
+                ServerHost = action.Host.ToString(),
+                ServerUser = action.Username,
+                ServerPassword = action.Password,
+                ContentId = contentId
+            };
+
+            if (delete)
+            {
+                ruleDescription = $"Delete entry index: {action.IndexName}";
+            }
+            else
+            {
+                ruleDescription = $"Upsert to index: {action.IndexName}";
+
+                JObject json;
+                try
+                {
+                    string jsonString;
+
+                    if (!string.IsNullOrEmpty(action.Document))
+                    {
+                        jsonString = await FormatAsync(action.Document, @event);
+                        jsonString = jsonString?.Trim();
+                    }
+                    else
+                    {
+                        jsonString = ToJson(@event);
+                    }
+
+                    json = JObject.Parse(jsonString);
+                }
+                catch (Exception ex)
+                {
+                    json = new JObject(new JProperty("error", $"Invalid JSON: {ex.Message}"));
+                }
+
+                json.AddFirst(new JProperty("contentId", contentId));
+
+                ruleJob.Content = json.ToString();
+            }
+
+            return (ruleDescription, ruleJob);
         }
 
         protected override async Task<Result> ExecuteJobAsync(ElasticSearchJob job,

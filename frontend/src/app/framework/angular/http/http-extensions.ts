@@ -8,8 +8,7 @@
 /* eslint-disable no-inner-declarations */
 
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { ErrorDto, Types, Version, Versioned } from '@app/framework/internal';
 
 export module HTTP {

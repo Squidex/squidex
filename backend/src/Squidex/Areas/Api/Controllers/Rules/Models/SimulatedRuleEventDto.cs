@@ -15,6 +15,12 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
     public sealed record SimulatedRuleEventDto
     {
         /// <summary>
+        /// The unique event id.
+        /// </summary>
+        [Required]
+        public Guid EventId { get; init; }
+
+        /// <summary>
         /// The name of the event.
         /// </summary>
         [Required]
@@ -52,7 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [Required]
         public List<SkipReason> SkipReasons { get; set; }
 
-        public static SimulatedRuleEventDto FromSimulatedRuleEvent(SimulatedRuleEvent ruleEvent)
+        public static SimulatedRuleEventDto FromDomain(SimulatedRuleEvent ruleEvent)
         {
             var result = SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto
             {

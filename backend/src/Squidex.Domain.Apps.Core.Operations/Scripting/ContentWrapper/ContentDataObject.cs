@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
             var propertyName = property.AsString();
 
-            fieldProperties.GetOrAdd(propertyName, this, (k, c) => new ContentDataProperty(c)).Value = value;
+            fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c), this).Value = value;
 
             return true;
         }
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 return PropertyDescriptor.Undefined;
             }
 
-            return fieldProperties.GetOrAdd(propertyName, this, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, new ContentFieldData(), false)));
+            return fieldProperties.GetOrAdd(propertyName, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, new ContentFieldData(), false)), this);
         }
 
         public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()

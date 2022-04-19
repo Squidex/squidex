@@ -32,13 +32,14 @@ export class LanguagesService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                const languages = body.map(item =>
-                    new LanguageDto(
-                        item.iso2Code,
-                        item.englishName));
-
-                return languages;
+                return parseLanguages(body);
             }),
             pretifyError('i18n:languages.loadFailed'));
     }
+}
+
+function parseLanguages(response: any[]) {
+    return response.map(item => new LanguageDto(
+        item.iso2Code,
+        item.englishName));
 }

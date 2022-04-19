@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
@@ -63,6 +64,12 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CustomCommandMiddlewareRunner>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<TemplateCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<AlwaysCreateClientCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<RestrictAppsCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
@@ -107,18 +114,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<SingletonCommandMiddleware>()
                 .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<AlwaysCreateClientCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<TemplateCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<CreateBlog>()
-                .As<ITemplate>();
-
-            services.AddSingletonAs<CreateProfile>()
-                .As<ITemplate>();
 
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();

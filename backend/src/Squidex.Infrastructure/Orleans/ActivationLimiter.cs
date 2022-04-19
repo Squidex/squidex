@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public void Register(Type grainType, IDeactivater deactivater, int maxActivations)
         {
-            var byType = instances.GetOrAdd(grainType, maxActivations, (t, a) => new LastUsedInstances(a));
+            var byType = instances.GetOrAdd(grainType, (t, a) => new LastUsedInstances(a), maxActivations);
 
             byType.Register(deactivater);
         }

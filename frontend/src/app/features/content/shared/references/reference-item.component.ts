@@ -47,11 +47,11 @@ export class ReferenceItemComponent implements OnChanges {
     @Input('sqxReferenceItem')
     public content!: ContentDto;
 
-    public get valid() {
+    public values: ReadonlyArray<any> = [];
+
+    public get isValid() {
         return !this.validations ? undefined : this.validations[this.content.id];
     }
-
-    public values: ReadonlyArray<any> = [];
 
     public ngOnChanges() {
         const values = [];

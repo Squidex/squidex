@@ -18,9 +18,10 @@ namespace Squidex.Extensions.Actions
         {
             if (!string.IsNullOrWhiteSpace(expression))
             {
-                var vars = new ScriptVars
+                // Script vars are just wrappers over dictionaries for better performance.
+                var vars = new EventScriptVars
                 {
-                    ["event"] = @event
+                    Event = @event
                 };
 
                 return scriptEngine.Evaluate(vars, expression);

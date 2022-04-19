@@ -8,6 +8,7 @@
 using NodaTime;
 using Orleans;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -34,16 +35,22 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
             this.ruleService = ruleService;
         }
 
-        public async Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
+        public Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
+            CancellationToken ct = default)
+        {
+            return SimulateAsync(rule.AppId, rule.Id, rule.RuleDef, ct);
+        }
+
+        public async Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, DomainId ruleId, Rule rule,
             CancellationToken ct = default)
         {
             Guard.NotNull(rule);
 
             var context = new RuleContext
             {
-                AppId = rule.AppId,
-                Rule = rule.RuleDef,
-                RuleId = rule.Id,
+                AppId = appId,
+                Rule = rule,
+                RuleId = ruleId,
                 IncludeSkipped = true,
                 IncludeStale = true
             };
@@ -52,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
 
             var fromNow = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
 
-            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-zA-Z0-9]+)\\-{rule.AppId.Id}", fromNow, MaxSimulatedEvents, ct))
+            await foreach (var storedEvent in eventStore.QueryAllReverseAsync($"^([a-zA-Z0-9]+)\\-{appId.Id}", fromNow, MaxSimulatedEvents, ct))
             {
                 var @event = eventDataFormatter.ParseIfKnown(storedEvent);
 
@@ -75,6 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Runner
                             EnrichedEvent = result.EnrichedEvent,
                             Error = result.EnrichmentError?.Message,
                             Event = @event.Payload,
+                            EventId = @event.Headers.EventId(),
                             EventName = eventName,
                             SkipReason = result.SkipReason
                         });

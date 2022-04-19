@@ -1,4 +1,4 @@
-<div class="control-dropdown-item d-flex align-items-center" [class.active]="node.isSelected" [style]="style" (click)="selectNode.emit(node)">
+<div class="control-dropdown-item d-flex align-items-center" [class.active]="node.isSelected" [style.paddingLeft]="paddingLeft" (click)="selectNode.emit(node)">
 
     <ng-container *ngIf="node.isLoading; else notLoading" class="loader">
         <button type="button" class="btn btn-sm btn-decent btn-text-secondary">

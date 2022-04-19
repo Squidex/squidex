@@ -2,7 +2,7 @@
     <sqx-modal-dialog (close)="emitComplete()">
         <ng-container title>
             <ng-container *ngIf="template; else noTemplate">
-                {{ 'apps.createWithTemplate' | sqxTranslate: { template: template } }}
+                {{ 'apps.createWithTemplate' | sqxTranslate: { template: template.title } }}
             </ng-container>
 
             <ng-template #noTemplate>

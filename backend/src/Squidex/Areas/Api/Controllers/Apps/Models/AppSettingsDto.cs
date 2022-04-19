@@ -40,13 +40,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AppSettingsDto FromApp(IAppEntity app, Resources resources)
+        public static AppSettingsDto FromDomain(IAppEntity app, Resources resources)
         {
             var settings = app.Settings;
 
             var result = new AppSettingsDto
             {
-                Editors = settings.Editors.Select(EditorDto.FromEditor).ToArray(),
+                Editors = settings.Editors.Select(EditorDto.FromDomain).ToArray(),
                 HideDateTimeModeButton = settings.HideDateTimeModeButton,
                 HideScheduler = settings.HideScheduler,
                 Patterns = settings.Patterns.Select(PatternDto.FromPattern).ToArray(),

@@ -5,12 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {
     public interface IRuleRunnerService
     {
+        Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, DomainId ruleId, Rule rule,
+            CancellationToken ct = default);
+
         Task<List<SimulatedRuleEvent>> SimulateAsync(IRuleEntity rule,
             CancellationToken ct = default);
 

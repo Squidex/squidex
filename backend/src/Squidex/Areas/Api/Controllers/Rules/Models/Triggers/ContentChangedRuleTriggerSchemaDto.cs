@@ -28,9 +28,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
             return SimpleMapper.Map(this, new ContentChangedTriggerSchemaV2());
         }
 
-        public static ContentChangedRuleTriggerSchemaDto FromTrigger(ContentChangedTriggerSchemaV2 trigger)
+        public static ContentChangedRuleTriggerSchemaDto FromDomain(ContentChangedTriggerSchemaV2 trigger)
         {
-            return SimpleMapper.Map(trigger, new ContentChangedRuleTriggerSchemaDto());
+            var result = SimpleMapper.Map(trigger, new ContentChangedRuleTriggerSchemaDto());
+
+            return result;
         }
     }
 }
