@@ -21,7 +21,7 @@ services:
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - GRAPHQL__CACHEDURATION=0
-      - ASSETS_RESIZERURL=http://resizer:8081
+      - ASSETS__RESIZERURL=http://resizer:8081
     networks:
       - internal
     depends_on:
