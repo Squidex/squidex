@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
@@ -80,6 +81,47 @@ namespace TestSuite.Model
             });
 
             return schema;
+        }
+
+        public static TestEntityData CreateTestEntry(int index)
+        {
+            var data = new TestEntityData
+            {
+                Number = index,
+                Json = JObject.FromObject(new
+                {
+                    nested1 = new
+                    {
+                        nested2 = index
+                    }
+                }),
+                String = index.ToString(CultureInfo.InvariantCulture)
+            };
+
+            if (index % 2 == 0)
+            {
+                data.Geo = new
+                {
+                    type = "Point",
+                    coordinates = new[]
+                    {
+                        index,
+                        index
+                    }
+                };
+            }
+            else
+            {
+                data.Geo = new
+                {
+                    longitude = index,
+                    lon = index,
+                    latitude = index,
+                    lat = index
+                };
+            }
+
+            return data;
         }
     }
 

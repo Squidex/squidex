@@ -11,22 +11,18 @@ namespace TestSuite.Fixtures
 {
     public class CreatedAppFixture : ClientFixture
     {
-        private static readonly string[] Contributors =
-        {
-            "hello@squidex.io"
-        };
-
-        private static int isCreated;
-
         public override async Task InitializeAsync()
         {
             await base.InitializeAsync();
 
-            if (Interlocked.Increment(ref isCreated) == 0)
+            await Factories.CreateAsync(AppName, async () =>
             {
                 try
                 {
-                    await Apps.PostAppAsync(new CreateAppDto { Name = AppName });
+                    await Apps.PostAppAsync(new CreateAppDto
+                    {
+                        Name = AppName
+                    });
                 }
                 catch (SquidexManagementException ex)
                 {
@@ -34,15 +30,6 @@ namespace TestSuite.Fixtures
                     {
                         throw;
                     }
-                }
-
-                var invite = new AssignContributorDto { Invite = true, Role = "Owner" };
-
-                foreach (var contributor in Contributors)
-                {
-                    invite.ContributorId = contributor;
-
-                    await Apps.PostContributorAsync(AppName, invite);
                 }
 
                 try
@@ -59,7 +46,9 @@ namespace TestSuite.Fixtures
                         throw;
                     }
                 }
-            }
+
+                return true;
+            });
         }
     }
 }

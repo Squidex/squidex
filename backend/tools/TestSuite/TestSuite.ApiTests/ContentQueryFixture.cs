@@ -5,17 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Globalization;
-using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
+using TestSuite.Fixtures;
 using TestSuite.Model;
 
-namespace TestSuite.Fixtures
+namespace TestSuite.ApiTests
 {
-    public class ContentQueryFixture1to10 : ContentFixture
+    public sealed class ContentQueryFixture : TestSchemaFixtureBase
     {
-        public ContentQueryFixture1to10()
-            : base("my-reads")
+        public ContentQueryFixture()
+            : base("my-queries")
         {
         }
 
@@ -27,29 +26,7 @@ namespace TestSuite.Fixtures
 
             for (var i = 10; i > 0; i--)
             {
-                var text = i.ToString(CultureInfo.InvariantCulture);
-
-                var data = new TestEntityData
-                {
-                    String = text,
-                    Json = JObject.FromObject(new
-                    {
-                        nested1 = new
-                        {
-                            nested2 = i
-                        }
-                    }),
-                    Number = i,
-                };
-
-                if (i % 2 == 0)
-                {
-                    data.Geo = new { type = "Point", coordinates = new[] { i, i } };
-                }
-                else
-                {
-                    data.Geo = new { longitude = i, latitude = i };
-                }
+                var data = TestEntity.CreateTestEntry(i);
 
                 await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
             }

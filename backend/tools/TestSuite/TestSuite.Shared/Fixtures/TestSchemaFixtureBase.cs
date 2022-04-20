@@ -11,20 +11,13 @@ using TestSuite.Model;
 
 namespace TestSuite.Fixtures
 {
-    public class ContentFixture : CreatedAppFixture
+    public abstract class TestSchemaFixtureBase : CreatedAppFixture
     {
-        private static readonly HashSet<string> CreatedSchemas = new HashSet<string>();
-
         public IContentsClient<TestEntity, TestEntityData> Contents { get; private set; }
 
         public string SchemaName { get; }
 
-        public ContentFixture()
-            : this("my-writes")
-        {
-        }
-
-        protected ContentFixture(string schemaName)
+        protected TestSchemaFixtureBase(string schemaName)
         {
             SchemaName = schemaName;
         }
@@ -33,7 +26,7 @@ namespace TestSuite.Fixtures
         {
             await base.InitializeAsync();
 
-            if (CreatedSchemas.Add(SchemaName))
+            await Factories.CreateAsync($"{nameof(TestEntity)}_{SchemaName}", async () =>
             {
                 try
                 {
@@ -46,7 +39,9 @@ namespace TestSuite.Fixtures
                         throw;
                     }
                 }
-            }
+
+                return true;
+            });
 
             Contents = ClientManager.CreateContentsClient<TestEntity, TestEntityData>(SchemaName);
         }

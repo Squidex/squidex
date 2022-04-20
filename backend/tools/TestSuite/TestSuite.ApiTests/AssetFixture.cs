@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary.Management;
+using TestSuite.Fixtures;
 
-namespace TestSuite.Fixtures
+namespace TestSuite.ApiTests
 {
     public class AssetFixture : CreatedAppFixture
     {
-        public IAssetsClient Assets => Squidex.Assets;
-
         public async Task<MemoryStream> DownloadAsync(AssetDto asset, int? version = null)
         {
             var temp = new MemoryStream();

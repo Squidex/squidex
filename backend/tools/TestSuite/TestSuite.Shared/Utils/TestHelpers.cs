@@ -24,5 +24,21 @@ namespace TestSuite.Utils
                 .AddEnvironmentVariables()
                 .Build();
         }
+
+        public static string GetValue(string name, string fallback)
+        {
+            var value = Configuration[name];
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                value = fallback;
+            }
+            else
+            {
+                Console.WriteLine("Using: {0}={1}", name, value);
+            }
+
+            return value;
+        }
     }
 }
