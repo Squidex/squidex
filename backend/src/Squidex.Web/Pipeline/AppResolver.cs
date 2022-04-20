@@ -35,7 +35,7 @@ namespace Squidex.Web.Pipeline
 
             if (context.RouteData.Values.TryGetValue("app", out var appValue))
             {
-                var appName = context.RouteData.Values["app"]?.ToString();
+                var appName = appValue?.ToString();
 
                 if (string.IsNullOrWhiteSpace(appName))
                 {
