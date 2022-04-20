@@ -15,63 +15,56 @@ namespace TestSuite.Fixtures
     public class ContentQueryFixture1to10 : ContentFixture
     {
         public ContentQueryFixture1to10()
-            : this("my-reads")
+            : base("my-reads")
         {
         }
 
-        protected ContentQueryFixture1to10(string schemaName = "my-schema")
-            : base(schemaName)
+        public override async Task InitializeAsync()
         {
-            Task.Run(async () =>
+            await base.InitializeAsync();
+
+            await DisposeAsync();
+
+            for (var i = 10; i > 0; i--)
             {
-#pragma warning disable MA0056 // Do not call overridable members in constructor
-                Dispose();
-#pragma warning restore MA0056 // Do not call overridable members in constructor
+                var text = i.ToString(CultureInfo.InvariantCulture);
 
-                for (var i = 10; i > 0; i--)
+                var data = new TestEntityData
                 {
-                    var text = i.ToString(CultureInfo.InvariantCulture);
-
-                    var data = new TestEntityData
+                    String = text,
+                    Json = JObject.FromObject(new
                     {
-                        String = text,
-                        Json = JObject.FromObject(new
+                        nested1 = new
                         {
-                            nested1 = new
-                            {
-                                nested2 = i
-                            }
-                        }),
-                        Number = i,
-                    };
+                            nested2 = i
+                        }
+                    }),
+                    Number = i,
+                };
 
-                    if (i % 2 == 0)
-                    {
-                        data.Geo = new { type = "Point", coordinates = new[] { i, i } };
-                    }
-                    else
-                    {
-                        data.Geo = new { longitude = i, latitude = i };
-                    }
-
-                    await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
+                if (i % 2 == 0)
+                {
+                    data.Geo = new { type = "Point", coordinates = new[] { i, i } };
                 }
-            }).Wait();
+                else
+                {
+                    data.Geo = new { longitude = i, latitude = i };
+                }
+
+                await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
+            }
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
-            Task.Run(async () =>
+            await base.DisposeAsync();
+
+            var contents = await Contents.GetAsync();
+
+            foreach (var content in contents.Items)
             {
-                var contents = await Contents.GetAsync();
-
-                foreach (var content in contents.Items)
-                {
-                    await Contents.DeleteAsync(content);
-                }
-            }).Wait();
-
-            GC.SuppressFinalize(this);
+                await Contents.DeleteAsync(content);
+            }
         }
     }
 }

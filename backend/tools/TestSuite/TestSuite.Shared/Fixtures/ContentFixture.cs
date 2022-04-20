@@ -15,7 +15,7 @@ namespace TestSuite.Fixtures
     {
         private static readonly HashSet<string> CreatedSchemas = new HashSet<string>();
 
-        public IContentsClient<TestEntity, TestEntityData> Contents { get; }
+        public IContentsClient<TestEntity, TestEntityData> Contents { get; private set; }
 
         public string SchemaName { get; }
 
@@ -27,25 +27,25 @@ namespace TestSuite.Fixtures
         protected ContentFixture(string schemaName)
         {
             SchemaName = schemaName;
+        }
 
-            if (!CreatedSchemas.Contains(schemaName))
+        public override async Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+
+            if (CreatedSchemas.Add(SchemaName))
             {
-                Task.Run(async () =>
+                try
                 {
-                    try
+                    await TestEntity.CreateSchemaAsync(Schemas, AppName, SchemaName);
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
                     {
-                        await TestEntity.CreateSchemaAsync(Schemas, AppName, schemaName);
+                        throw;
                     }
-                    catch (SquidexManagementException ex)
-                    {
-                        if (ex.StatusCode != 400)
-                        {
-                            throw;
-                        }
-                    }
-                }).Wait();
-
-                CreatedSchemas.Add(schemaName);
+                }
             }
 
             Contents = ClientManager.CreateContentsClient<TestEntity, TestEntityData>(SchemaName);

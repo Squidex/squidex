@@ -57,6 +57,25 @@ namespace Squidex.Web.Pipeline
             sut = new AppResolver(appProvider);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task Should_return_not_found_if_app_name_is_null(string? app)
+        {
+            SetupUser();
+
+            actionExecutingContext.RouteData.Values["app"] = app;
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            Assert.IsType<NotFoundResult>(actionExecutingContext.Result);
+            Assert.False(isNextCalled);
+
+            A.CallTo(() => appProvider.GetAppAsync(A<string>._, false, httpContext.RequestAborted))
+                .MustNotHaveHappened();
+        }
+
         [Fact]
         public async Task Should_return_not_found_if_app_not_found()
         {

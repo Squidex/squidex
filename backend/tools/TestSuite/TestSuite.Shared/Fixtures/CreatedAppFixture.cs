@@ -16,52 +16,49 @@ namespace TestSuite.Fixtures
             "hello@squidex.io"
         };
 
-        private static bool isCreated;
+        private static int isCreated;
 
-        public CreatedAppFixture()
+        public override async Task InitializeAsync()
         {
-            if (!isCreated)
+            await base.InitializeAsync();
+
+            if (Interlocked.Increment(ref isCreated) == 0)
             {
-                Task.Run(async () =>
+                try
                 {
-                    try
+                    await Apps.PostAppAsync(new CreateAppDto { Name = AppName });
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
                     {
-                        await Apps.PostAppAsync(new CreateAppDto { Name = AppName });
+                        throw;
                     }
-                    catch (SquidexManagementException ex)
+                }
+
+                var invite = new AssignContributorDto { Invite = true, Role = "Owner" };
+
+                foreach (var contributor in Contributors)
+                {
+                    invite.ContributorId = contributor;
+
+                    await Apps.PostContributorAsync(AppName, invite);
+                }
+
+                try
+                {
+                    await Apps.PostLanguageAsync(AppName, new AddLanguageDto
                     {
-                        if (ex.StatusCode != 400)
-                        {
-                            throw;
-                        }
-                    }
-
-                    var invite = new AssignContributorDto { Invite = true, Role = "Owner" };
-
-                    foreach (var contributor in Contributors)
+                        Language = "de"
+                    });
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
                     {
-                        invite.ContributorId = contributor;
-
-                        await Apps.PostContributorAsync(AppName, invite);
+                        throw;
                     }
-
-                    try
-                    {
-                        await Apps.PostLanguageAsync(AppName, new AddLanguageDto
-                        {
-                            Language = "de"
-                        });
-                    }
-                    catch (SquidexManagementException ex)
-                    {
-                        if (ex.StatusCode != 400)
-                        {
-                            throw;
-                        }
-                    }
-                }).Wait();
-
-                isCreated = true;
+                }
             }
         }
     }

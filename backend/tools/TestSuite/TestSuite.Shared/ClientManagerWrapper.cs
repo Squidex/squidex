@@ -16,7 +16,7 @@ namespace TestSuite
 {
     public sealed class ClientManagerWrapper
     {
-        private static Task<ClientManagerWrapper> manager;
+        private static readonly Task<ClientManagerWrapper> Instance = CreateInternalAsync();
 
         public SquidexClientManager ClientManager { get; set; }
 
@@ -65,24 +65,17 @@ namespace TestSuite
 
         public static Task<ClientManagerWrapper> CreateAsync()
         {
-            if (manager == null)
-            {
-                manager = CreateInternalAsync();
-            }
-
-            return manager;
+            return Instance;
         }
 
-        private static async Task<ClientManagerWrapper> CreateInternalAsync()
+        private static Task<ClientManagerWrapper> CreateInternalAsync()
         {
             var clientManager = new ClientManagerWrapper();
 
-            await clientManager.ConnectAsync();
-
-            return clientManager;
+            return clientManager.ConnectAsync();
         }
 
-        public async Task ConnectAsync()
+        public async Task<ClientManagerWrapper> ConnectAsync()
         {
             var waitSeconds = TestHelpers.Configuration.GetValue<int>("config:wait");
 
@@ -108,11 +101,15 @@ namespace TestSuite
                         }
                     }
                 }
+
+                Console.WriteLine("Connected to server.");
             }
             else
             {
                 Console.WriteLine("Waiting for server is skipped.");
             }
+
+            return this;
         }
 
         private static string GetValue(string name, string fallback)
