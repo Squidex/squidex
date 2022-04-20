@@ -30,7 +30,7 @@ services:
       - mongo
 
   resizer:
-    image: squidex/resizer:dev-2
+    image: squidex/resizer:dev-40
     ports:
       - "8081:80"
     networks:
