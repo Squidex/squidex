@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: true, position: initialPosition);
+            AssertGrainState(isStopped: true, position: initialPosition);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustNotHaveHappened();
@@ -135,7 +135,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: initialPosition);
+            AssertGrainState(isStopped: false, position: initialPosition);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();
@@ -151,7 +151,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: initialPosition);
+            AssertGrainState(isStopped: false, position: initialPosition);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: initialPosition);
+            AssertGrainState(isStopped: false, position: initialPosition);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>._, A<string>._, A<string>._))
                 .MustHaveHappenedOnceExactly();
@@ -181,7 +181,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: true, position: initialPosition);
+            AssertGrainState(isStopped: true, position: initialPosition);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
@@ -200,7 +200,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: null);
+            AssertGrainState(isStopped: false, position: null);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened(2, Times.Exactly);
@@ -228,7 +228,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: storedEvent.EventPosition, count: 1);
+            AssertGrainState(isStopped: false, position: storedEvent.EventPosition, count: 1);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
@@ -254,7 +254,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: storedEvent.EventPosition, count: 5);
+            AssertGrainState(isStopped: false, position: storedEvent.EventPosition, count: 5);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened(5, Times.Exactly);
@@ -280,7 +280,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: storedEvent.EventPosition, count: 5);
+            AssertGrainState(isStopped: false, position: storedEvent.EventPosition, count: 5);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
@@ -302,7 +302,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: storedEvent.EventPosition);
+            AssertGrainState(isStopped: false, position: storedEvent.EventPosition);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
@@ -324,7 +324,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: storedEvent.EventPosition);
+            AssertGrainState(isStopped: false, position: storedEvent.EventPosition);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
@@ -343,7 +343,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: initialPosition);
+            AssertGrainState(isStopped: false, position: initialPosition);
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
@@ -361,7 +361,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
+            AssertGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
@@ -382,7 +382,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: false, position: initialPosition);
+            AssertGrainState(isStopped: false, position: initialPosition);
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustNotHaveHappened();
@@ -415,7 +415,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
+            AssertGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
 
             A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedOnceExactly();
@@ -439,7 +439,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
+            AssertGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
@@ -466,7 +466,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
+            AssertGrainState(isStopped: true, position: initialPosition, error: ex.ToString());
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
@@ -497,7 +497,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             await sut.StartAsync();
             await sut.StartAsync();
 
-            AssetGrainState(isStopped: false, position: initialPosition);
+            AssertGrainState(isStopped: false, position: initialPosition);
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
@@ -527,7 +527,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             await sut.CompleteAsync();
 
-            AssetGrainState(isStopped: true, position: storedEvent.EventPosition, error: ex.ToString(), 1);
+            AssertGrainState(isStopped: true, position: storedEvent.EventPosition, error: ex.ToString(), 1);
         }
 
         private Task OnErrorAsync(IEventSubscription subscription, Exception exception)
@@ -540,7 +540,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return sut.OnEventAsync(subscription, ev);
         }
 
-        private void AssetGrainState(bool isStopped = false, string? position = null, string? error = null, int count = 0)
+        private void AssertGrainState(bool isStopped = false, string? position = null, string? error = null, int count = 0)
         {
             var expected = new EventConsumerState { IsStopped = isStopped, Position = position, Error = error, Count = count };
 

@@ -60,6 +60,22 @@ namespace Squidex.Web.Pipeline
             sut = new SchemaResolver(appProvider);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public async Task Should_return_not_found_if_schema_name_is_null(string? schema)
+        {
+            actionContext.RouteData.Values["schema"] = schema;
+
+            await sut.OnActionExecutionAsync(actionExecutingContext, next);
+
+            AssertNotFound();
+
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<DomainId>._, true, httpContext.RequestAborted))
+                .MustNotHaveHappened();
+        }
+
         [Fact]
         public async Task Should_return_not_found_if_schema_not_published_when_attribute_applied()
         {
@@ -73,7 +89,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            AssetNotFound();
+            AssertNotFound();
         }
 
         [Fact]
@@ -101,7 +117,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            AssetNotFound();
+            AssertNotFound();
         }
 
         [Fact]
@@ -193,7 +209,7 @@ namespace Squidex.Web.Pipeline
                 .MustNotHaveHappened();
         }
 
-        private void AssetNotFound()
+        private void AssertNotFound()
         {
             Assert.IsType<NotFoundResult>(actionExecutingContext.Result);
             Assert.False(isNextCalled);
