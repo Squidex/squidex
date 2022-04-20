@@ -115,7 +115,7 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v1
         with:
-         images: 'squidex-tmp'
+         images: 'squidex-tmp,squidex/resizer'
          tail: '100'
 
       - name: Cleanup Test
