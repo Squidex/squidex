@@ -26,12 +26,8 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0)
             {
-                var roles = identity
-                    .FindAll(c => c.Type == options.OidcRoleClaimType)
-                    .Select(c => c.Value);
-
                 var permissions = options.OidcRoleMapping
-                    .Where(r => roles.Contains(r.Key))
+                    .Where(r => identity.HasClaim(options.OidcRoleClaimType, r.Key))
                     .SelectMany(r => r.Value)
                     .Distinct();
 
