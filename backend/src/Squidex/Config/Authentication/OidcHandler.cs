@@ -24,16 +24,18 @@ namespace Squidex.Config.Authentication
         {
             var identity = (ClaimsIdentity)context.Principal!.Identity!;
 
-            if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0)
-            {
-                var role = identity.FindFirst(x => x.Type == options.OidcRoleClaimType)?.Value;
+            if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0) {
+                var roles = identity
+                    .FindAll(c => c.Type == options.OidcRoleClaimType)
+                    .Select(c => c.Value);
 
-                if (!string.IsNullOrWhiteSpace(role) && options.OidcRoleMapping.TryGetValue(role, out var permissions) && permissions != null)
-                {
-                    foreach (var permission in permissions)
-                    {
-                        identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
-                    }
+                var permissions = options.OidcRoleMapping
+                    .Where(r => roles.Contains(r.Key))
+                    .SelectMany(r => r.Value)
+                    .Distinct();
+
+                foreach (var permission in permissions) {
+                    identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
                 }
             }
 
