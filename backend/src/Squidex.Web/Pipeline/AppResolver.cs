@@ -33,10 +33,16 @@ namespace Squidex.Web.Pipeline
         {
             var user = context.HttpContext.User;
 
-            var appName = context.RouteData.Values["app"]?.ToString();
-
-            if (!string.IsNullOrWhiteSpace(appName))
+            if (context.RouteData.Values.TryGetValue("app", out var appValue))
             {
+                var appName = appValue?.ToString();
+
+                if (string.IsNullOrWhiteSpace(appName))
+                {
+                    context.Result = new NotFoundResult();
+                    return;
+                }
+
                 var isFrontend = user.IsInClient(DefaultClients.Frontend);
 
                 var app = await appProvider.GetAppAsync(appName, !isFrontend, context.HttpContext.RequestAborted);

@@ -5,15 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using TestSuite.Fixtures;
+using System.Collections.Concurrent;
 
-namespace TestSuite.LoadTests
+namespace TestSuite
 {
-    public sealed class WritingFixture : TestSchemaFixtureBase
+    public static class Factories
     {
-        public WritingFixture()
-            : base("benchmark_writing")
+        private static readonly ConcurrentDictionary<string, Task<object>> Instances = new ConcurrentDictionary<string, Task<object>>();
+
+        public static async Task<T> CreateAsync<T>(string key, Func<Task<T>> factory)
         {
+            return (T)await Instances.GetOrAdd(key, async (_, f) => await f(), factory);
         }
     }
 }

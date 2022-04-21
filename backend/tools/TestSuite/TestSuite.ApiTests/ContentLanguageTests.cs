@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.ClientLibrary;
-using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
 

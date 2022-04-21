@@ -8,7 +8,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
-using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
 
@@ -16,11 +15,11 @@ using Xunit;
 
 namespace TestSuite.ApiTests
 {
-    public class ContentQueryTests : IClassFixture<ContentQueryFixture1to10>
+    public class ContentQueryTests : IClassFixture<ContentQueryFixture>
     {
-        public ContentQueryFixture1to10 _ { get; }
+        public ContentQueryFixture _ { get; }
 
-        public ContentQueryTests(ContentQueryFixture1to10 fixture)
+        public ContentQueryTests(ContentQueryFixture fixture)
         {
             _ = fixture;
         }

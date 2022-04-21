@@ -11,15 +11,22 @@ using TestSuite.Model;
 
 namespace TestSuite.Fixtures
 {
-    public sealed class ContentReferencesFixture : CreatedAppFixture
+    public abstract class TestSchemaWithReferencesFixtureBase : CreatedAppFixture
     {
-        public string SchemaName { get; } = "references";
+        public IContentsClient<TestEntityWithReferences, TestEntityWithReferencesData> Contents { get; private set; }
 
-        public IContentsClient<TestEntityWithReferences, TestEntityWithReferencesData> Contents { get; }
+        public string SchemaName { get; }
 
-        public ContentReferencesFixture()
+        protected TestSchemaWithReferencesFixtureBase(string schemaName)
         {
-            Task.Run(async () =>
+            SchemaName = schemaName;
+        }
+
+        public override async Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+
+            await Factories.CreateAsync($"{nameof(TestEntityWithReferences)}_{SchemaName}", async () =>
             {
                 try
                 {
@@ -32,7 +39,9 @@ namespace TestSuite.Fixtures
                         throw;
                     }
                 }
-            }).Wait();
+
+                return true;
+            });
 
             Contents = ClientManager.CreateContentsClient<TestEntityWithReferences, TestEntityWithReferencesData>(SchemaName);
         }

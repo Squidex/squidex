@@ -33,10 +33,16 @@ namespace Squidex.Web.Pipeline
 
             if (appId != default)
             {
-                var schemaIdOrName = context.RouteData.Values["schema"]?.ToString();
-
-                if (!string.IsNullOrWhiteSpace(schemaIdOrName))
+                if (context.RouteData.Values.TryGetValue("schema", out var schemaValue))
                 {
+                    var schemaIdOrName = schemaValue?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(schemaIdOrName))
+                    {
+                        context.Result = new NotFoundResult();
+                        return;
+                    }
+
                     var schema = await GetSchemaAsync(appId, schemaIdOrName, context.HttpContext.User);
 
                     if (schema == null)

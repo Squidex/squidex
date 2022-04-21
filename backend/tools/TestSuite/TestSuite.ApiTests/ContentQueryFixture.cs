@@ -9,12 +9,12 @@ using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 using TestSuite.Model;
 
-namespace TestSuite.LoadTests
+namespace TestSuite.ApiTests
 {
-    public sealed class ReadingFixture : TestSchemaFixtureBase
+    public sealed class ContentQueryFixture : TestSchemaFixtureBase
     {
-        public ReadingFixture()
-            : base("benchmark-reading")
+        public ContentQueryFixture()
+            : base("my-reads")
         {
         }
 

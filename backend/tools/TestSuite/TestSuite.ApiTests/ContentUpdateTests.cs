@@ -8,7 +8,6 @@
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Management;
-using TestSuite.Fixtures;
 using TestSuite.Model;
 using Xunit;
 

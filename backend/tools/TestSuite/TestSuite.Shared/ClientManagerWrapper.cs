@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Lazy;
 using Microsoft.Extensions.Configuration;
 using Squidex.ClientLibrary;
 using Squidex.ClientLibrary.Configuration;
@@ -16,40 +15,63 @@ namespace TestSuite
 {
     public sealed class ClientManagerWrapper
     {
-        private static Task<ClientManagerWrapper> manager;
+        private readonly Lazy<IAppsClient> apps;
+        private readonly Lazy<IAssetsClient> assets;
+        private readonly Lazy<IBackupsClient> backups;
+        private readonly Lazy<ILanguagesClient> languages;
+        private readonly Lazy<IPingClient> ping;
+        private readonly Lazy<IRulesClient> rules;
+        private readonly Lazy<ISchemasClient> schemas;
+        private readonly Lazy<ITemplatesClient> templates;
 
-        public SquidexClientManager ClientManager { get; set; }
+        public SquidexClientManager ClientManager { get; }
 
-        [Lazy]
-        public IAppsClient Apps => ClientManager.CreateAppsClient();
+        public IAppsClient Apps
+        {
+            get => apps.Value;
+        }
 
-        [Lazy]
-        public IAssetsClient Assets => ClientManager.CreateAssetsClient();
+        public IAssetsClient Assets
+        {
+            get => assets.Value;
+        }
 
-        [Lazy]
-        public IBackupsClient Backups => ClientManager.CreateBackupsClient();
+        public IBackupsClient Backups
+        {
+            get => backups.Value;
+        }
 
-        [Lazy]
-        public ILanguagesClient Languages => ClientManager.CreateLanguagesClient();
+        public ILanguagesClient Languages
+        {
+            get => languages.Value;
+        }
 
-        [Lazy]
-        public IPingClient Ping => ClientManager.CreatePingClient();
+        public IPingClient Ping
+        {
+            get => ping.Value;
+        }
 
-        [Lazy]
-        public IRulesClient Rules => ClientManager.CreateRulesClient();
+        public IRulesClient Rules
+        {
+            get => rules.Value;
+        }
 
-        [Lazy]
-        public ISchemasClient Schemas => ClientManager.CreateSchemasClient();
+        public ISchemasClient Schemas
+        {
+            get => schemas.Value;
+        }
 
-        [Lazy]
-        public ITemplatesClient Templates => ClientManager.CreateTemplatesClient();
+        public ITemplatesClient Templates
+        {
+            get => templates.Value;
+        }
 
         public ClientManagerWrapper()
         {
-            var appName = GetValue("config:app:name", "integration-tests");
-            var clientId = GetValue("config:client:id", "root");
-            var clientSecret = GetValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-            var serverUrl = GetValue("config:server:url", "https://localhost:5001");
+            var appName = TestHelpers.GetValue("config:app:name", "integration-tests");
+            var clientId = TestHelpers.GetValue("config:client:id", "root");
+            var clientSecret = TestHelpers.GetValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
+            var serverUrl = TestHelpers.GetValue("config:server:url", "https://localhost:5001");
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {
@@ -61,28 +83,49 @@ namespace TestSuite
                 ReadResponseAsString = true,
                 Url = serverUrl
             });
-        }
 
-        public static Task<ClientManagerWrapper> CreateAsync()
-        {
-            if (manager == null)
+            apps = new Lazy<IAppsClient>(() =>
             {
-                manager = CreateInternalAsync();
-            }
+                return ClientManager.CreateAppsClient();
+            });
 
-            return manager;
+            assets = new Lazy<IAssetsClient>(() =>
+            {
+                return ClientManager.CreateAssetsClient();
+            });
+
+            backups = new Lazy<IBackupsClient>(() =>
+            {
+                return ClientManager.CreateBackupsClient();
+            });
+
+            languages = new Lazy<ILanguagesClient>(() =>
+            {
+                return ClientManager.CreateLanguagesClient();
+            });
+
+            ping = new Lazy<IPingClient>(() =>
+            {
+                return ClientManager.CreatePingClient();
+            });
+
+            rules = new Lazy<IRulesClient>(() =>
+            {
+                return ClientManager.CreateRulesClient();
+            });
+
+            schemas = new Lazy<ISchemasClient>(() =>
+            {
+                return ClientManager.CreateSchemasClient();
+            });
+
+            templates = new Lazy<ITemplatesClient>(() =>
+            {
+                return ClientManager.CreateTemplatesClient();
+            });
         }
 
-        private static async Task<ClientManagerWrapper> CreateInternalAsync()
-        {
-            var clientManager = new ClientManagerWrapper();
-
-            await clientManager.ConnectAsync();
-
-            return clientManager;
-        }
-
-        public async Task ConnectAsync()
+        public async Task<ClientManagerWrapper> ConnectAsync()
         {
             var waitSeconds = TestHelpers.Configuration.GetValue<int>("config:wait");
 
@@ -108,27 +151,15 @@ namespace TestSuite
                         }
                     }
                 }
+
+                Console.WriteLine("Connected to server.");
             }
             else
             {
                 Console.WriteLine("Waiting for server is skipped.");
             }
-        }
 
-        private static string GetValue(string name, string fallback)
-        {
-            var value = TestHelpers.Configuration[name];
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                value = fallback;
-            }
-            else
-            {
-                Console.WriteLine("Using: {0}={1}", name, value);
-            }
-
-            return value;
+            return this;
         }
     }
 }

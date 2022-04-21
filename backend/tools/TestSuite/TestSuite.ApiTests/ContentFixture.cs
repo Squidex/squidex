@@ -5,22 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace TestSuite.Utils
+using TestSuite.Fixtures;
+
+namespace TestSuite.ApiTests
 {
-    public static class RandomString
+    public sealed class ContentFixture : TestSchemaFixtureBase
     {
-        private static readonly Random Random = new Random();
-
-        public static string Create(int length)
+        public ContentFixture()
+            : base("my-writes")
         {
-            var chars = new char[length];
-
-            for (var i = 0; i < length; i++)
-            {
-                chars[i] = (char)Random.Next(48, 122);
-            }
-
-            return new string(chars);
         }
     }
 }
