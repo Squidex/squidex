@@ -14,7 +14,7 @@ namespace TestSuite.ApiTests
     public sealed class ContentQueryFixture : TestSchemaFixtureBase
     {
         public ContentQueryFixture()
-            : base("my-queries")
+            : base("my-reads")
         {
         }
 

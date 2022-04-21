@@ -90,6 +90,7 @@ namespace TestSuite.Model
                 Number = index,
                 Json = JObject.FromObject(new
                 {
+                    nested0 = index,
                     nested1 = new
                     {
                         nested2 = index
@@ -112,13 +113,7 @@ namespace TestSuite.Model
             }
             else
             {
-                data.Geo = new
-                {
-                    longitude = index,
-                    lon = index,
-                    latitude = index,
-                    lat = index
-                };
+                data.Geo = new { longitude = index, latitude = index };
             }
 
             return data;
