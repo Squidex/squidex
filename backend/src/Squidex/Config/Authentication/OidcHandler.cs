@@ -24,7 +24,8 @@ namespace Squidex.Config.Authentication
         {
             var identity = (ClaimsIdentity)context.Principal!.Identity!;
 
-            if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0) {
+            if (!string.IsNullOrWhiteSpace(options.OidcRoleClaimType) && options.OidcRoleMapping?.Count >= 0)
+            {
                 var roles = identity
                     .FindAll(c => c.Type == options.OidcRoleClaimType)
                     .Select(c => c.Value);
@@ -34,7 +35,8 @@ namespace Squidex.Config.Authentication
                     .SelectMany(r => r.Value)
                     .Distinct();
 
-                foreach (var permission in permissions) {
+                foreach (var permission in permissions)
+                {
                     identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
                 }
             }
