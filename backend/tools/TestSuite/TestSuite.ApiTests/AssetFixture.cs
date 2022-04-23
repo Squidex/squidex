@@ -18,7 +18,9 @@ namespace TestSuite.ApiTests
 
             using (var client = new HttpClient())
             {
-                var url = $"{ServerUrl}{asset._links["content"].Href}";
+                client.BaseAddress = new Uri(ServerUrl);
+
+                var url = asset._links["content"].Href;
 
                 if (version > 0)
                 {

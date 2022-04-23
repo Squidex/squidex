@@ -112,7 +112,7 @@ namespace TestSuite.ApiTests
 
         private async Task<(string, string)> GetEtagAsync(string id, Dictionary<string, string> headers)
         {
-            var url = $"{_.ClientManager.Options.Url}/api/content/{_.AppName}/{_.SchemaName}/{id}";
+            var url = $"{_.ClientManager.Options.Url}api/content/{_.AppName}/{_.SchemaName}/{id}";
 
             using (var httpClient = _.ClientManager.CreateHttpClient())
             {
