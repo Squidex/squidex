@@ -3,6 +3,41 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.7.0] - 2022-04-32
+
+### Fixed
+
+* **Contents**: Allow flatting of localized fields with custom languages codes.
+* **Contents**: Fixed permission checks for some endpoints.
+* **Routing**: Fixed base URL.
+* **Scripting**: Fixed auto-completion of scripting.
+* **UI**: Fixed default values for components.
+* **UI**: Fixed input placeholders in route actions forms.
+* **UI**: Fixed markdown fullscreen mode.
+* **UI**: Fixed some z-index settings in the embed SDK.
+* **UI**: Fixed table column widths for reference selector.
+
+## Changed
+
+* **Elastic**: Downgrade elastic search client.
+* **Identity**: Map and merge all roles for OIDC authentication.
+* **UI**: Improved the layout of the datetime editor.
+* **UI**: Remember selected language in contents and content view.
+* **UI**: Remove description of merged schema fields for contents filter.
+
+## Added
+
+* **Testing**: New tests for template handling.
+* **Testing**: Storybook basic setup.
+* **UI**: Tooltips for field fullscreen mode.
+
+## Security
+
+* **Routing**: Fixed a bug where the check for apps in a route was causing a 500 in some cases and not a 403, when the route parameter was invalid.
+* **Routing**: Fixed a bug where the check for schemas in a route was causing a 500 in some cases and not a 403, when the route parameter was invalid.
+* **Identity**: Allow request of access token for all domains.
+
+
 ## [6.6.0] - 2022-03-25
 
 There was actually a 6.5.0, but it was not documented and due to a problem with the Github CI never published as a Release to Github.
