@@ -47,6 +47,21 @@ namespace TestSuite.Fixtures
                     }
                 }
 
+                try
+                {
+                    await Apps.PostLanguageAsync(AppName, new AddLanguageDto
+                    {
+                        Language = "custom"
+                    });
+                }
+                catch (SquidexManagementException ex)
+                {
+                    if (ex.StatusCode != 400)
+                    {
+                        throw;
+                    }
+                }
+
                 return true;
             });
         }

@@ -43,6 +43,7 @@ namespace TestSuite.ApiTests
         [Theory]
         [InlineData("de", "Hallo")]
         [InlineData("en", "Hello")]
+        [InlineData("custom", "Custom")]
         public async Task Should_flatten_language(string code, string expected)
         {
             // STEP 1: Create content
@@ -51,7 +52,8 @@ namespace TestSuite.ApiTests
                 Localized = new Dictionary<string, string>
                 {
                     ["de"] = "Hallo",
-                    ["en"] = "Hello"
+                    ["en"] = "Hello",
+                    ["custom"] = "Custom"
                 }
             }, ContentCreateOptions.AsPublish);
 

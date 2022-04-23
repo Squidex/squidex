@@ -135,10 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 foreach (var iso2Code in value.Split(Separators, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    if (Language.TryGetLanguage(iso2Code.Trim(), out var language))
-                    {
-                        languages.Add(language);
-                    }
+                    languages.Add(iso2Code);
                 }
 
                 return languages;
