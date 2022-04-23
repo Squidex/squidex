@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
+using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 using TestSuite.Model;
@@ -24,9 +26,29 @@ namespace TestSuite.LoadTests
 
             await DisposeAsync();
 
-            for (var i = 10; i > 0; i--)
+            var current = await Contents.GetAsync(new ContentQuery
             {
-                var data = TestEntity.CreateTestEntry(i);
+                Top = 0
+            });
+
+            var countTotal = (int)current.Total;
+            var countMissing = 100 - countTotal;
+
+            for (var index = countMissing; index > 0; index--)
+            {
+                var data = new TestEntityData
+                {
+                    Number = index,
+                    Json = JObject.FromObject(new
+                    {
+                        nested0 = index,
+                        nested1 = new
+                        {
+                            nested2 = index
+                        }
+                    }),
+                    String = index.ToString(CultureInfo.InvariantCulture)
+                };
 
                 await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
             }
