@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public bool CheckReferrers { get; set; }
 
+        public bool Patch { get;  set; }
+
         public UpsertContent()
         {
             ContentId = DomainId.NewGuid();

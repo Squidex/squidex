@@ -493,6 +493,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Makes the update as patch..
+        /// </summary>
+        public static string ContentRequestPatch {
+            get {
+                return ResourceManager.GetString("ContentRequestPatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Set to true to autopublish content on create..
         /// </summary>
         public static string ContentRequestPublish {

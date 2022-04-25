@@ -29,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public string? Schema { get; set; }
 
+        public bool Patch { get; set; }
+
         public bool Permanent { get; set; }
 
         public long ExpectedCount { get; set; } = 1;

@@ -51,6 +51,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public string? Schema { get; set; }
 
         /// <summary>
+        /// Makes the update as patch.
+        /// </summary>
+        public bool Patch { get; set; }
+
+        /// <summary>
         /// True to delete the content permanently.
         /// </summary>
         public bool Permanent { get; set; }
