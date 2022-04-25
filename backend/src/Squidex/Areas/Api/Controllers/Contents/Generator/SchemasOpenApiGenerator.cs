@@ -9,13 +9,14 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation;
 using NSwag.Generation.Processors.Contexts;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Hosting;
 using Squidex.Infrastructure.Caching;
 using Squidex.Properties;
 using Squidex.Shared;
+using IRequestUrlGenerator = Squidex.Hosting.IUrlGenerator;
 using SchemaDefType = Squidex.Domain.Apps.Core.Schemas.SchemaType;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
@@ -23,16 +24,16 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
     public sealed class SchemasOpenApiGenerator
     {
         private readonly IAppProvider appProvider;
-        private readonly IUrlGenerator urlGenerator;
         private readonly OpenApiDocumentGeneratorSettings schemaSettings;
         private readonly OpenApiSchemaGenerator schemaGenerator;
+        private readonly IRequestUrlGenerator urlGenerator;
         private readonly IRequestCache requestCache;
 
         public SchemasOpenApiGenerator(
             IAppProvider appProvider,
-            IUrlGenerator urlGenerator,
             OpenApiDocumentGeneratorSettings schemaSettings,
             OpenApiSchemaGenerator schemaGenerator,
+            IRequestUrlGenerator urlGenerator,
             IRequestCache requestCache)
         {
             this.appProvider = appProvider;
@@ -123,7 +124,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(Permissions.AppContentsReadOwn)
                 .Operation("GetVersioned")
                 .OperationSummary("Get a [schema] content item by id and version.")
-                .HasPath("version", JsonObjectType.Number, "The version of the content item.")
+                .HasPath("version", JsonObjectType.Number, FieldDescriptions.EntityVersion)
                 .HasId()
                 .Responds(200, "Content item returned.", builder.ContentSchema);
 
@@ -139,8 +140,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(Permissions.AppContentsCreate)
                 .Operation("Create")
                 .OperationSummary("Create a [schema] content item.")
-                .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
-                .HasQuery("id", JsonObjectType.String, "The optional custom content id.")
+                .HasQuery("publish", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPublish)
+                .HasQuery("id", JsonObjectType.String, FieldDescriptions.ContentRequestOptionalId)
                 .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(201, "Content item created", builder.ContentSchema)
                 .Responds(400, "Content data not valid.");
@@ -149,7 +150,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 .RequirePermission(Permissions.AppContentsUpsert)
                 .Operation("Upsert")
                 .OperationSummary("Upsert a [schema] content item.")
-                .HasQuery("publish", JsonObjectType.Boolean, "True to automatically publish the content.")
+                .HasQuery("patch", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPatch)
+                .HasQuery("publish", JsonObjectType.Boolean, FieldDescriptions.ContentRequestPublish)
                 .HasId()
                 .HasBody("data", builder.DataSchema, Resources.OpenApiSchemaBody)
                 .Responds(200, "Content item created or updated.", builder.ContentSchema)

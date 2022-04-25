@@ -277,6 +277,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Description = FieldDescriptions.ContentRequestPublish,
                         DefaultValue = false
                     },
+                    new QueryArgument(AllTypes.Boolean)
+                    {
+                        Name = "patch",
+                        Description = FieldDescriptions.ContentRequestPatch,
+                        DefaultValue = false
+                    },
                     new QueryArgument(AllTypes.String)
                     {
                         Name = "status",
@@ -297,8 +303,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 var contentId = c.GetArgument<DomainId>("id");
                 var contentData = c.GetArgument<ContentData>("data")!;
                 var contentStatus = c.GetArgument<string?>("status");
+                var patch = c.GetArgument<bool>("patch");
 
-                var command = new UpsertContent { ContentId = contentId, Data = contentData };
+                var command = new UpsertContent { ContentId = contentId, Data = contentData, Patch = patch };
 
                 if (!string.IsNullOrWhiteSpace(contentStatus))
                 {

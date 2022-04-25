@@ -326,6 +326,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
         }
 
         [Fact]
+        public async Task Upsert_should_patch_content_if_found()
+        {
+            var command = new UpsertContent { Data = patch, Patch = true };
+
+            await ExecuteCreateAsync();
+
+            var result = await PublishAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(patched, sut.Snapshot.CurrentVersion.Data);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdated { Data = patched })
+                );
+
+            A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(patched, data, Status.Draft), "<update-script>", ScriptOptions(), default))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Upsert_should_not_change_status_on_update_if_status_set_to_initial()
         {
             var command = new UpsertContent { Data = otherData, Status = Status.Draft };

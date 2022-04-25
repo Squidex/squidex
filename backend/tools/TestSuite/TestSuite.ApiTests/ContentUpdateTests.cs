@@ -466,6 +466,106 @@ namespace TestSuite.ApiTests
         }
 
         [Fact]
+        public async Task Should_patch_content_with_upsert()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "test" }, ContentCreateOptions.AsPublish);
+
+
+                // STEP 2: Path an item.
+                await _.Contents.UpsertAsync(content.Id, new TestEntityData { Number = 1 }, ContentUpsertOptions.AsPatch);
+
+
+                // STEP 3: Update the item and ensure that the data has changed.
+                await _.Contents.UpsertAsync(content.Id, new TestEntityData { Number = 2 }, ContentUpsertOptions.AsPatch);
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, updated.Data.Number);
+
+                // Should not change other value with patch.
+                Assert.Equal("test", updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_patch_content_with_bulk()
+        {
+            TestEntity content = null;
+            try
+            {
+                // STEP 1: Create a new item.
+                content = await _.Contents.CreateAsync(new TestEntityData { String = "test" }, ContentCreateOptions.AsPublish);
+
+
+                // STEP 2: Path an item.
+                await _.Contents.BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Id = content.Id,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = 1
+                                }
+                            },
+                            Patch = true
+                        }
+                    }
+                });
+
+
+                // STEP 3: Update the item and ensure that the data has changed.
+                await _.Contents.BulkUpdateAsync(new BulkUpdate
+                {
+                    Jobs = new List<BulkUpdateJob>
+                    {
+                        new BulkUpdateJob
+                        {
+                            Id = content.Id,
+                            Data = new
+                            {
+                                number = new
+                                {
+                                    iv = 2
+                                }
+                            },
+                            Patch = true
+                        }
+                    }
+                });
+
+                var updated = await _.Contents.GetAsync(content.Id);
+
+                Assert.Equal(2, updated.Data.Number);
+
+                // Should not change other value with patch.
+                Assert.Equal("test", updated.Data.String);
+            }
+            finally
+            {
+                if (content != null)
+                {
+                    await _.Contents.DeleteAsync(content.Id);
+                }
+            }
+        }
+
+        [Fact]
         public async Task Should_create_draft_version()
         {
             TestEntity content = null;

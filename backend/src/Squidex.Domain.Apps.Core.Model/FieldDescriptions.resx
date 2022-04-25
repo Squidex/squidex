@@ -261,6 +261,9 @@
   <data name="ContentRequestOptionalStatus" xml:space="preserve">
     <value>The initial status.</value>
   </data>
+  <data name="ContentRequestPatch" xml:space="preserve">
+    <value>Makes the update as patch.</value>
+  </data>
   <data name="ContentRequestPublish" xml:space="preserve">
     <value>Set to true to autopublish content on create.</value>
   </data>

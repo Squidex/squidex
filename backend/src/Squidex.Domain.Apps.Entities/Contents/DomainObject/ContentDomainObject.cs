@@ -72,13 +72,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                     {
                         var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                        if (Version > EtagVersion.Empty && !IsDeleted(Snapshot))
+                        if (Version <= EtagVersion.Empty || IsDeleted(Snapshot))
                         {
-                            await UpdateCore(c.AsUpdate(), operation);
+                            await CreateCore(c.AsCreate(), operation);
+                        }
+                        else if (c.Patch)
+                        {
+                            await PatchCore(c.AsUpdate(), operation);
                         }
                         else
                         {
-                            await CreateCore(c.AsCreate(), operation);
+                            await UpdateCore(c.AsUpdate(), operation);
                         }
 
                         if (Is.OptionalChange(operation.Snapshot.EditingStatus(), c.Status))
