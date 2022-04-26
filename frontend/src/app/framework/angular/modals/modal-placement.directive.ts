@@ -14,6 +14,7 @@ import { AnchorX, AnchorY, computeAnchors, positionModal, PositionRequest, Relat
 })
 export class ModalPlacementDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
     private targetElement?: Element;
+    private isViewInit = false;
 
     @Input('sqxAnchoredTo')
     public set target(element: Element) {
@@ -26,7 +27,9 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
                 this.listenToElement(element);
             }
 
-            this.updatePosition();
+            if (this.isViewInit) {
+                this.updatePosition();
+            }
         }
     }
 
@@ -79,6 +82,8 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         private readonly element: ElementRef<HTMLElement>,
     ) {
         super();
+
+        renderer.setStyle(element.nativeElement, 'visibility', 'hidden');
     }
 
     private listenToElement(element: any) {
@@ -110,6 +115,8 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         }
 
         this.updatePosition();
+
+        this.isViewInit = true;
     }
 
     private updatePosition() {
@@ -186,5 +193,7 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
         if (position.y) {
             this.renderer.setStyle(modalRef, 'top', `${position.y}px`);
         }
+
+        this.renderer.setStyle(modalRef, 'visibility', 'visible');
     }
 }

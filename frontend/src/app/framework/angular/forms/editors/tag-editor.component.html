@@ -49,7 +49,7 @@
         </sqx-dropdown-menu>
     </ng-container>
 
-    <ng-container *ngIf="allowOpen && suggestionsSorted.length > 0">
+    <ng-container *ngIf="allowOpen || suggestionsSorted.length > 0">
         <ng-container *sqxModal="suggestionsModal">
             <sqx-dropdown-menu class="control-dropdown suggestions-dropdown"
                 [sqxAnchoredTo]="form"

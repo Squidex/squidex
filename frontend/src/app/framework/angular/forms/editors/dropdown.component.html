@@ -24,7 +24,7 @@
             [style]="dropdownStyles"
             [position]="dropdownPosition">
             <div *ngIf="canSearch" class="search-form">
-                <input class="form-control search" [formControl]="queryInput" placeholder="{{ 'contributors.search' | sqxTranslate }}" (keydown)="onKeyDown($event)" sqxFocusOnInit>
+                <input class="form-control search" [formControl]="queryInput" placeholder="{{ 'common.search' | sqxTranslate }}" (keydown)="onKeyDown($event)" sqxFocusOnInit>
             </div>
 
             <div class="control-dropdown-items" #container>

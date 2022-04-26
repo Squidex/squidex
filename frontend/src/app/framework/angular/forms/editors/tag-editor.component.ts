@@ -68,7 +68,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public acceptEnter?: boolean | null;
 
     @Input()
-    public allowOpen?: boolean | null = true;
+    public allowOpen?: boolean | null = false;
 
     @Input()
     public allowDuplicates?: boolean | null = true;

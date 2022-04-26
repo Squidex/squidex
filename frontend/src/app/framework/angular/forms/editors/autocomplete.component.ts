@@ -58,7 +58,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public inputStyle?: 'underlined' | 'empty';
 
     @Input()
-    public allowOpen?: boolean | null = true;
+    public allowOpen?: boolean | null = false;
 
     @Input()
     public displayProperty = '';
