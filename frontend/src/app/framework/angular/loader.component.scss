@@ -1,0 +1,22 @@
+@import 'mixins';
+@import 'vars';
+
+:host {
+    display: inline-block;
+}
+
+.theme {
+    stroke: $color-theme-brand;
+}
+
+.white {
+    stroke: $color-white;
+}
+
+.input {
+    stroke: $color-input;
+}
+
+.text {
+    stroke: $color-text;
+}

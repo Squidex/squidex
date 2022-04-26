@@ -38,6 +38,16 @@
                     
                     <ng-template *ngIf="templateItem" [sqxTemplateWrapper]="templateItem" [item]="item" [index]="i" [context]="snapshot.query"></ng-template>
                 </div>
+
+                <div class="text-decent control-dropdown-item no-events" *ngIf="snapshot.suggestedItems.length === 0">
+                    <ng-container *ngIf="itemsLoading; else notLoading">
+                        <sqx-loader color="input"></sqx-loader>
+                    </ng-container>
+    
+                    <ng-template #notLoading>
+                        <small>{{itemsEmptyText | sqxTranslate}}</small>
+                    </ng-template>
+                </div>
             </div>
         </sqx-dropdown-menu>
     </ng-container>

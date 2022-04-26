@@ -74,9 +74,6 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public allowDuplicates?: boolean | null = true;
 
     @Input()
-    public dashed?: boolean | null;
-
-    @Input()
     public itemSeparator?: boolean | null;
 
     @Input()
@@ -84,6 +81,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     @Input()
     public readonly?: boolean | null;
+
+    @Input()
+    public styleDashed?: boolean | null;
 
     @Input()
     public styleBlank?: boolean | null;
@@ -96,6 +96,12 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
 
     @Input()
     public dropdownWidth = '18rem';
+
+    @Input()
+    public suggestionsLoading?: boolean | null;
+
+    @Input()
+    public suggestionsEmptyText = 'i18n:common.empty';
 
     @Input()
     public set disabled(value: boolean | undefined | null) {

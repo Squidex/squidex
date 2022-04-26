@@ -5,13 +5,44 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Component } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { moduleMetadata } from '@storybook/angular';
 import { Meta, Story } from '@storybook/angular/types-6-0';
 import { DropdownComponent, LocalizerService, SqxFrameworkModule } from '@app/framework';
 
 const TRANSLATIONS = {
     'common.search': 'Search',
+    'common.empty': 'Nothing available.',
 };
+
+@Component({
+    selector: 'sqx-dropdown-test',
+    template: `
+        <sqx-root-view>
+            <sqx-dropdown 
+                [allowOpen]="true" 
+                [items]="items"
+                [itemsLoading]="itemsLoading"
+                (open)="load()">
+            </sqx-dropdown>
+        </sqx-root-view>
+    `,
+})
+class TestComponent {
+    public items: string[] = [];
+    public itemsLoading = false;
+
+    public load() {
+        this.items = [];
+        this.itemsLoading = true;
+
+        setTimeout(() => {
+            this.items = ['A', 'B'];
+            this.itemsLoading = false;
+        }, 1000);
+    }
+}
 
 export default {
     title: 'Framework/Dropdown',
@@ -26,7 +57,11 @@ export default {
     },
     decorators: [
         moduleMetadata({
+            declarations: [
+                TestComponent,
+            ],
             imports: [
+                BrowserAnimationsModule,
                 SqxFrameworkModule,
                 SqxFrameworkModule.forRoot(),
             ],
@@ -46,6 +81,7 @@ const Template: Story<DropdownComponent & { model: any }> = (args: DropdownCompo
                 [dropdownPosition]="'bottom-left'"
                 [dropdownFullWidth]="dropdownFullWidth"
                 [items]="items"
+                [itemsLoading]="itemsLoading"
                 [ngModel]="model">
             </sqx-dropdown>
         </sqx-root-view>
@@ -57,11 +93,12 @@ const Template2: Story<DropdownComponent & { model: any }> = (args: DropdownComp
     template: `
         <sqx-root-view>
             <sqx-dropdown
-                [searchProperty]="searchProperty"
                 [disabled]="disabled"
                 [dropdownPosition]="'bottom-left'"
                 [dropdownFullWidth]="dropdownFullWidth"
                 [items]="items"
+                [itemsLoading]="itemsLoading"
+                [searchProperty]="searchProperty"
                 [ngModel]="model"
                 [valueProperty]="valueProperty">
                 <ng-template let-target="$implicit">
@@ -72,11 +109,32 @@ const Template2: Story<DropdownComponent & { model: any }> = (args: DropdownComp
     `,
 });
 
+const Template3: Story<DropdownComponent & { model: any }> = (args: DropdownComponent) => ({
+    props: args,
+    template: `
+        <sqx-dropdown-test></sqx-dropdown-test>
+    `,
+});
+
 export const Default = Template.bind({});
 
 Default.args = {
     items: ['A', 'B', 'C'],
     model: 'B',
+};
+
+export const Empty = Template.bind({});
+
+Empty.args = {
+    items: [],
+    model: 'B',
+};
+
+export const EmptyLoading = Template.bind({});
+
+EmptyLoading.args = {
+    items: [],
+    itemsLoading: true,
 };
 
 export const NoSearch = Template.bind({});
@@ -113,3 +171,5 @@ ComplexValues.args = {
     model: 2,
     valueProperty: 'id',
 };
+
+export const Lazy = Template3.bind({});

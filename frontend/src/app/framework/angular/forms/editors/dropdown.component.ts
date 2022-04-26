@@ -47,6 +47,12 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
     public close = new EventEmitter();
 
     @Input()
+    public itemsLoading?: boolean | null;
+
+    @Input()
+    public itemsEmptyText = 'i18n:common.empty';
+
+    @Input()
     public items: ReadonlyArray<any> | undefined | null = [];
 
     @Input()

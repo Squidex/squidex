@@ -19,6 +19,10 @@ $color-input-disabled: #eef1f4;
     white-space: nowrap;
 }
 
+.no-events {
+    pointer-events: none;
+}
+
 .search-form {
     padding: .5rem;
 }
@@ -57,4 +61,8 @@ $color-input-disabled: #eef1f4;
     .form-control {
         cursor: default;
     }
+}
+
+sqx-loader {
+    margin-top: .25rem;
 }

@@ -19,6 +19,9 @@ export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
 interface State {
     // The tags converter.
     converter: ReferencesTagsConverter;
+
+    // True when loading.
+    isLoading?: boolean;
 }
 
 const NO_EMIT = { emitEvent: false };
@@ -126,6 +129,8 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     }
 
     private loadMore(observable: Observable<ContentsDto>) {
+        this.next({ isLoading: true });
+
         observable
             .subscribe({
                 next: ({ items }) => {
@@ -165,5 +170,7 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
             this.next({ converter });
         }
+        
+        this.next({ isLoading: false });
     }
 }

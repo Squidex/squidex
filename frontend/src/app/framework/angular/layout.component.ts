@@ -9,7 +9,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, QueryParamsHandling, Router } from '@angular/router';
-import { filter, map, startWith } from 'rxjs';
+import { concat, defer, filter, map, of } from 'rxjs';
 import { LayoutContainerDirective } from './layout-container.directive';
 
 @Component({
@@ -87,13 +87,14 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     public firstChild =
-        this.router.events.pipe(
-            filter(event => event instanceof NavigationEnd),
-            map(() => {
-                return !!this.route.firstChild;
-            }),
-            startWith(!!this.route.firstChild),
-        );
+        concat(
+            defer(() => of(!!this.route.firstChild)),
+            this.router.events.pipe(
+                filter(event => event instanceof NavigationEnd),
+                map(() => {
+                    return !!this.route.firstChild;
+                }),
+            ));
 
     constructor(
         private readonly container: LayoutContainerDirective,
