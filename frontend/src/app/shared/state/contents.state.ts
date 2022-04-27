@@ -15,6 +15,8 @@ import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { SchemasState } from './schemas.state';
 
+/* eslint-disable @typescript-eslint/no-throw-literal */
+
 export type StatusInfo =
     Readonly<{ status: string; color: string }>;
 
@@ -164,7 +166,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             return EMPTY;
         }
 
-        this.next({ isLoading: true }, 'Loading Done');
+        this.next({ isLoading: true }, 'Loading Started');
 
         const { page, pageSize, query, reference, referencing, total } = this.snapshot;
 
@@ -265,7 +267,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 'i18n:contents.unpublishReferrerConfirmTitle',
                 'i18n:contents.unpublishReferrerConfirmText',
                 'unpublishReferencngContent').pipe(
-            switchMap(() => this.loadInternalCore(false)), shareSubscribed(this.dialogs));
+            switchMap(() => this.reloadContents(contents)), shareSubscribed(this.dialogs));
     }
 
     public deleteMany(contents: ReadonlyArray<ContentDto>) {
@@ -334,6 +336,31 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal(false);
     }
 
+    private reloadContents(contents: ReadonlyArray<ContentDto>) {
+        this.next({ isLoading: true }, 'Loading Done');
+
+        return this.contentsService.getAllContents(this.appName, { ids: contents.map(x => x.id) }).pipe(
+            tap(updates => {
+                return this.next(s => {
+                    let contents = s.contents, selectedContent = s.selectedContent;
+
+                    for (const content of updates.items) {
+                        contents = contents.replacedBy('id', content);
+
+                        selectedContent =
+                            s.selectedContent?.id !== content.id ?
+                            s.selectedContent :
+                            content;
+                    }
+        
+                    return { ...s, contents, selectedContent };
+                });
+            }),
+            finalize(() => {
+                this.next({ isLoading: false }, 'Loading Done');
+            }));
+    }
+
     private replaceContent(content: ContentDto, oldVersion?: Version, updateText?: string) {
         if (!oldVersion || !oldVersion.eq(content.version)) {
             if (updateText) {
@@ -388,7 +415,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const error = errors[0].error!;
 
                     if (errors.length >= contents.length) {
-                        // eslint-disable-next-line @typescript-eslint/no-throw-literal
                         throw error;
                     } else {
                         this.dialogs.notifyError(error);
