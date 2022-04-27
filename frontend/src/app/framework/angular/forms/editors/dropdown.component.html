@@ -24,7 +24,7 @@
             [style]="dropdownStyles"
             [position]="dropdownPosition">
             <div *ngIf="canSearch" class="search-form">
-                <input class="form-control search" [formControl]="queryInput" placeholder="{{ 'contributors.search' | sqxTranslate }}" (keydown)="onKeyDown($event)" sqxFocusOnInit>
+                <input class="form-control search" [formControl]="queryInput" placeholder="{{ 'common.search' | sqxTranslate }}" (keydown)="onKeyDown($event)" sqxFocusOnInit>
             </div>
 
             <div class="control-dropdown-items" #container>
@@ -37,6 +37,16 @@
                     <ng-container *ngIf="!templateItem">{{item}}</ng-container>
                     
                     <ng-template *ngIf="templateItem" [sqxTemplateWrapper]="templateItem" [item]="item" [index]="i" [context]="snapshot.query"></ng-template>
+                </div>
+
+                <div class="text-decent control-dropdown-item no-events" *ngIf="snapshot.suggestedItems.length === 0">
+                    <ng-container *ngIf="itemsLoading; else notLoading">
+                        <sqx-loader color="input"></sqx-loader>
+                    </ng-container>
+    
+                    <ng-template #notLoading>
+                        <small>{{itemsEmptyText | sqxTranslate}}</small>
+                    </ng-template>
                 </div>
             </div>
         </sqx-dropdown-menu>

@@ -22,13 +22,14 @@
         <span class="text-decent">{{ 'workflows.syntax.for' | sqxTranslate }}</span>
     </div>
     <div class="col col-roles">
-        <sqx-tag-editor [allowDuplicates]="false" 
-            [dashed]="true" 
+        <sqx-tag-editor 
+            [allowDuplicates]="false" 
             [disabled]="!!disabled" 
             [ngModelOptions]="onBlur"
             [ngModel]="transition.roles" 
             (ngModelChange)="changeRole($event)" 
             [singleLine]="true" 
+            [styleDashed]="true" 
             [suggestions]="roles" placeholder="{{ 'common.role' | sqxTranslate }}">
         </sqx-tag-editor>
     </div>

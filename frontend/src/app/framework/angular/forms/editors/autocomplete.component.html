@@ -12,7 +12,13 @@
         [formControl]="queryInput">
 
     <div class="icon" *ngIf="icon">
-        <i class="icon-{{icon}}" [class.icon-spinner2]="snapshot.isLoading" [class.spin2]="snapshot.isLoading"></i>
+        <ng-container *ngIf="snapshot.isLoading; else notLoading">
+            <sqx-loader color="input"></sqx-loader>
+        </ng-container>
+
+        <ng-template #notLoading>
+            <i class="icon-{{icon}}"></i>
+        </ng-template>
     </div>
 
     <div class="btn btn-sm" (click)="openModal()" sqxStopClick *ngIf="allowOpen">

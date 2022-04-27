@@ -9,7 +9,7 @@
         [class.multiline]="!singleLine"
         [class.focus]="snapshot.hasFocus" 
         [class.disabled]="snapshot.isDisabled"
-        [class.dashed]="dashed && !(snapshot.items.length > 0)">
+        [class.dashed]="styleDashed && !(snapshot.items.length > 0)">
         <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
             {{item}} <i class="icon-close" (click)="remove(i)"></i>
         </span>
@@ -49,29 +49,37 @@
         </sqx-dropdown-menu>
     </ng-container>
 
-    <ng-container *ngIf="allowOpen && suggestionsSorted.length > 0">
-        <ng-container *sqxModal="suggestionsModal">
-            <sqx-dropdown-menu class="control-dropdown suggestions-dropdown"
-                [sqxAnchoredTo]="form"
-                [adjustWidth]="false"
-                [adjustHeight]="false"
-                [scrollY]="true" 
-                position="bottom-left">
-                <div class="row">
-                    <div class=" col-6" *ngFor="let item of suggestionsSorted; let i = index">
-                        <div class="form-check form-check">
-                            <input class="form-check-input" type="checkbox" id="tag_{{i}}"
-                                [ngModel]="isSelected(item)"
-                                (ngModelChange)="toggleValue($event, item)"
-                            />
+    <ng-container *sqxModal="suggestionsModal">
+        <sqx-dropdown-menu class="control-dropdown suggestions-dropdown"
+            [sqxAnchoredTo]="form"
+            [adjustWidth]="false"
+            [adjustHeight]="false"
+            [scrollY]="true" 
+            position="bottom-left">
+            <div class="row">
+                <div class=" col-6" *ngFor="let item of suggestionsSorted; let i = index">
+                    <div class="form-check form-check">
+                        <input class="form-check-input" type="checkbox" id="tag_{{i}}"
+                            [ngModel]="isSelected(item)"
+                            (ngModelChange)="toggleValue($event, item)"
+                        />
 
-                            <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
-                                <span class="truncate">{{item.name}}</span>
-                            </label>
-                        </div>
+                        <label class="form-check-label" for="tag_{{i}}" title="{{item.name}}" titlePosition="top-left">
+                            <span class="truncate">{{item.name}}</span>
+                        </label>
                     </div>
                 </div>
-            </sqx-dropdown-menu>
-        </ng-container>
+            </div>
+
+            <div class="text-decent" *ngIf="suggestionsSorted.length === 0">
+                <ng-container *ngIf="suggestionsLoading; else notLoading">
+                    <sqx-loader color="input"></sqx-loader>
+                </ng-container>
+
+                <ng-template #notLoading>
+                    <small>{{suggestionsEmptyText | sqxTranslate}}</small>
+                </ng-template>
+            </div>
+        </sqx-dropdown-menu>
     </ng-container>
 </div>

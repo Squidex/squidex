@@ -9,21 +9,22 @@ $color-background: #000;
     background: $color-background;
     border: 0;
     border-radius: 0;
-    color: white;
     text-align: center;
 
-    i {
-        margin-top: 1rem;
-        margin-bottom: 1rem;
+    & {
+        position: relative;
+        max-height: none;
+        min-height: 2rem;
+    }
+
+    sqx-loader {
+        @include absolute(50%, null, null, 50%);
+        margin-left: -8px;
     }
 
     img {
         max-width: 100%;
     }
-}
-
-.spin2 {
-    font-size: 14px;
 }
 
 .search {

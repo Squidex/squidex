@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { moduleMetadata } from '@storybook/angular';
 import { Meta, Story } from '@storybook/angular/types-6-0';
-import { LocalizerService, SqxFrameworkModule, UIOptions } from '@app/framework';
-import { DateTimeEditorComponent } from './date-time-editor.component';
+import { DateTimeEditorComponent, LocalizerService, SqxFrameworkModule, UIOptions } from '@app/framework';
 
 const translations = {
     'common.date': 'Date',
@@ -23,6 +23,9 @@ export default {
     title: 'Framework/DateTimeEditor',
     component: DateTimeEditorComponent,
     argTypes: {
+        disabled: {
+            control: 'boolean',
+        },
         hideClear: {
             control: 'boolean',
         },
@@ -43,6 +46,7 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
+                BrowserAnimationsModule,
                 SqxFrameworkModule,
                 SqxFrameworkModule.forRoot(),
             ],
@@ -64,8 +68,22 @@ Date.args = {
     mode: 'Date',
 };
 
+export const DateDisabled = Template.bind({});
+
+DateDisabled.args = {
+    mode: 'Date',
+    disabled: true,
+};
+
 export const DateTime = Template.bind({});
 
 DateTime.args = {
     mode: 'DateTime',
+};
+
+export const DateTimeDisabled = Template.bind({});
+
+DateTimeDisabled.args = {
+    mode: 'DateTime',
+    disabled: true,
 };

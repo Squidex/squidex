@@ -14,7 +14,7 @@
 <div *ngIf="stockPhotoThumbnail | async; let url;" class="preview mt-1" [class.hidden-important]="snapshot.thumbnailStatus === 'Failed'">
     <img [src]="url" (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()">
 
-    <i class="icon-spinner2 spin2" [class.hidden-important]="snapshot.thumbnailStatus === 'Loaded'"></i>
+    <sqx-loader color="white" *ngIf="snapshot.thumbnailStatus !== 'Loaded'"></sqx-loader>
 </div>
 
 <ng-container *sqxModal="searchDialog">
@@ -22,7 +22,7 @@
         <ng-container title>
             <input class="form-control search" [formControl]="stockPhotoSearch" sqxFocusOnInit placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}">
             
-            <i *ngIf="snapshot.isLoading" class="icon-spinner2 spin2"></i>
+            <sqx-loader *ngIf="snapshot.isLoading"></sqx-loader>
         </ng-container>
 
         <ng-container content>
@@ -44,7 +44,7 @@
 
             <div class="mt-4 text-center" *ngIf="snapshot.hasMore">
                 <button class="btn btn-outline-secondary" type="button" (click)="loadMore()" [disabled]="snapshot.isLoading">
-                    {{ 'common.loadMore' | sqxTranslate }} <i *ngIf="snapshot.isLoading" class="icon-spinner2 spin2"></i>
+                    {{ 'common.loadMore' | sqxTranslate }} <sqx-loader *ngIf="snapshot.isLoading"></sqx-loader>
                 </button>
             </div>
         </ng-container>

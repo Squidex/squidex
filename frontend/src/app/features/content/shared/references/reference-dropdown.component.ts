@@ -21,6 +21,9 @@ interface State {
 
     // The name of the selected item.
     selectedItem?: ContentName;
+
+    // True when loading.
+    isLoading?: boolean;
 }
 
 type ContentName = { name: string; id?: string };
@@ -143,6 +146,8 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     }
 
     private loadMore(observable: Observable<ContentsDto>) {
+        this.next({ isLoading: true });
+
         observable
             .subscribe({
                 next: ({ items }) => {
@@ -196,5 +201,7 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
 
             this.next({ contentNames });
         }
+    
+        this.next({ isLoading: false });
     }
 }
