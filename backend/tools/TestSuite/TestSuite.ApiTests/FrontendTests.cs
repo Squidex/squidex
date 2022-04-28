@@ -54,7 +54,7 @@ namespace TestSuite.ApiTests
             await page.GoToAsync(_.ClientManager.Options.Url + url + "?skip-setup");
             await page.ScreenshotAsync($"__{name}.jpg");
 
-            var diff = ImageSharpCompare.CalcDiff($"__{name}.jpg", $"{name}.jpg");
+            var diff = ImageSharpCompare.CalcDiff($"__{name}.jpg", $"Assets/{name}.jpg");
 
             Assert.InRange(diff.MeanError, 0, 10);
         }
