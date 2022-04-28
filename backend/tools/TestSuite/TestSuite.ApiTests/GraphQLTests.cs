@@ -105,6 +105,14 @@ namespace TestSuite.ApiTests
             try
             {
                 await CreateSchemasAsync();
+            }
+            catch
+            {
+                // Do nothing
+            }
+
+            try
+            {
                 await CreateContentsAsync();
             }
             catch

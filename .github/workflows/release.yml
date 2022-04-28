@@ -93,6 +93,18 @@ jobs:
           options: --name test
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+
+      - name: RUN TEST on path
+        uses: kohlerdominik/docker-run-action@v1.0.0
+        with:
+          image: mcr.microsoft.com/dotnet/sdk:6.0
+          environment: |
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8081/squidex
+          default_network: host
+          options: --name test
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
        
       - name: Dump docker logs on failure
         if: failure()

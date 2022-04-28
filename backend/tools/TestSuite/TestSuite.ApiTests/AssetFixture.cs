@@ -20,7 +20,7 @@ namespace TestSuite.ApiTests
             {
                 client.BaseAddress = new Uri(ServerUrl);
 
-                var url = asset._links["content"].Href;
+                var url = asset._links["content"].Href.Substring(1);
 
                 if (version > 0)
                 {

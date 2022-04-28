@@ -71,7 +71,7 @@ namespace TestSuite
             var appName = TestHelpers.GetValue("config:app:name", "integration-tests");
             var clientId = TestHelpers.GetValue("config:client:id", "root");
             var clientSecret = TestHelpers.GetValue("config:client:secret", "xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=");
-            var serverUrl = TestHelpers.GetValue("config:server:url", "https://localhost:5001");
+            var serverUrl = TestHelpers.GetValue("config:server:url", "http://localhost:8081/squidex");
 
             ClientManager = new SquidexClientManager(new SquidexOptions
             {
