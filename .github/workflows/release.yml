@@ -95,7 +95,7 @@ jobs:
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8080
           default_network: host
-          options: --name test
+          options: --name test1
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
@@ -107,7 +107,7 @@ jobs:
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8081/squidex
           default_network: host
-          options: --name test
+          options: --name test2
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
        
