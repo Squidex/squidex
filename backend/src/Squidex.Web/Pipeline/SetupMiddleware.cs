@@ -22,6 +22,12 @@ namespace Squidex.Web.Pipeline
 
         public async Task InvokeAsync(HttpContext context, IUserService userService)
         {
+            if (context.Request.Query.ContainsKey("skip-setup"))
+            {
+                await next(context);
+                return;
+            }
+
             if (!isUserFound && await userService.IsEmptyAsync(context.RequestAborted))
             {
                 var url = context.Request.PathBase.Add("/identity-server/setup");

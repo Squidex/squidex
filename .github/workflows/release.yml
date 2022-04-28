@@ -73,10 +73,15 @@ jobs:
       - name: Load Image
         run: docker load < squidex-tmp.tar.gz
 
-      - name: Replace Image Name
+      - name: Replace Image Name1
         uses: mikefarah/yq@v4.9.1
         with:
-          cmd: yq e '.services.squidex.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
+          cmd: yq e '.services.squidex1.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
+
+      - name: Replace Image Name2
+        uses: mikefarah/yq@v4.9.1
+        with:
+          cmd: yq e '.services.squidex2.image = "squidex-tmp"' -i backend/tests/docker-compose.yml
 
       - name: Start Test
         run: docker-compose up -d
@@ -85,12 +90,24 @@ jobs:
       - name: RUN TEST
         uses: kohlerdominik/docker-run-action@v1.0.0
         with:
-          image: mcr.microsoft.com/dotnet/sdk:6.0
+          image: squidex/build
           environment: |
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8080
           default_network: host
-          options: --name test
+          options: --name test1
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+
+      - name: RUN TEST on path
+        uses: kohlerdominik/docker-run-action@v1.0.0
+        with:
+          image: squidex/build
+          environment: |
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8081/squidex
+          default_network: host
+          options: --name test2
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/backend/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
        

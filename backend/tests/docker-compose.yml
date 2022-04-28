@@ -3,18 +3,17 @@ services:
   mongo:
     image: mongo:latest
     ports:
-      - "27018:27017"
+      - "27019:27017"
     networks:
       - internal
 
-  squidex:
+  squidex1:
     image: squidex
-    ports:
-      - "8080:80"
     environment:
       - URLS__BASEURL=http://localhost:8080
       - ASSETS__RESIZERURL=http://resizer
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - EVENTSTORE__MONGODB__DATABASE=squidex1
       - GRAPHQL__CACHEDURATION=0
       - IDENTITY__ADMINCLIENTID=root
       - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
@@ -22,8 +21,36 @@ services:
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
       - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - STORE__MONGODB__DATABASE=squidex1
+      - STORE__MONGODB__CONTENTDATABASE=squidex1_content
       - STORE__TYPE=MongoDB
-      - TEMPLATES__LOCALURL=http://localhost:80
+      - TEMPLATES__LOCALURL=http://localhost:5000
+      - ASPNETCORE_URLS=http://+:5000
+    networks:
+      - internal
+    depends_on:
+      - mongo
+
+  squidex2:
+    image: squidex
+    environment:
+      - URLS__BASEURL=http://localhost:8081/squidex/
+      - URLS__BASEPATH=squidex/
+      - ASSETS__RESIZERURL=http://resizer
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - EVENTSTORE__MONGODB__DATABASE=squidex2
+      - GRAPHQL__CACHEDURATION=0
+      - IDENTITY__ADMINCLIENTID=root
+      - IDENTITY__ADMINCLIENTSECRET=xeLd6jFxqbXJrfmNLlO2j1apagGGGSyZJhFnIuHp4I0=
+      - IDENTITY__MULTIPLEDOMAINS=true
+      - SCRIPTING__TIMEOUTEXECUTION=00:00:10
+      - SCRIPTING__TIMEOUTSCRIPT=00:00:10
+      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - STORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__CONTENTDATABASE=squidex2_content
+      - STORE__TYPE=MongoDB
+      - TEMPLATES__LOCALURL=http://localhost:5000
+      - ASPNETCORE_URLS=http://+:5000
     networks:
       - internal
     depends_on:
@@ -31,12 +58,38 @@ services:
 
   resizer:
     image: squidex/resizer:dev-40
-    ports:
-      - "8081:80"
     networks:
       - internal
     depends_on:
       - mongo
+
+  squidex_proxy1:
+    image: squidex/caddy-proxy
+    ports:
+      - "8080:8080"
+    environment:
+      - SITE_ADDRESS=http://localhost:8080
+      - SITE_PATH=*
+      - SITE_SERVER="squidex1:5000"
+    depends_on:
+      - squidex1
+    networks:
+      - internal
+    restart: unless-stopped
+
+  squidex_proxy2:
+    image: squidex/caddy-proxy-path
+    ports:
+      - "8081:8081"
+    environment:
+      - SITE_ADDRESS=http://localhost:8081
+      - SITE_PATH=/squidex/*
+      - SITE_SERVER="squidex2:5000"
+    depends_on:
+      - squidex2
+    networks:
+      - internal
+    restart: unless-stopped
     
 networks:
   internal:
