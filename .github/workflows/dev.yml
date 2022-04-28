@@ -107,7 +107,7 @@ jobs:
       - name: RUN TEST
         uses: kohlerdominik/docker-run-action@v1.0.0
         with:
-          image: mcr.microsoft.com/dotnet/sdk:6.0
+          image: squidex/build
           environment: |
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8080
@@ -119,7 +119,7 @@ jobs:
       - name: RUN TEST on path
         uses: kohlerdominik/docker-run-action@v1.0.0
         with:
-          image: mcr.microsoft.com/dotnet/sdk:6.0
+          image: squidex/build
           environment: |
             CONFIG__WAIT=60
             CONFIG__SERVER__URL=http://localhost:8081/squidex

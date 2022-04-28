@@ -42,6 +42,10 @@ namespace TestSuite.ApiTests
                     IsLandscape = true,
                     IsMobile = false,
                     Width = 1000
+                },
+                Args = new string[]
+                {
+                    "--no-sandbox"
                 }
             });
 
