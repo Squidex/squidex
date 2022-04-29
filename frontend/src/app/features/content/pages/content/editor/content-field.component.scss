@@ -61,7 +61,7 @@
     }
 
     &-copy {
-        @include absolute($t: 1rem, $l: -1rem);
+        @include absolute($t: 1rem, $l: -1.5rem);
         z-index: 1000;
     }
 }

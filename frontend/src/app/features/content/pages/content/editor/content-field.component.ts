@@ -7,7 +7,7 @@
 
 import { Component, EventEmitter, HostBinding, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, disabled$, EditContentForm, FieldForm, invalid$, LocalStoreService, SchemaDto, Settings, TranslationsService } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-field[form][formContext][formLevel][formModel][language][languages][schema]',
@@ -52,6 +52,7 @@ export class ContentFieldComponent implements OnChanges {
 
     public isDifferent?: Observable<boolean>;
     public isInvalid?: Observable<boolean>;
+    public isDisabled?: Observable<boolean>;
 
     @HostBinding('class')
     public get class() {
@@ -78,6 +79,7 @@ export class ContentFieldComponent implements OnChanges {
 
         if (changes['formModel'] && this.formModel) {
             this.isInvalid = invalid$(this.formModel.form);
+            this.isDisabled = disabled$(this.formModel.form);
         }
 
         if ((changes['formModel'] || changes['formModelCompare']) && this.formModelCompare) {
