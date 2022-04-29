@@ -120,17 +120,8 @@ export interface FormGlobals {
 }
 
 export abstract class AbstractContentForm<T extends FieldDto, TForm extends AbstractControl> extends Hidden {
-    private readonly disabled$ = new BehaviorSubject<boolean>(false);
     private readonly collapsed$ = new BehaviorSubject<boolean | null>(null);
     private readonly ruleSet: CompiledRules;
-
-    public get disabled() {
-        return this.disabled$.value;
-    }
-
-    public get disabledChanges(): Observable<boolean> {
-        return this.disabled$;
-    }
 
     public get collapsed() {
         return this.collapsed$.value;

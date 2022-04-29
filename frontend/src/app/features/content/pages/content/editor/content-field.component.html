@@ -50,7 +50,7 @@
     </div>
 
     <div class="col-6 col-right" *ngIf="formModelCompare && formCompare">
-        <div class="copy-button-container">
+        <div class="copy-button-container" *ngIf="!(isDisabled | async)">
             <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()" *ngIf="isDifferent | async">
                 <i class="icon-arrow_back"></i>
             </button>
