@@ -10,9 +10,11 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record Role : Named
+    public sealed record Role(string Name, PermissionSet? Permissions = null, JsonObject? Properties = null)
     {
         private static readonly HashSet<string> ExtraPermissions = new HashSet<string>
         {
@@ -33,38 +35,25 @@ namespace Squidex.Domain.Apps.Core.Apps
         public const string Owner = "Owner";
         public const string Reader = "Reader";
 
-        public PermissionSet Permissions { get; }
+        public string Name { get; } = Guard.NotNullOrEmpty(Name);
 
-        public JsonObject Properties { get; }
+        public PermissionSet Permissions { get; } = Permissions ?? PermissionSet.Empty;
+
+        public JsonObject Properties { get; } = Properties ?? new JsonObject();
 
         public bool IsDefault
         {
             get => Roles.IsDefault(this);
         }
 
-        public Role(string name, PermissionSet permissions, JsonObject properties)
-            : base(name)
+        public static Role WithPermissions(string name, params string[] permissions)
         {
-            Guard.NotNull(permissions);
-            Guard.NotNull(properties);
-
-            Permissions = permissions;
-            Properties = properties;
+            return new Role(name, new PermissionSet(permissions), JsonValue.Object());
         }
 
-        public static Role WithPermissions(string role, params string[] permissions)
+        public static Role WithProperties(string name, JsonObject properties)
         {
-            return new Role(role, new PermissionSet(permissions), JsonValue.Object());
-        }
-
-        public static Role WithProperties(string role, JsonObject properties)
-        {
-            return new Role(role, PermissionSet.Empty, properties);
-        }
-
-        public static Role Create(string role)
-        {
-            return new Role(role, PermissionSet.Empty, JsonValue.Object());
+            return new Role(name, PermissionSet.Empty, properties);
         }
 
         [Pure]

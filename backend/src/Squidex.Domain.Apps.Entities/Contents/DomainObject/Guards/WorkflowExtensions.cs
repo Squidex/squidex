@@ -14,11 +14,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public static class WorkflowExtensions
     {
-        public static Task<Status> GetInitialStatusAsync(this ContentOperation operation)
+        public static ValueTask<Status> GetInitialStatusAsync(this ContentOperation operation)
         {
             var workflow = GetWorkflow(operation);
 
             return workflow.GetInitialStatusAsync(operation.Schema);
+        }
+
+        public static ValueTask<bool> ShouldValidateAsync(this ContentOperation operation, Status status)
+        {
+            var workflow = GetWorkflow(operation);
+
+            return workflow.ShouldValidateAsync(operation.Schema, status);
         }
 
         public static async Task CheckTransitionAsync(this ContentOperation operation, Status status)

@@ -20,6 +20,8 @@ using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Xunit;
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
+
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
 {
     public class GuardContentTests : IClassFixture<TranslationsFixture>
@@ -240,7 +242,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
             var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
             A.CallTo(() => contentWorkflow.GetInfoAsync((ContentEntity)operation.Snapshot, Status.Archived))
-                .Returns(Task.FromResult<StatusInfo?>(null));
+                .Returns(ValueTask.FromResult<StatusInfo?>(null));
 
             await Assert.ThrowsAsync<ValidationException>(() => operation.CheckStatusAsync(Status.Archived));
         }

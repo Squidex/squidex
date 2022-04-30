@@ -947,6 +947,7 @@
   "schemas.updateScriptsFailed": "Failed to update schema scripts. Please reload.",
   "schemas.updateUIFieldsFailed": "Failed to update UI fields. Please reload.",
   "schemas.validateOnPublish": "Validate when publishing",
+  "schemas.validateOnPublishHint": "Use custom workflows when you need more control for which statuses a content should be validated.",
   "search.addFilter": "Add Filter",
   "search.addGroup": "Add Group",
   "search.addSorting": "Add Sorting",
@@ -1065,6 +1066,7 @@
   "workflows.tabEdit": "Editing",
   "workflows.tabVisualize": "Visualize",
   "workflows.updateFailed": "Failed to update Workflow. Please reload.",
+  "workflows.validate": "Validate content when changed to this status.",
   "workflows.workflowNameHint": "Optional name for the workflow.",
   "workflows.workflowNamePlaceholder": "Enter workflow name"
 }

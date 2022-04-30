@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_be_default_role()
         {
-            var role = Role.Create("Owner");
+            var role = new Role("Owner");
 
             Assert.True(role.IsDefault);
         }
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_not_be_default_role()
         {
-            var role = Role.Create("Custom");
+            var role = new Role("Custom");
 
             Assert.False(role.IsDefault);
         }
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_not_add_common_permission()
         {
-            var role = Role.Create("Name");
+            var role = new Role("Name");
 
             var result = role.ForApp("my-app").Permissions.ToIds();
 

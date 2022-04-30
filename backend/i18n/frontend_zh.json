@@ -947,6 +947,7 @@
   "schemas.updateScriptsFailed": "更新Schemas脚本失败。请重新加载。",
   "schemas.updateUIFieldsFailed": "无法更新 UI 字段。请重新加载。",
   "schemas.validateOnPublish": "发布时验证",
+  "schemas.validateOnPublishHint": "Use custom workflows when you need more control for which statuses a content should be validated.",
   "search.addFilter": "添加过滤器",
   "search.addGroup": "添加组",
   "search.addSorting": "添加排序",
@@ -1065,6 +1066,7 @@
   "workflows.tabEdit": "编辑",
   "workflows.tabVisualize": "可视化",
   "workflows.updateFailed": "无法更新工作流。请重新加载。",
+  "workflows.validate": "Validate content when changed to this status.",
   "workflows.workflowNameHint": "工作流的可选名称。",
   "workflows.workflowNamePlaceholder": "输入工作流名称"
 }

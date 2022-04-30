@@ -10,8 +10,10 @@ using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -38,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             [Status.Draft] = WorkflowTransition.Always
                         }.ToReadonlyDictionary(),
-                        StatusColors.Archived, NoUpdate.Always),
+                        StatusColors.Archived, NoUpdate.Always, Validate: true),
                 [Status.Draft] =
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
@@ -385,6 +387,48 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
 
             result.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task Should_not_validate_when_not_publishing()
+        {
+            var result = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Draft);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_not_validate_when_publishing_but_not_enabled()
+        {
+            var result = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_validate_when_publishing_and_enabled()
+        {
+            var result = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_validate_when_enabled_in_step()
+        {
+            var result = await sut.ShouldValidateAsync(Mocks.Schema(appId, schemaId), Status.Archived);
+
+            Assert.True(result);
+        }
+
+        private ISchemaEntity CreateSchema(bool validateOnPublish)
+        {
+            var schema = new Schema("my-schema", new SchemaProperties
+            {
+                ValidateOnPublish = validateOnPublish
+            });
+
+            return Mocks.Schema(appId, simpleSchemaId, schema);
         }
 
         private ContentEntity CreateContent(Status status, int value, bool simple = false)

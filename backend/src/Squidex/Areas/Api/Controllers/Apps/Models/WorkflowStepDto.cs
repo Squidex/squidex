@@ -27,6 +27,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string? Color { get; set; }
 
         /// <summary>
+        /// True if the content should be validated when moving to this step.
+        /// </summary>
+        public bool Validate { get; set; }
+
+        /// <summary>
         /// Indicates if updates should not be allowed.
         /// </summary>
         public bool NoUpdate { get; set; }
@@ -69,7 +74,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Color,
                 NoUpdate ?
                     NoUpdateType.When(NoUpdateExpression, NoUpdateRoles) :
-                    null);
+                    null,
+                Validate);
         }
     }
 }

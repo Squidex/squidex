@@ -297,7 +297,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
                 await operation.CheckReferrersAsync();
             }
 
-            if (!c.DoNotValidate && c.Status == Status.Published && operation.SchemaDef.Properties.ValidateOnPublish)
+            if (!c.DoNotValidate && await operation.ShouldValidateAsync(c.Status))
             {
                 await operation.ValidateContentAndInputAsync(Snapshot.Data, c.OptimizeValidation, true);
             }

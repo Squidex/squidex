@@ -9,43 +9,22 @@ using System.Diagnostics.CodeAnalysis;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed record Workflow
+    public sealed record Workflow(Status Initial, ReadonlyDictionary<Status, WorkflowStep>? Steps = null, ReadonlyList<DomainId>? SchemaIds = null, string? Name = null)
     {
         private const string DefaultName = "Unnamed";
 
         public static readonly Workflow Default = CreateDefault();
         public static readonly Workflow Empty = new Workflow(default, null);
 
-        public Status Initial { get; }
+        public string Name { get; } = Name.Or(DefaultName);
 
-        public ReadonlyDictionary<Status, WorkflowStep> Steps { get; } = ReadonlyDictionary.Empty<Status, WorkflowStep>();
+        public ReadonlyDictionary<Status, WorkflowStep> Steps { get; } = Steps ?? ReadonlyDictionary.Empty<Status, WorkflowStep>();
 
-        public ReadonlyList<DomainId> SchemaIds { get; } = ReadonlyList.Empty<DomainId>();
-
-        public string Name { get; }
-
-        public Workflow(
-            Status initial,
-            ReadonlyDictionary<Status, WorkflowStep>? steps = null,
-            ReadonlyList<DomainId>? schemaIds = null,
-            string? name = null)
-        {
-            Initial = initial;
-
-            if (steps != null)
-            {
-                Steps = steps;
-            }
-
-            if (schemaIds != null)
-            {
-                SchemaIds = schemaIds;
-            }
-
-            Name = name.Or(DefaultName);
-        }
+        public ReadonlyList<DomainId> SchemaIds { get; } = SchemaIds ?? ReadonlyList.Empty<DomainId>();
 
         public static Workflow CreateDefault(string? name = null)
         {

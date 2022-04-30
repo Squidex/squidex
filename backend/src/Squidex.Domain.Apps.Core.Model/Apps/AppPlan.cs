@@ -13,5 +13,8 @@ namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed record AppPlan(RefToken Owner, string PlanId)
     {
+        public RefToken Owner { get; } = Guard.NotNull(Owner);
+
+        public string PlanId { get; } = Guard.NotNullOrEmpty(PlanId);
     }
 }

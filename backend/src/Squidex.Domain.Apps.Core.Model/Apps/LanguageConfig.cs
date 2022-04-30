@@ -8,25 +8,15 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record LanguageConfig
+    public sealed record LanguageConfig(bool IsOptional = false, ReadonlyList<Language>? Fallbacks = null)
     {
         public static readonly LanguageConfig Default = new LanguageConfig();
 
-        public bool IsOptional { get; }
-
-        public ReadonlyList<Language> Fallbacks { get; } = ReadonlyList.Empty<Language>();
-
-        public LanguageConfig(bool isOptional = false, ReadonlyList<Language>? fallbacks = null)
-        {
-            IsOptional = isOptional;
-
-            if (fallbacks != null)
-            {
-                Fallbacks = fallbacks;
-            }
-        }
+        public ReadonlyList<Language> Fallbacks { get; } = Fallbacks ?? ReadonlyList.Empty<Language>();
 
         internal LanguageConfig Cleanup(string self, IReadOnlyDictionary<string, LanguageConfig> allowed)
         {
