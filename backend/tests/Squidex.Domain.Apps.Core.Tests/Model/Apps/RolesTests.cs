@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Add(role);
 
-            Assert.Equal(Role.Create(role), roles_1[role]);
+            Assert.Equal(new Role(role), roles_1[role]);
         }
 
         [Fact]

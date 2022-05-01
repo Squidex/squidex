@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_serialize_and_deserialize_no_update_condition()
         {
-            var step = new WorkflowStep(noUpdate: NoUpdate.When("Expression", "Role1", "Role2"));
+            var step = new WorkflowStep(NoUpdate: NoUpdate.When("Expression", "Role1", "Role2"));
 
             var serialized = step.SerializeAndDeserialize();
 

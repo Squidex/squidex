@@ -947,6 +947,7 @@
   "schemas.updateScriptsFailed": "Non è stato possibile aggiornare gli script dello schema. Per favore ricarica.",
   "schemas.updateUIFieldsFailed": "Non è stato possibile aggiornare i campi della UI. Per favore ricarica.",
   "schemas.validateOnPublish": "Valida quando pubblichi",
+  "schemas.validateOnPublishHint": "Use custom workflows when you need more control for which statuses a content should be validated.",
   "search.addFilter": "Aggiungi un Filtro",
   "search.addGroup": "Aggiungi un Gruppo",
   "search.addSorting": "Aggiungi ordinamento",
@@ -1065,6 +1066,7 @@
   "workflows.tabEdit": "Modifica",
   "workflows.tabVisualize": "Visualizza",
   "workflows.updateFailed": "Non è stato possibile aggiornare il Workflow. Per favore ricarica.",
+  "workflows.validate": "Validate content when changed to this status.",
   "workflows.workflowNameHint": "Nome facoltativo per il workflow.",
   "workflows.workflowNamePlaceholder": "Inserisci il nome del workflow"
 }

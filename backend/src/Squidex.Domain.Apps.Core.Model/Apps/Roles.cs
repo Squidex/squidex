@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            var newRole = Role.Create(name);
+            var newRole = new Role(name);
 
             if (!inner.TryAdd(name, newRole, out var updated))
             {

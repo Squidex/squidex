@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner
 {

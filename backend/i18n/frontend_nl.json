@@ -947,6 +947,7 @@
   "schemas.updateScriptsFailed": "Updaten van schemascripts is mislukt. Laad opnieuw.",
   "schemas.updateUIFieldsFailed": "Bijwerken van UI-velden is mislukt. Laad opnieuw.",
   "schemas.validateOnPublish": "Valideren bij het publiceren",
+  "schemas.validateOnPublishHint": "Use custom workflows when you need more control for which statuses a content should be validated.",
   "search.addFilter": "Filter toevoegen",
   "search.addGroup": "Groep toevoegen",
   "search.addSorting": "Sortering toevoegen",
@@ -1065,6 +1066,7 @@
   "workflows.tabEdit": "Bewerken",
   "workflows.tabVisualize": "Visualiseren",
   "workflows.updateFailed": "Update van workflow is mislukt. Laad opnieuw.",
+  "workflows.validate": "Validate content when changed to this status.",
   "workflows.workflowNameHint": "Optionele naam voor de workflow.",
   "workflows.workflowNamePlaceholder": "Voer de werkstroomnaam in"
 }

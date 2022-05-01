@@ -75,6 +75,10 @@ export class WorkflowStepComponent implements OnChanges {
         this.update.emit({ color });
     }
 
+    public changeValidate(validate: boolean) {
+        this.update.emit({ validate });
+    }
+
     public changeNoUpdate(noUpdate: boolean) {
         this.update.emit({ noUpdate });
     }

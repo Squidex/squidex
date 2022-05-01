@@ -187,7 +187,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
 }
 
 export type WorkflowStepValues =
-    Readonly<{ color?: string; isLocked?: boolean; noUpdate?: boolean; noUpdateExpression?: string; noUpdateRoles?: ReadonlyArray<string> }>;
+    Readonly<{ color?: string; isLocked?: boolean; validate?: boolean; noUpdate?: boolean; noUpdateExpression?: string; noUpdateRoles?: ReadonlyArray<string> }>;
 
 export type WorkflowStep =
     Readonly<{ name: string } & WorkflowStepValues>;

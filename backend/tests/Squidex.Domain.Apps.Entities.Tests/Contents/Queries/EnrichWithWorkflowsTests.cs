@@ -12,6 +12,8 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable CA2012 // Use ValueTasks correctly
+
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class EnrichWithWorkflowsTests
@@ -119,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var content = new ContentEntity { SchemaId = schemaId };
 
             A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
-                .Returns(Task.FromResult<StatusInfo?>(null!));
+                .Returns(ValueTask.FromResult<StatusInfo?>(null!));
 
             var ctx = requestContext.Clone(b => b.WithResolveFlow(false));
 

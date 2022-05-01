@@ -31,16 +31,15 @@ namespace Migrations.OldEvents
 
         public IEvent Migrate(AppDomainObject.State state)
         {
-            var newSettings = new AppSettings
+            var newSettings = state.Settings with
             {
-                Patterns = ReadonlyList.ToReadonlyList(new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
+                Patterns = new List<Pattern>(state.Settings.Patterns.Where(x => x.Name != Name || x.Regex != Pattern))
                 {
                     new Pattern(Name, Pattern)
                     {
                         Message = Message
                     }
-                }),
-                Editors = state.Settings.Editors
+                }.ToReadonlyList()
             };
 
             var newEvent = new AppSettingsUpdated

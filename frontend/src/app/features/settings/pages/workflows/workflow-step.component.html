@@ -61,11 +61,11 @@
             </div>
         </div>
 
-        <div class="row transition-prevent-updates g-0 align-items-center">
+        <div class="row step-prevent-updates g-0 align-items-center">
             <div class="col col-arrow"></div>
             <div class="col col-step text-right">
                 <div class="form-check">
-                    <input class="form-check-input transition-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
+                    <input class="form-check-input step-prevent-updates-checkbox" type="checkbox" id="preventUpdates_{{step.name}}"
                         [disabled]="!!disabled" 
                         [ngModel]="step.noUpdate" 
                         (ngModelChange)="changeNoUpdate($event)">
@@ -104,6 +104,22 @@
                 </div>
                 <div class="col col-button"></div>
             </ng-container>
+        </div>
+
+        <div class="row step-validate g-0 mt-2 mb-4 align-items-center">
+            <div class="col col-arrow"></div>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input step-validate-checkbox" type="checkbox" id="validate_{{step.name}}"
+                        [disabled]="!!disabled" 
+                        [ngModel]="step.validate" 
+                        (ngModelChange)="changeValidate($event)">
+
+                    <label class="form-check-label" for="validate_{{step.name}}">
+                        {{ 'workflows.validate' | sqxTranslate }}
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 </div>

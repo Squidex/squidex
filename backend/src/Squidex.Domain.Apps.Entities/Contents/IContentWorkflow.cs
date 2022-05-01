@@ -13,20 +13,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentWorkflow
     {
-        Task<Status> GetInitialStatusAsync(ISchemaEntity schema);
+        ValueTask<Status> GetInitialStatusAsync(ISchemaEntity schema);
 
-        Task<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user);
+        ValueTask<bool> CanMoveToAsync(ISchemaEntity schema, Status status, Status next, ContentData data, ClaimsPrincipal? user);
 
-        Task<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user);
+        ValueTask<bool> CanMoveToAsync(IContentEntity content, Status status, Status next, ClaimsPrincipal? user);
 
-        Task<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user);
+        ValueTask<bool> CanUpdateAsync(IContentEntity content, Status status, ClaimsPrincipal? user);
 
-        Task<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user);
+        ValueTask<bool> CanPublishInitialAsync(ISchemaEntity schema, ClaimsPrincipal? user);
 
-        Task<StatusInfo?> GetInfoAsync(IContentEntity content, Status status);
+        ValueTask<bool> ShouldValidateAsync(ISchemaEntity schema, Status status);
 
-        Task<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user);
+        ValueTask<StatusInfo?> GetInfoAsync(IContentEntity content, Status status);
 
-        Task<StatusInfo[]> GetAllAsync(ISchemaEntity schema);
+        ValueTask<StatusInfo[]> GetNextAsync(IContentEntity content, Status status, ClaimsPrincipal? user);
+
+        ValueTask<StatusInfo[]> GetAllAsync(ISchemaEntity schema);
     }
 }
