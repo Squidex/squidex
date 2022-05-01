@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_validate_when_publishing_and_enabled()
         {
-            var result = await sut.ShouldValidateAsync(CreateSchema(false), Status.Published);
+            var result = await sut.ShouldValidateAsync(CreateSchema(true), Status.Published);
 
             Assert.True(result);
         }

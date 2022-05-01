@@ -7,7 +7,6 @@
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
