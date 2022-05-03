@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 OldStatus = operation.Snapshot.Status,
                 Operation = "Update",
                 Status = operation.Snapshot.EditingStatus(),
-                StatusOld = default
+                StatusOld = default,
             });
 
             return TransformAsync(operation, script, vars);
@@ -85,7 +85,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
                 OldStatus = operation.Snapshot.EditingStatus(),
                 Operation = change.ToString(),
                 Status = status,
-                StatusOld = operation.Snapshot.EditingStatus()
+                StatusOld = operation.Snapshot.EditingStatus(),
+                Validate = Validate(operation, status)
             });
 
             return TransformAsync(operation, script, vars);
@@ -124,6 +125,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards
         private static async Task ExecuteAsync(ContentOperation operation, string script, ContentScriptVars vars)
         {
             await operation.Resolve<IScriptEngine>().ExecuteAsync(vars, script, Options);
+        }
+
+        private static Action Validate(ContentOperation operation, Status status)
+        {
+            return () =>
+            {
+                try
+                {
+                    var snapshot = operation.Snapshot;
+
+                    operation.ValidateContentAndInputAsync(snapshot.Data, false, snapshot.IsPublished() || status == Status.Published).Wait();
+                }
+                catch (AggregateException ex) when (ex.InnerException != null)
+                {
+                    throw ex.Flatten().InnerException!;
+                }
+            };
         }
 
         private static ContentScriptVars Enrich(ContentOperation operation, ContentScriptVars vars)

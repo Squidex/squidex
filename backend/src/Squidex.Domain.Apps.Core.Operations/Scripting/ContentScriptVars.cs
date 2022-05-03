@@ -13,6 +13,12 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class ContentScriptVars : DataScriptVars
     {
+        [FieldDescription(nameof(FieldDescriptions.ContentValidate))]
+        public Action Validate
+        {
+            set => SetValue(value);
+        }
+
         [FieldDescription(nameof(FieldDescriptions.AppId))]
         public DomainId AppId
         {

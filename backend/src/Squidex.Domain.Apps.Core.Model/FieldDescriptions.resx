@@ -297,6 +297,9 @@
   <data name="ContentUrl" xml:space="preserve">
     <value>The URL to the content.</value>
   </data>
+  <data name="ContentValidate" xml:space="preserve">
+    <value>Validates the content item.</value>
+  </data>
   <data name="Context" xml:space="preserve">
     <value>The context object holding all values.</value>
   </data>

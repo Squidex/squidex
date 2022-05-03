@@ -601,6 +601,15 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Validates the content item..
+        /// </summary>
+        public static string ContentValidate {
+            get {
+                return ResourceManager.GetString("ContentValidate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The context object holding all values..
         /// </summary>
         public static string Context {

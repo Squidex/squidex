@@ -235,6 +235,10 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     {
                         AddBoolean(name, description);
                     }
+                    else if (typeof(MulticastDelegate).IsAssignableFrom(propertyType.BaseType))
+                    {
+                        AddFunction(name, description);
+                    }
                     else if (propertyType == typeof(AssetMetadata))
                     {
                         AddObject(name, description, () =>
@@ -386,14 +390,19 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 Add(JsonType.Boolean, name, description);
             }
 
-            private void AddObject(string? name, string? description)
-            {
-                Add(JsonType.Object, name, description);
-            }
-
             private void AddNumber(string? name, string? description)
             {
                 Add(JsonType.Number, name, description);
+            }
+
+            private void AddFunction(string? name, string? description)
+            {
+                Add(JsonType.Function, name, description);
+            }
+
+            private void AddObject(string? name, string? description)
+            {
+                Add(JsonType.Object, name, description);
             }
 
             private void AddString(string? name, string? description)
