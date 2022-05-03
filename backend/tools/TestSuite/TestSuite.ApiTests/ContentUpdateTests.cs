@@ -73,7 +73,10 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 3. Get a 404 for the item because it is not published anymore.
-                await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+                await Assert.ThrowsAnyAsync<SquidexException>(() =>
+                {
+                    return _.Contents.GetAsync(content.Id);
+                });
             }
             finally
             {
@@ -106,7 +109,10 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 3. Get a 404 for the item because it is not published anymore.
-                await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+                await Assert.ThrowsAnyAsync<SquidexException>(() =>
+                {
+                    return _.Contents.GetAsync(content.Id);
+                });
             }
             finally
             {
@@ -211,7 +217,10 @@ namespace TestSuite.ApiTests
 
 
                 // STEP 2. Get a 404 for the item because it is not published.
-                await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.GetAsync(content.Id));
+                await Assert.ThrowsAnyAsync<SquidexException>(() =>
+                {
+                    return _.Contents.GetAsync(content.Id);
+                });
             }
             finally
             {
@@ -253,7 +262,9 @@ namespace TestSuite.ApiTests
             try
             {
                 // STEP 1: Create a new item with a custom id.
-                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, new ContentCreateOptions { Id = id, Publish = true });
+                var options = new ContentCreateOptions { Id = id, Publish = true };
+
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, options);
 
                 Assert.Equal(id, content.Id);
             }
@@ -275,13 +286,18 @@ namespace TestSuite.ApiTests
             try
             {
                 // STEP 1: Create a new item with a custom id.
-                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, new ContentCreateOptions { Id = id, Publish = true });
+                var options = new ContentCreateOptions { Id = id, Publish = true };
+
+                content = await _.Contents.CreateAsync(new TestEntityData { Number = 1 }, options);
 
                 Assert.Equal(id, content.Id);
 
 
                 // STEP 2: Create a new item with a custom id.
-                var ex = await Assert.ThrowsAnyAsync<SquidexException>(() => _.Contents.CreateAsync(new TestEntityData { Number = 1 }, new ContentCreateOptions { Id = id, Publish = true }));
+                var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
+                {
+                    return _.Contents.CreateAsync(new TestEntityData { Number = 1 }, options);
+                });
 
                 Assert.Contains("\"statusCode\":409", ex.Message, StringComparison.Ordinal);
             }
@@ -650,11 +666,15 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Delete the item.
-            await _.Contents.DeleteAsync(content_1.Id, new ContentDeleteOptions { Permanent = permanent });
+            var createOptions = new ContentDeleteOptions { Permanent = permanent };
+
+            await _.Contents.DeleteAsync(content_1.Id, createOptions);
 
 
             // STEP 3: Recreate the item with the same id.
-            var content_2 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, new ContentCreateOptions { Id = content_1.Id, Publish = true });
+            var deleteOptions = new ContentCreateOptions { Id = content_1.Id, Publish = true };
+
+            var content_2 = await _.Contents.CreateAsync(new TestEntityData { Number = 2 }, deleteOptions);
 
             Assert.Equal(Status.Published, content_2.Status);
 
@@ -675,7 +695,9 @@ namespace TestSuite.ApiTests
 
 
             // STEP 2: Delete the item.
-            await _.Contents.DeleteAsync(content_1.Id, new ContentDeleteOptions { Permanent = permanent });
+            var deleteOptions = new ContentDeleteOptions { Permanent = permanent };
+
+            await _.Contents.DeleteAsync(content_1.Id, deleteOptions);
 
 
             // STEP 3: Recreate the item with the same id.
