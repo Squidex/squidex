@@ -5,6 +5,10 @@
     padding-right: .25rem;
 }
 
+:host {
+    overflow-y: auto;
+}
+
 :host ::ng-deep {
     .user-ref {
         font-weight: 500;
