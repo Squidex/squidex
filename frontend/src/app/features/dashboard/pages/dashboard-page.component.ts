@@ -91,7 +91,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     }
 
     public ngAfterViewChecked() {
-        this.extendedHeight = `${this.grid.gridRows.length * this.grid.curRowHeight - 10}px`;
+        this.extendedHeight = `${this.grid.gridRows.length * this.grid.curRowHeight - (this.gridOptions.margin || 0)}px`;
     }
 
     public changeIsStacked(value: boolean) {
