@@ -25,6 +25,14 @@ gridster-item {
     /* stylelint-disable */
     gridster {
         background: none;
+
+        &::after {
+            @include absolute(100%, 0, null, 0);
+            content: '';
+            padding: 0;
+            padding-bottom: var(--gridster-margin);
+            pointer-events: none;
+        }
     }
 
     gridster-item {

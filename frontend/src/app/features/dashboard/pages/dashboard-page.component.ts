@@ -24,6 +24,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     public selectedApp = this.appsState.selectedApp.pipe(defined());
 
     public isStacked = false;
+    public isScrolled = false;
 
     public storageCurrent?: CurrentStorageDto;
     public storageUsage?: ReadonlyArray<StorageUsagePerDateDto>;
@@ -33,7 +34,7 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
     public gridConfig?: GridsterItem[];
     public gridOptions = DEFAULT_OPTIONS;
 
-    public isScrolled = false;
+    public extendedHeight: string = '';
 
     public user = this.authState.user?.displayName;
 
@@ -87,6 +88,10 @@ export class DashboardPageComponent extends ResourceOwner implements AfterViewIn
                 }
             });
         });
+    }
+
+    public ngAfterViewChecked() {
+        this.extendedHeight = `${this.grid.gridRows.length * this.grid.curRowHeight - 10}px`;
     }
 
     public changeIsStacked(value: boolean) {
