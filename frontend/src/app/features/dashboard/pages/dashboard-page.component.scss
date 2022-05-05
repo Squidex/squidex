@@ -25,6 +25,9 @@ gridster-item {
     /* stylelint-disable */
     gridster {
         background: none;
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
 
         &::after {
             @include absolute(100%, 0, null, 0);
