@@ -82,11 +82,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 return JsonValue.Create(value.AsBoolean());
             }
 
-            if (value.IsNumber())
-            {
-                return JsonValue.Create(value.AsNumber());
-            }
-
             if (value.IsDate())
             {
                 return JsonValue.Create(value.AsDate().ToString());
@@ -95,6 +90,18 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             if (value.IsRegExp())
             {
                 return JsonValue.Create(value.AsRegExp().Value?.ToString());
+            }
+
+            if (value.IsNumber())
+            {
+                var number = value.AsNumber();
+
+                if (double.IsNaN(number) || double.IsPositiveInfinity(number) || double.IsNegativeInfinity(number))
+                {
+                    return JsonValue.Zero;
+                }
+
+                return JsonValue.Create(number);
             }
 
             if (value.IsArray())

@@ -373,6 +373,33 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             ExecuteScript(original, script);
         }
 
+        [Theory]
+        [InlineData("NaN")]
+        [InlineData("Number.POSITIVE_INFINITY")]
+        [InlineData("Number.NEGATIVE_INFINITY")]
+        public void Should_not_throw_exceptions_if_invalid_numbers(string input)
+        {
+            var original =
+                new ContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array()));
+
+            var expected =
+                new ContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Zero));
+
+            string script = $@"
+                data.number.iv = {input};
+            ";
+
+            var result = ExecuteScript(original, script);
+
+            Assert.Equal(expected, result);
+        }
+
         [Fact]
         public void Should_null_propagate_unknown_fields()
         {

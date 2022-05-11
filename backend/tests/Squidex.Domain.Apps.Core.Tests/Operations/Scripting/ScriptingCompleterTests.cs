@@ -73,7 +73,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                     "ctx.schemaId",
                     "ctx.schemaName",
                     "ctx.status",
-                    "ctx.statusOld"
+                    "ctx.statusOld",
+                    "ctx.validate"
                 });
         }
 

@@ -35,21 +35,17 @@
                     </ng-container>
                 </ng-container>
 
-                <ng-container *ngIf="contributorsState.contributorsFiltered | async; let contributors">
-                    <ng-container *ngIf="rolesState.roles | async; let roles">                        
-                        <ng-container *ngIf="contributors.length > 0; else noContributors">
-                            <table class="table table-items table-fixed">
-                                <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor" [sqxContributor]="contributor" 
-                                    [search]="contributorsState.queryRegex | async" [roles]="roles">
-                                </tbody>
-                            </table>
-                        </ng-container>
-    
-                        <ng-template #noContributors>
-                            <div class="table-items-row  table-items-row-summary table-items-row-empty">
-                                {{ 'contributors.empty' | sqxTranslate }}
-                            </div>
-                        </ng-template>
+                <ng-container *ngIf="(contributorsState.isLoaded | async) && (contributorsState.contributorsFiltered | async); let contributors">
+                    <ng-container *ngIf="rolesState.roles | async; let roles">          
+                        <div class="table-items-row  table-items-row-summary table-items-row-empty" *ngIf="contributors.length === 0">
+                            {{ 'contributors.empty' | sqxTranslate }}
+                        </div>
+
+                        <table class="table table-items table-fixed">
+                            <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor" [sqxContributor]="contributor" 
+                                [search]="contributorsState.queryRegex | async" [roles]="roles">
+                            </tbody>
+                        </table>
                     </ng-container>
                 </ng-container>
             </ng-container>

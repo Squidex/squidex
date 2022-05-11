@@ -51,7 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
                 catch (HttpRequestException ex)
                 {
-                    throw new BackupRestoreException($"Cannot download the archive. Got status code: {response?.StatusCode}.", ex);
+                    var statusCode = response != null ? (int)response.StatusCode : 0;
+
+                    throw new BackupRestoreException($"Cannot download the archive. Got status code {statusCode}: {ex.Message}.", ex);
                 }
                 finally
                 {
