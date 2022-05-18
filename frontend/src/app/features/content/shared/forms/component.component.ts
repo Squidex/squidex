@@ -11,7 +11,7 @@ import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, 
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    selector: 'sqx-component[form][formContext][formLevel][formModel][language][languages]',
+    selector: 'sqx-component[form][formContext][formLevel][formModel][isComparing][language][languages]',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,6 +31,9 @@ export class ComponentComponent extends ResourceOwner implements OnChanges {
 
     @Input()
     public formModel!: ComponentForm;
+
+    @Input()
+    public isComparing = false;
 
     @Input()
     public language!: AppLanguageDto;

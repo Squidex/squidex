@@ -10,3 +10,11 @@
         line-height: 2rem;
     }
 }
+
+.col-6 {
+    margin-bottom: 0;
+
+    & ~ .col-12 {
+        margin-top: 1.25rem;
+    }
+}

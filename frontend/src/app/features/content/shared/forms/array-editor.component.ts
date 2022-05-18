@@ -14,7 +14,7 @@ import { AppLanguageDto, ComponentsFieldPropertiesDto, disabled$, EditContentFor
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
-    selector: 'sqx-array-editor[form][formContext][formLevel][formModel][language][languages]',
+    selector: 'sqx-array-editor[form][formContext][formLevel][formModel][language][languages][isComparing]',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,6 +31,9 @@ export class ArrayEditorComponent implements OnChanges {
 
     @Input()
     public formModel!: FieldArrayForm;
+
+    @Input()
+    public isComparing = false;
 
     @Input()
     public canUnset?: boolean | null;

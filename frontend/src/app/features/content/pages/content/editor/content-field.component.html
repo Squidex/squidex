@@ -24,13 +24,14 @@
                 <div class="form-group" *ngFor="let language of languages">
                     <sqx-field-editor
                         [canUnset]="!formModel.field.isDisabled"
+                        [displaySuffix]="prefix(language)"
                         [form]="form"
                         [formContext]="formContext"
                         [formLevel]="formLevel"
                         [formModel]="formModel.get(language)"
+                        [isComparing]="!!formModelCompare"
                         [language]="language"
-                        [languages]="languages"
-                        [displaySuffix]="prefix(language)">
+                        [languages]="languages">
                     </sqx-field-editor>
                 </div>
             </ng-container>
@@ -42,6 +43,7 @@
                     [formContext]="formContext"
                     [formLevel]="formLevel"
                     [formModel]="getControl()"
+                    [isComparing]="!!formModelCompare"
                     [language]="language"
                     [languages]="languages">
                 </sqx-field-editor>
@@ -73,13 +75,14 @@
             <ng-container *ngIf="showAllControls; else singleControlCompare">
                 <div class="form-group" *ngFor="let language of languages">
                     <sqx-field-editor
+                        [displaySuffix]="prefix(language)"
                         [form]="formCompare"
                         [formContext]="formContext"
                         [formLevel]="formLevel"
                         [formModel]="formModelCompare.get(language)"
+                        [isComparing]="!!formModelCompare"
                         [language]="language"
-                        [languages]="languages"
-                        [displaySuffix]="prefix(language)">
+                        [languages]="languages">
                     </sqx-field-editor>
                 </div>
             </ng-container>
@@ -91,7 +94,8 @@
                     [formLevel]="formLevel"
                     [formModel]="getControlCompare()!"
                     [language]="language"
-                    [languages]="languages">
+                    [languages]="languages"
+                    [isComparing]="!!formModelCompare">
                 </sqx-field-editor>
             </ng-template>
         </div>

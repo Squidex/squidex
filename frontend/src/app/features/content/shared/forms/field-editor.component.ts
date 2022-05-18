@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import { AbstractContentForm, AppLanguageDto, EditContentForm, FieldDto, hasNoValue$, MathHelper, Types } from '@app/shared';
 
 @Component({
-    selector: 'sqx-field-editor[form][formContext][formLevel][formModel][language][languages]',
+    selector: 'sqx-field-editor[form][formContext][formLevel][formModel][isComparing][language][languages]',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
 })
@@ -41,6 +41,9 @@ export class FieldEditorComponent implements OnChanges {
 
     @Input()
     public index: number | null | undefined;
+
+    @Input()
+    public isComparing = false;
 
     @Input()
     public canUnset?: boolean | null;

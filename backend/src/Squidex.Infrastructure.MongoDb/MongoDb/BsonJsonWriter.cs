@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using MongoDB.Bson.IO;
-using NewtonsoftJSonWriter = Newtonsoft.Json.JsonWriter;
+using NewtonsoftJsonWriter = Newtonsoft.Json.JsonWriter;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class BsonJsonWriter : NewtonsoftJSonWriter
+    public sealed class BsonJsonWriter : NewtonsoftJsonWriter
     {
         private readonly IBsonWriter bsonWriter;
 

@@ -12,7 +12,7 @@ import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatte
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    selector: 'sqx-array-item[form][formContext][formLevel][formModel][index][language][languages]',
+    selector: 'sqx-array-item[form][formContext][formLevel][formModel][index][isComparing][language][languages]',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +44,9 @@ export class ArrayItemComponent implements OnChanges {
 
     @Input()
     public canUnset?: boolean | null;
+
+    @Input()
+    public isComparing = false;
 
     @Input()
     public isCollapsedInitial = false;
