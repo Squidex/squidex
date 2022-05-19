@@ -17,7 +17,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public delegate object ValueResolver(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+    public delegate T ValueResolver<T>(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+
+    public delegate Task<T> AsyncValueResolver<T>(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
     internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
     {
@@ -79,14 +81,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             }
         });
 
-        private static readonly IFieldResolver Assets = CreateValueResolver((value, fieldContext, context) =>
+        private static readonly IFieldResolver Assets = CreateAsyncValueResolver((value, fieldContext, context) =>
         {
             var cacheDuration = fieldContext.CacheDuration();
 
             return context.GetReferencedAssetsAsync(value, cacheDuration, fieldContext.CancellationToken);
         });
 
-        private static readonly IFieldResolver References = CreateValueResolver((value, fieldContext, context) =>
+        private static readonly IFieldResolver References = CreateAsyncValueResolver((value, fieldContext, context) =>
         {
             var cacheDuration = fieldContext.CacheDuration();
 
@@ -274,7 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             return componentType;
         }
 
-        private static IFieldResolver CreateValueResolver(ValueResolver valueResolver)
+        private static IFieldResolver CreateValueResolver<T>(ValueResolver<T> valueResolver)
         {
             return Resolvers.Sync<IReadOnlyDictionary<string, IJsonValue>, object?>((source, fieldContext, context) =>
             {
@@ -288,6 +290,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     }
 
                     return valueResolver(value, fieldContext, context);
+                }
+
+                return null;
+            });
+        }
+
+        private static IFieldResolver CreateAsyncValueResolver<T>(AsyncValueResolver<T> valueResolver)
+        {
+            return Resolvers.Async<IReadOnlyDictionary<string, IJsonValue>, object?>(async (source, fieldContext, context) =>
+            {
+                var key = fieldContext.FieldDefinition.SourceName();
+
+                if (source.TryGetValue(key, out var value))
+                {
+                    if (value is JsonNull)
+                    {
+                        return null;
+                    }
+
+                    return await valueResolver(value, fieldContext, context);
                 }
 
                 return null;

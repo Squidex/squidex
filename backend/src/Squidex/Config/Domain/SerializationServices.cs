@@ -6,10 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using GraphQL;
-using GraphQL.Execution;
-using GraphQL.NewtonsoftJson;
-using GraphQL.Server;
 using Migrations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -30,8 +26,6 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Web.GraphQL;
-using IGraphQLBuilder = GraphQL.DI.IGraphQLBuilder;
 
 namespace Squidex.Config.Domain
 {
@@ -118,24 +112,6 @@ namespace Squidex.Config.Domain
                 options.AllowInputFormatterExceptionMessages = false;
 
                 ConfigureJson(TypeNameHandling.None, options.SerializerSettings);
-            });
-
-            return builder;
-        }
-
-        public static IGraphQLBuilder AddSquidexJson(this IGraphQLBuilder builder)
-        {
-            builder.AddDocumentWriter(c =>
-            {
-                var errorInfoProvider = c.GetRequiredService<IErrorInfoProvider>();
-
-                return new BufferingDocumentWriter(options =>
-                {
-                    options.ContractResolver = new ExecutionResultContractResolver(errorInfoProvider);
-
-                    options.Converters.Add(new JsonValueConverter());
-                    options.Converters.Add(new WriteonlyGeoJsonConverter());
-                });
             });
 
             return builder;

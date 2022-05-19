@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 using NodaTime.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
@@ -23,11 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             return InstantPattern.ExtendedIso.Parse(value?.ToString()!).Value;
         }
 
-        public override object? ParseLiteral(IValue value)
+        public override object? ParseLiteral(GraphQLValue value)
         {
             switch (value)
             {
-                case StringValue stringValue:
+                case GraphQLStringValue stringValue:
                     return ParseValue(stringValue.Value);
                 default:
                     return null;

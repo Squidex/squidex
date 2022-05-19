@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using GraphQL;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
@@ -127,16 +126,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static TimeSpan CacheDuration(this IResolveFieldContext context)
         {
-            var cacheDirective = context.FieldAst.Directives?.Find("cache");
+            var cacheDirective = context.GetDirective("cache");
 
             if (cacheDirective != null)
             {
-                var duration = cacheDirective.Arguments?.ValueFor("duration");
+                var duration = cacheDirective.GetArgument<int>("duration");
 
-                if (duration is IntValue value && value.Value > 0)
-                {
-                    return TimeSpan.FromSeconds(value.Value);
-                }
+                return TimeSpan.FromSeconds(duration);
             }
 
             return TimeSpan.Zero;

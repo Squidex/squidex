@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using GraphQL;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Http;
 
@@ -14,14 +15,14 @@ namespace Squidex.Web.GraphQL
     {
         private readonly GraphQLHttpMiddleware<DummySchema> middleware;
 
-        public GraphQLRunner(IGraphQLRequestDeserializer deserializer)
+        public GraphQLRunner(IGraphQLTextSerializer deserializer)
         {
-            middleware = new GraphQLHttpMiddleware<DummySchema>(x => Task.CompletedTask, deserializer);
+            middleware = new GraphQLHttpMiddleware<DummySchema>(deserializer);
         }
 
         public Task InvokeAsync(HttpContext context)
         {
-            return middleware.InvokeAsync(context);
+            return middleware.InvokeAsync(context, x => Task.CompletedTask);
         }
     }
 }

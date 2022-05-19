@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<DomainId, IEnrichedAssetEntity> GetAssetsLoader()
         {
-            return dataLoaders.Context.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
+            return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedAssetEntity>(nameof(GetAssetsLoader),
                 async (batch, ct) =>
                 {
                     var result = await GetReferencedAssetsAsync(new List<DomainId>(batch), ct);
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<DomainId, IEnrichedContentEntity> GetContentsLoader()
         {
-            return dataLoaders.Context.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
+            return dataLoaders.Context!.GetOrAddBatchLoader<DomainId, IEnrichedContentEntity>(nameof(GetContentsLoader),
                 async (batch, ct) =>
                 {
                     var result = await GetReferencedContentsAsync(new List<DomainId>(batch), ct);
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private IDataLoader<string, IUser> GetUserLoader()
         {
-            return dataLoaders.Context.GetOrAddBatchLoader<string, IUser>(nameof(GetUserLoader),
+            return dataLoaders.Context!.GetOrAddBatchLoader<string, IUser>(nameof(GetUserLoader),
                 async (batch, ct) =>
                 {
                     var result = await Resolve<IUserResolver>().QueryManyAsync(batch.ToArray(), ct);

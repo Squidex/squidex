@@ -44,7 +44,7 @@ namespace Squidex.Web.Services
 
         public string AssetContentCDNBase()
         {
-            return contentOptions.CDN ?? string.Empty;
+            return assetOptions.CDN ?? string.Empty;
         }
 
         public string AssetContentBase()

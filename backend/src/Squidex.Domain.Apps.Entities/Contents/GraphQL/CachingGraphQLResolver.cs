@@ -47,11 +47,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.options = options.Value;
         }
 
-        public async Task ConfigureAsync(ExecutionOptions executionOptions)
+        public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
         {
-            var context = ((GraphQLExecutionContext)executionOptions.UserContext!).Context;
+            var context = ((GraphQLExecutionContext)options.UserContext!).Context;
 
-            executionOptions.Schema = await GetSchemaAsync(context.App);
+            options.Schema = await GetSchemaAsync(context.App);
+
+            return await next(options);
         }
 
         public async Task<GraphQLSchema> GetSchemaAsync(IAppEntity app)

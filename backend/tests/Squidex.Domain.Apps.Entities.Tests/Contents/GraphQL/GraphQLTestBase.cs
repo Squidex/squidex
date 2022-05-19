@@ -25,7 +25,7 @@ using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Shared;
 using Squidex.Shared.Users;
 using Xunit;
@@ -36,9 +36,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLTestBase : IClassFixture<TranslationsFixture>
     {
-        protected readonly IJsonSerializer serializer =
-            TestUtils.CreateSerializer(TypeNameHandling.None,
-                new ExecutionResultJsonConverter(new ErrorInfoProvider()));
+        protected readonly GraphQLSerializer serializer = new GraphQLSerializer(options =>
+        {
+            options.Formatting = Formatting.Indented;
+            options.Converters.Add(new JsonValueConverter());
+            options.Converters.Add(new WriteonlyGeoJsonConverter());
+        });
+
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
@@ -61,12 +65,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             requestContext = new Context(Mocks.FrontendUser(), TestApp.Default);
         }
 
-        protected void AssertResult(object lhs, ExecutionResult result)
+        protected void AssertResult(object expected, ExecutionResult result)
         {
-            var rhsJson = serializer.Serialize(result, true);
-            var lhsJson = serializer.Serialize(lhs, true);
+            var jsonOutputResult = serializer.Serialize(result);
+            var isonOutputExpected = serializer.Serialize(expected);
 
-            Assert.Equal(lhsJson, rhsJson);
+            Assert.Equal(isonOutputExpected, jsonOutputResult);
         }
 
         protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string? permissionId = null)
@@ -94,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 options.Listeners.Add(listener);
             }
 
-            await sut.ConfigureAsync(options);
+            await sut.ExecuteAsync(options, x => Task.FromResult<ExecutionResult>(null!));
 
             return await new DocumentExecuter().ExecuteAsync(options);
         }

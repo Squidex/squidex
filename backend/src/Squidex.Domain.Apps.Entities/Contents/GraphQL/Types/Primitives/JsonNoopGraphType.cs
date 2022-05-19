@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
 {
@@ -20,9 +20,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             Description = "Unstructured Json object";
         }
 
-        public override object? ParseLiteral(IValue value)
+        public override object? ParseLiteral(GraphQLValue value)
         {
-            return value.Value;
+            return value;
         }
 
         public override object? ParseValue(object? value)

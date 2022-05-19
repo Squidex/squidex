@@ -35,11 +35,8 @@
   
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.3" />
-    <PackageReference Include="GraphQL.DataLoader" Version="4.7.1" />
-    <PackageReference Include="GraphQL.MicrosoftDI" Version="4.7.1" />
-    <PackageReference Include="GraphQL.Server.Core" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Transports.AspNetCore.NewtonsoftJson" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.2.0" />
+    <PackageReference Include="GraphQL" Version="5.3.0" />
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="5.3.0" />
     <PackageReference Include="Meziantou.Analyzer" Version="1.0.694">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

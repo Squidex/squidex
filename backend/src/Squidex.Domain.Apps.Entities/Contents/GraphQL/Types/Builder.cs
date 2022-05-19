@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = new Dictionary<SchemaInfo, ComponentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
-        private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new Dictionary<FieldInfo, EmbeddableStringGraphType>(); 
+        private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new Dictionary<FieldInfo, EmbeddableStringGraphType>();
         private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new Dictionary<string, EnumerationGraphType?>();
         private readonly FieldVisitor fieldVisitor;
         private readonly FieldInputVisitor fieldInputVisitor;
