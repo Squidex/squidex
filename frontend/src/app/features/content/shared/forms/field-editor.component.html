@@ -184,13 +184,23 @@
 							<textarea class="form-control" [formControl]="$any(fieldForm)" [placeholder]="field.displayPlaceholder" rows="5"></textarea>
 						</ng-container>
 						<ng-container *ngSwitchCase="'RichText'">
-							<sqx-rich-editor [formControl]="$any(fieldForm)" #editor [folderId]="field.rawProperties.folderId"></sqx-rich-editor>
+							<sqx-rich-editor [formControl]="$any(fieldForm)" #editor
+                                [folderId]="field.rawProperties.folderId"
+                                [language]="language"
+                                [languages]="languages"
+                                [schemaIds]="field.rawProperties.schemaIds">
+                            </sqx-rich-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Html'">
 							<sqx-code-editor [formControl]="$any(fieldForm)" #editor mode="ace/mode/html" [height]="350"  ></sqx-code-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Markdown'">
-							<sqx-markdown-editor [formControl]="$any(fieldForm)" #editor [folderId]="field.rawProperties.folderId"></sqx-markdown-editor>
+							<sqx-markdown-editor [formControl]="$any(fieldForm)" #editor 
+                                [folderId]="field.rawProperties.folderId"
+                                [language]="language"
+                                [languages]="languages"
+                                [schemaIds]="field.rawProperties.schemaIds">
+                            </sqx-markdown-editor>
 						</ng-container>
 						<ng-container *ngSwitchCase="'StockPhoto'">
 							<sqx-stock-photo-editor [formControl]="$any(fieldForm)"></sqx-stock-photo-editor>

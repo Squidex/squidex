@@ -26,29 +26,39 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             AddContentUrlPatterns(urlGenerator.ContentCDNBase());
         }
 
-        private void AddContentUrlPatterns(string @base)
+        private void AddContentUrlPatterns(string baseUrl)
         {
-            if (string.IsNullOrWhiteSpace(@base))
+            if (string.IsNullOrWhiteSpace(baseUrl))
             {
                 return;
             }
 
-            @base = Regex.Escape(@base);
+            if (!baseUrl.EndsWith('/'))
+            {
+                baseUrl += "/";
+            }
 
-            AddContentPattern(@base + @"(?<Id>[a-z0-9\-_9]+)");
+            baseUrl = Regex.Escape(baseUrl);
+
+            AddContentPattern(baseUrl + @"(.+)\/(.+)\/(?<Id>[a-z0-9\-_9]+)");
         }
 
-        private void AddAssetUrlPatterns(string @base)
+        private void AddAssetUrlPatterns(string baseUrl)
         {
-            if (string.IsNullOrWhiteSpace(@base))
+            if (string.IsNullOrWhiteSpace(baseUrl))
             {
                 return;
             }
 
-            @base = Regex.Escape(@base);
+            if (!baseUrl.EndsWith('/'))
+            {
+                baseUrl += "/";
+            }
 
-            AddAssetPattern(@base + @"(?<Id>[a-z0-9\-_9]+)");
-            AddAssetPattern(@base + @"(.+)\/(?<Id>[a-z0-9\-_9]+)");
+            baseUrl = Regex.Escape(baseUrl);
+
+            AddAssetPattern(baseUrl + @"(?<Id>[a-z0-9\-_9]+)");
+            AddAssetPattern(baseUrl + @"(.+)\/(?<Id>[a-z0-9\-_9]+)");
         }
 
         private void AddAssetPattern(string pattern)

@@ -38,8 +38,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         [Theory]
         [InlineData("before content:a_b-123|after")]
         [InlineData("before contents:a_b-123|after")]
-        [InlineData("before https://cloud.squidex.io/api/content/a_b-123|after")]
-        [InlineData("before https://contents.squidex.io/a_b-123|after")]
+        [InlineData("before https://cloud.squidex.io/api/content/my-app/my-schema/a_b-123|after")]
+        [InlineData("before https://contents.squidex.io/my-app/my-schema/a_b-123|after")]
         public void Should_extract_content_id(string input)
         {
             var ids = sut.GetEmbeddedContentIds(input);

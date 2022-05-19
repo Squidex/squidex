@@ -36,6 +36,11 @@
     }
 
     /* stylelint-disable-next-line selector-class-pattern */
+    .CodeMirror {
+        padding: 0;
+    }
+
+    /* stylelint-disable-next-line selector-class-pattern */
     .CodeMirror-linenumbers {
         min-width: 29px;
     }

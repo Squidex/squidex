@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Web.Services;
@@ -18,6 +19,9 @@ namespace Squidex.Config.Domain
         {
             services.Configure<GraphQLOptions>(config,
                 "graphql");
+
+            services.AddSingletonAs<StringReferenceExtractor>()
+                .AsSelf();
 
             services.AddSingletonAs<UrlGenerator>()
                 .As<IUrlGenerator>();

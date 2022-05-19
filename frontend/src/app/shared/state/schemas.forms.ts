@@ -341,6 +341,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['minWords'] = new FormControl(undefined);
         this.config['pattern'] = new FormControl(undefined);
         this.config['patternMessage'] = new FormControl(undefined);
+        this.config['schemaIds'] = new FormControl(undefined);
     }
 
     public visitTags() {

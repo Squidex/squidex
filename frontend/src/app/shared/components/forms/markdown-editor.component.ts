@@ -8,7 +8,8 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { marked } from 'marked';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { ContentDto } from '@app/shared';
 
 declare const SimpleMDE: any;
 
@@ -35,6 +36,15 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     private value?: string;
 
     @Input()
+    public schemaIds?: ReadonlyArray<string>;
+
+    @Input()
+    public language!: LanguageDto;
+
+    @Input()
+    public languages!: ReadonlyArray<LanguageDto>;
+
+    @Input()
     public folderId?: string;
 
     @Input()
@@ -52,6 +62,8 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     public inner!: ElementRef;
 
     public assetsDialog = new DialogModel();
+
+    public contentsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly apiUrl: ApiUrlConfig,
@@ -78,12 +90,20 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         }
     }
 
-    private showSelector = () => {
+    private showAssetSelector = () => {
         if (this.snapshot.isDisabled) {
             return;
         }
 
         this.assetsDialog.show();
+    };
+
+    private showContentsSelector = () => {
+        if (this.snapshot.isDisabled) {
+            return;
+        }
+
+        this.contentsDialog.show();
     };
 
     public ngAfterViewInit() {
@@ -170,10 +190,17 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                     '|',
                     {
                         name: 'assets',
-                        action: this.showSelector,
+                        action: this.showAssetSelector,
                         className: 'icon-assets icon-bold',
                         title: 'Insert Assets',
                     },
+                    this.schemaIds && this.schemaIds.length > 0 ?
+                    {
+                        name: 'contents',
+                        action: this.showContentsSelector,
+                        className: 'icon-contents icon-bold',
+                        title: 'Insert Contents',
+                    } : null,
                 ],
                 element: this.editor.nativeElement,
             });
@@ -204,13 +231,23 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {
-        const content = this.buildMarkups(assets);
+        const content = this.buildAssetsMarkup(assets);
 
         if (content.length > 0) {
             this.simplemde.codemirror.replaceSelection(content);
         }
 
         this.assetsDialog.hide();
+    }
+
+    public insertContents(contents: ReadonlyArray<ContentDto>) {
+        const content = this.buildContentsMarkup(contents);
+
+        if (content.length > 0) {
+            this.simplemde.codemirror.replaceSelection(content);
+        }
+
+        this.contentsDialog.hide();
     }
 
     public insertFiles(files: ReadonlyArray<File>) {
@@ -251,7 +288,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
             .subscribe({
                 next: asset => {
                     if (Types.is(asset, AssetDto)) {
-                        replaceText(this.buildMarkup(asset));
+                        replaceText(this.buildAssetMarkup(asset));
                     }
                 },
                 error: error => {
@@ -274,17 +311,39 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.next({ isFullscreen });
     }
 
-    private buildMarkups(assets: readonly AssetDto[]) {
-        let content = '';
+    private buildAssetsMarkup(assets: ReadonlyArray<AssetDto>) {
+        let markup = '';
 
         for (const asset of assets) {
-            content += this.buildMarkup(asset);
+            markup += this.buildAssetMarkup(asset);
         }
 
-        return content;
+        return markup;
     }
 
-    private buildMarkup(asset: AssetDto) {
+    private buildContentsMarkup(contents: ReadonlyArray<ContentDto>) {
+        let markup = '';
+
+        for (const content of contents) {
+            markup += this.buildContentMarkup(content);
+        }
+
+        return markup;
+    }
+
+    private buildContentMarkup(content: ContentDto) {
+        const name =
+            content.referenceFields
+                .map(f => getContentValue(content, this.language, f, false))
+                .map(v => v.formatted)
+                .defined()
+                .join(', ')
+            || 'content';
+            
+        return `[${name}](${this.apiUrl.buildUrl(content._links['self'].href)}')`;
+    }
+
+    private buildAssetMarkup(asset: AssetDto) {
         const name = asset.fileNameWithoutExtension;
 
         if (asset.type === 'Image' || asset.mimeType === 'image/svg+xml' || asset.fileName.endsWith('.svg')) {
