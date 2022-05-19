@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             foreach (var value in values)
             {
-                AddValue(value, null, value);
+                Add(value, value, value);
             }
         }
 

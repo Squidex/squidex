@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             };
 
-            public static readonly ValueResolver Resolver = (value, fieldContext, context) =>
+            public static readonly ValueResolver<object> Resolver = (value, fieldContext, context) =>
             {
                 if (fieldContext.Arguments != null &&
                     fieldContext.Arguments.TryGetValue("path", out var contextValue) &&

@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsCreate);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsCreate);
 
             var expected = new
             {
@@ -264,7 +264,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -373,7 +373,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpsert);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsUpsert);
 
             var expected = new
             {
@@ -482,7 +482,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(content);
 
-            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Inputs = GetInput() }, Permissions.AppContentsUpdateOwn);
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query, Variables = GetInput() }, Permissions.AppContentsUpdateOwn);
 
             var expected = new
             {
@@ -763,7 +763,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 data = TestContent.Input(content, TestSchemas.Ref1.Id, TestSchemas.Ref2.Id)
             };
 
-            return JObject.FromObject(input).ToInputs();
+            return serializer.ReadNode<Inputs>(JObject.FromObject(input))!;
         }
     }
 }

@@ -6,10 +6,11 @@
 // ==========================================================================
 
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Directives
 {
-    public sealed class CacheDirective : DirectiveGraphType
+    public sealed class CacheDirective : Directive
     {
         public CacheDirective()
             : base("cache", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
