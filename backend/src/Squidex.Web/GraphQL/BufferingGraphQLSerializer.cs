@@ -24,6 +24,10 @@ namespace Squidex.Web.GraphQL
         {
             await using (var bufferStream = new FileBufferingReadStream(stream, 30 * 1024))
             {
+                await bufferStream.DrainAsync(cancellationToken);
+
+                bufferStream.Seek(0L, SeekOrigin.Begin);
+
                 return await inner.ReadAsync<T>(bufferStream, cancellationToken);
             }
         }
