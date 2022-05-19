@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -37,6 +38,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool IsUnique { get; init; }
 
+        public bool IsEmbeddable { get; init; }
+
         public bool InlineEditable { get; init; }
 
         public bool CreateEnum { get; init; }
@@ -44,6 +47,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public StringContentType ContentType { get; init; }
 
         public StringFieldEditor Editor { get; init; }
+
+        public ReadonlyList<DomainId>? SchemaIds { get; init; }
 
         public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
         {

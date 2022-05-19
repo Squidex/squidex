@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using IGenericUrlGenerator = Squidex.Hosting.IUrlGenerator;
 
@@ -17,16 +19,17 @@ namespace Squidex.Web.Services
     {
         private readonly IAssetFileStore assetFileStore;
         private readonly IGenericUrlGenerator urlGenerator;
+        private readonly AssetOptions assetOptions;
+        private readonly ContentOptions contentOptions;
 
-        public bool CanGenerateAssetSourceUrl { get; }
-
-        public UrlGenerator(IGenericUrlGenerator urlGenerator, IAssetFileStore assetFileStore, bool allowAssetSourceUrl)
+        public UrlGenerator(IGenericUrlGenerator urlGenerator, IAssetFileStore assetFileStore,
+            IOptions<AssetOptions> assetOptions,
+            IOptions<ContentOptions> contentOptions)
         {
+            this.contentOptions = contentOptions.Value;
             this.assetFileStore = assetFileStore;
-
+            this.assetOptions = assetOptions.Value;
             this.urlGenerator = urlGenerator;
-
-            CanGenerateAssetSourceUrl = allowAssetSourceUrl;
         }
 
         public string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType)
@@ -37,6 +40,11 @@ namespace Squidex.Web.Services
             }
 
             return urlGenerator.BuildUrl($"api/assets/{appId.Name}/{idOrSlug}?width=100&mode=Max");
+        }
+
+        public string AssetContentCDNBase()
+        {
+            return assetOptions.CDN ?? string.Empty;
         }
 
         public string AssetContentBase()
@@ -77,6 +85,16 @@ namespace Squidex.Web.Services
         public string ClientsUI(NamedId<DomainId> appId)
         {
             return urlGenerator.BuildUrl($"app/{appId.Name}/settings/clients", false);
+        }
+
+        public string ContentCDNBase()
+        {
+            return contentOptions.CDN ?? string.Empty;
+        }
+
+        public string ContentBase()
+        {
+            return urlGenerator.BuildUrl("api/content/", false);
         }
 
         public string ContentsUI(NamedId<DomainId> appId, NamedId<DomainId> schemaId)

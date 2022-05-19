@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using GraphQL;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -24,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Dictionary<SchemaInfo, ComponentGraphType> componentTypes = new Dictionary<SchemaInfo, ComponentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentGraphType> contentTypes = new Dictionary<SchemaInfo, ContentGraphType>(ReferenceEqualityComparer.Instance);
         private readonly Dictionary<SchemaInfo, ContentResultGraphType> contentResultTypes = new Dictionary<SchemaInfo, ContentResultGraphType>(ReferenceEqualityComparer.Instance);
+        private readonly Dictionary<FieldInfo, EmbeddableStringGraphType> embeddableStringTypes = new Dictionary<FieldInfo, EmbeddableStringGraphType>(); 
         private readonly Dictionary<string, EnumerationGraphType?> enumTypes = new Dictionary<string, EnumerationGraphType?>();
         private readonly FieldVisitor fieldVisitor;
         private readonly FieldInputVisitor fieldInputVisitor;
@@ -107,6 +107,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return newSchema;
         }
 
+        public FieldGraphSchema GetGraphType(FieldInfo fieldInfo)
+        {
+            return fieldInfo.Field.Accept(fieldVisitor, fieldInfo);
+        }
+
         public IFieldPartitioning ResolvePartition(Partitioning key)
         {
             return partitionResolver(key);
@@ -115,11 +120,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public IGraphType? GetInputGraphType(FieldInfo fieldInfo)
         {
             return fieldInfo.Field.Accept(fieldInputVisitor, fieldInfo);
-        }
-
-        public (IGraphType?, IFieldResolver?, QueryArguments?) GetGraphType(FieldInfo fieldInfo)
-        {
-            return fieldInfo.Field.Accept(fieldVisitor, fieldInfo);
         }
 
         public IObjectGraphType GetContentResultType(SchemaInfo schemaId)
@@ -147,6 +147,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             return componentTypes.GetOrDefault(schema);
+        }
+
+        public EmbeddableStringGraphType GetEmbeddableString(FieldInfo fieldInfo, StringFieldProperties properties)
+        {
+            return embeddableStringTypes.GetOrAdd(fieldInfo, x => new EmbeddableStringGraphType(this, x, properties));
         }
 
         public EnumerationGraphType? GetEnumeration(string name, IEnumerable<string> values)

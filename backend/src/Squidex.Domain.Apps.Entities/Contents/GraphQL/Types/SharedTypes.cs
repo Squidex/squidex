@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             Name = "queryAssets",
             Arguments = AssetActions.Query.Arguments,
-            ResolvedType = AssetsList,
+            ResolvedType = new NonNullGraphType(AssetsList),
             Resolver = AssetActions.Query.Resolver,
             Description = "Get assets."
         };
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             Name = "queryAssetsWithTotal",
             Arguments = AssetActions.Query.Arguments,
-            ResolvedType = AssetsResult,
+            ResolvedType = new NonNullGraphType(AssetsResult),
             Resolver = AssetActions.Query.ResolverWithTotal,
             Description = "Get assets and total count."
         };

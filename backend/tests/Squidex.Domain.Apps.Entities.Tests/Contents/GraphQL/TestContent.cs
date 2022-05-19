@@ -236,6 +236,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     .Add("nested-number", 20)
                                     .Add("nested-boolean", false))));
 
+            if (assetId != default || refId != default)
+            {
+                data.AddField("my-embeds",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Create($"assets:{assetId}, contents:{refId}")));
+            }
+
             var content = new ContentEntity
             {
                 Id = id,
@@ -480,6 +487,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         assetId
                     }
+                };
+            }
+
+            if (assetId != default || refId != default)
+            {
+                result["myEmbeds"] = new
+                {
+                    iv = $"assets:{assetId}, contents:{refId}"
                 };
             }
 

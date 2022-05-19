@@ -14,6 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
     {
         public FieldEnumType(string name, IEnumerable<string> values)
         {
+            // The name is used for equal comparison. Therefore it is important to treat it as readonly.
             Name = name;
 
             foreach (var value in values)

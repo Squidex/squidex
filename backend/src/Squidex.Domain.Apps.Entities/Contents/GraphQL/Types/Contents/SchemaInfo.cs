@@ -108,6 +108,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public string ReferenceType { get; }
 
+        public string EmbeddableStringType { get; }
+
         public IReadOnlyList<FieldInfo> Fields { get; }
 
         private FieldInfo(IField field, string typeName, Names names, Names parentNames, IReadOnlyList<FieldInfo> fields)
@@ -116,11 +118,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
             ComponentType = names[$"{typeName}ComponentUnionDto"];
             DisplayName = field.DisplayName();
+            EmbeddableStringType = names[$"{typeName}EmbeddableString"];
+            EnumName = names[$"{fieldName}Enum"];
             Field = field;
-            Fields = fields;
             FieldName = fieldName;
             FieldNameDynamic = names[$"{fieldName}__Dynamic"];
-            EnumName = names[$"{fieldName}Enum"];
+            Fields = fields;
             LocalizedInputType = names[$"{typeName}InputDto"];
             LocalizedType = names[$"{typeName}Dto"];
             LocalizedTypeDynamic = names[$"{typeName}Dto__Dynamic"];

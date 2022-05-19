@@ -76,6 +76,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             new BooleanFieldProperties())
                         .AddNumber(122, "nested-number",
                             new NumberFieldProperties()))
+                    .AddString(16, "my-embeds", Partitioning.Invariant,
+                        new StringFieldProperties { IsEmbeddable = true, SchemaIds = ReadonlyList.Create(Ref1.Id, Ref2.Id) })
                     .SetScripts(new SchemaScripts { Query = "<query-script>" }));
         }
     }

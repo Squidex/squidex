@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
@@ -74,9 +75,19 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public ReadonlyList<string>? AllowedValues { get; set; }
 
         /// <summary>
+        /// The allowed schema ids that can be embedded.
+        /// </summary>
+        public ReadonlyList<DomainId>? SchemaIds { get; init; }
+
+        /// <summary>
         /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.
         /// </summary>
         public bool IsUnique { get; set; }
+
+        /// <summary>
+        /// Indicates that other content items or references are embedded.
+        /// </summary>
+        public bool IsEmbeddable { get; set; }
 
         /// <summary>
         /// Indicates that the inline editor is enabled for this field.

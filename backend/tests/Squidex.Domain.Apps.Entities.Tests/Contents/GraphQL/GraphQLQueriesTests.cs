@@ -401,6 +401,89 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_also_fetch_embedded_contents_if_field_is_included_in_query()
+        {
+            var contentRefId = DomainId.NewGuid();
+            var contentRef = TestContent.CreateRef(TestSchemas.Ref1Id, contentRefId, "schemaRef1Field", "ref1");
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, contentRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    data {
+                      myEmbeds {
+                        iv {
+                          text
+                          contents {
+                            ... on Content {
+                              id
+                            }
+                            ... on MyRefSchema1 {
+                              data {
+                                schemaRef1Field {
+                                  iv
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        data = new
+                        {
+                            myEmbeds = new
+                            {
+                                iv = new
+                                {
+                                    text = $"assets:{DomainId.Empty}, contents:{contentRefId}",
+                                    contents = new[]
+                                    {
+                                        new
+                                        {
+                                            id = contentRefId,
+                                            data = new
+                                            {
+                                                schemaRef1Field = new
+                                                {
+                                                    iv = "ref1"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_also_fetch_referenced_contents_if_field_is_included_in_query()
         {
             var contentRefId = DomainId.NewGuid();
@@ -893,6 +976,73 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                             }
                                         },
                                         __typename = "MyRefSchema1"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_also_fetch_embedded_assets_if_field_is_included_in_query()
+        {
+            var assetRefId = DomainId.NewGuid();
+            var assetRef = TestAsset.Create(assetRefId);
+
+            var contentId = DomainId.NewGuid();
+            var content = TestContent.Create(contentId, assetId: assetRefId);
+
+            var query = CreateQuery(@"
+                query {
+                  findMySchemaContent(id: '<ID>') {
+                    id
+                    data {
+                      myEmbeds {
+                        iv {
+                          text
+                          assets {
+                            id
+                          }
+                        }
+                      }
+                    }
+                  }
+                }", contentId);
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                    A<Q>.That.HasIdsWithoutTotal(contentId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(1, content));
+
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), null,
+                    A<Q>.That.HasIdsWithoutTotal(assetRefId), A<CancellationToken>._))
+                .Returns(ResultList.CreateFrom(0, assetRef));
+
+            var result = await ExecuteAsync(new ExecutionOptions { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        id = content.Id,
+                        data = new
+                        {
+                            myEmbeds = new
+                            {
+                                iv = new
+                                {
+                                    text = $"assets:{assetRefId}, contents:{DomainId.Empty}",
+                                    assets = new[]
+                                    {
+                                        new
+                                        {
+                                            id = assetRefId
+                                        }
                                     }
                                 }
                             }

@@ -9,6 +9,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -16,6 +17,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
     internal static class ContentFields
     {
+        public static readonly IFieldResolver ResolveStringFieldAssets = Resolvers.Async<string, object>(async (value, fieldContext, context) =>
+        {
+            var cacheDuration = fieldContext.CacheDuration();
+
+            var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedAssetIds(value).ToList();
+
+            return await context.GetAssetsAsync(ids, cacheDuration, fieldContext.CancellationToken);
+        });
+
+        public static readonly IFieldResolver ResolveStringFieldContents = Resolvers.Async<string, object>(async (value, fieldContext, context) =>
+        {
+            var cacheDuration = fieldContext.CacheDuration();
+
+            var ids = context.Resolve<StringReferenceExtractor>().GetEmbeddedContentIds(value).ToList();
+
+            return await context.GetContentsAsync(ids, cacheDuration, fieldContext.CancellationToken);
+        });
+
         public static readonly FieldType Id = new FieldType
         {
             Name = "id",
@@ -134,6 +153,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             ResolvedType = AllTypes.String,
             Resolver = Resolve(x => x.EditToken),
             Description = FieldDescriptions.EditToken
+        };
+
+        public static readonly FieldType StringFieldText = new FieldType
+        {
+            Name = "text",
+            ResolvedType = AllTypes.String,
+            Resolver = Resolvers.Sync<string, string>(x => x),
+            Description = FieldDescriptions.StringFieldText
+        };
+
+        public static readonly FieldType StringFieldAssets = new FieldType
+        {
+            Name = "assets",
+            ResolvedType = new NonNullGraphType(SharedTypes.AssetsList),
+            Resolver = ResolveStringFieldAssets,
+            Description = FieldDescriptions.StringFieldAssets
         };
 
         private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)

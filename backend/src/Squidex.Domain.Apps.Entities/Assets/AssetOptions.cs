@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public long MaxSize { get; set; } = 5 * 1024 * 1024;
 
+        public string? CDN { get; set; }
+
         public TimeSpan TimeoutFind { get; set; } = TimeSpan.FromSeconds(1);
 
         public TimeSpan TimeoutQuery { get; set; } = TimeSpan.FromSeconds(5);

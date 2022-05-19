@@ -331,6 +331,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['defaultValues'] = new FormControl(undefined);
         this.config['folderId'] = new FormControl(undefined);
         this.config['inlineEditable'] = new FormControl(undefined);
+        this.config['isEmbeddable'] = new FormControl(undefined);
         this.config['isUnique'] = new FormControl(undefined);
         this.config['maxCharacters'] = new FormControl(undefined);
         this.config['maxLength'] = new FormControl(undefined);
