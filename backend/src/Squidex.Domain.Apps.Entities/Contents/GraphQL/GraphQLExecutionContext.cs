@@ -77,12 +77,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value, TimeSpan cacheDuration,
+        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
 
-            if (ids == null)
+            return GetAssetsAsync(ids, cacheDuration, ct);
+        }
+
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetAssetsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
+            CancellationToken ct)
+        {
+            if (ids == null || ids.Count == 0)
             {
                 return EmptyAssets;
             }
@@ -107,12 +113,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await LoadAsync(ids);
         }
 
-        public async Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value, TimeSpan cacheDuration,
+        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
 
-            if (ids == null)
+            return GetContentsAsync(ids, cacheDuration, ct);
+        }
+
+        public async Task<IReadOnlyList<IEnrichedContentEntity>> GetContentsAsync(List<DomainId>? ids, TimeSpan cacheDuration,
+            CancellationToken ct)
+        {
+            if (ids == null || ids.Count == 0)
             {
                 return EmptyContents;
             }

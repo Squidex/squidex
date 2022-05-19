@@ -7,3 +7,12 @@
         (select)="insertAssets($event)">
     </sqx-assets-selector>
 </ng-container>
+
+<ng-container *sqxModal="contentsDialog">
+    <sqx-content-selector
+        [language]="language"
+        [languages]="languages"
+        [schemaIds]="schemaIds"
+        (select)="insertContents($event)">
+    </sqx-content-selector>
+</ng-container>

@@ -798,6 +798,8 @@
   "schemas.field.hide": "Hide in API",
   "schemas.field.hintsHint": "Describe this field for documentation and the UI.",
   "schemas.field.inlineEditable": "Inline Editable",
+  "schemas.field.isEmbeddable": "Is embedding contents and assets",
+  "schemas.field.isEmbeddableHint": "With this option a custom format is returned in GraphQL, where the linked assets or contents can be fetched.",
   "schemas.field.labelHint": "Display name for documentation and the UI.",
   "schemas.field.localizable": "Localizable",
   "schemas.field.localizableHint": "You can mark the field as localizable. It means that is dependent on the language, for example a city name.",

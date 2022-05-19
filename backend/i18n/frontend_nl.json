@@ -798,6 +798,8 @@
   "schemas.field.hide": "Verbergen in API",
   "schemas.field.hintsHint": "Beschrijf dit schema voor documentatie en gebruikersinterfaces.",
   "schemas.field.inlineEditable": "Inline bewerkbaar",
+  "schemas.field.isEmbeddable": "Is embedding contents and assets",
+  "schemas.field.isEmbeddableHint": "With this option a custom format is returned in GraphQL, where the linked assets or contents can be fetched.",
   "schemas.field.labelHint": "Weergavenaam voor documentatie en gebruikersinterfaces.",
   "schemas.field.localizable": "Localizable",
   "schemas.field.localizableHint": "Je kunt het veld markeren als lokaliseerbaar. Dit betekent dat het afhankelijk is van de taal, bijvoorbeeld de naam van een stad.",

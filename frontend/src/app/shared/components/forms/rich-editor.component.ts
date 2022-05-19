@@ -7,7 +7,8 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, LocalizerService, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
+import { ContentDto } from '@app/shared';
+import { ApiUrlConfig, AssetDto, AssetUploaderState, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types, UploadCanceled } from '@app/shared/internal';
 
 declare const tinymce: any;
 
@@ -32,6 +33,15 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     public assetPluginClick = new EventEmitter<any>();
 
     @Input()
+    public schemaIds?: ReadonlyArray<string>;
+
+    @Input()
+    public language!: LanguageDto;
+
+    @Input()
+    public languages!: ReadonlyArray<LanguageDto>;
+
+    @Input()
     public folderId = '';
 
     @Input()
@@ -44,11 +54,12 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
     public assetsDialog = new DialogModel();
 
+    public contentsDialog = new DialogModel();
+
     constructor(changeDetector: ChangeDetectorRef,
         private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService,
-        private readonly localizer: LocalizerService,
     ) {
         super(changeDetector, {});
     }
@@ -82,12 +93,20 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
         });
     }
 
-    private showSelector = () => {
+    private showAssetsSelector = () => {
         if (this.snapshot.isDisabled) {
             return;
         }
 
         this.assetsDialog.show();
+    };
+
+    private showContentsSelector = () => {
+        if (this.snapshot.isDisabled) {
+            return;
+        }
+
+        this.contentsDialog.show();
     };
 
     private getEditorOptions(target: any): any {
@@ -117,11 +136,20 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
 
             setup: (editor: any) => {
                 editor.ui.registry.addButton('assets', {
-                    onAction: self.showSelector,
+                    onAction: self.showAssetsSelector,
                     icon: 'gallery',
                     text: '',
-                    tooltip: this.localizer.getOrKey('assets.insertAssets'),
+                    tooltip: 'Insert Assets',
                 });
+
+                if (this.schemaIds && this.schemaIds.length > 0) {
+                    editor.ui.registry.addButton('contents', {
+                        onAction: self.showContentsSelector,
+                        icon: 'duplicate',
+                        text: '',
+                        tooltip: 'Insert Contents',
+                    });
+                }
 
                 editor.on('init', () => {
                     self.tinyEditor = editor;
@@ -222,13 +250,23 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public insertAssets(assets: ReadonlyArray<AssetDto>) {
-        const content = this.buildMarkups(assets);
+        const content = this.buildAssetsMarkup(assets);
 
         if (content.length > 0) {
             this.tinyEditor.execCommand('mceInsertContent', false, content);
         }
 
         this.assetsDialog.hide();
+    }
+
+    public insertContents(contents: ReadonlyArray<ContentDto>) {
+        const content = this.buildContentsMarkup(contents);
+
+        if (content.length > 0) {
+            this.tinyEditor.execCommand('mceInsertContent', false, content);
+        }
+
+        this.contentsDialog.hide();
     }
 
     public insertFiles(files: ReadonlyArray<File>) {
@@ -252,7 +290,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             .subscribe({
                 next: asset => {
                     if (Types.is(asset, AssetDto)) {
-                        replaceText(this.buildMarkup(asset));
+                        replaceText(this.buildAssetMarkup(asset));
                     }
                 },
                 error: error => {
@@ -263,17 +301,39 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
             });
     }
 
-    private buildMarkups(assets: readonly AssetDto[]) {
-        let content = '';
+    private buildAssetsMarkup(assets: ReadonlyArray<AssetDto>) {
+        let markup = '';
 
         for (const asset of assets) {
-            content += this.buildMarkup(asset);
+            markup += this.buildAssetMarkup(asset);
         }
 
-        return content;
+        return markup;
     }
 
-    private buildMarkup(asset: AssetDto) {
+    private buildContentsMarkup(contents: ReadonlyArray<ContentDto>) {
+        let markup = '';
+
+        for (const content of contents) {
+            markup += this.buildContentMarkup(content);
+        }
+
+        return markup;
+    }
+
+    private buildContentMarkup(content: ContentDto) {
+        const name =
+            content.referenceFields
+                .map(f => getContentValue(content, this.language, f, false))
+                .map(v => v.formatted)
+                .defined()
+                .join(', ')
+            || 'content';
+            
+        return `<a href="${this.apiUrl.buildUrl(content._links['self'].href)}" alt="${name}">${name}</a>`;
+    }
+
+    private buildAssetMarkup(asset: AssetDto) {
         const name = asset.fileNameWithoutExtension;
 
         if (asset.type === 'Image' || asset.mimeType === 'image/svg+xml' || asset.fileName.endsWith('.svg')) {
@@ -295,5 +355,5 @@ const DEFAULT_PROPS = {
     max_height: 800,
     removed_menuitems: 'newdocument',
     resize: true,
-    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets',
+    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets contents',
 };

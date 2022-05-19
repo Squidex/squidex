@@ -331,6 +331,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['defaultValues'] = new FormControl(undefined);
         this.config['folderId'] = new FormControl(undefined);
         this.config['inlineEditable'] = new FormControl(undefined);
+        this.config['isEmbeddable'] = new FormControl(undefined);
         this.config['isUnique'] = new FormControl(undefined);
         this.config['maxCharacters'] = new FormControl(undefined);
         this.config['maxLength'] = new FormControl(undefined);
@@ -340,6 +341,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['minWords'] = new FormControl(undefined);
         this.config['pattern'] = new FormControl(undefined);
         this.config['patternMessage'] = new FormControl(undefined);
+        this.config['schemaIds'] = new FormControl(undefined);
     }
 
     public visitTags() {

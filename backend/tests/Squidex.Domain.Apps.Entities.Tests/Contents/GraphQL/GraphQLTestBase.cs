@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
@@ -60,12 +61,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             requestContext = new Context(Mocks.FrontendUser(), TestApp.Default);
         }
 
-        protected void AssertResult(object expected, ExecutionResult result)
+        protected void AssertResult(object lhs, ExecutionResult result)
         {
-            var resultJson = serializer.Serialize(result, true);
-            var expectJson = serializer.Serialize(expected, true);
+            var rhsJson = serializer.Serialize(result, true);
+            var lhsJson = serializer.Serialize(lhs, true);
 
-            Assert.Equal(expectJson, resultJson);
+            Assert.Equal(lhsJson, rhsJson);
         }
 
         protected Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, string? permissionId = null)
@@ -138,6 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddSingleton<InstantGraphType>()
                     .AddSingleton<JsonGraphType>()
                     .AddSingleton<JsonNoopGraphType>()
+                    .AddSingleton<StringReferenceExtractor>()
                     .BuildServiceProvider();
 
             var schemasHash = A.Fake<ISchemasHash>();

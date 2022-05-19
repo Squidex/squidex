@@ -384,6 +384,15 @@
   <data name="SchemaId" xml:space="preserve">
     <value>The ID of the schema.</value>
   </data>
+  <data name="StringFieldAssets" xml:space="preserve">
+    <value>The referenced assets.</value>
+  </data>
+  <data name="StringFieldReferences" xml:space="preserve">
+    <value>The referenced content items.</value>
+  </data>
+  <data name="StringFieldText" xml:space="preserve">
+    <value>The text of this field.</value>
+  </data>
   <data name="UsageCallsCurrent" xml:space="preserve">
     <value>The current number of calls.</value>
   </data>

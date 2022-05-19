@@ -429,22 +429,24 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
 
     public readonly allowedValues?: ReadonlyArray<string>;
+    public readonly contentType?: StringContentType;
     public readonly createEnum: boolean = false;
     public readonly defaultValue?: string;
     public readonly defaultValues?: DefaultValue<string>;
     public readonly editor: StringFieldEditor = 'Input';
-    public readonly inlineEditable: boolean = false;
-    public readonly isUnique: boolean = false;
     public readonly folderId?: string;
-    public readonly maxLength?: number;
-    public readonly minLength?: number;
-    public readonly maxWords?: number;
-    public readonly minWords?: number;
+    public readonly inlineEditable: boolean = false;
+    public readonly isEmbeddable: boolean = false;
+    public readonly isUnique: boolean = false;
     public readonly maxCharacters?: number;
+    public readonly maxLength?: number;
+    public readonly maxWords?: number;
     public readonly minCharacters?: number;
-    public readonly contentType?: StringContentType;
+    public readonly minLength?: number;
+    public readonly minWords?: number;
     public readonly pattern?: string;
     public readonly patternMessage?: string;
+    public readonly schemaIds?: ReadonlyArray<string>;
 
     public get isComplexUI() {
         return this.editor !== 'Input' && this.editor !== 'Color' && this.editor !== 'Radio' && this.editor !== 'Slug' && this.editor !== 'TextArea';

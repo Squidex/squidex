@@ -798,6 +798,8 @@
   "schemas.field.hide": "隐藏在 API",
   "schemas.field.hintsHint": "为文档和 UI 描述这个字段。",
   "schemas.field.inlineEditable": "内联可编辑",
+  "schemas.field.isEmbeddable": "Is embedding contents and assets",
+  "schemas.field.isEmbeddableHint": "With this option a custom format is returned in GraphQL, where the linked assets or contents can be fetched.",
   "schemas.field.labelHint": "文档和 UI 的显示名称。",
   "schemas.field.localizable": "Localizable",
   "schemas.field.localizableHint": "您可以将字段标记为可本地化。这意味着这取决于语言，例如城市名称。",

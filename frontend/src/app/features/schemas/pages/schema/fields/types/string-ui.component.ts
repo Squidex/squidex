@@ -8,7 +8,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, ResourceOwner, STRING_FIELD_EDITORS, StringFieldPropertiesDto, valueProjection$ } from '@app/shared';
+import { FieldDto, ResourceOwner, STRING_FIELD_EDITORS, StringFieldPropertiesDto, valueProjection$, SchemaTagSource } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui[field][fieldForm][properties]',
@@ -29,6 +29,13 @@ export class StringUIComponent extends ResourceOwner implements OnChanges {
 
     public hideAllowedValues?: Observable<boolean>;
     public hideInlineEditable?: Observable<boolean>;
+    public hideSchemaIds?: Observable<boolean>;
+
+    constructor(
+        public readonly schemasSource: SchemaTagSource,
+    ) {
+        super();
+    }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {
@@ -41,6 +48,9 @@ export class StringUIComponent extends ResourceOwner implements OnChanges {
 
             this.hideInlineEditable =
                 valueProjection$(editor, x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug')));
+
+            this.hideSchemaIds =
+                valueProjection$(this.fieldForm.controls['isEmbeddable'], x => !x);
 
             this.own(
                 this.hideAllowedValues.subscribe(isSelection => {

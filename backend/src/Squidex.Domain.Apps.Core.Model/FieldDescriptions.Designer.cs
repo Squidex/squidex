@@ -862,6 +862,33 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The referenced assets..
+        /// </summary>
+        public static string StringFieldAssets {
+            get {
+                return ResourceManager.GetString("StringFieldAssets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The referenced content items..
+        /// </summary>
+        public static string StringFieldReferences {
+            get {
+                return ResourceManager.GetString("StringFieldReferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The text of this field..
+        /// </summary>
+        public static string StringFieldText {
+            get {
+                return ResourceManager.GetString("StringFieldText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The current number of calls..
         /// </summary>
         public static string UsageCallsCurrent {
