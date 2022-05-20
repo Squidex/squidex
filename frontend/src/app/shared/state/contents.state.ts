@@ -425,6 +425,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     private bulkMany(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean, job: Partial<BulkUpdateJobDto>): Observable<ReadonlyArray<BulkResultDto>> {
         const update = {
+            // This is set to true by default, so we turn it off here.
+            optimizeValidation: false,
+            dotNotValidate: false,
             doNotScript: false,
             jobs: contents.map(x => ({
                 id: x.id,
