@@ -71,27 +71,34 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                 return;
             }
 
-            using (var cliLog = new StringLogger(template, log))
+            using (var cliLog = new StringLogger())
             {
-                var session = CreateSession(app);
-
-                var syncService = await CreateSyncServiceAsync(repository, session);
-                var syncOptions = new SyncOptions();
-
-                var targets = new ISynchronizer[]
+                try
                 {
-                    new AppSynchronizer(cliLog),
-                    new AssetFoldersSynchronizer(cliLog),
-                    new AssetsSynchronizer(cliLog),
-                    new RulesSynchronizer(cliLog),
-                    new SchemasSynchronizer(cliLog),
-                    new WorkflowsSynchronizer(cliLog),
-                    new ContentsSynchronizer(cliLog)
-                };
+                    var session = CreateSession(app);
 
-                foreach (var target in targets)
+                    var syncService = await CreateSyncServiceAsync(repository, session);
+                    var syncOptions = new SyncOptions();
+
+                    var targets = new ISynchronizer[]
+                    {
+                        new AppSynchronizer(cliLog),
+                        new AssetFoldersSynchronizer(cliLog),
+                        new AssetsSynchronizer(cliLog),
+                        new RulesSynchronizer(cliLog),
+                        new SchemasSynchronizer(cliLog),
+                        new WorkflowsSynchronizer(cliLog),
+                        new ContentsSynchronizer(cliLog)
+                    };
+
+                    foreach (var target in targets)
+                    {
+                        await target.ImportAsync(syncService, syncOptions, session);
+                    }
+                }
+                finally
                 {
-                    await target.ImportAsync(syncService, syncOptions, session);
+                    cliLog.Flush(log, template);
                 }
             }
         }

@@ -15,21 +15,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     public sealed class StringLogger : ILogger, ILogLine
     {
         private const int MaxActionLength = 40;
-        private readonly ISemanticLog log;
-        private readonly string template;
         private readonly List<string> lines = new List<string>();
         private readonly List<string> errors = new List<string>();
         private string startedLine = string.Empty;
 
         public bool CanWriteToSameLine => false;
 
-        public StringLogger(string template, ISemanticLog log)
-        {
-            this.template = template;
-            this.log = log;
-        }
-
-        public void Dispose()
+        public void Flush(ISemanticLog log, string template)
         {
             var mesage = string.Join('\n', lines);
 
@@ -48,6 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 throw new DomainException($"Template failed with {errors[0]}");
             }
+        }
+
+        public void Dispose()
+        {
         }
 
         public void StepStart(string message)
