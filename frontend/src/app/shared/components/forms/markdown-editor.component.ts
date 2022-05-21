@@ -112,7 +112,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
             this.resourceLoader.loadLocalStyle('dependencies/font-awesome/css/font-awesome.min.css'),
             this.resourceLoader.loadLocalScript('dependencies/simplemde/simplemde.min.js'),
         ]).then(() => {
-            this.simplemde = new SimpleMDE({
+            const options = {
                 previewRender: (text: string) => {
                     return marked(text, { pedantic: true });
                 },
@@ -193,18 +193,21 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                         action: this.showAssetSelector,
                         className: 'icon-assets icon-bold',
                         title: 'Insert Assets',
-                    },
-                    this.schemaIds && this.schemaIds.length > 0 ?
-                    {
-                        name: 'contents',
-                        action: this.showContentsSelector,
-                        className: 'icon-contents icon-bold',
-                        title: 'Insert Contents',
-                    } : null,
+                    }
                 ],
                 element: this.editor.nativeElement,
-            });
+            };
 
+            if (this.schemaIds && this.schemaIds.length > 0) {
+                options.toolbar.push({
+                    name: 'contents',
+                    action: this.showContentsSelector,
+                    className: 'icon-contents icon-bold',
+                    title: 'Insert Contents',
+                });
+            }
+
+            this.simplemde = new SimpleMDE(options);
             this.simplemde.value(this.value || '');
             this.simplemde.codemirror.setOption('readOnly', this.snapshot.isDisabled);
 
@@ -340,7 +343,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                 .join(', ')
             || 'content';
             
-        return `[${name}](${this.apiUrl.buildUrl(content._links['self'].href)}')`;
+        return `[${name}](${this.apiUrl.buildUrl(content._links['self'].href)})`;
     }
 
     private buildAssetMarkup(asset: AssetDto) {
@@ -349,9 +352,9 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         if (asset.type === 'Image' || asset.mimeType === 'image/svg+xml' || asset.fileName.endsWith('.svg')) {
             return `![${name}](${asset.fullUrl(this.apiUrl)} '${name}')`;
         } else if (asset.type === 'Video') {
-            return `[${name}](${asset.fullUrl(this.apiUrl)}')`;
+            return `[${name}](${asset.fullUrl(this.apiUrl)})`;
         } else {
-            return `[${name}](${asset.fullUrl(this.apiUrl)}')`;
+            return `[${name}](${asset.fullUrl(this.apiUrl)})`;
         }
     }
 }

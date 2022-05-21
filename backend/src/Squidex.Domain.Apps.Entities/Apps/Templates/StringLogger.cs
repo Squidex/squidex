@@ -21,10 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private readonly List<string> errors = new List<string>();
         private string startedLine = string.Empty;
 
+        public bool CanWriteToSameLine => false;
+
         public StringLogger(string template, ISemanticLog log)
         {
             this.template = template;
-
             this.log = log;
         }
 

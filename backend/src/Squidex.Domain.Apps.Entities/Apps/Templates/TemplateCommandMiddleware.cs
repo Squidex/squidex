@@ -11,8 +11,9 @@ using Squidex.CLI.Commands.Implementation;
 using Squidex.CLI.Commands.Implementation.FileSystem;
 using Squidex.CLI.Commands.Implementation.Sync;
 using Squidex.CLI.Commands.Implementation.Sync.App;
-using Squidex.CLI.Commands.Implementation.Sync.AssertFolders;
+using Squidex.CLI.Commands.Implementation.Sync.AssetFolders;
 using Squidex.CLI.Commands.Implementation.Sync.Assets;
+using Squidex.CLI.Commands.Implementation.Sync.Contents;
 using Squidex.CLI.Commands.Implementation.Sync.Rules;
 using Squidex.CLI.Commands.Implementation.Sync.Schemas;
 using Squidex.CLI.Commands.Implementation.Sync.Workflows;
@@ -85,9 +86,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new RulesSynchronizer(cliLog),
                     new SchemasSynchronizer(cliLog),
                     new WorkflowsSynchronizer(cliLog),
+                    new ContentsSynchronizer(cliLog)
                 };
 
-                foreach (var target in targets.OrderBy(x => x.Name))
+                foreach (var target in targets)
                 {
                     await target.ImportAsync(syncService, syncOptions, session);
                 }

@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             baseUrl = Regex.Escape(baseUrl);
 
-            AddContentPattern(baseUrl + @"(.+)\/(.+)\/(?<Id>[a-z0-9\-_9]+)");
+            AddContentPattern(baseUrl + @"([^\/]+)\/([^\/]+)\/(?<Id>[a-z0-9\-_9]+)");
         }
 
         private void AddAssetUrlPatterns(string baseUrl)
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             baseUrl = Regex.Escape(baseUrl);
 
             AddAssetPattern(baseUrl + @"(?<Id>[a-z0-9\-_9]+)");
-            AddAssetPattern(baseUrl + @"(.+)\/(?<Id>[a-z0-9\-_9]+)");
+            AddAssetPattern(baseUrl + @"([^\/]+)\/(?<Id>[a-z0-9\-_9]+)");
         }
 
         private void AddAssetPattern(string pattern)
