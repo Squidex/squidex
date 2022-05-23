@@ -77,7 +77,13 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     public writeValue(obj: any) {
-        this.value = Types.isString(obj) ? obj : '';
+        const newValue = Types.isString(obj) ? obj : '';
+
+        if (newValue === this.value) {
+            return;
+        }
+
+        this.value = newValue;
 
         if (this.simplemde) {
             this.simplemde.value(this.value);
