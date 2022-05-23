@@ -228,7 +228,13 @@ export class RichEditorComponent extends StatefulControlComponent<{}, string> im
     }
 
     public writeValue(obj: any) {
-        this.value = Types.isString(obj) ? obj : '';
+        const newValue = Types.isString(obj) ? obj : '';
+
+        if (newValue == this.value) {
+            return;
+        }
+
+        this.value = newValue;
 
         if (this.tinyEditor && this.tinyEditor.initialized) {
             this.setContent();
