@@ -142,19 +142,21 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 Response.Headers[HeaderNames.CacheControl] = $"public,max-age={request.CacheDuration}";
             }
 
-            var resizeOptions = request.ToResizeOptions(asset);
+            var resizeOptions = request.ToResizeOptions(asset, HttpContext.Request);
 
             var contentLength = (long?)null;
             var contentCallback = (FileCallback?)null;
-            var contentType = request.Format?.ToMimeType() ?? asset.MimeType;
+            var contentType = asset.MimeType;
 
-            if (asset.Type == AssetType.Image && resizeOptions.IsValid)
+            if (asset.Type == AssetType.Image && assetThumbnailGenerator.IsResizable(asset.MimeType, resizeOptions, out var destinationMimeType))
             {
+                contentType = destinationMimeType!;
+
                 contentCallback = async (body, range, ct) =>
                 {
                     var suffix = resizeOptions.ToString();
 
-                    if (request.ForceResize)
+                    if (request.Force)
                     {
                         using (Telemetry.Activities.StartActivity("Resize"))
                         {

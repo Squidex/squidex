@@ -82,10 +82,16 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public bool IgnoreFocus { get; set; }
 
         /// <summary>
+        /// True to use auto format.
+        /// </summary>
+        [FromQuery(Name = "auto")]
+        public bool Auto { get; set; }
+
+        /// <summary>
         /// True to force a new resize even if it already stored.
         /// </summary>
         [FromQuery(Name = "force")]
-        public bool ForceResize { get; set; }
+        public bool Force { get; set; }
 
         /// <summary>
         /// True to force a new resize even if it already stored.
@@ -93,7 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [FromQuery(Name = "format")]
         public ImageFormat? Format { get; set; }
 
-        public ResizeOptions ToResizeOptions(IAssetEntity asset)
+        public ResizeOptions ToResizeOptions(IAssetEntity asset, HttpRequest request)
         {
             Guard.NotNull(asset);
 
@@ -105,6 +111,23 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             result.FocusY = y;
             result.TargetWidth = Width;
             result.TargetHeight = Height;
+
+            if (Auto && request.Headers.TryGetValue("Accept", out var accept))
+            {
+                var formats = new List<ImageFormat>();
+
+                if (accept.Any(x => x.Contains("image/avif", StringComparison.OrdinalIgnoreCase)))
+                {
+                    formats.Add(ImageFormat.AVIF);
+                }
+
+                if (accept.Any(x => x.Contains("image/webp", StringComparison.OrdinalIgnoreCase)))
+                {
+                    formats.Add(ImageFormat.WEBP);
+                }
+
+                result.Formats = formats.ToArray();
+            }
 
             return result;
         }
