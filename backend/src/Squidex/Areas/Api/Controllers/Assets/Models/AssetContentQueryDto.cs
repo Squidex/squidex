@@ -111,12 +111,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             result.FocusY = y;
             result.TargetWidth = Width;
             result.TargetHeight = Height;
-            result.Format = GetFormat(assetThumbnailGenerator, request);
+            result.Format = GetFormat(asset, assetThumbnailGenerator, request);
 
             return result;
         }
 
-        private ImageFormat? GetFormat(IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
+        private ImageFormat? GetFormat(IAssetEntity asset, IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
         {
             if (Format.HasValue || !Auto)
             {
@@ -125,6 +125,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             bool Accepts(string mimeType)
             {
+                if (string.Equals(asset.MimeType, mimeType, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
                 request.Headers.TryGetValue("Accept", out var accept);
 
                 return accept.Any(x => x.Contains(mimeType, StringComparison.OrdinalIgnoreCase)) && assetThumbnailGenerator.CanReadAndWrite(mimeType);
