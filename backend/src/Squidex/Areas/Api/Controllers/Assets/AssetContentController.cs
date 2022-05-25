@@ -142,7 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 Response.Headers[HeaderNames.CacheControl] = $"public,max-age={request.CacheDuration}";
             }
 
-            var resizeOptions = request.ToResizeOptions(asset, HttpContext.Request);
+            var resizeOptions = request.ToResizeOptions(asset, assetThumbnailGenerator, HttpContext.Request);
 
             var contentLength = (long?)null;
             var contentCallback = (FileCallback?)null;

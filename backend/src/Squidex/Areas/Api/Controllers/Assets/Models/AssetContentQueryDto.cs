@@ -99,7 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [FromQuery(Name = "format")]
         public ImageFormat? Format { get; set; }
 
-        public ResizeOptions ToResizeOptions(IAssetEntity asset, HttpRequest request)
+        public ResizeOptions ToResizeOptions(IAssetEntity asset, IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
         {
             Guard.NotNull(asset);
 
@@ -111,43 +111,56 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             result.FocusY = y;
             result.TargetWidth = Width;
             result.TargetHeight = Height;
-
-            if (Auto && request.Headers.TryGetValue("Accept", out var accept))
-            {
-                var formats = new List<ImageFormat>();
-
-                if (accept.Any(x => x.Contains("image/avif", StringComparison.OrdinalIgnoreCase)))
-                {
-                    formats.Add(ImageFormat.AVIF);
-                }
-
-                if (accept.Any(x => x.Contains("image/webp", StringComparison.OrdinalIgnoreCase)))
-                {
-                    formats.Add(ImageFormat.WEBP);
-                }
-
-                result.Formats = formats.ToArray();
-            }
+            result.Format = GetFormat(assetThumbnailGenerator, request);
 
             return result;
         }
 
+        private ImageFormat? GetFormat(IAssetThumbnailGenerator assetThumbnailGenerator, HttpRequest request)
+        {
+            if (Format.HasValue || !Auto)
+            {
+                return Format;
+            }
+
+            bool Accepts(string mimeType)
+            {
+                request.Headers.TryGetValue("Accept", out var accept);
+
+                return accept.Any(x => x.Contains(mimeType, StringComparison.OrdinalIgnoreCase)) && assetThumbnailGenerator.CanReadAndWrite(mimeType);
+            }
+
+            if (Accepts("image/avif"))
+            {
+                return ImageFormat.AVIF;
+            }
+
+            if (Accepts("image/webp"))
+            {
+                return ImageFormat.WEBP;
+            }
+
+            return Format;
+        }
+
         private (float?, float?) GetFocusPoint(IAssetEntity asset)
         {
-            if (!IgnoreFocus)
+            if (IgnoreFocus)
             {
-                if (FocusX != null && FocusY != null)
-                {
-                    return (FocusX.Value, FocusY.Value);
-                }
+                return (null, null);
+            }
 
-                var focusX = asset.Metadata.GetFocusX();
-                var focusY = asset.Metadata.GetFocusY();
+            if (FocusX != null && FocusY != null)
+            {
+                return (FocusX.Value, FocusY.Value);
+            }
 
-                if (focusX != null && focusY != null)
-                {
-                    return (focusX.Value, focusY.Value);
-                }
+            var focusX = asset.Metadata.GetFocusX();
+            var focusY = asset.Metadata.GetFocusY();
+
+            if (focusX != null && focusY != null)
+            {
+                return (focusX.Value, focusY.Value);
             }
 
             return (null, null);
