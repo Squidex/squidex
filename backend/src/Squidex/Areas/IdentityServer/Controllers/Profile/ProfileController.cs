@@ -62,7 +62,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             var userId = userService.GetUserId(User, HttpContext.RequestAborted);
 
             var challengeRedirectUrl = Url.Action(nameof(AddLoginCallback));
-            var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, userId);
+            var challengeProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, challengeRedirectUrl, userId);
 
             return Challenge(challengeProperties, provider);
         }
