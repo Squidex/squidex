@@ -129,12 +129,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
                 return accept.Any(x => x.Contains(mimeType, StringComparison.OrdinalIgnoreCase)) && assetThumbnailGenerator.CanReadAndWrite(mimeType);
             }
-
+#if ENABLE_AVIF
             if (Accepts("image/avif"))
             {
                 return ImageFormat.AVIF;
             }
-
+#endif
             if (Accepts("image/webp"))
             {
                 return ImageFormat.WEBP;
