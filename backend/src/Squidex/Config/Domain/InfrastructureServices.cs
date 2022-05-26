@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Dump;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
@@ -50,6 +51,9 @@ namespace Squidex.Config.Domain
             services.Configure<JintScriptOptions>(config,
                 "scripting");
 
+            services.Configure<DumperOptions>(config,
+                "diagnostics");
+
             services.AddReplicatedCache();
             services.AddAsyncLocalCache();
             services.AddBackgroundCache();
@@ -62,6 +66,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<BackgroundRequestLogStore>()
                 .AsOptional<IRequestLogStore>();
+
+            services.AddSingletonAs<Dumper>()
+                .AsSelf();
 
             services.AddSingletonAs<ScriptingCompleter>()
                 .AsSelf();
