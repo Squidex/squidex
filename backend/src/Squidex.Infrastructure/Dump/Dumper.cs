@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Dump
         public Task InitializeAsync(
             CancellationToken ct)
         {
-            if (options.DumpLimit > 0 || options.GCDumpLimit > 0)
+            if (options.DumTrigger > 0 || options.GCDumpTrigger > 0)
             {
                 timer = new Timer(CollectDump);
                 timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(5));
@@ -70,12 +70,12 @@ namespace Squidex.Infrastructure.Dump
             {
                 var usage = GC.GetTotalMemory(false) / (1024 * 1024);
 
-                if (options.DumpLimit > 0 && usage > options.DumpLimit && scheduledDumpTask == null)
+                if (options.DumTrigger > 0 && usage > options.DumTrigger && scheduledDumpTask == null)
                 {
                     scheduledDumpTask = CreateDumpAsync();
                 }
 
-                if (options.GCDumpLimit > 0 && usage > options.GCDumpLimit && scheduledGcDumpTask == null)
+                if (options.GCDumpTrigger > 0 && usage > options.GCDumpTrigger && scheduledGcDumpTask == null)
                 {
                     scheduledGcDumpTask = CreateGCDumpAsync();
                 }
