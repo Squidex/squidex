@@ -66,16 +66,25 @@ namespace Squidex.Infrastructure.Dump
 
         private void CollectDump(object? state)
         {
-            var usage = GC.GetTotalMemory(false) / (1024 * 1024);
-
-            if (options.DumpLimit > 0 && usage > options.DumpLimit && scheduledDumpTask == null)
+            try
             {
-                scheduledDumpTask = CreateDumpAsync();
+                var usage = GC.GetTotalMemory(false) / (1024 * 1024);
+
+                if (options.DumpLimit > 0 && usage > options.DumpLimit && scheduledDumpTask == null)
+                {
+                    scheduledDumpTask = CreateDumpAsync();
+                }
+
+                if (options.GCDumpLimit > 0 && usage > options.GCDumpLimit && scheduledGcDumpTask == null)
+                {
+                    scheduledGcDumpTask = CreateGCDumpAsync();
+                }
             }
-
-            if (options.GCDumpLimit > 0 && usage > options.GCDumpLimit && scheduledGcDumpTask == null)
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+            catch
+#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
             {
-                scheduledGcDumpTask = CreateGCDumpAsync();
+
             }
         }
 
