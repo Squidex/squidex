@@ -48,10 +48,8 @@ WORKDIR /src
 
 ENV CONTINUOUS_INTEGRATION=1
 
-# Copy Node project files.
+# Copy Node project files and patches
 COPY frontend/package*.json /tmp/
-
-# Copy patches for broken npm packages
 COPY frontend/patches /tmp/patches
 
 # Install Node packages 
@@ -72,7 +70,7 @@ RUN cp -a build /build/
 #
 FROM mcr.microsoft.com/dotnet/aspnet:6.0.0-bullseye-slim
 
-# Curl for debugging and libc-dev for Protobuf
+# Curl for debugging and libc-dev for protobuf
 RUN apt-get update \
  && apt-get install -y curl libc-dev
 
@@ -80,15 +78,15 @@ RUN apt-get update \
 WORKDIR /tools
 
 # Copy tools from backend build stage.
-COPY --from=build-env /tools .
+COPY --from=backend /tools .
 
-# Default AspNetCore directory
+# Default app directory
 WORKDIR /app
 
-# Copy from backend build stages
+# Copy backend files
 COPY --from=backend /build/ .
 
-# Copy from backend build stages to webserver folder
+# Copy frontend files to backend folder.
 COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80
