@@ -124,11 +124,9 @@ namespace Squidex.Infrastructure.Dump
 
                 await process.WaitForExitAsync(ctl.Token);
 
-                var isSucceess = process.ExitCode == 0;
-
-                if (!isSucceess)
+                if (process.ExitCode != 0)
                 {
-                    return false;
+                    throw new InvalidOperationException($"Failed to execute tool. Got exit code: {process.ExitCode}.");
                 }
 
                 await using (var fs = new FileStream(writtenFile, FileMode.Open))

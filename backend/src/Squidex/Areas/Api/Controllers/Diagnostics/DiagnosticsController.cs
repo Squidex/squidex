@@ -32,13 +32,19 @@ namespace Squidex.Areas.Api.Controllers.Diagnostics
         /// </summary>
         /// <returns>
         /// 204 => Dump created successful.
+        /// 501 => Not configured.
         /// </returns>
         [HttpGet]
         [Route("diagnostics/dump")]
         [ApiPermissionOrAnonymous(Permissions.Admin)]
         public async Task<IActionResult> GetDump()
         {
-            await dumper.CreateDumpAsync(HttpContext.RequestAborted);
+            var success = await dumper.CreateDumpAsync(HttpContext.RequestAborted);
+
+            if (!success)
+            {
+                return StatusCode(501);
+            }
 
             return NoContent();
         }
@@ -48,13 +54,19 @@ namespace Squidex.Areas.Api.Controllers.Diagnostics
         /// </summary>
         /// <returns>
         /// 204 => Dump created successful.
+        /// 501 => Not configured.
         /// </returns>
         [HttpGet]
         [Route("diagnostics/gc-dump")]
         [ApiPermissionOrAnonymous(Permissions.Admin)]
         public async Task<IActionResult> GetGCDump()
         {
-            await dumper.CreateGCDumpAsync(HttpContext.RequestAborted);
+            var success = await dumper.CreateGCDumpAsync(HttpContext.RequestAborted);
+
+            if (!success)
+            {
+                return StatusCode(501);
+            }
 
             return NoContent();
         }
