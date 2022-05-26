@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Dump;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -19,9 +19,9 @@ namespace Squidex.Areas.Api.Controllers.Diagnostics
     [ApiExplorerSettings(GroupName = nameof(Diagnostics))]
     public sealed class DiagnosticsController : ApiController
     {
-        private readonly Dumper dumper;
+        private readonly Diagnoser dumper;
 
-        public DiagnosticsController(ICommandBus commandBus, Dumper dumper)
+        public DiagnosticsController(ICommandBus commandBus, Diagnoser dumper)
             : base(commandBus)
         {
             this.dumper = dumper;
@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Diagnostics
         /// 501 => Not configured.
         /// </returns>
         [HttpGet]
-        [Route("diagnostics/gc-dump")]
+        [Route("diagnostics/gcdump")]
         [ApiPermissionOrAnonymous(Permissions.Admin)]
         public async Task<IActionResult> GetGCDump()
         {

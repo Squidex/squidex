@@ -10,12 +10,12 @@ using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Hosting;
 
-namespace Squidex.Infrastructure.Dump
+namespace Squidex.Infrastructure.Diagnostics
 {
-    public sealed class Dumper : IInitializable
+    public sealed class Diagnoser : IInitializable
     {
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(30);
-        private readonly DumperOptions options;
+        private readonly DiagnoserOptions options;
         private readonly IAssetStore assetStore;
         private Task? scheduledGcDumpTask;
         private Task? scheduledDumpTask;
@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Dump
 
         public int Order => int.MaxValue;
 
-        public Dumper(IOptions<DumperOptions> options, IAssetStore assetStore)
+        public Diagnoser(IOptions<DiagnoserOptions> options, IAssetStore assetStore)
         {
             this.options = options.Value;
             this.assetStore = assetStore;
@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Dump
         public Task InitializeAsync(
             CancellationToken ct)
         {
-            if (options.DumTrigger > 0 || options.GCDumpTrigger > 0)
+            if (options.DumpTrigger > 0 || options.GCDumpTrigger > 0)
             {
                 timer = new Timer(CollectDump);
                 timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(5));
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.Dump
             {
                 var usage = GC.GetTotalMemory(false) / (1024 * 1024);
 
-                if (options.DumTrigger > 0 && usage > options.DumTrigger && scheduledDumpTask == null)
+                if (options.DumpTrigger > 0 && usage > options.DumpTrigger && scheduledDumpTask == null)
                 {
                     scheduledDumpTask = CreateDumpAsync();
                 }
@@ -84,7 +84,6 @@ namespace Squidex.Infrastructure.Dump
             catch
 #pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
             {
-
             }
         }
 
