@@ -39,7 +39,12 @@ namespace Squidex.Areas.Api.Config.OpenApi
             context.Document.Info.Version = version;
             context.Document.Info.ExtensionData = new Dictionary<string, object>
             {
-                ["x-logo"] = new { url = logoUrl, backgroundColor = logoBackground }
+                ["x-logo"] = new
+                {
+                    url = logoUrl,
+                    backgroundStyle = string.Empty,
+                    backgroundColor = logoBackground
+                }
             };
 
             context.Document.ExternalDocumentation = documentation;

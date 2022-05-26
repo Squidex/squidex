@@ -61,6 +61,11 @@ namespace Squidex.Infrastructure.UsageTracking
 
                     foreach (var (key, value) in localUsages)
                     {
+                        if (updateIndex >= updates.Length)
+                        {
+                            break;
+                        }
+
                         updates[updateIndex].Key = key.Key;
                         updates[updateIndex].Category = key.Category;
                         updates[updateIndex].Counters = value;
