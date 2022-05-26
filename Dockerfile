@@ -32,6 +32,12 @@ RUN dotnet test --no-restore --filter Category!=Dependencies
 # Publish
 RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__VERSION
 
+# Install tools
+RUN dotnet tool install --tool-path /tools dotnet-counters \
+ && dotnet tool install --tool-path /tools dotnet-dump \
+ && dotnet tool install --tool-path /tools dotnet-gcdump \
+ && dotnet tool install --tool-path /tools dotnet-trace
+
 
 #
 # Stage 2, Build Frontend
@@ -70,6 +76,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0.0-bullseye-slim
 RUN apt-get update \
  && apt-get install -y curl libc-dev
 
+# Default tool directory
+WORKDIR /tools
+
+# Copy tools from backend build stage.
+COPY --from=build-env /tools .
+
 # Default AspNetCore directory
 WORKDIR /app
 
@@ -81,5 +93,10 @@ COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80
 EXPOSE 11111
+
+ENV DIAGNOSTICS__GCDUMPTOOL=/TOOLS/DOTNET-GCDUMP
+ENV DIAGNOSTICS__DUMPTOOL=/TOOLS/DOTNET-DUMP
+ENV DIAGNOSTICS__TRACETOOL=/TOOLS/DOTNET-TRACE
+ENV DIAGNOSTICS__COUNTERSTOOL=/TOOLS/DOTNET-COUNTERS
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
