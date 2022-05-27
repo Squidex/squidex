@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public FieldGraphSchema Visit(IField<BooleanFieldProperties> field, FieldInfo args)
         {
-            return new (AllTypes.Boolean, JsonBoolean, null);
+            return new (Scalars.Boolean, JsonBoolean, null);
         }
 
         public FieldGraphSchema Visit(IField<ComponentFieldProperties> field, FieldInfo args)
@@ -155,27 +155,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public FieldGraphSchema Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
-            return new (AllTypes.DateTime, JsonDateTime, null);
+            return new (Scalars.DateTime, JsonDateTime, null);
         }
 
         public FieldGraphSchema Visit(IField<JsonFieldProperties> field, FieldInfo args)
         {
-            return new (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
+            return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);
         }
 
         public FieldGraphSchema Visit(IField<GeolocationFieldProperties> field, FieldInfo args)
         {
-            return new (AllTypes.Json, JsonPath, ContentActions.Json.Arguments);
+            return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);
         }
 
         public FieldGraphSchema Visit(IField<NumberFieldProperties> field, FieldInfo args)
         {
-            return new (AllTypes.Float, JsonNumber, null);
+            return new (Scalars.Float, JsonNumber, null);
         }
 
         public FieldGraphSchema Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
-            var type = AllTypes.String;
+            var type = Scalars.String;
 
             if (field.Properties.IsEmbeddable)
             {
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public FieldGraphSchema Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
-            var type = AllTypes.Strings;
+            var type = Scalars.Strings;
 
             if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {

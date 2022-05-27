@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.String)
+                new QueryArgument(Scalars.String)
                 {
                     Name = "path",
                     Description = FieldDescriptions.JsonPath,
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.NonNullString)
+                new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "id",
                     Description = "The id of the asset (usually GUID).",
@@ -67,25 +67,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.Int)
+                new QueryArgument(Scalars.Int)
                 {
                     Name = "top",
                     Description = "Optional number of assets to take.",
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.Int)
+                new QueryArgument(Scalars.Int)
                 {
                     Name = "skip",
                     Description = "Optional number of assets to skip.",
                     DefaultValue = 0
                 },
-                new QueryArgument(AllTypes.String)
+                new QueryArgument(Scalars.String)
                 {
                     Name = "filter",
                     Description = "Optional OData filter.",
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.String)
+                new QueryArgument(Scalars.String)
                 {
                     Name = "orderby",
                     Description = "Optional OData order definition.",

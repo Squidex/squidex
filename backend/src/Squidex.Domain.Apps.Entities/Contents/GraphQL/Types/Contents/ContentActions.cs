@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.String)
+                new QueryArgument(Scalars.String)
                 {
                     Name = "path",
                     Description = FieldDescriptions.JsonPath,
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public static readonly QueryArguments JsonPath = new QueryArguments
         {
-            new QueryArgument(AllTypes.String)
+            new QueryArgument(Scalars.String)
             {
                 Name = "path",
                 Description = FieldDescriptions.JsonPath,
@@ -63,13 +63,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.NonNullString)
+                new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "id",
                     Description = FieldDescriptions.EntityId,
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.Int)
+                new QueryArgument(Scalars.Int)
                 {
                     Name = "version",
                     Description = FieldDescriptions.QueryVersion,
@@ -101,31 +101,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.Int)
+                new QueryArgument(Scalars.Int)
                 {
                     Name = "top",
                     Description = FieldDescriptions.QueryTop,
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.Int)
+                new QueryArgument(Scalars.Int)
                 {
                     Name = "skip",
                     Description = FieldDescriptions.QuerySkip,
                     DefaultValue = 0
                 },
-                new QueryArgument(AllTypes.String)
+                new QueryArgument(Scalars.String)
                 {
                     Name = "filter",
                     Description = FieldDescriptions.QueryFilter,
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.String)
+                new QueryArgument(Scalars.String)
                 {
                     Name = "orderby",
                     Description = FieldDescriptions.QueryOrderBy,
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.String)
+                new QueryArgument(Scalars.String)
                 {
                     Name = "search",
                     Description = FieldDescriptions.QuerySearch,
@@ -206,19 +206,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Description = FieldDescriptions.ContentRequestData,
                         DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.Boolean)
+                    new QueryArgument(Scalars.Boolean)
                     {
                         Name = "publish",
                         Description = FieldDescriptions.ContentRequestPublish,
                         DefaultValue = false
                     },
-                    new QueryArgument(AllTypes.String)
+                    new QueryArgument(Scalars.String)
                     {
                         Name = "status",
                         Description = FieldDescriptions.ContentRequestOptionalStatus,
                         DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.String)
+                    new QueryArgument(Scalars.String)
                     {
                         Name = "id",
                         Description = FieldDescriptions.ContentRequestOptionalId,
@@ -259,7 +259,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    new QueryArgument(AllTypes.NonNullString)
+                    new QueryArgument(Scalars.NonNullString)
                     {
                         Name = "id",
                         Description = FieldDescriptions.EntityId,
@@ -271,25 +271,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Description = FieldDescriptions.ContentRequestData,
                         DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.Boolean)
+                    new QueryArgument(Scalars.Boolean)
                     {
                         Name = "publish",
                         Description = FieldDescriptions.ContentRequestPublish,
                         DefaultValue = false
                     },
-                    new QueryArgument(AllTypes.Boolean)
+                    new QueryArgument(Scalars.Boolean)
                     {
                         Name = "patch",
                         Description = FieldDescriptions.ContentRequestPatch,
                         DefaultValue = false
                     },
-                    new QueryArgument(AllTypes.String)
+                    new QueryArgument(Scalars.String)
                     {
                         Name = "status",
                         Description = FieldDescriptions.ContentRequestOptionalStatus,
                         DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.Int)
+                    new QueryArgument(Scalars.Int)
                     {
                         Name = "expectedVersion",
                         Description = FieldDescriptions.EntityExpectedVersion,
@@ -326,7 +326,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    new QueryArgument(AllTypes.String)
+                    new QueryArgument(Scalars.String)
                     {
                         Name = "id",
                         Description = FieldDescriptions.EntityId,
@@ -338,7 +338,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Description = FieldDescriptions.ContentRequestData,
                         DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.Int)
+                    new QueryArgument(Scalars.Int)
                     {
                         Name = "expectedVersion",
                         Description = FieldDescriptions.EntityExpectedVersion,
@@ -362,7 +362,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 return new QueryArguments
                 {
-                    new QueryArgument(AllTypes.String)
+                    new QueryArgument(Scalars.String)
                     {
                         Name = "id",
                         Description = FieldDescriptions.EntityId,
@@ -374,7 +374,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                         Description = FieldDescriptions.ContentRequestData,
                         DefaultValue = null
                     },
-                    new QueryArgument(AllTypes.Int)
+                    new QueryArgument(Scalars.Int)
                     {
                         Name = "expectedVersion",
                         Description = FieldDescriptions.EntityExpectedVersion,
@@ -396,25 +396,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.NonNullString)
+                new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "id",
                     Description = FieldDescriptions.EntityId,
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.NonNullString)
+                new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "status",
                     Description = FieldDescriptions.ContentRequestStatus,
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.DateTime)
+                new QueryArgument(Scalars.DateTime)
                 {
                     Name = "dueTime",
                     Description = FieldDescriptions.ContentRequestDueTime,
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.Int)
+                new QueryArgument(Scalars.Int)
                 {
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
@@ -436,13 +436,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             public static readonly QueryArguments Arguments = new QueryArguments
             {
-                new QueryArgument(AllTypes.NonNullString)
+                new QueryArgument(Scalars.NonNullString)
                 {
                     Name = "id",
                     Description = "The id of the content (usually GUID).",
                     DefaultValue = null
                 },
-                new QueryArgument(AllTypes.Int)
+                new QueryArgument(Scalars.Int)
                 {
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,

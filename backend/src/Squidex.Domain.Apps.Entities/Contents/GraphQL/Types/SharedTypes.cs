@@ -20,10 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType AssetsResult = new AssetsResultGraphType(AssetsList);
 
-        public static readonly IInterfaceGraphType ContentInterface = new ContentInterfaceGraphType();
-
-        public static readonly IInterfaceGraphType ComponentInterface = new ComponentInterfaceGraphType();
-
         public static readonly CacheDirective MemoryCacheDirective = new CacheDirective();
 
         public static readonly FieldType FindAsset = new FieldType

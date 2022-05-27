@@ -36,6 +36,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             ValueConverter.Register<string, Status>(x => new Status(x));
         }
 
+        public IInterfaceGraphType ContentInterface { get; } = new ContentInterfaceGraphType();
+
+        public IInterfaceGraphType ComponentInterface { get; } = new ComponentInterfaceGraphType();
+
         public Builder(IAppEntity app)
         {
             partitionResolver = app.PartitionResolver();
@@ -72,8 +76,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Query = new AppQueriesGraphType(this, schemaInfos)
             };
 
-            newSchema.RegisterType(SharedTypes.ComponentInterface);
-            newSchema.RegisterType(SharedTypes.ContentInterface);
+            newSchema.RegisterType(ComponentInterface);
+            newSchema.RegisterType(ContentInterface);
 
             newSchema.Directives.Register(SharedTypes.MemoryCacheDirective);
 

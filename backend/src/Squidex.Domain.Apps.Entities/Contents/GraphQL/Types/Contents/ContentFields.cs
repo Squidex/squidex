@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType Id = new FieldType
         {
             Name = "id",
-            ResolvedType = AllTypes.NonNullString,
+            ResolvedType = Scalars.NonNullString,
             Resolver = EntityResolvers.Id,
             Description = FieldDescriptions.EntityId
         };
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType Version = new FieldType
         {
             Name = "version",
-            ResolvedType = AllTypes.NonNullInt,
+            ResolvedType = Scalars.NonNullInt,
             Resolver = EntityResolvers.Version,
             Description = FieldDescriptions.EntityVersion
         };
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType Created = new FieldType
         {
             Name = "created",
-            ResolvedType = AllTypes.NonNullDateTime,
+            ResolvedType = Scalars.NonNullDateTime,
             Resolver = EntityResolvers.Created,
             Description = FieldDescriptions.EntityCreated
         };
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType CreatedBy = new FieldType
         {
             Name = "createdBy",
-            ResolvedType = AllTypes.NonNullString,
+            ResolvedType = Scalars.NonNullString,
             Resolver = EntityResolvers.CreatedBy,
             Description = FieldDescriptions.EntityCreatedBy
         };
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType LastModified = new FieldType
         {
             Name = "lastModified",
-            ResolvedType = AllTypes.NonNullDateTime,
+            ResolvedType = Scalars.NonNullDateTime,
             Resolver = EntityResolvers.LastModified,
             Description = FieldDescriptions.EntityLastModified
         };
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType LastModifiedBy = new FieldType
         {
             Name = "lastModifiedBy",
-            ResolvedType = AllTypes.NonNullString,
+            ResolvedType = Scalars.NonNullString,
             Resolver = EntityResolvers.LastModifiedBy,
             Description = FieldDescriptions.EntityLastModifiedBy
         };
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType Status = new FieldType
         {
             Name = "status",
-            ResolvedType = AllTypes.NonNullString,
+            ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.Status.ToString().ToUpperInvariant()),
             Description = FieldDescriptions.ContentStatus
         };
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType StatusColor = new FieldType
         {
             Name = "statusColor",
-            ResolvedType = AllTypes.NonNullString,
+            ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.StatusColor),
             Description = FieldDescriptions.ContentStatusColor
         };
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType NewStatus = new FieldType
         {
             Name = "newStatus",
-            ResolvedType = AllTypes.String,
+            ResolvedType = Scalars.String,
             Resolver = Resolve(x => x.NewStatus?.ToString().ToUpperInvariant()),
             Description = FieldDescriptions.ContentNewStatus
         };
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType NewStatusColor = new FieldType
         {
             Name = "newStatusColor",
-            ResolvedType = AllTypes.String,
+            ResolvedType = Scalars.String,
             Resolver = Resolve(x => x.NewStatusColor),
             Description = FieldDescriptions.ContentStatusColor
         };
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType SchemaId = new FieldType
         {
             Name = "schemaId",
-            ResolvedType = AllTypes.NonNullString,
+            ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x[Component.Discriminator].ToString()),
             Description = FieldDescriptions.ContentSchemaId
         };
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType Url = new FieldType
         {
             Name = "url",
-            ResolvedType = AllTypes.NonNullString,
+            ResolvedType = Scalars.NonNullString,
             Resolver = ContentResolvers.Url,
             Description = FieldDescriptions.ContentUrl
         };
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType EditToken = new FieldType
         {
             Name = "editToken",
-            ResolvedType = AllTypes.String,
+            ResolvedType = Scalars.String,
             Resolver = Resolve(x => x.EditToken),
             Description = FieldDescriptions.EditToken
         };
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         public static readonly FieldType StringFieldText = new FieldType
         {
             Name = "text",
-            ResolvedType = AllTypes.String,
+            ResolvedType = Scalars.String,
             Resolver = Resolvers.Sync<string, string>(x => x),
             Description = FieldDescriptions.StringFieldText
         };

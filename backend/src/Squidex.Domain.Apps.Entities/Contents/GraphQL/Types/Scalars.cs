@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public static class AllTypes
+    public static class Scalars
     {
         public static readonly IGraphType Int = new IntGraphType();
 
