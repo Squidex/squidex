@@ -83,13 +83,12 @@ COPY --from=backend /tools .
 # Default app directory
 WORKDIR /app
 
-# Copy backend files
+# Copy from build stages
 COPY --from=backend /build/ .
-
-# Copy frontend files to backend folder.
 COPY --from=frontend /build/ wwwroot/build/
 
 EXPOSE 80
+EXPOSE 443
 EXPOSE 11111
 
 ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters

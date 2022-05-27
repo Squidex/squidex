@@ -13,8 +13,8 @@ namespace Squidex.Infrastructure.Diagnostics
 
         public string? DumpTool { get; set; }
 
-        public int GCDumpTrigger { get; set; }
+        public int GCDumpTriggerInMB { get; set; }
 
-        public int DumpTrigger { get; set; }
+        public int DumpTriggerInMB { get; set; }
     }
 }

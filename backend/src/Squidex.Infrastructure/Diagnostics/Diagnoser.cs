@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Diagnostics
         public Task InitializeAsync(
             CancellationToken ct)
         {
-            if (options.DumpTrigger > 0 || options.GCDumpTrigger > 0)
+            if (options.DumpTriggerInMB > 0 || options.GCDumpTriggerInMB > 0)
             {
                 timer = new Timer(CollectDump);
                 timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(5));
@@ -70,12 +70,12 @@ namespace Squidex.Infrastructure.Diagnostics
             {
                 var workingSet = Process.GetCurrentProcess().WorkingSet64 / (1024 * 1024);
 
-                if (options.DumpTrigger > 0 && workingSet > options.DumpTrigger && scheduledDumpTask == null)
+                if (options.DumpTriggerInMB > 0 && workingSet > options.DumpTriggerInMB && scheduledDumpTask == null)
                 {
                     scheduledDumpTask = CreateDumpAsync();
                 }
 
-                if (options.GCDumpTrigger > 0 && workingSet > options.GCDumpTrigger && scheduledGcDumpTask == null)
+                if (options.GCDumpTriggerInMB > 0 && workingSet > options.GCDumpTriggerInMB && scheduledGcDumpTask == null)
                 {
                     scheduledGcDumpTask = CreateGCDumpAsync();
                 }

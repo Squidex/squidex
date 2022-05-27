@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Diagnostics
 
         public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
         {
-            threshold = 1024 * 1024 * options.Value.Threshold;
+            threshold = 1024 * 1024 * options.Value.ThresholdInMB;
         }
 
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
