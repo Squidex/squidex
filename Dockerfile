@@ -92,9 +92,9 @@ COPY --from=frontend /build/ wwwroot/build/
 EXPOSE 80
 EXPOSE 11111
 
-ENV DIAGNOSTICS__GCDUMPTOOL=/tools/dotnet-gcdump
-ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
-ENV DIAGNOSTICS__TRACETOOL=/tools/dotnet-trace
 ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters
+ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
+ENV DIAGNOSTICS__GCDUMPTOOL=/tools/dotnet-gcdump
+ENV DIAGNOSTICS__TRACETOOL=/tools/dotnet-trace
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
