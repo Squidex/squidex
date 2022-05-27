@@ -130,7 +130,7 @@ namespace Squidex.Infrastructure.Diagnostics
 
                 await using (var fs = new FileStream(writtenFile, FileMode.Open))
                 {
-                    var name = $"diagnostics/{extension}/{DateTime.UtcNow:yyyy-MM-dd-hh-mm-ss}.{extension}";
+                    var name = $"diagnostics/{extension}/{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.{extension}";
 
                     await assetStore.UploadAsync(name, fs, true, ctl.Token);
                 }
