@@ -1,0 +1,26 @@
+<li class="nav-item nav-icon dropdown position-relative" #button>
+    <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
+        <i class="icon-comments"></i>
+
+        <span class="badge rounded-pill badge-danger" *ngIf="unread">{{unread}}</span>
+    </span>
+</li>
+
+<ng-container *sqxModal="modalMenu;onRoot:false">
+    <sqx-dropdown-menu [scrollTop]="scrollMe.nativeElement.scrollHeight" [sqxAnchoredTo]="button" [offsetY]="10" #scrollMe>
+        <ng-container *ngIf="commentsState.comments | async; let comments">
+            <small class="text-muted" *ngIf="comments.length === 0">
+                {{ 'notifications.empty' | sqxTranslate}}
+            </small>
+
+            <sqx-comment *ngFor="let comment of comments; trackBy: trackByComment"
+                [comment]="comment"
+                [commentsState]="commentsState"
+                [confirmDelete]="false"
+                [canDelete]="true"
+                [canFollow]="true"
+                [userToken]="userToken">
+            </sqx-comment>
+        </ng-container>
+    </sqx-dropdown-menu>
+</ng-container>
