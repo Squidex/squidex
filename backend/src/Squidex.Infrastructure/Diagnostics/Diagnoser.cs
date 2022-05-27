@@ -68,14 +68,14 @@ namespace Squidex.Infrastructure.Diagnostics
         {
             try
             {
-                var usage = GC.GetTotalMemory(false) / (1024 * 1024);
+                var workingSet = Process.GetCurrentProcess().WorkingSet64 / (1024 * 1024);
 
-                if (options.DumpTrigger > 0 && usage > options.DumpTrigger && scheduledDumpTask == null)
+                if (options.DumpTrigger > 0 && workingSet > options.DumpTrigger && scheduledDumpTask == null)
                 {
                     scheduledDumpTask = CreateDumpAsync();
                 }
 
-                if (options.GCDumpTrigger > 0 && usage > options.GCDumpTrigger && scheduledGcDumpTask == null)
+                if (options.GCDumpTrigger > 0 && workingSet > options.GCDumpTrigger && scheduledGcDumpTask == null)
                 {
                     scheduledGcDumpTask = CreateGCDumpAsync();
                 }

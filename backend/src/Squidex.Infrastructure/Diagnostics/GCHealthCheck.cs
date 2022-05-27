@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace Squidex.Infrastructure.Diagnostics
 {
@@ -22,17 +23,20 @@ namespace Squidex.Infrastructure.Diagnostics
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
             CancellationToken cancellationToken = default)
         {
-            var allocated = GC.GetTotalMemory(false);
+            var workingSet = Process.GetCurrentProcess().WorkingSet64;
 
             var data = new Dictionary<string, object>
             {
-                { "Allocated", allocated.ToReadableSize() },
-                { "Gen0Collections", GC.CollectionCount(0) },
-                { "Gen1Collections", GC.CollectionCount(1) },
-                { "Gen2Collections", GC.CollectionCount(2) }
+                { "HeapSize", GC.GetTotalMemory(false) },
+                { "Gen0CollectionCount", GC.CollectionCount(0) },
+                { "Gen1CollectionCount", GC.CollectionCount(1) },
+                { "Gen2CollectionCount", GC.CollectionCount(2) },
+                { "WorkingSet", workingSet.ToReadableSize() }
             };
 
-            var status = allocated < threshold ? HealthStatus.Healthy : HealthStatus.Unhealthy;
+            var status = workingSet < threshold ?
+                HealthStatus.Healthy :
+                HealthStatus.Unhealthy;
 
             var message = $"Application must consume less than {threshold.ToReadableSize()} memory.";
 
