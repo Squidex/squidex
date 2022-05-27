@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             {
                 Name = "version",
                 Resolver = ResolveVersion(),
-                ResolvedType = AllTypes.NonNullLong,
+                ResolvedType = Scalars.NonNullLong,
                 Description = "The new version of the item."
             });
 

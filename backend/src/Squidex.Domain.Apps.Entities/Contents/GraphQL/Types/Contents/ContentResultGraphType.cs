@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             AddField(new FieldType
             {
                 Name = "total",
-                ResolvedType = AllTypes.NonNullInt,
+                ResolvedType = Scalars.NonNullInt,
                 Resolver = ContentResolvers.ListTotal,
                 Description = FieldDescriptions.ContentsTotal
             });

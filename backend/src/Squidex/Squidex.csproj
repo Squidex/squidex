@@ -109,10 +109,12 @@
     <EmbeddedResource Include="Pipeline\Squid\icon-sad-sm.svg" />
     <EmbeddedResource Include="Pipeline\Squid\icon-sad.svg" />
     <EmbeddedResource Remove="Assets\**" />
+    <EmbeddedResource Remove="wwwroot\build\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Assets\**" />
+    <Compile Remove="wwwroot\build\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -125,15 +127,16 @@
 
   <ItemGroup>
     <None Remove="Assets\**" />
+    <None Remove="wwwroot\build\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="Assets\**" />
+    <Content Remove="wwwroot\build\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Areas\Frontend\Resources\" />
-    <Folder Include="wwwroot\build\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 AddReferencesQueries(builder, other);
             }
 
-            AddResolvedInterface(SharedTypes.ContentInterface);
+            AddResolvedInterface(builder.ContentInterface);
 
             Description = $"The structure of a {schemaInfo.DisplayName} content type.";
         }

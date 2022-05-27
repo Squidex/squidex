@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Assets
             AddField(new FieldType
             {
                 Name = "total",
-                ResolvedType = AllTypes.NonNullInt,
+                ResolvedType = Scalars.NonNullInt,
                 Resolver = ResolveList(x => x.Total),
                 Description = FieldDescriptions.AssetsTotal
             });

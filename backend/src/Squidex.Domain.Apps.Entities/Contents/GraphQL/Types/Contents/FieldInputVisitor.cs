@@ -36,52 +36,52 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IGraphType? Visit(IField<AssetsFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Strings;
+            return Scalars.Strings;
         }
 
         public IGraphType? Visit(IField<BooleanFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Boolean;
+            return Scalars.Boolean;
         }
 
         public IGraphType? Visit(IField<ComponentFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Json;
+            return Scalars.Json;
         }
 
         public IGraphType? Visit(IField<ComponentsFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Json;
+            return Scalars.Json;
         }
 
         public IGraphType? Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.DateTime;
+            return Scalars.DateTime;
         }
 
         public IGraphType? Visit(IField<GeolocationFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Json;
+            return Scalars.Json;
         }
 
         public IGraphType? Visit(IField<JsonFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Json;
+            return Scalars.Json;
         }
 
         public IGraphType? Visit(IField<ReferencesFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Strings;
+            return Scalars.Strings;
         }
 
         public IGraphType? Visit(IField<NumberFieldProperties> field, FieldInfo args)
         {
-            return AllTypes.Float;
+            return Scalars.Float;
         }
 
         public IGraphType? Visit(IField<StringFieldProperties> field, FieldInfo args)
         {
-            var type = AllTypes.String;
+            var type = Scalars.String;
 
             if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         public IGraphType? Visit(IField<TagsFieldProperties> field, FieldInfo args)
         {
-            var type = AllTypes.Strings;
+            var type = Scalars.Strings;
 
             if (field.Properties?.AllowedValues?.Count > 0 && field.Properties.CreateEnum)
             {

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     {
                         Name = nestedFieldInfo.FieldNameDynamic,
                         Arguments = ContentActions.Json.Arguments,
-                        ResolvedType = AllTypes.Json,
+                        ResolvedType = Scalars.Json,
                         Resolver = FieldVisitor.JsonPath,
                         Description = nestedFieldInfo.Field.RawProperties.Hints
                     }).WithSourceName(nestedFieldInfo);

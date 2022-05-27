@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                     {
                         Name = fieldInfo.FieldNameDynamic,
                         Arguments = ContentActions.Json.Arguments,
-                        ResolvedType = AllTypes.Json,
+                        ResolvedType = Scalars.Json,
                         Resolver = FieldVisitor.JsonPath,
                         Description = fieldInfo.Field.RawProperties.Hints
                     }).WithSourceName(fieldInfo);
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             }
 
-            AddResolvedInterface(SharedTypes.ComponentInterface);
+            AddResolvedInterface(builder.ComponentInterface);
         }
 
         private static Func<object, bool> CheckType(string schemaId)

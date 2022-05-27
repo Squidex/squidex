@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "id",
                 Resolver = Resolve(x => x.Id),
-                ResolvedType = AllTypes.NonNullString,
+                ResolvedType = Scalars.NonNullString,
                 Description = FieldDescriptions.UserId
             });
 
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "displayName",
                 Resolver = Resolve(x => x.Claims.DisplayName()),
-                ResolvedType = AllTypes.String,
+                ResolvedType = Scalars.String,
                 Description = FieldDescriptions.UserDisplayName
             });
 
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "email",
                 Resolver = Resolve(x => x.Email),
-                ResolvedType = AllTypes.String,
+                ResolvedType = Scalars.String,
                 Description = FieldDescriptions.UserEmail
             });
 
