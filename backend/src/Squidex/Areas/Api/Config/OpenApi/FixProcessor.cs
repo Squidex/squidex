@@ -17,7 +17,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         public bool Process(OperationProcessorContext context)
         {
-            foreach (var parameter in context.Parameters.Values)
+            foreach (var (_, parameter) in context.Parameters)
             {
                 if (parameter.IsRequired && parameter.Schema != null && parameter.Schema.Type == JsonObjectType.String)
                 {

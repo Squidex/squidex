@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Core.GenerateFilters
 
             var nestedArgs = args with { Level = args.Level + 1 };
 
-            foreach (var schema in args.Components.Resolve(schemaIds).Values)
+            foreach (var (_, schema) in args.Components.Resolve(schemaIds))
             {
                 var componentName = schema.DisplayName();
 

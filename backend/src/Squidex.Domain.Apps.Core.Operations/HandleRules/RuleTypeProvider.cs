@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public void Map(TypeNameRegistry typeNameRegistry)
         {
-            foreach (var actionType in actionTypes.Values)
+            foreach (var (_, actionType) in actionTypes)
             {
                 typeNameRegistry.Map(actionType.Type, actionType.Type.Name);
             }

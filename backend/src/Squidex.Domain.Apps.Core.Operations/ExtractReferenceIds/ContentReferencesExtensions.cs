@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
                 if (value is JsonObject obj)
                 {
-                    foreach (var nested in obj.Values)
+                    foreach (var (_, nested) in obj)
                     {
                         if (CanHaveReference(nested))
                         {
@@ -43,7 +43,21 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return false;
             }
 
-            return source.Values.NotNull().SelectMany(x => x.Values).Any(CanHaveReference);
+            foreach (var (_, field) in source)
+            {
+                if (field != null)
+                {
+                    foreach (var (_, value) in field)
+                    {
+                        if (CanHaveReference(value))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         public static HashSet<DomainId> GetReferencedIds(this ContentData source, Schema schema,

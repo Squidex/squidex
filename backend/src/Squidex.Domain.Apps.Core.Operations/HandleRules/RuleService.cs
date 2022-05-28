@@ -339,7 +339,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public string GetName(AppEvent @event)
         {
-            foreach (var handler in ruleTriggerHandlers.Values)
+            foreach (var (_, handler) in ruleTriggerHandlers)
             {
                 if (handler.Handles(@event))
                 {

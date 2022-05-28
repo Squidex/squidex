@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 var languages = new Dictionary<string, StringBuilder>();
                 try
                 {
-                    foreach (var value in data.Values)
+                    foreach (var (_, value) in data)
                     {
                         if (value != null)
                         {
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
             else if (value is JsonObject obj)
             {
-                foreach (var item in obj.Values)
+                foreach (var (_, item) in obj)
                 {
                     AppendJsonText(languages, language, item);
                 }

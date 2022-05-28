@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                foreach (var value in data.Values)
+                foreach (var (_, value) in data)
                 {
                     if (value.Type == JsonValueType.Null)
                     {
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     }
                     else if (data.Count > 0)
                     {
-                        result[iv] = data.Values.First();
+                        result[iv] = data.First().Value;
                     }
 
                     return result;
