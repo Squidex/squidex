@@ -100,9 +100,24 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         return result;
                     }
 
-                    foreach (var key in data.Keys.Where(x => !languages.AllKeys.Contains(x)).ToList())
+                    while (true)
                     {
-                        data.Remove(key);
+                        var isRemoved = false;
+
+                        foreach (var (key, _) in data)
+                        {
+                            if (!languages.AllKeys.Contains(key))
+                            {
+                                data.Remove(key);
+                                isRemoved = true;
+                                break;
+                            }
+                        }
+
+                        if (!isRemoved)
+                        {
+                            break;
+                        }
                     }
                 }
 
@@ -164,11 +179,23 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
                 {
-                    foreach (var (key, _) in data.ToList())
+                    while (true)
                     {
-                        if (!languageSet.Contains(key))
+                        var isRemoved = false;
+
+                        foreach (var (key, _) in data)
                         {
-                            data.Remove(key);
+                            if (!languageSet.Contains(key))
+                            {
+                                data.Remove(key);
+                                isRemoved = true;
+                                break;
+                            }
+                        }
+
+                        if (!isRemoved)
+                        {
+                            break;
                         }
                     }
                 }
