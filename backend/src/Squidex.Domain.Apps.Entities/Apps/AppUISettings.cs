@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public async Task<JsonValue> GetAsync(DomainId appId, string? userId)
+        public async Task<JsonObject> GetAsync(DomainId appId, string? userId)
         {
             var result = await GetGrain(appId, userId).GetAsync();
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return GetGrain(appId, userId).SetAsync(path, value.AsJ());
         }
 
-        public Task SetAsync(DomainId appId, string? userId, JsonValue settings)
+        public Task SetAsync(DomainId appId, string? userId, JsonObject settings)
         {
             return GetGrain(appId, userId).SetAsync(settings.AsJ());
         }

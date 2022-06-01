@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task RestoreAsync(RestoreContext context,
             CancellationToken ct)
         {
-            var json = await context.Reader.ReadJsonAsync<JsonValue>(SettingsFile, ct);
+            var json = await context.Reader.ReadJsonAsync<JsonObject>(SettingsFile, ct);
 
             await appUISettings.SetAsync(context.AppId, null, json);
         }

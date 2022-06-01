@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
     internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
     {
-        public static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value);
+        public static readonly IFieldResolver JsonNoop = CreateValueResolver((value, fieldContext, contex) => value.RawValue);
         public static readonly IFieldResolver JsonPath = CreateValueResolver(ContentActions.Json.Resolver);
 
         private static readonly IFieldResolver JsonBoolean = CreateValueResolver((value, fieldContext, contex) =>
@@ -32,6 +32,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
             {
                 case JsonValueType.Boolean:
                     return value.AsBoolean;
+                default:
+                    throw new NotSupportedException();
+            }
+        });
+
+        private static readonly IFieldResolver JsonComponents = CreateValueResolver((value, fieldContext, contex) =>
+        {
+            switch (value.Type)
+            {
+                case JsonValueType.Array:
+                    return value.AsArray.Select(x => x.AsObject).ToList();
                 default:
                     throw new NotSupportedException();
             }
@@ -116,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            return new (new ListGraphType(new NonNullGraphType(type)), JsonNoop, null);
+            return new (new ListGraphType(new NonNullGraphType(type)), JsonComponents, null);
         }
 
         public FieldGraphSchema Visit(IField<AssetsFieldProperties> field, FieldInfo args)
@@ -150,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 return default;
             }
 
-            return new (new ListGraphType(new NonNullGraphType(type)), JsonNoop, null);
+            return new (new ListGraphType(new NonNullGraphType(type)), JsonComponents, null);
         }
 
         public FieldGraphSchema Visit(IField<DateTimeFieldProperties> field, FieldInfo args)
@@ -243,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (!union.HasType)
                 {
-                    return default;
+                    return null;
                 }
 
                 contentType = union;
@@ -267,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (!union.HasType)
                 {
-                    return default;
+                    return null;
                 }
 
                 componentType = union;
@@ -284,7 +295,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (source.TryGetValue(key, out var value))
                 {
-                    if (value.Type == JsonValueType.Number)
+                    if (value == JsonValue.Null)
                     {
                         return null;
                     }
@@ -304,7 +315,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
                 if (source.TryGetValue(key, out var value))
                 {
-                    if (value.Type == JsonValueType.Number)
+                    if (value == JsonValue.Null)
                     {
                         return null;
                     }

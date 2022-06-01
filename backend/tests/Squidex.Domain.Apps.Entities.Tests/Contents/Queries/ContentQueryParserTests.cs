@@ -299,9 +299,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         public async Task Should_convert_json_query_and_enrich_with_defaults()
         {
             var query = Q.Empty.WithJsonQuery(
-                new Query<IJsonValue>
+                new Query<JsonValue>
                 {
-                    Filter = new CompareFilter<IJsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
+                    Filter = new CompareFilter<JsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
                 });
 
             var q = await sut.ParseAsync(requestContext, query, schema);

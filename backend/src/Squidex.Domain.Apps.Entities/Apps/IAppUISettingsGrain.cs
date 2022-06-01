@@ -13,11 +13,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppUISettingsGrain : IGrainWithStringKey
     {
-        Task<J<JsonValue>> GetAsync();
+        Task<J<JsonObject>> GetAsync();
 
         Task SetAsync(string path, J<JsonValue> value);
 
-        Task SetAsync(J<JsonValue> settings);
+        Task SetAsync(J<JsonObject> settings);
 
         Task RemoveAsync(string path);
 

@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
     {
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
         {
+            FluidValue.SetTypeMapping<ContentData>(x => new ObjectValue(x));
             FluidValue.SetTypeMapping<ContentFieldData>(x => new ObjectValue(x));
             FluidValue.SetTypeMapping<JsonObject>(x => new ObjectValue(x));
             FluidValue.SetTypeMapping<JsonArray>(x => new JsonArrayFluidValue(x));
@@ -60,8 +61,6 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
             memberAccessStrategy.Register<JsonObject, object?>(
                 (value, name) => value.GetOrDefault(name).RawValue);
-
-            memberAccessStrategy.Register<ContentData>();
         }
     }
 }

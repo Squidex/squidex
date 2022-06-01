@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject
             new ContentData()
                 .AddField("my-field1",
                 new ContentFieldData()
-                        .AddInvariant(null))
+                        .AddInvariant(JsonValue.Null))
                 .AddField("my-field2",
                     new ContentFieldData()
                         .AddInvariant(1));

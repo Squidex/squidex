@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         private static bool TryGetFirst(ContentFieldData? fieldData, string fallback, out JsonValue result)
         {
-            result = default;
+            result = JsonValue.Null;
 
             if (fieldData == null)
             {

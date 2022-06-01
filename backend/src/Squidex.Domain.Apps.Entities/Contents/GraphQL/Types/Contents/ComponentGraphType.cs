@@ -64,12 +64,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             return value =>
             {
-                if (value is not JsonValue json)
+                if (value is not JsonObject json)
                 {
                     return false;
                 }
 
-                return Component.IsValid(json, out var discrimiator) && discrimiator == schemaId;
+                return Component.IsValid(json, out var discriminator) && discriminator == schemaId;
             };
         }
     }

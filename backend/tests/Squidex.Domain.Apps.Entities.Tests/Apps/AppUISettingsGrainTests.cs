@@ -25,12 +25,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_set_setting()
         {
-            await sut.SetAsync(JsonValue.Object().Add("key", 15).AsJ());
+            await sut.SetAsync(new JsonObject().Add("key", 15).AsJ());
 
             var actual = await sut.GetAsync();
 
             var expected =
-                JsonValue.Object().Add("key", 15);
+                new JsonObject().Add("key", 15);
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var actual = await sut.GetAsync();
 
             var expected =
-                JsonValue.Object().Add("key", 123);
+                new JsonObject().Add("key", 123);
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var actual = await sut.GetAsync();
 
-            var expected = JsonValue.Object();
+            var expected = new JsonObject();
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
 
@@ -79,8 +79,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var actual = await sut.GetAsync();
 
             var expected =
-                JsonValue.Object().Add("root",
-                    JsonValue.Object().Add("nested", 123));
+                new JsonObject().Add("root",
+                    new JsonObject().Add("nested", 123));
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
 
@@ -98,8 +98,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var actual = await sut.GetAsync();
 
             var expected =
-                JsonValue.Object().Add("root",
-                    JsonValue.Object());
+                new JsonObject().Add("root",
+                    new JsonObject());
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
 

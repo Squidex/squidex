@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_writer_user_settings()
         {
-            var settings = JsonValue.Object();
+            var settings = new JsonObject();
 
             var context = CreateBackupContext();
 
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_read_user_settings()
         {
-            var settings = JsonValue.Object();
+            var settings = new JsonObject();
 
             var context = CreateRestoreContext();
 

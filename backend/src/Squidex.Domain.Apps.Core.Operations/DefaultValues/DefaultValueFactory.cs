@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public JsonValue Visit(ComponentFieldProperties properties, Args args)
         {
-            return default;
+            return JsonValue.Null;
         }
 
         public JsonValue Visit(ComponentsFieldProperties properties, Args args)
@@ -67,12 +67,12 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public JsonValue Visit(GeolocationFieldProperties properties, Args args)
         {
-            return default;
+            return JsonValue.Null;
         }
 
         public JsonValue Visit(JsonFieldProperties properties, Args args)
         {
-            return default;
+            return JsonValue.Null;
         }
 
         public JsonValue Visit(NumberFieldProperties properties, Args args)
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Core.DefaultValues
 
         public JsonValue Visit(UIFieldProperties properties, Args args)
         {
-            return default;
+            return JsonValue.Null;
         }
 
         public JsonValue Visit(DateTimeFieldProperties properties, Args args)

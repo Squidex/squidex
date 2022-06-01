@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     .AddField("assetsInObj",
                         new ContentFieldData()
                             .AddLocalized("iv",
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("asset", $"Asset: {oldAssetsUrlApp}/my-asset.jpg.")));
 
             var updateData =
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     .AddField("assetsInObj",
                         new ContentFieldData()
                             .AddLocalized("iv",
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("asset", $"Asset: {newAssetsUrlApp}/my-asset.jpg.")));
 
             var context = new RestoreContext(appId.Id, new UserMapping(me), reader, DomainId.NewGuid());

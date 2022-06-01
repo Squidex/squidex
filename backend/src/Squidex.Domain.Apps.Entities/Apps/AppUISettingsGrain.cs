@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [CollectionName("UISettings")]
         public sealed class State
         {
-            public JsonValue Settings { get; set; } = new JsonObject();
+            public JsonObject Settings { get; set; } = new JsonObject();
         }
 
         public AppUISettingsGrain(IGrainState<State> state)
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.state = state;
         }
 
-        public Task<J<JsonValue>> GetAsync()
+        public Task<J<JsonObject>> GetAsync()
         {
             return Task.FromResult(state.Value.Settings.AsJ());
         }
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return state.ClearAsync();
         }
 
-        public Task SetAsync(J<JsonValue> settings)
+        public Task SetAsync(J<JsonObject> settings)
         {
             state.Value.Settings = settings;
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             key = segments[^1];
 
-            var current = state.Value.Settings.AsObject;
+            var current = state.Value.Settings;
 
             if (segments.Length > 1)
             {
@@ -90,9 +90,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     {
                         if (add)
                         {
-                            var obj = new JsonObject();
+                            temp = new JsonObject();
 
-                            current[segment] = new JsonValue(obj);
+                            current[segment] = temp;
                         }
                         else
                         {

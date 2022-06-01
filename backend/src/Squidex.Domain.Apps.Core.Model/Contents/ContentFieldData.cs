@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out JsonValue result)
         {
-            result = default;
+            result = JsonValue.Null;
 
             if (TryGetValue(key, out var found) && found.Type != JsonValueType.Null)
             {
@@ -48,15 +48,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentFieldData AddInvariant(JsonValue value)
         {
-            return AddValue(InvariantPartitioning.Key, value);
+            this[key] = value;
+
+            return this;
         }
 
         public ContentFieldData AddLocalized(string key, JsonValue value)
-        {
-            return AddValue(key, value);
-        }
-
-        public ContentFieldData AddValue(string key, JsonValue value)
         {
             this[key] = value;
 
