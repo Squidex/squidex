@@ -42,7 +42,12 @@ namespace Squidex.Infrastructure.Collections
 
             public void CopyTo(TValue[] array, int arrayIndex)
             {
-                throw new NotSupportedException();
+                var i = 0;
+                foreach (var (_, value) in dictionary.entries)
+                {
+                    array[arrayIndex + i] = value;
+                    i++;
+                }
             }
 
             public bool Remove(TValue item)

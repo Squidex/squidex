@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
         public object? this[string key]
         {
             get => metadata[key];
-            set => metadata[key] = JsonValue2.Create(value);
+            set => metadata[key] = JsonValue.Create(value);
         }
 
         public bool IsReadOnly
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards
 
         public void Add(string key, object? value)
         {
-            metadata.Add(key, JsonValue2.Create(value));
+            metadata.Add(key, JsonValue.Create(value));
         }
 
         public void Add(KeyValuePair<string, object?> item)

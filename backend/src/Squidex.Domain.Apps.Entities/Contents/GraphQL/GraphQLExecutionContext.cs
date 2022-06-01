@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(JsonValue2 value, TimeSpan cacheDuration,
+        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(JsonValue value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await LoadAsync(ids);
         }
 
-        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(JsonValue2 value, TimeSpan cacheDuration,
+        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(JsonValue value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 });
         }
 
-        private static List<DomainId>? ParseIds(JsonValue2 value)
+        private static List<DomainId>? ParseIds(JsonValue value)
         {
             try
             {

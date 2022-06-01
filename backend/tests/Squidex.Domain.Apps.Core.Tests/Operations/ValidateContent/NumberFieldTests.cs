@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Invalid json type, expected number." });
         }
 
-        private static IJsonValue CreateValue(double v)
+        private static JsonValue CreateValue(double v)
         {
             return JsonValue.Create(v);
         }

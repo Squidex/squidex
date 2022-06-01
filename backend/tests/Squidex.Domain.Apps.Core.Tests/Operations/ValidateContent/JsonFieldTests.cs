@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Field is required." });
         }
 
-        private static IJsonValue CreateValue(IJsonValue v)
+        private static JsonValue CreateValue(JsonValue v)
         {
             return v;
         }

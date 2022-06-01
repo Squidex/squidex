@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
-    public sealed class RolesSurrogate : Dictionary<string, JsonValue2>, ISurrogate<Roles>
+    public sealed class RolesSurrogate : Dictionary<string, JsonValue>, ISurrogate<Roles>
     {
         public void FromSource(Roles source)
         {
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             {
                 var (key, value) = x;
 
-                var properties = JsonValue2.Object();
+                var properties = new JsonObject();
                 var permissions = PermissionSet.Empty;
 
                 if (value.Type == JsonValueType.Array)
@@ -63,9 +63,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
                         permissions = new PermissionSet(array.AsArray.Where(x => x.Type == JsonValueType.String).Select(x => x.AsString));
                     }
 
-                    if (!value.TryGetValue(JsonValueType.Object, "properties", out properties))
+                    if (value.TryGetValue(JsonValueType.Object, "properties", out var obj))
                     {
-                        properties = JsonValue2.Object();
+                        properties = obj.AsObject;
                     }
                 }
 

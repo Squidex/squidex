@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
-    public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, JsonValue2, JsonFilterVisitor.Args>
+    public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, JsonValue, JsonFilterVisitor.Args>
     {
         private static readonly JsonFilterVisitor Instance = new JsonFilterVisitor();
 
@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Queries.Json
         {
         }
 
-        public static FilterNode<ClrValue>? Parse(FilterNode<JsonValue2> filter, QueryModel model, List<string> errors)
+        public static FilterNode<ClrValue>? Parse(FilterNode<JsonValue> filter, QueryModel model, List<string> errors)
         {
             var args = new Args(model, errors);
 
@@ -38,17 +38,17 @@ namespace Squidex.Infrastructure.Queries.Json
             }
         }
 
-        public override FilterNode<ClrValue> Visit(NegateFilter<JsonValue2> nodeIn, Args args)
+        public override FilterNode<ClrValue> Visit(NegateFilter<JsonValue> nodeIn, Args args)
         {
             return new NegateFilter<ClrValue>(nodeIn.Accept(this, args));
         }
 
-        public override FilterNode<ClrValue> Visit(LogicalFilter<JsonValue2> nodeIn, Args args)
+        public override FilterNode<ClrValue> Visit(LogicalFilter<JsonValue> nodeIn, Args args)
         {
             return new LogicalFilter<ClrValue>(nodeIn.Type, nodeIn.Filters.Select(x => x.Accept(this, args)).ToList());
         }
 
-        public override FilterNode<ClrValue> Visit(CompareFilter<JsonValue2> nodeIn, Args args)
+        public override FilterNode<ClrValue> Visit(CompareFilter<JsonValue> nodeIn, Args args)
         {
             var fieldMatches = nodeIn.Path.GetMatchingFields(args.Model.Schema, args.Errors);
             var fieldErrors = new List<string>();

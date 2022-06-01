@@ -41,7 +41,7 @@ namespace Squidex.Extensions.Actions.Script
 
             var result = await scriptEngine.ExecuteAsync(vars, job.Script, ct: ct);
 
-            return Result.Success(result?.ToString());
+            return Result.Success(result.ToString());
         }
     }
 

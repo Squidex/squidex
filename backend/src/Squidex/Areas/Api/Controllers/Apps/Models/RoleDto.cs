@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// Associated list of UI properties.
         /// </summary>
         [LocalizedRequired]
-        public JsonValue2 Properties { get; set; }
+        public JsonObject Properties { get; set; }
 
         public static RoleDto FromDomain(Role role, IAppEntity app)
         {

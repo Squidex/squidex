@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return false;
             }
 
-            static bool CanHaveReference(JsonValue2 value)
+            static bool CanHaveReference(JsonValue value)
             {
                 if (value.Type == JsonValueType.Array)
                 {
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
-        public static HashSet<DomainId> GetReferencedIds(this IField field, JsonValue2 value,
+        public static HashSet<DomainId> GetReferencedIds(this IField field, JsonValue value,
             ResolvedComponents components, int referencesPerField = int.MaxValue)
         {
             Guard.NotNull(components);

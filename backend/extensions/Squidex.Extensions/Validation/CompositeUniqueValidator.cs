@@ -65,7 +65,7 @@ namespace Squidex.Extensions.Validation
 
             if (data.TryGetValue(field.Name, out var fieldValue))
             {
-                if (fieldValue.TryGetValue(InvariantPartitioning.Key, out var temp) && temp != null)
+                if (fieldValue.TryGetValue(InvariantPartitioning.Key, out var temp) && temp != default)
                 {
                     value = temp;
                 }
@@ -73,20 +73,27 @@ namespace Squidex.Extensions.Validation
 
             switch (field.RawProperties)
             {
-                case BooleanFieldProperties when value is JsonBoolean boolean:
-                    return boolean.Value;
-                case BooleanFieldProperties when value is JsonNull:
+                case BooleanFieldProperties when value.Type == JsonValueType.Boolean:
+                    return value.AsBoolean;
+                case BooleanFieldProperties when value.Type == JsonValueType.Null:
                     return ClrValue.Null;
-                case NumberFieldProperties when value is JsonNumber number:
-                    return number.Value;
-                case NumberFieldProperties when value is JsonNull:
+                case NumberFieldProperties when value.Type == JsonValueType.Number:
+                    return value.AsNumber;
+                case NumberFieldProperties when value.Type == JsonValueType.Null:
                     return ClrValue.Null;
-                case StringFieldProperties when value is JsonString @string:
-                    return @string.Value;
-                case StringFieldProperties when value is JsonNull:
+                case StringFieldProperties when value.Type == JsonValueType.String:
+                    return value.AsString;
+                case StringFieldProperties when value.Type == JsonValueType.Null:
                     return ClrValue.Null;
-                case ReferencesFieldProperties when value is JsonArray array && array.FirstOrDefault() is JsonString @string:
-                    return @string.Value;
+                case ReferencesFieldProperties when value.Type == JsonValueType.Array:
+                    var first = value.AsArray.FirstOrDefault();
+
+                    if (first.Type == JsonValueType.String)
+                    {
+                        return first.AsString;
+                    }
+
+                    break;
             }
 
             return null;

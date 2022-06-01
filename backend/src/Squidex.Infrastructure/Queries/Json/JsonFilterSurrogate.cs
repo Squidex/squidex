@@ -10,45 +10,45 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
-    public sealed class JsonFilterSurrogate : ISurrogate<FilterNode<JsonValue2>>
+    public sealed class JsonFilterSurrogate : ISurrogate<FilterNode<JsonValue>>
     {
-        public FilterNode<JsonValue2>[]? And { get; set; }
+        public FilterNode<JsonValue>[]? And { get; set; }
 
-        public FilterNode<JsonValue2>[]? Or { get; set; }
+        public FilterNode<JsonValue>[]? Or { get; set; }
 
-        public FilterNode<JsonValue2>? Not { get; set; }
+        public FilterNode<JsonValue>? Not { get; set; }
 
         public CompareOperator? Op { get; set; }
 
         public string? Path { get; set; }
 
-        public JsonValue2 Value { get; set; }
+        public JsonValue Value { get; set; }
 
-        public void FromSource(FilterNode<JsonValue2> source)
+        public void FromSource(FilterNode<JsonValue> source)
         {
             throw new NotSupportedException();
         }
 
-        public FilterNode<JsonValue2> ToSource()
+        public FilterNode<JsonValue> ToSource()
         {
             if (Not != null)
             {
-                return new NegateFilter<JsonValue2>(Not);
+                return new NegateFilter<JsonValue>(Not);
             }
 
             if (And != null)
             {
-                return new LogicalFilter<JsonValue2>(LogicalFilterType.And, And);
+                return new LogicalFilter<JsonValue>(LogicalFilterType.And, And);
             }
 
             if (Or != null)
             {
-                return new LogicalFilter<JsonValue2>(LogicalFilterType.Or, Or);
+                return new LogicalFilter<JsonValue>(LogicalFilterType.Or, Or);
             }
 
             if (!string.IsNullOrWhiteSpace(Path))
             {
-                return new CompareFilter<JsonValue2>(Path, Op ?? CompareOperator.Equals, Value);
+                return new CompareFilter<JsonValue>(Path, Op ?? CompareOperator.Equals, Value);
             }
 
             throw new JsonException(Errors.InvalidJsonStructure());

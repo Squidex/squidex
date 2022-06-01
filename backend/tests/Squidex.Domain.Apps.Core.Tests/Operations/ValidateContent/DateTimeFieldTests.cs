@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return SystemClock.Instance.GetCurrentInstant().WithoutMs().Plus(Duration.FromDays(days));
         }
 
-        private static IJsonValue CreateValue(Instant v)
+        private static JsonValue CreateValue(Instant v)
         {
             return JsonValue.Create(v);
         }

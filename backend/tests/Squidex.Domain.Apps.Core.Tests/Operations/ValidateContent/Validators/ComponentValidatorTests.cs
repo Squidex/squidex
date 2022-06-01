@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         {
             var validator = A.Fake<IValidator>();
 
-            var componentData = JsonValue.Object();
+            var componentData = new JsonObject();
             var componentObject = new Component("type", componentData, new Schema("my-schema"));
 
             var isFactoryCalled = false;

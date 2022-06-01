@@ -649,7 +649,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            var jsonFilter = TestUtils.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
+            var jsonFilter = TestUtils.DefaultSerializer.Deserialize<FilterNode<JsonValue>>(json);
 
             return JsonFilterVisitor.Parse(jsonFilter, Model, errors)?.ToString();
         }

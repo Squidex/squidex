@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
         {
             return value =>
             {
-                if (value is not JsonValue2 json)
+                if (value is not JsonValue json)
                 {
                     return false;
                 }

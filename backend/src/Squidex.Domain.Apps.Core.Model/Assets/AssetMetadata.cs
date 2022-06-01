@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Assets
 {
-    public sealed class AssetMetadata : Dictionary<string, JsonValue2>
+    public sealed class AssetMetadata : Dictionary<string, JsonValue>
     {
         private static readonly char[] PathSeparators = { '.', '[', ']' };
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Assets
         {
             if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
             {
-                return (int)n.AsNumber;
+                return (float)n.AsNumber;
             }
 
             return null;

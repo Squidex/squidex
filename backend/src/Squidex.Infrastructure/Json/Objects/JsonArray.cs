@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
-    public sealed class JsonArray : List<JsonValue2>, IEquatable<JsonArray>
+    public sealed class JsonArray : List<JsonValue>, IEquatable<JsonArray>
     {
         public JsonArray()
         {
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
-        public JsonArray(IEnumerable<JsonValue2>? source)
+        public JsonArray(IEnumerable<JsonValue>? source)
         {
             if (source != null)
             {
@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.Json.Objects
             }
         }
 
-        public new JsonArray Add(JsonValue2 value)
+        public new JsonArray Add(JsonValue value)
         {
             base.Add(value);
 
@@ -61,15 +61,10 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override string ToString()
         {
-            return $"[{string.Join(", ", this.Select(x => x.ToString()))}]";
-        }
-
-        public string ToJsonString()
-        {
             return $"[{string.Join(", ", this.Select(x => x.ToJsonString()))}]";
         }
 
-        public bool TryGetValue(string pathSegment, [MaybeNullWhen(false)] out JsonValue2 result)
+        public bool TryGetValue(string pathSegment, [MaybeNullWhen(false)] out JsonValue result)
         {
             Guard.NotNull(pathSegment);
 

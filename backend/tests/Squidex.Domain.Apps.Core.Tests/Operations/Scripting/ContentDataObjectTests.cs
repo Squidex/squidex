@@ -211,13 +211,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("geo",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("lat", 1.0)));
+                            .AddInvariant(new JsonObject().Add("lat", 1.0)));
 
             var expected =
                 new ContentData()
                     .AddField("geo",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("lat", 1.0).Add("lon", 4.0)));
+                            .AddInvariant(new JsonObject().Add("lat", 1.0).Add("lon", 4.0)));
 
             const string script = @"
                 data.geo.iv = { lat: data.geo.iv.lat, lon: data.geo.iv.lat + 3 }
@@ -235,13 +235,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("geo",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("lat", 1.0)));
+                            .AddInvariant(new JsonObject().Add("lat", 1.0)));
 
             var expected =
                 new ContentData()
                     .AddField("geo",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("lat", 2.0).Add("lon", 4.0)));
+                            .AddInvariant(new JsonObject().Add("lat", 2.0).Add("lon", 4.0)));
 
             const string script = @"
                 var nested = data.geo.iv;
@@ -262,7 +262,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("geo",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("lat", 2.0).Add("lon", 4.0)));
+                            .AddInvariant(new JsonObject().Add("lat", 2.0).Add("lon", 4.0)));
 
             const string script = @"
                 var nested = data.geo.iv;
@@ -364,7 +364,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("obj",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Array()));
+                            .AddInvariant(new JsonArray()));
 
             const string script = @"
                 data.obj.iv[0] = 1
@@ -383,7 +383,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new ContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Array()));
+                            .AddInvariant(new JsonArray()));
 
             var expected =
                 new ContentData()

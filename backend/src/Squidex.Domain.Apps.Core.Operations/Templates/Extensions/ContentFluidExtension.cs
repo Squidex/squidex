@@ -17,7 +17,11 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
     {
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
         {
-            FluidValue.SetTypeMapping<JsonValue2>(source =>
+            FluidValue.SetTypeMapping<ContentFieldData>(x => new ObjectValue(x));
+            FluidValue.SetTypeMapping<JsonObject>(x => new ObjectValue(x));
+            FluidValue.SetTypeMapping<JsonArray>(x => new JsonArrayFluidValue(x));
+
+            FluidValue.SetTypeMapping<JsonValue>(source =>
             {
                 switch (source.Type)
                 {
@@ -38,14 +42,26 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
                 }
             });
 
+            memberAccessStrategy.Register<JsonValue, object?>((value, name) =>
+            {
+                if (value.Type == JsonValueType.Object)
+                {
+                    return value.AsObject.GetOrDefault(name);
+                }
+
+                return null;
+            });
+
             memberAccessStrategy.Register<ContentData, object?>(
                 (value, name) => value.GetOrDefault(name));
 
-            memberAccessStrategy.Register<JsonObject, object?>(
-                (value, name) => value.GetOrDefault(name));
-
             memberAccessStrategy.Register<ContentFieldData, object?>(
-                (value, name) => value.GetOrDefault(name));
+                (value, name) => value.GetOrDefault(name).RawValue);
+
+            memberAccessStrategy.Register<JsonObject, object?>(
+                (value, name) => value.GetOrDefault(name).RawValue);
+
+            memberAccessStrategy.Register<ContentData>();
         }
     }
 }

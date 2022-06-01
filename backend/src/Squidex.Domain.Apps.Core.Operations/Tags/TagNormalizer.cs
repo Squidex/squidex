@@ -21,10 +21,10 @@ namespace Squidex.Domain.Apps.Core.Tags
             Guard.NotNull(newData);
 
             var newValues = new HashSet<string>();
-            var newArrays = new List<JsonValue2>();
+            var newArrays = new List<JsonValue>();
 
             var oldValues = new HashSet<string>();
-            var oldArrays = new List<JsonValue2>();
+            var oldArrays = new List<JsonValue>();
 
             GetValues(schema, newValues, newArrays, newData);
 
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             Guard.NotNull(schema);
 
             var tagsValues = new HashSet<string>();
-            var tagsArrays = new List<JsonValue2>();
+            var tagsArrays = new List<JsonValue>();
 
             GetValues(schema, tagsValues, tagsArrays, datas);
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        private static void GetValues(Schema schema, HashSet<string> values, List<JsonValue2> arrays, params ContentData[] datas)
+        private static void GetValues(Schema schema, HashSet<string> values, List<JsonValue> arrays, params ContentData[] datas)
         {
             foreach (var field in schema.Fields)
             {
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        private static void ExtractTags(JsonValue2 value, ISet<string> values, ICollection<JsonValue2> arrays)
+        private static void ExtractTags(JsonValue value, ISet<string> values, ICollection<JsonValue> arrays)
         {
             if (value.Type == JsonValueType.Array)
             {

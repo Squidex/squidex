@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                         new PermissionSet(
                             "Permission1",
                             "Permission2"),
-                        JsonValue.Object()
+                        new JsonObject()
                             .Add("Property1", true)
                             .Add("Property2", true));
 

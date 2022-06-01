@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
 
         public override void WriteTo(TextWriter writer, TextEncoder encoder, CultureInfo cultureInfo)
         {
-            writer.Write(value.ToString());
+            writer.Write(value);
         }
     }
 }

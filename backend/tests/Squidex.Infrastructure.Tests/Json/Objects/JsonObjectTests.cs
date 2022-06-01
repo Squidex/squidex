@@ -5,9 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections;
 using NodaTime;
 using Xunit;
+
+#pragma warning disable xUnit2004 // Do not use equality check to test for boolean conditions
 
 namespace Squidex.Infrastructure.Json.Objects
 {
@@ -16,13 +17,13 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_make_correct_object_equal_comparisons()
         {
-            var obj1a = JsonValue.Object().Add("key1", 1);
-            var obj1b = JsonValue.Object().Add("key1", 1);
+            var obj1a = new JsonObject().Add("key1", 1);
+            var obj1b = new JsonObject().Add("key1", 1);
 
-            var objOtherValue = JsonValue.Object().Add("key1", 2);
-            var objOtherKey = JsonValue.Object().Add("key2", 1);
+            var objOtherValue = new JsonObject().Add("key1", 2);
+            var objOtherKey = new JsonObject().Add("key2", 1);
 
-            var objOtherCount = JsonValue.Object().Add("key1", 1).Add("key2", 2);
+            var objOtherCount = new JsonObject().Add("key1", 1).Add("key2", 2);
 
             var number = JsonValue.Create(1);
 
@@ -116,156 +117,237 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         [Fact]
-        public void Should_cache_null()
-        {
-            Assert.Same(JsonValue.Null, JsonValue.Create((string?)null));
-            Assert.Same(JsonValue.Null, JsonValue.Create((bool?)null));
-            Assert.Same(JsonValue.Null, JsonValue.Create((double?)null));
-            Assert.Same(JsonValue.Null, JsonValue.Create((object?)null));
-            Assert.Same(JsonValue.Null, JsonValue.Create((Instant?)null));
-        }
-
-        [Fact]
-        public void Should_cache_true()
-        {
-            Assert.Same(JsonValue.True, JsonValue.Create(true));
-        }
-
-        [Fact]
-        public void Should_cache_false()
-        {
-            Assert.Same(JsonValue.False, JsonValue.Create(false));
-        }
-
-        [Fact]
-        public void Should_cache_empty()
-        {
-            Assert.Same(JsonValue.Empty, JsonValue.Create(string.Empty));
-        }
-
-        [Fact]
-        public void Should_cache_zero()
-        {
-            Assert.Same(JsonValue.Zero, JsonValue.Create(0));
-        }
-
-        [Fact]
-        public void Should_create_boolean_from_object()
-        {
-            Assert.Equal(JsonValue.True, JsonValue.Create((object)true));
-        }
-
-        [Fact]
-        public void Should_create_value_from_instant()
-        {
-            var instant = Instant.FromUnixTimeSeconds(4123125455);
-
-            Assert.Equal(instant.ToString(), JsonValue.Create(instant).ToString());
-        }
-
-        [Fact]
-        public void Should_create_value_from_instant_object()
-        {
-            var instant = Instant.FromUnixTimeSeconds(4123125455);
-
-            Assert.Equal(instant.ToString(), JsonValue.Create((object)instant).ToString());
-        }
-
-        [Fact]
-        public void Should_create_array()
-        {
-            var json = JsonValue.Array<object>(1, "2");
-
-            Assert.Equal("[1, \"2\"]", json.ToJsonString());
-            Assert.Equal("[1, \"2\"]", json.ToString());
-        }
-
-        [Fact]
-        public void Should_create_array_from_object_source()
-        {
-            var json = JsonValue.Create(new object[] { 1, "2" });
-
-            Assert.Equal("[1, \"2\"]", json.ToJsonString());
-            Assert.Equal("[1, \"2\"]", json.ToString());
-        }
-
-        [Fact]
-        public void Should_create_array_from_source()
-        {
-            var json = JsonValue.Array<object>(1, "2");
-
-            var copy = new JsonArray(json);
-
-            Assert.Equal("[1, \"2\"]", copy.ToJsonString());
-            Assert.Equal("[1, \"2\"]", copy.ToString());
-
-            copy.Clear();
-
-            Assert.Empty(copy);
-            Assert.NotEmpty(json);
-        }
-
-        [Fact]
-        public void Should_create_object()
-        {
-            var json = JsonValue.Object().Add("key1", 1).Add("key2", "2");
-
-            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToJsonString());
-            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToString());
-        }
-
-        [Fact]
-        public void Should_create_object_from_clr_source()
-        {
-            var json = JsonValue.Create(new Dictionary<string, object> { ["key1"] = 1, ["key2"] = "2" });
-
-            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToJsonString());
-            Assert.Equal("{\"key1\":1, \"key2\":\"2\"}", json.ToString());
-        }
-
-        [Fact]
-        public void Should_create_number()
-        {
-            var json = JsonValue.Create(123);
-
-            Assert.Equal("123", json.ToJsonString());
-            Assert.Equal("123", json.ToString());
-        }
-
-        [Fact]
-        public void Should_create_boolean_true()
-        {
-            var json = JsonValue.Create(true);
-
-            Assert.Equal("true", json.ToJsonString());
-            Assert.Equal("true", json.ToString());
-        }
-
-        [Fact]
-        public void Should_create_boolean_false()
-        {
-            var json = JsonValue.Create(false);
-
-            Assert.Equal("false", json.ToJsonString());
-            Assert.Equal("false", json.ToString());
-        }
-
-        [Fact]
-        public void Should_create_string()
-        {
-            var json = JsonValue.Create("hi");
-
-            Assert.Equal("\"hi\"", json.ToJsonString());
-            Assert.Equal("hi", json.ToString());
-        }
-
-        [Fact]
         public void Should_create_null()
         {
-            var json = JsonValue.Create((object?)null);
+            var jsons = new[]
+            {
+                new JsonValue((string?)null),
+                JsonValue.Create((string?)null),
+                JsonValue.Create((object?)null),
+                default
+            };
 
-            Assert.Equal("null", json.ToJsonString());
-            Assert.Equal("null", json.ToString());
+            foreach (var json in jsons)
+            {
+                Assert.Null(json.RawValue);
+                Assert.Equal(JsonValueType.Null, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsNumber);
+                Assert.Throws<InvalidOperationException>(() => json.AsString);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_booleans()
+        {
+            var jsons = new[]
+            {
+                new JsonValue(true),
+                JsonValue.Create(true),
+                JsonValue.Create((object?)true),
+                true
+            };
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal(true, json.RawValue);
+                Assert.Equal(true, json.AsBoolean);
+                Assert.Equal(JsonValueType.Boolean, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsNumber);
+                Assert.Throws<InvalidOperationException>(() => json.AsString);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_floats()
+        {
+            var jsons = new[]
+            {
+                new JsonValue(12.5),
+                JsonValue.Create(12.5),
+                JsonValue.Create((object?)12.5),
+                JsonValue.Create((object?)12.5f),
+                12.5
+            };
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal(12.5, json.RawValue);
+                Assert.Equal(12.5, json.AsNumber);
+                Assert.Equal(JsonValueType.Number, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsString);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_more_integers()
+        {
+            var jsons = new[]
+            {
+                new JsonValue(12),
+                JsonValue.Create(12),
+                JsonValue.Create((object?)12L),
+                JsonValue.Create((object?)12),
+                12
+            };
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal(12d, json.RawValue);
+                Assert.Equal(12d, json.AsNumber);
+                Assert.Equal(JsonValueType.Number, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsString);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_strings()
+        {
+            var jsons = new[]
+            {
+                new JsonValue("text"),
+                JsonValue.Create("text"),
+                JsonValue.Create((object?)"text"),
+                "text"
+            };
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal("text", json.RawValue);
+                Assert.Equal("text", json.AsString);
+                Assert.Equal(JsonValueType.String, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsNumber);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_instants()
+        {
+            var instant = Instant.FromUnixTimeSeconds(4123125455);
+
+            var jsons = new[]
+            {
+                JsonValue.Create(instant),
+                JsonValue.Create((object?)instant),
+                instant
+            };
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal(instant.ToString(), json.RawValue);
+                Assert.Equal(instant.ToString(), json.AsString);
+                Assert.Equal(JsonValueType.String, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsNumber);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_ids()
+        {
+            var id = DomainId.NewGuid();
+
+            var jsons = new[]
+            {
+                JsonValue.Create(id),
+                JsonValue.Create((object?)id),
+                id
+            };
+
+            var result = id.ToString();
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal(result, json.RawValue);
+                Assert.Equal(result, json.AsString);
+                Assert.Equal(JsonValueType.String, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsNumber);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_arrays()
+        {
+            var input = new JsonArray { 1, 2 };
+
+            var jsons = new[]
+            {
+                new JsonValue(input),
+                JsonValue.Array(1, 2),
+                JsonValue.Array(new int[] { 1, 2 }),
+                JsonValue.Create(input),
+                JsonValue.Create((object?)input),
+                JsonValue.Create(new object[] { 1, 2 }),
+                input
+            };
+
+            var result = new JsonArray { 1, 2 };
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal(result, json.RawValue);
+                Assert.Equal(result, json.AsArray);
+                Assert.Equal(JsonValueType.Array, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsNumber);
+                Assert.Throws<InvalidOperationException>(() => json.AsString);
+                Assert.Throws<InvalidOperationException>(() => json.AsObject);
+            }
+        }
+
+        [Fact]
+        public void Should_create_objects()
+        {
+            var input = new JsonObject().Add("1", 1).Add("2", 2);
+
+            var jsons = new[]
+            {
+                new JsonValue(input),
+                JsonValue.Create(input),
+                JsonValue.Create((object?)input),
+                JsonValue.Create(input.ToDictionary(x => x.Key, x => x.Value.RawValue)),
+                input,
+            };
+
+            var result = new JsonObject().Add("1", 1).Add("2", 2);
+
+            foreach (var json in jsons)
+            {
+                Assert.Equal(result, json.RawValue);
+                Assert.Equal(result, json.AsObject);
+                Assert.Equal(JsonValueType.Object, json.Type);
+
+                Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
+                Assert.Throws<InvalidOperationException>(() => json.AsNumber);
+                Assert.Throws<InvalidOperationException>(() => json.AsString);
+                Assert.Throws<InvalidOperationException>(() => json.AsArray);
+            }
         }
 
         [Fact]
@@ -275,7 +357,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source, clone);
+            Assert.Same(source.RawValue, clone.RawValue);
         }
 
         [Fact]
@@ -285,7 +367,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source, clone);
+            Assert.Same(source.RawValue, clone.RawValue);
         }
 
         [Fact]
@@ -295,7 +377,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source, clone);
+            Assert.Same(source.RawValue, clone.RawValue);
         }
 
         [Fact]
@@ -305,149 +387,37 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source, clone);
+            Assert.Same(source.RawValue, clone.RawValue);
         }
 
         [Fact]
         public void Should_clone_array_and_also_children()
         {
-            var source = JsonValue.Array(JsonValue.Array(), JsonValue.Array());
+            var source = JsonValue.Array(new JsonArray(), new JsonArray()).AsArray;
 
-            var clone = (JsonArray)source.Clone();
+            var clone = ((JsonValue)source).Clone().AsArray;
 
             Assert.NotSame(source, clone);
 
             for (var i = 0; i < source.Count; i++)
             {
-                Assert.NotSame(clone[i], source[i]);
+                Assert.NotSame(clone[i].RawValue, source[i].RawValue);
             }
         }
 
         [Fact]
         public void Should_clone_object_and_also_children()
         {
-            var source = JsonValue.Object().Add("1", JsonValue.Array()).Add("2", JsonValue.Array());
+            var source = new JsonObject().Add("1", new JsonArray()).Add("2", new JsonArray());
 
-            var clone = (JsonObject)source.Clone();
+            var clone = ((JsonValue)source).Clone().AsObject;
 
             Assert.NotSame(source, clone);
 
             foreach (var (key, value) in clone)
             {
-                Assert.NotSame(value, source[key]);
+                Assert.NotSame(value.RawValue, source[key].RawValue);
             }
-        }
-
-        [Fact]
-        public void Should_create_arrays_in_different_ways()
-        {
-            var numbers = new[]
-            {
-                JsonValue.Array(1.0f, 2.0f),
-                JsonValue.Array(JsonValue.Create(1.0f), JsonValue.Create(2.0f))
-            };
-
-            Assert.Single(numbers.Distinct());
-            Assert.Single(numbers.Select(x => x.GetHashCode()).Distinct());
-        }
-
-        [Fact]
-        public void Should_create_number_from_types()
-        {
-            var numbers = new[]
-            {
-                JsonValue.Create(12.0f),
-                JsonValue.Create(12.0),
-                JsonValue.Create(12L),
-                JsonValue.Create(12),
-                JsonValue.Create((object)12.0d),
-                JsonValue.Create((double?)12.0d)
-            };
-
-            Assert.Single(numbers.Distinct());
-            Assert.Single(numbers.Select(x => x.GetHashCode()).Distinct());
-        }
-
-        [Fact]
-        public void Should_create_null_if_adding_null_to_array()
-        {
-            var array = JsonValue.Array();
-
-            array.Add(null!);
-
-            Assert.Same(JsonValue.Null, array[0]);
-        }
-
-        [Fact]
-        public void Should_create_null_if_replacing_to_null_in_array()
-        {
-            var array = JsonValue.Array(1);
-
-            array[0] = null!;
-
-            Assert.Same(JsonValue.Null, array[0]);
-        }
-
-        [Fact]
-        public void Should_create_null_if_adding_null_to_object()
-        {
-            var obj = JsonValue.Object();
-
-            obj.Add("key", null!);
-
-            Assert.Same(JsonValue.Null, obj["key"]);
-        }
-
-        [Fact]
-        public void Should_create_null_if_replacing_to_null_object()
-        {
-            var obj = JsonValue.Object();
-
-            obj["key"] = null!;
-
-            Assert.Same(JsonValue.Null, obj["key"]);
-        }
-
-        [Fact]
-        public void Should_remove_value_from_object()
-        {
-            var obj = JsonValue.Object().Add("key", 1);
-
-            obj.Remove("key");
-
-            Assert.False(obj.TryGetValue("key", out _));
-            Assert.False(obj.ContainsKey("key"));
-        }
-
-        [Fact]
-        public void Should_clear_values_from_object()
-        {
-            var obj = JsonValue.Object().Add("key", 1);
-
-            obj.Clear();
-
-            Assert.False(obj.TryGetValue("key", out _));
-            Assert.False(obj.ContainsKey("key"));
-        }
-
-        [Fact]
-        public void Should_provide_collection_values_from_object()
-        {
-            var obj = JsonValue.Object().Add("11", "44").Add("22", "88");
-
-            var kvps = new[]
-            {
-                new KeyValuePair<string, IJsonValue>("11", JsonValue.Create("44")),
-                new KeyValuePair<string, IJsonValue>("22", JsonValue.Create("88"))
-            };
-
-            Assert.Equal(2, obj.Count);
-
-            Assert.Equal(new[] { "11", "22" }, obj.Keys);
-            Assert.Equal(new[] { "44", "88" }, obj.Values.Select(x => x.ToString()));
-
-            Assert.Equal(kvps, obj.ToArray());
-            Assert.Equal(kvps, ((IEnumerable)obj).OfType<KeyValuePair<string, IJsonValue>>().ToArray());
         }
 
         [Fact]
@@ -461,10 +431,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.Null;
 
-            var found = json.TryGet("path", out var result);
+            var found = json.TryGetByPath("path", out var result);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Equal(default, result);
         }
 
         [Fact]
@@ -472,10 +442,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.Create("string");
 
-            var found = json.TryGet("path", out var result);
+            var found = json.TryGetByPath("path", out var result);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Equal(default, result);
         }
 
         [Fact]
@@ -483,10 +453,10 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.True;
 
-            var found = json.TryGet("path", out var result);
+            var found = json.TryGetByPath("path", out var result);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Equal(default, result);
         }
 
         [Fact]
@@ -494,43 +464,43 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var json = JsonValue.Create(12);
 
-            var found = json.TryGet("path", out var result);
+            var found = json.TryGetByPath("path", out var result);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Equal(default, result);
         }
 
         [Fact]
         public void Should_return_same_object_if_path_is_null()
         {
-            var json = JsonValue.Object().Add("property", 12);
+            JsonValue json = new JsonObject().Add("property", 12);
 
             var found = json.TryGetByPath((string?)null, out var result);
 
             Assert.False(found);
-            Assert.Same(json, result);
+            Assert.Equal(json, result);
         }
 
         [Fact]
         public void Should_return_same_object_if_path_is_empty()
         {
-            var json = JsonValue.Object().Add("property", 12);
+            JsonValue json = new JsonObject().Add("property", 12);
 
             var found = json.TryGetByPath(string.Empty, out var result);
 
             Assert.False(found);
-            Assert.Same(json, result);
+            Assert.Equal(json, result);
         }
 
         [Fact]
         public void Should_return_from_nested_array()
         {
-            var json =
-                JsonValue.Object()
+            JsonValue json =
+                new JsonObject()
                     .Add("property",
                         JsonValue.Array(
                             JsonValue.Create(12),
-                            JsonValue.Object()
+                            new JsonObject()
                                 .Add("nested", 13)));
 
             var found = json.TryGetByPath("property[1].nested", out var result);
@@ -542,36 +512,36 @@ namespace Squidex.Infrastructure.Json.Objects
         [Fact]
         public void Should_return_null_if_property_not_found()
         {
-            var json =
-                JsonValue.Object()
+            JsonValue json =
+                new JsonObject()
                     .Add("property", 12);
 
             var found = json.TryGetByPath("notfound", out var result);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Equal(default, result);
         }
 
         [Fact]
         public void Should_return_null_if_out_of_index1()
         {
-            var json = JsonValue.Array(12, 14);
+            JsonValue json = JsonValue.Array(12, 14);
 
             var found = json.TryGetByPath("-1", out var result);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Equal(default, result);
         }
 
         [Fact]
         public void Should_return_null_if_out_of_index2()
         {
-            var json = JsonValue.Array(12, 14);
+            JsonValue json = JsonValue.Array(12, 14);
 
             var found = json.TryGetByPath("2", out var result);
 
             Assert.False(found);
-            Assert.Null(result);
+            Assert.Equal(default, result);
         }
     }
 }

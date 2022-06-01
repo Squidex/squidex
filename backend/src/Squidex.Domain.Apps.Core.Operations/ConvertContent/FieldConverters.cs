@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        private static JsonValue2? ConvertByType<T>(T field, JsonValue2 value, IArrayField? parent, ValueConverter[] converters,
+        private static JsonValue? ConvertByType<T>(T field, JsonValue value, IArrayField? parent, ValueConverter[] converters,
             ResolvedComponents components) where T : IField
         {
             switch (field)
@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             }
         }
 
-        private static JsonValue2? ConvertArray(IArrayField field, JsonValue2 value, ValueConverter[] converters,
+        private static JsonValue? ConvertArray(IArrayField field, JsonValue value, ValueConverter[] converters,
             ResolvedComponents components)
         {
             if (value.Type == JsonValueType.Array)
@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return null;
         }
 
-        private static JsonValue2? ConvertComponents(JsonValue2? value, ValueConverter[] converters,
+        private static JsonValue? ConvertComponents(JsonValue? value, ValueConverter[] converters,
             ResolvedComponents components)
         {
             if (value?.Type == JsonValueType.Array)
@@ -318,7 +318,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return null;
         }
 
-        private static JsonValue2? ConvertComponent(JsonValue2? value, ValueConverter[] converters,
+        private static JsonValue? ConvertComponent(JsonValue? value, ValueConverter[] converters,
             ResolvedComponents components)
         {
             if (value.HasValue && value.Value.Type == JsonValueType.Object && value.Value.AsObject.TryGetValue(Component.Discriminator, out var type) && type.Type == JsonValueType.String)
@@ -338,7 +338,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return null;
         }
 
-        private static JsonValue2? ConvertArrayItem(IArrayField field, JsonValue2 value, ValueConverter[] converters,
+        private static JsonValue? ConvertArrayItem(IArrayField field, JsonValue value, ValueConverter[] converters,
             ResolvedComponents components)
         {
             if (value.Type == JsonValueType.Object)
@@ -349,14 +349,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return null;
         }
 
-        private static JsonValue2 ConvertNested<T>(FieldCollection<T> fields, JsonValue2 source, IArrayField? parent, ValueConverter[] converters,
+        private static JsonValue ConvertNested<T>(FieldCollection<T> fields, JsonValue source, IArrayField? parent, ValueConverter[] converters,
             ResolvedComponents components) where T : IField
         {
             JsonObject? result = null;
 
-            foreach (var (key, value) in source.AsObject)
+            var obj = source.AsObject;
+
+            foreach (var (key, value) in obj)
             {
-                JsonValue2? newValue = value;
+                JsonValue? newValue = value;
 
                 if (fields.ByName.TryGetValue(key, out var field))
                 {
@@ -369,12 +371,12 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 if (newValue == null)
                 {
-                    result ??= new JsonObject();
+                    result ??= new JsonObject(obj);
                     result.Remove(key);
                 }
                 else if (!ReferenceEquals(newValue.Value.RawValue, value.RawValue))
                 {
-                    result ??= new JsonObject();
+                    result ??= new JsonObject(obj);
                     result[key] = newValue.Value;
                 }
             }
@@ -382,7 +384,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return result ?? source;
         }
 
-        private static JsonValue2? ConvertValue(IField field, JsonValue2 value, IArrayField? parent, ValueConverter[] converters)
+        private static JsonValue? ConvertValue(IField field, JsonValue value, IArrayField? parent, ValueConverter[] converters)
         {
             var newValue = value;
 

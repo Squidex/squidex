@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
     {
         private readonly HashSet<Type> supportedTypes = new HashSet<Type>
         {
-            typeof(JsonValue2)
+            typeof(JsonValue)
         };
 
         public virtual IEnumerable<Type> SupportedTypes
@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return ReadJson(reader);
         }
 
-        private static JsonValue2 ReadJson(JsonReader reader)
+        private static JsonValue ReadJson(JsonReader reader)
         {
             switch (reader.TokenType)
             {
@@ -117,10 +117,10 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 return;
             }
 
-            WriteJson(writer, (JsonValue2)value);
+            WriteJson(writer, (JsonValue)value);
         }
 
-        private static void WriteJson(JsonWriter writer, JsonValue2 value)
+        private static void WriteJson(JsonWriter writer, JsonValue value)
         {
             switch (value.Type)
             {

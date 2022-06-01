@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class BulkUpdateJob
     {
-        public Query<JsonValue2>? Query { get; set; }
+        public Query<JsonValue>? Query { get; set; }
 
         public DomainId? Id { get; set; }
 

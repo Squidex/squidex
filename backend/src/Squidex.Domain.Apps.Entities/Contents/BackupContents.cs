@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private void ReplaceAssetUrl(IDictionary<string, JsonValue2> source)
+        private void ReplaceAssetUrl(IDictionary<string, JsonValue> source)
         {
             List<(string, string)>? replacements = null;
 
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private void ReplaceAssetUrl(List<JsonValue2> source)
+        private void ReplaceAssetUrl(List<JsonValue> source)
         {
             for (var i = 0; i < source.Count; i++)
             {

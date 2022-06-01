@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return result;
         }
 
-        private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, JsonValue2 value)
+        private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, JsonValue value)
         {
             switch (value.Type)
             {

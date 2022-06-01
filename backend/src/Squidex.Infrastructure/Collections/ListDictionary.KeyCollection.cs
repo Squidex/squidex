@@ -42,7 +42,12 @@ namespace Squidex.Infrastructure.Collections
 
             public void CopyTo(TKey[] array, int arrayIndex)
             {
-                throw new NotSupportedException();
+                var i = 0;
+                foreach (var (key, _) in dictionary.entries)
+                {
+                    array[arrayIndex + i] = key;
+                    i++;
+                }
             }
 
             public bool Remove(TKey item)

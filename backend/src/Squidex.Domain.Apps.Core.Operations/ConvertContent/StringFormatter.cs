@@ -17,13 +17,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         private static readonly StringFormatter Instance = new StringFormatter();
 
-        public record struct Args(JsonValue2 Value);
+        public record struct Args(JsonValue Value);
 
         private StringFormatter()
         {
         }
 
-        public static string Format(IField field, JsonValue2 value)
+        public static string Format(IField field, JsonValue value)
         {
             Guard.NotNull(field);
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public string Visit(GeolocationFieldProperties properties, Args args)
         {
-            if (args.Value.Type == JsonValueType.Number &&
+            if (args.Value.Type == JsonValueType.Object &&
                 args.Value.TryGetValue(JsonValueType.Number, "latitude", out var lat) &&
                 args.Value.TryGetValue(JsonValueType.Number, "longitude", out var lon))
             {
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return string.Empty;
         }
 
-        private static string FormatArray(JsonValue2 value, string singularName, string pluralName)
+        private static string FormatArray(JsonValue value, string singularName, string pluralName)
         {
             if (value.Type == JsonValueType.Array)
             {

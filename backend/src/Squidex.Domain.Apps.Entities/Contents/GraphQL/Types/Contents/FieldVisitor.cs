@@ -17,9 +17,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public delegate T ValueResolver<T>(JsonValue2 value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+    public delegate T ValueResolver<T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
-    public delegate Task<T> AsyncValueResolver<T>(JsonValue2 value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+    public delegate Task<T> AsyncValueResolver<T>(JsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
     internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
     {
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static IFieldResolver CreateValueResolver<T>(ValueResolver<T> valueResolver)
         {
-            return Resolvers.Sync<IReadOnlyDictionary<string, JsonValue2>, object?>((source, fieldContext, context) =>
+            return Resolvers.Sync<IReadOnlyDictionary<string, JsonValue>, object?>((source, fieldContext, context) =>
             {
                 var key = fieldContext.FieldDefinition.SourceName();
 
@@ -298,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static IFieldResolver CreateAsyncValueResolver<T>(AsyncValueResolver<T> valueResolver)
         {
-            return Resolvers.Async<IReadOnlyDictionary<string, JsonValue2>, object?>(async (source, fieldContext, context) =>
+            return Resolvers.Async<IReadOnlyDictionary<string, JsonValue>, object?>(async (source, fieldContext, context) =>
             {
                 var key = fieldContext.FieldDefinition.SourceName();
 

@@ -88,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The properties from the role.
         /// </summary>
         [LocalizedRequired]
-        public JsonValue2 RoleProperties { get; set; }
+        public JsonValue RoleProperties { get; set; }
 
         public static AppDto FromDomain(IAppEntity app, string userId, bool isFrontend, Resources resources)
         {

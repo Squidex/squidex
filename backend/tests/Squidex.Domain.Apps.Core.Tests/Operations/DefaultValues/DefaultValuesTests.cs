@@ -52,14 +52,14 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(456, ((JsonNumber)data["myNumber"]!["iv"]).Value);
+            Assert.Equal(456, data["myNumber"]!["iv"].AsNumber);
 
-            Assert.Equal("de-string", data["myString"]!["de"].ToString());
-            Assert.Equal("en-string", data["myString"]!["en"].ToString());
+            Assert.Equal("de-string", data["myString"]!["de"].AsString);
+            Assert.Equal("en-string", data["myString"]!["en"].AsString);
 
-            Assert.Equal(now.ToString(), data["myDatetime"]!["iv"].ToString());
+            Assert.Equal(now.ToString(), data["myDatetime"]!["iv"].AsString);
 
-            Assert.True(((JsonBoolean)data["myBoolean"]!["iv"]).Value);
+            Assert.True(data["myBoolean"]!["iv"].AsBoolean);
         }
 
         [Fact]
@@ -76,8 +76,8 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
 
             data.GenerateDefaultValues(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(string.Empty, data["myString"]!["de"].ToString());
-            Assert.Equal("en-string", data["myString"]!["en"].ToString());
+            Assert.Equal(string.Empty, data["myString"]!["de"].AsString);
+            Assert.Equal("en-string", data["myString"]!["en"].AsString);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.Assets(1, "1", Partitioning.Invariant,
                     new AssetsFieldProperties());
 
-            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+            Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         [Fact]
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                         DefaultValue = ReadonlyList.Create("1", "2")
                     });
 
-            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+            Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         [Fact]
@@ -245,7 +245,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                 Fields.References(1, "1", Partitioning.Invariant,
                     new ReferencesFieldProperties());
 
-            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+            Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         [Fact]
@@ -272,7 +272,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                         DefaultValue = ReadonlyList.Create("1", "2")
                     });
 
-            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+            Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         [Fact]
@@ -326,7 +326,7 @@ namespace Squidex.Domain.Apps.Core.Operations.DefaultValues
                         DefaultValue = ReadonlyList.Create("tag1", "tag2")
                     });
 
-            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+            Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
         }
 
         private Instant FutureDays(int days)

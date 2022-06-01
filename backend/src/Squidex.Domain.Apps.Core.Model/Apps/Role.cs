@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed record Role(string Name, PermissionSet? Permissions = null, JsonValue2 Properties = default)
+    public sealed record Role(string Name, PermissionSet? Permissions = null, JsonObject? Properties = null)
     {
         private static readonly HashSet<string> ExtraPermissions = new HashSet<string>
         {
@@ -37,6 +37,8 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public string Name { get; } = Guard.NotNullOrEmpty(Name);
 
+        public JsonObject Properties { get; } = Properties ?? new JsonObject();
+
         public PermissionSet Permissions { get; } = Permissions ?? PermissionSet.Empty;
 
         public bool IsDefault
@@ -46,16 +48,16 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public static Role WithPermissions(string name, params string[] permissions)
         {
-            return new Role(name, new PermissionSet(permissions), JsonValue2.Object());
+            return new Role(name, new PermissionSet(permissions), new JsonObject());
         }
 
-        public static Role WithProperties(string name, JsonValue2 properties)
+        public static Role WithProperties(string name, JsonObject properties)
         {
             return new Role(name, PermissionSet.Empty, properties);
         }
 
         [Pure]
-        public Role Update(PermissionSet? permissions, JsonValue2? properties)
+        public Role Update(PermissionSet? permissions, JsonObject? properties)
         {
             return new Role(Name, permissions ?? Permissions, properties ?? Properties);
         }

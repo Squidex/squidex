@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Queries.Json
 {
     public static class ValueConverter
     {
-        private delegate bool Parser<T>(List<string> errors, PropertyPath path, JsonValue2 value, out T result);
+        private delegate bool Parser<T>(List<string> errors, PropertyPath path, JsonValue value, out T result);
 
         private static readonly InstantPattern[] InstantPatterns =
         {
@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Queries.Json
             InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
         };
 
-        public static ClrValue? Convert(FilterField field, JsonValue2 value, PropertyPath path, List<string> errors)
+        public static ClrValue? Convert(FilterField field, JsonValue value, PropertyPath path, List<string> errors)
         {
             ClrValue? result = null;
 
@@ -157,7 +157,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return items;
         }
 
-        private static bool TryParseGeoJson(List<string> errors, PropertyPath path, JsonValue2 value, out FilterSphere result)
+        private static bool TryParseGeoJson(List<string> errors, PropertyPath path, JsonValue value, out FilterSphere result)
         {
             const string expected = "Object(geo-json)";
 
@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseBoolean(List<string> errors, PropertyPath path, JsonValue2 value, out bool result)
+        private static bool TryParseBoolean(List<string> errors, PropertyPath path, JsonValue value, out bool result)
         {
             const string expected = "Boolean";
 
@@ -196,7 +196,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseNumber(List<string> errors, PropertyPath path, JsonValue2 value, out double result)
+        private static bool TryParseNumber(List<string> errors, PropertyPath path, JsonValue value, out double result)
         {
             const string expected = "Number";
 
@@ -214,7 +214,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseString(List<string> errors, PropertyPath path, JsonValue2 value, out string? result)
+        private static bool TryParseString(List<string> errors, PropertyPath path, JsonValue value, out string? result)
         {
             const string expected = "String";
 
@@ -232,7 +232,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseGuid(List<string> errors, PropertyPath path, JsonValue2 value, out Guid result)
+        private static bool TryParseGuid(List<string> errors, PropertyPath path, JsonValue value, out Guid result)
         {
             const string expected = "String (Guid)";
 
@@ -255,7 +255,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseDateTime(List<string> errors, PropertyPath path, JsonValue2 value, out Instant result)
+        private static bool TryParseDateTime(List<string> errors, PropertyPath path, JsonValue value, out Instant result)
         {
             const string expected = "String (ISO8601 DateTime)";
 
@@ -287,7 +287,7 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseDynamic(List<string> errors, PropertyPath path, JsonValue2 value, out ClrValue? result)
+        private static bool TryParseDynamic(List<string> errors, PropertyPath path, JsonValue value, out ClrValue? result)
         {
             result = null;
 

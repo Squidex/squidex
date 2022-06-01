@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public ValueTask ValidateAsync(object? value, ValidationContext context, AddError addError)
         {
-            if (value is IEnumerable<JsonValue2> objects && objects.Count() > 1)
+            if (value is IEnumerable<JsonObject> objects && objects.Count() > 1)
             {
                 Validate(context, addError, objects);
             }
@@ -34,9 +34,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             return default;
         }
 
-        private void Validate(ValidationContext context, AddError addError, IEnumerable<JsonValue2> items)
+        private void Validate(ValidationContext context, AddError addError, IEnumerable<JsonObject> items)
         {
-            var duplicates = new HashSet<JsonValue2>(10);
+            var duplicates = new HashSet<JsonValue>(10);
 
             foreach (var field in fields)
             {
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 foreach (var item in items)
                 {
-                    if (item.AsObject.TryGetValue(field, out var fieldValue) && !duplicates.Add(fieldValue))
+                    if (item.TryGetValue(field, out var fieldValue) && !duplicates.Add(fieldValue))
                     {
                         addError(context.Path, T.Get("contents.validation.uniqueObjectValues", new { field }));
                         break;

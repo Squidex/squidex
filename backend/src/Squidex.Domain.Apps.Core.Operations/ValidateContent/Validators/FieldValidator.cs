@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             try
             {
-                if (value is JsonValue2 jsonValue)
+                if (value is JsonValue jsonValue)
                 {
                     if (jsonValue.Type == JsonValueType.Null)
                     {
@@ -40,6 +40,8 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                     else
                     {
+                        typedValue = jsonValue.RawValue;
+
                         var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue, context.JsonSerializer, context.Components);
 
                         if (error != null)

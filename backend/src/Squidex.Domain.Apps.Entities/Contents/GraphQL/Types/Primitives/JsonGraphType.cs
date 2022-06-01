@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
             return ParseJson(value);
         }
 
-        public static JsonValue2 ParseJson(object? input)
+        public static JsonValue ParseJson(object? input)
         {
             switch (input)
             {
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
                     }
 
                 default:
-                    return JsonValue2.Create(input);
+                    return JsonValue.Create(input);
             }
         }
 

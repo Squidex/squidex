@@ -67,8 +67,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         {
             var source = new ContentFieldData
             {
-                ["en"] = JsonValue.Array(),
-                ["de"] = JsonValue.Array()
+                ["en"] = new JsonArray(),
+                ["de"] = new JsonArray()
             };
 
             var clone = source.Clone();
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             foreach (var (key, value) in clone)
             {
-                Assert.NotSame(value, source[key]);
+                Assert.NotSame(value.RawValue, source[key].RawValue);
             }
         }
     }

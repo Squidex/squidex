@@ -15,9 +15,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives
     {
         public override ASTNodeKind Kind => ASTNodeKind.ObjectValue;
 
-        public JsonValue2 Value { get; }
+        public JsonValue Value { get; }
 
-        public JsonValueNode(JsonValue2 value)
+        public JsonValueNode(JsonValue value)
         {
             Value = value;
         }

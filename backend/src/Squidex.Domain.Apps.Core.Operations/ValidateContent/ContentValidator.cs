@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new AggregateValidator(
                 CreateFieldValidators(field)
                     .Union(Enumerable.Repeat(
-                        new ObjectValidator<JsonValue2>(partitioningValidators, isPartial, typeName), 1)), log);
+                        new ObjectValidator<JsonValue>(partitioningValidators, isPartial, typeName), 1)), log);
         }
 
         private IValidator CreateValueValidator(IField field)

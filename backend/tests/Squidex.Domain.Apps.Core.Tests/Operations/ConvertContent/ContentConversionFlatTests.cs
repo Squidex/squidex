@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         .AddLocalized("en", 2))
                 .AddField("field2",
                     new ContentFieldData()
-                        .AddLocalized("de", null)
+                        .AddLocalized("de", default)
                         .AddLocalized("it", 4))
                 .AddField("field3",
                     new ContentFieldData()
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 {
                     "field2",
                     new ContentFieldData()
-                        .AddLocalized("de", null)
+                        .AddLocalized("de", default)
                         .AddLocalized("it", 4)
                 },
                 { "field3", JsonValue.Create(6) },

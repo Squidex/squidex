@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (id, sut, components) = Field(new ComponentsFieldProperties { SchemaId = schemaId1, IsRequired = true }, true);
 
-            await sut.ValidateAsync(CreateValue(1, id.ToString(), "componentField", null), errors, components: components);
+            await sut.ValidateAsync(CreateValue(1, id.ToString(), "componentField", default), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[1].componentField: Field is required." });
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var (_, sut, components) = Field(new ComponentsFieldProperties { SchemaId = schemaId1 });
 
-            await sut.ValidateAsync(JsonValue.Array(JsonValue.Create("Invalid")), errors, components: components);
+            await sut.ValidateAsync((JsonValue)JsonValue.Array(JsonValue.Create("Invalid")), errors, components: components);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Invalid json object, expected object with 'schemaId' field." });
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(value, errors, components: components);
 
             Assert.Empty(errors);
-            Assert.Equal(((JsonObject)value[0])[Component.Discriminator].ToString(), schemaId1.ToString());
+            Assert.Equal(value.AsArray[0].AsObject[Component.Discriminator].AsString, schemaId1.ToString());
         }
 
         [Fact]
@@ -193,16 +193,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(value, errors, components: components);
 
             Assert.Empty(errors);
-            Assert.Equal(((JsonObject)value[0])[Component.Discriminator].ToString(), schemaId1.ToString());
+            Assert.Equal(value.AsArray[0].AsObject[Component.Discriminator].AsString, schemaId1.ToString());
         }
 
-        private static JsonArray CreateValue(int count, string? type, string key, object? value, string? discriminator = null)
+        private static JsonValue CreateValue(int count, string? type, string key, JsonValue value, string? discriminator = null)
         {
-            var result = JsonValue.Array();
+            var result = new JsonArray();
 
             for (var i = 0; i < count; i++)
             {
-                var obj = JsonValue.Object();
+                var obj = new JsonObject();
 
                 if (type != null)
                 {

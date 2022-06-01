@@ -52,33 +52,33 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add("nested", JsonValue.Array(1, 2)))))
                     .AddField("component",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("references",
                                         JsonValue.Array(1, 2))
                                     .Add("assets1",
                                         JsonValue.Array(1))
                                     .Add("array",
                                         JsonValue.Array(
-                                            JsonValue.Object()
+                                            new JsonObject()
                                                 .Add("nested", JsonValue.Array(1, 2))))
                                     .Add(Component.Discriminator, DomainId.Empty)))
                     .AddField("components",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add("references",
                                             JsonValue.Array(1, 2))
                                         .Add("assets1",
                                             JsonValue.Array(1))
                                         .Add("array",
                                             JsonValue.Array(
-                                                JsonValue.Object()
+                                                new JsonObject()
                                                     .Add("nested", JsonValue.Array(1, 2))))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
@@ -93,30 +93,30 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object())))
+                                    new JsonObject())))
                     .AddField("component",
                         new ContentFieldData()
                             .AddInvariant(
-                                JsonValue.Object()
+                                new JsonObject()
                                     .Add("assets1",
                                         JsonValue.Array(1))
                                     .Add("array",
                                         JsonValue.Array(
-                                            JsonValue.Object()))
+                                            new JsonObject()))
                                     .Add(Component.Discriminator, DomainId.Empty)))
                     .AddField("components",
                         new ContentFieldData()
                             .AddInvariant(
                                 JsonValue.Array(
-                                    JsonValue.Object()
+                                    new JsonObject()
                                         .Add("assets1",
                                             JsonValue.Array(1))
                                         .Add("array",
                                             JsonValue.Array(
-                                                JsonValue.Object()))
+                                                new JsonObject()))
                                         .Add(Component.Discriminator, DomainId.Empty))));
 
-            var converter = new ValueConverter((data, field, parent) => field.Name != "assets1" ? null : data);
+            var converter = new ValueConverter((data, field, parent) => field.Name != "assets1" ? (JsonValue?)null : data);
 
             var actual =
                 source.Convert(schema,

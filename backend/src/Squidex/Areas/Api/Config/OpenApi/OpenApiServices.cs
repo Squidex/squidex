@@ -119,8 +119,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
                 CreateObjectMap<JsonObject>(),
                 CreateObjectMap<AssetMetadata>(),
 
-                CreateAnyMap<JsonValue2>(),
-                CreateAnyMap<FilterNode<JsonValue2>>()
+                CreateAnyMap<JsonValue>(),
+                CreateAnyMap<FilterNode<JsonValue>>()
             };
 
             settings.SchemaType = SchemaType.OpenApi3;

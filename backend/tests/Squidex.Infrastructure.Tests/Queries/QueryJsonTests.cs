@@ -175,11 +175,11 @@ namespace Squidex.Infrastructure.Queries
             SerializeAndDeserialize(json);
         }
 
-        private static FilterNode<IJsonValue> SerializeAndDeserialize<T>(T value)
+        private static FilterNode<JsonValue> SerializeAndDeserialize<T>(T value)
         {
             var json = TestUtils.DefaultSerializer.Serialize(value, true);
 
-            return TestUtils.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
+            return TestUtils.DefaultSerializer.Deserialize<FilterNode<JsonValue>>(json);
         }
     }
 }

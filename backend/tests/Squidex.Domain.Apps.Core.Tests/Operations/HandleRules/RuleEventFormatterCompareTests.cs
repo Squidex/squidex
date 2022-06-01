@@ -577,7 +577,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddInvariant(JsonValue.Array()))
+                                .AddInvariant(new JsonArray()))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -601,7 +601,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -673,7 +673,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -697,7 +697,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);
@@ -745,7 +745,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new ContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                                .AddInvariant(new JsonObject().Add("name", "Berlin")))
             };
 
             var result = await sut.FormatAsync(script, @event);

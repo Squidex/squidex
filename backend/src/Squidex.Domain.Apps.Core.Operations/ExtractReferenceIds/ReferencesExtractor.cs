@@ -18,13 +18,13 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         private static readonly ReferencesExtractor Instance = new ReferencesExtractor();
 
-        public record struct Args(JsonValue2 Value, ISet<DomainId> Result, int Take, ResolvedComponents Components);
+        public record struct Args(JsonValue Value, ISet<DomainId> Result, int Take, ResolvedComponents Components);
 
         private ReferencesExtractor()
         {
         }
 
-        public static None Extract(IField field, JsonValue2 value, HashSet<DomainId> result, int take, ResolvedComponents components)
+        public static None Extract(IField field, JsonValue value, HashSet<DomainId> result, int take, ResolvedComponents components)
         {
             var args = new Args(value, result, take, components);
 
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return None.Value;
         }
 
-        private void ExtractFromArrayItem(IArrayField field, JsonValue2 value, Args args)
+        private void ExtractFromArrayItem(IArrayField field, JsonValue value, Args args)
         {
             if (value.Type == JsonValueType.Object)
             {
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
-        private void ExtractFromComponent(JsonValue2 value, Args args)
+        private void ExtractFromComponent(JsonValue value, Args args)
         {
             if (value.Type == JsonValueType.Object)
             {

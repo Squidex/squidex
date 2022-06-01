@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var formatted = data.FormatReferences(schema, languages);
 
             var expected =
-                JsonValue.Object()
+                new JsonObject()
                     .Add("en", "EN, 12")
                     .Add("de", "DE, 12");
 
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var formatted = data.FormatReferences(schema, languages);
 
             var expected =
-                JsonValue.Object()
+                new JsonObject()
                     .Add("en", "EN")
                     .Add("de", "DE");
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var formatted = data.FormatReferences(schema, languages);
 
             var expected =
-                JsonValue.Object()
+                new JsonObject()
                     .Add("en", string.Empty)
                     .Add("de", string.Empty);
 

@@ -109,6 +109,11 @@ namespace Squidex.Infrastructure.Collections
             get => entries.Count;
         }
 
+        public int Capacity
+        {
+            get => entries.Capacity;
+        }
+
         public bool IsReadOnly
         {
             get => false;
@@ -129,14 +134,20 @@ namespace Squidex.Infrastructure.Collections
         {
         }
 
-        public ListDictionary(int capacity)
-            : this(capacity, null)
+        public ListDictionary(ListDictionary<TKey, TValue> source, IEqualityComparer<TKey>? comparer = null)
         {
+            Guard.NotNull(source);
+
+            entries = source.entries.ToList();
+
+            this.comparer = comparer ?? EqualityComparer<TKey>.Default;
         }
 
-        public ListDictionary(int capacity, IEqualityComparer<TKey>? comparer)
+        public ListDictionary(int capacity, IEqualityComparer<TKey>? comparer = null)
         {
-            this.entries = new List<KeyValuePair<TKey, TValue>>(capacity);
+            Guard.GreaterEquals(capacity, 0);
+
+            entries = new List<KeyValuePair<TKey, TValue>>(capacity);
 
             this.comparer = comparer ?? EqualityComparer<TKey>.Default;
         }
@@ -241,7 +252,7 @@ namespace Squidex.Infrastructure.Collections
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            throw new NotSupportedException();
+            entries.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()

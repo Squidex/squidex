@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Events.Apps
 
         public string[] Permissions { get; set; }
 
-        public JsonValue2? Properties { get; set; }
+        public JsonObject? Properties { get; set; }
 
         public PermissionSet ToPermissions()
         {

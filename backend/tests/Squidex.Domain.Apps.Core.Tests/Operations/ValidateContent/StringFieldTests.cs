@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Custom Error Message." });
         }
 
-        private static IJsonValue CreateValue(string? v)
+        private static JsonValue CreateValue(string? v)
         {
             return JsonValue.Create(v);
         }

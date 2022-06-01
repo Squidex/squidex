@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public static class JsonMapper
     {
-        public static JsValue Map(JsonValue2 value, Engine engine)
+        public static JsValue Map(JsonValue value, Engine engine)
         {
             if (value == default)
             {
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return default!;
         }
 
-        private static JsValue FromArray(List<JsonValue2> arr, Engine engine)
+        private static JsValue FromArray(List<JsonValue> arr, Engine engine)
         {
             var target = new JsValue[arr.Count];
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return engine.Realm.Intrinsics.Array.Construct(target);
         }
 
-        private static JsValue FromObject(ListDictionary<string, JsonValue2> obj, Engine engine)
+        private static JsValue FromObject(ListDictionary<string, JsonValue> obj, Engine engine)
         {
             var target = new ObjectInstance(engine);
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return target;
         }
 
-        public static JsonValue2 Map(JsValue? value)
+        public static JsonValue Map(JsValue? value)
         {
             if (value == null || value.IsNull() || value.IsUndefined())
             {

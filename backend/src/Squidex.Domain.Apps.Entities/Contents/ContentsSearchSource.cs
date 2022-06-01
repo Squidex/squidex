@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var sb = new StringBuilder();
 
-            JsonValue2? GetValue(ContentData? data, RootField field)
+            JsonValue? GetValue(ContentData? data, RootField field)
             {
                 if (data != null && data.TryGetValue(field.Name, out var fieldValue) && fieldValue != null)
                 {

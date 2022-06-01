@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public static class GeoJsonValue
     {
-        public static GeoJsonParseResult TryParse(JsonValue2 value, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
+        public static GeoJsonParseResult TryParse(JsonValue value, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
         {
             Guard.NotNull(serializer);
             Guard.NotNull(value);
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             return GeoJsonParseResult.InvalidValue;
         }
 
-        private static bool TryParseGeoJson(ListDictionary<string, JsonValue2> obj, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
+        private static bool TryParseGeoJson(ListDictionary<string, JsonValue> obj, IJsonSerializer serializer, out GeoJSONObject? geoJSON)
         {
             geoJSON = null;
 

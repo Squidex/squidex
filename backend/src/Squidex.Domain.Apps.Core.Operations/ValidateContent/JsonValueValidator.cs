@@ -20,13 +20,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly JsonValueValidator Instance = new JsonValueValidator();
 
-        public record struct Args(JsonValue2 Value, IJsonSerializer JsonSerializer);
+        public record struct Args(JsonValue Value, IJsonSerializer JsonSerializer);
 
         private JsonValueValidator()
         {
         }
 
-        public static bool IsValid(IField field, JsonValue2 value, IJsonSerializer jsonSerializer)
+        public static bool IsValid(IField field, JsonValue value, IJsonSerializer jsonSerializer)
         {
             Guard.NotNull(field);
             Guard.NotNull(value);
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return true;
         }
 
-        private static bool IsValidStringList(JsonValue2 value)
+        private static bool IsValidStringList(JsonValue value)
         {
             if (value.Type != JsonValueType.Array)
             {
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return true;
         }
 
-        private static bool IsValidObjectList(JsonValue2 value)
+        private static bool IsValidObjectList(JsonValue value)
         {
             if (value.Type != JsonValueType.Array)
             {
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return true;
         }
 
-        private static bool IsValidComponentList(JsonValue2 value)
+        private static bool IsValidComponentList(JsonValue value)
         {
             if (value.Type != JsonValueType.Array)
             {
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return true;
         }
 
-        private static bool IsValidComponent(JsonValue2 value)
+        private static bool IsValidComponent(JsonValue value)
         {
             return Component.IsValid(value, out _);
         }

@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             }
         }
 
-        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<JsonValue2> query,
+        private ClrQuery ParseJson(Context context, ISchemaEntity? schema, Query<JsonValue> query,
             ResolvedComponents components)
         {
             var queryModel = BuildQueryModel(context, schema, components);

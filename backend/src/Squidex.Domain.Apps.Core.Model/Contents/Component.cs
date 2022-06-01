@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed record Component(string Type, JsonValue2 Data, Schema Schema)
+    public sealed record Component(string Type, JsonObject Data, Schema Schema)
     {
         public const string Discriminator = "schemaId";
 
@@ -22,7 +22,9 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public Schema Schema { get; } = Guard.NotNull(Schema);
 
-        public static bool IsValid(JsonValue2 value, [MaybeNullWhen(false)] out string discriminator)
+        public JsonObject Data { get; } = Guard.NotNull(Data);
+
+        public static bool IsValid(JsonValue value, [MaybeNullWhen(false)] out string discriminator)
         {
             discriminator = null!;
 

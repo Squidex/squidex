@@ -9,7 +9,7 @@ using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
-    public class JsonObject : ListDictionary<string, JsonValue2>, IEquatable<JsonObject>
+    public class JsonObject : ListDictionary<string, JsonValue>, IEquatable<JsonObject>
     {
         public JsonObject()
         {
@@ -17,6 +17,11 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public JsonObject(int capacity)
             : base(capacity)
+        {
+        }
+
+        public JsonObject(JsonObject source)
+            : base(source)
         {
         }
 
@@ -37,15 +42,10 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override string ToString()
         {
-            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value}"))}}}";
-        }
-
-        public string ToJsonString()
-        {
             return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value.ToJsonString()}"))}}}";
         }
 
-        public new JsonObject Add(string key, JsonValue2 value)
+        public new JsonObject Add(string key, JsonValue value)
         {
             this[key] = value;
 

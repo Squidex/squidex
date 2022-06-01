@@ -9,13 +9,13 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class EnvelopeHeaders : Dictionary<string, JsonValue2>
+    public sealed class EnvelopeHeaders : Dictionary<string, JsonValue>
     {
         public EnvelopeHeaders()
         {
         }
 
-        public EnvelopeHeaders(IDictionary<string, JsonValue2> headers)
+        public EnvelopeHeaders(IDictionary<string, JsonValue> headers)
             : base(headers)
         {
         }

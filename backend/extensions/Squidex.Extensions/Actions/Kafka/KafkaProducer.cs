@@ -173,7 +173,7 @@ namespace Squidex.Extensions.Actions.Kafka
             avroProducer?.Dispose();
         }
 
-        private static object GetValue(JsonValue2 value, Schema schema)
+        private static object GetValue(JsonValue value, Schema schema)
         {
             switch (value.Type)
             {

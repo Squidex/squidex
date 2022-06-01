@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.TestHelpers
                     new JsonValueConverter(),
                     new StringEnumConverter(),
                     new SurrogateConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>(),
-                    new SurrogateConverter<FilterNode<IJsonValue>, JsonFilterSurrogate>(),
+                    new SurrogateConverter<FilterNode<JsonValue>, JsonFilterSurrogate>(),
                     new SurrogateConverter<LanguageConfig, LanguageConfigSurrogate>(),
                     new SurrogateConverter<LanguagesConfig, LanguagesConfigSurrogate>(),
                     new SurrogateConverter<Roles, RolesSurrogate>(),

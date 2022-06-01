@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate JsonValue2? ValueConverter(JsonValue2 value, IField field, IArrayField? parent);
+    public delegate JsonValue? ValueConverter(JsonValue value, IField field, IArrayField? parent);
 
     public static class ValueConverters
     {
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static readonly ValueConverter ExcludeHidden = (value, field, parent) =>
         {
-            return field.IsForApi() ? (JsonValue2?)value : null;
+            return field.IsForApi() ? (JsonValue?)value : null;
         };
 
         public static ValueConverter ExcludeChangedTypes(IJsonSerializer jsonSerializer)

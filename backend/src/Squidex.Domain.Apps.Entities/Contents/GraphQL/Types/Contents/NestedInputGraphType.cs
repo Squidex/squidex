@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 }
             }
 
-            return new JsonValue2(result);
+            return new JsonValue(result);
         }
     }
 }

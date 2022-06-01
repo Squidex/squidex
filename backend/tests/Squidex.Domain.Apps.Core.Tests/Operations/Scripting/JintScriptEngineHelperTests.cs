@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return html2Text(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("Hello World", result);
         }
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return markdown2Text(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("Hello World", result);
         }
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return wordCount(value);
             ";
 
-            var result = ((JsonNumber)sut.Execute(vars, script)).Value;
+            var result = sut.Execute(vars, script).AsNumber;
 
             Assert.Equal(2, result);
         }
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return characterCount(value);
             ";
 
-            var result = ((JsonNumber)sut.Execute(vars, script)).Value;
+            var result = sut.Execute(vars, script).AsNumber;
 
             Assert.Equal(10, result);
         }
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return toCamelCase(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("helloWorld", result);
         }
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return toPascalCase(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("HelloWorld", result);
         }
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("4-haeuser", result);
         }
@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return slugify(value, true);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("4-hauser", result);
         }
@@ -192,7 +192,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return sha256(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("HelloWorld".ToSha256(), result);
         }
@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return sha512(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("HelloWorld".ToSha512(), result);
         }
@@ -226,7 +226,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return md5(value);
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.Equal("HelloWorld".ToMD5(), result);
         }
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 return guid();
             ";
 
-            var result = sut.Execute(vars, script).ToString();
+            var result = sut.Execute(vars, script).AsString;
 
             Assert.True(Guid.TryParse(result, out _));
         }
@@ -385,7 +385,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeMethod(HttpMethod.Get);
             httpHandler.ShouldBeUrl("http://squidex.io/");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }
@@ -419,7 +419,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeHeader("X-Header1", "1");
             httpHandler.ShouldBeHeader("X-Header2", "2");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }
@@ -446,7 +446,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeMethod(HttpMethod.Delete);
             httpHandler.ShouldBeUrl("http://squidex.io/");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }
@@ -476,7 +476,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeUrl("http://squidex.io/");
             httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }
@@ -506,7 +506,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeUrl("http://squidex.io/");
             httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }
@@ -536,7 +536,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             httpHandler.ShouldBeUrl("http://squidex.io/");
             httpHandler.ShouldBeBody("{\"key\":42}", "text/json");
 
-            var expectedResult = JsonValue.Object().Add("key", 42);
+            var expectedResult = new JsonObject().Add("key", 42);
 
             Assert.Equal(expectedResult, result);
         }

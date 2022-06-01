@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class ContentFieldData : ListDictionary<string, JsonValue2>, IEquatable<ContentFieldData>
+    public sealed class ContentFieldData : ListDictionary<string, JsonValue>, IEquatable<ContentFieldData>
     {
         public ContentFieldData()
             : base(0, StringComparer.OrdinalIgnoreCase)
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             }
         }
 
-        public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out JsonValue2 result)
+        public bool TryGetNonNull(string key, [MaybeNullWhen(false)] out JsonValue result)
         {
             result = default;
 
@@ -46,17 +46,17 @@ namespace Squidex.Domain.Apps.Core.Contents
             return false;
         }
 
-        public ContentFieldData AddInvariant(JsonValue2 value)
+        public ContentFieldData AddInvariant(JsonValue value)
         {
             return AddValue(InvariantPartitioning.Key, value);
         }
 
-        public ContentFieldData AddLocalized(string key, JsonValue2 value)
+        public ContentFieldData AddLocalized(string key, JsonValue value)
         {
             return AddValue(key, value);
         }
 
-        public ContentFieldData AddValue(string key, JsonValue2 value)
+        public ContentFieldData AddValue(string key, JsonValue value)
         {
             this[key] = value;
 
