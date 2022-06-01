@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Assets
 {
-    public sealed class AssetMetadata : Dictionary<string, IJsonValue>
+    public sealed class AssetMetadata : Dictionary<string, JsonValue2>
     {
         private static readonly char[] PathSeparators = { '.', '[', ']' };
 
@@ -23,42 +23,42 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public AssetMetadata SetFocusX(float value)
         {
-            this[FocusX] = JsonValue.Create(value);
+            this[FocusX] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetFocusY(float value)
         {
-            this[FocusY] = JsonValue.Create(value);
+            this[FocusY] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetPixelWidth(int value)
         {
-            this[PixelWidth] = JsonValue.Create(value);
+            this[PixelWidth] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetPixelHeight(int value)
         {
-            this[PixelHeight] = JsonValue.Create(value);
+            this[PixelHeight] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetVideoWidth(int value)
         {
-            this[VideoWidth] = JsonValue.Create(value);
+            this[VideoWidth] = (double)value;
 
             return this;
         }
 
         public AssetMetadata SetVideoHeight(int value)
         {
-            this[VideoHeight] = JsonValue.Create(value);
+            this[VideoHeight] = (double)value;
 
             return this;
         }
@@ -95,9 +95,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public int? GetIn32(string name)
         {
-            if (TryGetValue(name, out var n) && n is JsonNumber number)
+            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
             {
-                return (int)number.Value;
+                return (int)n.AsNumber;
             }
 
             return null;
@@ -105,9 +105,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public float? GetSingle(string name)
         {
-            if (TryGetValue(name, out var n) && n is JsonNumber number)
+            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
             {
-                return (float)number.Value;
+                return (int)n.AsNumber;
             }
 
             return null;
@@ -115,9 +115,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public bool TryGetNumber(string name, out double result)
         {
-            if (TryGetValue(name, out var v) && v is JsonNumber n)
+            if (TryGetValue(name, out var n) && n.Type == JsonValueType.Number)
             {
-                result = n.Value;
+                result = n.AsNumber;
 
                 return true;
             }
@@ -129,9 +129,9 @@ namespace Squidex.Domain.Apps.Core.Assets
 
         public bool TryGetString(string name, [MaybeNullWhen(false)] out string result)
         {
-            if (TryGetValue(name, out var v) && v is JsonString s)
+            if (TryGetValue(name, out var s) && s.Type == JsonValueType.String)
             {
-                result = s.Value;
+                result = s.AsString;
 
                 return true;
             }

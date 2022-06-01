@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return content;
         }
 
-        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value, TimeSpan cacheDuration,
+        public Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(JsonValue2 value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await LoadAsync(ids);
         }
 
-        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(IJsonValue value, TimeSpan cacheDuration,
+        public Task<IReadOnlyList<IEnrichedContentEntity>> GetReferencedContentsAsync(JsonValue2 value, TimeSpan cacheDuration,
             CancellationToken ct)
         {
             var ids = ParseIds(value);
@@ -182,20 +182,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 });
         }
 
-        private static List<DomainId>? ParseIds(IJsonValue value)
+        private static List<DomainId>? ParseIds(JsonValue2 value)
         {
             try
             {
                 List<DomainId>? result = null;
 
-                if (value is JsonArray array)
+                if (value.Type == JsonValueType.Array)
                 {
-                    foreach (var id in array)
+                    foreach (var item in value.AsArray)
                     {
-                        if (id is JsonString jsonString)
+                        if (item.Type == JsonValueType.String)
                         {
                             result ??= new List<DomainId>();
-                            result.Add(DomainId.Create(jsonString.Value));
+                            result.Add(DomainId.Create(item.AsString));
                         }
                     }
                 }

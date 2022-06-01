@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps
         {
             var text = T.Get("contents.listReferences", new { count = referencedContents.Count });
 
-            var value = JsonValue.Object();
+            var value = new JsonObject();
 
             foreach (var partitionKey in context.App.Languages.AllKeys)
             {

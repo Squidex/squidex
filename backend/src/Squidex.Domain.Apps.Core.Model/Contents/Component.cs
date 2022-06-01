@@ -14,36 +14,36 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed record Component(string Type, JsonObject Data, Schema Schema)
+    public sealed record Component(string Type, JsonValue2 Data, Schema Schema)
     {
         public const string Discriminator = "schemaId";
 
         public string Type { get; } = Guard.NotNullOrEmpty(Type);
 
-        public JsonObject Data { get; } = Guard.NotNull(Data);
-
         public Schema Schema { get; } = Guard.NotNull(Schema);
 
-        public static bool IsValid(IJsonValue? value, [MaybeNullWhen(false)] out string discriminator)
+        public static bool IsValid(JsonValue2 value, [MaybeNullWhen(false)] out string discriminator)
         {
             discriminator = null!;
 
-            if (value is not JsonObject obj)
+            if (value.Type != JsonValueType.Object)
             {
                 return false;
             }
 
-            if (!obj.TryGetValue<JsonString>(Discriminator, out var type))
+            if (!value.AsObject.TryGetValue(Discriminator, out var type) || type.Type != JsonValueType.String)
             {
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(type.Value))
+            var typed = type.AsString;
+
+            if (string.IsNullOrWhiteSpace(typed))
             {
                 return false;
             }
 
-            discriminator = type.Value;
+            discriminator = typed;
 
             return true;
         }

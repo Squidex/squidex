@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             try
             {
-                if (value is IJsonValue jsonValue)
+                if (value is JsonValue2 jsonValue)
                 {
                     if (jsonValue.Type == JsonValueType.Null)
                     {

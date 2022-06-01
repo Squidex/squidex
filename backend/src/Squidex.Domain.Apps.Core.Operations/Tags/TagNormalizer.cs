@@ -21,10 +21,10 @@ namespace Squidex.Domain.Apps.Core.Tags
             Guard.NotNull(newData);
 
             var newValues = new HashSet<string>();
-            var newArrays = new List<JsonArray>();
+            var newArrays = new List<JsonValue2>();
 
             var oldValues = new HashSet<string>();
-            var oldArrays = new List<JsonArray>();
+            var oldArrays = new List<JsonValue2>();
 
             GetValues(schema, newValues, newArrays, newData);
 
@@ -37,13 +37,15 @@ namespace Squidex.Domain.Apps.Core.Tags
             {
                 var normalized = await tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId), newValues, oldValues);
 
-                foreach (var array in newArrays)
+                foreach (var source in newArrays)
                 {
+                    var array = source.AsArray;
+
                     for (var i = 0; i < array.Count; i++)
                     {
                         if (normalized.TryGetValue(array[i].ToString(), out var result))
                         {
-                            array[i] = JsonValue.Create(result);
+                            array[i] = result;
                         }
                     }
                 }
@@ -56,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             Guard.NotNull(schema);
 
             var tagsValues = new HashSet<string>();
-            var tagsArrays = new List<JsonArray>();
+            var tagsArrays = new List<JsonValue2>();
 
             GetValues(schema, tagsValues, tagsArrays, datas);
 
@@ -64,20 +66,22 @@ namespace Squidex.Domain.Apps.Core.Tags
             {
                 var denormalized = await tagService.DenormalizeTagsAsync(appId, TagGroups.Schemas(schemaId), tagsValues);
 
-                foreach (var array in tagsArrays)
+                foreach (var source in tagsArrays)
                 {
+                    var array = source.AsArray;
+
                     for (var i = 0; i < array.Count; i++)
                     {
                         if (denormalized.TryGetValue(array[i].ToString(), out var result))
                         {
-                            array[i] = JsonValue.Create(result);
+                            array[i] = result;
                         }
                     }
                 }
             }
         }
 
-        private static void GetValues(Schema schema, HashSet<string> values, List<JsonArray> arrays, params ContentData[] datas)
+        private static void GetValues(Schema schema, HashSet<string> values, List<JsonValue2> arrays, params ContentData[] datas)
         {
             foreach (var field in schema.Fields)
             {
@@ -106,13 +110,13 @@ namespace Squidex.Domain.Apps.Core.Tags
                                 {
                                     foreach (var partition in fieldData)
                                     {
-                                        if (partition.Value is JsonArray array)
+                                        if (partition.Value.Type == JsonValueType.Array)
                                         {
-                                            foreach (var value in array)
+                                            foreach (var value in partition.Value.AsArray)
                                             {
-                                                if (value is JsonObject nestedObject)
+                                                if (value.Type == JsonValueType.Object)
                                                 {
-                                                    if (nestedObject.TryGetValue(nestedField.Name, out var nestedValue))
+                                                    if (value.AsObject.TryGetValue(nestedField.Name, out var nestedValue))
                                                     {
                                                         ExtractTags(nestedValue, values, arrays);
                                                     }
@@ -128,11 +132,11 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        private static void ExtractTags(IJsonValue value, ISet<string> values, ICollection<JsonArray> arrays)
+        private static void ExtractTags(JsonValue2 value, ISet<string> values, ICollection<JsonValue2> arrays)
         {
-            if (value is JsonArray array)
+            if (value.Type == JsonValueType.Array)
             {
-                foreach (var item in array)
+                foreach (var item in value.AsArray)
                 {
                     if (item.Type == JsonValueType.String)
                     {
@@ -140,7 +144,7 @@ namespace Squidex.Domain.Apps.Core.Tags
                     }
                 }
 
-                arrays.Add(array);
+                arrays.Add(value);
             }
         }
     }

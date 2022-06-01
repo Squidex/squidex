@@ -35,9 +35,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             foreach (var (key, value) in content)
             {
-                var first = GetFirst(value, fallback);
-
-                if (first != null)
+                if (TryGetFirst(value, fallback, out var first))
                 {
                     result[key] = first;
                 }
@@ -61,29 +59,34 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return fieldData;
         }
 
-        private static IJsonValue? GetFirst(ContentFieldData? fieldData, string fallback)
+        private static bool TryGetFirst(ContentFieldData? fieldData, string fallback, out JsonValue2 result)
         {
+            result = default;
+
             if (fieldData == null)
             {
-                return null;
+                return false;
             }
 
             if (fieldData.Count == 1)
             {
-                return fieldData.Values.First();
+                result = fieldData.Values.First();
+                return true;
             }
 
             if (fieldData.TryGetValue(fallback, out var value))
             {
-                return value;
+                result = value;
+                return true;
             }
 
             if (fieldData.Count > 1)
             {
-                return fieldData.Values.First();
+                result = fieldData.Values.First();
+                return true;
             }
 
-            return null;
+            return false;
         }
     }
 }

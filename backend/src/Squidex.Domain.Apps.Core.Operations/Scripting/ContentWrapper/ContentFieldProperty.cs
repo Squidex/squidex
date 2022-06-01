@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     public sealed class ContentFieldProperty : CustomProperty
     {
         private readonly ContentFieldObject contentField;
-        private IJsonValue contentValue;
+        private JsonValue2 contentValue;
         private JsValue? value;
         private bool isChanged;
 
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             {
                 if (value == null)
                 {
-                    if (contentValue != null)
+                    if (contentValue != default)
                     {
                         value = JsonMapper.Map(contentValue, contentField.Engine);
                     }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             }
         }
 
-        public IJsonValue ContentValue
+        public JsonValue2 ContentValue
         {
             get => contentValue;
         }
@@ -59,10 +59,10 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             get => isChanged;
         }
 
-        public ContentFieldProperty(ContentFieldObject contentField, IJsonValue? contentValue = null)
+        public ContentFieldProperty(ContentFieldObject contentField, JsonValue2 contentValue = default)
         {
             this.contentField = contentField;
-            this.contentValue = contentValue ?? JsonValue.Null;
+            this.contentValue = contentValue;
         }
     }
 }

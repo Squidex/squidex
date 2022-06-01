@@ -18,26 +18,26 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         private static readonly ReferencesExtractor Instance = new ReferencesExtractor();
 
-        public record struct Args(IJsonValue Value, ISet<DomainId> Result, int Take, ResolvedComponents Components);
+        public record struct Args(JsonValue2 Value, ISet<DomainId> Result, int Take, ResolvedComponents Components);
 
         private ReferencesExtractor()
         {
         }
 
-        public static None Extract(IField field, IJsonValue? value, HashSet<DomainId> result, int take, ResolvedComponents components)
+        public static None Extract(IField field, JsonValue2 value, HashSet<DomainId> result, int take, ResolvedComponents components)
         {
-            var args = new Args(value ?? JsonValue.Null, result, take, components);
+            var args = new Args(value, result, take, components);
 
             return field.Accept(Instance, args);
         }
 
         public None Visit(IArrayField field, Args args)
         {
-            if (args.Value is JsonArray array)
+            if (args.Value.Type == JsonValueType.Array)
             {
-                for (var i = 0; i < array.Count; i++)
+                foreach (var value in args.Value.AsArray)
                 {
-                    ExtractFromArrayItem(field, array[i], args);
+                    ExtractFromArrayItem(field, value, args);
                 }
             }
 
@@ -72,11 +72,11 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         public None Visit(IField<ComponentsFieldProperties> field, Args args)
         {
-            if (args.Value is JsonArray array)
+            if (args.Value.Type == JsonValueType.Array)
             {
-                for (var i = 0; i < array.Count; i++)
+                foreach (var value in args.Value.AsArray)
                 {
-                    ExtractFromComponent(array[i], args);
+                    ExtractFromComponent(value, args);
                 }
             }
 
@@ -118,10 +118,12 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return None.Value;
         }
 
-        private void ExtractFromArrayItem(IArrayField field, IJsonValue value, Args args)
+        private void ExtractFromArrayItem(IArrayField field, JsonValue2 value, Args args)
         {
-            if (value is JsonObject obj)
+            if (value.Type == JsonValueType.Object)
             {
+                var obj = value.AsObject;
+
                 foreach (var nestedField in field.Fields)
                 {
                     if (obj.TryGetValue(nestedField.Name, out var nestedValue))
@@ -132,19 +134,24 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             }
         }
 
-        private void ExtractFromComponent(IJsonValue value, Args args)
+        private void ExtractFromComponent(JsonValue2 value, Args args)
         {
-            if (value is JsonObject obj && obj.TryGetValue<JsonString>(Component.Discriminator, out var type))
+            if (value.Type == JsonValueType.Object)
             {
-                var id = DomainId.Create(type.Value);
+                var obj = value.AsObject;
 
-                if (args.Components.TryGetValue(id, out var schema))
+                if (obj.TryGetValue(Component.Discriminator, out var type) && type.Type == JsonValueType.String)
                 {
-                    foreach (var componentField in schema.Fields)
+                    var id = DomainId.Create(type.AsString);
+
+                    if (args.Components.TryGetValue(id, out var schema))
                     {
-                        if (obj.TryGetValue(componentField.Name, out var componentValue))
+                        foreach (var componentField in schema.Fields)
                         {
-                            componentField.Accept(this, args with { Value = componentValue });
+                            if (obj.TryGetValue(componentField.Name, out var componentValue))
+                            {
+                                componentField.Accept(this, args with { Value = componentValue });
+                            }
                         }
                     }
                 }
@@ -155,13 +162,13 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             var added = 0;
 
-            if (args.Value is JsonArray array)
+            if (args.Value.Type == JsonValueType.Array)
             {
-                foreach (var id in array)
+                foreach (var id in args.Value.AsArray)
                 {
-                    if (id is JsonString s)
+                    if (id.Type == JsonValueType.String)
                     {
-                        args.Result.Add(DomainId.Create(s.Value));
+                        args.Result.Add(DomainId.Create(id.AsString));
 
                         added++;
 

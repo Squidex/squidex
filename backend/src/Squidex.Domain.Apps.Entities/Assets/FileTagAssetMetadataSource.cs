@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (!string.IsNullOrWhiteSpace(value))
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value));
+                            command.Metadata.Add(name, value);
                         }
                     }
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (value > 0)
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value));
+                            command.Metadata.Add(name, (double)value.Value);
                         }
                     }
 
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (value > 0)
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value));
+                            command.Metadata.Add(name, value.Value);
                         }
                     }
 
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         if (value != TimeSpan.Zero)
                         {
-                            command.Metadata.Add(name, JsonValue.Create(value.ToString()));
+                            command.Metadata.Add(name, value.ToString());
                         }
                     }
 

@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var sb = new StringBuilder();
 
-            IJsonValue? GetValue(ContentData? data, RootField field)
+            JsonValue2? GetValue(ContentData? data, RootField field)
             {
                 if (data != null && data.TryGetValue(field.Name, out var fieldValue) && fieldValue != null)
                 {
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     var value = GetValue(content.ReferenceData, field) ?? GetValue(content.Data, field);
 
-                    var formatted = StringFormatter.Format(field, value);
+                    var formatted = StringFormatter.Format(field, value ?? default);
 
                     if (!string.IsNullOrWhiteSpace(formatted))
                     {

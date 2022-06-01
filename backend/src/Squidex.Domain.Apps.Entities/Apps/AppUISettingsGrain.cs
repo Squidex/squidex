@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [CollectionName("UISettings")]
         public sealed class State
         {
-            public JsonObject Settings { get; set; } = JsonValue.Object();
+            public JsonValue2 Settings { get; set; } = JsonValue2.Object();
         }
 
         public AppUISettingsGrain(IGrainState<State> state)
@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.state = state;
         }
 
-        public Task<J<JsonObject>> GetAsync()
+        public Task<J<JsonValue2>> GetAsync()
         {
             return Task.FromResult(state.Value.Settings.AsJ());
         }
@@ -39,14 +39,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return state.ClearAsync();
         }
 
-        public Task SetAsync(J<JsonObject> settings)
+        public Task SetAsync(J<JsonValue2> settings)
         {
             state.Value.Settings = settings;
 
             return state.WriteAsync();
         }
 
-        public Task SetAsync(string path, J<IJsonValue> value)
+        public Task SetAsync(string path, J<JsonValue2> value)
         {
             var container = GetContainer(path, true, out var key);
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             key = segments[^1];
 
-            var current = state.Value.Settings;
+            var current = state.Value.Settings.AsObject;
 
             if (segments.Length > 1)
             {
@@ -90,9 +90,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     {
                         if (add)
                         {
-                            temp = JsonValue.Object();
+                            var obj = new JsonObject();
 
-                            current[segment] = temp;
+                            current[segment] = new JsonValue2(obj);
                         }
                         else
                         {
@@ -100,9 +100,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                     }
 
-                    if (temp is JsonObject next)
+                    if (temp.Type == JsonValueType.Object)
                     {
-                        current = next;
+                        current = temp.AsObject;
                     }
                     else
                     {

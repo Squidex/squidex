@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         void Run<T>(Action<T>? action, T argument);
     }
 
-    public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, IScheduler where T : class
+    public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, IScheduler
     {
         private readonly TaskCompletionSource<T?> tcs = new TaskCompletionSource<T?>();
         private readonly CancellationToken cancellationToken;
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         {
             if (pendingTasks <= 0)
             {
-                tcs.TrySetResult(null);
+                tcs.TrySetResult(default);
             }
 
             return tcs.Task.WithCancellation(cancellationToken);
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                     if (Interlocked.Decrement(ref pendingTasks) <= 0)
                     {
-                        tcs.TrySetResult(null);
+                        tcs.TrySetResult(default);
                     }
                 }
                 catch (Exception ex)

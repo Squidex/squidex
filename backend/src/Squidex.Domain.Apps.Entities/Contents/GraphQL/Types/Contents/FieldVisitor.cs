@@ -17,9 +17,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 {
-    public delegate T ValueResolver<T>(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+    public delegate T ValueResolver<T>(JsonValue2 value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
-    public delegate Task<T> AsyncValueResolver<T>(IJsonValue value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
+    public delegate Task<T> AsyncValueResolver<T>(JsonValue2 value, IResolveFieldContext fieldContext, GraphQLExecutionContext context);
 
     internal sealed class FieldVisitor : IFieldVisitor<FieldGraphSchema, FieldInfo>
     {
@@ -28,10 +28,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonBoolean = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonBoolean b:
-                    return b.Value;
+                case JsonValueType.Boolean:
+                    return value.AsBoolean;
                 default:
                     throw new NotSupportedException();
             }
@@ -39,10 +39,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonDateTime = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonString n:
-                    return n.Value;
+                case JsonValueType.String:
+                    return value.AsString;
                 default:
                     throw new NotSupportedException();
             }
@@ -50,10 +50,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonNumber = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonNumber n:
-                    return n.Value;
+                case JsonValueType.Number:
+                    return value.AsNumber;
                 default:
                     throw new NotSupportedException();
             }
@@ -61,10 +61,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonString = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonString s:
-                    return s.Value;
+                case JsonValueType.String:
+                    return value.AsString;
                 default:
                     throw new NotSupportedException();
             }
@@ -72,10 +72,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static readonly IFieldResolver JsonStrings = CreateValueResolver((value, fieldContext, contex) =>
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonArray a:
-                    return a.Select(x => x.ToString()).ToList();
+                case JsonValueType.Array:
+                    return value.AsArray.Select(x => x.ToString()).ToList();
                 default:
                     throw new NotSupportedException();
             }
@@ -278,13 +278,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static IFieldResolver CreateValueResolver<T>(ValueResolver<T> valueResolver)
         {
-            return Resolvers.Sync<IReadOnlyDictionary<string, IJsonValue>, object?>((source, fieldContext, context) =>
+            return Resolvers.Sync<IReadOnlyDictionary<string, JsonValue2>, object?>((source, fieldContext, context) =>
             {
                 var key = fieldContext.FieldDefinition.SourceName();
 
                 if (source.TryGetValue(key, out var value))
                 {
-                    if (value is JsonNull)
+                    if (value.Type == JsonValueType.Number)
                     {
                         return null;
                     }
@@ -298,13 +298,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
 
         private static IFieldResolver CreateAsyncValueResolver<T>(AsyncValueResolver<T> valueResolver)
         {
-            return Resolvers.Async<IReadOnlyDictionary<string, IJsonValue>, object?>(async (source, fieldContext, context) =>
+            return Resolvers.Async<IReadOnlyDictionary<string, JsonValue2>, object?>(async (source, fieldContext, context) =>
             {
                 var key = fieldContext.FieldDefinition.SourceName();
 
                 if (source.TryGetValue(key, out var value))
                 {
-                    if (value is JsonNull)
+                    if (value.Type == JsonValueType.Number)
                     {
                         return null;
                     }

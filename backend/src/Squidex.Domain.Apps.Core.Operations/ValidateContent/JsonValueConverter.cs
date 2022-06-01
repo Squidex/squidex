@@ -22,13 +22,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private static readonly JsonValueConverter Instance = new JsonValueConverter();
 
-        public record struct Args(IJsonValue Value, IJsonSerializer JsonSerializer, ResolvedComponents Components);
+        public record struct Args(JsonValue2 Value, IJsonSerializer JsonSerializer, ResolvedComponents Components);
 
         private JsonValueConverter()
         {
         }
 
-        public static (object? Result, JsonError? Error) ConvertValue(IField field, IJsonValue value, IJsonSerializer jsonSerializer,
+        public static (object? Result, JsonError? Error) ConvertValue(IField field, JsonValue2 value, IJsonSerializer jsonSerializer,
             ResolvedComponents components)
         {
             Guard.NotNull(field);
@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<BooleanFieldProperties> field, Args args)
         {
-            if (args.Value is JsonBoolean b)
+            if (args.Value.Type == JsonValueType.Boolean)
             {
-                return (b.Value, null);
+                return (args.Value.AsBoolean, null);
             }
 
             return (null, new JsonError(T.Get("contents.invalidBoolean")));
@@ -86,9 +86,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<NumberFieldProperties> field, Args args)
         {
-            if (args.Value is JsonNumber n)
+            if (args.Value.Type == JsonValueType.Number)
             {
-                return (n.Value, null);
+                return (args.Value.AsNumber, null);
             }
 
             return (null, new JsonError(T.Get("contents.invalidNumber")));
@@ -96,9 +96,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public (object? Result, JsonError? Error) Visit(IField<StringFieldProperties> field, Args args)
         {
-            if (args.Value is JsonString s)
+            if (args.Value.Type == JsonValueType.String)
             {
-                return (s.Value, null);
+                return (args.Value.AsString, null);
             }
 
             return (null, new JsonError(T.Get("contents.invalidString")));
@@ -143,17 +143,25 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        private static (object? Result, JsonError? Error) ConvertToIdList(IJsonValue value)
+        private static (object? Result, JsonError? Error) ConvertToIdList(JsonValue2 value)
         {
-            if (value is JsonArray array)
+            if (value.Type == JsonValueType.Array)
             {
+                var array = value.AsArray;
+
                 var result = new List<DomainId>(array.Count);
 
-                for (var i = 0; i < array.Count; i++)
+                foreach (var item in array)
                 {
-                    if (array[i] is JsonString s && !string.IsNullOrWhiteSpace(s.Value))
+                    if (item.Type == JsonValueType.String)
                     {
-                        result.Add(DomainId.Create(s.Value));
+                        var typed = item.AsString;
+
+                        if (!string.IsNullOrWhiteSpace(item.AsString))
+                        {
+                            result.Add(DomainId.Create(typed));
+                            continue;
+                        }
                     }
                     else
                     {
@@ -167,17 +175,25 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
         }
 
-        private static (object? Result, JsonError? Error) ConvertToStringList(IJsonValue value)
+        private static (object? Result, JsonError? Error) ConvertToStringList(JsonValue2 value)
         {
-            if (value is JsonArray array)
+            if (value.Type == JsonValueType.Array)
             {
+                var array = value.AsArray;
+
                 var result = new List<string?>(array.Count);
 
-                for (var i = 0; i < array.Count; i++)
+                foreach (var item in array)
                 {
-                    if (array[i] is JsonString s && !string.IsNullOrWhiteSpace(s.Value))
+                    if (item.Type == JsonValueType.String)
                     {
-                        result.Add(s.Value);
+                        var typed = item.AsString;
+
+                        if (!string.IsNullOrWhiteSpace(item.AsString))
+                        {
+                            result.Add(typed);
+                            continue;
+                        }
                     }
                     else
                     {
@@ -191,17 +207,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfStrings")));
         }
 
-        private static (object? Result, JsonError? Error) ConvertToObjectList(IJsonValue value)
+        private static (object? Result, JsonError? Error) ConvertToObjectList(JsonValue2 value)
         {
-            if (value is JsonArray array)
+            if (value.Type == JsonValueType.Array)
             {
-                var result = new List<JsonObject>(array.Count);
+                var array = value.AsArray;
 
-                for (var i = 0; i < array.Count; i++)
+                var result = new List<ListDictionary<string, JsonValue2>>(array.Count);
+
+                foreach (var item in array)
                 {
-                    if (array[i] is JsonObject obj)
+                    if (item.Type == JsonValueType.Object)
                     {
-                        result.Add(obj);
+                        result.Add(item.AsObject);
                     }
                     else
                     {
@@ -215,25 +233,27 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfObjects")));
         }
 
-        private static (object? Result, JsonError? Error) ConvertToComponentList(IJsonValue value,
+        private static (object? Result, JsonError? Error) ConvertToComponentList(JsonValue2 value,
             ResolvedComponents components, ReadonlyList<DomainId>? allowedIds)
         {
-            if (value is JsonArray array)
+            if (value.Type == JsonValueType.Array)
             {
+                var array = value.AsArray;
+
                 var result = new List<Component>(array.Count);
 
-                for (var i = 0; i < array.Count; i++)
+                foreach (var item in array)
                 {
-                    var (item, error) = ConvertToComponent(array[i], components, allowedIds);
+                    var (component, error) = ConvertToComponent(item, components, allowedIds);
 
                     if (error != null)
                     {
                         return (null, error);
                     }
 
-                    if (item != null)
+                    if (component != null)
                     {
-                        result.Add(item);
+                        result.Add(component);
                     }
                 }
 
@@ -243,32 +263,34 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return (null, new JsonError(T.Get("contents.invalidArrayOfObjects")));
         }
 
-        private static (Component? Result, JsonError? Error) ConvertToComponent(IJsonValue value,
+        private static (Component? Result, JsonError? Error) ConvertToComponent(JsonValue2 value,
             ResolvedComponents components, ReadonlyList<DomainId>? allowedIds)
         {
-            if (value is not JsonObject obj)
+            if (value.Type != JsonValueType.Object)
             {
                 return (null, new JsonError(T.Get("contents.invalidComponentNoObject")));
             }
 
             var id = default(DomainId);
 
-            if (obj.TryGetValue<JsonString>("schemaName", out var schemaName))
+            var obj = value.AsObject;
+
+            if (obj.TryGetValue("schemaName", out var schemaName) && schemaName.Type == JsonValueType.String)
             {
-                id = components.FirstOrDefault(x => x.Value.Name == schemaName.Value).Key;
+                id = components.FirstOrDefault(x => x.Value.Name == schemaName.AsString).Key;
 
                 obj.Remove("schemaName");
-                obj[Component.Discriminator] = JsonValue.Create(id);
+                obj[Component.Discriminator] = id;
             }
-            else if (obj.TryGetValue<JsonString>(Component.Discriminator, out var discriminator))
+            else if (obj.TryGetValue(Component.Discriminator, out var discriminator) && discriminator.Type == JsonValueType.String)
             {
-                id = DomainId.Create(discriminator.Value);
+                id = DomainId.Create(discriminator.AsString);
             }
             else if (allowedIds?.Count == 1)
             {
                 id = allowedIds[0];
 
-                obj[Component.Discriminator] = JsonValue.Create(id);
+                obj[Component.Discriminator] = id;
             }
 
             if (id == default)
@@ -281,11 +303,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return (null, new JsonError(T.Get("contents.invalidComponentUnknownSchema")));
             }
 
-            var data = new JsonObject(obj);
+            obj.Remove(Component.Discriminator);
 
-            data.Remove(Component.Discriminator);
-
-            return (new Component(id.ToString(), data, schema), null);
+            return (new Component(id.ToString(), obj, schema), null);
         }
     }
 }

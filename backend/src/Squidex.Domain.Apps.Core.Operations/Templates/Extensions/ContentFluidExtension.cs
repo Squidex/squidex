@@ -17,12 +17,26 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
     {
         public void RegisterGlobalTypes(IMemberAccessStrategy memberAccessStrategy)
         {
-            FluidValue.SetTypeMapping<JsonObject>(x => new ObjectValue(x));
-            FluidValue.SetTypeMapping<JsonArray>(x => new JsonArrayFluidValue(x));
-            FluidValue.SetTypeMapping<JsonString>(x => FluidValue.Create(x.Value));
-            FluidValue.SetTypeMapping<JsonBoolean>(x => FluidValue.Create(x.Value));
-            FluidValue.SetTypeMapping<JsonNumber>(x => FluidValue.Create(x.Value));
-            FluidValue.SetTypeMapping<JsonNull>(_ => FluidValue.Create(null));
+            FluidValue.SetTypeMapping<JsonValue2>(source =>
+            {
+                switch (source.Type)
+                {
+                    case JsonValueType.Null:
+                        return FluidValue.Create(null);
+                    case JsonValueType.Boolean:
+                        return FluidValue.Create(source.AsBoolean);
+                    case JsonValueType.Number:
+                        return FluidValue.Create(source.AsNumber);
+                    case JsonValueType.String:
+                        return FluidValue.Create(source.AsString);
+                    case JsonValueType.Array:
+                        return new JsonArrayFluidValue(source.AsArray);
+                    case JsonValueType.Object:
+                        return new ObjectValue(source.AsObject);
+                    default:
+                        throw new InvalidOperationException();
+                }
+            });
 
             memberAccessStrategy.Register<ContentData, object?>(
                 (value, name) => value.GetOrDefault(name));

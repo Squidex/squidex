@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Queries.Json
 {
     public static class ValueConverter
     {
-        private delegate bool Parser<T>(List<string> errors, PropertyPath path, IJsonValue value, out T result);
+        private delegate bool Parser<T>(List<string> errors, PropertyPath path, JsonValue2 value, out T result);
 
         private static readonly InstantPattern[] InstantPatterns =
         {
@@ -22,13 +22,13 @@ namespace Squidex.Infrastructure.Queries.Json
             InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
         };
 
-        public static ClrValue? Convert(FilterField field, IJsonValue value, PropertyPath path, List<string> errors)
+        public static ClrValue? Convert(FilterField field, JsonValue2 value, PropertyPath path, List<string> errors)
         {
             ClrValue? result = null;
 
             var type = field.Schema.Type;
 
-            if (value is JsonNull && type != FilterSchemaType.GeoObject && field.IsNullable)
+            if (value.Type == JsonValueType.Null && type != FilterSchemaType.GeoObject && field.IsNullable)
             {
                 return ClrValue.Null;
             }
@@ -47,9 +47,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Any:
                     {
-                        if (value is JsonArray jsonArray)
+                        if (value.Type == JsonValueType.Array)
                         {
-                            var array = ParseArray<ClrValue?>(errors, path, jsonArray, TryParseDynamic);
+                            var array = ParseArray<ClrValue?>(errors, path, value.AsArray, TryParseDynamic);
 
                             result = array.Select(x => x?.Value).ToList();
                         }
@@ -63,9 +63,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Boolean:
                     {
-                        if (value is JsonArray jsonArray)
+                        if (value.Type == JsonValueType.Array)
                         {
-                            result = ParseArray<bool>(errors, path, jsonArray, TryParseBoolean);
+                            result = ParseArray<bool>(errors, path, value.AsArray, TryParseBoolean);
                         }
                         else if (TryParseBoolean(errors, path, value, out var temp))
                         {
@@ -77,9 +77,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Number:
                     {
-                        if (value is JsonArray jsonArray)
+                        if (value.Type == JsonValueType.Array)
                         {
-                            result = ParseArray<double>(errors, path, jsonArray, TryParseNumber);
+                            result = ParseArray<double>(errors, path, value.AsArray, TryParseNumber);
                         }
                         else if (TryParseNumber(errors, path, value, out var temp))
                         {
@@ -91,9 +91,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.Guid:
                     {
-                        if (value is JsonArray jsonArray)
+                        if (value.Type == JsonValueType.Array)
                         {
-                            result = ParseArray<Guid>(errors, path, jsonArray, TryParseGuid);
+                            result = ParseArray<Guid>(errors, path, value.AsArray, TryParseGuid);
                         }
                         else if (TryParseGuid(errors, path, value, out var temp))
                         {
@@ -105,9 +105,9 @@ namespace Squidex.Infrastructure.Queries.Json
 
                 case FilterSchemaType.DateTime:
                     {
-                        if (value is JsonArray jsonArray)
+                        if (value.Type == JsonValueType.Array)
                         {
-                            result = ParseArray<Instant>(errors, path, jsonArray, TryParseDateTime);
+                            result = ParseArray<Instant>(errors, path, value.AsArray, TryParseDateTime);
                         }
                         else if (TryParseDateTime(errors, path, value, out var temp))
                         {
@@ -120,9 +120,9 @@ namespace Squidex.Infrastructure.Queries.Json
                 case FilterSchemaType.StringArray:
                 case FilterSchemaType.String:
                     {
-                        if (value is JsonArray jsonArray)
+                        if (value.Type == JsonValueType.Array)
                         {
-                            result = ParseArray<string>(errors, path, jsonArray, TryParseString!);
+                            result = ParseArray<string>(errors, path, value.AsArray, TryParseString!);
                         }
                         else if (TryParseString(errors, path, value, out var temp))
                         {
@@ -157,18 +157,18 @@ namespace Squidex.Infrastructure.Queries.Json
             return items;
         }
 
-        private static bool TryParseGeoJson(List<string> errors, PropertyPath path, IJsonValue value, out FilterSphere result)
+        private static bool TryParseGeoJson(List<string> errors, PropertyPath path, JsonValue2 value, out FilterSphere result)
         {
             const string expected = "Object(geo-json)";
 
             result = default!;
 
-            if (value is JsonObject geoObject &&
-                geoObject.TryGetValue<JsonNumber>("latitude", out var lat) &&
-                geoObject.TryGetValue<JsonNumber>("longitude", out var lon) &&
-                geoObject.TryGetValue<JsonNumber>("distance", out var distance))
+            if (value.Type == JsonValueType.Object &&
+                value.TryGetValue("latitude", out var lat) && lat.Type == JsonValueType.Number &&
+                value.TryGetValue("longitude", out var lon) && lon.Type == JsonValueType.Number &&
+                value.TryGetValue("distance", out var distance) && distance.Type == JsonValueType.Number)
             {
-                result = new FilterSphere(lon.Value, lat.Value, distance.Value);
+                result = new FilterSphere(lon.AsNumber, lat.AsNumber, distance.AsNumber);
 
                 return true;
             }
@@ -178,15 +178,15 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseBoolean(List<string> errors, PropertyPath path, IJsonValue value, out bool result)
+        private static bool TryParseBoolean(List<string> errors, PropertyPath path, JsonValue2 value, out bool result)
         {
             const string expected = "Boolean";
 
             result = default;
 
-            if (value is JsonBoolean jsonBoolean)
+            if (value.Type == JsonValueType.Boolean)
             {
-                result = jsonBoolean.Value;
+                result = value.AsBoolean;
 
                 return true;
             }
@@ -196,15 +196,15 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseNumber(List<string> errors, PropertyPath path, IJsonValue value, out double result)
+        private static bool TryParseNumber(List<string> errors, PropertyPath path, JsonValue2 value, out double result)
         {
             const string expected = "Number";
 
             result = default;
 
-            if (value is JsonNumber jsonNumber)
+            if (value.Type == JsonValueType.Number)
             {
-                result = jsonNumber.Value;
+                result = value.AsNumber;
 
                 return true;
             }
@@ -214,15 +214,15 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseString(List<string> errors, PropertyPath path, IJsonValue value, out string? result)
+        private static bool TryParseString(List<string> errors, PropertyPath path, JsonValue2 value, out string? result)
         {
             const string expected = "String";
 
             result = default;
 
-            if (value is JsonString jsonString)
+            if (value.Type == JsonValueType.String)
             {
-                result = jsonString.Value;
+                result = value.AsString;
 
                 return true;
             }
@@ -232,15 +232,15 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseGuid(List<string> errors, PropertyPath path, IJsonValue value, out Guid result)
+        private static bool TryParseGuid(List<string> errors, PropertyPath path, JsonValue2 value, out Guid result)
         {
             const string expected = "String (Guid)";
 
             result = default;
 
-            if (value is JsonString jsonString)
+            if (value.Type == JsonValueType.String)
             {
-                if (Guid.TryParse(jsonString.Value, out result))
+                if (Guid.TryParse(value.AsString, out result))
                 {
                     return true;
                 }
@@ -255,17 +255,19 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseDateTime(List<string> errors, PropertyPath path, IJsonValue value, out Instant result)
+        private static bool TryParseDateTime(List<string> errors, PropertyPath path, JsonValue2 value, out Instant result)
         {
             const string expected = "String (ISO8601 DateTime)";
 
             result = default;
 
-            if (value is JsonString jsonString)
+            if (value.Type == JsonValueType.String)
             {
+                var typed = value.AsString;
+
                 foreach (var pattern in InstantPatterns)
                 {
-                    var parsed = pattern.Parse(jsonString.Value);
+                    var parsed = pattern.Parse(typed);
 
                     if (parsed.Success)
                     {
@@ -285,23 +287,25 @@ namespace Squidex.Infrastructure.Queries.Json
             return false;
         }
 
-        private static bool TryParseDynamic(List<string> errors, PropertyPath path, IJsonValue value, out ClrValue? result)
+        private static bool TryParseDynamic(List<string> errors, PropertyPath path, JsonValue2 value, out ClrValue? result)
         {
             result = null;
 
-            switch (value)
+            switch (value.Type)
             {
-                case JsonNull:
+                case JsonValueType.Null:
                     return true;
-                case JsonNumber jsonNumber:
-                    result = jsonNumber.Value;
+                case JsonValueType.Number:
+                    result = value.AsNumber;
                     return true;
-                case JsonBoolean jsonBoolean:
-                    result = jsonBoolean.Value;
+                case JsonValueType.Boolean:
+                    result = value.AsBoolean;
                     return true;
-                case JsonString jsonString:
+                case JsonValueType.String:
                     {
-                        if (Guid.TryParse(jsonString.Value, out var guid))
+                        var typed = value.AsString;
+
+                        if (Guid.TryParse(typed, out var guid))
                         {
                             result = guid;
 
@@ -310,7 +314,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
                         foreach (var pattern in InstantPatterns)
                         {
-                            var parsed = pattern.Parse(jsonString.Value);
+                            var parsed = pattern.Parse(typed);
 
                             if (parsed.Success)
                             {
@@ -320,7 +324,7 @@ namespace Squidex.Infrastructure.Queries.Json
                             }
                         }
 
-                        result = jsonString.Value;
+                        result = typed;
 
                         return true;
                     }

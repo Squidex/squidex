@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
                             throw new JsonSerializationException("Unexpected end when reading Object.");
                         }
 
-                        var value = serializer.Deserialize<IJsonValue>(reader)!;
+                        var value = serializer.Deserialize<JsonValue2>(reader)!;
 
                         if (Language.IsDefault(propertyName) || propertyName == InvariantPartitioning.Key)
                         {

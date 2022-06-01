@@ -173,23 +173,23 @@ namespace Squidex.Extensions.Actions.Kafka
             avroProducer?.Dispose();
         }
 
-        private static object GetValue(IJsonValue value, Schema schema)
+        private static object GetValue(JsonValue2 value, Schema schema)
         {
-            switch (value)
+            switch (value.Type)
             {
-                case JsonString s when IsTypeOrUnionWith(schema, Schema.Type.String):
-                    return s.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Long):
-                    return (long)n.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Float):
-                    return (float)n.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Int):
-                    return (int)n.Value;
-                case JsonNumber n when IsTypeOrUnionWith(schema, Schema.Type.Double):
-                    return n.Value;
-                case JsonBoolean b when IsTypeOrUnionWith(schema, Schema.Type.Boolean):
-                    return b.Value;
-                case JsonObject o when IsTypeOrUnionWith(schema, Schema.Type.Map):
+                case JsonValueType.String when IsTypeOrUnionWith(schema, Schema.Type.String):
+                    return value.AsString;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Long):
+                    return (long)value.AsNumber;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Float):
+                    return (float)value.AsNumber;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Int):
+                    return (int)value.AsNumber;
+                case JsonValueType.Number when IsTypeOrUnionWith(schema, Schema.Type.Double):
+                    return value.AsNumber;
+                case JsonValueType.Boolean when IsTypeOrUnionWith(schema, Schema.Type.Boolean):
+                    return value.AsBoolean;
+                case JsonValueType.Object when IsTypeOrUnionWith(schema, Schema.Type.Map):
                     {
                         var mapResult = new Dictionary<string, object>();
 
@@ -197,14 +197,14 @@ namespace Squidex.Extensions.Actions.Kafka
                         {
                             var map = (MapSchema)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Map);
 
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 mapResult.Add(key, GetValue(childValue, map?.ValueSchema));
                             }
                         }
                         else if (schema is MapSchema map)
                         {
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 mapResult.Add(key, GetValue(childValue, map?.ValueSchema));
                             }
@@ -213,7 +213,7 @@ namespace Squidex.Extensions.Actions.Kafka
                         return mapResult;
                     }
 
-                case JsonObject o when IsTypeOrUnionWith(schema, Schema.Type.Record):
+                case JsonValueType.Object when IsTypeOrUnionWith(schema, Schema.Type.Record):
                     {
                         GenericRecord result = null;
 
@@ -223,7 +223,7 @@ namespace Squidex.Extensions.Actions.Kafka
 
                             result = new GenericRecord(record);
 
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 if (record != null && record.TryGetField(key, out var field))
                                 {
@@ -235,7 +235,7 @@ namespace Squidex.Extensions.Actions.Kafka
                         {
                             result = new GenericRecord(record);
 
-                            foreach (var (key, childValue) in o)
+                            foreach (var (key, childValue) in value.AsObject)
                             {
                                 if (record.TryGetField(key, out var field))
                                 {
@@ -247,7 +247,7 @@ namespace Squidex.Extensions.Actions.Kafka
                         return result;
                     }
 
-                case JsonArray a when IsTypeOrUnionWith(schema, Schema.Type.Array):
+                case JsonValueType.Array when IsTypeOrUnionWith(schema, Schema.Type.Array):
                     {
                         var result = new List<object>();
 
@@ -255,14 +255,14 @@ namespace Squidex.Extensions.Actions.Kafka
                         {
                             var arraySchema = (ArraySchema)union.Schemas.FirstOrDefault(x => x.Tag == Schema.Type.Array);
 
-                            foreach (var item in a)
+                            foreach (var item in value.AsArray)
                             {
                                 result.Add(GetValue(item, arraySchema?.ItemSchema));
                             }
                         }
                         else if (schema is ArraySchema array)
                         {
-                            foreach (var item in a)
+                            foreach (var item in value.AsArray)
                             {
                                 result.Add(GetValue(item, array.ItemSchema));
                             }

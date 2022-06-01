@@ -25,13 +25,13 @@ namespace Squidex.Domain.Apps.Core.Apps
                 new Role(Role.Owner,
                     new PermissionSet(
                         WithoutPrefix(Permissions.App)),
-                    JsonValue.Object()),
+                    JsonValue2.Object()),
             [Role.Reader] =
                 new Role(Role.Reader,
                     new PermissionSet(
                         WithoutPrefix(Permissions.AppAssetsRead),
                         WithoutPrefix(Permissions.AppContentsRead)),
-                    JsonValue.Object()
+                    new JsonObject()
                         .Add("ui.api.hide", true)),
             [Role.Editor] =
                 new Role(Role.Editor,
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                         WithoutPrefix(Permissions.AppContents),
                         WithoutPrefix(Permissions.AppRolesRead),
                         WithoutPrefix(Permissions.AppWorkflowsRead)),
-                    JsonValue.Object()
+                    new JsonObject()
                         .Add("ui.api.hide", true)),
             [Role.Developer] =
                 new Role(Role.Developer,
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                         WithoutPrefix(Permissions.AppRules),
                         WithoutPrefix(Permissions.AppSchemas),
                         WithoutPrefix(Permissions.AppWorkflows)),
-                    JsonValue.Object())
+                    JsonValue2.Object())
         };
 
         public static readonly Roles Empty = new Roles(new ReadonlyDictionary<string, Role>());
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public Roles Update(string name, PermissionSet? permissions = null, JsonObject? properties = null)
+        public Roles Update(string name, PermissionSet? permissions = null, JsonValue2? properties = null)
         {
             Guard.NotNullOrEmpty(name);
 

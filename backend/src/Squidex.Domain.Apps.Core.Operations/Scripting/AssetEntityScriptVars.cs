@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
         [FieldDescription(nameof(FieldDescriptions.AssetMetadata))]
         public AssetMetadata? Metadata
         {
-            set => SetValue(value != null ? new ReadOnlyDictionary<string, IJsonValue>(value) : null);
+            set => SetValue(value != null ? new ReadOnlyDictionary<string, JsonValue2>(value) : null);
         }
 
         [FieldDescription(nameof(FieldDescriptions.AssetTags))]

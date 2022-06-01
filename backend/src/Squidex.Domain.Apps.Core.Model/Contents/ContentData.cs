@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                 {
                     foreach (var (language, value) in fieldData.ToList())
                     {
-                        if (!otherField.TryGetValue(language, out var otherValue) || otherValue == null)
+                        if (!otherField.TryGetValue(language, out var otherValue))
                         {
                             continue;
                         }

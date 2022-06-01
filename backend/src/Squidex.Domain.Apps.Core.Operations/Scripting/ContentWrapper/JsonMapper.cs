@@ -9,39 +9,41 @@ using System.Globalization;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public static class JsonMapper
     {
-        public static JsValue Map(IJsonValue? value, Engine engine)
+        public static JsValue Map(JsonValue2 value, Engine engine)
         {
-            if (value == null)
+            if (value == default)
             {
                 return JsValue.Null;
             }
 
-            switch (value)
+            switch (value.Type)
             {
-                case JsonNull:
+                case JsonValueType.Null:
                     return JsValue.Null;
-                case JsonString s:
-                    return new JsString(s.Value);
-                case JsonBoolean b:
-                    return new JsBoolean(b.Value);
-                case JsonNumber b:
-                    return new JsNumber(b.Value);
-                case JsonObject obj:
-                    return FromObject(obj, engine);
-                case JsonArray arr:
-                    return FromArray(arr, engine);
+                case JsonValueType.String:
+                    return new JsString(value.AsString);
+                case JsonValueType.Boolean:
+                    return new JsBoolean(value.AsBoolean);
+                case JsonValueType.Number:
+                    return new JsNumber(value.AsNumber);
+                case JsonValueType.Object:
+                    return FromObject(value.AsObject, engine);
+                case JsonValueType.Array:
+                    return FromArray(value.AsArray, engine);
             }
 
-            throw new ArgumentException("Invalid json type.", nameof(value));
+            ThrowInvalidType(nameof(value));
+            return default!;
         }
 
-        private static JsValue FromArray(JsonArray arr, Engine engine)
+        private static JsValue FromArray(List<JsonValue2> arr, Engine engine)
         {
             var target = new JsValue[arr.Count];
 
@@ -53,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return engine.Realm.Intrinsics.Array.Construct(target);
         }
 
-        private static JsValue FromObject(JsonObject obj, Engine engine)
+        private static JsValue FromObject(ListDictionary<string, JsonValue2> obj, Engine engine)
         {
             var target = new ObjectInstance(engine);
 
@@ -65,31 +67,31 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return target;
         }
 
-        public static IJsonValue Map(JsValue? value)
+        public static JsonValue2 Map(JsValue? value)
         {
             if (value == null || value.IsNull() || value.IsUndefined())
             {
-                return JsonValue.Null;
+                return default;
             }
 
             if (value.IsString())
             {
-                return JsonValue.Create(value.AsString());
+                return value.AsString();
             }
 
             if (value.IsBoolean())
             {
-                return JsonValue.Create(value.AsBoolean());
+                return value.AsBoolean();
             }
 
             if (value.IsDate())
             {
-                return JsonValue.Create(value.AsDate().ToString());
+                return value.AsDate().ToString();
             }
 
             if (value.IsRegExp())
             {
-                return JsonValue.Create(value.AsRegExp().Value?.ToString());
+                return value.AsRegExp().Value?.ToString();
             }
 
             if (value.IsNumber())
@@ -98,17 +100,17 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
                 if (double.IsNaN(number) || double.IsPositiveInfinity(number) || double.IsNegativeInfinity(number))
                 {
-                    return JsonValue.Zero;
+                    return 0;
                 }
 
-                return JsonValue.Create(number);
+                return number;
             }
 
             if (value.IsArray())
             {
                 var arr = value.AsArray();
 
-                var result = JsonValue.Array();
+                var result = new JsonArray((int)arr.Length);
 
                 for (var i = 0; i < arr.Length; i++)
                 {
@@ -122,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             {
                 var obj = value.AsObject();
 
-                var result = JsonValue.Object();
+                var result = new JsonObject((int)obj.Length);
 
                 foreach (var (key, propertyDescriptor) in obj.GetOwnProperties())
                 {
@@ -132,7 +134,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 return result;
             }
 
-            throw new ArgumentException("Invalid json type.", nameof(value));
+            ThrowInvalidType(nameof(value));
+            return default;
+        }
+
+        private static void ThrowInvalidType(string argument)
+        {
+            throw new ArgumentException("Invalid json type.", argument);
         }
     }
 }

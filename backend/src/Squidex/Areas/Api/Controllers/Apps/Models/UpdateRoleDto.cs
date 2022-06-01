@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Associated list of UI properties.
         /// </summary>
-        public JsonObject? Properties { get; set; }
+        public JsonValue2 Properties { get; set; }
 
         public UpdateRole ToCommand(string name)
         {

@@ -26,8 +26,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class AppDto : Resource
     {
-        private static readonly JsonObject EmptyObject = JsonValue.Object();
-
         /// <summary>
         /// The name of the app.
         /// </summary>
@@ -90,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The properties from the role.
         /// </summary>
         [LocalizedRequired]
-        public JsonObject RoleProperties { get; set; } = EmptyObject;
+        public JsonValue2 RoleProperties { get; set; }
 
         public static AppDto FromDomain(IAppEntity app, string userId, bool isFrontend, Resources resources)
         {
@@ -117,6 +115,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.Permissions = permissions.ToIds();
 
                 permissions = role.Permissions;
+            }
+            else
+            {
+                result.RoleProperties = new JsonObject();
             }
 
             if (resources.Includes(Shared.Permissions.ForApp(Shared.Permissions.AppContents, app.Name), permissions))
