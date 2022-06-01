@@ -57,6 +57,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                                     result[propertyName] = value;
                                     break;
                                 case JsonToken.EndObject:
+                                    result.TrimExcess();
+
                                     return result;
                             }
                         }
@@ -75,6 +77,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                                 case JsonToken.Comment:
                                     continue;
                                 case JsonToken.EndArray:
+                                    result.TrimExcess();
+
                                     return result;
                                 default:
                                     var value = ReadJson(reader);
