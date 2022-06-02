@@ -14,13 +14,16 @@ using GraphQL.NewtonsoftJson;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json.Newtonsoft;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Pipeline.Plugins;
 using Squidex.Web;
 using Squidex.Web.GraphQL;
@@ -76,11 +79,19 @@ namespace Squidex.Config.Web
 
             services.AddMvc(options =>
             {
+                // Never change this order here.
                 options.Filters.Add<CachingFilter>();
                 options.Filters.Add<DeferredActionFilter>();
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<SchemaResolver>();
                 options.Filters.Add<MeasureResultFilter>();
+
+                // Ingore all values that could have JsonValue somewhere.
+                options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(ContentData)));
+                options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(ContentFieldData)));
+                options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(JsonArray)));
+                options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(JsonObject)));
+                options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(JsonValue)));
             })
             .AddDataAnnotationsLocalization()
             .AddRazorRuntimeCompilation()
