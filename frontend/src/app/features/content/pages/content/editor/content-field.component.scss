@@ -5,6 +5,7 @@
     border-left-width: 4px;
     overflow-x: hidden;
     overflow-y: hidden;
+    padding-top: 1.125rem;
 }
 
 .languages {
@@ -14,7 +15,6 @@
 
     &-buttons,
     &-buttons-compare {
-        @include absolute(-.5rem, 4.25rem);
         background: $color-white;
         display: flex;
         flex-grow: 1;
@@ -27,11 +27,11 @@
     }
 
     &-buttons {
-        @include absolute(-.5rem, 4.25rem);
+        @include absolute(-.75rem, 4.25rem);
     }
 
     &-buttons-compare {
-        @include absolute(-.5rem, 0);
+        @include absolute(-.75rem, 0);
     }
 }
 
