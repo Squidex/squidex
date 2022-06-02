@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.Commands
 
             if (errorRate > errorThreshold)
             {
-                throw new InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
+                ThrowHelper.InvalidOperationException($"Error rate of {errorRate} is above threshold {errorThreshold}.");
             }
         }
 

@@ -52,7 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             if (container == null)
             {
-                throw new InvalidOperationException("Path does not lead to an object.");
+                ThrowHelper.InvalidOperationException("Path does not lead to an object.");
+                return Task.CompletedTask;
             }
 
             container[key] = value.Value;

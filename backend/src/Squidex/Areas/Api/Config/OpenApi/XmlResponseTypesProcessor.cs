@@ -10,6 +10,7 @@ using Namotion.Reflection;
 using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {
@@ -40,7 +41,8 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
                     if (description.Contains("=&gt;", StringComparison.Ordinal))
                     {
-                        throw new InvalidOperationException("Description not formatted correcly.");
+                        ThrowHelper.InvalidOperationException("Description not formatted correcly.");
+                        return default!;
                     }
 
                     response.Description = description;

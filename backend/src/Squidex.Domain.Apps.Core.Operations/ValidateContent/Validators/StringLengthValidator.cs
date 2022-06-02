@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -18,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (minLength > maxLength)
             {
-                throw new ArgumentException("Min length must be greater than max length.", nameof(minLength));
+                ThrowHelper.ArgumentException("Min length must be greater than max length.", nameof(minLength));
             }
 
             this.minLength = minLength;

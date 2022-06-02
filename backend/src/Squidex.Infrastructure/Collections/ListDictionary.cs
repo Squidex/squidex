@@ -65,7 +65,8 @@ namespace Squidex.Infrastructure.Collections
             {
                 if (!TryGetValue(key, out var result))
                 {
-                    throw new KeyNotFoundException();
+                    ThrowHelper.KeyNotFoundException();
+                    return default!;
                 }
 
                 return result;
@@ -156,7 +157,7 @@ namespace Squidex.Infrastructure.Collections
         {
             if (ContainsKey(key))
             {
-                throw new ArgumentException("Key already exists.", nameof(key));
+                ThrowHelper.ArgumentException("Key already exists.", nameof(key));
             }
 
             entries.Add(new KeyValuePair<TKey, TValue>(key, value));

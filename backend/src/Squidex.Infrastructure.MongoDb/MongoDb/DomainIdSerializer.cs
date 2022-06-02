@@ -49,7 +49,8 @@ namespace Squidex.Infrastructure.MongoDb
 
                     return DomainId.Create(binary.ToString());
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 
@@ -62,7 +63,8 @@ namespace Squidex.Infrastructure.MongoDb
         {
             if (representation != BsonType.String)
             {
-                throw new NotSupportedException();
+                ThrowHelper.NotSupportedException();
+                return default!;
             }
 
             return this;

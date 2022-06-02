@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure.States
 
                 if (@event.EventStreamNumber != newVersion)
                 {
-                    throw new InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
+                    ThrowHelper.InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
                 }
 
                 if (!isStopped)

@@ -35,7 +35,8 @@ namespace Squidex.Infrastructure.Queries.OData
                 return ClrFilter.Not(nodeIn.Operand.Accept(this));
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
 
         public override FilterNode<ClrValue> Visit(InNode nodeIn)
@@ -94,7 +95,8 @@ namespace Squidex.Infrastructure.Queries.OData
                 return ClrFilter.Contains(PropertyPathVisitor.Visit(fieldNode), value);
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
 
         public override FilterNode<ClrValue> Visit(BinaryOperatorNode nodeIn)
@@ -117,12 +119,14 @@ namespace Squidex.Infrastructure.Queries.OData
 
                     if (functionNode.Parameters.ElementAt(1) is not ConstantNode constantNode)
                     {
-                        throw new NotSupportedException();
+                        ThrowHelper.NotSupportedException();
+                        return default!;
                     }
 
                     if (constantNode.Value is not GeographyPoint geographyPoint)
                     {
-                        throw new NotSupportedException();
+                        ThrowHelper.NotSupportedException();
+                        return default!;
                     }
 
                     var property = PropertyPathVisitor.Visit(functionNode.Parameters.ElementAt(0));
@@ -192,7 +196,8 @@ namespace Squidex.Infrastructure.Queries.OData
                 }
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
     }
 }

@@ -81,7 +81,8 @@ namespace Squidex.Infrastructure.MongoDb
                         SetToken(NewtonsoftJsonToken.Float, Decimal128.ToDouble(bsonReader.ReadDecimal128()));
                         break;
                     default:
-                        throw new NotSupportedException();
+                        ThrowHelper.NotSupportedException();
+                        break;
                 }
             }
             else if (bsonReader.State == BsonReaderState.EndOfDocument)

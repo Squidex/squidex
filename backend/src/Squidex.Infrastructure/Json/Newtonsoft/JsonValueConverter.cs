@@ -92,11 +92,11 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     }
 
                 case JsonToken.Integer when reader.Value is int i:
-                    return (double)i;
+                    return i;
                 case JsonToken.Integer when reader.Value is long l:
-                    return (double)l;
+                    return l;
                 case JsonToken.Float when reader.Value is float f:
-                    return (double)f;
+                    return f;
                 case JsonToken.Float when reader.Value is double d:
                     return d;
                 case JsonToken.Boolean when reader.Value is bool b:
@@ -106,11 +106,13 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 case JsonToken.String when reader.Value is string s:
                     return s;
                 case JsonToken.Null:
+                    return default;
                 case JsonToken.Undefined:
                     return default;
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default;
         }
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)

@@ -80,7 +80,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 if (schema == null)
                 {
-                    throw new InvalidOperationException();
+                    ThrowHelper.InvalidOperationException();
+                    return;
                 }
 
                 var textQuery = new TextQuery(query.FullText, 1000)

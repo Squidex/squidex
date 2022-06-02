@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Text;
 
@@ -26,12 +27,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (minCharacters > maxCharacters)
             {
-                throw new ArgumentException("Min characters must be greater than max characters.", nameof(minCharacters));
+                ThrowHelper.ArgumentException("Min characters must be greater than max characters.", nameof(minCharacters));
             }
 
             if (minWords > maxWords)
             {
-                throw new ArgumentException("Min words must be greater than max words.", nameof(minWords));
+                ThrowHelper.ArgumentException("Min words must be greater than max words.", nameof(minWords));
             }
 
             this.transform = transform;

@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Web;
 
@@ -20,14 +21,16 @@ namespace Squidex.Areas.IdentityServer.Controllers
 
             if (login == null)
             {
-                throw new InvalidOperationException("Request from external provider cannot be handled.");
+                ThrowHelper.InvalidOperationException("Request from external provider cannot be handled.");
+                return default!;
             }
 
             var email = login.Principal.GetEmail();
 
             if (string.IsNullOrWhiteSpace(email))
             {
-                throw new InvalidOperationException("External provider does not provide email claim.");
+                ThrowHelper.InvalidOperationException("External provider does not provide email claim.");
+                return default!;
             }
 
             login.ProviderDisplayName = email;

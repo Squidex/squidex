@@ -10,6 +10,7 @@ using IdentityModel;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Server;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users
@@ -86,7 +87,8 @@ namespace Squidex.Domain.Users
 
             if (state == null)
             {
-                throw new InvalidOperationException("Cannot read key.");
+                ThrowHelper.InvalidOperationException("Cannot read key.");
+                return default!;
             }
 
             securityKey = new RsaSecurityKey(state.Parameters)

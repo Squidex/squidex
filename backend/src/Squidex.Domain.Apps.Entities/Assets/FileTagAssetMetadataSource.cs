@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             public Stream WriteStream
             {
-                get { throw new NotSupportedException(); }
+                get => throw new NotSupportedException();
             }
 
             public FileAbstraction(AssetFile file)

@@ -88,7 +88,8 @@ namespace Squidex.Infrastructure
         {
             if (!TryParse(value, out var result))
             {
-                throw new ArgumentException("Ref token cannot be null or empty.", nameof(value));
+                ThrowHelper.ArgumentException("Ref token cannot be null or empty.", nameof(value));
+                return default!;
             }
 
             return result;

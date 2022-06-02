@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure.Diagnostics
 
                 if (process.ExitCode != 0)
                 {
-                    throw new InvalidOperationException($"Failed to execute tool. Got exit code: {process.ExitCode}.");
+                    ThrowHelper.InvalidOperationException($"Failed to execute tool. Got exit code: {process.ExitCode}.");
                 }
 
                 await using (var fs = new FileStream(writtenFile, FileMode.Open))

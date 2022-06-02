@@ -527,12 +527,12 @@ namespace Squidex.Infrastructure.Json.Objects
 
         private static void ThrowInvalidType()
         {
-            throw new InvalidOperationException("Invalid type.");
+            ThrowHelper.InvalidOperationException("Invalid type.");
         }
 
         private static void ThrowArgumentException(string parameterName)
         {
-            throw new ArgumentException("Invalid type.", parameterName);
+            ThrowHelper.ArgumentException("Invalid type.", parameterName);
         }
     }
 }

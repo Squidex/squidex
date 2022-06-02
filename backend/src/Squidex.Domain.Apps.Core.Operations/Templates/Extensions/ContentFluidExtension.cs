@@ -38,9 +38,10 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
                         return new JsonArrayFluidValue(source.AsArray);
                     case JsonValueType.Object:
                         return new ObjectValue(source.AsObject);
-                    default:
-                        throw new InvalidOperationException();
                 }
+
+                ThrowHelper.InvalidOperationException();
+                return default!;
             });
 
             memberAccessStrategy.Register<JsonValue, object?>((value, name) =>

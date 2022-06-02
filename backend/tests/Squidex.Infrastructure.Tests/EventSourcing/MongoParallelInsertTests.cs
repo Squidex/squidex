@@ -131,7 +131,8 @@ namespace Squidex.Infrastructure.EventSourcing
                     }
                     else
                     {
-                        throw new NotSupportedException();
+                        ThrowHelper.NotSupportedException();
+                        return default!;
                     }
                 }
                 finally

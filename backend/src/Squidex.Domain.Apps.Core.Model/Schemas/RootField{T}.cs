@@ -47,7 +47,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (newProperties is not T typedProperties)
             {
-                throw new ArgumentException($"Properties must be of type '{typeof(T)}", nameof(newProperties));
+                ThrowHelper.ArgumentException($"Properties must be of type '{typeof(T)}", nameof(newProperties));
+                return default!;
             }
 
             return typedProperties;

@@ -29,7 +29,8 @@ namespace Squidex.Infrastructure.Queries.OData
                 return nodeIn.Left.Accept(this) + " " + nodeIn.Right.Accept(this);
             }
 
-            throw new NotSupportedException();
+            ThrowHelper.NotSupportedException();
+            return default!;
         }
 
         public override string Visit(SearchTermNode nodeIn)

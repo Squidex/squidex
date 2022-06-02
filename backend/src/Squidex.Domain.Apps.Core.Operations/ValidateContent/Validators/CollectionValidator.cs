@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -20,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (minItems != null && minItems > maxItems)
             {
-                throw new ArgumentException("Min length must be greater than max length.", nameof(minItems));
+                ThrowHelper.ArgumentException("Min length must be greater than max length.", nameof(minItems));
             }
 
             this.isRequired = isRequired;

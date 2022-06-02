@@ -33,7 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 case JsonValueType.Boolean:
                     return value.AsBoolean;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
@@ -44,7 +45,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 case JsonValueType.Array:
                     return value.AsArray.Select(x => x.AsObject).ToList();
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
@@ -55,7 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 case JsonValueType.String:
                     return value.AsString;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
@@ -66,7 +69,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 case JsonValueType.Number:
                     return value.AsNumber;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
@@ -77,7 +81,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 case JsonValueType.String:
                     return value.AsString;
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 
@@ -88,7 +93,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents
                 case JsonValueType.Array:
                     return value.AsArray.Select(x => x.ToString()).ToList();
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         });
 

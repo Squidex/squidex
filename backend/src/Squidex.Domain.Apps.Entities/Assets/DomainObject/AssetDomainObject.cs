@@ -16,6 +16,8 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
+#pragma warning disable MA0022 // Return Task.FromResult instead of returning null
+
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
 {
     public sealed partial class AssetDomainObject : DomainObject<AssetDomainObject.State>
@@ -145,7 +147,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.DomainObject
                         await DeleteCore(c, operation);
                     });
                 default:
-                    throw new NotSupportedException();
+                    ThrowHelper.NotSupportedException();
+                    return default!;
             }
         }
 
