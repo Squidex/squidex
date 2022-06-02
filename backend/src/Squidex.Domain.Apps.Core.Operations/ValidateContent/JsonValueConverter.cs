@@ -266,7 +266,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 return (null, new JsonError(T.Get("contents.invalidComponentNoObject")));
             }
 
-            var id = default(DomainId);
+            var id = DomainId.Empty;
 
             var obj = value.AsObject;
 

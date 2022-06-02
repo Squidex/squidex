@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 else if (current is JsonValue json)
                 {
-                    if (!json.TryGetValue(segment, out var temp) || temp == default)
+                    if (!json.TryGetValue(segment, out var temp) || temp == JsonValue.Null)
                     {
                         break;
                     }

@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 using Xunit;
 

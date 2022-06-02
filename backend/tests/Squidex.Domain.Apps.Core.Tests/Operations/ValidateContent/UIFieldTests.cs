@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new ContentData()
                     .AddField("myUI1", new ContentFieldData())
                     .AddField("myUI2", new ContentFieldData()
-                        .AddInvariant(default));
+                        .AddInvariant(JsonValue.Null));
 
             var dataErrors = new List<ValidationError>();
 

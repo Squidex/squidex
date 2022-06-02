@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Fluid.Values;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Templates;
 using Squidex.Domain.Apps.Core.Templates.Extensions;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Templates

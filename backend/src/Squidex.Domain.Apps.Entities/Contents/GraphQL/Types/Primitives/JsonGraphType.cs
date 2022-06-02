@@ -7,7 +7,6 @@
 
 using System.Globalization;
 using GraphQLParser.AST;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives

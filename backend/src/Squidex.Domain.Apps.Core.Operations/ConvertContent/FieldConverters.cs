@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 

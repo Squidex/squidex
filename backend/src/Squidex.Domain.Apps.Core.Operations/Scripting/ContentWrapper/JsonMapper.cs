@@ -18,11 +18,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     {
         public static JsValue Map(JsonValue value, Engine engine)
         {
-            if (value == default)
-            {
-                return JsValue.Null;
-            }
-
             switch (value.Type)
             {
                 case JsonValueType.Null:
@@ -40,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             }
 
             ThrowInvalidType(nameof(value));
-            return default!;
+            return JsValue.Null;
         }
 
         private static JsValue FromArray(List<JsonValue> arr, Engine engine)

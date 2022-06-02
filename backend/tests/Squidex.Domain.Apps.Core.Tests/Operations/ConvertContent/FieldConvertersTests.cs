@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var source =
                 new ContentFieldData()
-                    .AddLocalized("en", default)
+                    .AddLocalized("en", JsonValue.Null)
                     .AddLocalized("de", 1);
 
             var result = FieldConverters.ExcludeChangedTypes(TestUtils.DefaultSerializer)(source, field);

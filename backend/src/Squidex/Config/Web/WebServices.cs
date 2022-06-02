@@ -11,7 +11,6 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
 using GraphQL.NewtonsoftJson;
-using GraphQL.Server;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;

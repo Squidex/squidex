@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentFieldData AddInvariant(JsonValue value)
         {
-            this[key] = value;
+            this[Partitioning.Invariant.Key] = value;
 
             return this;
         }

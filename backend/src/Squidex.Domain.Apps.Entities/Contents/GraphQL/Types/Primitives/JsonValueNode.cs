@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQLParser;
 using GraphQLParser.AST;
 using Squidex.Infrastructure.Json.Objects;
 
