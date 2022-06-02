@@ -73,6 +73,8 @@ namespace Squidex.Config
 
         public bool ShowPII { get; set; }
 
+        public bool SuppressXFrameOptionsHeader { get; set; }
+
         public bool IsAdminConfigured()
         {
             return !string.IsNullOrWhiteSpace(AdminEmail) && !string.IsNullOrWhiteSpace(AdminPassword);

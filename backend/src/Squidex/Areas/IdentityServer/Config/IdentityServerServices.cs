@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
@@ -114,6 +115,13 @@ namespace Squidex.Areas.IdentityServer.Config
                     options.UseLocalServer();
                     options.UseAspNetCore();
                 });
+
+            services.Configure<AntiforgeryOptions>((services, options) =>
+            {
+                var identityOptions = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
+
+                options.SuppressXFrameOptionsHeader = identityOptions.SuppressXFrameOptionsHeader;
+            });
 
             services.Configure<OpenIddictServerOptions>((services, options) =>
             {

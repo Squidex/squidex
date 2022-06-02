@@ -43,10 +43,8 @@ namespace Squidex
             services.AddSquidexIdentityServer();
             services.AddSquidexAuthentication(config);
 
-            services.AddSquidexImageResizing(config);
-            services.AddSquidexAssetInfrastructure(config);
-            services.AddSquidexSerializers();
             services.AddSquidexApps(config);
+            services.AddSquidexAssetInfrastructure(config);
             services.AddSquidexAssets(config);
             services.AddSquidexBackups();
             services.AddSquidexCommands(config);
@@ -58,6 +56,7 @@ namespace Squidex
             services.AddSquidexGraphQL();
             services.AddSquidexHealthChecks(config);
             services.AddSquidexHistory(config);
+            services.AddSquidexImageResizing(config);
             services.AddSquidexInfrastructure(config);
             services.AddSquidexLocalization();
             services.AddSquidexMigration(config);
@@ -67,6 +66,7 @@ namespace Squidex
             services.AddSquidexRules(config);
             services.AddSquidexSchemas();
             services.AddSquidexSearch();
+            services.AddSquidexSerializers();
             services.AddSquidexStoreServices(config);
             services.AddSquidexSubscriptions(config);
             services.AddSquidexTelemetry(config);
