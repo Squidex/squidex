@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
                     else
                     {
-                        typedValue = jsonValue.RawValue;
+                        typedValue = jsonValue.Value;
 
                         var (json, error) = JsonValueConverter.ConvertValue(field, jsonValue, context.JsonSerializer, context.Components);
 

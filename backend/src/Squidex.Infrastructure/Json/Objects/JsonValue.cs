@@ -22,15 +22,13 @@ namespace Squidex.Infrastructure.Json.Objects
         public static readonly JsonValue False = new JsonValue(false);
         public static readonly JsonValue Zero = new JsonValue(0);
 
-        private readonly object? value;
-
-        public object? RawValue => value;
+        public readonly object? Value;
 
         public JsonValueType Type
         {
             get
             {
-                switch (value)
+                switch (Value)
                 {
                     case null:
                         return JsonValueType.Null;
@@ -55,7 +53,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             get
             {
-                if (value is bool typed)
+                if (Value is bool typed)
                 {
                     return typed;
                 }
@@ -69,7 +67,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             get
             {
-                if (value is double typed)
+                if (Value is double typed)
                 {
                     return typed;
                 }
@@ -83,7 +81,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             get
             {
-                if (value is string typed)
+                if (Value is string typed)
                 {
                     return typed;
                 }
@@ -97,7 +95,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             get
             {
-                if (value is JsonArray typed)
+                if (Value is JsonArray typed)
                 {
                     return typed;
                 }
@@ -111,7 +109,7 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             get
             {
-                if (value is JsonObject typed)
+                if (Value is JsonObject typed)
                 {
                     return typed;
                 }
@@ -125,27 +123,27 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             Guard.ValidNumber(value);
 
-            this.value = value;
+            this.Value = value;
         }
 
         public JsonValue(bool value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
         public JsonValue(string? value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
         public JsonValue(JsonArray? value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
         public JsonValue(JsonObject? value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
         public static JsonValue Create<T>(IReadOnlyDictionary<string, T>? values)
@@ -321,20 +319,20 @@ namespace Squidex.Infrastructure.Json.Objects
                 return false;
             }
 
-            switch (value)
+            switch (Value)
             {
                 case null:
                     return true;
                 case bool b:
-                    return b == (bool)other.value!;
+                    return b == (bool)other.Value!;
                 case double d:
-                    return d == (double)other.value!;
+                    return d == (double)other.Value!;
                 case string s:
-                    return s == (string)other.value!;
+                    return s == (string)other.Value!;
                 case JsonArray a:
-                    return a.Equals((JsonArray)other.value!);
+                    return a.Equals((JsonArray)other.Value!);
                 case JsonObject o:
-                    return o.Equals((JsonObject)other.value!);
+                    return o.Equals((JsonObject)other.Value!);
                 default:
                     ThrowInvalidType();
                     return default!;
@@ -343,7 +341,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override int GetHashCode()
         {
-            switch (value)
+            switch (Value)
             {
                 case null:
                     return 0;
@@ -365,7 +363,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override string ToString()
         {
-            switch (value)
+            switch (Value)
             {
                 case null:
                     return "null";
@@ -387,7 +385,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public string ToJsonString()
         {
-            switch (value)
+            switch (Value)
             {
                 case null:
                     return "null";
@@ -409,7 +407,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public JsonValue Clone()
         {
-            switch (value)
+            switch (Value)
             {
                 case null:
                     return this;
@@ -505,7 +503,7 @@ namespace Squidex.Infrastructure.Json.Objects
                 return false;
             }
 
-            switch (value)
+            switch (Value)
             {
                 case null:
                     return false;

@@ -58,10 +58,10 @@ namespace Squidex.Domain.Apps.Core.Templates.Extensions
                 (value, name) => value.GetOrDefault(name));
 
             memberAccessStrategy.Register<ContentFieldData, object?>(
-                (value, name) => value.GetOrDefault(name).RawValue);
+                (value, name) => value.GetOrDefault(name).Value);
 
             memberAccessStrategy.Register<JsonObject, object?>(
-                (value, name) => value.GetOrDefault(name).RawValue);
+                (value, name) => value.GetOrDefault(name).Value);
         }
     }
 }

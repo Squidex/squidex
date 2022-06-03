@@ -129,7 +129,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Null(json.RawValue);
+                Assert.Null(json.Value);
                 Assert.Equal(JsonValueType.Null, json.Type);
 
                 Assert.Throws<InvalidOperationException>(() => json.AsBoolean);
@@ -153,7 +153,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal(true, json.RawValue);
+                Assert.Equal(true, json.Value);
                 Assert.Equal(true, json.AsBoolean);
                 Assert.Equal(JsonValueType.Boolean, json.Type);
 
@@ -178,7 +178,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal(12.5, json.RawValue);
+                Assert.Equal(12.5, json.Value);
                 Assert.Equal(12.5, json.AsNumber);
                 Assert.Equal(JsonValueType.Number, json.Type);
 
@@ -203,7 +203,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal(12d, json.RawValue);
+                Assert.Equal(12d, json.Value);
                 Assert.Equal(12d, json.AsNumber);
                 Assert.Equal(JsonValueType.Number, json.Type);
 
@@ -227,7 +227,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal("text", json.RawValue);
+                Assert.Equal("text", json.Value);
                 Assert.Equal("text", json.AsString);
                 Assert.Equal(JsonValueType.String, json.Type);
 
@@ -252,7 +252,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal(instant.ToString(), json.RawValue);
+                Assert.Equal(instant.ToString(), json.Value);
                 Assert.Equal(instant.ToString(), json.AsString);
                 Assert.Equal(JsonValueType.String, json.Type);
 
@@ -279,7 +279,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal(result, json.RawValue);
+                Assert.Equal(result, json.Value);
                 Assert.Equal(result, json.AsString);
                 Assert.Equal(JsonValueType.String, json.Type);
 
@@ -310,7 +310,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal(result, json.RawValue);
+                Assert.Equal(result, json.Value);
                 Assert.Equal(result, json.AsArray);
                 Assert.Equal(JsonValueType.Array, json.Type);
 
@@ -331,7 +331,7 @@ namespace Squidex.Infrastructure.Json.Objects
                 new JsonValue(input),
                 JsonValue.Create(input),
                 JsonValue.Create((object?)input),
-                JsonValue.Create(input.ToDictionary(x => x.Key, x => x.Value.RawValue)),
+                JsonValue.Create(input.ToDictionary(x => x.Key, x => x.Value.Value)),
                 input,
             };
 
@@ -339,7 +339,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var json in jsons)
             {
-                Assert.Equal(result, json.RawValue);
+                Assert.Equal(result, json.Value);
                 Assert.Equal(result, json.AsObject);
                 Assert.Equal(JsonValueType.Object, json.Type);
 
@@ -357,7 +357,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source.RawValue, clone.RawValue);
+            Assert.Same(source.Value, clone.Value);
         }
 
         [Fact]
@@ -367,7 +367,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source.RawValue, clone.RawValue);
+            Assert.Same(source.Value, clone.Value);
         }
 
         [Fact]
@@ -377,7 +377,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source.RawValue, clone.RawValue);
+            Assert.Same(source.Value, clone.Value);
         }
 
         [Fact]
@@ -387,7 +387,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             var clone = source.Clone();
 
-            Assert.Same(source.RawValue, clone.RawValue);
+            Assert.Same(source.Value, clone.Value);
         }
 
         [Fact]
@@ -401,7 +401,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             for (var i = 0; i < source.Count; i++)
             {
-                Assert.NotSame(clone[i].RawValue, source[i].RawValue);
+                Assert.NotSame(clone[i].Value, source[i].Value);
             }
         }
 
@@ -416,7 +416,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
             foreach (var (key, value) in clone)
             {
-                Assert.NotSame(value.RawValue, source[key].RawValue);
+                Assert.NotSame(value.Value, source[key].Value);
             }
         }
 

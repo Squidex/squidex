@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             foreach (var (key, value) in clone)
             {
-                Assert.NotSame(value.RawValue, source[key].RawValue);
+                Assert.NotSame(value.Value, source[key].Value);
             }
         }
     }

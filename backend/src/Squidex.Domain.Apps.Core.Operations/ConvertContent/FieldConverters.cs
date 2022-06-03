@@ -219,7 +219,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         newData ??= new ContentFieldData(data);
                         newData.Remove(key);
                     }
-                    else if (!ReferenceEquals(newValue.Value.RawValue, value.RawValue))
+                    else if (!ReferenceEquals(newValue.Value.Value, value.Value))
                     {
                         newData ??= new ContentFieldData(data);
                         newData[key] = newValue.Value;
@@ -270,7 +270,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         result.RemoveAt(j);
                         j--;
                     }
-                    else if (!ReferenceEquals(newValue.Value.RawValue, oldValue.RawValue))
+                    else if (!ReferenceEquals(newValue.Value.Value, oldValue.Value))
                     {
                         result ??= new JsonArray(array);
                         result[j] = newValue.Value;
@@ -304,7 +304,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         result.RemoveAt(j);
                         j--;
                     }
-                    else if (!ReferenceEquals(newValue.Value.RawValue, array[i].RawValue))
+                    else if (!ReferenceEquals(newValue.Value.Value, array[i].Value))
                     {
                         result ??= new JsonArray(array);
                         result[j] = newValue.Value;
@@ -373,7 +373,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     result ??= new JsonObject(obj);
                     result.Remove(key);
                 }
-                else if (!ReferenceEquals(newValue.Value.RawValue, value.RawValue))
+                else if (!ReferenceEquals(newValue.Value.Value, value.Value))
                 {
                     result ??= new JsonObject(obj);
                     result[key] = newValue.Value;
