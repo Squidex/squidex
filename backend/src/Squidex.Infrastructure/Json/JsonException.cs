@@ -16,12 +16,12 @@ namespace Squidex.Infrastructure.Json
         {
         }
 
-        public JsonException(string message)
+        public JsonException(string? message)
             : base(message)
         {
         }
 
-        public JsonException(string message, Exception inner)
+        public JsonException(string? message, Exception? inner)
             : base(message, inner)
         {
         }

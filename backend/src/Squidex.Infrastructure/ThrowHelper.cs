@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable RECS0083 // Shows NotImplementedException throws in the quick task bar
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Infrastructure
 {
@@ -36,9 +36,9 @@ namespace Squidex.Infrastructure
             throw new InvalidCastException(message);
         }
 
-        public static void NotImplementedException(string? message = null)
+        public static void JsonException(string? message = null, Exception? ex = null)
         {
-            throw new NotImplementedException(message);
+            throw new JsonException(message, ex);
         }
 
         public static void NotSupportedException(string? message = null)

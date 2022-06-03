@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.Queries.Json
@@ -51,7 +50,8 @@ namespace Squidex.Infrastructure.Queries.Json
                 return new CompareFilter<JsonValue>(Path, Op ?? CompareOperator.Equals, Value);
             }
 
-            throw new JsonException(Errors.InvalidJsonStructure());
+            ThrowHelper.JsonException(Errors.InvalidJsonStructure());
+            return default!;
         }
     }
 }
