@@ -51,16 +51,18 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (!string.IsNullOrWhiteSpace(position))
                 {
-                    var streamPosition = position.ToPosition(true);
+                    var from = FromStream.After(position.ToPosition(true));
 
-                    subscription = await client.SubscribeToStreamAsync(streamName, streamPosition,
+                    subscription = await client.SubscribeToStreamAsync(streamName, from,
                         OnEvent, true,
                         OnError,
                         cancellationToken: ct);
                 }
                 else
                 {
-                    subscription = await client.SubscribeToStreamAsync(streamName,
+                    var from = FromStream.Start;
+
+                    subscription = await client.SubscribeToStreamAsync(streamName, from,
                         OnEvent, true,
                         OnError,
                         cancellationToken: ct);

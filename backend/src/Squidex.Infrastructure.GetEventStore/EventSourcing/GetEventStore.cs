@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             try
             {
-                await client.SoftDeleteAsync(Guid.NewGuid().ToString(), StreamState.Any, cancellationToken: ct);
+                await client.DeleteAsync(Guid.NewGuid().ToString(), StreamState.Any, cancellationToken: ct);
             }
             catch (Exception ex)
             {
@@ -142,7 +142,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 streamName,
                 start,
                 count,
-                resolveLinkTos: true,
+                true,
                 cancellationToken: ct);
 
             return result.Select(x => Formatter.Read(x, StreamPrefix, serializer));
@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNullOrEmpty(streamName);
 
-            await client.SoftDeleteAsync(GetStreamName(streamName), StreamState.Any, cancellationToken: ct);
+            await client.DeleteAsync(GetStreamName(streamName), StreamState.Any, cancellationToken: ct);
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events,
@@ -243,7 +243,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (deleted.Add(streamToDelete))
                 {
-                    await client.SoftDeleteAsync(streamToDelete, StreamState.Any, cancellationToken: ct);
+                    await client.DeleteAsync(streamToDelete, StreamState.Any, cancellationToken: ct);
                 }
             }
         }
