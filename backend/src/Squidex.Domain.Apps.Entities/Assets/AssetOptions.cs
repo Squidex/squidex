@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public bool CanCache { get; set; }
 
+        public bool OptimizeTotal { get; set; } = true;
+
         public int DefaultPageSize { get; set; } = 200;
 
         public int MaxResults { get; set; } = 200;

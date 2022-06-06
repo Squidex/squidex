@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -20,12 +21,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        private readonly MongoCountCollection countCollection;
+        private readonly MongoCountCollection? countCollection;
 
-        public MongoAssetRepository(IMongoDatabase database)
+        public MongoAssetRepository(IMongoDatabase database, IOptions<AssetOptions> options)
             : base(database)
         {
-            countCollection = new MongoCountCollection(database, $"{CollectionName()}_Count");
+            if (options.Value.OptimizeTotal)
+            {
+                countCollection = new MongoCountCollection(database, $"{CollectionName()}_Count");
+            }
         }
 
         public IMongoCollection<MongoAssetEntity> GetInternalCollection()
@@ -69,6 +73,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task RebuildCountsAsync(
             CancellationToken ct = default)
         {
+            if (countCollection == null)
+            {
+                return;
+            }
+
             var emptyId = DomainId.Create(string.Empty);
 
             var results =
@@ -160,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         }
                         else if (assetEntities.Count >= q.Query.Take || q.Query.Skip > 0)
                         {
-                            if (isDefault)
+                            if (isDefault && countCollection != null)
                             {
                                 assetTotal = await countCollection.CountAsync(appId, ct);
                             }

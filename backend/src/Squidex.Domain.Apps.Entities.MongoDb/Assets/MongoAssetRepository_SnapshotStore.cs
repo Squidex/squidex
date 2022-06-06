@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, entity, ct);
 
-                if (oldVersion == EtagVersion.Empty || entity.IsDeleted)
+                if ((oldVersion == EtagVersion.Empty || entity.IsDeleted) && countCollection != null)
                 {
                     await countCollection.UpdateAsync(entity.IndexedAppId, entity.IsDeleted, ct);
                 }
@@ -86,7 +86,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 await Collection.BulkWriteAsync(updates, BulkUnordered, ct);
 
-                await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Value.IsDeleted)), ct);
+                if (countCollection != null)
+                {
+                    await countCollection.UpdateAsync(snapshots.Select(x => (x.Value.AppId.Id, x.Value.IsDeleted)), ct);
+                }
             }
         }
 
@@ -97,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, ct);
 
-                if (entity != null && !entity.IsDeleted)
+                if (entity != null && !entity.IsDeleted && countCollection != null)
                 {
                     await countCollection.UpdateAsync(entity.IndexedAppId, true, ct);
                 }
@@ -108,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             CancellationToken ct = default
         )
         {
-            return Task.WhenAll(base.ClearAsync(ct), countCollection.ClearAsync(ct));
+            return Task.WhenAll(base.ClearAsync(ct), countCollection?.ClearAsync(ct) ?? Task.CompletedTask);
         }
 
         private static MongoAssetEntity Map(AssetDomainObject.State value)

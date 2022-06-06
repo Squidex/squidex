@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEntity>
     {
         private static readonly DomainId EmptyId = DomainId.Create(string.Empty);
-        private readonly MongoCountCollection countCollection;
+        private readonly MongoCountCollection? countCollection;
         private readonly QueryAsStream queryAsStream;
         private readonly QueryById queryBdId;
         private readonly QueryByIds queryByIds;
@@ -33,12 +34,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly string name;
         private readonly ReadPreference readPreference;
 
-        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, ReadPreference readPreference)
+        public MongoContentCollection(string name, IMongoDatabase database, IAppProvider appProvider, IOptions<ContentOptions> options, ReadPreference readPreference)
             : base(database)
         {
             this.name = name;
 
-            countCollection = new MongoCountCollection(database, $"{name}_Count");
+            if (options.Value.OptimizeTotal)
+            {
+                countCollection = new MongoCountCollection(database, $"{name}_Count");
+            }
 
             queryAsStream = new QueryAsStream();
             queryBdId = new QueryById();
@@ -222,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             await Collection.UpsertVersionedAsync(documentId, oldVersion, entity.Version, entity);
 
-            if (oldVersion == EtagVersion.Empty || entity.IsDeleted)
+            if ((oldVersion == EtagVersion.Empty || entity.IsDeleted) && countCollection != null)
             {
                 await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), entity.IsDeleted, ct);
             }
@@ -231,11 +235,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task RemoveAsync(DomainId key,
             CancellationToken ct = default)
         {
-            var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key);
+            var entity = await Collection.FindOneAndDeleteAsync(x => x.DocumentId == key, null, ct);
 
-            if (entity != null && !entity.IsDeleted)
+            if (entity != null && !entity.IsDeleted && countCollection != null)
             {
-                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), true);
+                await countCollection.UpdateAsync(DomainId.Combine(entity.IndexedAppId, entity.IndexedSchemaId), true, ct);
             }
         }
 
@@ -249,14 +253,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 return;
             }
 
-            await Collection.InsertManyAsync(entities, InsertUnordered);
+            await Collection.InsertManyAsync(entities, InsertUnordered, ct);
 
-            await countCollection.UpdateAsync(snapshots.Select(x => (DomainId.Combine(x.IndexedAppId, x.IndexedSchemaId), x.IsDeleted)));
+            if (countCollection != null)
+            {
+                await countCollection.UpdateAsync(snapshots.Select(x => (DomainId.Combine(x.IndexedAppId, x.IndexedSchemaId), x.IsDeleted)), ct);
+            }
         }
 
         public async Task RebuildCountsAsync(
             CancellationToken ct)
         {
+            if (countCollection == null)
+            {
+                return;
+            }
+
             var emptyId = DomainId.Create(string.Empty);
 
             var results =
@@ -286,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public override Task ClearAsync(
             CancellationToken ct = default)
         {
-            return Task.WhenAll(base.ClearAsync(), countCollection.ClearAsync());
+            return Task.WhenAll(base.ClearAsync(ct), countCollection?.ClearAsync(ct) ?? Task.CompletedTask);
         }
     }
 }

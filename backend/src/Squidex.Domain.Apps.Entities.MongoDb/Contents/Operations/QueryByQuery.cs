@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
     internal sealed class QueryByQuery : OperationBase
     {
         private readonly IAppProvider appProvider;
-        private readonly MongoCountCollection countCollection;
+        private readonly MongoCountCollection? countCollection;
 
         [BsonIgnoreExtraElements]
         internal sealed class IdOnly
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
             public MongoContentEntity[] Joined { get; set; }
         }
 
-        public QueryByQuery(IAppProvider appProvider, MongoCountCollection countCollection)
+        public QueryByQuery(IAppProvider appProvider, MongoCountCollection? countCollection)
         {
             this.appProvider = appProvider;
 
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations
                 }
                 else if (contentTotal >= q.Query.Take || q.Query.Skip > 0)
                 {
-                    if (isDefault && false)
+                    if (isDefault && countCollection != null)
                     {
                         contentTotal = await countCollection.CountAsync(DomainId.Combine(app.Id, schema.Id), ct);
                     }

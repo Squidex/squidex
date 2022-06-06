@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -36,12 +37,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
         public AssetsQueryFixture()
         {
+            SetupJson();
+
             mongoClient = new MongoClient(TestConfig.Configuration["mongodb:configuration"]);
             mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]);
 
-            SetupJson();
-
-            var assetRepository = new MongoAssetRepository(mongoDatabase);
+            var assetRepository = new MongoAssetRepository(mongoDatabase, Options.Create(new AssetOptions()));
 
             Task.Run(async () =>
             {
